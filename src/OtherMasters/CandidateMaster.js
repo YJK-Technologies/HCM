@@ -487,7 +487,7 @@ function CandidateMaster() {
       formData.append("email", email);
       formData.append("phone", phone);
       formData.append("applied_job_id", applied_job_id);
-      formData.append("department_id", department_id);
+      formData.append("department_id", dpt);
       formData.append(
         "company_code",
         sessionStorage.getItem("selectedCompanyCode")
