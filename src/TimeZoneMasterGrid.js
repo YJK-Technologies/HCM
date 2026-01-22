@@ -651,7 +651,7 @@ function TimeZoneGrid() {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
-                <label for="uscode" className="exp-form-labels">User Code</label>
+                <label for="uscode" className="exp-form-labels"> TimeZone ID</label>
               </div>
             </div>
 
@@ -669,7 +669,7 @@ function TimeZoneGrid() {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
-                <label for="cno" className="exp-form-labels">Company Code</label>
+                <label for="cno" className="exp-form-labels">TimeZone Name</label>
               </div>
             </div>
 
@@ -687,7 +687,7 @@ function TimeZoneGrid() {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
-                <label for="locno" className="exp-form-labels">Location No</label>
+                <label for="locno" className="exp-form-labels">UTC Offset</label>
               </div>
             </div>
 
@@ -709,7 +709,7 @@ function TimeZoneGrid() {
                   onFocus={() => setIsSelectFocused(true)}
                   onBlur={() => setIsSelectFocused(false)}
                 />
-                <label for="status" className="floating-label">Status</label>
+                <label for="status" className="floating-label">DST Flag </label>
               </div>
             </div>
 

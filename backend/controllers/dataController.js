@@ -19338,7 +19338,7 @@ const UpdateEmployeeImage = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId) // Add the EmployeeId for any further queries if needed
       .input("Photos", sql.VarBinary, Photos)
       .input("Modified_by", sql.NVarChar, Modified_by) // Assuming req.user.username is available
-      .query(`EXEC [sp_employee_personal_test]  'UI',@EmployeeId,'','','','','','','','','','','','','','','','','','',@Photos,'','','','','','','','','','','',0,0,'','','','','','',','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC [sp_employee_personal]  'UI',@EmployeeId,'','','','','','','','','','','','','','','','','','',@Photos,'','','','','','','','','','','',0,0,'','','','','','',','','','','','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       return res.status(200).json({ success: true, message: 'Image updated successfully' });
@@ -19432,7 +19432,7 @@ const UpdateEmployeeImage = async (req, res) => {
 //       .input("datetime2", sql.NVarChar, datetime2)
 //       .input("datetime3", sql.NVarChar, datetime3)
 //       .input("datetime4", sql.NVarChar, datetime4)
-//       .query(`EXEC sp_employee_personal_test @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id, @Created_by, @Modified_by, @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
+//       .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id, @Created_by, @Modified_by, @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
 //     // Return success response
 //     if (result.rowsAffected && result.rowsAffected[0] > 0) {
 //       return res.status(200).json({ success: true, message: 'Employee personal data inserted successfully' });
@@ -19449,7 +19449,7 @@ const UpdateEmployeeImage = async (req, res) => {
 
 const Employeedataupdate = async (req, res) => {
   const { EmployeeId, First_Name, Middle_Name, Last_Name, Father_Name, Mother_Name, DOB, Gender, Email, Phone1, Phone2, Address1, Address2, Address3, PermanantAddress,
-     City,  State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings, Reference_name,Spouse_Name,Blood_Group,Religion, Nationality,Title,Place_of_Birth,Reference_Phone, Pan_No, Aadhar_no, Marital_Status, Siblings, Kids, Grade_id, company_code, Modified_by
+     City,  State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings, Reference_name,Spouse_Name,Blood_Group,Religion, Nationality,Title,Place_of_Birth,Reference_Phone, Pan_No, Aadhar_no, Marital_Status, Siblings, Kids,Other_Id_No, Grade_id,Passport_No,Passport_Expiry_Date, Other_Id_Type,company_code, Modified_by
   } = req.body;
 
   let Photos = null;
@@ -19505,17 +19505,21 @@ const Employeedataupdate = async (req, res) => {
       .input("State", sql.NVarChar, State)
       .input("Country", sql.NVarChar, Country)
       .input("Postal_Code", sql.NVarChar, Postal_Code)
+      .input("Passport_No", sql.NVarChar, Passport_No)
+      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date)
+      .input("Other_Id_Type", sql.NVarChar, Other_Id_Type)
+      .input("Other_Id_No", sql.NVarChar, Other_Id_No)
       
 
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_employee_personal_test
+      .query(`EXEC sp_employee_personal
             @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name,
             @Father_Name, @Mother_Name, @DOB, @Gender,
             @Email, @Phone1, @Phone2, @Address1,
             @Address2, @Address3, @PermanantAddress,
             @Reference_Name, @Reference_Phone, @Pan_No,
             @Aadhar_no, @Photos, @Marital_Status,
-             @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,'', @Modified_by,
+             @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No,'', @Modified_by,
              null, null, null, null,
              null, null, null, null`);
     res.status(200).json("Employee personal data updated successfully");
@@ -19537,7 +19541,7 @@ const deleteemployeeper = async (req, res) => {
     const result = await pool.request()
       .input("employeeID", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC [sp_employee_personal_test]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC [sp_employee_personal]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.rowsAffected[0] > 0) {
       return res.status(200).json({ message: "Employee Personal  deleted successfully." });
     } else {
@@ -19556,7 +19560,7 @@ const getAllemployeedata = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC [sp_employee_personal_test]  'A','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',0,0,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`
+      `EXEC [sp_employee_personal]  'A','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`
       /* "exec spexpensetype"*/
     );
     res.json(result.recordset);
@@ -19618,7 +19622,7 @@ const addEmployeePersonalData = async (req, res) => {
     Grade_id,
     company_code,
     Created_by,
-    City,State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Blood_Group,Religion, Nationality,Title,Place_of_Birth,
+    City,State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Other_Id_No,Blood_Group,Other_Id_Type,Religion, Nationality,Passport_Expiry_Date,Title,Place_of_Birth,Passport_No,
     tempstr1,
     tempstr2,
     tempstr3,
@@ -19680,6 +19684,10 @@ const addEmployeePersonalData = async (req, res) => {
       .input("State", sql.NVarChar, State)
       .input("Country", sql.NVarChar, Country)
       .input("Postal_Code", sql.NVarChar, Postal_Code)
+      .input("Passport_No", sql.NVarChar, Passport_No)
+      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date)
+      .input("Other_Id_Type", sql.NVarChar, Other_Id_Type)
+      .input("Other_Id_No", sql.NVarChar, Other_Id_No)
       .input("Created_by", sql.NVarChar, Created_by)
       .input("tempstr1", sql.NVarChar, tempstr1)
       .input("tempstr2", sql.NVarChar, tempstr2)
@@ -19689,7 +19697,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_employee_personal_test @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
+      .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       res.status(200).json(result.recordset);
@@ -21506,7 +21514,7 @@ const EmployeePersonalSC = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
 
       .input("DOB", sql.NVarChar, DOB)
-      .query(`EXEC [sp_employee_personal_test]  @mode,@EmployeeId,@First_Name,'',@Last_Name,'','',@DOB,'','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(`EXEC [sp_employee_personal]  @mode,@EmployeeId,@First_Name,'',@Last_Name,'','',@DOB,'','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -28320,7 +28328,7 @@ const assetsEmployeeId = async (req, res) => {
       .input("mode", sql.NVarChar, "EI")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_personal_test  @mode,@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_personal  @mode,@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -29980,7 +29988,7 @@ const getEmployeeId = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_personal_test 'FE','','','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_personal 'FE','','','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -33904,7 +33912,7 @@ const interview_scheduleLoopDelete = async (req, res) => {
 };
 
 const interview_feedbackInsert = async (req, res) => {
-  const {schedule_id, employee_id, rating, comments, submitted_on, company_code, keyfield, created_by } = req.body;
+  const {schedule_id, employee_id, rating, comments,Recommendation, submitted_on, company_code, keyfield, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33915,10 +33923,11 @@ const interview_feedbackInsert = async (req, res) => {
       .input("rating", sql.Decimal(3,2), rating)
       .input("comments", sql.NVarChar, comments)
       .input("submitted_on", sql.DateTime, submitted_on)
+      .input("Recommendation", sql.DateTime, Recommendation)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)  
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_interview_feedback @mode,0, @schedule_id, @employee_id, @rating, @comments, @submitted_on, @company_code, @keyfield, @created_by, '', '', ''`);
+      .query(`EXEC sp_interview_feedback_test @mode,0, @schedule_id, @employee_id, @rating, @comments, @submitted_on,@Recommendation, @company_code, @keyfield, @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "interview_feedback insertd successfully" });
   } catch (err) {
@@ -33946,10 +33955,11 @@ const interview_feedbackLoopUpdate = async (req, res) => {
         .input("rating", sql.Decimal(3, 2), item.rating)
         .input("comments", sql.NVarChar, item.comments)
         .input("submitted_on", sql.DateTime, item.submitted_on)
+        .input("Recommendation", sql.DateTime, item.Recommendation)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_interview_feedback @mode, 0, @schedule_id, @employee_id, @rating, @comments, @submitted_on, @company_code, @keyfield, '', '', @modified_by, ''`);
+        .query(`EXEC sp_interview_feedback_test @mode, 0, @schedule_id, @employee_id, @rating, @comments, @submitted_on,@Recommendation, @company_code, @keyfield, '', '', @modified_by, ''`);
     }
     res.status(200).json("interview_feedback data updated successfully");
   } catch (err) {
@@ -33958,7 +33968,7 @@ const interview_feedbackLoopUpdate = async (req, res) => {
   }
 };
 
-// Auto-generated interview_feedbackLoopDelete API for sp_interview_feedback
+// Auto-generated interview_feedbackLoopDelete API for sp_interview_feedback_test
 const interview_feedbackLoopDelete = async (req, res) => {
   const interview_feedbackData = req.body.interview_feedbackData;
   if (!interview_feedbackData || !interview_feedbackData.length) {
@@ -33971,7 +33981,7 @@ const interview_feedbackLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_interview_feedback @mode, 0, 0, '', 0, '', '', '', @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_interview_feedback_test @mode, 0, 0, '', 0, '', '','', '', @keyfield, '', '', '', ''`);
     }
     res.status(200).json("interview_feedback data deleted successfully");
   } catch (err) {
@@ -34208,7 +34218,7 @@ const InterviewFeedbackSC = async (req, res) => {
       .input("rating", sql.Decimal(3,2), rating  )
       .input("comments", sql.VarChar, comments)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_feedback @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'',@company_code,'','','','',''
+      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'','',@company_code,'','','','',''
 
 `);
 
@@ -34374,7 +34384,7 @@ const Feedback_ID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "IF")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_feedback @mode,0,0,'',0,'','',@company_code,'','','','',''
+      .query(`EXEC sp_interview_feedback_test @mode,0,0,'',0,'','','',@company_code,'','','','',''
 `);
 
     if (result.recordset.length > 0) {
@@ -34421,14 +34431,14 @@ const Employee_ID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "EA")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_employee_personal_test
+      .query(`EXEC sp_employee_personal
             @mode, '', '', '', '',
             '', '', '', '',
             '', '', '', '',
             '', '','',
             '', '', '',
             '', '', '',
-             0, 0, '',@company_code,'','','','','','','','','','','','','','','','','','','',
+             0, 0, '',@company_code,'','','','','','','','','','','','','','','','','','','','','','','',
              null, null, null, null,
              null, null, null, null
 `);
@@ -34476,6 +34486,136 @@ const InterviewStatus = async (req, res) => {
     res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
+const Recommendation = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Recommendation','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+
+const TimeZonemasterInsert = async (req, res) => {
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, 
+    keyfield} = req.body;
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
+      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("keyfield", sql.NVarChar, keyfield)
+     .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code,'', '', '', '', @keyfield`);
+    if (result.rowsAffected && result.rowsAffected[0] > 0) {
+      return res.status(200).json({
+        success: true, message: 'Data inserted successfully' });
+    }
+  } catch (err) {
+    if (err.class === 16 && err.number === 50000) {
+      // Custom error from the stored procedure
+      res.status(400).json({ message: 'Timezone already exists' });
+    } else {
+      // Handle unexpected errors
+      res.status(500).json({ message: err.message || "Internal Server Error" });
+    }
+  }
+};
+
+
+const TimeZonemasterUpdate = async (req, res) => {
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, created_by, modified_by, modified_date, keyfield } = req.body;
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
+      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("modified_by", sql.NVarChar, modified_by)
+     .input("modified_date", sql.DateTime, new Date(modified_date))
+     .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, '', @modified_by, @modified_date, @keyfield`);
+    res.status(200).json({ success: true, message: "TimeZonemaster updated successfully" });
+  } catch (err) {
+    console.error("Error during TimeZonemaster update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+
+const TimeZonemasterDelete = async (req, res) => {
+  const { TimeZone_ID} = req.body;
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("modified_by", sql.NVarChar, req.headers['modified-by'])
+      .query(`EXEC Sp_Time_Zone_master 'D', @TimeZone_ID, '','','', '', '', @modified_by, '', '',''`);
+    res.status(200).json({ success: true, message: "Sp_Time_Zone_master deleted successfully" });
+  } catch (err) {
+    console.error("Error during dbo.Sp_Time _Zone_master delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+
+const getTimeZoneData = async (req, res) => {
+  try {
+    await connection.connectToDatabase();
+    const result = await sql.query(
+      "EXEC Sp_Time_Zone_master 'F', '', '','','', '', '', '', '', '',''");
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+
+const getTimeZonesearchdata = async (req, res) => {
+const { TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
+      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset,'', '','', '', '','', ''`);
+    // Send response
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+
+
 
 module.exports = {
   login,
@@ -35626,6 +35766,12 @@ module.exports = {
     Decision_ID,
     Employee_ID,
     InterviewMode,
-    InterviewStatus
+    InterviewStatus,
+    Recommendation,
+    TimeZonemasterInsert,
+    TimeZonemasterUpdate,
+    TimeZonemasterDelete,
+    getTimeZoneData,
+    getTimeZonesearchdata
 
 };

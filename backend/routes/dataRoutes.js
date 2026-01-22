@@ -1181,6 +1181,12 @@ router.post("/Decision_ID", dataController.Decision_ID)
 router.post("/Employee_ID", dataController.Employee_ID)
 router.post("/InterviewMode", dataController.InterviewMode)
 router.post("/InterviewStatus", dataController.InterviewStatus)
+router.post("/Recommendation", dataController.Recommendation)
+router.post("/TimeZonemasterInsert", dataController.TimeZonemasterInsert)
+router.post("/TimeZonemasterUpdate", dataController.TimeZonemasterUpdate)
+router.post("/TimeZonemasterDelete", dataController.TimeZonemasterDelete)
+router.get("/getTimeZoneData",dataController.getTimeZoneData)
+router.post("/getTimeZonesearchdata",dataController.getTimeZonesearchdata)
 
 
 
