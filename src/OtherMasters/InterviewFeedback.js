@@ -52,6 +52,7 @@ function InterviewFeedback({ }) {
   const [isselectedfeedback_id, setIsfeedback_id] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [feedback_idDrop, setfeedback_idDrop] = useState([]);
+  const [RecommendationDrop, setRecommendationDrop] = useState([]);
 
   const [activeTab, setActiveTab] = useState("Interview Feedback")
   const [loading, setLoading] = useState(false);
@@ -66,6 +67,12 @@ function InterviewFeedback({ }) {
     const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
     const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
     const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
+     const [selectedRecommendation, setselectedRecommendation] = useState("");
+      const [Recommendation, setRecommendation] = useState("");
+      const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
+      const [RecommendationSC, setRecommendationSC] = useState("");
+      const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
+      const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
 
   const navigate = useNavigate();
 
@@ -85,6 +92,18 @@ function InterviewFeedback({ }) {
    const filteredOptionfeedback_id = feedback_idDrop.map(option => ({
     value: option.feedback_id,
     label: option.feedback_id,
+  }));
+   const handleRecommendation = (selectedDPT) => {
+    setselectedRecommendation(selectedDPT);
+    setRecommendation(selectedDPT ? selectedDPT.value : '');
+  };
+   const handleRecommendationSC = (selectedDPT) => {
+    setselectedRecommendationSC(selectedDPT);
+    setRecommendationSC(selectedDPT ? selectedDPT.value : '');
+  };
+   const filteredOptionRecommendation = RecommendationDrop.map(option => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
   }));
 
       const handleEmployeeID = (selectedDPT) => {
@@ -137,6 +156,34 @@ function InterviewFeedback({ }) {
     
             const val = await response.json();
             setEmployeeIDdrop(val);
+          } catch (error) {
+            console.error('Error fetching departments:', error);
+          }
+        };
+    
+        if (company_code) {
+          fetchDept();
+        }
+      }, []);
+   useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+    
+        const fetchDept = async () => {
+          try {
+            const response = await fetch(`${config.apiBaseUrl}/Recommendation `, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ company_code }),
+            });
+    
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+    
+            const val = await response.json();
+            setRecommendationDrop(val);
           } catch (error) {
             console.error('Error fetching departments:', error);
           }
@@ -314,7 +361,7 @@ function InterviewFeedback({ }) {
   };
 
   const handleSave = async () => {
-    if (!scheduleid || !EmployeeID || !rating || !submitted_on) {
+    if (!scheduleid || !EmployeeID || !rating || !submitted_on || !Recommendation) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -327,6 +374,7 @@ function InterviewFeedback({ }) {
         rating: rating,
         comments: comments,
         submitted_on: submitted_on,
+        Recommendation: Recommendation,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
@@ -363,6 +411,7 @@ function InterviewFeedback({ }) {
         schedule_id: scheduleidSC,
         feedback_id: feedback_id,
         employee_id: EmployeeIDSC,
+        RecommendationSC: RecommendationSC,
         rating: Number.rating,
         comments: commentsSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -658,6 +707,29 @@ function InterviewFeedback({ }) {
             </div>
           </div>
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedRecommendation ? "has-value" : ""} 
+              ${isSelectRecommendation ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectRecommendation(true)}
+                onBlur={() => setisSelectRecommendation(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedRecommendation}
+                onChange={handleRecommendation}
+                options={filteredOptionRecommendation}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedRecommendation ? 'text-danger' : ''}`}>
+                Recommendation {showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -770,6 +842,29 @@ function InterviewFeedback({ }) {
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Employee ID
+              </label>
+            </div>
+          </div>
+           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedRecommendationSC ? "has-value" : ""} 
+              ${isSelectRecommendationSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectRecommendationSC(true)}
+                onBlur={() => setisSelectRecommendationSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedRecommendationSC}
+                onChange={handleRecommendationSC}
+                options={filteredOptionRecommendation}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Recommendation 
               </label>
             </div>
           </div>

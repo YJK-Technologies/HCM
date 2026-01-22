@@ -400,6 +400,7 @@ function InterviewDecision({ }) {
       const body = {
         candidate_id:canditatenameSC,
         job_id:JobIDSC,
+        decision_id:decision_id,
         job_id:remarksSC,
         decided_by:decided_bySC,
         status:statusSC,

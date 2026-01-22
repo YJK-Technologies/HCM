@@ -319,7 +319,7 @@ function AddTimeZoneMaster({ }) {
                 }
               />
               <label className={`floating-label ${error && !user_code ? 'text-danger' : ''}`}>
-                Country Code<span className="text-danger">*</span>
+                TimeZone ID<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -345,7 +345,7 @@ function AddTimeZoneMaster({ }) {
                 }
               />
               <label for="rid" className={`floating-label ${error && !company_no ? 'text-danger' : ''}`}>
-                Country Name<span className="text-danger">*</span>
+                TimeZone Name<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -367,7 +367,7 @@ function AddTimeZoneMaster({ }) {
                 }
                 maxLength={50}
               />
-              <label for="ordno" className="exp-form-labels">TimeZone Default</label>
+              <label for="ordno" className="exp-form-labels">UTC Offset</label>
             </div>
           </div>
           <div className="col-md-2">
@@ -397,7 +397,7 @@ function AddTimeZoneMaster({ }) {
                   }
                 }}
               />
-              <label for="ordno" className="exp-form-labels">Week Start Day</label>
+              <label for="ordno" className="exp-form-labels">DST Flag </label>
             </div>
           </div>
 
