@@ -58,6 +58,7 @@ function Input({ }) {
   const [updateButtonVisible, setUpdateButtonVisible] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [bloodGroup, setBloodGroup] = useState('');
   
 
   const [isSelectGender, setIsSelectGender] = useState(false);
@@ -1417,7 +1418,22 @@ function Input({ }) {
                 isClearable
               />
               <label htmlFor="KidS" className={`floating-label ${error && !selectedkids ? 'text-danger' : ''}`}>Kids{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="email"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={bloodGroup}
+                onChange={(e) => setBloodGroup(e.target.value)}
+                maxLength={225}
+                autoComplete="off"
+              />
+              <label htmlFor="email" className={`exp-form-labels ${error && !bloodGroup ? 'text-danger' : ''}`}>Blood Group{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
