@@ -989,7 +989,7 @@ const getsearchdata = async (req, res) => {
       .input("country", sql.NVarChar, country)
       .input("company_gst_no", sql.NVarChar, company_gst_no)
       .input("status", sql.NVarChar, status)
-      .query(` EXEC sp_company_info @mode,@company_no,@company_name,'','','','',@city,@state,@pincode,@country,@company_gst_no,@status,'','','','','','','','','','','','','','','','','','' `);
+      .query(` EXEC sp_company_info @mode,@company_no,@company_name,'','','','',@city,@state,@pincode,@country,@company_gst_no,@status,'','','','','','','','','','','','','','','','','','','','' `);
     // Send response
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -33606,7 +33606,7 @@ const interview_panelLoopDelete = async (req, res) => {
 };
 
 const job_masterInsert = async (req, res) => {
-  const {  job_title, department_id, company_code, created_by } = req.body;
+  const {  job_title, department_id, company_code, Country_Code, location, employment_type, updated_on, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33615,8 +33615,12 @@ const job_masterInsert = async (req, res) => {
       .input("job_title", sql.NVarChar, job_title)
       .input("department_id", sql.VarChar, department_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Country_Code", sql.VarChar, Country_Code)
+      .input("location", sql.VarChar, location)
+      .input("employment_type", sql.VarChar, employment_type)
+      .input("updated_on", sql.Date, updated_on)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_job_master @mode,0, @job_title, @department_id, @company_code, '', @created_by, '', '', ''`);
+      .query(`EXEC sp_job_master_test @mode,0, @job_title, @department_id, @company_code, '', @Country_Code, @location, @employment_type, @updated_on, @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "job_master insertd successfully" });
   } catch (err) {
@@ -33642,11 +33646,15 @@ const job_masterLoopInsert = async (req, res) => {
         .input("department_id", sql.VarChar, item.department_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("Country_Code", sql.VarChar, item.Country_Code)
+        .input("location", sql.VarChar, item.location)
+        .input("employment_type", sql.VarChar, item.employment_type)
+        .input("updated_on", sql.Date, item.updated_on)
         .input("created_by", sql.NVarChar, item.created_by)
         .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_job_master @mode, @job_id, @job_title, @department_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_job_master_test @mode, @job_id, @job_title, @department_id, @company_code, @keyfield, @Country_Code, @location, @employment_type, @updated_on, @created_by, @created_date, @modified_by, @modified_date`);
     }
     res.status(200).json("job_master data inserted successfully");
   } catch (err) {
@@ -33675,11 +33683,12 @@ const job_masterLoopUpdate = async (req, res) => {
         .input("department_id", sql.VarChar, item.department_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield) // optional now
+        .input("Country_Code", sql.VarChar, item.Country_Code)
+        .input("location", sql.VarChar, item.location)
+        .input("employment_type", sql.VarChar, item.employment_type)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .query(`
-          EXEC sp_job_master @mode,@job_id,@job_title,@department_id,@company_code,@keyfield,
-            '','',@modified_by,''
-        `);
+          EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,@keyfield, @Country_Code, @location, @employment_type, '', @created_by, '','',@modified_by,''`);
 
       
       updatedRows.push({
@@ -33712,7 +33721,7 @@ const job_masterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '','', ''`);
+        .query(`EXEC sp_job_master_test @mode, '', '', '', '', @keyfield, '', '', '', '', '', '','', ''`);
     }
     res.status(200).json("job_master data deleted successfully");
   } catch (err) {
@@ -34097,7 +34106,7 @@ const CandidateSearch = async (req, res) => {
   }
 };
 const JobmasterSearch = async (req, res) => {
-  const { job_title,job_id ,department_id, company_code } = req.body;
+  const { job_title,job_id ,department_id, company_code, Country_Code, location, employment_type, updated_on } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -34108,7 +34117,11 @@ const JobmasterSearch = async (req, res) => {
       .input("job_id", sql.Int, job_id  )
       .input("department_id", sql.VarChar, department_id )
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_job_master @mode,@job_id,@job_title,@department_id,@company_code,'','','','',''
+      .input("Country_Code", sql.VarChar, Country_Code)
+      .input("location", sql.VarChar, location)
+      .input("employment_type", sql.VarChar, employment_type)
+      .input("updated_on", sql.Date, updated_on ? updated_on : null)
+      .query(`EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,'',@Country_Code, @location, @employment_type, @updated_on,'','','',''
  `);
 
     if (result.recordset.length > 0) {
@@ -34296,7 +34309,7 @@ const JobMaster = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SA")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_job_master @mode,0,'',0,@company_code,'','','','',''
+      .query(`EXEC sp_job_master_test @mode,0,'',0,@company_code,'','','','','','','','',''
 `);
 
     if (result.recordset.length > 0) {
