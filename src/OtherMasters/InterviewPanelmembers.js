@@ -50,9 +50,9 @@ function InterviewPanelMem({ }) {
   const [PanelDrop, setPanelDrop] = useState([]);
   const [isSelectPanelID, setIsisSelectPanelID] = useState(false);
   const [isSelectPanelSC, setisSelectPanelSC] = useState(false);
-  const [selectedEmployeeID, setselectedEmployeeID] = useState("");
+  const [selectedEmployeeID, setselectedEmployeeID] = useState([]);
   const [EmployeeID, setEmployeeID] = useState("");
-  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
+  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState([]);
   const [EmployeeIDSC, setEmployeeIDSC] = useState("");
   const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
   const [showAsterisk, setShowAsterisk] = useState(true);
@@ -76,12 +76,18 @@ function InterviewPanelMem({ }) {
   };
 
 
-     const handleEmployeeID = (selectedDPT) => {
-    setselectedEmployeeID(selectedDPT);
-    setEmployeeID(selectedDPT ? selectedDPT.value : '');
-  };
+   const handleEmployeeID = (selectedDPT) => {
+  setselectedEmployeeID(selectedDPT || []);
+
+  const employeeIds = selectedDPT
+    ? selectedDPT.map(emp => emp.value).join(",")
+    : "";
+
+  setEmployeeID(employeeIds);
+};
+
      const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT);
+    setselectedEmployeeIDSC(selectedDPT||[]);
     setEmployeeIDSC(selectedDPT ? selectedDPT.value : '');
   };
 
@@ -558,29 +564,45 @@ function InterviewPanelMem({ }) {
               </label>
             </div>
           </div>
-         <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${selectedEmployeeID ? "has-value" : ""} 
-              ${isSelectEmployeeID ? "is-focused" : ""}`}
-            >
-              <Select
-                id="department"
-                placeholder=" "
-                onFocus={() => setisSelectEmployeeID(true)}
-                onBlur={() => setisSelectEmployeeID(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                value={selectedEmployeeID}
-                onChange={handleEmployeeID}
-                options={filteredOptionEmployeeID}
-              />
-              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedEmployeeID ? 'text-danger' : ''}`}>
-                Employee ID{showAsterisk && <span className="text-danger">*</span>}
-              </label>
-            </div>
-          </div>
+         <div
+  className={`employee-col ${
+    selectedEmployeeID?.length > 0 ? "expanded" : ""
+  }`}
+>
+  <div
+    className={`inputGroup selectGroup 
+    ${selectedEmployeeID?.length > 0 ? "has-value" : ""} 
+    ${isSelectEmployeeID ? "is-focused" : ""}`}
+  >
+    <Select
+      id="employee"
+      isMulti
+      isClearable
+      placeholder=" "
+      value={selectedEmployeeID}
+      onChange={handleEmployeeID}
+      onFocus={() => setisSelectEmployeeID(true)}
+      onBlur={() => setisSelectEmployeeID(false)}
+      options={filteredOptionEmployeeID}
+      classNamePrefix="react-select"
+      styles={{
+        container: (base) => ({
+          ...base,
+          width: "100%",
+        }),
+      }}
+    />
+
+    <label
+      className={`floating-label ${
+        error && !selectedEmployeeID?.length ? "text-danger" : ""
+      }`}
+    >
+      Employee ID{showAsterisk && <span className="text-danger">*</span>}
+    </label>
+  </div>
+</div>
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -592,6 +614,7 @@ function InterviewPanelMem({ }) {
                 required
                 autoComplete="off"
                 value={Role}
+                maxLength={50}
                 onChange={(e) => setRole((e.target.value))}
               />
               <label for="add1" className={`exp-form-labels ${error && !Role ? 'text-danger' : ''}`}>Role<span className="text-danger">*</span></label>
@@ -652,18 +675,41 @@ function InterviewPanelMem({ }) {
               ${selectedEmployeeIDSC ? "has-value" : ""} 
               ${isSelectEmployeeIDSC ? "is-focused" : ""}`}
             >
-              <Select
-                id="department"
-                placeholder=" "
-                onFocus={() => setisSelectEmployeeIDSC(true)}
-                onBlur={() => setisSelectEmployeeIDSC(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                value={selectedEmployeeIDSC}
-                onChange={handleEmployeeIDSC}
-                options={filteredOptionEmployeeID}
-              />
+           <Select
+  id="employee"
+  placeholder=" "
+  isMulti
+  classNamePrefix="react-select"
+  isClearable
+  value={selectedEmployeeIDSC}
+  onChange={handleEmployeeIDSC}
+  options={filteredOptionEmployeeID}
+  styles={{
+    control: (base) => ({
+      ...base,
+      minHeight: "42px",
+      height: "auto",
+      alignItems: "flex-start",
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      flexWrap: "wrap",          // allow wrapping
+      alignItems: "flex-start",
+      padding: "6px",
+    }),
+    multiValue: (base) => ({
+      ...base,
+      maxWidth: "100%",
+    }),
+    multiValueLabel: (base) => ({
+      ...base,
+      whiteSpace: "normal",      // 👈 show full text
+      overflow: "visible",
+      textOverflow: "unset",
+    }),
+  }}
+/>
+
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Employee ID
               </label>
