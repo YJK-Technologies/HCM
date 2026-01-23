@@ -77,6 +77,9 @@ function InterviewSchedule({ }) {
   const [selectedInterviewModeSC, setselectedInterviewModeSC] = useState("");
   const [InterviewModeSC, setInterviewModeSC] = useState("");
   const [isSelectInterviewModeSC, setisSelectInterviewModeSC] = useState(false);
+   const [statusgriddrop, setStatusGriddrop] = useState([]);
+   const [Paneldrop, setPaneldrop] = useState([]);
+   const [candidatedrop, setcandidatedrop] = useState([]);
 
 
 
@@ -109,6 +112,56 @@ function InterviewSchedule({ }) {
     label: option.attributedetails_name
   }));
 
+ useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+ useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.panel_id);
+        setPaneldrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+ useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/CanditateID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.candidate_id);
+        setcandidatedrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -334,17 +387,25 @@ function InterviewSchedule({ }) {
     {
       headerName: "Schedule ID",
       field: "schedule_id",
-      editable: true
+     editable: false,
     },
     {
-      headerName: "Candidate_id ID",
+      headerName: "Candidate ID",
       field: "candidate_id",
+      cellEditor: "agSelectCellEditor",
+       cellEditorParams: {
+        values: candidatedrop,
+      },
       editable: true
     },
     {
       headerName: "Panel ID",
       field: "panel_id",
-      editable: false
+      editable: true,
+       cellEditor: "agSelectCellEditor",
+       cellEditorParams: {
+        values: Paneldrop,
+      },
     },
     {
       headerName: "Schedule Date",
@@ -386,6 +447,11 @@ function InterviewSchedule({ }) {
     {
       headerName: "Status",
       field: "Status",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+       cellEditorParams: {
+        values: statusgriddrop,
+      },
       editable: true
     },
     {
@@ -737,6 +803,22 @@ function InterviewSchedule({ }) {
               <label for="add1" className={`exp-form-labels ${error && !scheduled_datetime ? 'text-danger' : ''}`}>Schedule Date<span className="text-danger">*</span></label>
             </div>
           </div>
+           <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="time"
+                placeholder=""
+                title="Please Enter the Company Contribution"
+                required
+                autoComplete="off"
+                value={timezone}
+                onChange={(e) => settimezone((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !timezone ? 'text-danger' : ''}`}>Time Zone<span className="text-danger">*</span></label>
+            </div>
+          </div>
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -789,25 +871,10 @@ function InterviewSchedule({ }) {
                 value={meeting_link}
                 onChange={(e) => setmeeting_link((e.target.value))}
               />
-              <label for="sname" className={`exp-form-labels ${error && !meeting_link ? 'text-danger' : ''}`}>Meeting Link<span className="text-danger">*</span></label>
+              <label for="sname" className={`exp-form-labels`}>Meeting Link</label>
             </div>
           </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="time"
-                placeholder=""
-                title="Please Enter the Company Contribution"
-                required
-                autoComplete="off"
-                value={timezone}
-                onChange={(e) => settimezone((e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !timezone ? 'text-danger' : ''}`}>Time Zone<span className="text-danger">*</span></label>
-            </div>
-          </div>
+         
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -925,8 +992,8 @@ function InterviewSchedule({ }) {
                 onChange={handleInterviewModeSC}
                 options={filteredOptionInterviewMode}
               />
-              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedInterviewModeSC ? 'text-danger' : ''}`}>
-                Interview Mode{showAsterisk && <span className="text-danger">*</span>}
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Interview Mode
               </label>
             </div>
           </div>

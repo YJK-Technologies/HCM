@@ -336,6 +336,23 @@
   padding-left: 10px;
 }
 
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.employee-col {
+  flex: 0 0 220px;          /* default width */
+  max-width: 220px;
+  transition: all 0.3s ease;
+}
+
+.employee-col.expanded {
+  flex: 1 1 600px;          /* grows only after selection */
+  max-width: 600px;
+}
+
+
+
 /* Ensure the value container (where text is) centers properly */
 .selectGroup .react-select__value-container {
   height: 30px;
