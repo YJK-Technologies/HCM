@@ -35740,7 +35740,6 @@ module.exports = {
     candidate_masterLoopDelete,
     candidate_masterInsert,
     interview_panelInsert,
-    interview_panelUpdate,
     interview_panelLoopUpdate,
     interview_panelLoopDelete,
     job_masterInsert,
