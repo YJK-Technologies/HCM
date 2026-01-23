@@ -19622,7 +19622,7 @@ const addEmployeePersonalData = async (req, res) => {
     Grade_id,
     company_code,
     Created_by,
-    City,State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Other_Id_No,Blood_Group,Other_Id_Type,Religion, Nationality,Passport_Expiry_Date,Title,Place_of_Birth,Passport_No,
+    City, State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Other_Id_No,Blood_Group,Other_Id_Type,Religion, Nationality,Passport_Expiry_Date,Title,Place_of_Birth,Passport_No,
     tempstr1,
     tempstr2,
     tempstr3,
@@ -19697,7 +19697,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
+      .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       res.status(200).json(result.recordset);
@@ -19705,7 +19705,7 @@ const addEmployeePersonalData = async (req, res) => {
       res.status(404).json(err.message);
     }
   } catch (error) {
-
+    console.log(error.message)
     return res.status(500).json({ message: error.message || "Internal Server Error" });
 
   }
@@ -34614,7 +34614,56 @@ const { TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
   }
 };
 
+const getTitle = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Title','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
 
+const getReligion = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Religion','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getNationality = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Nationality','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
 
 
 module.exports = {
@@ -35772,6 +35821,9 @@ module.exports = {
     TimeZonemasterUpdate,
     TimeZonemasterDelete,
     getTimeZoneData,
-    getTimeZonesearchdata
+    getTimeZonesearchdata,
+    getTitle,
+    getReligion,
+    getNationality
 
 };

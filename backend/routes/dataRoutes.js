@@ -1187,6 +1187,9 @@ router.post("/TimeZonemasterUpdate", dataController.TimeZonemasterUpdate)
 router.post("/TimeZonemasterDelete", dataController.TimeZonemasterDelete)
 router.get("/getTimeZoneData",dataController.getTimeZoneData)
 router.post("/getTimeZonesearchdata",dataController.getTimeZonesearchdata)
+router.post("/getTitle",dataController.getTitle)
+router.post("/getReligion",dataController.getReligion)
+router.post("/getNationality",dataController.getNationality)
 
 
 
