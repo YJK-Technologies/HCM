@@ -16,14 +16,24 @@ function JobMaster({ }) {
 
   const [rowData, setRowData] = useState([]);
 
-  const [job_title, setjob_title] = useState("");
   const [job_titleSC, setjob_titleSC] = useState("");
+  const [job_title, setjob_title] = useState("");
+  const [Country_Code, setCountry_Code] = useState("");
+  const [location, setlocation] = useState("");
+  const [employment_type, setemployment_type] = useState("");
+  const [updated_on, setupdated_on] = useState("");
+  const [Country_CodeSC, setCountry_CodeSC] = useState("");
+  const [locationSC, setlocationSC] = useState("");
+  const [employment_typeSC, setemployment_typeSC] = useState("");
+  const [updated_onSC, setupdated_onSC] = useState("");
   const [department_idSC, setdepartment_idSC] = useState("");
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("Job Master")
   const [loading, setLoading] = useState(false);
    const [isSelectDepartment, setIsSelectDepartment] = useState(false);
    const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
+const [departmentList, setDepartmentList] = useState([]);
+const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     const [selecteddpt, setselecteddept] = useState("");
     const [DPTdrop, setDPTdrop] = useState([]);
     const [dpt, setdpt] = useState("");
@@ -81,6 +91,23 @@ function JobMaster({ }) {
         }
       }, []);
 
+      useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+      
+        fetch(`${config.apiBaseUrl}/department`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        })
+          .then((response) => response.json())
+          .then((val) => setDPTdrop(val))
+          .catch((error) =>
+            console.error("Error fetching department data:", error)
+          );
+      }, []);
+      
 
   const columnDefs = [
     {
@@ -128,8 +155,30 @@ function JobMaster({ }) {
       editable: true
     },
     {
-      headerName: "Department ID",
+      headerName: "Department",
       field: "department_id",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: DPTdrop
+      }
+    },
+    {
+      headerName: "Country Code",
+      field: "Country_Code",
+      editable: true
+    },{
+      headerName: "Location",
+      field: "location",
+      editable: true
+    },{
+      headerName: "Employment Type",
+      field: "employment_type",
+      editable: true
+    },{
+      headerName: "Updated On",
+      field: "updated_on",
       editable: true
     },
     {
@@ -147,7 +196,13 @@ function JobMaster({ }) {
   };
 
   const handleSave = async () => {
-    if (!dpt || !job_title) {
+    if (!dpt ||
+       !job_title ||
+       !Country_Code ||
+       !location ||
+       !employment_type ||
+       !updated_on
+      ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -157,6 +212,10 @@ function JobMaster({ }) {
       const Header = {
         department_id: dpt,
         job_title: job_title,
+        Country_Code: Country_Code,
+        location: location,
+        employment_type: employment_type,
+        updated_on: updated_on,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
@@ -191,8 +250,12 @@ function JobMaster({ }) {
     setLoading(true);
     try {
       const body = {
-        job_title: job_titleSC,
-        department_id: dptSC,
+        job_title:       job_titleSC,
+        department_id:   dptSC,
+        Country_Code:    Country_CodeSC,
+        location:        locationSC,
+        employment_type: employment_typeSC,
+        updated_on: updated_onSC || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -210,6 +273,11 @@ function JobMaster({ }) {
           job_title: matchedItem.job_title,
           job_id: matchedItem.job_id,
           department_id: matchedItem.department_id,
+          dept_name: matchedItem.dept_name,
+          Country_Code: matchedItem.Country_Code,
+          employment_type: matchedItem.employment_type,
+          location: matchedItem.location,
+          updated_on: matchedItem.updated_on,
           keyfield: matchedItem.keyfield,
         }));
         setRowData(newRows);
@@ -463,6 +531,71 @@ function JobMaster({ }) {
             </div>
           </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={Country_Code}
+                onChange={(e) => setCountry_Code((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={location}
+                onChange={(e) => setlocation((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={employment_type}
+                onChange={(e) => setemployment_type((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !employment_type ? 'text-danger' : ''}`}>Employment Type<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={updated_on}
+                onChange={(e) => setupdated_on((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !updated_on ? 'text-danger' : ''}`}>Updated On<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+
 
         </div>
       </div>
@@ -512,8 +645,75 @@ function JobMaster({ }) {
             <label htmlFor="selecteddpt" className={`floating-label`}>
               Department ID
             </label>
+           </div>
+          </div>
+
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={Country_CodeSC}
+                onChange={(e) => setCountry_CodeSC((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels`}>Country Code</label>
             </div>
           </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={locationSC}
+                onChange={(e) => setlocationSC((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels`}>Location</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={employment_typeSC}
+                onChange={(e) => setemployment_typeSC((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels`}>Employment Type</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={updated_onSC}
+                onChange={(e) => setupdated_onSC((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels`}>Updated On</label>
+            </div>
+          </div>
+
+
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
