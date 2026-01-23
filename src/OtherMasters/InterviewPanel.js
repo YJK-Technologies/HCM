@@ -69,6 +69,8 @@ function InterviewPanel({ }) {
   const [activeTab, setActiveTab] = useState("Interview Panel")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
+   const [statusgriddrop, setStatusGriddrop] = useState([]);
+   const [Dptdrop, setDptdrop] = useState([]);
 
   const navigate = useNavigate();
 
@@ -110,6 +112,48 @@ function InterviewPanel({ }) {
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
+
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+useEffect(() => {
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+  fetch(`${config.apiBaseUrl}/DeptID`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ company_code }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Merge dept_id and dept_name
+      const deptOptions = data.map((option) => ({
+        value: option.dept_id,
+        label: `${option.dept_id} - ${option.dept_name}`,
+      }));
+
+      setDptdrop(deptOptions);
+    })
+    .catch((error) => console.error("Error fetching data:", error));
+}, []);
+
 
 
   useEffect(() => {
@@ -255,11 +299,25 @@ function InterviewPanel({ }) {
     {
       headerName: "Department ID",
       field: "department_id",
-      editable: true
+      width: 250, 
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+  values: Dptdrop.map(d => d.value),
+},
+valueFormatter: (params) => {
+  const dept = Dptdrop.find(d => d.value === params.value);
+  return dept ? dept.label : params.value;
+},
+
     },
     {
       headerName: "Status",
-      field: "STATUS",
+      cellEditor: "agSelectCellEditor",
+      field: "Status",
+      cellEditorParams: {
+        values: statusgriddrop,
+      },
       editable: true
     },
     {
@@ -325,7 +383,7 @@ function InterviewPanel({ }) {
         panel_name: panel_nameSC,
         job_id: JobIDSC,
         department_id: dptSC,
-        status: statusSC,
+        Status: statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -343,7 +401,7 @@ function InterviewPanel({ }) {
           panel_name: matchedItem.panel_name,
           job_id: matchedItem.job_id,
           department_id: matchedItem.department_id,
-          STATUS: matchedItem.STATUS,
+          Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
         }));
         setRowData(newRows);
@@ -620,7 +678,9 @@ function InterviewPanel({ }) {
                 onFocus={() => setIsSelectFocused(true)}
                 onBlur={() => setIsSelectFocused(false)}
               />
-              <label for="status" class="floating-label">Status</label>
+              <label for="status" class={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>Status{showAsterisk && <span className="text-danger">*</span>}
+
+              </label>
             </div>
           </div>
         </div>

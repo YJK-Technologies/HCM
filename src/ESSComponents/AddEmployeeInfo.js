@@ -58,12 +58,56 @@ function Input({ }) {
   const [updateButtonVisible, setUpdateButtonVisible] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [loading, setLoading] = useState(false);
-  
+  const [placeOfBirth, setPlaceOfBirth] = useState('');
+  const [bloodGroup, setBloodGroup] = useState('');
+  const [spouseName, setSpouseName] = useState('');
+  const [noOfChildren, setNoOfChildren] = useState('');
+  const [noOfSiblings, setNoOfSiblings] = useState('');
+  const [businessEmail, setBusinessEmail] = useState('');
+  const [emergencyContactName, setEmergencyContactName] = useState('');
+  const [emergencyContactRelation, setEmergencyContactRelation] = useState('');
+  const [selectedEmergencyContactRelation, setSelectedEmergencyContactRelation] = useState('')
+  const [emergencyContactRelationDrop, setEmergencyContactRelationDrop] = useState([]);
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [cityDrop, setCityDrop] = useState([]);
+  const [title, setTitle] = useState('');
+  const [selectedTitle, setSelectedTitle] = useState('');
+  const [titleDrop, setTitleDrop] = useState([]);
+  const [nationality, setNationality] = useState('');
+  const [selectedNationality, setSelectedNationality] = useState('');
+  const [nationalityDrop, setNationalityDrop] = useState([]);
+  const [religion, setReligion] = useState('');
+  const [selectedReligion, setSelectedReligion] = useState('');
+  const [religionDrop, setReligionDrop] = useState([]);
+  const [state, setState] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [stateDrop, setStateDrop] = useState([]);
+  const [country, setCountry] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [countryDrop, setCountryDrop] = useState([]);
+  const [postalCode, setPostalCode] = useState('');
+  const [passportNo, setPassportNo] = useState('');
+  const [passportExpiryDate, setPassportExpiryDate] = useState('');
+  const [otherIdType, setOtherIdType] = useState('');
+  const [selectedOtherIdType, setSelectedOtherIdType] = useState('');
+  const [otherDrop, setOtherDrop] = useState([]);
+  const [otherIdNo, setOtherIdNo] = useState('');
+
 
   const [isSelectGender, setIsSelectGender] = useState(false);
   const [isSelectGrade, setIsSelectGrade] = useState(false);
   const [isSelectKids, setIsSelectKids] = useState(false);
+  const [isSelectTitle, setIsSelectTitle] = useState(false);
+  const [isSelectReligion, setIsSelectReligion] = useState(false);
+  const [isSelectNationality, setIsSelectNationality] = useState(false);
+  const [isSelectRelation, setIsSelectRelation] = useState(false);
   const [isSelectMarital, setIsSelectMarital] = useState(false);
+  const [isSelectCity, setIsSelectCity] = useState(false);
+  const [isSelectState, setIsSelectState] = useState(false);
+  const [isSelectCountry, setIsSelectCountry] = useState(false);
+  const [isSelectOtherType, setIsSelectOtherType] = useState(false);
   const logo = useRef(null)
 
   //code added by Pavun purpose of set user permisssion
@@ -91,7 +135,19 @@ function Input({ }) {
       !Aadhaar_no ||
       !selectedmartial ||
       !kids ||
-      !Grade_id
+      !Grade_id ||
+      !title ||
+      !placeOfBirth ||
+      !nationality ||
+      !religion ||
+      !bloodGroup ||
+      !emergencyContactName ||
+      !emergencyContactPhone ||
+      !emergencyContactRelation ||
+      !city ||
+      !state ||
+      !country ||
+      !postalCode
     ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
@@ -103,6 +159,13 @@ function Input({ }) {
       setError("Please enter a valid email address");
       return;
     }
+
+    if (!validateEmail(businessEmail)) {
+      toast.warning("Please enter a valid email address")
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
     try {
       const formData = new FormData();
@@ -128,6 +191,26 @@ function Input({ }) {
       formData.append("Marital_Status", selectedmartial);
       formData.append("Kids", selectedkids);
       formData.append("Grade_id", selectedgradeid);
+      formData.append("City", city);
+      formData.append("State", state);
+      formData.append("Country", country);
+      formData.append("Postal_Code", postalCode);
+      formData.append("Emergency_Contact_Phone", emergencyContactPhone);
+      formData.append("Emergency_Contact_Relationship", emergencyContactRelation);
+      formData.append("Emergency_Contact_Name", emergencyContactName);
+      formData.append("Email_Business", businessEmail);
+      formData.append("Number_of_Children", noOfChildren);
+      formData.append("Number_of_Siblings", noOfSiblings);
+      formData.append("Spouse_Name", spouseName);
+      formData.append("Other_Id_No", otherIdNo);
+      formData.append("Blood_Group", bloodGroup);
+      formData.append("Other_Id_Type", otherIdType);
+      formData.append("Religion", religion);
+      formData.append("Nationality", nationality);
+      formData.append("Passport_Expiry_Date", passportExpiryDate);
+      formData.append("Title", title);
+      formData.append("Place_of_Birth", placeOfBirth);
+      formData.append("Passport_No", passportNo);
       formData.append("Created_by", sessionStorage.getItem("selectedUserCode"));
       formData.append("company_code", sessionStorage.getItem('selectedCompanyCode'));
       if (user_images) {
@@ -156,7 +239,7 @@ function Input({ }) {
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };;
@@ -187,13 +270,32 @@ function Input({ }) {
       !Aadhaar_no ||
       !marital_Status ||
       !kids ||
-      !Grade_id
+      !Grade_id ||
+      !title ||
+      !placeOfBirth ||
+      !nationality ||
+      !religion ||
+      !bloodGroup ||
+      !emergencyContactName ||
+      !emergencyContactPhone ||
+      !emergencyContactRelation ||
+      !city ||
+      !state ||
+      !country ||
+      !postalCode
     ) {
       setError(" ");
+      toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!validateEmail(Email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!validateEmail(businessEmail)) {
+      toast.warning("Please enter a valid email address")
       setError("Please enter a valid email address");
       return;
     }
@@ -210,7 +312,7 @@ function Input({ }) {
           formData.append("Father_Name", Father_Name);
           formData.append("Mother_Name", Mother_Name);
           formData.append("DOB", DOB);
-          formData.append("Gender", selectedGender ? selectedGender : '');
+          formData.append("Gender", selectedGender);
           formData.append("Email", Email);
           formData.append("Phone1", Phone1);
           formData.append("Phone2", Phone2);
@@ -222,9 +324,29 @@ function Input({ }) {
           formData.append("Reference_Phone", reference_Phone);
           formData.append("Pan_No", pan_No);
           formData.append("Aadhar_no", Aadhaar_no);
-          formData.append("Marital_Status", marital_Status ? marital_Status.value : '');
+          formData.append("Marital_Status", selectedmartial);
           formData.append("Kids", selectedkids);
           formData.append("Grade_id", selectedgradeid);
+          formData.append("City", city);
+          formData.append("State",  state);
+          formData.append("Country", country);
+          formData.append("Postal_Code", postalCode);
+          formData.append("Emergency_Contact_Phone", emergencyContactPhone);
+          formData.append("Emergency_Contact_Relationship", emergencyContactRelation);
+          formData.append("Emergency_Contact_Name", emergencyContactName);
+          formData.append("Email_Business", businessEmail);
+          formData.append("Number_of_Children", noOfChildren);
+          formData.append("Number_of_Siblings", noOfSiblings);
+          formData.append("Spouse_Name", spouseName);
+          formData.append("Other_Id_No", otherIdNo);
+          formData.append("Blood_Group", bloodGroup);
+          formData.append("Other_Id_Type", otherIdType);
+          formData.append("Religion", religion);
+          formData.append("Nationality", nationality);
+          formData.append("Passport_Expiry_Date", passportExpiryDate);
+          formData.append("Title", title);
+          formData.append("Place_of_Birth", placeOfBirth);
+          formData.append("Passport_No", passportNo);
           formData.append("company_code", sessionStorage.getItem('selectedCompanyCode'));
           formData.append("modified_by", sessionStorage.getItem('selectedUserCode'));
 
@@ -417,6 +539,74 @@ function Input({ }) {
       .then((val) => setKidsDrop(val));
   }, []);
 
+  const handleChangeTitle = (selectedTitle) => {
+    setSelectedTitle(selectedTitle);
+    setTitle(selectedTitle ? selectedTitle.value : '');
+  };
+
+  const filteredOptionTitle = titleDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getTitle`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setTitleDrop(val));
+  }, []);
+
+  const handleChangeNationality = (selectedNationality) => {
+    setSelectedNationality(selectedNationality);
+    setNationality(selectedNationality ? selectedNationality.value : '');
+  };
+
+  const filteredOptionNationality = nationalityDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getNationality`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setNationalityDrop(val));
+  }, []);
+
+  const handleChangeReligion = (selectedReligion) => {
+    setSelectedReligion(selectedReligion);
+    setReligion(selectedReligion ? selectedReligion.value : '');
+  };
+
+  const filteredOptionReligion = religionDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getReligion`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setReligionDrop(val));
+  }, []);
 
   const handlemartial = (martilalselected) => {
     setMarital_Status(martilalselected);
@@ -434,11 +624,130 @@ function Input({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
       .then((val) => setMarital_StatusDrop(val));
+  }, []);
+
+  const handleChangeRelation = (selectedEmergencyContactRelation) => {
+    setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
+    setEmergencyContactRelation(selectedEmergencyContactRelation ? selectedEmergencyContactRelation.value : '');
+  };
+
+  const filteredOptionRelation = emergencyContactRelationDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getrelation`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmergencyContactRelationDrop(val));
+  }, []);
+
+  const handleChangeCity = (selectedCity) => {
+    setSelectedCity(selectedCity);
+    setCity(selectedCity ? selectedCity.value : '');
+  };
+
+  const filteredOptionCity = cityDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/city`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCityDrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const handleChangeCountry = (selectedCountry) => {
+    setSelectedCountry(selectedCountry);
+    setCountry(selectedCountry ? selectedCountry.value : '');
+  };
+
+  const filteredOptionCountry = countryDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/country`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountryDrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const handleChangeState = (selectedState) => {
+    setSelectedState(selectedState);
+    setState(selectedState ? selectedState.value : '');
+  };
+
+  const filteredOptionState = stateDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/state`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setStateDrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const handleChangeOtherType = (selectedOtherIdType) => {
+    setSelectedOtherIdType(selectedOtherIdType);
+    setOtherIdType(selectedOtherIdType ? selectedOtherIdType.value : '');
+  };
+
+  const filteredOptionOtherType = otherDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getDocumentType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setOtherDrop(val));
   }, []);
 
   const handleRemoveLogo = () => {
@@ -496,13 +805,17 @@ function Input({ }) {
         setSaveButtonVisible(false);
         setUpdateButtonVisible(true);
         const searchData = await response.json();
-        const [{ EmployeeId, first_Name, Middle_Name, Last_Name, father_name, mother_name, DOB,
+        const [{ EmployeeId, First_Name, Middle_Name, Last_Name, father_name, mother_name, DOB,
           email, Aadhar_no, Reference_Phone, phone1, phone2, Address1, address2, address3,
-          PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender, marital_status, Kids }] = searchData;
+          PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender, 
+          Marital_Status, Kids, Title, Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
+          Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name, 
+          Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
+          Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
 
         setEmployeeId(EmployeeId);
-        setFirst_Name(first_Name);
-        setfirst_Name(first_Name);
+        setFirst_Name(First_Name);
+        setfirst_Name(First_Name);
         setMiddle_Name(Middle_Name);
         setLast_Name(Last_Name);
         setFather_Name(father_name);
@@ -520,6 +833,19 @@ function Input({ }) {
         setReference_Name(Reference_name);
         setdepartment_id(department_id);
         setdesignation_id(designation_id);
+        setPlaceOfBirth(Place_of_Birth);
+        setBloodGroup(Blood_Group);
+        setSpouseName(Spouse_Name);
+        setNoOfSiblings(Number_of_Siblings);
+        setNoOfChildren(Number_of_Children);
+        setBusinessEmail(Email_Business);
+        setEmergencyContactName(Emergency_Contact_Name);
+        setEmergencyContactPhone(Emergency_Contact_Phone);
+        setPostalCode(Postal_Code);
+        setPassportNo(Passport_No);
+        setPassportExpiryDate(formatDate(Passport_Expiry_Date));
+        setOtherIdNo(Other_Id_No);
+
         const imageBlob = new Blob([new Uint8Array(Photos.data)], { type: 'image/jpeg' });
 
         setuser_image(imageBlob);
@@ -537,13 +863,45 @@ function Input({ }) {
         setGender(selectedGender);
         setselectedGender(selectedGender?.value || null);
 
-        const martialStatus = filteredOptionmartial.find(option => option.value === marital_status);
+        const martialStatus = filteredOptionmartial.find(option => option.value === Marital_Status);
         setMarital_Status(martialStatus);
         setselectedmartial(martialStatus?.value || null);
 
         const kids = filteredOptionKids.find(option => option.value === Kids);
         setKids(kids);
         setselectedkids(kids?.value || null);
+
+        const selectedTitle = filteredOptionTitle.find(option => option.value === Title);
+        setSelectedTitle(selectedTitle);
+        setTitle(selectedTitle?.value || null);
+
+        const selectedNationality = filteredOptionNationality.find(option => option.value === Nationality);
+        setSelectedNationality(selectedNationality);
+        setNationality(selectedNationality?.value || null);
+
+        const selectedReligion = filteredOptionReligion.find(option => option.value === Religion);
+        setSelectedReligion(selectedReligion);
+        setReligion(selectedReligion?.value || null);
+        
+        const selectedEmergencyContactRelation = filteredOptionRelation.find(option => option.value === Emergency_Contact_Relationship);
+        setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
+        setEmergencyContactRelation(selectedEmergencyContactRelation?.value || null);
+
+        const selectedCity = filteredOptionCity.find(option => option.value === City);
+        setSelectedCity(selectedCity);
+        setCity(selectedCity?.value || null);
+
+        const selectedState = filteredOptionState.find(option => option.value === State);
+        setSelectedState(selectedState);
+        setState(selectedState?.value || null);
+
+        const selectedCountry = filteredOptionCountry.find(option => option.value === Country);
+        setSelectedCountry(selectedCountry);
+        setCountry(selectedCountry?.value || null);
+
+        const selectedOtherIdType = filteredOptionOtherType.find(option => option.value === Other_Id_Type);
+        setSelectedOtherIdType(selectedOtherIdType);
+        setOtherIdType(selectedOtherIdType?.value || null);
 
         console.log("data fetched successfully")
       } else if (response.status === 404) {
@@ -562,15 +920,15 @@ function Input({ }) {
   const handleDelete = async () => {
     if (
       !EmployeeId) {
-        toast.warning("Please fill all required fields.");
-        return;
-      }
-      
-      showConfirmationToast(
-        "Are you sure you want to Delete the data ?",
-        async () => {
-          setLoading(true);
-          try {
+      toast.warning("Please fill all required fields.");
+      return;
+    }
+
+    showConfirmationToast(
+      "Are you sure you want to Delete the data ?",
+      async () => {
+        setLoading(true);
+        try {
           const deatils = {
             EmployeeId: EmployeeId,
             company_code: sessionStorage.getItem("selectedCompanyCode")
@@ -587,7 +945,7 @@ function Input({ }) {
           if (response.status === 200) {
             console.log("Data deleted successfully");
             setTimeout(() => {
-              toast.success( "Data deleted successfully!", {
+              toast.success("Data deleted successfully!", {
                 onClose: () => window.location.reload(),
               });
             }, 1000);
@@ -602,8 +960,8 @@ function Input({ }) {
           toast.error('Error delete data: ' + error.message, {
           });
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -625,234 +983,121 @@ function Input({ }) {
     setOpen(true);
   };
 
-  const EmployeeInfo = async (data) => {
-    if (data && data.length > 0) {
-      setSaveButtonVisible(false);
-      setUpdateButtonVisible(true);
-      const [{ EmployeeId, DOB, First_Name, designation_id, department_id, Middle_Name, Last_Name, Gender, grade_id, Father_Name, Mother_Name, Reference_Phone, Email, Aadhar_no, phone1, phone2, PermanantAddress, Address3, Address1, Pan_No, Address2, Reference_Name, Marital_Status, Kids }] = data;
+  const EmployeeInfo = (data) => {
+  if (!data || data.length === 0) return;
 
-      console.log(data);
+  setSaveButtonVisible(false);
+  setUpdateButtonVisible(true);
 
-      setSelectedImage(`data:image/jpeg;base64,${data[0].Photos}`);
+  const [{
+    EmployeeId, First_Name, Middle_Name, Last_Name, Father_Name, Mother_Name, DOB,
+    Email, Aadhar_no, Reference_Phone, phone1, phone2,
+    Address1, Address2, Address3, PermanantAddress,
+    designation_id, department_id, Reference_Name, Pan_No,
+    Photos, Grade_id, Gender, Marital_Status, Kids, Title,
+    Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
+    Number_of_Siblings, Number_of_Children, Email_Business,
+    Emergency_Contact_Name, Emergency_Contact_Phone,
+    Emergency_Contact_Relationship, City, State, Country,
+    Postal_Code, Passport_No, Passport_Expiry_Date,
+    Other_Id_Type, Other_Id_No
+  }] = data;
 
-      const employeeId = document.getElementById('EmployeeId');
-      if (employeeId) {
-        employeeId.value = EmployeeId;
-        setEmployeeId(EmployeeId);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+  // 🔹 BASIC FIELDS
+  setEmployeeId(EmployeeId);
+  setFirst_Name(First_Name);
+  setfirst_Name(First_Name);
+  setMiddle_Name(Middle_Name);
+  setLast_Name(Last_Name);
+  setFather_Name(Father_Name);
+  setMother_Name(Mother_Name);
+  setDOB(formatDate(DOB));
+  setEmail(Email);
+  setPhone1(phone1);
+  setPhone2(phone2);
+  setAddress1(Address1);
+  setAddress2(Address2);
+  setAddress3(Address3);
+  setPermanantAddress(PermanantAddress);
+  setReference_Name(Reference_Name);
+  setReference_Phone(Reference_Phone);
+  setPan_No(Pan_No);
+  setAadhar_no(Aadhar_no);
+  setdepartment_id(department_id);
+  setdesignation_id(designation_id);
+  setPlaceOfBirth(Place_of_Birth);
+  setBloodGroup(Blood_Group);
+  setSpouseName(Spouse_Name);
+  setNoOfSiblings(Number_of_Siblings);
+  setNoOfChildren(Number_of_Children);
+  setBusinessEmail(Email_Business);
+  setEmergencyContactName(Emergency_Contact_Name);
+  setEmergencyContactPhone(Emergency_Contact_Phone);
+  setPostalCode(Postal_Code);
+  setPassportNo(Passport_No);
+  setPassportExpiryDate(formatDate(Passport_Expiry_Date));
+  setOtherIdNo(Other_Id_No);
 
-      const dOB = document.getElementById('dob');
-      if (dOB) {
-        dOB.value = DOB;
-        setDOB(formatDate(DOB));
-      } else {
-        console.error('Date of Birth  not found');
-      }
+  // 🔹 IMAGE
+  if (Photos?.data) {
+    const imageBlob = new Blob([new Uint8Array(Photos.data)], { type: "image/jpeg" });
+    setuser_image(imageBlob);
+    setSelectedImage(URL.createObjectURL(imageBlob));
+  }
 
-      const Des_ID = document.getElementById('designationLabel');
-      if (Des_ID) {
-        Des_ID.value = designation_id;
-        setdesignation_id(designation_id);
-      } else {
-        console.error('entry element not found');
-      }
-      const Dep_ID_ = document.getElementById('Departmentlabel');
-      if (Dep_ID_) {
-        Dep_ID_.value = department_id;
-        setdepartment_id(department_id);
-      } else {
-        console.error('entry element not found');
-      }
+  // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
 
-      const firstName = document.getElementById('FirstName');
-      if (firstName) {
-        firstName.value = First_Name;
-        setFirst_Name(First_Name);
-      } else {
-        console.error('entry element not found');
-      }
+  const selectedGrade = filteredOptionGradeid.find(o => o.value === Grade_id);
+  setGrade_id(selectedGrade);
+  setselectedgradeid(selectedGrade?.value || null);
 
-      const first_Name = document.getElementById('FirstNamelabel');
-      if (first_Name) {
-        first_Name.value = First_Name;
-        setfirst_Name(First_Name);
-      } else {
-        console.error('entry element not found');
-      }
+  const selectedGender = filteredOptiongender.find(o => o.value === Gender);
+  setGender(selectedGender);
+  setselectedGender(selectedGender?.value || null);
 
-      const MiddleName = document.getElementById('MiddleName');
-      if (MiddleName) {
-        MiddleName.value = Middle_Name;
-        setMiddle_Name(Middle_Name);
-      } else {
-        console.error('MiddleName element not found');
-      }
+  const selectedMartial = filteredOptionmartial.find(o => o.value === Marital_Status);
+  setMarital_Status(selectedMartial);
+  setselectedmartial(selectedMartial?.value || null);
 
-      const lastName = document.getElementById('LastName');
-      if (lastName) {
-        lastName.value = Last_Name;
-        setLast_Name(Last_Name);
-      } else {
-        console.error('LastName  not found');
-      }
+  const selectedKids = filteredOptionKids.find(o => o.value === Kids);
+  setKids(selectedKids);
+  setselectedkids(selectedKids?.value || null);
 
-      const gender = document.getElementById('gender');
-      if (gender) {
-        const selectedgender = filteredOptiongender.find(option => option.value === Gender);
-        setGender(selectedgender);
-        setselectedGender(selectedgender);
-      } else {
-        console.error('Gender element not found');
-      }
+  const selectedTitle = filteredOptionTitle.find(o => o.value === Title);
+  setSelectedTitle(selectedTitle);
+  setTitle(selectedTitle?.value || null);
 
-      const gradeid = document.getElementById('gradeid');
-      if (gradeid) {
-        const Grade_id = filteredOptionGradeid.find(option => option.value === grade_id);
-        setGrade_id(Grade_id);
-        setselectedgradeid(Grade_id);
-      } else {
-        console.error('entry element not found');
-      }
+  const selectedNationality = filteredOptionNationality.find(o => o.value === Nationality);
+  setSelectedNationality(selectedNationality);
+  setNationality(selectedNationality?.value || null);
 
-      const maritalstatus = document.getElementById('maritalStatus');
-      if (maritalstatus) {
-        const selectedmartial = filteredOptionmartial.find(option => option.value === Marital_Status);
-        setMarital_Status(selectedmartial);
-        setselectedmartial(selectedmartial);
-      } else {
-        console.error('entry element not found');
-      }
+  const selectedReligion = filteredOptionReligion.find(o => o.value === Religion);
+  setSelectedReligion(selectedReligion);
+  setReligion(selectedReligion?.value || null);
 
-      const fatherName = document.getElementById('FatherName');
-      if (fatherName) {
-        fatherName.value = Father_Name;
-        setFather_Name(Father_Name);
-      } else {
-        console.error('FatherName element not found');
-      }
+  const selectedRelation = filteredOptionRelation.find(o => o.value === Emergency_Contact_Relationship);
+  setSelectedEmergencyContactRelation(selectedRelation);
+  setEmergencyContactRelation(selectedRelation?.value || null);
 
-      const MotherName = document.getElementById('MotherName');
-      if (MotherName) {
-        MotherName.value = Mother_Name;
-        setMother_Name(Mother_Name);
-      } else {
-        console.error('MotherName  not found');
-      }
+  const selectedCity = filteredOptionCity.find(o => o.value === City);
+  setSelectedCity(selectedCity);
+  setCity(selectedCity?.value || null);
 
-      const email = document.getElementById('email');
-      if (email) {
-        email.value = Email;
-        setEmail(Email);
-      } else {
-        console.error('Email element not found');
-      }
+  const selectedState = filteredOptionState.find(o => o.value === State);
+  setSelectedState(selectedState);
+  setState(selectedState?.value || null);
 
-      const PhoneNo = document.getElementById('Phone');
-      if (PhoneNo) {
-        PhoneNo.value = phone1;
-        setPhone1(phone1);
-      } else {
-        console.error('Phone1 element not found');
-      }
+  const selectedCountry = filteredOptionCountry.find(o => o.value === Country);
+  setSelectedCountry(selectedCountry);
+  setCountry(selectedCountry?.value || null);
 
-      const alternaiveNo = document.getElementById('phone2');
-      if (alternaiveNo) {
-        alternaiveNo.value = phone2;
-        setPhone2(phone2);
-      } else {
-        console.error('Phone2 element not found');
-      }
+  const selectedOtherIdType = filteredOptionOtherType.find(o => o.value === Other_Id_Type);
+  setSelectedOtherIdType(selectedOtherIdType);
+  setOtherIdType(selectedOtherIdType?.value || null);
 
+  console.log("Popup data mapped successfully");
+};
 
-      const address1 = document.getElementById('address1');
-      if (address1) {
-        address1.value = Address1;
-        setAddress1(Address1);
-      } else {
-        console.error('Address1 element not found');
-      }
-
-
-      const Address2nd = document.getElementById('address2');
-      if (Address2nd) {
-        Address2nd.value = Address2;
-        setAddress2(Address2);
-      } else {
-        console.error('Address2 element not found');
-      }
-
-      const Address3rd = document.getElementById('address3');
-      if (Address3rd) {
-        Address3rd.value = Address3;
-        setAddress3(Address3);
-      } else {
-        console.error('Address2 element not found');
-      }
-
-      const address3 = document.getElementById('address3');
-      if (address3) {
-        address3.value = Address3;
-        setAddress3(Address3);
-      } else {
-        console.error('Address3 element not found');
-      }
-
-      const permanantAddress = document.getElementById('permanantAddress');
-      if (permanantAddress) {
-        permanantAddress.value = PermanantAddress;
-        setPermanantAddress(PermanantAddress);
-      } else {
-        console.error('PermanantAddress element not found');
-      }
-
-      const ReferenceName = document.getElementById('ReferenceName');
-      if (ReferenceName) {
-        ReferenceName.value = Reference_Name;
-        setReference_Name(Reference_Name);
-      } else {
-        console.error('ReferenceName element not found');
-      }
-
-      const ReferencePhone = document.getElementById('ReferencePhone');
-      if (ReferencePhone) {
-        ReferencePhone.value = Reference_Phone;
-        setReference_Phone(Reference_Phone);
-      } else {
-        console.error('ReferencePhone element not found');
-      }
-
-      const panno = document.getElementById('Panno');
-      if (panno) {
-        panno.value = Pan_No;
-        setPan_No(Pan_No);
-      } else {
-        console.error('PanNo element not found');
-      }
-
-      const Aadharno = document.getElementById('Aadharno');
-      if (Aadharno) {
-        Aadharno.value = Aadhar_no;
-        setAadhar_no(Aadhar_no);
-      } else {
-        console.error('Aadhar no element not found');
-      }
-
-      const kids = document.getElementById('KidS');
-      if (kids) {
-        const selectedOption = filteredOptionKids.find(option => option.value === Kids);
-        setKids(selectedOption);
-        setselectedkids(selectedOption);
-      } else {
-        console.error('Kids  element not found');
-      }
-
-    } else {
-      console.log("Data not fetched...!");
-    }
-    console.log(data);
-  };
 
 
   // useEffect(() => {
@@ -957,7 +1202,7 @@ function Input({ }) {
 
             </ul>
           </div>
-          
+
         </div>
       </div>
 
@@ -1417,7 +1662,382 @@ function Input({ }) {
                 isClearable
               />
               <label htmlFor="KidS" className={`floating-label ${error && !selectedkids ? 'text-danger' : ''}`}>Kids{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedTitle ? "has-value" : ""} 
+              ${isSelectTitle ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="title"
+                name="title"
+                value={selectedTitle}
+                onChange={handleChangeTitle}
+                options={filteredOptionTitle}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectTitle(true)}
+                onBlur={() => setIsSelectTitle(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="title" className={`floating-label ${error && !title ? 'text-danger' : ''}`}>Title{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="placeOfBirth"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={placeOfBirth}
+                onChange={(e) => setPlaceOfBirth(e.target.value)}
+                maxLength={100}
+                autoComplete="off"
+              />
+              <label htmlFor="placeOfBirth" className={`exp-form-labels ${error && !placeOfBirth ? 'text-danger' : ''}`}>Place of Birth{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedNationality ? "has-value" : ""} 
+              ${isSelectNationality ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="nationality"
+                name="nationality"
+                value={selectedNationality}
+                onChange={handleChangeNationality}
+                options={filteredOptionNationality}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectNationality(true)}
+                onBlur={() => setIsSelectNationality(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="nationality" className={`floating-label ${error && !nationality ? 'text-danger' : ''}`}>Nationality{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedReligion ? "has-value" : ""} 
+              ${isSelectReligion ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="religion"
+                name="religion"
+                value={selectedReligion}
+                onChange={handleChangeReligion}
+                options={filteredOptionReligion}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectReligion(true)}
+                onBlur={() => setIsSelectReligion(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="religion" className={`floating-label ${error && !religion ? 'text-danger' : ''}`}>Religion{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="bloodGroup"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={bloodGroup}
+                onChange={(e) => setBloodGroup(e.target.value)}
+                maxLength={10}
+                autoComplete="off"
+              />
+              <label htmlFor="bloodGroup" className={`exp-form-labels ${error && !bloodGroup ? 'text-danger' : ''}`}>Blood Group{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="spouseName"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={spouseName}
+                onChange={(e) => setSpouseName(e.target.value)}
+                maxLength={100}
+                autoComplete="off"
+              />
+              <label htmlFor="spouseName" className="exp-form-labels">Spouse Name</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="noOfChildren"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                value={noOfChildren}
+                onChange={(e) => setNoOfChildren(e.target.value)}
+                maxLength={2}
+                autoComplete="off"
+              />
+              <label htmlFor="noOfChildren" className="exp-form-labels">No of Children</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="noOfSiblings"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                value={noOfSiblings}
+                onChange={(e) => setNoOfSiblings(e.target.value)}
+                maxLength={2}
+                autoComplete="off"
+              />
+              <label htmlFor="noOfSiblings" className="exp-form-labels">No of Siblings</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="businessEmail"
+                className="exp-input-field form-control"
+                type="email"
+                placeholder=""
+                value={businessEmail}
+                onChange={(e) => setBusinessEmail(e.target.value)}
+                maxLength={100}
+                autoComplete="off"
+              />
+              <label htmlFor="businessEmail" className="exp-form-labels">Email Business</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="emergencyContactName"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={emergencyContactName}
+                onChange={(e) => setEmergencyContactName(e.target.value)}
+                maxLength={100}
+                autoComplete="off"
+              />
+              <label htmlFor="emergencyContactName" className={`exp-form-labels ${error && !emergencyContactName ? 'text-danger' : ''}`}>Emergency Contact Name{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedEmergencyContactRelation ? "has-value" : ""} 
+              ${isSelectRelation ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="emergencyContactRelation"
+                name="emergencyContactRelation"
+                value={selectedEmergencyContactRelation}
+                onChange={handleChangeRelation}
+                options={filteredOptionRelation}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectRelation(true)}
+                onBlur={() => setIsSelectRelation(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="emergencyContactRelation" className={`floating-label ${error && !emergencyContactRelation ? 'text-danger' : ''}`}>Emergency Relation{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="emergencyContactPhone"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                value={emergencyContactPhone}
+                onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                maxLength={15}
+                autoComplete="off"
+              />
+              <label htmlFor="emergencyContactPhone" className={`exp-form-labels ${error && !emergencyContactPhone ? 'text-danger' : ''}`}>Emergency Contact Name{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCity ? "has-value" : ""} 
+              ${isSelectCity ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="city"
+                name="city"
+                value={selectedCity}
+                onChange={handleChangeCity}
+                options={filteredOptionCity}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectCity(true)}
+                onBlur={() => setIsSelectCity(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="city" className={`floating-label ${error && !city ? 'text-danger' : ''}`}>City{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedState ? "has-value" : ""} 
+              ${isSelectState ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="state"
+                name="state"
+                value={selectedState}
+                onChange={handleChangeState}
+                options={filteredOptionState}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectState(true)}
+                onBlur={() => setIsSelectState(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="state" className={`floating-label ${error && !state ? 'text-danger' : ''}`}>State{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCountry ? "has-value" : ""} 
+              ${isSelectCountry ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="country"
+                name="country"
+                value={selectedCountry}
+                onChange={handleChangeCountry}
+                options={filteredOptionCountry}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectCountry(true)}
+                onBlur={() => setIsSelectCountry(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="country" className={`floating-label ${error && !country ? 'text-danger' : ''}`}>Country{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="postalCode"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                maxLength={10}
+                autoComplete="off"
+              />
+              <label htmlFor="postalCode" className={`exp-form-labels ${error && !postalCode ? 'text-danger' : ''}`}>Postal Code{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="passportNo"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={passportNo}
+                onChange={(e) => setPassportNo(e.target.value)}
+                maxLength={30}
+                autoComplete="off"
+              />
+              <label htmlFor="passportNo" className="exp-form-labels">Passport No</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="passportExpiryDate"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                value={passportExpiryDate}
+                onChange={(e) => setPassportExpiryDate(e.target.value)}
+                maxLength={225}
+                autoComplete="off"
+              />
+              <label htmlFor="passportExpiryDate" className="exp-form-labels">Passport Expiry Date</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedOtherIdType ? "has-value" : ""} 
+              ${isSelectOtherType ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="otherIdType"
+                name="otherIdType"
+                value={selectedOtherIdType}
+                onChange={handleChangeOtherType}
+                options={filteredOptionOtherType}
+                autoComplete="off"
+                placeholder=" "
+                onFocus={() => setIsSelectOtherType(true)}
+                onBlur={() => setIsSelectOtherType(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label htmlFor="otherIdType" className="floating-label">Other ID Type</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="otherIdNo"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={otherIdNo}
+                onChange={(e) => setOtherIdNo(e.target.value)}
+                maxLength={50}
+                autoComplete="off"
+              />
+              <label htmlFor="otherIdNo" className="exp-form-labels">Other ID No</label>
             </div>
           </div>
 

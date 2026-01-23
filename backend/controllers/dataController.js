@@ -989,7 +989,7 @@ const getsearchdata = async (req, res) => {
       .input("country", sql.NVarChar, country)
       .input("company_gst_no", sql.NVarChar, company_gst_no)
       .input("status", sql.NVarChar, status)
-      .query(` EXEC sp_company_info @mode,@company_no,@company_name,'','','','',@city,@state,@pincode,@country,@company_gst_no,@status,'','','','','','','','','','','','','','','','','','' `);
+      .query(` EXEC sp_company_info @mode,@company_no,@company_name,'','','','',@city,@state,@pincode,@country,@company_gst_no,@status,'','','','','','','','','','','','','','','','','','','','' `);
     // Send response
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -19622,7 +19622,7 @@ const addEmployeePersonalData = async (req, res) => {
     Grade_id,
     company_code,
     Created_by,
-    City,State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Other_Id_No,Blood_Group,Other_Id_Type,Religion, Nationality,Passport_Expiry_Date,Title,Place_of_Birth,Passport_No,
+    City, State, Country, Postal_Code, Emergency_Contact_Phone,Emergency_Contact_Relationship, Emergency_Contact_Name,Phone_Alternate, Email_Business, Number_of_Children,Number_of_Siblings,Spouse_Name,Other_Id_No,Blood_Group,Other_Id_Type,Religion, Nationality,Passport_Expiry_Date,Title,Place_of_Birth,Passport_No,
     tempstr1,
     tempstr2,
     tempstr3,
@@ -19697,7 +19697,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
+      .query(`EXEC sp_employee_personal @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       res.status(200).json(result.recordset);
@@ -19705,7 +19705,7 @@ const addEmployeePersonalData = async (req, res) => {
       res.status(404).json(err.message);
     }
   } catch (error) {
-
+    console.log(error.message)
     return res.status(500).json({ message: error.message || "Internal Server Error" });
 
   }
@@ -33384,12 +33384,15 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("email", sql.VarChar, item.email)
         .input("phone", sql.VarChar, item.phone)
         .input("applied_job_id", sql.Int, item.applied_job_id)
-        .input("department_id", sql.VarChar, item.department_id)
+        .input("Education", sql.Int, item.Education)
+        .input("Experience", sql.Int, item.Experience)
+        .input("Related_experience", sql.Int, item.Related_experience)
+        .input("Job_description", sql.Int, item.Job_description)
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
         .query(`
-          EXEC sp_candidate_master  @mode,0,@candidate_name,@email,@phone, @applied_job_id,@department_id,@company_code, @keyfield, '','','',@modified_by,''
+          EXEC sp_candidate_master  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','',@modified_by,''
         `);
 
       // 👇 capture NEW keyfield
@@ -33425,16 +33428,8 @@ const candidate_masterLoopDelete = async (req, res) => {
     for (const item of candidate_masterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
-        .input("candidate_id", sql.Int, item.candidate_id)
-        .input("candidate_name", sql.NVarChar, item.candidate_name)
-        .input("email", sql.NVarChar, item.email)
-        .input("phone", sql.NVarChar, item.phone)
-        .input("applied_job_id", sql.Int, item.applied_job_id)
-        .input("department_id", sql.VarChar, item.department_id)
-        .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_candidate_master @mode, @candidate_id, @candidate_name, @email, @phone, @applied_job_id, @department_id, @company_code, @keyfield, '','', '', @modified_by, ''`);
+        .query(`EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','', '', '', ''`);
     }
     res.status(200).json("candidate_master data deleted successfully");
   } catch (err) {
@@ -33444,7 +33439,7 @@ const candidate_masterLoopDelete = async (req, res) => {
 };
 
 const candidate_masterInsert = async (req, res) => {
-  const {  candidate_name, email, phone, applied_job_id, department_id, company_code, created_by } = req.body;
+  const {candidate_name, email, phone, applied_job_id,Education,Experience,Related_experience,Job_description, company_code, created_by } = req.body;
 
     let Canditate_CV = null;
 
@@ -33461,11 +33456,14 @@ const candidate_masterInsert = async (req, res) => {
       .input("email", sql.NVarChar, email)
       .input("phone", sql.VarChar, phone)
       .input("applied_job_id", sql.Int, applied_job_id)
-      .input("department_id", sql.VarChar, department_id)
+      .input("Education", sql.VarChar, Education)
+      .input("Experience", sql.VarChar, Experience)
+      .input("Related_experience", sql.VarChar, Related_experience)
+      .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.NVarChar, company_code)
       .input("Canditate_CV", sql.VarBinary, Canditate_CV)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, @department_id, @company_code,'',@Canditate_CV, @created_by, '', '', ''`);
+      .query(`EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "candidate_master insertd successfully" });
   } catch (err) {
@@ -33474,33 +33472,6 @@ const candidate_masterInsert = async (req, res) => {
   }
 };
 
-const candidate_masterUpdate = async (req, res) => {
-  const { candidate_id, candidate_name, email, phone, applied_job_id, department_id, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
-
-  try {
-    const pool = await sql.connect(dbConfig);
-    await pool.request()
-      .input("mode", sql.NVarChar, "U")
-      .input("candidate_id", sql.Int, candidate_id)
-      .input("candidate_name", sql.NVarChar, candidate_name)
-      .input("email", sql.NVarChar, email)
-      .input("phone", sql.NVarChar, phone)
-      .input("applied_job_id", sql.Int, applied_job_id)
-      .input("department_id", sql.VarChar, department_id)
-      .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_candidate_master @mode, @candidate_id, @candidate_name, @email, @phone, @applied_job_id, @department_id, @company_code, @keyfield, '', @created_by, @created_date, @modified_by, @modified_date`);
-
-    res.status(200).json({ success: true, message: "candidate_master updated successfully" });
-  } catch (err) {
-    console.error("Error during candidate_master update:", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
-  }
-};
 
 
 
@@ -33526,31 +33497,7 @@ const interview_panelInsert = async (req, res) => {
   }
 };
 
-const interview_panelUpdate = async (req, res) => {
-  const { panel_id, panel_name, job_id, department_id, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
 
-  try {
-    const pool = await sql.connect(dbConfig);
-    await pool.request()
-      .input("mode", sql.NVarChar, "U")
-      .input("panel_id", sql.Int, panel_id)
-      .input("panel_name", sql.NVarChar, panel_name)
-      .input("job_id", sql.Int, job_id)
-      .input("department_id", sql.Int, department_id)
-      .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_interview_panel @mode, @panel_id, @panel_name, @job_id, @department_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
-
-    res.status(200).json({ success: true, message: "interview_panel updated successfully" });
-  } catch (err) {
-    console.error("Error during interview_panel update:", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
-  }
-};
 
 
 // Auto-generated interview_panelLoopUpdate API for sp_interview_panel
@@ -33606,7 +33553,7 @@ const interview_panelLoopDelete = async (req, res) => {
 };
 
 const job_masterInsert = async (req, res) => {
-  const {  job_title, department_id, company_code, created_by } = req.body;
+  const {  job_title, department_id, company_code, Country_Code, location, employment_type, updated_on, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33615,8 +33562,12 @@ const job_masterInsert = async (req, res) => {
       .input("job_title", sql.NVarChar, job_title)
       .input("department_id", sql.VarChar, department_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Country_Code", sql.VarChar, Country_Code)
+      .input("location", sql.VarChar, location)
+      .input("employment_type", sql.VarChar, employment_type)
+      .input("updated_on", sql.Date, updated_on)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_job_master @mode,0, @job_title, @department_id, @company_code, '', @created_by, '', '', ''`);
+      .query(`EXEC sp_job_master_test @mode,0, @job_title, @department_id, @company_code, '', @Country_Code, @location, @employment_type, @updated_on, @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "job_master insertd successfully" });
   } catch (err) {
@@ -33642,11 +33593,15 @@ const job_masterLoopInsert = async (req, res) => {
         .input("department_id", sql.VarChar, item.department_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("Country_Code", sql.VarChar, item.Country_Code)
+        .input("location", sql.VarChar, item.location)
+        .input("employment_type", sql.VarChar, item.employment_type)
+        .input("updated_on", sql.Date, item.updated_on)
         .input("created_by", sql.NVarChar, item.created_by)
         .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_job_master @mode, @job_id, @job_title, @department_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_job_master_test @mode, @job_id, @job_title, @department_id, @company_code, @keyfield, @Country_Code, @location, @employment_type, @updated_on, @created_by, @created_date, @modified_by, @modified_date`);
     }
     res.status(200).json("job_master data inserted successfully");
   } catch (err) {
@@ -33675,11 +33630,12 @@ const job_masterLoopUpdate = async (req, res) => {
         .input("department_id", sql.VarChar, item.department_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield) // optional now
+        .input("Country_Code", sql.VarChar, item.Country_Code)
+        .input("location", sql.VarChar, item.location)
+        .input("employment_type", sql.VarChar, item.employment_type)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .query(`
-          EXEC sp_job_master @mode,@job_id,@job_title,@department_id,@company_code,@keyfield,
-            '','',@modified_by,''
-        `);
+          EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,@keyfield, @Country_Code, @location, @employment_type, '', @created_by, '','',@modified_by,''`);
 
       
       updatedRows.push({
@@ -33712,7 +33668,7 @@ const job_masterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '','', ''`);
+        .query(`EXEC sp_job_master_test @mode, '', '', '', '', @keyfield, '', '', '', '', '', '','', ''`);
     }
     res.status(200).json("job_master data deleted successfully");
   } catch (err) {
@@ -34071,20 +34027,22 @@ const interview_decisionLoopDelete = async (req, res) => {
 
 // Code Added by Harishon 12-02-26
 const CandidateSearch = async (req, res) => {
-  const { candidate_name, email,phone,department_id, applied_job_id, company_code } = req.body;
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("candidate_name", sql.NVarChar,candidate_name)
       .input("email", sql.VarChar, email)
       .input("phone", sql.VarChar, phone)
       .input("applied_job_id", sql.Int, applied_job_id)
-      .input("department_id", sql.VarChar, department_id )
+      .input("Education", sql.VarChar, Education)
+      .input("Experience", sql.VarChar, Experience)
+      .input("Related_experience", sql.VarChar, Related_experience)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,@department_id,@company_code,'','','','','','' `);
+      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,'',@company_code,'','','','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34097,7 +34055,7 @@ const CandidateSearch = async (req, res) => {
   }
 };
 const JobmasterSearch = async (req, res) => {
-  const { job_title,job_id ,department_id, company_code } = req.body;
+  const { job_title,job_id ,department_id, company_code, Country_Code, location, employment_type, updated_on } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -34108,7 +34066,11 @@ const JobmasterSearch = async (req, res) => {
       .input("job_id", sql.Int, job_id  )
       .input("department_id", sql.VarChar, department_id )
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_job_master @mode,@job_id,@job_title,@department_id,@company_code,'','','','',''
+      .input("Country_Code", sql.VarChar, Country_Code)
+      .input("location", sql.VarChar, location)
+      .input("employment_type", sql.VarChar, employment_type)
+      .input("updated_on", sql.Date, updated_on ? updated_on : null)
+      .query(`EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,'',@Country_Code, @location, @employment_type, @updated_on,'','','',''
  `);
 
     if (result.recordset.length > 0) {
@@ -34296,7 +34258,7 @@ const JobMaster = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SA")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_job_master @mode,0,'',0,@company_code,'','','','',''
+      .query(`EXEC sp_job_master_test @mode,0,'',0,@company_code,'','','','','','','','',''
 `);
 
     if (result.recordset.length > 0) {
@@ -34363,7 +34325,7 @@ const CanditateID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SE")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master 'SE',0,'','','',0,0,@company_code,'','','','','',''`);
+      .query(`EXEC sp_candidate_master 'SE',0,'','','',0,'','','','','',@company_code,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34614,7 +34576,56 @@ const { TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
   }
 };
 
+const getTitle = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Title','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
 
+const getReligion = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Religion','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getNationality = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Nationality','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
 
 
 module.exports = {
@@ -35728,7 +35739,6 @@ module.exports = {
     candidate_masterLoopUpdate,
     candidate_masterLoopDelete,
     candidate_masterInsert,
-    candidate_masterUpdate,
     interview_panelInsert,
     interview_panelUpdate,
     interview_panelLoopUpdate,
@@ -35772,6 +35782,9 @@ module.exports = {
     TimeZonemasterUpdate,
     TimeZonemasterDelete,
     getTimeZoneData,
-    getTimeZonesearchdata
+    getTimeZonesearchdata,
+    getTitle,
+    getReligion,
+    getNationality
 
 };

@@ -1142,7 +1142,6 @@ router.post("/candidate_masterLoopUpdate", dataController.candidate_masterLoopUp
 router.post("/candidate_masterInsert",upload.single('Canditate_CV'),dataController.candidate_masterInsert)
 router.post("/candidate_masterLoopDelete", dataController.candidate_masterLoopDelete)
 router.post("/PrintTemplateUpdate", dataController.PrintTemplateUpdate)
-router.post("/candidate_masterUpdate", dataController.candidate_masterUpdate)
 router.post("/interview_panelInsert", dataController.interview_panelInsert)
 router.post("/interview_panelUpdate", dataController.interview_panelUpdate)
 router.post("/interview_panelLoopUpdate", dataController.interview_panelLoopUpdate)
@@ -1187,6 +1186,9 @@ router.post("/TimeZonemasterUpdate", dataController.TimeZonemasterUpdate)
 router.post("/TimeZonemasterDelete", dataController.TimeZonemasterDelete)
 router.get("/getTimeZoneData",dataController.getTimeZoneData)
 router.post("/getTimeZonesearchdata",dataController.getTimeZonesearchdata)
+router.post("/getTitle",dataController.getTitle)
+router.post("/getReligion",dataController.getReligion)
+router.post("/getNationality",dataController.getNationality)
 
 
 
