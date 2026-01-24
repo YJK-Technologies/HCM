@@ -29082,6 +29082,7 @@ const WeekOff = async (req, res) => {
   }
 };
 
+
 //Code added by pavun on 17-06-25
 const addCRMClient = async (req, res) => {
   const { company_code, contact_no, company_name, Contact_name, client_name, client_email, Expected_revenue, Monthly_revenue, created_by } = req.body;
@@ -33809,8 +33810,6 @@ const interview_scheduleInsert = async (req, res) => {
 };
 
 
-
-
 // Auto-generated interview_scheduleLoopUpdate API for sp_interview_schedule
 const interview_scheduleLoopUpdate = async (req, res) => {
   const interview_scheduleData = req.body.interview_scheduleData;
@@ -33818,7 +33817,7 @@ const interview_scheduleLoopUpdate = async (req, res) => {
     return res.status(400).json("Invalid or empty interview_scheduleData array.");
   }
 
-  try {
+  try { 
     const pool = await sql.connect(dbConfig);
     for (const item of interview_scheduleData) {
       await pool.request()
@@ -34626,6 +34625,211 @@ const getNationality = async (req, res) => {
     res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
+
+const CountryMasterInsert = async (req, res) => {
+  const {
+    Country_Code,Country_Name,TimeZone_Default,Week_Start_Day, company_code,
+created_by,} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("Country_Code", sql.NVarChar, Country_Code)
+      .input("Country_Name", sql.NVarChar, Country_Name)
+      .input("TimeZone_Default", sql.NVarChar, TimeZone_Default)
+      .input("Week_Start_Day", sql.NVarChar, Week_Start_Day)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`
+        EXEC sp_Country_Master
+          @mode,@Country_Code,@Country_Name, @TimeZone_Default,@Week_Start_Day,
+          @created_by,'', '','','',@company_code
+      `);
+
+    res.status(200).json({
+      success: true,
+      message: "sp_Shift_Type_Master inserted successfully"
+    });
+
+  } catch (err) {
+    console.error("Error during sp_Shift_Type_Master insert:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+
+const CountryMasterUpdate= async (req, res) => {
+  const {
+    Country_Code,Country_Name,TimeZone_Default,Week_Start_Day, company_code,
+modified_by,keyfield} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("Country_Code", sql.NVarChar, Country_Code)
+      .input("Country_Name", sql.NVarChar, Country_Name)
+      .input("TimeZone_Default", sql.NVarChar, TimeZone_Default)
+      .input("Week_Start_Day", sql.NVarChar, Week_Start_Day)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`
+        EXEC sp_Country_Master
+          @mode,@Country_Code,@Country_Name, @TimeZone_Default,@Week_Start_Day, 
+          '','', @modified_by,'',@keyfield,@company_code
+      `);
+
+    res.status(200).json({
+      success: true,
+      message: "Edited data saved successfully"
+    });
+
+  } catch (err) {
+    console.error("Error during sp_Shift_Type_Master Update:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+
+const deleteCountryMaster = async (req, res) => {
+  const { company_code, keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`
+        EXEC sp_Country_Master
+          @mode,'','', '','',@company_code,
+          '','', '','',@keyfield
+      `);
+    res.status(200).json({ success: true,
+      message: "Country master deleted successfully"
+    });
+
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+
+const getCountrySearchData = async (req, res) => {
+  const {
+    Country_Code,Country_Name,TimeZone_Default, Week_Start_Day,company_code
+  } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Country_Code", sql.NVarChar, Country_Code)
+      .input("Country_Name", sql.NVarChar, Country_Name)
+      .input("TimeZone_Default", sql.NVarChar, TimeZone_Default)
+      .input("Week_Start_Day", sql.NVarChar, Week_Start_Day)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC sp_Country_Master
+          @mode,@Country_Code,@Country_Name, @TimeZone_Default,@Week_Start_Day,
+          '','', '','','',@company_code
+      `);
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({ message: "Data not found" });
+    }
+
+  } catch (err) {
+    console.error("Error fetching country search data:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+
+const Country_MasterLoopUpdate = async (req, res) => {
+  const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
+    return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Country_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("Country_Code", sql.NVarChar, item.Country_Code)
+        .input("Country_Name", sql.NVarChar, item.Country_Name)
+        .input("TimeZone_Default", sql.NVarChar, item.TimeZone_Default)
+        .input("Week_Start_Day", sql.NVarChar, item.Week_Start_Day)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default, @Week_Start_Day, '', '', @modified_by, '', @keyfield, @company_code`);
+    }
+    res.status(200).json("Country_Master data updated successfully");
+  } catch (err) {
+    console.error("Error in Country_MasterLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+
+const Country_MasterLoopDelete = async (req, res) => {
+  const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
+    return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Country_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .query(`EXEC sp_Country_Master @mode, '', '', '', '', '', '', '', '', @keyfield, @company_code`);
+    }
+    res.status(200).json("Country_Master data deleted successfully");
+  } catch (err) {
+    console.error("Error in Country_MasterLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const GetCountry = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_Country_Master CA,'','','','','','','','','',@company_code"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+
+
 
 
 module.exports = {
@@ -35740,7 +35944,6 @@ module.exports = {
     candidate_masterLoopDelete,
     candidate_masterInsert,
     interview_panelInsert,
-    interview_panelUpdate,
     interview_panelLoopUpdate,
     interview_panelLoopDelete,
     job_masterInsert,
@@ -35785,6 +35988,12 @@ module.exports = {
     getTimeZonesearchdata,
     getTitle,
     getReligion,
-    getNationality
-
+    getNationality,
+    CountryMasterInsert,
+    CountryMasterUpdate,
+    deleteCountryMaster,
+    getCountrySearchData,
+    Country_MasterLoopUpdate,
+    Country_MasterLoopDelete,
+    GetCountry
 };
