@@ -11,7 +11,18 @@ jobs:
 
     steps:
       # -------------------------------------------------
-      # 0️⃣ Capture JOB START TIME (IST - Local Machine)
+      # 0️⃣ CLEAN OLD WORKSPACE (CRITICAL FOR SELF-HOSTED)
+      # -------------------------------------------------
+      - name: Clean runner workspace
+        shell: powershell
+        run: |
+          Write-Host "Cleaning old workspace..."
+          if (Test-Path "$env:GITHUB_WORKSPACE") {
+            Get-ChildItem "$env:GITHUB_WORKSPACE" -Force | Remove-Item -Recurse -Force
+          }
+
+      # -------------------------------------------------
+      # 1️⃣ Capture JOB START TIME (IST)
       # -------------------------------------------------
       - name: Capture Job Start Time (IST)
         shell: powershell
@@ -21,13 +32,16 @@ jobs:
           "START | $($ist.ToString('yyyy-MM-dd HH:mm:ss')) | Repo=$env:GITHUB_REPOSITORY | RunId=$env:GITHUB_RUN_ID" | Out-File -Append $log
 
       # -------------------------------------------------
-      # 1️⃣ Checkout source
+      # 2️⃣ Checkout source (FORCE CLEAN)
       # -------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 0
 
       # -------------------------------------------------
-      # 2️⃣ Setup Node
+      # 3️⃣ Setup Node.js
       # -------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,7 +49,7 @@ jobs:
           node-version: 20
 
       # -------------------------------------------------
-      # 3️⃣ Sync BACKEND code to IIS
+      # 4️⃣ Sync BACKEND code to IIS
       # -------------------------------------------------
       - name: Sync backend code to IIS
         shell: powershell
@@ -52,15 +66,19 @@ jobs:
           if ($LASTEXITCODE -le 7) { exit 0 } else { exit $LASTEXITCODE }
 
       # -------------------------------------------------
-      # 4️⃣ Backend npm install
+      # 5️⃣ Backend npm install (CLEAN)
       # -------------------------------------------------
       - name: Install backend dependencies
         shell: powershell
         run: |
-          npm install --legacy-peer-deps --prefix C:\inetpub\wwwroot\HCM\server
+          cd C:\inetpub\wwwroot\HCM\server
+          if (Test-Path node_modules) {
+            Remove-Item -Recurse -Force node_modules
+          }
+          npm ci --legacy-peer-deps
 
       # -------------------------------------------------
-      # 5️⃣ Restart backend via PM2
+      # 6️⃣ Restart backend via PM2
       # -------------------------------------------------
       - name: Restart backend
         shell: powershell
@@ -73,15 +91,18 @@ jobs:
           pm2 save
 
       # -------------------------------------------------
-      # 6️⃣ Frontend npm install
+      # 7️⃣ Frontend npm install (LOCK FILE STRICT)
       # -------------------------------------------------
       - name: Install frontend dependencies
         shell: powershell
         run: |
-          npm install --legacy-peer-deps
+          if (Test-Path node_modules) {
+            Remove-Item -Recurse -Force node_modules
+          }
+          npm ci --legacy-peer-deps
 
       # -------------------------------------------------
-      # 7️⃣ Build frontend
+      # 8️⃣ Build frontend
       # -------------------------------------------------
       - name: Build frontend
         shell: powershell
@@ -90,9 +111,9 @@ jobs:
           $env:GENERATE_SOURCEMAP="false"
           npm run build
 
-      # --------------------------------------------------
-      # 8️⃣ Deploy frontend to IIS
-      # --------------------------------------------------
+      # -------------------------------------------------
+      # 9️⃣ Deploy frontend to IIS
+      # -------------------------------------------------
       - name: Deploy frontend to IIS
         shell: powershell
         run: |
@@ -100,7 +121,7 @@ jobs:
           if ($LASTEXITCODE -le 7) { exit 0 } else { exit $LASTEXITCODE }
 
       # -------------------------------------------------
-      # 9️⃣ Capture JOB END TIME (IST)
+      # 🔟 Capture JOB END TIME (IST)
       # -------------------------------------------------
       - name: Capture Job End Time (IST)
         if: always()
