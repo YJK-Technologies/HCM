@@ -42,7 +42,7 @@ function InterviewPanel({ }) {
   const [error, setError] = useState("");
   const [panel_name, setpanel_name] = useState("");
   const [panel_nameSC, setpanel_nameSC] = useState("");
-  
+
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedStatusSC, setSelectedStatusSC] = useState(null);
   const [status, setstatus] = useState("");
@@ -68,8 +68,8 @@ function InterviewPanel({ }) {
   const [activeTab, setActiveTab] = useState("Interview Panel")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
-   const [statusgriddrop, setStatusGriddrop] = useState([]);
-   const [Dptdrop, setDptdrop] = useState([]);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [Dptdrop, setDptdrop] = useState([]);
 
   const navigate = useNavigate();
 
@@ -113,7 +113,7 @@ function InterviewPanel({ }) {
   }));
 
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/status`, {
       method: 'POST',
@@ -130,28 +130,28 @@ function InterviewPanel({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-useEffect(() => {
-  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-  fetch(`${config.apiBaseUrl}/DeptID`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ company_code }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Merge dept_id and dept_name
-      const deptOptions = data.map((option) => ({
-        value: option.dept_id,
-        label: `${option.dept_id} - ${option.dept_name}`,
-      }));
-
-      setDptdrop(deptOptions);
+    fetch(`${config.apiBaseUrl}/DeptID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
     })
-    .catch((error) => console.error("Error fetching data:", error));
-}, []);
+      .then((response) => response.json())
+      .then((data) => {
+        // Merge dept_id and dept_name
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+
+        setDptdrop(deptOptions);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
 
 
@@ -298,17 +298,16 @@ useEffect(() => {
     {
       headerName: "Department ID",
       field: "department_id",
-      width: 250, 
+      width: 250,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-  values: Dptdrop.map(d => d.value),
-},
-valueFormatter: (params) => {
-  const dept = Dptdrop.find(d => d.value === params.value);
-  return dept ? dept.label : params.value;
-},
-
+        values: Dptdrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = Dptdrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Status",
@@ -614,7 +613,7 @@ valueFormatter: (params) => {
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedJobID ? "has-value" : ""} 
@@ -633,7 +632,7 @@ valueFormatter: (params) => {
                 options={filteredOptionJobID}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Job ID{ <span className="text-danger">*</span>}
+                Job ID{<span className="text-danger">*</span>}
               </label>
             </div>
           </div>
