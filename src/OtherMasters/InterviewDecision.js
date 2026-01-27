@@ -401,7 +401,7 @@ function InterviewDecision({ }) {
         candidate_id:canditatenameSC,
         job_id:JobIDSC,
         decision_id:decision_id,
-        job_id:remarksSC,
+        remarks:remarksSC,
         decided_by:decided_bySC,
         status:statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),

@@ -77,9 +77,10 @@ function InterviewSchedule({ }) {
   const [selectedInterviewModeSC, setselectedInterviewModeSC] = useState("");
   const [InterviewModeSC, setInterviewModeSC] = useState("");
   const [isSelectInterviewModeSC, setisSelectInterviewModeSC] = useState(false);
-   const [statusgriddrop, setStatusGriddrop] = useState([]);
-   const [Paneldrop, setPaneldrop] = useState([]);
-   const [candidatedrop, setcandidatedrop] = useState([]);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [Paneldrop, setPaneldrop] = useState([]);
+  const [candidatedrop, setcandidatedrop] = useState([]);
+  const [interviewmodeDrop, setInterviewmodeDrop] = useState([]);
 
 
 
@@ -112,7 +113,7 @@ function InterviewSchedule({ }) {
     label: option.attributedetails_name
   }));
 
- useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/status`, {
       method: 'POST',
@@ -129,7 +130,7 @@ function InterviewSchedule({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
       method: 'POST',
@@ -146,7 +147,7 @@ function InterviewSchedule({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/CanditateID`, {
       method: 'POST',
@@ -190,6 +191,24 @@ function InterviewSchedule({ }) {
     if (company_code) {
       fetchDept();
     }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/InterviewMode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const interviewMode = data.map(option => option.attributedetails_name);
+        setInterviewmodeDrop(interviewMode);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const handlescandidate_name = (selectedDPT) => {
@@ -387,13 +406,13 @@ function InterviewSchedule({ }) {
     {
       headerName: "Schedule ID",
       field: "schedule_id",
-     editable: false,
+      editable: false,
     },
     {
       headerName: "Candidate ID",
       field: "candidate_id",
       cellEditor: "agSelectCellEditor",
-       cellEditorParams: {
+      cellEditorParams: {
         values: candidatedrop,
       },
       editable: true
@@ -402,8 +421,8 @@ function InterviewSchedule({ }) {
       headerName: "Panel ID",
       field: "panel_id",
       editable: true,
-       cellEditor: "agSelectCellEditor",
-       cellEditorParams: {
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
         values: Paneldrop,
       },
     },
@@ -435,6 +454,15 @@ function InterviewSchedule({ }) {
       editable: true
     },
     {
+      headerName: "Interview Mode",
+      field: "Interview_Mode",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: interviewmodeDrop,
+      },
+    },
+    {
       headerName: "Time Zone",
       field: "timezone",
       editable: true
@@ -449,7 +477,7 @@ function InterviewSchedule({ }) {
       field: "Status",
       editable: true,
       cellEditor: "agSelectCellEditor",
-       cellEditorParams: {
+      cellEditorParams: {
         values: statusgriddrop,
       },
       editable: true
@@ -548,6 +576,7 @@ function InterviewSchedule({ }) {
           meeting_link: matchedItem.meeting_link,
           Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
+          Interview_Mode: matchedItem.Interview_Mode,
         }));
         setRowData(newRows);
       } else if (response.status === 404) {
@@ -803,7 +832,7 @@ function InterviewSchedule({ }) {
               <label for="add1" className={`exp-form-labels ${error && !scheduled_datetime ? 'text-danger' : ''}`}>Schedule Date<span className="text-danger">*</span></label>
             </div>
           </div>
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -874,7 +903,7 @@ function InterviewSchedule({ }) {
               <label for="sname" className={`exp-form-labels`}>Meeting Link</label>
             </div>
           </div>
-         
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 

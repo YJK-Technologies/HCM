@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,28 +30,29 @@ function JobMaster({ }) {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("Job Master")
   const [loading, setLoading] = useState(false);
-   const [isSelectDepartment, setIsSelectDepartment] = useState(false);
-   const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
-const [departmentList, setDepartmentList] = useState([]);
-const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
-    const [selecteddpt, setselecteddept] = useState("");
-    const [DPTdrop, setDPTdrop] = useState([]);
-    const [dpt, setdpt] = useState("");
-    const [showAsterisk, setShowAsterisk] = useState(true);
-    const [selecteddptSC, setselecteddeptSC] = useState("");
-    const [dptSC, setdptSC] = useState("");
+  const [isSelectDepartment, setIsSelectDepartment] = useState(false);
+  const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
+  const [departmentList, setDepartmentList] = useState([]);
+  const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
+  const [selecteddpt, setselecteddept] = useState("");
+  const [DPTdrop, setDPTdrop] = useState([]);
+  const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [dpt, setdpt] = useState("");
+  const [showAsterisk, setShowAsterisk] = useState(true);
+  const [selecteddptSC, setselecteddeptSC] = useState("");
+  const [dptSC, setdptSC] = useState("");
   const navigate = useNavigate();
 
 
   const handleDPT = (selectedDPT) => {
-      setselecteddept(selectedDPT);
-      setdpt(selectedDPT ? selectedDPT.value : '');
-    };
+    setselecteddept(selectedDPT);
+    setdpt(selectedDPT ? selectedDPT.value : '');
+  };
   const handleDPTSC = (selectedDPT) => {
-      setselecteddeptSC(selectedDPT);
-      setdptSC(selectedDPT ? selectedDPT.value : '');
-    };
-  
+    setselecteddeptSC(selectedDPT);
+    setdptSC(selectedDPT ? selectedDPT.value : '');
+  };
+
   const filteredOptionDPt = DPTdrop.map(option => ({
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
@@ -60,54 +61,61 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
-  
-  
-     useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
-        const fetchDept = async () => {
-          try {
-            const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ company_code }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-    
-            const val = await response.json();
-            setDPTdrop(val);
-          } catch (error) {
-            console.error('Error fetching departments:', error);
-          }
-        };
-    
-        if (company_code) {
-          fetchDept();
-        }
-      }, []);
 
-      useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-      
-        fetch(`${config.apiBaseUrl}/department`, {
-          method: "POST",
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ company_code }),
-        })
-          .then((response) => response.json())
-          .then((val) => setDPTdrop(val))
-          .catch((error) =>
-            console.error("Error fetching department data:", error)
-          );
-      }, []);
-      
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const val = await response.json();
+        setDPTdrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/DeptID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setDepartmentDrop(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error)
+      );
+  }, []);
+
 
   const columnDefs = [
     {
@@ -161,22 +169,26 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: DPTdrop
-      }
+        values: departmentDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = departmentDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Country Code",
       field: "Country_Code",
       editable: true
-    },{
+    }, {
       headerName: "Location",
       field: "location",
       editable: true
-    },{
+    }, {
       headerName: "Employment Type",
       field: "employment_type",
       editable: true
-    },{
+    }, {
       headerName: "Updated On",
       field: "updated_on",
       editable: true
@@ -197,12 +209,12 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
 
   const handleSave = async () => {
     if (!dpt ||
-       !job_title ||
-       !Country_Code ||
-       !location ||
-       !employment_type ||
-       !updated_on
-      ) {
+      !job_title ||
+      !Country_Code ||
+      !location ||
+      !employment_type ||
+      !updated_on
+    ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -250,10 +262,10 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     setLoading(true);
     try {
       const body = {
-        job_title:       job_titleSC,
-        department_id:   dptSC,
-        Country_Code:    Country_CodeSC,
-        location:        locationSC,
+        job_title: job_titleSC,
+        department_id: dptSC,
+        Country_Code: Country_CodeSC,
+        location: locationSC,
         employment_type: employment_typeSC,
         updated_on: updated_onSC || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -335,7 +347,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
           if (response.ok) {
             toast.success("Data updated successfully");
 
-           
+
             setRowData(prev =>
               prev.map(row => {
                 const updated = result.data.find(u => u.job_id === row.job_id);
@@ -400,7 +412,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     );
   };
 
-    const tabs = [
+  const tabs = [
     { label: 'Candiate Master' },
     { label: 'Job Master' },
     { label: 'Interview Panel' },
@@ -411,14 +423,14 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
   ];
 
 
-   const handleTabClick = (tabLabel) => {
+  const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-       case 'Candiate Master':
+      case 'Candiate Master':
         CandidateMaster();
         break;
 
-       case 'Job Master':
+      case 'Job Master':
         JobMaster();
         break;
       case 'Interview Panel':
@@ -427,7 +439,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
       case 'Interview Panel Members':
         InterviewPanelMembers();
         break;
-     
+
       case 'Interview schedule':
         InterviewSchedule();
         break;
@@ -442,12 +454,12 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     }
   };
 
-   const CandidateMaster = () => {
+  const CandidateMaster = () => {
     navigate("/CandidateMaster");
   };
-  
 
- const JobMaster = () => {
+
+  const JobMaster = () => {
     navigate("/JobMaster");
   };
 
@@ -455,7 +467,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
     navigate("/InterviewPanel");
   };
 
- const InterviewPanelMembers = () => {
+  const InterviewPanelMembers = () => {
     navigate("/InterviewPanelMem");
   };
 
@@ -507,7 +519,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
             </div>
           </div>
 
-         <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
@@ -525,9 +537,9 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
                 onChange={handleDPT}
                 options={filteredOptionDPt}
               />
-            <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-              Department ID{showAsterisk && <span className="text-danger">*</span>}
-            </label>
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
+                Department ID{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -624,7 +636,7 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selecteddptSC ? "has-value" : ""} 
@@ -642,14 +654,14 @@ const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
                 onChange={handleDPTSC}
                 options={filteredOptionDPtSC}
               />
-            <label htmlFor="selecteddpt" className={`floating-label`}>
-              Department ID
-            </label>
-           </div>
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Department ID
+              </label>
+            </div>
           </div>
 
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
