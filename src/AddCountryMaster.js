@@ -7,41 +7,26 @@ import { ToastContainer, toast } from 'react-toastify';
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from './Loading';
+import { setDefaultLocale } from "react-datepicker";
 
 const config = require("./Apiconfig");
 
 function AddCountryMaster({ }) {
-  const [user_code, setuser_code] = useState("");
-  const [company_no, setcompany_no] = useState("");
-  const [location_no, setlocation_no] = useState("");
-  const [status, setstatus] = useState("");
-  const [order_no, setorder_no] = useState();
-  const [usercodedrop, setusercodedrop] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [locationnodrop, setlocationnodrop] = useState([]);
-  const [statusdrop, setStatusdrop] = useState([]);
+  
+  const [TimeZone_Default, seTimeZone_Default] = useState();
+  const [weekoffdrop, setweekoffdrop] = useState([]);
+  const [Country_Code, setCountry_Code] = useState("");
+  const [Country_Name, setCountry_Name] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const usercode = useRef(null);
-  const companycode = useRef(null);
-  const locno = useRef(null);
-  const Status = useRef(null);
-  const Orderno = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const modified_by = sessionStorage.getItem("selectedUserCode");
-
   const [isUpdated, setIsUpdated] = useState(false);
-  const [keyfiels, setKeyfiels] = useState('');
-
-  const [isSelectUser, setIsSelectUser] = useState(false);
-  const [isSelectCompany, setIsSelectCompany] = useState(false);
-  const [isSelectLocation, setIsSelectLocation] = useState(false);
-  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [selectedWeekoff, setselectedWeekoff] = useState("");
+  const [WeekOff, setWeekOff] = useState("");
+  const [issslectedweekoff, setisSelectedtWEeekoff] = useState(false);
+  const [key_field, setkey_field] = useState(false);
 
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
@@ -49,38 +34,22 @@ function AddCountryMaster({ }) {
   console.log(selectedRow);
 
   const clearInputFields = () => {
-    setSelectedUser("");
-    setuser_code("");
-    setSelectedCompany("");
-    setSelectedLocation("");
-    setSelectedStatus("");
-    setorder_no("");
+    setCountry_Code("");
+    setselectedWeekoff("");
+    setCountry_Name("");
   };
 
 
   useEffect(() => {
     if (mode === "update" && selectedRow && !isUpdated) {
-      setorder_no(selectedRow.order_no || "");
-      setKeyfiels(selectedRow.keyfiels || "");
-      setuser_code(selectedRow.user_code || "");
-      setcompany_no(selectedRow.company_no || "");
-      setlocation_no(selectedRow.location_no || "");
-      setstatus(selectedRow.status || "");
-      setSelectedUser({
-        label: selectedRow.user_code,
-        value: selectedRow.user_code,
-      });
-      setSelectedCompany({
-        label: selectedRow.company_no,
-        value: selectedRow.company_no,
-      });
-      setSelectedLocation({
-        label: selectedRow.location_no,
-        value: selectedRow.location_no,
-      });
-      setSelectedStatus({
-        label: selectedRow.status,
-        value: selectedRow.status,
+      setCountry_Code(selectedRow.Country_Code || "");
+      setCountry_Name(selectedRow.Country_Name || "");
+      seTimeZone_Default(selectedRow.TimeZone_Default || "");
+       setkey_field(selectedRow.keyfield || "");
+
+      setselectedWeekoff({
+        label: selectedRow.Week_Start_Day,
+        value: selectedRow.Week_Start_Day,
       });
 
     } else if (mode === "create") {
@@ -89,23 +58,14 @@ function AddCountryMaster({ }) {
   }, [mode, selectedRow, isUpdated]);
 
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/usercode`)
-      .then((data) => data.json())
-      .then((val) => setusercodedrop(val));
-  }, []);
+ 
 
-
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/locationno`)
-      .then((data) => data.json())
-      .then((val) => setlocationnodrop(val));
-  }, []);
+ 
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/WeekOff`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -113,43 +73,58 @@ function AddCountryMaster({ }) {
       body: JSON.stringify({ company_code })
     })
       .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
+      .then((val) => setweekoffdrop(val))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
 
 
-  const filteredOptionUser = usercodedrop.map((option) => ({
-    value: option.user_code,
-    label: `${option.user_code} - ${option.user_name}`,
+
+
+
+  const weekOrder = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const weekoffMap = weekoffdrop.reduce((acc, item) => {
+  acc[item.attributedetails_name] = item;
+  return acc;
+}, {});
+
+
+  
+  // const filteredOptionWeekoff = weekoffdrop.map(option => ({
+  //   value: option.attributedetails_name,
+  //   label: option.attributedetails_name
+  // }));
+ 
+  const filteredOptionWeekoff = weekOrder
+  .filter(day => weekoffMap[day]) // keeps only days sent by backend
+  .map(day => ({
+    label: day,
+    value: day,
   }));
 
- 
+
 
  
 
-  const handleChangeStatus = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-    setstatus(selectedStatus ? selectedStatus.value : "");
+  const handleWeekoff = (selectedDPT) => {
+    setselectedWeekoff(selectedDPT);
+    setWeekOff(selectedDPT ? selectedDPT.value : '');
   };
 
-  const handleChangeUser = (selectedUser) => {
-    setSelectedUser(selectedUser);
-    setuser_code(selectedUser ? selectedUser.value : "");
-  };
+ 
 
-  const handleChangeCompany = (selectedCompany) => {
-    setSelectedCompany(selectedCompany);
-    setcompany_no(selectedCompany ? selectedCompany.value : "");
-  };
-
-  const handleChangeLocation = (selectedLocation) => {
-    setSelectedLocation(selectedLocation);
-    setlocation_no(selectedLocation ? selectedLocation.value : "");
-  };
 
   const handleInsert = async () => {
-    if (!user_code || !company_no || !location_no || !status) {
+    if (!Country_Code || !Country_Name || !TimeZone_Default ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -157,7 +132,7 @@ function AddCountryMaster({ }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/addCompanyMappingData`,
+      const response = await fetch(`${config.apiBaseUrl}/CountryMasterInsert`,
         {
           method: "POST",
           headers: {
@@ -165,18 +140,17 @@ function AddCountryMaster({ }) {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            user_code,
-            company_no,
-            location_no,
-            status,
-            order_no,
+            Week_Start_Day:WeekOff,
+            Country_Code: Country_Code,
+            Country_Name:Country_Name,
+            TimeZone_Default:TimeZone_Default,
             created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         }
       );
       if (response.ok) {
         toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+          // onClose: () => clearInputFields()
         });
       } else if (response.status === 400) {
         const errorResponse = await response.json();
@@ -231,7 +205,7 @@ function AddCountryMaster({ }) {
 
 
   const handleUpdate = async () => {
-    if (!user_code || !company_no || !location_no || !status) {
+     if (!Country_Code || !Country_Name || !TimeZone_Default ){
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -239,20 +213,19 @@ function AddCountryMaster({ }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/CompanyMappingUpdate`, {
+      const response = await fetch(`${config.apiBaseUrl}/CountryMasterUpdate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          user_code,
-          company_no,
-          location_no,
-          status,
-          order_no,
-          modified_by,
-          keyfiels
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Country_Code:Country_Code,
+            Country_Name:Country_Name,
+            Week_Start_Day:WeekOff,
+            keyfield: key_field,
+            TimeZone_Default:TimeZone_Default,
+            modified_by
         }),
       });
       // if (response.status === 200) {
@@ -297,48 +270,37 @@ function AddCountryMaster({ }) {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-          <div className="col-md-2">
+            <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="usercode"
-                isClearable
-                value={selectedUser}
-                onChange={handleChangeUser}
-                options={filteredOptionUser}
-                className="exp-input-field form-control"
-                placeholder=" "
-                onFocus={() => setIsSelectUser(true)}
-                onBlur={() => setIsSelectUser(false)}
-                ref={usercode}
-                onKeyDown={(e) =>
-                  handleKeyDown(e, companycode, usercode)
-                }
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                title="Please Enter the Company Contribution"
+                required
+                autoComplete="off"
+                value={Country_Code}
+                onChange={(e) => setCountry_Code((e.target.value))}
               />
-              <label className={`exp-form-labels ${error && !user_code ? 'text-danger' : ''}`}>
-                Country Code<span className="text-danger">*</span>
-              </label>
+              <label for="sname" className={`exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
-          <div className="col-md-2">
+            <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="comno"
-                isClearable
-                value={selectedCompany}
-                onChange={handleChangeCompany}
-                className="exp-input-field form-control"
-                placeholder=" "
-                onFocus={() => setIsSelectCompany(true)}
-                onBlur={() => setIsSelectCompany(false)}
-                ref={companycode}
-                onKeyDown={(e) =>
-                  handleKeyDown(e, locno, companycode)
-                }
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                title="Please Enter the Company Contribution"
+                required
+                autoComplete="off"
+                value={Country_Name}
+                onChange={(e) => setCountry_Name((e.target.value))}
               />
-              <label for="rid" className={`exp-form-labels ${error && !company_no ? 'text-danger' : ''}`}>
-                Country Name<span className="text-danger">*</span>
-              </label>
+              <label for="sname" className={`exp-form-labels ${error && !Country_Name ? 'text-danger' : ''}`}>Country Name<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -347,49 +309,36 @@ function AddCountryMaster({ }) {
               <input
                 id="ordno"
                 class="exp-input-field form-control"
-                type="time"
+                type="text"
                 placeholder=""
                 required
                 autoComplete="off"
-                value={order_no}
-                onChange={(e) =>
-                  setorder_no(
-                    e.target.value.replace(/\D/g, "").slice(0, 50)
-                  )
-                }
-                maxLength={50}
+                value={TimeZone_Default}
+                onChange={(e) => seTimeZone_Default((e.target.value))}
               />
-              <label for="ordno" className="exp-form-labels">TimeZone Default</label>
+              <label for="ordno" className="exp-form-labels">Default Timezone</label>
             </div>
           </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="ordno"
-                class="exp-input-field form-control"
-                type="number"
+         <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedWeekoff ? "has-value" : ""} 
+              ${issslectedweekoff ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedWeekoff}
+                onChange={handleWeekoff}
+                options={filteredOptionWeekoff}
                 placeholder=""
-                required
-                autoComplete="off"
-                value={order_no}
-                onChange={(e) =>
-                  setorder_no(
-                    e.target.value.replace(/\D/g, "").slice(0, 50)
-                  )
-                }
-                maxLength={50}
-                ref={Orderno}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    if (mode === "create") {
-                      handleInsert();
-                    } else {
-                      handleUpdate();
-                    }
-                  }
-                }}
+                classNamePrefix="react-select"
+                onFocus={() => setisSelectedtWEeekoff(true)}
+                onBlur={() => setisSelectedtWEeekoff(false)}
               />
-              <label for="ordno" className="exp-form-labels">Week Start Day</label>
+              <label for="status" class={`floating-label ${error && !selectedWeekoff ? 'text-danger' : ''}`}>Week Start Day{<span className="text-danger">*</span>}
+
+              </label>
             </div>
           </div>
 
