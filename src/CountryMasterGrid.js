@@ -18,27 +18,30 @@ import LoadingScreen from './Loading';
 const config = require("./Apiconfig");
 
 function CountryMaster() {
-  const [open2, setOpen2] = React.useState(false);
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const navigate = useNavigate();
   const [editedData, setEditedData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [user_code, setuser_code] = useState("");
-  const [company_no, setcompany_no] = useState("");
-  const [location_no, setlocation_no] = useState("");
-  const [status, setstatus] = useState("");
-  const [companynodrop, setcompanynodrop] = useState([]);
-  const [locationnodrop, setlocationnodrop] = useState([]);
-  const [statusdrop, setStatusdrop] = useState([]);
-  const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [usercodedrop, setusercodedrop] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [TimeZoneDefault, setTimeZoneDefault] = useState("");
+  const [CountryCodedrop, setCountryCodedrop] = useState([]);
+  const [CountryNamedrop, setCountryNamedrop] = useState([]);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isSelectFocused, setIsSelectFocused] = useState(false);
-
+ const [issslectedCountryCode, setisSelectedtCountryCode] = useState(false);
+ const [issslectedCountryName, setisSelectedtCountryName] = useState(false);
+  const [selectedCountryCode, setselectedCountryCode] = useState("");
+  const [CountryCode, setCountryCode] = useState("");
+  const [selectCountryName, setselectedselectCountryName] = useState("");
+  const [CountryName, setCountryName] = useState("");
+  const [selectedWeekoff, setselectedWeekoff] = useState("");
+  const [WeekOff, setWeekOff] = useState("");
+  const [issslectedweekoff, setisSelectedtWEeekoff] = useState(false);
+  const [weekoffdrop, setweekoffdrop] = useState([]);
+  const [coundrop, setcoundrop] = useState([]);
+  const [namedrop, setnamedrop] = useState([]);
+  const [WeekdayDrop, setWeekdayDrop] = useState([]);
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
@@ -50,57 +53,50 @@ function CountryMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const handleCountryCode= (selectedDPT) => {
+    setselectedCountryCode(selectedDPT);
+    setCountryCode(selectedDPT ? selectedDPT.value : '');
+  };
+  const handleCountryCountryName= (selectedDPT) => {
+    setselectedselectCountryName(selectedDPT);
+    setCountryName(selectedDPT ? selectedDPT.value : '');
+  };
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/usercode`)
-      .then((response) => response.json())
-      .then((data) => {
-        const UserOption = data.map((option) => option.user_code);
-        setusercodedrop(UserOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  
+  const weekOrder = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/Companyno`)
-      .then((response) => response.json())
-      .then((data) => {
-        const CompanyOption = data.map((option) => option.company_no);
-        setcompanynodrop(CompanyOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+const weekoffMap = weekoffdrop.reduce((acc, item) => {
+  acc[item.attributedetails_name] = item;
+  return acc;
+}, {});
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/locationno`)
-      .then((response) => response.json())
-      .then((data) => {
-        const LocationOption = data.map((option) => option.location_no);
-        setlocationnodrop(LocationOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
 
-  useEffect(() => {
+  
+  // const filteredOptionWeekoff = weekoffdrop.map(option => ({
+  //   value: option.attributedetails_name,
+  //   label: option.attributedetails_name
+  // }));
+ 
+  const filteredOptionWeekoff = weekOrder
+  .filter(day => weekoffMap[day]) // keeps only days sent by backend
+  .map(day => ({
+    label: day,
+    value: day,
+  }));
+
+
+    useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ company_code })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const statusOption = data.map(option => option.attributedetails_name);
-        setStatusGriddrop(statusOption);
-      })
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/WeekOff`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -108,39 +104,126 @@ function CountryMaster() {
       body: JSON.stringify({ company_code })
     })
       .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
+      .then((val) => setweekoffdrop(val))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+   useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      fetch(`${config.apiBaseUrl}/GetCountry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const statusOption = data.map(option => option.Country_Code);
+          setcoundrop(statusOption);
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+   useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      fetch(`${config.apiBaseUrl}/WeekOff`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const statusOption = data.map(option => option.attributedetails_name);
+          setWeekdayDrop(statusOption);
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
-  const handleChangeStatus = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-    setstatus(selectedStatus ? selectedStatus.value : "");
-    setHasValueChanged(true);
+   useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      fetch(`${config.apiBaseUrl}/GetCountry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const statusOption = data.map(option => option.Country_Name);
+          setnamedrop(statusOption);
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+
+
+  const handleWeekoff = (selectedDPT) => {
+    setselectedWeekoff(selectedDPT);
+    setWeekOff(selectedDPT ? selectedDPT.value : '');
   };
+
+
+    const filteredOptionCountryCode = CountryCodedrop.map(option => ({
+    value: option.Country_Code,
+    label: option.Country_Code
+  }));
+    const filteredOptionCountryname = CountryNamedrop.map(option => ({
+    value: option.Country_Name,
+    label: option.Country_Name
+  }));
+  
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountryCodedrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountryNamedrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
 
   const handleSearch = async () => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
       const response = await fetch(
-        `${config.apiBaseUrl}/companymappingsearchdata`,
+        `${config.apiBaseUrl}/getCountrySearchData`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            company_no,
-            user_code,
+            Country_Code:CountryCode,
+           Country_Name: CountryName,
             company_code,
-            location_no,
-            status,
+           TimeZone_Default: TimeZoneDefault,
+            Week_Start_Day:WeekOff,
           }),
         }
       );
@@ -172,14 +255,14 @@ function CountryMaster() {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
-      headerName: "User Code",
-      field: "user_code",
+      headerName: "Country Code",
+      field: "Country_Code",
       editable: true,
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         maxLength: 18,
-        values: usercodedrop,
+        values: coundrop,
       },
       cellRenderer: (params) => {
         const handleClick = () => {
@@ -197,49 +280,40 @@ function CountryMaster() {
       }
     },
     {
-      headerName: "Company Code",
-      field: "company_no",
+      headerName: "Country Name",
+      field: "Country_Name",
       editable: true,
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         maxLength: 18,
-        values: companynodrop,
+        values: namedrop,
       },
     },
     {
-      headerName: "Location No",
-      field: "location_no",
+      headerName: "Week start Day",
+      field: "Week_Start_Day",
       editable: true,
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         maxLength: 18,
-        values: locationnodrop,
+        values: WeekdayDrop,
       },
     },
     {
-      headerName: "Status",
-      field: "status",
+      headerName: "Default Timezone",
+      field: "TimeZone_Default",
       editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: statusgriddrop,
-      },
+      cellStyle: { textAlign: "left" }
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   values: statusgriddrop,
+      // },
     },
     {
-      headerName: "Order No",
-      field: "order_no",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditorParams: {
-        maxLength: 50,
-      },
-    },
-    {
-      headerName: "Keyfiels",
-      field: "keyfiels",
+      headerName: "Keyfield",
+      field: "keyfield",
       editable: true,
       filter: true,
       hide: true,
@@ -443,14 +517,14 @@ function CountryMaster() {
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
 
-          const response = await fetch(`${config.apiBaseUrl}/updcompanymapping`, {
+          const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopUpdate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               company_code: company_code,
               "modified-by": modified_by,
             },
-            body: JSON.stringify({ editedData: selectedRowsData }),
+            body: JSON.stringify({ sp_Country_MasterData: selectedRowsData }),
           });
 
           if (response.status === 200) {
@@ -473,59 +547,56 @@ function CountryMaster() {
       }
     );
   };
+const deleteSelectedRows = async () => {
+  const selectedRows = gridApi.getSelectedRows();
 
-  const deleteSelectedRows = async () => {
-    const selectedRows = gridApi.getSelectedRows();
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to delete");
+    return;
+  }
 
-    if (selectedRows.length === 0) {
-      toast.warning("Please select atleast One Row to Delete");
-      return;
-    }
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const modified_by = sessionStorage.getItem("selectedUserCode");
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const modified_by = sessionStorage.getItem("selectedUserCode");
-    const keyfielsToDelete = selectedRows.map((row) => row.keyfiels);
+  const sp_Country_MasterData = selectedRows.map(row => ({
+    keyfield: row.keyfield,
+    company_code: company_code
+  }));
 
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-
-        try {
-          const response = await fetch(
-            `${config.apiBaseUrl}/commappingdeleteData`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
-                "Modified-By": modified_by,
-              },
-              body: JSON.stringify({ keyfiels: keyfielsToDelete }),
+  showConfirmationToast(
+    "Are you sure you want to delete the data in the selected rows?",
+    async () => {
+      try {
+        const response = await fetch(
+          `${config.apiBaseUrl}/Country_MasterLoopDelete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
               company_code: company_code,
-              modified_by: modified_by,
-            }
-          );
-
-          if (response.ok) {
-            console.log("Rows deleted successfully:", keyfielsToDelete);
-            setTimeout(() => {
-              toast.success("Data Deleted successfully")
-              handleSearch();
-            }, 1000);
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+              "Modified-By": modified_by,
+            },
+            body: JSON.stringify({
+              sp_Country_MasterData
+            }),
           }
-        } catch (error) {
-          console.error("Error saving data:", error);
-          toast.error("Error Deleting Data: " + error.message);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully");
+          handleSearch();
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        toast.error("Error deleting data: " + error.message);
       }
-    );
-  };
+    },
+    () => toast.info("Data delete cancelled.")
+  );
+};
+
 
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
@@ -637,41 +708,53 @@ function CountryMaster() {
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
 
+          
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="uscode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  required
-                  title="Please fill the user code here"
-                  value={user_code}
-                  onChange={(e) => setuser_code(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="uscode" class="exp-form-labels">User Code</label>
-              </div>
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCountryCode ? "has-value" : ""} 
+              ${issslectedCountryCode ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectedtCountryCode(true)}
+                onBlur={() => setisSelectedtCountryCode(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedCountryCode}
+                onChange={handleCountryCode}
+                options={filteredOptionCountryCode}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Country Code
+              </label>
             </div>
-
+          </div>
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="cno"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  required
-                  title="Please fill the company code here"
-                  value={company_no}
-                  onChange={(e) => setcompany_no(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="cno" class="exp-form-labels">Company Code</label>
-              </div>
+            <div
+              className={`inputGroup selectGroup 
+              ${selectCountryName ? "has-value" : ""} 
+              ${issslectedCountryName ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectedtCountryName(true)}
+                onBlur={() => setisSelectedtCountryName(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectCountryName}
+                onChange={handleCountryCountryName}
+                options={filteredOptionCountryname}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Country Name
+              </label>
             </div>
+          </div>
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -682,36 +765,37 @@ function CountryMaster() {
                   placeholder=" "
                   required
                   title="Please fill the location number here"
-                  value={location_no}
-                  onChange={(e) => setlocation_no(e.target.value)}
+                  value={TimeZoneDefault}
+                  onChange={(e) => setTimeZoneDefault(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
-                <label for="locno" class="exp-form-labels">Location No</label>
+                <label for="locno" class="exp-form-labels">Default Timezone </label>
               </div>
             </div>
 
             <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectFocused ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  placeholder=""
-                  classNamePrefix="react-select"
-                  onKeyDown={handleKeyDownStatus}
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
-                />
-                <label for="status" class="floating-label">Status</label>
-              </div>
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedWeekoff ? "has-value" : ""} 
+              ${issslectedweekoff ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedWeekoff}
+                onChange={handleWeekoff}
+                options={filteredOptionWeekoff}
+                placeholder=""
+                classNamePrefix="react-select"
+                onFocus={() => setisSelectedtWEeekoff(true)}
+                onBlur={() => setisSelectedtWEeekoff(false)}
+              />
+              <label for="status" class={`floating-label `}>Week Start Day
+
+              </label>
             </div>
+          </div>
 
             <div className="col-12">
               <div className="search-btn-wrapper">
