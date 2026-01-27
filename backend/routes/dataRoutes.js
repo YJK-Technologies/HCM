@@ -1188,6 +1188,12 @@ router.post("/getTimeZonesearchdata",dataController.getTimeZonesearchdata)
 router.post("/getTitle",dataController.getTitle)
 router.post("/getReligion",dataController.getReligion)
 router.post("/getNationality",dataController.getNationality)
+router.post("/CountryMasterInsert",dataController.CountryMasterInsert)
+router.post("/getCountrySearchData",dataController.getCountrySearchData)
+router.post("/Country_MasterLoopUpdate",dataController.Country_MasterLoopUpdate)
+router.post("/Country_MasterLoopDelete",dataController.Country_MasterLoopDelete)
+router.post("/GetCountry",dataController.GetCountry)
+router.post("/CountryMasterUpdate",dataController.CountryMasterUpdate)
 
 
 

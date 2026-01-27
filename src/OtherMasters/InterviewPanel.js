@@ -63,7 +63,6 @@ function InterviewPanel({ }) {
   const [JobID, setJobID] = useState("");
   const [selectedJobIDSC, setselectedJobIDSC] = useState("");
   const [JobIDSC, setJobIDSC] = useState("");
-  const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
   const [dptSC, setdptSC] = useState("");
   const [activeTab, setActiveTab] = useState("Interview Panel")
@@ -634,7 +633,7 @@ valueFormatter: (params) => {
                 options={filteredOptionJobID}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Job ID{showAsterisk && <span className="text-danger">*</span>}
+                Job ID{ <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -657,7 +656,7 @@ valueFormatter: (params) => {
                 options={filteredOptionDPt}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Department ID{showAsterisk && <span className="text-danger">*</span>}
+                Department ID{<span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -678,7 +677,7 @@ valueFormatter: (params) => {
                 onFocus={() => setIsSelectFocused(true)}
                 onBlur={() => setIsSelectFocused(false)}
               />
-              <label for="status" class={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>Status{showAsterisk && <span className="text-danger">*</span>}
+              <label for="status" class={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>Status{<span className="text-danger">*</span>}
 
               </label>
             </div>
