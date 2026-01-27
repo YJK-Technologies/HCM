@@ -90,12 +90,34 @@ const menuData = [
     icon: BsPersonVcard,
     isDropdown: true,
     subMenus: [
-      { label: "Admin Dashboard", path: "/ESSDashboard" },
-      { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-      { label: "Employee Info", path: "/AddEmployeeInfo" },
-      { label: "Salary Process", path: "/salarypath" },
-      { label: "Payslip Master", path: "/PayslipSalaryDays" },
-     
+      // { label: "Admin Dashboard", path: "/ESSDashboard" },
+      // { label: "Employee Dashboard", path: "/EmployeeDashboard" },
+      // { label: "Employee Info", path: "/AddEmployeeInfo" },
+      // { label: "Salary Process", path: "/salarypath" },
+      // { label: "Payslip Master", path: "/PayslipSalaryDays" },
+     {
+        label: "Dashboard",
+        isDropdown: true,
+        subMenus: [
+          { label: "Admin Dashboard", path: "/ESSDashboard" },
+          { label: "Employee Dashboard", path: "/EmployeeDashboard" },
+        ],
+      },
+     {
+        label: "Employee Management",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Information", path: "/AddEmployeeInfo" },
+        ],
+      },
+     {
+        label: "Payroll Management",
+        isDropdown: true,
+        subMenus: [
+          { label: "Salary Process", path: "/salarypath" },
+          { label: "Payslip Master", path: "/PayslipSalaryDays" },
+        ],
+      },
       {
         label: "Masters",
         isDropdown: true,
@@ -105,10 +127,11 @@ const menuData = [
           { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Setting Screen", path: "/WeekOff" },
+          // { label: "Setting Screen", path: "/WeekOff" },
           { label: "Interview Master", path: "/CandidateMaster" }
         ],
       },
+      { label: "Setting", path: "/WeekOff" },
     ],
   },
   {

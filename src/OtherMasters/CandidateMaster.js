@@ -148,9 +148,9 @@ function CandidateMaster() {
         email: emailSC,
         phone: phoneSC,
         applied_job_id: JobIDSC,
-        Education: Education,
-        Experience: Experience,
-        Related_experience: Related_experience,
+        Education: EducationSC,
+        Experience: ExperienceSC,
+        Related_experience: Related_experienceSC,
         company_code: sessionStorage.getItem("selectedCompanyCode")
       };
 
