@@ -53,6 +53,7 @@ function InterviewFeedback({ }) {
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [feedback_idDrop, setfeedback_idDrop] = useState([]);
   const [RecommendationDrop, setRecommendationDrop] = useState([]);
+  const [recommendationDrop, setRecommendationdrop] = useState([]);
 
   const [activeTab, setActiveTab] = useState("Interview Feedback")
   const [loading, setLoading] = useState(false);
@@ -60,19 +61,19 @@ function InterviewFeedback({ }) {
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selectedfeedback_id, setselectedfeedback_id] = useState("");
   const [feedback_id, setfeedback_id] = useState("");
-   const [selectedEmployeeID, setselectedEmployeeID] = useState("");
-    const [EmployeeID, setEmployeeID] = useState("");
-    const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
-    const [EmployeeIDSC, setEmployeeIDSC] = useState("");
-    const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
-    const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
-    const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
-     const [selectedRecommendation, setselectedRecommendation] = useState("");
-      const [Recommendation, setRecommendation] = useState("");
-      const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
-      const [RecommendationSC, setRecommendationSC] = useState("");
-      const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
-      const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
+  const [selectedEmployeeID, setselectedEmployeeID] = useState("");
+  const [EmployeeID, setEmployeeID] = useState("");
+  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
+  const [EmployeeIDSC, setEmployeeIDSC] = useState("");
+  const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
+  const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
+  const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
+  const [selectedRecommendation, setselectedRecommendation] = useState("");
+  const [Recommendation, setRecommendation] = useState("");
+  const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
+  const [RecommendationSC, setRecommendationSC] = useState("");
+  const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
+  const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
 
   const navigate = useNavigate();
 
@@ -85,37 +86,37 @@ function InterviewFeedback({ }) {
   };
 
 
-   const handlefeedback_id = (selectedDPT) => {
+  const handlefeedback_id = (selectedDPT) => {
     setselectedfeedback_id(selectedDPT);
     setfeedback_id(selectedDPT ? selectedDPT.value : '');
   };
-   const filteredOptionfeedback_id = feedback_idDrop.map(option => ({
+  const filteredOptionfeedback_id = feedback_idDrop.map(option => ({
     value: option.feedback_id,
     label: option.feedback_id,
   }));
-   const handleRecommendation = (selectedDPT) => {
+  const handleRecommendation = (selectedDPT) => {
     setselectedRecommendation(selectedDPT);
     setRecommendation(selectedDPT ? selectedDPT.value : '');
   };
-   const handleRecommendationSC = (selectedDPT) => {
+  const handleRecommendationSC = (selectedDPT) => {
     setselectedRecommendationSC(selectedDPT);
     setRecommendationSC(selectedDPT ? selectedDPT.value : '');
   };
-   const filteredOptionRecommendation = RecommendationDrop.map(option => ({
+  const filteredOptionRecommendation = RecommendationDrop.map(option => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
-      const handleEmployeeID = (selectedDPT) => {
+  const handleEmployeeID = (selectedDPT) => {
     setselectedEmployeeID(selectedDPT);
     setEmployeeID(selectedDPT ? selectedDPT.value : '');
   };
-     const handleEmployeeIDSC = (selectedDPT) => {
+  const handleEmployeeIDSC = (selectedDPT) => {
     setselectedEmployeeIDSC(selectedDPT);
     setEmployeeIDSC(selectedDPT ? selectedDPT.value : '');
   };
 
-   const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
+  const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`
   }));
@@ -137,62 +138,81 @@ function InterviewFeedback({ }) {
     label: option.schedule_id,
   }));
 
-   useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
-        const fetchDept = async () => {
-          try {
-            const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ company_code }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-    
-            const val = await response.json();
-            setEmployeeIDdrop(val);
-          } catch (error) {
-            console.error('Error fetching departments:', error);
-          }
-        };
-    
-        if (company_code) {
-          fetchDept();
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      }, []);
-   useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
-        const fetchDept = async () => {
-          try {
-            const response = await fetch(`${config.apiBaseUrl}/Recommendation `, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ company_code }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-    
-            const val = await response.json();
-            setRecommendationDrop(val);
-          } catch (error) {
-            console.error('Error fetching departments:', error);
-          }
-        };
-    
-        if (company_code) {
-          fetchDept();
+
+        const val = await response.json();
+        setEmployeeIDdrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/Recommendation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      }, []);
+
+        const val = await response.json();
+        setRecommendationDrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Recommendation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const recommendation = data.map(option => option.attributedetails_name);
+        setRecommendationdrop(recommendation);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
 
   useEffect(() => {
@@ -330,6 +350,15 @@ function InterviewFeedback({ }) {
       editable: true
     },
     {
+      headerName: "Recommendation",
+      field: "Recommendation",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: recommendationDrop,
+      },
+    },
+    {
       headerName: "Submitted On",
       field: "submitted_on",
       editable: true,
@@ -432,6 +461,7 @@ function InterviewFeedback({ }) {
           employee_id: matchedItem.employee_id,
           rating: matchedItem.rating,
           comments: matchedItem.comments,
+          Recommendation: matchedItem.Recommendation,
           submitted_on: matchedItem.submitted_on,
           keyfield: matchedItem.keyfield,
         }));
@@ -822,7 +852,7 @@ function InterviewFeedback({ }) {
             </div>
           </div>
 
-         <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedEmployeeIDSC ? "has-value" : ""} 
@@ -845,7 +875,7 @@ function InterviewFeedback({ }) {
               </label>
             </div>
           </div>
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedRecommendationSC ? "has-value" : ""} 
@@ -864,7 +894,7 @@ function InterviewFeedback({ }) {
                 options={filteredOptionRecommendation}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
-                Recommendation 
+                Recommendation
               </label>
             </div>
           </div>

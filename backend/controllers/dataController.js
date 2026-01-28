@@ -33636,7 +33636,7 @@ const job_masterLoopUpdate = async (req, res) => {
         .input("employment_type", sql.VarChar, item.employment_type)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .query(`
-          EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,@keyfield, @Country_Code, @location, @employment_type, '', @created_by, '','',@modified_by,''`);
+          EXEC sp_job_master_test @mode,@job_id,@job_title,@department_id,@company_code,@keyfield, @Country_Code, @location, @employment_type, '', '', '',@modified_by,''`);
 
       
       updatedRows.push({
@@ -33878,7 +33878,7 @@ const interview_feedbackInsert = async (req, res) => {
       .input("rating", sql.Decimal(3,2), rating)
       .input("comments", sql.NVarChar, comments)
       .input("submitted_on", sql.DateTime, submitted_on)
-      .input("Recommendation", sql.DateTime, Recommendation)
+      .input("Recommendation", sql.NVarChar, Recommendation)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)  
       .input("created_by", sql.NVarChar, created_by)
@@ -33910,7 +33910,7 @@ const interview_feedbackLoopUpdate = async (req, res) => {
         .input("rating", sql.Decimal(3, 2), item.rating)
         .input("comments", sql.NVarChar, item.comments)
         .input("submitted_on", sql.DateTime, item.submitted_on)
-        .input("Recommendation", sql.DateTime, item.Recommendation)
+        .input("Recommendation", sql.NVarChar, item.Recommendation)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
