@@ -18865,9 +18865,18 @@ const updateEmployeeFamily = async (req, res) => {
         .input("AGE", updatedRow.AGE)
         .input("aadhar_no", updatedRow.aadhar_no)
         .input("keyfield", updatedRow.keyfield)
+        .input("Sex", updatedRow.Sex)
+        .input("Nationality", updatedRow.Nationality  )
+        .input("CPR_No", updatedRow.CPR_No )
+        .input("CPR_Expiry_Date", updatedRow.CPR_Expiry_Date)
+        .input("Passport_No", updatedRow.Passport_No)
+        .input("Passport_Expiry_Date", updatedRow.Passport_Expiry_Date )
+        .input("Visa_Entitled", updatedRow.Visa_Entitled)
+        .input("Visa_Expiry_Date", updatedRow.Visa_Expiry_Date )
+        .input("Air_Ticket_Entitled", updatedRow.Air_Ticket_Entitled )
         .input("company_code", updatedRow.company_code)
         .input("modified_by", updatedRow.modified_by)
-        .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,'',@DOB,@AGE,@aadhar_no,@keyfield,@company_code,'','','','','','',0,'',0,'',@modified_by,'','','','','','','',''`);
+        .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,'',@DOB,@AGE,@aadhar_no,@keyfield,@company_code,@Sex,@Nationality,@CPR_No,@CPR_Expiry_Date,@Passport_No,@Passport_Expiry_Date,@Visa_Entitled,@Visa_Expiry_Date,@Air_Ticket_Entitled,'',@modified_by,'','','','','','','',''`);
     }
     res.status(200).json("Employee family data updated successfully");
   } catch (err) {
@@ -19171,7 +19180,7 @@ const addEmployeedoc = async (req, res) => {
 
 
 const Add_employee_bankdetails = async (req, res) => {
-  const { Account_NO, EmployeeId, AccountHolderName,Account_Type,Bank_City, bankName, branchName, IFSC_Code,Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id, company_code, created_by } = req.body;
+  const { Account_NO, EmployeeId, S_NO, AccountHolderName,Account_Type,Bank_City, bankName, branchName, IFSC_Code,Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id, company_code, created_by } = req.body;
 
   let Bankbook_img = null;
 
@@ -19204,8 +19213,7 @@ const Add_employee_bankdetails = async (req, res) => {
       .input("Is_Deleted", sql.VarChar, Is_Deleted)
       .input("S_NO", sql.Int, S_NO)
       .input("created_by", sql.VarChar, created_by)
-      .query(
-        `EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error", err);
@@ -34469,7 +34477,7 @@ const Recommendation = async (req, res) => {
 
 
 const TimeZonemasterUpdate = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, created_by, modified_by, modified_date, keyfield } = req.body;
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, modified_by, keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
@@ -34479,11 +34487,9 @@ const TimeZonemasterUpdate = async (req, res) => {
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
       .input("DST_Flag", sql.Bit, DST_Flag)
       .input("company_code", sql.NVarChar, company_code)
-      .input("created_by", sql.NVarChar, created_by)
+      .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-     .input("modified_date", sql.DateTime, new Date(modified_date))
-     .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, '', @modified_by, @modified_date, @keyfield`);
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @keyfield, '','', @modified_by, ''`);
     res.status(200).json({ success: true, message: "TimeZonemaster updated successfully" });
   } catch (err) {
     console.error("Error during TimeZonemaster update:", err);
@@ -34839,7 +34845,6 @@ const Time_Zone_masterLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
         .query(`EXEC sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @keyfield, '', '', @modified_by, @modified_date`);
     }
     res.status(200).json("Time_Zone_master data updated successfully");
@@ -34900,8 +34905,152 @@ const Time_Zone_master_sc = async (req, res) => {
   }
 };
 
+//Code Added by harish on 28-01-26
+
+const Shift_MasterInsert = async (req, res) => {
+  const { Shift_ID, Shift_Code, Shift_Name, Start_Time, End_Time, Shift_Hours, Is_Night_Shift, Grace_In_Min, Grace_Out_Min, Status, company_code, created_by,  keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("Shift_ID", sql.Int, Shift_ID)
+      .input("Shift_Code", sql.NVarChar, Shift_Code)
+      .input("Shift_Name", sql.NVarChar, Shift_Name)
+      .input("Start_Time", sql.NVarChar, Start_Time)
+      .input("End_Time", sql.NVarChar, End_Time)
+      .input("Shift_Hours", sql.Decimal(4,2), Shift_Hours)
+      .input("Is_Night_Shift", sql.Bit, Is_Night_Shift)
+      .input("Grace_In_Min", sql.Int, Grace_In_Min)
+      .input("Grace_Out_Min", sql.Int, Grace_Out_Min)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @company_code, @created_by, '', '', '', @keyfield`);
+
+   res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
+  } catch (err) {
+    console.error("Error during interview_schedule insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
 
 
+const getShiftsearchdata = async (req, res) => {
+  const { Shift_ID, Shift_Code,company_code, Shift_Name, Status} = req.body;
+
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Shift_ID", sql.Int, Shift_ID)
+      .input("Shift_Code", sql.NVarChar, Shift_Code)
+      .input("Shift_Name", sql.NVarChar, Shift_Name)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code, @Shift_Name, '', '', 0, 0, 0,0, @Status,@company_code, '', '', '', '', '' `);
+
+    // Send response
+       if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const sp_Shift_MasterLoopUpdate = async (req, res) => {
+  const sp_Shift_MasterData = req.body.sp_Shift_MasterData;
+ if (!sp_Shift_MasterData || !sp_Shift_MasterData.length) {
+  return res.status(400).json("Invalid or empty sp_Shift_MasterData array.");
+}
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("Shift_ID", sql.Int, item.Shift_ID)
+        .input("Shift_Code", sql.NVarChar, item.Shift_Code)
+        .input("Shift_Name", sql.NVarChar, item.Shift_Name)
+        .input("Start_Time", sql.NVarChar, item.Start_Time)
+        .input("End_Time", sql.NVarChar, item.End_Time)
+        .input("Shift_Hours", sql.Decimal(18,2), item.Shift_Hours)
+        .input("Is_Night_Shift", sql.Bit, item.Is_Night_Shift)
+        .input("Grace_In_Min", sql.Int, item.Grace_In_Min)
+        .input("Grace_Out_Min", sql.Int, item.Grace_Out_Min)
+        .input("Status", sql.NVarChar, item.Status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code,@Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @company_code,'','', @modified_by,'', @keyfield`);
+    }
+    res.status(200).json("Shift_Master data updated successfully");
+  } catch (err) {
+    console.error("Error in Shift_MasterLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code added by pavun on 28-1-26
+const getSex = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Sex','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getAccountType = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Account Type','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getBoolean = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Bool','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by pavun om 28-1-26
 
 
 module.exports = {
@@ -36070,5 +36219,11 @@ module.exports = {
     GetCountry,
     Time_Zone_masterLoopUpdate,
     Time_Zone_masterLoopDelete,
-    Time_Zone_master_sc
+    Time_Zone_master_sc,
+    Shift_MasterInsert,
+    getShiftsearchdata,
+    sp_Shift_MasterLoopUpdate,
+    getSex,
+    getAccountType,
+    getBoolean
 };

@@ -26,7 +26,7 @@ function AddCountryMaster({ }) {
   const [selectedWeekoff, setselectedWeekoff] = useState("");
   const [WeekOff, setWeekOff] = useState("");
   const [issslectedweekoff, setisSelectedtWEeekoff] = useState(false);
-  const [key_field, setkey_field] = useState(false);
+  const [keyfield, setkey_field] = useState(false);
 
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
@@ -45,7 +45,7 @@ function AddCountryMaster({ }) {
       setCountry_Code(selectedRow.Country_Code || "");
       setCountry_Name(selectedRow.Country_Name || "");
       seTimeZone_Default(selectedRow.TimeZone_Default || "");
-       setkey_field(selectedRow.keyfield || "");
+      setkey_field(selectedRow.keyfield || "");
 
       setselectedWeekoff({
         label: selectedRow.Week_Start_Day,
@@ -223,7 +223,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
             Country_Code:Country_Code,
             Country_Name:Country_Name,
             Week_Start_Day:WeekOff,
-            keyfield: key_field,
+            keyfield: keyfield,
             TimeZone_Default:TimeZone_Default,
             modified_by
         }),
