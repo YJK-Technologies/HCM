@@ -1197,6 +1197,9 @@ router.post("/Time_Zone_masterLoopUpdate",dataController.Time_Zone_masterLoopUpd
 router.post("/CountryMasterUpdate",dataController.CountryMasterUpdate)
 router.post("/Time_Zone_masterLoopDelete",dataController.Time_Zone_masterLoopDelete)
 router.post("/Time_Zone_master_sc",dataController.Time_Zone_master_sc)
+router.post("/getSex",dataController.getSex)
+router.post("/getAccountType",dataController.getAccountType)
+router.post("/getBool",dataController.getBoolean)
 
 
 

@@ -18865,9 +18865,18 @@ const updateEmployeeFamily = async (req, res) => {
         .input("AGE", updatedRow.AGE)
         .input("aadhar_no", updatedRow.aadhar_no)
         .input("keyfield", updatedRow.keyfield)
+        .input("Sex", updatedRow.Sex)
+        .input("Nationality", updatedRow.Nationality  )
+        .input("CPR_No", updatedRow.CPR_No )
+        .input("CPR_Expiry_Date", updatedRow.CPR_Expiry_Date)
+        .input("Passport_No", updatedRow.Passport_No)
+        .input("Passport_Expiry_Date", updatedRow.Passport_Expiry_Date )
+        .input("Visa_Entitled", updatedRow.Visa_Entitled)
+        .input("Visa_Expiry_Date", updatedRow.Visa_Expiry_Date )
+        .input("Air_Ticket_Entitled", updatedRow.Air_Ticket_Entitled )
         .input("company_code", updatedRow.company_code)
         .input("modified_by", updatedRow.modified_by)
-        .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,'',@DOB,@AGE,@aadhar_no,@keyfield,@company_code,'','','','','','',0,'',0,'',@modified_by,'','','','','','','',''`);
+        .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,'',@DOB,@AGE,@aadhar_no,@keyfield,@company_code,@Sex,@Nationality,@CPR_No,@CPR_Expiry_Date,@Passport_No,@Passport_Expiry_Date,@Visa_Entitled,@Visa_Expiry_Date,@Air_Ticket_Entitled,'',@modified_by,'','','','','','','',''`);
     }
     res.status(200).json("Employee family data updated successfully");
   } catch (err) {
@@ -19171,7 +19180,7 @@ const addEmployeedoc = async (req, res) => {
 
 
 const Add_employee_bankdetails = async (req, res) => {
-  const { Account_NO, EmployeeId, AccountHolderName,Account_Type,Bank_City, bankName, branchName, IFSC_Code,Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id, company_code, created_by } = req.body;
+  const { Account_NO, EmployeeId, S_NO, AccountHolderName,Account_Type,Bank_City, bankName, branchName, IFSC_Code,Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id, company_code, created_by } = req.body;
 
   let Bankbook_img = null;
 
@@ -19204,8 +19213,7 @@ const Add_employee_bankdetails = async (req, res) => {
       .input("Is_Deleted", sql.VarChar, Is_Deleted)
       .input("S_NO", sql.Int, S_NO)
       .input("created_by", sql.VarChar, created_by)
-      .query(
-        `EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error", err);
@@ -34901,7 +34909,59 @@ const Time_Zone_master_sc = async (req, res) => {
 };
 
 
+//Code added by pavun on 28-1-26
+const getSex = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Sex','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
 
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getAccountType = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Account Type','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getBoolean = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Bool','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by pavun om 28-1-26
 
 
 module.exports = {
@@ -36070,5 +36130,8 @@ module.exports = {
     GetCountry,
     Time_Zone_masterLoopUpdate,
     Time_Zone_masterLoopDelete,
-    Time_Zone_master_sc
+    Time_Zone_master_sc,
+    getSex,
+    getAccountType,
+    getBoolean
 };
