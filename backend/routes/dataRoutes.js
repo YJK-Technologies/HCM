@@ -1193,7 +1193,10 @@ router.post("/getCountrySearchData",dataController.getCountrySearchData)
 router.post("/Country_MasterLoopUpdate",dataController.Country_MasterLoopUpdate)
 router.post("/Country_MasterLoopDelete",dataController.Country_MasterLoopDelete)
 router.post("/GetCountry",dataController.GetCountry)
+router.post("/Time_Zone_masterLoopUpdate",dataController.Time_Zone_masterLoopUpdate)
 router.post("/CountryMasterUpdate",dataController.CountryMasterUpdate)
+router.post("/Time_Zone_masterLoopDelete",dataController.Time_Zone_masterLoopDelete)
+router.post("/Time_Zone_master_sc",dataController.Time_Zone_master_sc)
 
 
 
