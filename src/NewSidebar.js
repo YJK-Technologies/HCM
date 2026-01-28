@@ -60,6 +60,7 @@ const menuData = [
       { label: "Company Mapping", path: "/CompanyMapping" },
       { label: "Country Master", path: "/CountryMaster" },
       { label: "Time Zone Master", path: "/TimeZoneGrid" },
+      { label: "Shift Master", path: "/ShiftMasterGrid" },
       { label: "Location", path: "/Location" },
       { label: "Role", path: "/Role" },
       { label: "Role Mapping", path: "/UserRoleMapping"},

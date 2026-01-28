@@ -18,26 +18,18 @@ import LoadingScreen from './Loading';
 const config = require("./Apiconfig");
 
 function TimeZoneGrid() {
-  const [open2, setOpen2] = React.useState(false);
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const navigate = useNavigate();
   const [editedData, setEditedData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [user_code, setuser_code] = useState("");
-  const [company_no, setcompany_no] = useState("");
-  const [location_no, setlocation_no] = useState("");
-  const [status, setstatus] = useState("");
-  const [companynodrop, setcompanynodrop] = useState([]);
-  const [locationnodrop, setlocationnodrop] = useState([]);
-  const [statusdrop, setStatusdrop] = useState([]);
-  const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [usercodedrop, setusercodedrop] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [TimeZone_Name, setTimeZone_Name] = useState("");
+  const [TimeZone_ID, setTimeZone_ID] = useState("");
+  const [UTC_Offset, setUTC_Offset] = useState("");
+  const [DST_Flag , setDST_Flag ] = useState("");
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isSelectFocused, setIsSelectFocused] = useState(false);
 
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
@@ -51,96 +43,25 @@ function TimeZoneGrid() {
     .map((permission) => permission.permission_type.toLowerCase());
 
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/usercode`)
-      .then((response) => response.json())
-      .then((data) => {
-        const UserOption = data.map((option) => option.user_code);
-        setusercodedrop(UserOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/Companyno`)
-      .then((response) => response.json())
-      .then((data) => {
-        const CompanyOption = data.map((option) => option.company_no);
-        setcompanynodrop(CompanyOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/locationno`)
-      .then((response) => response.json())
-      .then((data) => {
-        const LocationOption = data.map((option) => option.location_no);
-        setlocationnodrop(LocationOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ company_code })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const statusOption = data.map(option => option.attributedetails_name);
-        setStatusGriddrop(statusOption);
-      })
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ company_code })
-    })
-      .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
-
-
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const handleChangeStatus = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-    setstatus(selectedStatus ? selectedStatus.value : "");
-    setHasValueChanged(true);
-  };
 
   const handleSearch = async () => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
       const response = await fetch(
-        `${config.apiBaseUrl}/companymappingsearchdata`,
+        `${config.apiBaseUrl}/Time_Zone_master_sc`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            company_no,
-            user_code,
-            company_code,
-            location_no,
-            status,
+            TimeZone_ID,
+            UTC_Offset,
+            TimeZone_Name,
+            company_code
+            // UTC_Offset
           }),
         }
       );
@@ -172,15 +93,15 @@ function TimeZoneGrid() {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
-      headerName: "User Code",
-      field: "user_code",
+      headerName: "TimeZone ID",
+      field: "TimeZone_ID",
       editable: true,
       cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        maxLength: 18,
-        values: usercodedrop,
-      },
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   maxLength: 18,
+      //   values: usercodedrop,
+      // },
       cellRenderer: (params) => {
         const handleClick = () => {
           handleNavigateWithRowData(params.data);
@@ -197,49 +118,40 @@ function TimeZoneGrid() {
       }
     },
     {
-      headerName: "Company Code",
-      field: "company_no",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        maxLength: 18,
-        values: companynodrop,
-      },
+      headerName: "TimeZone Name",
+      field: "TimeZone_Name",
+      editable: true
+      // cellStyle: { textAlign: "left" }
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   maxLength: 18,
+      //   values: companynodrop,
+      // },
     },
     {
-      headerName: "Location No",
-      field: "location_no",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        maxLength: 18,
-        values: locationnodrop,
-      },
+      headerName: "UTC Offset",
+      field: "UTC_Offset",
+      editable: true
+      // cellStyle: { textAlign: "left" },
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   maxLength: 18,
+      //   values: locationnodrop,
+      // },
     },
     {
-      headerName: "Status",
-      field: "status",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: statusgriddrop,
-      },
+      headerName: "DST Flag",
+      field: "DST_Flag",
+      editable: true
+      // cellStyle: { textAlign: "left" },
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   values: statusgriddrop,
+      // },
     },
     {
-      headerName: "Order No",
-      field: "order_no",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditorParams: {
-        maxLength: 50,
-      },
-    },
-    {
-      headerName: "Keyfiels",
-      field: "keyfiels",
+      headerName: "keyfield",
+      field: "keyfield",
       editable: true,
       filter: true,
       hide: true,
@@ -269,8 +181,8 @@ function TimeZoneGrid() {
       const safeValue = (val) => (val !== undefined && val !== null ? val : '');
 
       return {
-        "User Code": safeValue(row.user_code),
-        "Company No": safeValue(row.company_no),
+        "TimeZone ID": safeValue(row.TimeZone_ID),
+        "TimeZone Name": safeValue(row.TimeZone_Name),
         "Location No": safeValue(row.location_no),
         Status: safeValue(row.status),
         "Order No": safeValue(row.order_no),
@@ -377,9 +289,18 @@ function TimeZoneGrid() {
   const handleNavigateToForm = () => {
     navigate("/AddTimeZoneMaster", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
-  const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddTimeZoneMaster", { state: { mode: "update", selectedRow } });
-  };
+ const handleNavigateWithRowData = (selectedRow) => {
+  navigate("/AddTimeZoneMaster", {
+    state: {
+      mode: "update",
+      selectedRow: {
+        ...selectedRow,
+        DST_Flag: Number(selectedRow.DST_Flag) // ensures 0 or 1
+      }
+    }
+  });
+};
+
 
   // const onCellValueChanged = (params) => {
   //   const updatedRowData = [...rowData];
@@ -398,7 +319,7 @@ function TimeZoneGrid() {
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
-      (row) => row.keyfiels === params.data.keyfiels
+      (row) => row.keyfield === params.data.keyfield
     );
 
     if (rowIndex !== -1) {
@@ -407,7 +328,7 @@ function TimeZoneGrid() {
 
       setEditedData((prevData) => {
         const existingIndex = prevData.findIndex(
-          (item) => item.keyfiels === params.data.keyfiels
+          (item) => item.keyfield === params.data.keyfield
         );
 
         if (existingIndex !== -1) {
@@ -443,14 +364,14 @@ function TimeZoneGrid() {
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
 
-          const response = await fetch(`${config.apiBaseUrl}/updcompanymapping`, {
+          const response = await fetch(`${config.apiBaseUrl}/Time_Zone_masterLoopUpdate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               company_code: company_code,
               "modified-by": modified_by,
             },
-            body: JSON.stringify({ editedData: selectedRowsData }),
+            body: JSON.stringify({ sp_Time_Zone_masterData: selectedRowsData }),
           });
 
           if (response.status === 200) {
@@ -475,57 +396,55 @@ function TimeZoneGrid() {
   };
 
   const deleteSelectedRows = async () => {
-    const selectedRows = gridApi.getSelectedRows();
+  const selectedRows = gridApi.getSelectedRows();
 
-    if (selectedRows.length === 0) {
-      toast.warning("Please select atleast One Row to Delete");
-      return;
-    }
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to delete");
+    return;
+  }
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const modified_by = sessionStorage.getItem("selectedUserCode");
-    const keyfielsToDelete = selectedRows.map((row) => row.keyfiels);
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const modified_by = sessionStorage.getItem("selectedUserCode");
 
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
+  const sp_Time_Zone_masterData = selectedRows.map((row) => ({
+    keyfield: row.keyfield,
+    company_code
+  }));
 
-        try {
-          const response = await fetch(
-            `${config.apiBaseUrl}/commappingdeleteData`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
-                "Modified-By": modified_by,
-              },
-              body: JSON.stringify({ keyfiels: keyfielsToDelete }),
-              company_code: company_code,
-              modified_by: modified_by,
-            }
-          );
-
-          if (response.ok) {
-            console.log("Rows deleted successfully:", keyfielsToDelete);
-            setTimeout(() => {
-              toast.success("Data Deleted successfully")
-              handleSearch();
-            }, 1000);
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+  showConfirmationToast(
+    "Are you sure you want to Delete the data in the selected rows?",
+    async () => {
+      try {
+        const response = await fetch(
+          `${config.apiBaseUrl}/Time_Zone_masterLoopDelete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Modified-By": modified_by,
+            },
+            body: JSON.stringify({
+              sp_Time_Zone_masterData
+            }),
           }
-        } catch (error) {
-          console.error("Error saving data:", error);
-          toast.error("Error Deleting Data: " + error.message);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully");
+          handleSearch();
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Error deleting data:", error);
+        toast.error("Error Deleting Data: " + error.message);
       }
-    );
-  };
+    },
+    () => toast.info("Data delete cancelled.")
+  );
+};
+
 
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
@@ -571,34 +490,34 @@ function TimeZoneGrid() {
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Time Zone  </h1>
-          <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon add" onClick={handleNavigateToForm}>
-                <span className="tooltip">Add</span>
-                <i class="fa-solid fa-user-plus"></i>
-              </div>
-            )}
-            {["delete", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon delete" onClick={deleteSelectedRows}>
-                <span className="tooltip">Delete</span>
-                <i class="fa-solid fa-user-minus"></i>
-              </div>
-            )}
-            {["update", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon update" onClick={saveEditedData}>
-                <span className="tooltip">Update</span>
-               <i class="fa-solid fa-pen-to-square"></i>
-              </div>
-            )}
-            {["all permission", "view"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon print" onClick={generateReport}>
-                <span className="tooltip">Print</span>
-                <i class="fa-solid fa-print"></i>
-              </div>
-            )}
-          </div>
-          
-          {/* Mobile Dropdown */}
+            <div className="action-wrapper desktop-actions">
+              {["add", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
+                <div className="action-icon add" onClick={handleNavigateToForm}>
+                  <span className="tooltip">Add</span>
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+              )}
+              {["delete", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
+                <div className="action-icon delete" onClick={deleteSelectedRows}>
+                  <span className="tooltip">Delete</span>
+                  <i class="fa-solid fa-user-minus"></i>
+                </div>
+              )}
+              {["update", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
+                <div className="action-icon update" onClick={saveEditedData}>
+                  <span className="tooltip">Update</span>
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+              )}
+              {["all permission", "view"].some((permission) => companyMappingPermission.includes(permission)) && (
+                <div className="action-icon print" onClick={generateReport}>
+                  <span className="tooltip">Print</span>
+                  <i class="fa-solid fa-print"></i>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
               <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
                 <i className="fa-solid fa-list"></i>
@@ -646,8 +565,8 @@ function TimeZoneGrid() {
                   placeholder=" "
                   required
                   title="Please fill the user code here"
-                  value={user_code}
-                  onChange={(e) => setuser_code(e.target.value)}
+                  value={TimeZone_ID}
+                  onChange={(e) => setTimeZone_ID(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
@@ -664,8 +583,8 @@ function TimeZoneGrid() {
                   placeholder=" "
                   required
                   title="Please fill the company code here"
-                  value={company_no}
-                  onChange={(e) => setcompany_no(e.target.value)}
+                  value={TimeZone_Name}
+                  onChange={(e) => setTimeZone_Name(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
@@ -682,8 +601,8 @@ function TimeZoneGrid() {
                   placeholder=" "
                   required
                   title="Please fill the location number here"
-                  value={location_no}
-                  onChange={(e) => setlocation_no(e.target.value)}
+                  value={UTC_Offset}
+                  onChange={(e) => setUTC_Offset(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
@@ -691,27 +610,26 @@ function TimeZoneGrid() {
               </div>
             </div>
 
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectFocused ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  placeholder=""
-                  classNamePrefix="react-select"
-                  onKeyDown={handleKeyDownStatus}
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
+           
+
+               {/* <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  required
+                  title="Please fill the location number here"
+                  value={DST_Flag }
+                  onChange={(e) => setDST_Flag (e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
                 />
-                <label for="status" className="floating-label">DST Flag </label>
+                <label for="locno" className="exp-form-labels">DST Flag </label>
               </div>
-            </div>
+            </div> */}
+
 
             <div className="col-12">
               <div className="search-btn-wrapper">
@@ -747,25 +665,6 @@ function TimeZoneGrid() {
           </div>
         </div>
       </div>
-
-      {/* <div className="shadow-lg p-2 bg-body-tertiary rounded mt-2 mb-2">
-        <div className="row ms-2">
-          <div className="d-flex justify-content-start">
-            <p className="col-md-6">{labels.createdBy}: {createdBy}</p>
-            <p className="col-md-6">
-              {labels.createdDate}: {createdDate}
-            </p>
-          </div>
-          <div className="d-flex justify-content-start">
-            <p className="col-md-6">
-              {labels.modifiedBy}: {modifiedBy}
-            </p>
-            <p className="col-md-6">
-              {labels.modifiedDate}: {modifiedDate}
-            </p>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

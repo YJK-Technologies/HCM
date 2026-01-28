@@ -8,6 +8,7 @@ import TabButtons from "./Tabs";
 import Bankaccdetpopup from "./bankaccdetpopup";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import Select from "react-select";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -28,6 +29,29 @@ function Input({ }) {
   const [First_Name, setFirst_Name] = useState('');
   const logo = useRef(null)
   const [loading, setLoading] = useState(false);
+  const [accountTypeDrop, setAccountTypeDrop] = useState([]);
+  const [selectedAccountType, setSelectedAccountType] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [isSelectAccountType, setIsSelectAccountType] = useState(false);
+  const [isSelectWPSEnabled, setIsSelectWPSEnabled] = useState(false);
+  const [isSelectIsPrimaryAccount, setIsSelectIsPrimaryAccount] = useState(false);
+  const [isSelectIsActive, setIsSelectIsActive] = useState(false);
+  const [isSelectIsDelete, setIsSelectIsDelete] = useState(false);
+  const [bankCity, setBankCity] = useState('');
+  const [bankCountry, setBankCountry] = useState('');
+  const [salaryCurrency, setSalaryCurrency] = useState('');
+  const [booleanDrop, setBooleanDrop] = useState([]);
+  const [selectedWPSEnabled, setSelectedWPSEnabled] = useState('');
+  const [WPSEnabled, setWPSEnabled] = useState('');
+  const [WPSMemberId, setWPSMemberId] = useState('');
+  const [selectedIsPrimaryAccount, setSelectedIsPrimaryAccount] = useState('');
+  const [isPrimaryAccount, setIsPrimaryAccount] = useState('');
+  const [selectedIsActive, setSelectedIsActive] = useState('');
+  const [isActive, setIsActive] = useState('');
+  const [selectedIsDelete, setSelectedIsDelete] = useState('');
+  const [isDelete, setIsDelete] = useState('');
+  const [sNo, setSNo] = useState('');
+
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -115,6 +139,66 @@ function Input({ }) {
     { label: 'Documents' }
   ];
 
+  const handleChangeAccountType = (selectedAccountType) => {
+    setSelectedAccountType(selectedAccountType);
+    setAccountType(selectedAccountType ? selectedAccountType.value : '');
+  };
+
+  const filteredOptionAccountType = accountTypeDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getAccountType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setAccountTypeDrop(val));
+  }, []);
+
+  const handleChangeWPSEnabled = (selectedWPSEnabled) => {
+    setSelectedWPSEnabled(selectedWPSEnabled);
+    setWPSEnabled(selectedWPSEnabled ? selectedWPSEnabled.value : '');
+  };
+
+  const handleChangeIsPrimaryAccount = (selectedIsPrimaryAccount) => {
+    setSelectedIsPrimaryAccount(selectedIsPrimaryAccount);
+    setIsPrimaryAccount(selectedIsPrimaryAccount ? selectedIsPrimaryAccount.value : '');
+  };
+
+  const handleChangeIsActive = (selectedIsActive) => {
+    setSelectedIsActive(selectedIsActive);
+    setIsActive(selectedIsActive ? selectedIsActive.value : '');
+  };
+
+  const handleChangeIsDelete = (selectedIsDelete) => {
+    setSelectedIsDelete(selectedIsDelete);
+    setIsDelete(selectedIsDelete ? selectedIsDelete.value : '');
+  };
+
+  const filteredOptionBoolean = booleanDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setBooleanDrop(val));
+  }, []);
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -145,6 +229,16 @@ function Input({ }) {
       formData.append("bankName", bankName);
       formData.append("branchName", branchName);
       formData.append("IFSC_Code", IFSC_Code);
+      formData.append("Account_Type", accountType);
+      formData.append("Bank_City", bankCity);
+      formData.append("Bank_Country", bankCountry);
+      formData.append("Salary_Currency", salaryCurrency);
+      formData.append("WPS_Enabled", WPSEnabled);
+      formData.append("WPS_Member_Id", WPSMemberId);
+      formData.append("Is_Primary_Account", isPrimaryAccount);
+      formData.append("Is_Active", isActive);
+      formData.append("Is_Deleted", isDelete);
+      formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
@@ -218,8 +312,8 @@ function Input({ }) {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -248,7 +342,9 @@ function Input({ }) {
       if (response.ok) {
         const searchData = await response.json();
 
-        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName, IFSC_Code, branchName, Bankbook_img }] = searchData;
+        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName, 
+          IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
+        Is_Primary_Account, Is_Active, Is_Deleted }] = searchData;
 
         setAccountHolderName(AccountHolderName);
         setAccountNumber(Account_NO)
@@ -658,6 +754,21 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
+                id="sNo"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=" "
+                autoComplete="off"
+                value={sNo}
+                onChange={(e) => setSNo(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>SNo</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
                 id="cno"
                 class="exp-input-field form-control"
                 type="text"
@@ -729,7 +840,187 @@ function Input({ }) {
                 value={branchName}
                 onChange={(e) => setBranchName(e.target.value)}
               />
-              <label for="add1" className={`${error && !branchName ? 'text-danger' : ''}`}>Branch Name<span className="text-danger">*</span></label>
+              <label for="add1" className={`exp-form-labels ${error && !branchName ? 'text-danger' : ''}`}>Branch Name<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedAccountType ? "has-value" : ""} 
+              ${isSelectAccountType ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectAccountType(true)}
+                onBlur={() => setIsSelectAccountType(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedAccountType}
+                onChange={handleChangeAccountType}
+                options={filteredOptionAccountType}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Account Type
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="bankCity"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={bankCity}
+                onChange={(e) => setBankCity(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Bank City</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="bankCountry"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={bankCountry}
+                onChange={(e) => setBankCountry(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Bank Country</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="salaryCurrency"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={salaryCurrency}
+                onChange={(e) => setSalaryCurrency(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Salary Currency</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedWPSEnabled ? "has-value" : ""} 
+              ${isSelectWPSEnabled ? "is-focused" : ""}`}
+            >
+              <Select
+                id="WPSEnabled"
+                placeholder=" "
+                onFocus={() => setIsSelectWPSEnabled(true)}
+                onBlur={() => setIsSelectWPSEnabled(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedWPSEnabled}
+                onChange={handleChangeWPSEnabled}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                WPS Enabled
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="WPSMemberId"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=" "
+                autoComplete="off"
+                value={WPSMemberId}
+                onChange={(e) => setWPSMemberId(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>WPS Member Id</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsPrimaryAccount ? "has-value" : ""} 
+              ${isSelectIsPrimaryAccount ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsPrimaryAccount"
+                placeholder=" "
+                onFocus={() => setIsSelectIsPrimaryAccount(true)}
+                onBlur={() => setIsSelectIsPrimaryAccount(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsPrimaryAccount}
+                onChange={handleChangeIsPrimaryAccount}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Primary Account
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsActive ? "has-value" : ""} 
+              ${isSelectIsActive ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsActive"
+                placeholder=" "
+                onFocus={() => setIsSelectIsActive(true)}
+                onBlur={() => setIsSelectIsActive(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsActive}
+                onChange={handleChangeIsActive}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Active
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsDelete ? "has-value" : ""} 
+              ${isSelectIsDelete ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsDelete"
+                placeholder=" "
+                onFocus={() => setIsSelectIsDelete(true)}
+                onBlur={() => setIsSelectIsDelete(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsDelete}
+                onChange={handleChangeIsDelete}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Delete
+              </label>
             </div>
           </div>
 
