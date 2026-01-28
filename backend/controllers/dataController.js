@@ -34465,35 +34465,7 @@ const Recommendation = async (req, res) => {
 };
 
 
-const TimeZonemasterInsert = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, 
-    keyfield} = req.body;
-  try {
-    const pool = await sql.connect(dbConfig);
-    await pool.request()
-      .input("mode", sql.NVarChar, "I")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
-      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
-      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Flag", sql.Bit, DST_Flag)
-      .input("company_code", sql.NVarChar, company_code)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("keyfield", sql.NVarChar, keyfield)
-     .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code,'', '', '', '', @keyfield`);
-    if (result.rowsAffected && result.rowsAffected[0] > 0) {
-      return res.status(200).json({
-        success: true, message: 'Data inserted successfully' });
-    }
-  } catch (err) {
-    if (err.class === 16 && err.number === 50000) {
-      // Custom error from the stored procedure
-      res.status(400).json({ message: 'Timezone already exists' });
-    } else {
-      // Handle unexpected errors
-      res.status(500).json({ message: err.message || "Internal Server Error" });
-    }
-  }
-};
+
 
 
 const TimeZonemasterUpdate = async (req, res) => {
@@ -34824,6 +34796,106 @@ const GetCountry = async (req, res) => {
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const TimeZonemasterInsert = async (req, res) => {
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, 
+    keyfield} = req.body;
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
+      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+     .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code,'', '', '', '', ''`);
+res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
+  } catch (err) {
+    console.error("Error during interview_schedule insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const Time_Zone_masterLoopUpdate = async (req, res) => {
+  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
+  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
+    return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Time_Zone_masterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("TimeZone_ID", sql.NVarChar, item.TimeZone_ID)
+        .input("TimeZone_Name", sql.NVarChar, item.TimeZone_Name)
+        .input("UTC_Offset", sql.NVarChar, item.UTC_Offset)
+        .input("DST_Flag", sql.Bit, item.DST_Flag)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @keyfield, '', '', @modified_by, @modified_date`);
+    }
+    res.status(200).json("Time_Zone_master data updated successfully");
+  } catch (err) {
+    console.error("Error in Time_Zone_masterLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const  Time_Zone_masterLoopDelete = async (req, res) => {
+  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
+  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
+    return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Time_Zone_masterData) {
+      await pool.request().input("mode", sql.NVarChar, "D")
+      
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Time_Zone_master @mode, '', '', '', '', @company_code, @keyfield, '', '', '', ''`);
+    }
+    res.status(200).json("Time_Zone_master data deleted successfully");
+  } catch (err) {
+    console.error("Error in Time_Zone_masterLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const Time_Zone_master_sc = async (req, res) => {
+  const { company_code, TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
+
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
+      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .query(` EXEC sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, '', @company_code, '', '', '', '', ''`);
+
+    // Send response
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
     res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
@@ -35995,5 +36067,8 @@ module.exports = {
     getCountrySearchData,
     Country_MasterLoopUpdate,
     Country_MasterLoopDelete,
-    GetCountry
+    GetCountry,
+    Time_Zone_masterLoopUpdate,
+    Time_Zone_masterLoopDelete,
+    Time_Zone_master_sc
 };
