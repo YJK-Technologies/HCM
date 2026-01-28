@@ -11,81 +11,40 @@ import LoadingScreen from './Loading';
 const config = require("./Apiconfig");
 
 function AddTimeZoneMaster({ }) {
-  const [user_code, setuser_code] = useState("");
-  const [company_no, setcompany_no] = useState("");
-  const [location_no, setlocation_no] = useState("");
-  const [status, setstatus] = useState("");
-  const [order_no, setorder_no] = useState();
-  const [usercodedrop, setusercodedrop] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
+
   const [DST_Flag, setDST_Flag] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [locationnodrop, setlocationnodrop] = useState([]);
-  const [statusdrop, setStatusdrop] = useState([]);
   const [error, setError] = useState("");
   const [TimeZone_ID, setTimeZone_ID] = useState("");
   const [TimeZone_Name, setTimeZone_Name] = useState("");
   const [UTC_Offset, setUTC_Offset] = useState("");
+  const [key_field, setkey_field] = useState("");
   const navigate = useNavigate();
-  const usercode = useRef(null);
-  const companycode = useRef(null);
-  const locno = useRef(null);
-  const Status = useRef(null);
-  const Orderno = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const modified_by = sessionStorage.getItem("selectedUserCode");
-
+  
   const [isUpdated, setIsUpdated] = useState(false);
   const [keyfiels, setKeyfiels] = useState('');
-
-  const [isSelectUser, setIsSelectUser] = useState(false);
-  const [isSelectCompany, setIsSelectCompany] = useState(false);
-  const [isSelectLocation, setIsSelectLocation] = useState(false);
-  const [isSelectStatus, setIsSelectStatus] = useState(false);
-
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
 
   console.log(selectedRow);
 
   const clearInputFields = () => {
-    setSelectedUser("");
-    setuser_code("");
-    setSelectedCompany("");
-    setSelectedLocation("");
-    setSelectedStatus("");
-    setorder_no("");
+    setDST_Flag("");
+    setTimeZone_ID("");
+    setTimeZone_Name("");
+    setUTC_Offset("");
   };
 
 
   useEffect(() => {
     if (mode === "update" && selectedRow && !isUpdated) {
-      setorder_no(selectedRow.order_no || "");
-      setKeyfiels(selectedRow.keyfiels || "");
-      setuser_code(selectedRow.user_code || "");
-      setcompany_no(selectedRow.company_no || "");
-      setlocation_no(selectedRow.location_no || "");
-      setstatus(selectedRow.status || "");
-      setSelectedUser({
-        label: selectedRow.user_code,
-        value: selectedRow.user_code,
-      });
-      setSelectedCompany({
-        label: selectedRow.company_no,
-        value: selectedRow.company_no,
-      });
-      setSelectedLocation({
-        label: selectedRow.location_no,
-        value: selectedRow.location_no,
-      });
-      setSelectedStatus({
-        label: selectedRow.status,
-        value: selectedRow.status,
-      });
+      setTimeZone_ID(selectedRow.TimeZone_ID || "");
+      setTimeZone_Name(selectedRow.TimeZone_Name || "");
+      setUTC_Offset(selectedRow.UTC_Offset || "");
+      setDST_Flag(selectedRow.DST_Flag ?? 0);
+      setkey_field(selectedRow.keyfield || "");
 
     } else if (mode === "create") {
       clearInputFields();
@@ -93,108 +52,50 @@ function AddTimeZoneMaster({ }) {
   }, [mode, selectedRow, isUpdated]);
 
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/usercode`)
-      .then((data) => data.json())
-      .then((val) => setusercodedrop(val));
-  }, []);
 
-
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/locationno`)
-      .then((data) => data.json())
-      .then((val) => setlocationnodrop(val));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ company_code })
-    })
-      .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
-
-
-
-  const filteredOptionUser = usercodedrop.map((option) => ({
-    value: option.user_code,
-    label: `${option.user_code} - ${option.user_name}`,
-  }));
-
- 
-
- 
-
-  const handleChangeStatus = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-    setstatus(selectedStatus ? selectedStatus.value : "");
-  };
-
-  const handleChangeUser = (selectedUser) => {
-    setSelectedUser(selectedUser);
-    setuser_code(selectedUser ? selectedUser.value : "");
-  };
-
-  const handleChangeCompany = (selectedCompany) => {
-    setSelectedCompany(selectedCompany);
-    setcompany_no(selectedCompany ? selectedCompany.value : "");
-  };
-
-  const handleChangeLocation = (selectedLocation) => {
-    setSelectedLocation(selectedLocation);
-    setlocation_no(selectedLocation ? selectedLocation.value : "");
-  };
-
-const handleInsert = async () => {
-  if (!TimeZone_ID || !TimeZone_Name || !UTC_Offset || DST_Flag === undefined) {
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const response = await fetch(
-      `${config.apiBaseUrl}/TimeZonemasterInsert`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          TimeZone_ID: TimeZone_ID,
-          TimeZone_Name: TimeZone_Name,
-          UTC_Offset : UTC_Offset,
-          DST_Flag: DST_Flag,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          created_by: sessionStorage.getItem("selectedUserCode"),
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-      toast.success(data.message || "Data inserted successfully", {
-        onClose: () => clearInputFields(),
-      });
-    } else {
-      toast.warning(data.message || "Insert failed");
+  const handleInsert = async () => {
+    if (!TimeZone_ID || !TimeZone_Name || !UTC_Offset || DST_Flag === undefined) {
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  } catch (error) {
-    console.error("Error inserting timezone:", error);
-    toast.error("Server error");
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/TimeZonemasterInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            TimeZone_ID: TimeZone_ID,
+            TimeZone_Name: TimeZone_Name,
+            UTC_Offset: UTC_Offset,
+            DST_Flag: DST_Flag,
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            created_by: sessionStorage.getItem("selectedUserCode"),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || "Data inserted successfully", {
+          onClose: () => clearInputFields(),
+        });
+      } else {
+        toast.warning(data.message || "Insert failed");
+      }
+    } catch (error) {
+      console.error("Error inserting timezone:", error);
+      toast.error("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNavigate = () => {
     navigate("/TimeZoneGrid"); // Pass selectedRows as props to the Input component
@@ -233,7 +134,7 @@ const handleInsert = async () => {
 
 
   const handleUpdate = async () => {
-    if (!user_code || !company_no || !location_no || !status) {
+    if (!DST_Flag || !TimeZone_ID || !TimeZone_Name || !UTC_Offset) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -241,20 +142,19 @@ const handleInsert = async () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/CompanyMappingUpdate`, {
+      const response = await fetch(`${config.apiBaseUrl}/TimeZonemasterUpdate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          user_code,
-          company_no,
-          location_no,
-          status,
-          order_no,
-          modified_by,
-          keyfiels
+          DST_Flag:DST_Flag,
+         TimeZone_ID: TimeZone_ID,
+         TimeZone_Name: TimeZone_Name,
+          UTC_Offset:UTC_Offset,
+          keyfield: key_field,
+          modified_by
         }),
       });
       // if (response.status === 200) {
@@ -299,7 +199,7 @@ const handleInsert = async () => {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="TimeZone_ID"
@@ -315,7 +215,7 @@ const handleInsert = async () => {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="TimeZone_Name"
@@ -331,7 +231,7 @@ const handleInsert = async () => {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="UTC_Offset"
@@ -346,39 +246,7 @@ const handleInsert = async () => {
               <label for="state" className={`exp-form-labels ${error && !UTC_Offset ? 'text-danger' : ''}`}>UTC Offset<span className="text-danger">*</span></label>
             </div>
           </div>
-
-          {/* <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="ordno"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                autoComplete="off"
-                value={order_no}
-                onChange={(e) =>
-                  setorder_no(
-                    e.target.value.replace(/\D/g, "").slice(0, 50)
-                  )
-                }
-                maxLength={50}
-                ref={Orderno}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    if (mode === "create") {
-                      handleInsert();
-                    } else {
-                      handleUpdate();
-                    }
-                  }
-                }}
-              />
-              <label for="ordno" className="exp-form-labels">DST Flag </label>
-            </div>
-          </div> */}
-
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
