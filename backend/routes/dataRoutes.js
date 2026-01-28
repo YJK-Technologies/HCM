@@ -1197,9 +1197,15 @@ router.post("/Time_Zone_masterLoopUpdate",dataController.Time_Zone_masterLoopUpd
 router.post("/CountryMasterUpdate",dataController.CountryMasterUpdate)
 router.post("/Time_Zone_masterLoopDelete",dataController.Time_Zone_masterLoopDelete)
 router.post("/Time_Zone_master_sc",dataController.Time_Zone_master_sc)
+<<<<<<< HEAD
 router.post("/Shift_MasterInsert",dataController.Shift_MasterInsert)
 router.post("/getShiftsearchdata",dataController.getShiftsearchdata)
 router.post("/sp_Shift_MasterLoopUpdate",dataController.sp_Shift_MasterLoopUpdate)
+=======
+router.post("/getSex",dataController.getSex)
+router.post("/getAccountType",dataController.getAccountType)
+router.post("/getBool",dataController.getBoolean)
+>>>>>>> 77d90869429d562b00cd68cea5ac489018bd850b
 
 
 
