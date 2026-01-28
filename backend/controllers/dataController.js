@@ -36219,5 +36219,11 @@ module.exports = {
     GetCountry,
     Time_Zone_masterLoopUpdate,
     Time_Zone_masterLoopDelete,
-    Time_Zone_master_sc
+    Time_Zone_master_sc,
+    Shift_MasterInsert,
+    getShiftsearchdata,
+    sp_Shift_MasterLoopUpdate,
+    getSex,
+    getAccountType,
+    getBoolean
 };
