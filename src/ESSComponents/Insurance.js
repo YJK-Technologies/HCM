@@ -942,12 +942,15 @@ function Input({ }) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <input
-                    type="number"
+                    type="text"
                     className="exp-input-field form-control"
                     value={member.Age}
                     placeholder=" "
+                    maxLength={3}
                     autoComplete="off"
                     readOnly
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                   // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
                   />
                   <label for="cno" className={`exp-form-labels ${error && !member.Age ? 'text-danger' : ''}`}>Age{showAsterisk && <span className="text-danger">*</span>}</label>
@@ -957,13 +960,20 @@ function Input({ }) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <input
-                    type="number"
+                    type="text"
                     className="exp-input-field form-control"
                     value={member.aadharNo}
-                    maxLength={18}
+                    maxLength={12}
                     placeholder=" "
                     autoComplete="off"
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'aadharNo', e.target.value)}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        RelationInputChange(relationGroup.relation,index,'aadharNo',value);
+                      }
+                    }}
                   />
                   <label for="cno" className="exp-form-labels">Aadhaar No</label>
                 </div>
@@ -1021,7 +1031,7 @@ function Input({ }) {
                     type="number"
                     className="exp-input-field form-control"
                     value={member.CRPNo}
-                    maxLength={18}
+                    maxLength={30}
                     placeholder=" "
                     autoComplete="off"
                     onChange={(e) => RelationInputChange(relationGroup.relation, index, 'CRPNo', e.target.value)}
@@ -1051,7 +1061,7 @@ function Input({ }) {
                     type="text"
                     className="exp-input-field form-control"
                     value={member.passportNo}
-                    maxLength={18}
+                    maxLength={9}
                     placeholder=" "
                     autoComplete="off"
                     onChange={(e) => RelationInputChange(relationGroup.relation, index, 'passportNo', e.target.value)}
