@@ -160,12 +160,10 @@ function Input({ }) {
       return;
     }
 
-    if (!validateEmail(businessEmail)) {
-      toast.warning("Please enter a valid email address")
-      setError("Please enter a valid email address");
+    if (businessEmail && !validateEmail(businessEmail)) {
+      toast.warning("Please enter a valid business email");
       return;
     }
-
     setLoading(true);
     try {
       const formData = new FormData();
@@ -242,7 +240,7 @@ function Input({ }) {
     } finally {
       setLoading(false);
     }
-  };;
+  };
 
   function validateEmail(email) {
     const emailRegex = /^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/;
@@ -294,9 +292,8 @@ function Input({ }) {
       return;
     }
 
-    if (!validateEmail(businessEmail)) {
-      toast.warning("Please enter a valid email address")
-      setError("Please enter a valid email address");
+    if (businessEmail && !validateEmail(businessEmail)) {
+      toast.warning("Please enter a valid business email");
       return;
     }
 
@@ -328,7 +325,7 @@ function Input({ }) {
           formData.append("Kids", selectedkids);
           formData.append("Grade_id", selectedgradeid);
           formData.append("City", city);
-          formData.append("State",  state);
+          formData.append("State", state);
           formData.append("Country", country);
           formData.append("Postal_Code", postalCode);
           formData.append("Emergency_Contact_Phone", emergencyContactPhone);
@@ -807,9 +804,9 @@ function Input({ }) {
         const searchData = await response.json();
         const [{ EmployeeId, First_Name, Middle_Name, Last_Name, father_name, mother_name, DOB,
           email, Aadhar_no, Reference_Phone, phone1, phone2, Address1, address2, address3,
-          PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender, 
+          PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender,
           Marital_Status, Kids, Title, Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
-          Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name, 
+          Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name,
           Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
           Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
 
@@ -882,7 +879,7 @@ function Input({ }) {
         const selectedReligion = filteredOptionReligion.find(option => option.value === Religion);
         setSelectedReligion(selectedReligion);
         setReligion(selectedReligion?.value || null);
-        
+
         const selectedEmergencyContactRelation = filteredOptionRelation.find(option => option.value === Emergency_Contact_Relationship);
         setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
         setEmergencyContactRelation(selectedEmergencyContactRelation?.value || null);
@@ -983,120 +980,130 @@ function Input({ }) {
     setOpen(true);
   };
 
+  const base64ToBlob = (base64, contentType = 'image/jpeg') => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+  };
+
   const EmployeeInfo = (data) => {
-  if (!data || data.length === 0) return;
+    if (!data || data.length === 0) return;
 
-  setSaveButtonVisible(false);
-  setUpdateButtonVisible(true);
+    setSaveButtonVisible(false);
+    setUpdateButtonVisible(true);
 
-  const [{
-    EmployeeId, First_Name, Middle_Name, Last_Name, Father_Name, Mother_Name, DOB,
-    Email, Aadhar_no, Reference_Phone, phone1, phone2,
-    Address1, Address2, Address3, PermanantAddress,
-    designation_id, department_id, Reference_Name, Pan_No,
-    Photos, Grade_id, Gender, Marital_Status, Kids, Title,
-    Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
-    Number_of_Siblings, Number_of_Children, Email_Business,
-    Emergency_Contact_Name, Emergency_Contact_Phone,
-    Emergency_Contact_Relationship, City, State, Country,
-    Postal_Code, Passport_No, Passport_Expiry_Date,
-    Other_Id_Type, Other_Id_No
-  }] = data;
+    const [{
+      EmployeeId, First_Name, Middle_Name, Last_Name, Father_Name, Mother_Name, DOB,
+      Email, Aadhar_no, Reference_Phone, phone1, phone2,
+      Address1, Address2, Address3, PermanantAddress,
+      designation_id, department_id, Reference_Name, Pan_No,
+      Photos, Grade_id, Gender, Marital_Status, Kids, Title,
+      Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
+      Number_of_Siblings, Number_of_Children, Email_Business,
+      Emergency_Contact_Name, Emergency_Contact_Phone,
+      Emergency_Contact_Relationship, City, State, Country,
+      Postal_Code, Passport_No, Passport_Expiry_Date,
+      Other_Id_Type, Other_Id_No
+    }] = data;
 
-  // 🔹 BASIC FIELDS
-  setEmployeeId(EmployeeId);
-  setFirst_Name(First_Name);
-  setfirst_Name(First_Name);
-  setMiddle_Name(Middle_Name);
-  setLast_Name(Last_Name);
-  setFather_Name(Father_Name);
-  setMother_Name(Mother_Name);
-  setDOB(formatDate(DOB));
-  setEmail(Email);
-  setPhone1(phone1);
-  setPhone2(phone2);
-  setAddress1(Address1);
-  setAddress2(Address2);
-  setAddress3(Address3);
-  setPermanantAddress(PermanantAddress);
-  setReference_Name(Reference_Name);
-  setReference_Phone(Reference_Phone);
-  setPan_No(Pan_No);
-  setAadhar_no(Aadhar_no);
-  setdepartment_id(department_id);
-  setdesignation_id(designation_id);
-  setPlaceOfBirth(Place_of_Birth);
-  setBloodGroup(Blood_Group);
-  setSpouseName(Spouse_Name);
-  setNoOfSiblings(Number_of_Siblings);
-  setNoOfChildren(Number_of_Children);
-  setBusinessEmail(Email_Business);
-  setEmergencyContactName(Emergency_Contact_Name);
-  setEmergencyContactPhone(Emergency_Contact_Phone);
-  setPostalCode(Postal_Code);
-  setPassportNo(Passport_No);
-  setPassportExpiryDate(formatDate(Passport_Expiry_Date));
-  setOtherIdNo(Other_Id_No);
+    // 🔹 BASIC FIELDS
+    setEmployeeId(EmployeeId);
+    setFirst_Name(First_Name);
+    setfirst_Name(First_Name);
+    setMiddle_Name(Middle_Name);
+    setLast_Name(Last_Name);
+    setFather_Name(Father_Name);
+    setMother_Name(Mother_Name);
+    setDOB(formatDate(DOB));
+    setEmail(Email);
+    setPhone1(phone1);
+    setPhone2(phone2);
+    setAddress1(Address1);
+    setAddress2(Address2);
+    setAddress3(Address3);
+    setPermanantAddress(PermanantAddress);
+    setReference_Name(Reference_Name);
+    setReference_Phone(Reference_Phone);
+    setPan_No(Pan_No);
+    setAadhar_no(Aadhar_no);
+    setdepartment_id(department_id);
+    setdesignation_id(designation_id);
+    setPlaceOfBirth(Place_of_Birth);
+    setBloodGroup(Blood_Group);
+    setSpouseName(Spouse_Name);
+    setNoOfSiblings(Number_of_Siblings);
+    setNoOfChildren(Number_of_Children);
+    setBusinessEmail(Email_Business);
+    setEmergencyContactName(Emergency_Contact_Name);
+    setEmergencyContactPhone(Emergency_Contact_Phone);
+    setPostalCode(Postal_Code);
+    setPassportNo(Passport_No);
+    setPassportExpiryDate(formatDate(Passport_Expiry_Date));
+    setOtherIdNo(Other_Id_No);
 
-  // 🔹 IMAGE
-  if (Photos?.data) {
-    const imageBlob = new Blob([new Uint8Array(Photos.data)], { type: "image/jpeg" });
+    const imageBlob = base64ToBlob(Photos);
     setuser_image(imageBlob);
-    setSelectedImage(URL.createObjectURL(imageBlob));
-  }
+    const imageUrl = URL.createObjectURL(imageBlob);
+    setSelectedImage(imageUrl);
 
-  // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
+    // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
 
-  const selectedGrade = filteredOptionGradeid.find(o => o.value === Grade_id);
-  setGrade_id(selectedGrade);
-  setselectedgradeid(selectedGrade?.value || null);
+    const selectedGrade = filteredOptionGradeid.find(o => o.value === Grade_id);
+    setGrade_id(selectedGrade);
+    setselectedgradeid(selectedGrade?.value || null);
 
-  const selectedGender = filteredOptiongender.find(o => o.value === Gender);
-  setGender(selectedGender);
-  setselectedGender(selectedGender?.value || null);
+    const selectedGender = filteredOptiongender.find(o => o.value === Gender);
+    setGender(selectedGender);
+    setselectedGender(selectedGender?.value || null);
 
-  const selectedMartial = filteredOptionmartial.find(o => o.value === Marital_Status);
-  setMarital_Status(selectedMartial);
-  setselectedmartial(selectedMartial?.value || null);
+    const selectedMartial = filteredOptionmartial.find(o => o.value === Marital_Status);
+    setMarital_Status(selectedMartial);
+    setselectedmartial(selectedMartial?.value || null);
 
-  const selectedKids = filteredOptionKids.find(o => o.value === Kids);
-  setKids(selectedKids);
-  setselectedkids(selectedKids?.value || null);
+    const selectedKids = filteredOptionKids.find(o => o.value === Kids);
+    setKids(selectedKids);
+    setselectedkids(selectedKids?.value || null);
 
-  const selectedTitle = filteredOptionTitle.find(o => o.value === Title);
-  setSelectedTitle(selectedTitle);
-  setTitle(selectedTitle?.value || null);
+    const selectedTitle = filteredOptionTitle.find(o => o.value === Title);
+    setSelectedTitle(selectedTitle);
+    setTitle(selectedTitle?.value || null);
 
-  const selectedNationality = filteredOptionNationality.find(o => o.value === Nationality);
-  setSelectedNationality(selectedNationality);
-  setNationality(selectedNationality?.value || null);
+    const selectedNationality = filteredOptionNationality.find(o => o.value === Nationality);
+    setSelectedNationality(selectedNationality);
+    setNationality(selectedNationality?.value || null);
 
-  const selectedReligion = filteredOptionReligion.find(o => o.value === Religion);
-  setSelectedReligion(selectedReligion);
-  setReligion(selectedReligion?.value || null);
+    const selectedReligion = filteredOptionReligion.find(o => o.value === Religion);
+    setSelectedReligion(selectedReligion);
+    setReligion(selectedReligion?.value || null);
 
-  const selectedRelation = filteredOptionRelation.find(o => o.value === Emergency_Contact_Relationship);
-  setSelectedEmergencyContactRelation(selectedRelation);
-  setEmergencyContactRelation(selectedRelation?.value || null);
+    const selectedRelation = filteredOptionRelation.find(o => o.value === Emergency_Contact_Relationship);
+    setSelectedEmergencyContactRelation(selectedRelation);
+    setEmergencyContactRelation(selectedRelation?.value || null);
 
-  const selectedCity = filteredOptionCity.find(o => o.value === City);
-  setSelectedCity(selectedCity);
-  setCity(selectedCity?.value || null);
+    const selectedCity = filteredOptionCity.find(o => o.value === City);
+    setSelectedCity(selectedCity);
+    setCity(selectedCity?.value || null);
 
-  const selectedState = filteredOptionState.find(o => o.value === State);
-  setSelectedState(selectedState);
-  setState(selectedState?.value || null);
+    const selectedState = filteredOptionState.find(o => o.value === State);
+    setSelectedState(selectedState);
+    setState(selectedState?.value || null);
 
-  const selectedCountry = filteredOptionCountry.find(o => o.value === Country);
-  setSelectedCountry(selectedCountry);
-  setCountry(selectedCountry?.value || null);
+    const selectedCountry = filteredOptionCountry.find(o => o.value === Country);
+    setSelectedCountry(selectedCountry);
+    setCountry(selectedCountry?.value || null);
 
-  const selectedOtherIdType = filteredOptionOtherType.find(o => o.value === Other_Id_Type);
-  setSelectedOtherIdType(selectedOtherIdType);
-  setOtherIdType(selectedOtherIdType?.value || null);
+    const selectedOtherIdType = filteredOptionOtherType.find(o => o.value === Other_Id_Type);
+    setSelectedOtherIdType(selectedOtherIdType);
+    setOtherIdType(selectedOtherIdType?.value || null);
 
-  console.log("Popup data mapped successfully");
-};
+    console.log("Popup data mapped successfully");
+  };
 
 
 
@@ -1219,6 +1226,7 @@ function Input({ }) {
                 autoComplete="off"
                 required
                 value={EmployeeId}
+                maxLength={100}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
@@ -1570,7 +1578,6 @@ function Input({ }) {
                 autoComplete="off"
                 maxLength={20}
               />
-              {/* <label htmlFor="ReferencePhone" className="exp-form-labels">Reference Phone No</label> */}
               <label for="ReferencePhone" className={`exp-form-labels ${error && !reference_Phone ? 'text-danger' : ''}`}>Reference Phone No<span className="text-danger">*</span></label>
             </div>
           </div>
@@ -1631,7 +1638,7 @@ function Input({ }) {
                 // onChange={(e) => setAadhar_no(e.target.value)}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (value.length <= 13) {
+                  if (value.length <= 12) {
                     setAadhar_no(value);
                   }
                 }}
@@ -1787,12 +1794,17 @@ function Input({ }) {
               <input
                 id="noOfChildren"
                 className="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 value={noOfChildren}
-                onChange={(e) => setNoOfChildren(e.target.value)}
                 maxLength={2}
                 autoComplete="off"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setNoOfChildren(value);
+                  }
+                }}
               />
               <label htmlFor="noOfChildren" className="exp-form-labels">No of Children</label>
             </div>
@@ -1803,12 +1815,17 @@ function Input({ }) {
               <input
                 id="noOfSiblings"
                 className="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 value={noOfSiblings}
-                onChange={(e) => setNoOfSiblings(e.target.value)}
                 maxLength={2}
                 autoComplete="off"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setNoOfSiblings(value);
+                  }
+                }}
               />
               <label htmlFor="noOfSiblings" className="exp-form-labels">No of Siblings</label>
             </div>
@@ -1874,14 +1891,19 @@ function Input({ }) {
               <input
                 id="emergencyContactPhone"
                 className="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 value={emergencyContactPhone}
-                onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                maxLength={15}
+                maxLength={12}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setEmergencyContactPhone(value);
+                  }
+                }}
                 autoComplete="off"
               />
-              <label htmlFor="emergencyContactPhone" className={`exp-form-labels ${error && !emergencyContactPhone ? 'text-danger' : ''}`}>Emergency Contact Name{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label htmlFor="emergencyContactPhone" className={`exp-form-labels ${error && !emergencyContactPhone ? 'text-danger' : ''}`}>Emergency Contact Phone{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -1959,12 +1981,17 @@ function Input({ }) {
               <input
                 id="postalCode"
                 className="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
                 maxLength={10}
                 autoComplete="off"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setPostalCode(value);
+                  }
+                }}
               />
               <label htmlFor="postalCode" className={`exp-form-labels ${error && !postalCode ? 'text-danger' : ''}`}>Postal Code{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
@@ -2085,8 +2112,6 @@ function Input({ }) {
       <div>
         <EmployeeInfoPopup open={open} handleClose={handleClose} EmployeeInfo={EmployeeInfo} />
       </div>
-
-
     </div>
   );
 }

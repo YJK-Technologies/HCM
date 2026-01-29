@@ -95,7 +95,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Relation: relation, EmployeeName, Name: name, company_code: sessionStorage.getItem("selectedCompanyCode") })
+        body: JSON.stringify({ EmployeeId, Relation: relation, EmployeeName, company_code: sessionStorage.getItem("selectedCompanyCode") })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -180,6 +180,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={EmployeeId}
+                      maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
@@ -195,6 +196,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={EmployeeName}
+                      maxLength={250}
                       onChange={(e) => setEmployeeName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
@@ -210,6 +212,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={relation}
+                      maxLength={100}
                       onChange={(e) => setRelation(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
@@ -218,20 +221,21 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3 col-sm-6 mb-2">
+                {/* <div className="form-block col-md-3 col-sm-6 mb-2">
                   <div className="inputGroup">
                     <input
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={name}
+                      maxLength={250}
                       onChange={(e) => setName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Name</label>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Action Buttons */}
                 <div className="form-block col-12 mt-2">
