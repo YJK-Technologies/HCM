@@ -1203,6 +1203,7 @@ router.post("/sp_Shift_MasterLoopUpdate",dataController.sp_Shift_MasterLoopUpdat
 router.post("/getSex",dataController.getSex)
 router.post("/getAccountType",dataController.getAccountType)
 router.post("/getBool",dataController.getBoolean)
+router.post("/getEmployeeType",dataController.getEmployeeType)
 
 
 
