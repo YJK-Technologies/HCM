@@ -43,8 +43,14 @@ function Input() {
   const [isSelectDesignation, setIsSelectDesignation] = useState(false);
   const [isSelectManager, setIsSelectManager] = useState(false);
   const [isSelectShift, setIsSelectShift] = useState(false);
+  const [isSelectEmpType, setIsSelectEmpType] = useState(false);
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [empTypeDrop, setEmpTypeDrop] = useState([]);
+  const [selectedEmpType, setSelectedEmpType] = useState('');
+  const [empType, setEmpType] = useState('');
+  const [section, setSection] = useState('');
+  const [workLocation, setWorkLocation] = useState('');
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const companyPermissions = permissions
@@ -59,7 +65,6 @@ function Input() {
 
   // Fetch status options
   useEffect(() => {
-
     fetch(`${config.apiBaseUrl}/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -70,6 +75,18 @@ function Input() {
     })
       .then((data) => data.json())
       .then((val) => setStatusdrop(val));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getEmployeeType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpTypeDrop(val));
   }, []);
 
   useEffect(() => {
@@ -134,6 +151,11 @@ function Input() {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionEmpType = empTypeDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
   const filteredOptionDPt = DPTdrop.map((option) => ({
     value: option.Department,
     label: option.Department,
@@ -164,6 +186,11 @@ function Input() {
   const handleShiftChange = (selectedShift) => {
     setSelectedShift(selectedShift);
     setShift(selectedShift ? selectedShift.value : '');
+  };
+
+  const handleChangeEmpType = (selectedEmpType) => {
+    setSelectedEmpType(selectedEmpType);
+    setEmpType(selectedEmpType ? selectedEmpType.value : '');
   };
 
   // Handle shift change
@@ -219,7 +246,7 @@ function Input() {
       }));
 
       setDynamicOptions(formattedData);
-      return formattedData; // Return fetched data
+      return formattedData;
     } catch (error) {
       console.error('Error fetching product codes:', error);
       return [];
@@ -243,7 +270,7 @@ function Input() {
       }));
 
       setManagerOptions(formattedData);
-      return formattedData; // Return fetched data
+      return formattedData;
     } catch (error) {
       console.error('Error fetching managers:', error);
       return [];
@@ -269,8 +296,10 @@ function Input() {
         manager: manager,
         shift: Shift,
         status: status,
+        Section: section,
+        Work_Location: workLocation,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode') // Assuming this value is required
+        created_by: sessionStorage.getItem('selectedUserCode')
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addEmployeeCompany`, {
@@ -278,7 +307,7 @@ function Input() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(Header), // Sending the data
+        body: JSON.stringify(Header),
       });
 
       if (response.status === 200) {
@@ -342,8 +371,8 @@ function Input() {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -367,9 +396,12 @@ function Input() {
             department_ID: dpt,
             designation_ID: selecteddesg,
             DOJ,
+            DOL: DOL && DOL !== "" ? DOL : null,
             manager: manager,
             shift: Shift,
             status: status,
+            Section: section,
+            Work_Location: workLocation,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
             modified_by: sessionStorage.getItem('selectedUserCode')
           };
@@ -397,8 +429,8 @@ function Input() {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -455,137 +487,40 @@ function Input() {
       setSaveButtonVisible(false);
       setUpdateButtonVisible(true);
       setShowAsterisk(false);
-      const [{ EmployeeId, first_name, Department, Designation, DOJ, DOL, manager, shift, status }] = data;
+      const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location }] = data;
+      const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
+      const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
-      console.log(data);
+      setEmployeeId(EmployeeId);
+      setdepartment_id(department_ID);
+      setdesignation_id(designation_ID);
+      setFirst_Name(First_Name);
+      setDOJ(formatDateDOJ);
+      setDOL(formatDateDOL);
+      setSection(Section);
+      setWorkLocation(Work_Location);
 
-      const employeeId = document.getElementById('EmployeeId');
-      if (employeeId) {
-        employeeId.value = EmployeeId;
-        setEmployeeId(EmployeeId);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+      const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
+      setselecteddept(selecteddept);
+      setdpt(selecteddept?.value || null);
 
-      const firstname = document.getElementById('EmployeelabelName');
-      if (firstname) {
-        firstname.value = first_name;
-        setFirst_Name(first_name);
-      } else {
-        console.error('EmployeeId  not found');
-      }
-      const DPT = document.getElementById('Departmentlabel');
-      if (DPT) {
-        DPT.value = Department;
-        setdepartment_id(Department);
-      } else {
-        console.error('EmployeeId  not found');
-      }
-      const Desig = document.getElementById('designationLabel');
-      if (Desig) {
-        Desig.value = Designation;
-        setdesignation_id(Designation);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+      const designationData = await fetchProductCodes(department_ID);
+      const selectedDesg = designationData.find(option => option.value === designation_ID);
+      setDesignation(selectedDesg);
+      setSelecteddesg(selectedDesg?.value || null);
 
-      const dOJ = document.getElementById('DOJ');
-      if (dOJ) {
-        dOJ.value = DOJ;
-        setDOJ(formatDate(DOJ));
-      } else {
-        console.error('Date of Joining  not found');
-      }
+      const managerData = await fetchmanager(designation_ID);
+      const selectedmanager = managerData.find(option => option.value === manager);
+      setselectedmanager(selectedmanager);
+      setManager(selectedmanager?.value || null);
 
-      const dOl = document.getElementById('DOL');
-      if (dOl) {
-        dOl.value = DOL;
-        setDOL(formatDate(DOL));
-      } else {
-        console.error('Date of Leave not found');
-      }
+      const selectedShift = filteredOptionShift.find(option => option.value === shift);
+      setSelectedShift(selectedShift);
+      setShift(selectedShift?.value || null);
 
-      const department = document.getElementById('department');
-      if (department) {
-        const selectedDepartment = filteredOptionDPt.find(option => option.value === Department);
-        setselecteddept(selectedDepartment);
-        if (selectedDepartment) {
-  setdpt(selectedDepartment.value);
-} else {
-  console.warn("Department not found:", Department);
-  setdpt('');
-}
-      } else {
-        console.error('department element not found');
-      }
-
-      const designationOptions = await fetchProductCodes(Department);
-
-      const designation = document.getElementById('designation');
-      if (designation) {
-        const selectedDesignation = designationOptions.find(option => option.value === Designation);
-        setDesignation(selectedDesignation);
-        if (selectedDesignation) {
-  setSelecteddesg(selectedDesignation.value);
-} else {
-  console.warn("Designation not found:", Designation);
-  setSelecteddesg('');
-}
-      } else {
-        console.error('designation element not found');
-      }
-
-      const managerOptions = await fetchmanager(Designation);
-
-      const managers = document.getElementById('manager');
-      if (managers) {
-        const selectedManager = managerOptions.find(option => option.value === manager);
-        console.log(selectedManager)
-        if (selectedManager) {
-          setselectedmanager(selectedManager);
-          setManager(selectedManager.value);
-        } else {
-          console.warn('Manager not found in options:', manager);
-          setselectedmanager(null);
-          setManager('');
-        }
-      } else {
-        console.error('designation element not found');
-      }
-
-      const Shift = document.getElementById('shift');
-      if (Shift) {
-        const selectedShift = filteredOptionShift.find(option => option.value === shift);
-
-if (selectedShift) {
-  setShift(selectedShift.value);
-  setSelectedShift(selectedShift);
-} else {
-  console.warn("Shift not found:", shift);
-  setShift('');
-  setSelectedShift(null);
-}
-      } else {
-        console.error('shift element not found');
-      }
-
-      const Status = document.getElementById('status');
-      if (Status) {
-        const selectedStatus = filteredOptionStatus.find(option => option.value === status);
-
-if (selectedStatus) {
-  setStatus(selectedStatus.value);
-  setSelectedStatus(selectedStatus);
-} else {
-  console.warn("Status not found:", status);
-  setStatus('');
-  setSelectedStatus(null);
-}
-      } else {
-        console.error('status element not found');
-      }
-
-
+      const selectedStatus = filteredOptionStatus.find(option => option.value === status);
+      setSelectedStatus(selectedStatus);
+      setStatus(selectedStatus?.value || null);
       console.log(data);
     };
   }
@@ -624,7 +559,7 @@ if (selectedStatus) {
         const searchData = await response.json();
 
         if (searchData && searchData.length > 0) {
-          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status }] = searchData;
+          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location }] = searchData;
           const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
           const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
@@ -632,9 +567,10 @@ if (selectedStatus) {
           setdepartment_id(department_ID);
           setdesignation_id(designation_ID);
           setFirst_Name(First_Name);
-          console.log(First_Name)
           setDOJ(formatDateDOJ);
           setDOL(formatDateDOL);
+          setSection(Section);
+          setWorkLocation(Work_Location);
 
           const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
           setselecteddept(selecteddept);
@@ -647,7 +583,6 @@ if (selectedStatus) {
 
           const managerData = await fetchmanager(designation_ID);
           const selectedmanager = managerData.find(option => option.value === manager);
-          console.log(selectedmanager)
           setselectedmanager(selectedmanager);
           setManager(selectedmanager?.value || null);
 
@@ -731,19 +666,19 @@ if (selectedStatus) {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
-            <h1 className="page-title">Company Details</h1>
+          <h1 className="page-title">Company Details</h1>
 
-           <div className="action-wrapper desktop-actions">
+          <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
-                 <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
             {updateButtonVisible && ['update', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
               <div className="action-icon update" onClick={handleUpdate}>
                 <span className="tooltip">Update</span>
-                  <i class="fa-solid fa-pen-to-square"></i>
+                <i class="fa-solid fa-pen-to-square"></i>
               </div>
             )}
             {['delete', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
@@ -754,108 +689,108 @@ if (selectedStatus) {
             )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
 
           {/* Mobile Dropdown */}
-            <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
-              </button>
+          <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
 
-              <ul className="dropdown-menu dropdown-menu-end text-center">
+            <ul className="dropdown-menu dropdown-menu-end text-center">
 
-                {saveButtonVisible && ['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {saveButtonVisible && ['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleSave}>
+                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                </li>
+              )}
 
-                {updateButtonVisible && ['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleUpdate}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
+              {updateButtonVisible && ['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleUpdate}>
+                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                </li>
+              )}
 
-                {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleDelete}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
-                )}
+              {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleDelete}>
+                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                </li>
+              )}
 
-                {['all permission', 'reload'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={reloadGridData}>
-                    <i className="fa-solid fa-arrow-rotate-right"></i>
-                  </li>
-                )}
+              {['all permission', 'reload'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right"></i>
+                </li>
+              )}
 
-              </ul>
-            </div>
+            </ul>
+          </div>
         </div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-          <div className="row g-3">
+        <div className="row g-3">
 
           <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="EmployeeId"
-                  className="exp-input-field form-control "
-                  maxLength={100}
-                  required
-                  value={EmployeeId}
-                  onChange={(e) => setEmployeeId(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder=" "
-                  autoComplete="off"
-                />
-             <label htmlFor="EmployeeId" className={`exp-form-labels ${error && !EmployeeId ? 'text-danger' : ''}`}>Employee ID<span className="text-danger">*</span></label>
-                  <span className="select-add-btn" title="Company Details Help" onClick={handleCompanyDetails}>
-                    <i className="fa fa-search"></i>
-                  </span>
+            <div className="inputGroup">
+              <input
+                id="EmployeeId"
+                className="exp-input-field form-control "
+                maxLength={100}
+                required
+                value={EmployeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder=" "
+                autoComplete="off"
+              />
+              <label htmlFor="EmployeeId" className={`exp-form-labels ${error && !EmployeeId ? 'text-danger' : ''}`}>Employee ID<span className="text-danger">*</span></label>
+              <span className="select-add-btn" title="Company Details Help" onClick={handleCompanyDetails}>
+                <i className="fa fa-search"></i>
+              </span>
             </div>
           </div>
 
           <div className="col-md-2">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
-                  <label id='FirstNamelabel' className="partyName">
-                    <strong>Employee Name:</strong> {first_Name}
-                  </label>
-                </div>
+            <div className="exp-form-floating">
+              <div className="info-label-container">
+                <label id='FirstNamelabel' className="partyName">
+                  <strong>Employee Name:</strong> {first_Name}
+                </label>
               </div>
             </div>
+          </div>
 
-            <div className="col-md-2" style={{ marginRight: "20px", }}>
-              <div className="exp-form-floating">
-                <div className="info-label-container">
-                  <label id='Departmentlabel' className="partyName">
-                    <strong>Department:</strong> {department_id}
-                  </label>
-                </div>
+          <div className="col-md-2" style={{ marginRight: "20px", }}>
+            <div className="exp-form-floating">
+              <div className="info-label-container">
+                <label id='Departmentlabel' className="partyName">
+                  <strong>Department:</strong> {department_id}
+                </label>
               </div>
             </div>
+          </div>
 
-            <div className="col-md-2">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
-                  <label id='designationLabel' className="partyName">
-                    <strong>Designation:</strong> {designation_id}
-                  </label>
-                </div>
+          <div className="col-md-2">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
+                <label id='designationLabel' className="partyName">
+                  <strong>Designation:</strong> {designation_id}
+                </label>
               </div>
             </div>
+          </div>
 
         </div>
       </div>
 
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
       <div className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
-          <div className="row g-3">
+        <div className="row g-3">
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
@@ -873,12 +808,12 @@ if (selectedStatus) {
                 onChange={handleDPT}
                 options={filteredOptionDPt}
               />
-            <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-              Department{showAsterisk && <span className="text-danger">*</span>}
-            </label>
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
+                Department{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
-          
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -897,42 +832,44 @@ if (selectedStatus) {
                 options={dynamicOptions}
                 onChange={handleChangedesgination}
               />
-            <label htmlFor="selecteddpt" className={`floating-label ${error && !selecteddesg ? 'text-danger' : ''}`}>
-              Designation{showAsterisk && <span className="text-danger">*</span>}
-            </label>
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !selecteddesg ? 'text-danger' : ''}`}>
+                Designation{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-            <input
-              id="DOJ"
-              className="exp-input-field form-control"
-              type="date"
-              name="DOJ"
-              value={DOJ}
-              onChange={(e) => setDOJ(e.target.value)}
-              required
-            />
-            <label htmlFor="DOJ" className={`exp-form-labels ${error && !DOJ ? 'text-danger' : ''}`}>
-              DOJ{showAsterisk && <span className="text-danger">*</span>}
-            </label>
-          </div>
+              <input
+                id="DOJ"
+                className="exp-input-field form-control"
+                type="date"
+                name="DOJ"
+                placeholder=" "
+                value={DOJ}
+                onChange={(e) => setDOJ(e.target.value)}
+                required
+              />
+              <label htmlFor="DOJ" className={`exp-form-labels ${error && !DOJ ? 'text-danger' : ''}`}>
+                DOJ{showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
           </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-            <input
-              id="DOL"
-              className="exp-input-field form-control"
-              type="date"
-              name="DOL"
-              value={DOL}
-              onChange={(e) => setDOL(e.target.value)}
-            />
-             <label htmlFor="DOL" className="exp-form-labels">DOL</label>
-         </div>
-         </div>
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="date"
+                name="DOL"
+                placeholder=" "
+                value={DOL}
+                onChange={(e) => setDOL(e.target.value)}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">DOL</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div
@@ -940,27 +877,27 @@ if (selectedStatus) {
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
             >
-                <Select
-                  id="manager"
-                  placeholder=" "
+              <Select
+                id="manager"
+                placeholder=" "
                 onFocus={() => setIsSelectManager(true)}
                 onBlur={() => setIsSelectManager(false)}
                 classNamePrefix="react-select"
                 isClearable
-                  type="text"
-                  name="manager"
-                  value={selectedmanager}
-                  options={filteredOptionManager}
-                  onChange={handleChangeCode}
-                  required
-                />
+                type="text"
+                name="manager"
+                value={selectedmanager}
+                options={filteredOptionManager}
+                onChange={handleChangeCode}
+                required
+              />
               <label htmlFor="selectedmanager" className={`floating-label ${error && !manager ? 'text-danger' : ''}`}>
                 Manager{showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedShift ? "has-value" : ""} 
@@ -972,16 +909,16 @@ if (selectedStatus) {
                 value={selectedShift}
                 onChange={handleShiftChange}
                 options={filteredOptionShift}
-                 placeholder=" "
+                placeholder=" "
                 onFocus={() => setIsSelectShift(true)}
                 onBlur={() => setIsSelectShift(false)}
                 classNamePrefix="react-select"
                 isClearable
               />
-          
-            <label htmlFor="selectedshift" className={`floating-label ${error && !Shift ? 'text-danger' : ''}`}>
+
+              <label htmlFor="selectedshift" className={`floating-label ${error && !Shift ? 'text-danger' : ''}`}>
                 Shift{showAsterisk && <span className="text-danger">*</span>}
-                </label>
+              </label>
             </div>
           </div>
 
@@ -1003,9 +940,66 @@ if (selectedStatus) {
                 onChange={handleStatusChange}
                 options={filteredOptionStatus}
               />
-            <label htmlFor="Status" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
-              Status{showAsterisk && <span className="text-danger">*</span>}
+              <label htmlFor="Status" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
+                Status{showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedEmpType ? "has-value" : ""} 
+              ${isSelectEmpType ? "is-focused" : ""}`}
+            >
+              <Select
+                id="shift"
+                type="text"
+                value={selectedEmpType}
+                onChange={handleChangeEmpType}
+                options={filteredOptionEmpType}
+                 placeholder=" "
+                onFocus={() => setIsSelectEmpType(true)}
+                onBlur={() => setIsSelectEmpType(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+          
+            <label htmlFor="selectedshift" className={`floating-label`}>
+              Employee Type
             </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="text"
+                name="DOL"
+                placeholder=" "
+                value={section}
+                maxLength={50}
+                onChange={(e) => setSection(e.target.value)}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">Section</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="text"
+                name="DOL"
+                placeholder=" "
+                value={workLocation}
+                maxLength={100}
+                onChange={(e) => setWorkLocation(e.target.value)}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">Work Location</label>
             </div>
           </div>
 

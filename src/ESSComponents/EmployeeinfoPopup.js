@@ -349,6 +349,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={EmployeeId}
+                      maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
@@ -379,6 +380,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={First_Name}
+                      maxLength={100}
                       onChange={(e) => setFirst_Name(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
@@ -394,6 +396,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={Last_Name}
+                      maxLength={100}
                       onChange={(e) => setLast_Name(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />

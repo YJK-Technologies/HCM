@@ -170,14 +170,16 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const handleConfirm = () => {
     const selectedData = selectedRows.map(row => ({
       EmployeeId: row.EmployeeId,
-      Department: row.department_ID,
-      Designation: row.designation_ID,
+      department_ID: row.department_ID,
+      designation_ID: row.designation_ID,
       DOJ: row.DOJ,
       DOL: row.DOL,
       manager: row.manager,
       shift: row.shift,
       status: row.status,
-      first_name: row.first_name
+      First_name: row.first_name,
+      Section: row.Section,
+      Work_Location: row.Work_Location
     }));
     CompanyDetails(selectedData);
     handleClose();
@@ -216,6 +218,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       placeholder=" "
                       autoComplete="off"
                       value={EmployeeId}
+                      maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -230,6 +233,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       autoComplete="off"
                       className="exp-input-field form-control"
                       value={Name}
+                      maxLength={100}
                       onChange={(e) => setname(e.target.value)}
                     />
                     <label className="exp-form-labels">Employee Name</label>
@@ -243,6 +247,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={100}
                       value={Department}
                       onChange={(e) => setDepartment(e.target.value)}
                     />
@@ -258,6 +263,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       autoComplete="off"
                       placeholder=" "
                       value={Designation}
+                      maxLength={100}
                       onChange={(e) => setDesignation(e.target.value)}
                     />
                     <label className="exp-form-labels">Designation</label>

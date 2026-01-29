@@ -284,6 +284,7 @@ function Input({ }) {
       async () => {
         try {
           const Header = {
+            EmployeeId: EmployeeId,
             Account_NO: Account_NO,
             company_code: sessionStorage.getItem("selectedCompanyCode")
           };
@@ -342,9 +343,9 @@ function Input({ }) {
       if (response.ok) {
         const searchData = await response.json();
 
-        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName, 
+        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
           IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
-        Is_Primary_Account, Is_Active, Is_Deleted }] = searchData;
+          Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = searchData;
 
         setAccountHolderName(AccountHolderName);
         setAccountNumber(Account_NO)
@@ -355,13 +356,23 @@ function Input({ }) {
         setIFSCCode(IFSC_Code);
         setBankName(bankName);
         setBranchName(branchName);
+        setBankCity(Bank_City);
+        setBankCountry(Bank_Country);
+        setSalaryCurrency(Salary_Currency);
+        setWPSMemberId(WPS_Member_Id);
+        setSNo(S_NO);
+
+        setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
+        setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
+        setBooleanSelect(Is_Active, setSelectedIsActive, setIsActive);
+        setBooleanSelect(Is_Deleted, setSelectedIsDelete, setIsDelete);
+
         setUpdateButtonVisible(true);
 
         setSaveButtonVisible(false);
+
         const imageBlob = new Blob([new Uint8Array(Bankbook_img.data)], { type: 'image/jpeg' });
-
         setPassBookImg(imageBlob);
-
         const imageUrl = URL.createObjectURL(imageBlob);
         setSelectedImage(imageUrl);
 
@@ -387,23 +398,13 @@ function Input({ }) {
 
 
   const handleUpdate = async () => {
-    if (
-      !EmployeeId ||
-      !Account_NO ||
-      !AccountHolderName ||
-      !bankName ||
-      !branchName ||
-      !IFSC_Code
-
-    ) {
-      setError("Please fill all required fields.");
+    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
       return;
     }
     setLoading(true)
-    // if (!validateEmail(Email)) {
-    //   setError("Please enter a valid email address");
-    //   return;
-    // }
+
     try {
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
@@ -412,6 +413,15 @@ function Input({ }) {
       formData.append("bankName", bankName);
       formData.append("branchName", branchName);
       formData.append("IFSC_Code", IFSC_Code);
+      formData.append("Bank_City", bankCity);
+      formData.append("Bank_Country", bankCountry);
+      formData.append("Salary_Currency", salaryCurrency);
+      formData.append("WPS_Enabled", WPSEnabled);
+      formData.append("WPS_Member_Id", WPSMemberId);
+      formData.append("Is_Primary_Account", isPrimaryAccount);
+      formData.append("Is_Active", isActive);
+      formData.append("Is_Deleted", isDelete);
+      formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
 
@@ -431,23 +441,14 @@ function Input({ }) {
             onClose: () => window.location.reload(),
           });
         }, 1000);
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
-        });
-      } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data', {
-
-        });
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
+      toast.error('Error inserting data: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -466,90 +467,79 @@ function Input({ }) {
     window.location.reload();
   };
 
+  const base64ToBlob = (base64, contentType = 'image/jpeg') => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+  };
+
+  const setBooleanSelect = (
+    backendValue,
+    setSelectedFn,
+    setValueFn
+  ) => {
+    if (backendValue === null || backendValue === undefined) {
+      setSelectedFn(null);
+      setValueFn(null);
+      return;
+    }
+
+    const value = backendValue === true ? "1" : "0";
+
+    const selectedOption = filteredOptionBoolean.find(
+      option => option.value === value
+    );
+
+    setSelectedFn(selectedOption || null);
+    setValueFn(value);
+  };
+
   const Employeebankdetails = async (data) => {
 
     if (data && data.length > 0) {
       setSaveButtonVisible(false);
       setUpdateButtonVisible(true);
-      const [{ EmployeeId, Account_NO, first_name, department_ID, designation_ID, AccountHolderName, IFSC_Code, bankName, branchName }] = data;
+      const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
+        IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
+        Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = data;
 
-      console.log(data);
-      setSelectedImage(`data:image/jpeg;base64,${data[0].Bankbook_img}`);
-
-      const employeeId = document.getElementById('EmployeeId');
-      if (employeeId) {
-        employeeId.value = EmployeeId;
-        setEmployeeId(EmployeeId);
-      } else {
-        console.error('EmployeeId  not found');
+      if (Bankbook_img?.data) {
+        const imageBlob = base64ToBlob(Bankbook_img);
+        setPassBookImg(imageBlob);
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setSelectedImage(imageUrl);
       }
 
-      const firstname = document.getElementById('EmployeelabelName');
-      if (firstname) {
-        firstname.value = first_name;
-        setFirst_Name(first_name);
-      } else {
-        console.error('EmployeeId  not found');
-      }
-      const DPT = document.getElementById('Departmentlabel');
-      if (DPT) {
-        DPT.value = department_ID;
-        setdepartment_id(department_ID);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+      setAccountHolderName(AccountHolderName);
+      setAccountNumber(Account_NO)
+      setdepartment_id(department_id);
+      setdesignation_id(designation_id);
+      setFirst_Name(First_Name);
+      setEmployeeId(EmployeeId);
+      setIFSCCode(IFSC_Code);
+      setBankName(bankName);
+      setBranchName(branchName);
+      setBankCity(Bank_City);
+      setBankCountry(Bank_Country);
+      setSalaryCurrency(Salary_Currency);
+      setWPSMemberId(WPS_Member_Id);
+      setSNo(S_NO);
 
-      const Desig = document.getElementById('designationLabel');
-      if (Desig) {
-        Desig.value = designation_ID;
-        setdesignation_id(designation_ID);
-      } else {
-        console.error('EmployeeId  not found');
-      }
-
-
-      const accounno = document.getElementById('Account_NO');
-      if (accounno) {
-        accounno.value = Account_NO;
-        setAccountNumber(Account_NO);
-      } else {
-        console.error('Account_NO not found');
-      }
-
-      const accountholder = document.getElementById('AccountHolderName');
-      if (accountholder) {
-        accountholder.value = AccountHolderName;
-        setAccountHolderName(AccountHolderName);
-      } else {
-        console.error('AccountHolderName not found');
-      }
-      const IFSCCode = document.getElementById('IFSC_Code');
-      if (IFSCCode) {
-        IFSCCode.value = IFSC_Code;
-        setIFSCCode(IFSC_Code);
-      } else {
-        console.error('IFSC_Code  not found');
-      }
-      const bankname = document.getElementById('bankName');
-      if (bankname) {
-        bankname.value = bankName;
-        setBankName(bankName);
-      } else {
-        console.error('bankName not found');
-      }
-
-      const branchname = document.getElementById('branchName');
-      if (branchname) {
-        branchname.value = branchName;
-        setBranchName(branchName);
-      } else {
-        console.error('branchName not found');
-      }
+      setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
+      setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
+      setBooleanSelect(Is_Active, setSelectedIsActive, setIsActive);
+      setBooleanSelect(Is_Deleted, setSelectedIsDelete, setIsDelete);
 
     } else {
       console.log("Data not fetched...!");
     }
-    console.log(data);
+    console.log(data)
   };
 
   const EmployeeInfo = async (data) => {
@@ -703,6 +693,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={EmployeeId}
+                maxLength={100}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
@@ -775,6 +766,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={AccountHolderName}
+                maxLength={200}
                 onChange={(e) => setAccountHolderName(e.target.value)}
               />
               <label for="cno" className={`exp-form-labels ${error && !AccountHolderName ? 'text-danger' : ''}`}>Account Holder Name<span className="text-danger">*</span> </label>
@@ -791,6 +783,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={Account_NO}
+                maxLength={50}
                 onChange={(e) => setAccountNumber(e.target.value)}
               />
               <label for="cname" className={`exp-form-labels ${error && !Account_NO ? 'text-danger' : ''}`}>Account Number<span className="text-danger">*</span></label>
@@ -806,6 +799,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={IFSC_Code}
+                maxLength={11}
                 onChange={(e) => setIFSCCode(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels ${error && !IFSC_Code ? 'text-danger' : ''}`}>IFSC Code<span className="text-danger">*</span></label>
@@ -821,6 +815,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={bankName}
+                maxLength={100}
                 onChange={(e) => setBankName(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels ${error && !bankName ? 'text-danger' : ''}`}>Bank Name
@@ -838,6 +833,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={branchName}
+                maxLength={100}
                 onChange={(e) => setBranchName(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels ${error && !branchName ? 'text-danger' : ''}`}>Branch Name<span className="text-danger">*</span></label>
@@ -877,6 +873,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={bankCity}
+                maxLength={50}
                 onChange={(e) => setBankCity(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>Bank City</label>
@@ -892,6 +889,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={bankCountry}
+                maxLength={50}
                 onChange={(e) => setBankCountry(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>Bank Country</label>
@@ -907,6 +905,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={salaryCurrency}
+                maxLength={3}
                 onChange={(e) => setSalaryCurrency(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>Salary Currency</label>
@@ -942,11 +941,17 @@ function Input({ }) {
               <input
                 id="WPSMemberId"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=" "
                 autoComplete="off"
                 value={WPSMemberId}
-                onChange={(e) => setWPSMemberId(e.target.value)}
+                maxLength={20}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setWPSMemberId(value);
+                  }
+                }}
               />
               <label for="add1" className={`exp-form-labels`}>WPS Member Id</label>
             </div>

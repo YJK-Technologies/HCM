@@ -9,7 +9,6 @@ const CryptoJS = require('crypto-js');
 const upload = multer({ storage: multer.memoryStorage() });//add in top of the datacontroller page
 const path = require("path");
 const fs = require("fs");
-const { max } = require("date-fns");
 const otpStorage = {};
 
 
@@ -18726,12 +18725,12 @@ const updateEmployeeCompany = async (req, res) => {
     for (const updatedRow of EmployeeId) {
       await pool
         .request()
-        .input("mode", sql.NVarChar, "U") // Insert mode
+        .input("mode", sql.NVarChar, "U") 
         .input("EmployeeId", sql.VarChar, EmployeeId)
         .input("department_ID", sql.VarChar, department_ID)
         .input("designation_ID", sql.VarChar, designation_ID)
-        .input("DOJ", sql.Date, DOJ)
-        .input("DOL", sql.Date, DOL)
+        .input("DOJ", sql.Date, DOJ && DOJ !== "" ? DOJ : null)
+        .input("DOL", sql.Date, DOL && DOL !== "" ? DOL : null)
         .input("manager", sql.VarChar, manager)
         .input("shift", sql.VarChar, shift)
         .input("status", sql.VarChar, status)
@@ -19233,12 +19232,13 @@ const getallEmployeebankdet = async (req, res) => {
 };
 
 const Employeebankdetdelete = async (req, res) => {
-  const { Account_NO, company_code } = req.body; try {
+  const { EmployeeId, Account_NO, company_code } = req.body; try {
     const pool = await connection.connectToDatabase();
     await pool.request()
-      .input("Account_NO", sql.NVarChar, Account_NO) // Specify the type (e.g., sql.NVarChar)
-      .input("company_code", sql.NVarChar, company_code) // Specify the type (e.g., sql.NVarChar)
-      .query(`EXEC sp_employee_bankdetails 'D',@Account_NO, '', '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','','', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`); res.status(200).json("Bank details Deleted Successfully");
+      .input("EmployeeId", sql.NVarChar, EmployeeId) 
+      .input("Account_NO", sql.NVarChar, Account_NO) 
+      .input("company_code", sql.NVarChar, company_code) 
+      .query(`EXEC sp_employee_bankdetails 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','','', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`); res.status(200).json("Bank details Deleted Successfully");
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || 'Internal Server Error' });
@@ -19247,7 +19247,7 @@ const Employeebankdetdelete = async (req, res) => {
 
 
 const updateEmployeebankdet = async (req, res) => {
-  const { Account_NO, EmployeeId,Account_Type,Bank_City,Bank_Country,Salary_Currency,WPS_Enabled,WPS_Member_Id, Is_Primary_Account, Is_Active,Is_Deleted,AccountHolderName, bankName, branchName, IFSC_Code, company_code, modified_by } = req.body;
+  const { Account_NO, EmployeeId,Account_Type,Bank_City,Bank_Country,Salary_Currency,WPS_Enabled,WPS_Member_Id, Is_Primary_Account, Is_Active,Is_Deleted,AccountHolderName, bankName, branchName, IFSC_Code, company_code, modified_by, S_NO } = req.body;
 
   let Bankbook_img = null;
 
@@ -19277,18 +19277,14 @@ const updateEmployeebankdet = async (req, res) => {
       .input("Is_Primary_Account", sql.VarChar, Is_Primary_Account)
       .input("Is_Active", sql.VarChar, Is_Active	)
       .input("Is_Deleted", sql.VarChar, Is_Deleted)
+      .input("S_NO", sql.Int, S_NO)
       .input("modified_by", sql.VarChar, modified_by)
       .query(`EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.status(200).json("Employee bank details edited successfully");
-  } catch (error) {
-    if (error.class === 16 && error.number === 50000) {
-      // Custom error from the stored procedure
-      res.status(400).json({ message: error.message });
-    } else {
-      // Handle unexpected errors
-      res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
 
@@ -19514,7 +19510,7 @@ const Employeedataupdate = async (req, res) => {
       .input("Country", sql.NVarChar, Country)
       .input("Postal_Code", sql.NVarChar, Postal_Code)
       .input("Passport_No", sql.NVarChar, Passport_No)
-      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date)
+      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date ? new Date(Passport_Expiry_Date) : null)
       .input("Other_Id_Type", sql.NVarChar, Other_Id_Type)
       .input("Other_Id_No", sql.NVarChar, Other_Id_No)
       
@@ -19693,7 +19689,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("Country", sql.NVarChar, Country)
       .input("Postal_Code", sql.NVarChar, Postal_Code)
       .input("Passport_No", sql.NVarChar, Passport_No)
-      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date)
+      .input("Passport_Expiry_Date", sql.Date, Passport_Expiry_Date ? new Date(Passport_Expiry_Date) : null)
       .input("Other_Id_Type", sql.NVarChar, Other_Id_Type)
       .input("Other_Id_No", sql.NVarChar, Other_Id_No)
       .input("Created_by", sql.NVarChar, Created_by)
@@ -22739,7 +22735,7 @@ const getFinancialDetailsSearchCretria = async (req, res) => {
 };
 
 const getFamilyDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, Relation, Name, EmployeeName, company_code } = req.body;
+  const { EmployeeId, Relation, EmployeeName, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -22748,10 +22744,9 @@ const getFamilyDetailsSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Relation", sql.NVarChar, Relation)
-      .input("Name", sql.NVarChar, Name)
       .input("company_code", sql.NVarChar, company_code)
       .input("EmployeeName", sql.NVarChar, EmployeeName)
-      .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,@EmployeeName,'',0,'','',@company_code,'','','','','','',0,'',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_family @mode,@EmployeeId,@Relation,'',@EmployeeName,'',0,'','',@company_code,'','','','','','',0,'',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -35052,6 +35047,25 @@ const getBoolean = async (req, res) => {
 };
 //Code ended by pavun om 28-1-26
 
+//Code added by pavun on 29-01-26
+const getEmployeeType = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'EmpType','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by pavun on 29-01-26
+
 
 module.exports = {
   login,
@@ -36225,5 +36239,6 @@ module.exports = {
     sp_Shift_MasterLoopUpdate,
     getSex,
     getAccountType,
-    getBoolean
+    getBoolean,
+    getEmployeeType
 };

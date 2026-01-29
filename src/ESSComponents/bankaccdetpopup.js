@@ -132,7 +132,6 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
 
 
   const handleSearch = async () => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode')
     setLoading(true)
     try {
       const response = await fetch(`${config.apiBaseUrl}/getEmpBankDetailsSC`, {
@@ -207,9 +206,20 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
       branchName: row.branchName,
       IFSC_Code: row.IFSC_Code,
       Bankbook_img: row.Bankbook_img,
-      department_ID: row.department_id,
-      designation_ID: row.designation_id,
-      first_name: row.first_name
+      designation_id: row.department_id,
+      department_id: row.designation_id,
+      First_name: row.first_name,
+      Account_Type: row.Account_Type,
+      Bank_Emirate: row.Bank_Emirate,
+      Bank_City: row.Bank_City,
+      Bank_Country: row.Bank_Country,
+      Salary_Currency: row.Salary_Currency,
+      WPS_Enabled: row.WPS_Enabled,
+      WPS_Member_Id: row.WPS_Member_Id,
+      Is_Primary_Account: row.Is_Primary_Account,
+      Is_Active: row.Is_Active,
+      Is_Deleted: row.Is_Deleted,
+      S_NO: row.S_NO
     }));
 
 
@@ -253,7 +263,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={EmployeeId}
-                      maxLength={18}
+                      maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
@@ -269,6 +279,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={Name}
+                      maxLength={200}
                       onChange={(e) => setname(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
@@ -284,6 +295,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={AccountHolderName}
+                      maxLength={200}
                       onChange={(e) => setAccountHolderName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
@@ -299,6 +311,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={Account_NO}
+                      maxLength={50}
                       onChange={(e) => setAccountNumber(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
