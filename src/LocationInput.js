@@ -457,7 +457,7 @@ function LocInfoInput({ }) {
                 maxLength={250}
                 ref={locationname}
               />
-              <label for="state" class="exp-form-labels" className={`${error && !location_name ? 'text-danger' : ''}`}>Location Name<span className="text-danger">*</span></label>
+              <label for="state" className={` exp-form-labels ${error && !location_name ? 'text-danger' : ''}`}>Location Name<span className="text-danger">*</span></label>
             </div>
           </div>
 

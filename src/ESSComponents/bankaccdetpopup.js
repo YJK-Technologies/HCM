@@ -154,7 +154,6 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
             bankName: item.bankName,
             branchName: item.branchName,
             Bankbook_img: item.Bankbook_img ? arrayBufferToBase64(item.Bankbook_img.data) : null,
-
           }))
         );
         setRowData(updatedData);
@@ -208,7 +207,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
       Bankbook_img: row.Bankbook_img,
       designation_id: row.department_id,
       department_id: row.designation_id,
-      First_name: row.first_name,
+      First_Name: row.First_Name,
       Account_Type: row.Account_Type,
       Bank_Emirate: row.Bank_Emirate,
       Bank_City: row.Bank_City,
