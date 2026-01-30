@@ -235,3 +235,50 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none !important; /* Chrome, Edge, Safari */
 }
+
+/* target the dropdown menu only when it contains our switcher */
+.dropdown-menu:has(.theme-dropdown-container) {
+    min-width: auto !important; 
+    width: 60px !important;     
+    padding: 12px 0;
+    left:0;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.theme-dropdown-container {
+    width: 100%;
+}
+
+.theme-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+/* Hover effect */
+.theme-circle:hover {
+    transform: scale(1.2);
+}
+
+/* Selected state - adds a ring around the active color */
+.theme-circle.active {
+    border: 1px solid #fff;
+    outline: 2px solid #555; 
+    transform: scale(1.1);
+}
+
+/* Responsive adjustment for mobile */
+@media (max-width: 576px) {
+    .dropdown-menu:has(.theme-dropdown-container) {
+        width: 50px !important;
+    }
+    .theme-circle {
+        width: 24px;
+        height: 24px;
+    }
+}
