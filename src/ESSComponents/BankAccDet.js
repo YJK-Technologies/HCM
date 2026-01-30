@@ -214,7 +214,7 @@ function Input({ }) {
   };
 
   const handleInsert = async () => {
-    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code) {
+    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -272,7 +272,7 @@ function Input({ }) {
   };
 
   const handleDelete = async () => {
-    if (!Account_NO) {
+    if (!Account_NO || !EmployeeId) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -398,7 +398,7 @@ function Input({ }) {
 
 
   const handleUpdate = async () => {
-    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code) {
+    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -509,7 +509,7 @@ function Input({ }) {
         IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
         Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = data;
 
-      if (Bankbook_img?.data) {
+      if (Bankbook_img) {
         const imageBlob = base64ToBlob(Bankbook_img);
         setPassBookImg(imageBlob);
         const imageUrl = URL.createObjectURL(imageBlob);
@@ -1031,7 +1031,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container">
+              <div className={`image-upload-container ${error && !passBookImg ? "image-error" : ""}`}>
                 {selectedImg ? (
                   <div className="image-preview-box">
                     <img

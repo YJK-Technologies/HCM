@@ -354,7 +354,7 @@ function DesginationInput({ }) {
                     ref={desg}
                     onKeyDown={(e) => handleKeyDown(e, Status, desg)}
                   />
-                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Desgination<span className="text-danger">*</span></label>
+                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Desgination Name<span className="text-danger">*</span></label>
                 </div>
               </div>
 

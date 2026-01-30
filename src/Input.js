@@ -330,7 +330,8 @@ function Input({ }) {
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/locationno`)
       .then((data) => data.json())
-      .then((val) => setLocationdrop(val));
+      .then((val) => setLocationdrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const filteredOptionCity = drop.map((option) => ({
