@@ -519,6 +519,11 @@
   background-color: #c82333;
 }
 
+.image-error {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
 .partyName {
   /* font-weight: 600; */
   color: #000;

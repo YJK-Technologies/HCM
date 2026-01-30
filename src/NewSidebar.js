@@ -58,9 +58,6 @@ const menuData = [
     subMenus: [
       { label: "Company", path: "/Company" },
       { label: "Company Mapping", path: "/CompanyMapping" },
-      { label: "Country Master", path: "/CountryMaster" },
-      { label: "Time Zone Master", path: "/TimeZoneGrid" },
-      { label: "Shift Master", path: "/ShiftMasterGrid" },
       { label: "Location", path: "/Location" },
       { label: "Role", path: "/Role" },
       { label: "Role Mapping", path: "/UserRoleMapping"},
@@ -91,11 +88,6 @@ const menuData = [
     icon: BsPersonVcard,
     isDropdown: true,
     subMenus: [
-      // { label: "Admin Dashboard", path: "/ESSDashboard" },
-      // { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-      // { label: "Employee Info", path: "/AddEmployeeInfo" },
-      // { label: "Salary Process", path: "/salarypath" },
-      // { label: "Payslip Master", path: "/PayslipSalaryDays" },
      {
         label: "Dashboard",
         isDropdown: true,
@@ -119,6 +111,15 @@ const menuData = [
           { label: "Payslip Master", path: "/PayslipSalaryDays" },
         ],
       },
+     {
+        label: "Shift Management",
+        isDropdown: true,
+        subMenus: [
+          { label: "Country Master", path: "/CountryMaster" },
+          { label: "Time Zone Master", path: "/TimeZoneGrid" },
+          { label: "Shift Master", path: "/ShiftMasterGrid" },
+        ],
+      },
       {
         label: "Masters",
         isDropdown: true,
@@ -128,7 +129,6 @@ const menuData = [
           { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          // { label: "Setting Screen", path: "/WeekOff" },
           { label: "Interview Master", path: "/CandidateMaster" }
         ],
       },

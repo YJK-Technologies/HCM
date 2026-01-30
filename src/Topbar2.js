@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './Topbar2.css'; 
+import './Topbar2.css';
 import './NewSideBar.css'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Swal from 'sweetalert2';
@@ -7,10 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import DocumentPdf from './pdf/YJK_ERP_DOCUMENTATION.pdf';
 import { ThemeProvider } from './ThemeContext';
 import AppContent from './App_content';
+import { showConfirmationToast } from './ToastConfirmation';
 
 // Assuming config is imported from Apiconfig
 const TopBar = () => {
   const user_code = sessionStorage.getItem('selectedUserCode');
+  const user_name = sessionStorage.getItem('selectedUserName');
   const [selectedImage, setSelectedImage] = useState(null);
   const userImageBase64 = sessionStorage.getItem('user_image');
   const userImageSrc = userImageBase64 ? `data:image/png;base64,${userImageBase64}` : null;
@@ -28,11 +30,29 @@ const TopBar = () => {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
+  // const handleLogout = () => {
+  //   localStorage.clear();
+  //   sessionStorage.clear();
+  //   navigate('/login', { replace: true });
+  //   window.history.pushState(null, null, window.location.href);
+  // };
+
+  const performLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate('/login', { replace: true });
     window.history.pushState(null, null, window.location.href);
+  };
+
+  // The function that triggers your custom confirmation toast
+  const handleLogoutClick = (e) => {
+    e.preventDefault(); // Prevent link jump
+
+    showConfirmationToast(
+      "Are you sure you want to logout?",
+      performLogout, // Runs if user clicks 'Yes'
+      () => console.log("Logout cancelled") // Runs if user clicks 'No'
+    );
   };
 
   // Back button handling remains the same...
@@ -256,28 +276,50 @@ const TopBar = () => {
                 </div>
               )}
             </a>
-            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li style={{ cursor: "pointer" }}>
-                <a className="dropdown-item" onClick={handleAccount}>List of Companies</a>
+            <ul className="dropdown-menu dropdown-menu-end profile-dropdown-card" aria-labelledby="navbarDropdown">
+              {/* User Info Header */}
+              <li className="px-3 py-2 border-bottom mb-2">
+                <div className="d-flex align-items-center">
+                  <div className="me-2">
+                    {/* Reusing your avatar logic */}
+                    {userImageSrc ? (
+                      <img src={userImageSrc} alt="User" width="40" height="40" className="rounded-circle border" />
+                    ) : (
+                      <div className="avatar-placeholder-small">{user_code?.charAt(0)}</div>
+                    )}
+                  </div>
+                  <div className="lh-sm">
+                    <p className="mb-0 fw-bold text-white">{user_name || 'User'}</p>
+                    {/* <small className="text-white text-center align-text-center" style={{ fontSize: '11px' }}>Active Account</small> */}
+                  </div>
+                </div>
               </li>
-              <li style={{ cursor: "pointer" }}>
-                <a className="dropdown-item" onClick={handlesetting}>Settings</a>
-              </li>
+
+              {/* Main Actions */}
+              <li><a className="dropdown-item" onClick={handleAccount}><i className="bi bi-building me-2"></i>Companies</a></li>
+              <li><a className="dropdown-item" onClick={handlesetting}><i className="bi bi-gear me-2"></i>Settings</a></li>
+
               <li>
-                <label className="dropdown-item" style={{ cursor: "pointer" }}>
-                  Change Profile Picture
+                <label className="dropdown-item mb-0">
+                  <i className="bi bi-camera me-2"></i>Change Photo
                   <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
                 </label>
               </li>
+
               {selectedImage && (
-                <li style={{ cursor: "pointer" }}>
-                  <button className="dropdown-item" onClick={handleSaveImage}>
-                    Save Image
-                  </button>
+                <li className="px-2 mt-1">
+                  <button className="btn btn-sm btn-primary w-100 py-1" onClick={handleSaveImage}>Save Changes</button>
                 </li>
               )}
-              <li style={{ cursor: "pointer" }}>
-                <a className="dropdown-item" onClick={handleLogout}>Logout</a>
+
+              {/* Divider */}
+              <li><hr className="dropdown-divider border-secondary" /></li>
+
+              {/* Logout */}
+              <li>
+                <a className="dropdown-item logout-item" onClick={handleLogoutClick}>
+                  <i className="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
               </li>
             </ul>
           </div>
@@ -288,7 +330,7 @@ const TopBar = () => {
               className="text-white p-0 theme-icon-link"
               href="#"
               id="dropdownMenuButton"
-              role="button" 
+              role="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               title="Change Theme"

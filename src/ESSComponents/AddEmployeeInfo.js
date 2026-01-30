@@ -1047,10 +1047,12 @@ function Input({ }) {
     setPassportExpiryDate(formatDate(Passport_Expiry_Date));
     setOtherIdNo(Other_Id_No);
 
+    if(Photos){
     const imageBlob = base64ToBlob(Photos);
     setuser_image(imageBlob);
     const imageUrl = URL.createObjectURL(imageBlob);
     setSelectedImage(imageUrl);
+    }
 
     // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
 
