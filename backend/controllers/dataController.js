@@ -13549,7 +13549,7 @@ const AddDepartment = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_department @mode,@dept_id,@dept_name,@company_code,'',@Status,@created_by,@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_department @mode,@dept_id,@dept_name,@company_code,'',@Status,@created_by,'',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error", err);
@@ -13562,7 +13562,7 @@ const AddDepartment = async (req, res) => {
 const ViewEmployee = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(`EXEC sp_department 'A','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`)
+    const result = await sql.query(`EXEC sp_department 'A','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`)
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -14408,7 +14408,7 @@ const getDept = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_department 'F','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_department 'F','','',@company_code,'','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -15233,14 +15233,9 @@ const DesgintionEditData = async (req, res) => {
     }
 
     res.status(200).json("Edited data saved successfully");
-  } catch (error) {
-    if (error.class === 16 && error.number === 50000) {
-      // Custom error from the stored procedure
-      res.status(400).json({ message: error.message });
-    } else {
-      // Handle unexpected errors
-      res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
 
@@ -15275,7 +15270,7 @@ const desgsearch = async (req, res) => {
 
 
 const DeptSearch = async (req, res) => {
-  const { dept_id, dept_name, company_code } = req.body;
+  const { dept_id, dept_name, Status, company_code } = req.body;
 
   try {
     // Connect to the database
@@ -15287,8 +15282,9 @@ const DeptSearch = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("dept_id", sql.NVarChar, dept_id)
       .input("dept_name", sql.NVarChar, dept_name)
+      .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_department @mode,@dept_id,@dept_name,@company_code,'','','', '',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_department @mode,@dept_id,@dept_name,@company_code,'',@Status,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     // Send response
     if (result.recordset.length > 0) {
@@ -15321,8 +15317,9 @@ const DepartmetEditData = async (req, res) => {
         .input("dept_name", updatedRow.dept_name)
         .input("Status", updatedRow.Status)
         .input("key_field", updatedRow.key_field)
+        .input("company_code", sql.NVarChar, req.headers['company_code'])
         .input("modified_by", sql.NVarChar, req.headers['modified-by'])
-        .query(`EXEC sp_department @mode,'',@dept_name,'',@key_field,@Status,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_department @mode,'',@dept_name,@company_code,@key_field,@Status,'','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Edited data saved successfully");
@@ -15351,7 +15348,7 @@ const departmentDelete = async (req, res) => {
     for (const key_field of keyfieldsToDelete) {
       try {
         await pool.request().input("key_field", sql.NVarChar, key_field)
-          .query(`EXEC sp_department 'D','','','',@key_field,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+          .query(`EXEC sp_department 'D','','','',@key_field,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
       } catch (error) {
         if (error.number === 547) {
           // Foreign key constraint violation
@@ -16759,7 +16756,7 @@ const BankAccountUpdate = async (req, res) => {
 };
 
 const DepartmentUpdate = async (req, res) => {
-  const { dept_name, key_field, Status, modified_by } = req.body;
+  const { dept_name, key_field, Status, company_code, modified_by } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -16769,9 +16766,10 @@ const DepartmentUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("dept_name", sql.NVarChar, dept_name)
       .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
       .input("key_field", sql.NVarChar, key_field)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_department @mode,'',@dept_name,'',@key_field,@Status,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_department @mode,'',@dept_name,@company_code,@key_field,@Status,'','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.status(200).json("Edited data saved successfully");
   } catch (error) {
@@ -34191,7 +34189,7 @@ const DeptID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "DP")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_department @mode,'','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_department @mode,'','',@company_code,'','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
