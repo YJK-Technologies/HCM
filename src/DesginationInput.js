@@ -66,7 +66,6 @@ function DesginationInput({ }) {
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : '');
-    setError(false);
   };
 
 
@@ -108,7 +107,6 @@ function DesginationInput({ }) {
   const handleChangedept = (selecteddept) => {
     setSelecteddept(selecteddept);
     setdept_id(selecteddept ? selecteddept.value : '');
-    setError(false);
   };
 
 
@@ -387,9 +385,7 @@ function DesginationInput({ }) {
                     }}
                   />
                   <label for="locno" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
-
                 </div>
-
               </div>
 
               <div class="col-12">
