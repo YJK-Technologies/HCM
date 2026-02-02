@@ -91,30 +91,6 @@ function Desgination() {
     setHasValueChanged(true);
   };
 
-
-
-
-
-
-
-  const reloadGridDatas = async () => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/reloadGridData`); // Replace with the actual endpoint to reload grid data
-      if (response.ok) {
-        const gridData = await response.json();
-        setRowData(gridData);
-        console.log("Grid data reloaded successfully");
-      } else {
-        console.error("Failed to reload grid data");
-      
-        toast.error("Failed to reload grid data. Please try again later")
-      }
-    } catch (error) {
-      console.error("Error reloading grid data:", error);
-      toast.error("An error occurred while reloading grid data. Please try again later")
-    }
-  };
-
   const handleSearch = async () => {
     const company_code = sessionStorage.getItem('selectedCompanyCode')
     setLoading(true);
@@ -147,7 +123,6 @@ function Desgination() {
     }finally {
       setLoading(false);
     }
-
   };
 
   const reloadGridData = () => {
@@ -155,9 +130,7 @@ function Desgination() {
   };
 
 
-
   const columnDefs = [
-
     {
       headerCheckboxSelection: true,
       headerName: "Department ID",
@@ -182,7 +155,6 @@ function Desgination() {
           </span>
         );
       },
-
     },
     {
       headerName: "Desgination ID",
@@ -205,7 +177,6 @@ function Desgination() {
         maxLength: 50,
       },
     },
-
     {
       headerName: "Status",
       field: "status",
@@ -216,7 +187,6 @@ function Desgination() {
       cellEditorParams: {
         values: statusgriddrop
       },
-
     },
     {
       headerName: 'Keyfield',
@@ -227,8 +197,6 @@ function Desgination() {
       hide: true,
       sortable: false
     },
-
-
   ];
 
   const defaultColDef = {
@@ -259,7 +227,7 @@ function Desgination() {
         "Department ID": row.dept_id,
         "Desgination ID": row.desgination_id,
         "Desgination": row.desgination,
-        "status": row.status,
+        "Status": row.status,
       };
     });
 
@@ -385,6 +353,7 @@ function Desgination() {
 
   const saveEditedData = async () => {
     const modified_by = sessionStorage.getItem('selectedUserCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const selectedRowsData = editedData.filter(row => selectedRows.some(selectedRow => selectedRow.keyfield === row.keyfield));
     if (selectedRowsData.length === 0) {
@@ -402,7 +371,7 @@ setLoading(true);
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "modified-by": modified_by
+              "modified-by": modified_by,
             },
             body: JSON.stringify({ editedData: selectedRowsData }),
           });
