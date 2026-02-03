@@ -4,16 +4,16 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 // import "./apps.css";
-import './App.css';
+import "./App.css";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import labels from "./Labels";
-import { showConfirmationToast } from './ToastConfirmation';
-import LoadingScreen from './Loading';
+import { showConfirmationToast } from "./ToastConfirmation";
+import LoadingScreen from "./Loading";
 
 const config = require("./Apiconfig");
 
@@ -25,19 +25,27 @@ function CountryMaster() {
   const [editedData, setEditedData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [TimeZoneDefault, setTimeZoneDefault] = useState("");
+  const [Max_Work_Hours_Day, setMax_Work_Hours_Day] = useState("");
+  const [Max_Work_Hours_Week, setMax_Work_Hours_Week] = useState("");
+  const [Overtime_Allowed, setOvertime_Allowed] = useState("");
+  const [Currency_Code, setCurrency_Code] = useState("");
+  const [ISO_Code, setISO_Code] = useState("");
   const [CountryCodedrop, setCountryCodedrop] = useState([]);
   const [CountryNamedrop, setCountryNamedrop] = useState([]);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
- const [issslectedCountryCode, setisSelectedtCountryCode] = useState(false);
- const [issslectedCountryName, setisSelectedtCountryName] = useState(false);
+  const [issslectedCountryCode, setisSelectedtCountryCode] = useState(false);
+  const [issslectedCountryName, setisSelectedtCountryName] = useState(false);
   const [selectedCountryCode, setselectedCountryCode] = useState("");
   const [CountryCode, setCountryCode] = useState("");
   const [selectCountryName, setselectedselectCountryName] = useState("");
   const [CountryName, setCountryName] = useState("");
   const [selectedWeekoff, setselectedWeekoff] = useState("");
+  const [selectedWeekoffEnd, setselectedWeekoffEnd] = useState("");
   const [WeekOff, setWeekOff] = useState("");
+  const [WeekOffEnd, setWeekOffEnd] = useState("");
   const [issslectedweekoff, setisSelectedtWEeekoff] = useState(false);
+  const [issslectedweekoffEnd, setisSelectedtWEeekoffEnd] = useState(false);
   const [weekoffdrop, setweekoffdrop] = useState([]);
   const [coundrop, setcoundrop] = useState([]);
   const [namedrop, setnamedrop] = useState([]);
@@ -46,6 +54,11 @@ function CountryMaster() {
   const [modifiedBy, setModifiedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [Status, setStatus] = useState("");
+  const [statusdrop, setStatusdrop] = useState([]);
+  
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -53,159 +66,189 @@ function CountryMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handleCountryCode= (selectedDPT) => {
+  const handleCountryCode = (selectedDPT) => {
     setselectedCountryCode(selectedDPT);
-    setCountryCode(selectedDPT ? selectedDPT.value : '');
+    setCountryCode(selectedDPT ? selectedDPT.value : "");
   };
-  const handleCountryCountryName= (selectedDPT) => {
+  const handleCountryCountryName = (selectedDPT) => {
     setselectedselectCountryName(selectedDPT);
-    setCountryName(selectedDPT ? selectedDPT.value : '');
+    setCountryName(selectedDPT ? selectedDPT.value : "");
   };
+      const handleChangeStatus = (selectedStatus) => {
+        setSelectedStatus(selectedStatus);
+        setStatus(selectedStatus ? selectedStatus.value : '');
+        setHasValueChanged(true);
+    };
 
-  
+     const filteredOptionStatus = statusdrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+        fetch(`${config.apiBaseUrl}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setStatusdrop(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+
+
+
   const weekOrder = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
-const weekoffMap = weekoffdrop.reduce((acc, item) => {
-  acc[item.attributedetails_name] = item;
-  return acc;
-}, {});
+  const weekoffMap = weekoffdrop.reduce((acc, item) => {
+    acc[item.attributedetails_name] = item;
+    return acc;
+  }, {});
 
-
-  
   // const filteredOptionWeekoff = weekoffdrop.map(option => ({
   //   value: option.attributedetails_name,
   //   label: option.attributedetails_name
   // }));
- 
+
   const filteredOptionWeekoff = weekOrder
-  .filter(day => weekoffMap[day]) // keeps only days sent by backend
-  .map(day => ({
-    label: day,
-    value: day,
-  }));
+    .filter((day) => weekoffMap[day]) // keeps only days sent by backend
+    .map((day) => ({
+      label: day,
+      value: day,
+    }));
+  const filteredOptionWeekoffEnd = weekOrder
+    .filter((day) => weekoffMap[day]) // keeps only days sent by backend
+    .map((day) => ({
+      label: day,
+      value: day,
+    }));
 
-
-    useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/WeekOff`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setweekoffdrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-   useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/GetCountry`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => option.Country_Code);
+        setcoundrop(statusOption);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          const statusOption = data.map(option => option.Country_Code);
-          setcoundrop(statusOption);
-        })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-   useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/WeekOff`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/WeekOff`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => option.attributedetails_name);
+        setWeekdayDrop(statusOption);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          const statusOption = data.map(option => option.attributedetails_name);
-          setWeekdayDrop(statusOption);
-        })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-   useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/GetCountry`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => option.Country_Name);
+        setnamedrop(statusOption);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          const statusOption = data.map(option => option.Country_Name);
-          setnamedrop(statusOption);
-        })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const handleWeekoff = (selectedDPT) => {
     setselectedWeekoff(selectedDPT);
-    setWeekOff(selectedDPT ? selectedDPT.value : '');
+    setWeekOff(selectedDPT ? selectedDPT.value : "");
+  };
+  const handleWeekoffEnd = (selectedDPT) => {
+    setselectedWeekoffEnd(selectedDPT);
+    setWeekOffEnd(selectedDPT ? selectedDPT.value : "");
   };
 
-
-    const filteredOptionCountryCode = CountryCodedrop.map(option => ({
+  const filteredOptionCountryCode = CountryCodedrop.map((option) => ({
     value: option.Country_Code,
-    label: option.Country_Code
+    label: option.Country_Code,
   }));
-    const filteredOptionCountryname = CountryNamedrop.map(option => ({
+  const filteredOptionCountryname = CountryNamedrop.map((option) => ({
     value: option.Country_Name,
-    label: option.Country_Name
+    label: option.Country_Name,
   }));
-  
-    useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCountryCodedrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-    useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCountryNamedrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
-
 
   const handleSearch = async () => {
     setLoading(true);
@@ -219,13 +262,13 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Country_Code:CountryCode,
-           Country_Name: CountryName,
+            Country_Code: CountryCode,
+            Country_Name: CountryName,
             company_code,
-           TimeZone_Default: TimeZoneDefault,
-            Week_Start_Day:WeekOff,
+            TimeZone_Default: TimeZoneDefault,
+            Week_Start_Day: WeekOff,
           }),
-        }
+        },
       );
       if (response.ok) {
         const searchData = await response.json();
@@ -233,7 +276,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
         console.log("data fetched successfully");
       } else if (response.status === 404) {
         console.log("Data not found");
-        toast.warning("Data not found")
+        toast.warning("Data not found");
         setRowData([]);
       } else {
         const errorResponse = await response.json();
@@ -270,14 +313,11 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
         };
 
         return (
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={handleClick}
-          >
+          <span style={{ cursor: "pointer" }} onClick={handleClick}>
             {params.value}
           </span>
         );
-      }
+      },
     },
     {
       headerName: "Country Name",
@@ -305,7 +345,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
       headerName: "Default Timezone",
       field: "TimeZone_Default",
       editable: true,
-      cellStyle: { textAlign: "left" }
+      cellStyle: { textAlign: "left" },
       // cellEditor: "agSelectCellEditor",
       // cellEditorParams: {
       //   values: statusgriddrop,
@@ -336,11 +376,11 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
       toast.warning("Please select at least one row to generate a report");
-      return
-    };
+      return;
+    }
 
     const reportData = selectedRows.map((row) => {
-      const safeValue = (val) => (val !== undefined && val !== null ? val : '');
+      const safeValue = (val) => (val !== undefined && val !== null ? val : "");
 
       return {
         "User Code": safeValue(row.user_code),
@@ -352,7 +392,9 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
     });
 
     const reportWindow = window.open("", "_blank");
-    reportWindow.document.write("<html><head><title>Company Mapping Report</title>");
+    reportWindow.document.write(
+      "<html><head><title>Company Mapping Report</title>",
+    );
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
       body {
@@ -436,7 +478,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
     reportWindow.document.write("</tbody></table>");
 
     reportWindow.document.write(
-      '<button class="report-button" title="Print" onclick="window.print()">Print</button>'
+      '<button class="report-button" title="Print" onclick="window.print()">Print</button>',
     );
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
@@ -472,7 +514,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
-      (row) => row.keyfiels === params.data.keyfiels
+      (row) => row.keyfiels === params.data.keyfiels,
     );
 
     if (rowIndex !== -1) {
@@ -481,7 +523,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
 
       setEditedData((prevData) => {
         const existingIndex = prevData.findIndex(
-          (item) => item.keyfiels === params.data.keyfiels
+          (item) => item.keyfiels === params.data.keyfiels,
         );
 
         if (existingIndex !== -1) {
@@ -498,44 +540,45 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
 
   const saveEditedData = async () => {
     const selectedRowsData = editedData.filter((row) =>
-      selectedRows.some(
-        (selectedRow) => selectedRow.keyfiels === row.keyfiels
-      )
+      selectedRows.some((selectedRow) => selectedRow.keyfiels === row.keyfiels),
     );
 
     if (selectedRowsData.length === 0) {
-      toast.warning("Please select a row to update its data")
+      toast.warning("Please select a row to update its data");
       return;
     }
 
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-
         try {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
-
-          const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopUpdate`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              company_code: company_code,
-              "modified-by": modified_by,
+          const response = await fetch(
+            `${config.apiBaseUrl}/Country_MasterLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                company_code: company_code,
+                "modified-by": modified_by,
+              },
+              body: JSON.stringify({ sp_Country_MasterData: selectedRowsData }),
             },
-            body: JSON.stringify({ sp_Country_MasterData: selectedRowsData }),
-          });
+          );
 
           if (response.status === 200) {
             setTimeout(() => {
-              toast.success("Data Updated Successfully")
+              toast.success("Data Updated Successfully");
               handleSearch();
             }, 1000);
             return;
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
           }
         } catch (error) {
           console.error("Error saving data:", error);
@@ -544,59 +587,58 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
       },
       () => {
         toast.info("Data update cancelled.");
-      }
+      },
     );
   };
-const deleteSelectedRows = async () => {
-  const selectedRows = gridApi.getSelectedRows();
+  const deleteSelectedRows = async () => {
+    const selectedRows = gridApi.getSelectedRows();
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to delete");
-    return;
-  }
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to delete");
+      return;
+    }
 
-  const company_code = sessionStorage.getItem("selectedCompanyCode");
-  const modified_by = sessionStorage.getItem("selectedUserCode");
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const modified_by = sessionStorage.getItem("selectedUserCode");
 
-  const sp_Country_MasterData = selectedRows.map(row => ({
-    keyfield: row.keyfield,
-    company_code: company_code
-  }));
+    const sp_Country_MasterData = selectedRows.map((row) => ({
+      keyfield: row.keyfield,
+      company_code: company_code,
+    }));
 
-  showConfirmationToast(
-    "Are you sure you want to delete the data in the selected rows?",
-    async () => {
-      try {
-        const response = await fetch(
-          `${config.apiBaseUrl}/Country_MasterLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              company_code: company_code,
-              "Modified-By": modified_by,
+    showConfirmationToast(
+      "Are you sure you want to delete the data in the selected rows?",
+      async () => {
+        try {
+          const response = await fetch(
+            `${config.apiBaseUrl}/Country_MasterLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                company_code: company_code,
+                "Modified-By": modified_by,
+              },
+              body: JSON.stringify({
+                sp_Country_MasterData,
+              }),
             },
-            body: JSON.stringify({
-              sp_Country_MasterData
-            }),
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully");
+            handleSearch();
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data deleted successfully");
-          handleSearch();
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+        } catch (error) {
+          toast.error("Error deleting data: " + error.message);
         }
-      } catch (error) {
-        toast.error("Error deleting data: " + error.message);
-      }
-    },
-    () => toast.info("Data delete cancelled.")
-  );
-};
-
+      },
+      () => toast.info("Data delete cancelled."),
+    );
+  };
 
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
@@ -633,69 +675,93 @@ const deleteSelectedRows = async () => {
     }
   };
 
-
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
         {loading && <LoadingScreen />}
-        <ToastContainer position="top-right" className="toast-design" theme="colored" />
+        <ToastContainer
+          position="top-right"
+          className="toast-design"
+          theme="colored"
+        />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Country Master</h1>
-          <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon add" onClick={handleNavigateToForm}>
-                <span className="tooltip">Add</span>
-                <i class="fa-solid fa-user-plus"></i>
-              </div>
-            )}
-            {["delete", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon delete" onClick={deleteSelectedRows}>
-                <span className="tooltip">Delete</span>
-                <i class="fa-solid fa-user-minus"></i>
-              </div>
-            )}
-            {["update", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon update" onClick={saveEditedData}>
-                <span className="tooltip">Update</span>
-               <i class="fa-solid fa-pen-to-square"></i>
-              </div>
-            )}
-            {["all permission", "view"].some((permission) => companyMappingPermission.includes(permission)) && (
-              <div className="action-icon print" onClick={generateReport}>
-                <span className="tooltip">Print</span>
-                <i class="fa-solid fa-print"></i>
-              </div>
-            )}
-          </div>
-          
-          {/* Mobile Dropdown */}
+            <div className="action-wrapper desktop-actions">
+              {["add", "all permission"].some((permission) =>
+                companyMappingPermission.includes(permission),
+              ) && (
+                <div className="action-icon add" onClick={handleNavigateToForm}>
+                  <span className="tooltip">Add</span>
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+              )}
+              {["delete", "all permission"].some((permission) =>
+                companyMappingPermission.includes(permission),
+              ) && (
+                <div
+                  className="action-icon delete"
+                  onClick={deleteSelectedRows}
+                >
+                  <span className="tooltip">Delete</span>
+                  <i class="fa-solid fa-user-minus"></i>
+                </div>
+              )}
+              {["update", "all permission"].some((permission) =>
+                companyMappingPermission.includes(permission),
+              ) && (
+                <div className="action-icon update" onClick={saveEditedData}>
+                  <span className="tooltip">Update</span>
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+              )}
+              {["all permission", "view"].some((permission) =>
+                companyMappingPermission.includes(permission),
+              ) && (
+                <div className="action-icon print" onClick={generateReport}>
+                  <span className="tooltip">Print</span>
+                  <i class="fa-solid fa-print"></i>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <button
+                className="btn btn-primary dropdown-toggle p-1"
+                data-bs-toggle="dropdown"
+              >
                 <i className="fa-solid fa-list"></i>
               </button>
 
               <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                {['add', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
+                {["add", "all permission"].some((p) =>
+                  companyMappingPermission.includes(p),
+                ) && (
                   <li className="dropdown-item" onClick={handleNavigateToForm}>
                     <i className="fa-solid fa-user-plus text-success fs-4"></i>
                   </li>
                 )}
 
-                {['delete', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
+                {["delete", "all permission"].some((p) =>
+                  companyMappingPermission.includes(p),
+                ) && (
                   <li className="dropdown-item" onClick={deleteSelectedRows}>
                     <i className="fa-solid fa-user-minus text-danger fs-4"></i>
                   </li>
                 )}
 
-                {['update', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
+                {["update", "all permission"].some((p) =>
+                  companyMappingPermission.includes(p),
+                ) && (
                   <li className="dropdown-item" onClick={saveEditedData}>
                     <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
                   </li>
                 )}
 
-                {['all permission', 'view'].some(p => companyMappingPermission.includes(p)) && (
+                {["all permission", "view"].some((p) =>
+                  companyMappingPermission.includes(p),
+                ) && (
                   <li className="dropdown-item" onClick={generateReport}>
                     <i className="fa-solid fa-print fs-4"></i>
                   </li>
@@ -707,54 +773,72 @@ const deleteSelectedRows = async () => {
 
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
-
-          
             <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
+              <div
+                className={`inputGroup selectGroup 
               ${selectedCountryCode ? "has-value" : ""} 
               ${issslectedCountryCode ? "is-focused" : ""}`}
-            >
-              <Select
-                id="department"
-                placeholder=" "
-                onFocus={() => setisSelectedtCountryCode(true)}
-                onBlur={() => setisSelectedtCountryCode(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                value={selectedCountryCode}
-                onChange={handleCountryCode}
-                options={filteredOptionCountryCode}
-              />
-              <label htmlFor="selecteddpt" className={`floating-label`}>
-                Country Code
-              </label>
+              >
+                <Select
+                  id="department"
+                  placeholder=" "
+                  onFocus={() => setisSelectedtCountryCode(true)}
+                  onBlur={() => setisSelectedtCountryCode(false)}
+                  classNamePrefix="react-select"
+                  isClearable
+                  type="text"
+                  value={selectedCountryCode}
+                  onChange={handleCountryCode}
+                  options={filteredOptionCountryCode}
+                />
+                <label htmlFor="selecteddpt" className={`floating-label`}>
+                  Country Code
+                </label>
+              </div>
             </div>
-          </div>
             <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
+              <div
+                className={`inputGroup selectGroup 
               ${selectCountryName ? "has-value" : ""} 
               ${issslectedCountryName ? "is-focused" : ""}`}
-            >
-              <Select
-                id="department"
-                placeholder=" "
-                onFocus={() => setisSelectedtCountryName(true)}
-                onBlur={() => setisSelectedtCountryName(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                value={selectCountryName}
-                onChange={handleCountryCountryName}
-                options={filteredOptionCountryname}
-              />
-              <label htmlFor="selecteddpt" className={`floating-label`}>
-                Country Name
-              </label>
+              >
+                <Select
+                  id="department"
+                  placeholder=" "
+                  onFocus={() => setisSelectedtCountryName(true)}
+                  onBlur={() => setisSelectedtCountryName(false)}
+                  classNamePrefix="react-select"
+                  isClearable
+                  type="text"
+                  value={selectCountryName}
+                  onChange={handleCountryCountryName}
+                  options={filteredOptionCountryname}
+                />
+                <label htmlFor="selecteddpt" className={`floating-label`}>
+                  Country Name
+                </label>
+              </div>
             </div>
-          </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  required
+                  title="Please fill the ISO Code here"
+                  value={ISO_Code}
+                  onChange={(e) => setISO_Code(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
+                />
+                <label for="locno" class="exp-form-labels">
+                  ISO Code{" "}
+                </label>
+              </div>
+            </div>
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -770,32 +854,159 @@ const deleteSelectedRows = async () => {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   maxLength={18}
                 />
-                <label for="locno" class="exp-form-labels">Default Timezone </label>
+                <label for="locno" class="exp-form-labels">
+                  Default Timezone{" "}
+                </label>
               </div>
             </div>
 
             <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
+              <div
+                className={`inputGroup selectGroup 
               ${selectedWeekoff ? "has-value" : ""} 
               ${issslectedweekoff ? "is-focused" : ""}`}
-            >
-              <Select
-                id="status"
-                isClearable
-                value={selectedWeekoff}
-                onChange={handleWeekoff}
-                options={filteredOptionWeekoff}
-                placeholder=""
-                classNamePrefix="react-select"
-                onFocus={() => setisSelectedtWEeekoff(true)}
-                onBlur={() => setisSelectedtWEeekoff(false)}
-              />
-              <label for="status" class={`floating-label `}>Week Start Day
-
-              </label>
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedWeekoff}
+                  onChange={handleWeekoff}
+                  options={filteredOptionWeekoff}
+                  placeholder=""
+                  classNamePrefix="react-select"
+                  onFocus={() => setisSelectedtWEeekoff(true)}
+                  onBlur={() => setisSelectedtWEeekoff(false)}
+                />
+                <label for="status" class={`floating-label `}>
+                  Week Start Day
+                </label>
+              </div>
             </div>
-          </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedWeekoffEnd ? "has-value" : ""} 
+              ${issslectedweekoffEnd ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedWeekoffEnd}
+                  onChange={handleWeekoffEnd}
+                  options={filteredOptionWeekoffEnd}
+                  placeholder=""
+                  classNamePrefix="react-select"
+                  onFocus={() => setisSelectedtWEeekoffEnd(true)}
+                  onBlur={() => setisSelectedtWEeekoffEnd(false)}
+                />
+                <label for="status" class={`floating-label `}>
+                  Week End Day
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="Number"
+                  placeholder=" "
+                  required
+                  title="Please fill the Max Work Hours Day here"
+                  value={Max_Work_Hours_Day}
+                  onChange={(e) => setMax_Work_Hours_Day(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
+                />
+                <label for="locno" class="exp-form-labels">
+                  Max Work Hours Day{" "}
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="Number"
+                  placeholder=" "
+                  required
+                  title="Please fill the Max Work Hours Week here"
+                  value={Max_Work_Hours_Week}
+                  onChange={(e) => setMax_Work_Hours_Week(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
+                />
+                <label for="locno" class="exp-form-labels">
+                  Max Work Hours Week{" "}
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  required
+                  title="Please fill the Overtime Allowed here"
+                  value={Overtime_Allowed}
+                  onChange={(e) => setOvertime_Allowed(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
+                />
+                <label for="locno" class="exp-form-labels">
+                  Overtime Allowed{" "}
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="locno"
+                  className="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  required
+                  title="Please fill the Currency Code here"
+                  value={Currency_Code}
+                  onChange={(e) => setCurrency_Code(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  maxLength={18}
+                />
+                <label for="locno" class="exp-form-labels">
+                  Currency Code{" "}
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectFocused ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocused(true)}
+                  onBlur={() => setIsSelectFocused(false)}
+                  onKeyDown={handleKeyDownStatus}
+                />
+                <label class="floating-label">Status</label>
+              </div>
+            </div>
 
             <div className="col-12">
               <div className="search-btn-wrapper">
@@ -810,11 +1021,13 @@ const deleteSelectedRows = async () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
-        <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+        <div
+          className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+          style={{ width: "100%" }}
+        >
           <div class="ag-theme-alpine" style={{ height: 450, width: "100%" }}>
             <AgGridReact
               rowData={rowData}

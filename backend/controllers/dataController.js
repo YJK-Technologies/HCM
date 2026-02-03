@@ -34425,7 +34425,7 @@ const Recommendation = async (req, res) => {
 
 
 const TimeZonemasterUpdate = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, modified_by, keyfield } = req.body;
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, DST_Applicable, modified_by, keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
@@ -34434,10 +34434,11 @@ const TimeZonemasterUpdate = async (req, res) => {
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
       .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("DST_Applicable", sql.VarChar, DST_Applicable)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @keyfield, '','', @modified_by, ''`);
+      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '','', @modified_by, ''`);
     res.status(200).json({ success: true, message: "TimeZonemaster updated successfully" });
   } catch (err) {
     console.error("Error during TimeZonemaster update:", err);
@@ -34467,7 +34468,7 @@ const getTimeZoneData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      "EXEC Sp_Time_Zone_master 'F', '', '','','', '', '', '', '', '',''");
+      "EXEC Sp_Time_Zone_master_test 'F', '', '','','', '', '', '', '', '', '',''");
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -34477,7 +34478,7 @@ const getTimeZoneData = async (req, res) => {
 
 
 const getTimeZonesearchdata = async (req, res) => {
-const { TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
+const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
   try {
     // Connect to the database
     const pool = await connection.connectToDatabase();
@@ -34488,7 +34489,8 @@ const { TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
       .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset,'', '','', '', '','', ''`);
+      .input("DST_Applicable", sql.VarChar, DST_Applicable)
+      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset,'', '', @DST_Applicable, '', '', '','', ''`);
     // Send response
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -34760,7 +34762,7 @@ const GetCountry = async (req, res) => {
 };
 
 const TimeZonemasterInsert = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, 
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, DST_Applicable ,
     keyfield} = req.body;
   try {
     const pool = await sql.connect(dbConfig);
@@ -34769,10 +34771,11 @@ const TimeZonemasterInsert = async (req, res) => {
       .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
+      .input("DST_Applicable", sql.VarChar, DST_Applicable)
       .input("DST_Flag", sql.Bit, DST_Flag)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-     .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code,'', '', '', '', ''`);
+     .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, '', '', '', '', ''`);
 res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
@@ -34794,11 +34797,12 @@ const Time_Zone_masterLoopUpdate = async (req, res) => {
         .input("TimeZone_ID", sql.NVarChar, item.TimeZone_ID)
         .input("TimeZone_Name", sql.NVarChar, item.TimeZone_Name)
         .input("UTC_Offset", sql.NVarChar, item.UTC_Offset)
+        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
         .input("DST_Flag", sql.Bit, item.DST_Flag)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @keyfield, '', '', @modified_by, @modified_date`);
+        .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '', '', @modified_by, @modified_date`);
     }
     res.status(200).json("Time_Zone_master data updated successfully");
   } catch (err) {
@@ -34819,8 +34823,9 @@ const  Time_Zone_masterLoopDelete = async (req, res) => {
       await pool.request().input("mode", sql.NVarChar, "D")
       
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Time_Zone_master @mode, '', '', '', '', @company_code, @keyfield, '', '', '', ''`);
+        .query(`EXEC Sp_Time_Zone_master_test @mode, '', '', '', '', @company_code, @DST_Applicable, @keyfield, '', '', '', ''`);
     }
     res.status(200).json("Time_Zone_master data deleted successfully");
   } catch (err) {
@@ -34830,7 +34835,7 @@ const  Time_Zone_masterLoopDelete = async (req, res) => {
 };
 
 const Time_Zone_master_sc = async (req, res) => {
-  const { company_code, TimeZone_ID, TimeZone_Name, UTC_Offset } = req.body;
+  const { company_code, TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
 
   try {
     // Connect to the database
@@ -34844,7 +34849,8 @@ const Time_Zone_master_sc = async (req, res) => {
       .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .query(` EXEC sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, '', @company_code, '', '', '', '', ''`);
+      .input("DST_Applicable", sql.VarChar, DST_Applicable)
+      .query(` EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, '', @company_code, @DST_Applicable, '', '', '', '', ''`);
 
     // Send response
     if (result.recordset.length > 0) {
@@ -34861,7 +34867,7 @@ const Time_Zone_master_sc = async (req, res) => {
 //Code Added by harish on 28-01-26
 
 const Shift_MasterInsert = async (req, res) => {
-  const { Shift_ID, Shift_Code, Shift_Name, Start_Time, End_Time, Shift_Hours, Is_Night_Shift, Grace_In_Min, Grace_Out_Min, Status, company_code, created_by,  keyfield } = req.body;
+  const { Shift_ID, Shift_Code, Shift_Name, Start_Time, End_Time, Shift_Hours, Is_Night_Shift, Grace_In_Min, Grace_Out_Min, Status, Cross_Midnight, company_code, created_by,  keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -34877,10 +34883,11 @@ const Shift_MasterInsert = async (req, res) => {
       .input("Grace_In_Min", sql.Int, Grace_In_Min)
       .input("Grace_Out_Min", sql.Int, Grace_Out_Min)
       .input("Status", sql.NVarChar, Status)
+      .input("Cross_Midnight", sql.NVarChar, Cross_Midnight)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @company_code, @created_by, '', '', '', @keyfield`);
+      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @Cross_Midnight, @company_code, @created_by, '', '', '', @keyfield`);
 
    res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
   } catch (err) {
@@ -34906,7 +34913,7 @@ const getShiftsearchdata = async (req, res) => {
       .input("Shift_Name", sql.NVarChar, Shift_Name)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code, @Shift_Name, '', '', 0, 0, 0,0, @Status,@company_code, '', '', '', '', '' `);
+      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, '', '', 0, 0, 0,0, @Status,'',@company_code, '', '', '', '', '' `);
 
     // Send response
        if (result.recordset.length > 0) {
@@ -34940,10 +34947,11 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
         .input("Grace_In_Min", sql.Int, item.Grace_In_Min)
         .input("Grace_Out_Min", sql.Int, item.Grace_Out_Min)
         .input("Status", sql.NVarChar, item.Status)
+        .input("Cross_Midnight", sql.NVarChar, item.Cross_Midnight)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Master @mode, @Shift_ID, @Shift_Code,@Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @company_code,'','', @modified_by,'', @keyfield`);
+        .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code,@Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @Cross_Midnight, @company_code,'','', @modified_by,'', @keyfield`);
     }
     res.status(200).json("Shift_Master data updated successfully");
   } catch (err) {
