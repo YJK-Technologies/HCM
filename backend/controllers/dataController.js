@@ -34896,7 +34896,7 @@ const Shift_MasterInsert = async (req, res) => {
 
 
 const getShiftsearchdata = async (req, res) => {
-  const { Shift_ID, Shift_Code,company_code, Shift_Name, Status} = req.body;
+  const { Shift_ID, Shift_Code,company_code, Shift_Name, Start_Time, End_Time,Shift_Hours, Cross_Midnight, Is_Night_Shift,Grace_In_Min,Grace_Out_Min, Status} = req.body;
 
   try {
     // Connect to the database
@@ -34910,8 +34910,15 @@ const getShiftsearchdata = async (req, res) => {
       .input("Shift_Code", sql.NVarChar, Shift_Code)
       .input("Shift_Name", sql.NVarChar, Shift_Name)
       .input("Status", sql.NVarChar, Status)
+      .input("Start_Time", sql.NVarChar, Start_Time)
+      .input("End_Time", sql.NVarChar, End_Time)
+      .input("Shift_Hours", sql.Decimal(5,2), Shift_Hours)
+      .input("Is_Night_Shift", sql.Bit, Is_Night_Shift)
+      .input("Grace_In_Min", sql.Int, Grace_In_Min)
+      .input("Grace_Out_Min", sql.Int, Grace_Out_Min)
+      .input("Cross_Midnight", sql.VarChar, Cross_Midnight)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, '', '', 0, 0, 0,0, @Status,'',@company_code, '', '', '', '', '' `);
+      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status,@Cross_Midnight,@company_code, '', '', '', '', '' `);
 
     // Send response
        if (result.recordset.length > 0) {
@@ -34957,6 +34964,30 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
+// code added by sakthi on 02-03-26
+const sp_Shift_MasterLoopDelete = async (req, res) => {
+  const sp_Shift_MasterData = req.body.sp_Shift_MasterData;
+  if (!sp_Shift_MasterData || !sp_Shift_MasterData.length) {
+    return res.status(400).json("Invalid or empty sp_Shift_MasterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Master_test @mode, '', '', '', '', '', 0, 0, 0, 0, '', '', @company_code, '', '', '', '', @keyfield`);
+    }
+    res.status(200).json("sp_Shift_Master_test data deleted successfully");
+  } catch (err) {
+    console.error("Error in sp_Shift_MasterLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
 //Code added by pavun on 28-1-26
 const getSex = async (req, res) => {
   const { company_code } = req.body;
@@ -35636,6 +35667,61 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
   }
 };
 //Code ended by pavun on 30-01-26
+
+//Code exported by Sakthi on 03-02-26
+const Shift_Type_MasterInsert = async (req, res) => {
+  const { Shift_Type_ID, Shift_Type, Description, company_code, created_by,  keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("Shift_Type_ID", sql.Int, Shift_Type_ID)
+      .input("Shift_Type", sql.VarChar, Shift_Type)
+      .input("Description", sql.VarChar, Description)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, @created_by, '', '', '', @keyfield`);
+
+   res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
+  } catch (err) {
+    console.error("Error during interview_schedule insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 03-02-26
+
+//Code exported by Sakthi on 05-02-26
+const getShift_TypeSC = async (req, res) => {
+  const { Shift_Type_ID, Shift_Type, Description, company_code, keyfield} = req.body;
+
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Shift_Type_ID", sql.Int, Shift_Type_ID)
+      .input("Shift_Type", sql.VarChar, Shift_Type)
+      .input("Description", sql.VarChar, Description)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, '', '', '', '', @keyfield`);
+
+    // Send response
+       if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
 
 module.exports = {
   login,
@@ -36834,6 +36920,9 @@ module.exports = {
     Employee_shift_mappingDelete,
     Employee_shift_mappingLoopInsert,
     Employee_shift_mappingLoopUpdate,
-    Employee_shift_mappingLoopDelete
+    Employee_shift_mappingLoopDelete,
+    sp_Shift_MasterLoopDelete,
+    Shift_Type_MasterInsert,
+    getShift_TypeSC
 
 };

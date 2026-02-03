@@ -1228,6 +1228,9 @@ router.post("/Employee_shift_mappingDelete",dataController.Employee_shift_mappin
 router.post("/Employee_shift_mappingLoopInsert",dataController.Employee_shift_mappingLoopInsert)
 router.post("/Employee_shift_mappingLoopUpdate",dataController.Employee_shift_mappingLoopUpdate)
 router.post("/Employee_shift_mappingLoopDelete",dataController.Employee_shift_mappingLoopDelete)
+router.post("/sp_Shift_MasterLoopDelete",dataController.sp_Shift_MasterLoopDelete)
+router.post("/Shift_Type_MasterInsert",dataController.Shift_Type_MasterInsert)
+router.post("/getShift_TypeSC",dataController.getShift_TypeSC)
 
 
 

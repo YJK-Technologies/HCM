@@ -93,6 +93,7 @@ import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
 import TimeZoneGrid from "./TimeZoneMasterGrid.js";
 import ShiftMaster from "./ShiftMaster.js";
 import ShiftMasterGrid from "./ShiftMasterGrid.js";
+import ShiftTypeMaster from "./ShiftTypeMaster.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -232,6 +233,7 @@ function Main() {
     { path: "/TimeZoneGrid", component: <TimeZoneGrid /> },
     { path: "/ShiftMaster", component: <ShiftMaster /> },
     { path: "/ShiftMasterGrid", component: <ShiftMasterGrid /> },
+    { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
     
 
 
