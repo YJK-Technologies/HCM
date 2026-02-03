@@ -3,22 +3,18 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
-// import "./apps.css";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Select from "react-select";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import labels from "./Labels";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
 
 const config = require("./Apiconfig");
 
-function ShiftMasterGrid() {
+function ShiftTypeMaster() {
   const [activeTab, setActiveTab] = useState("Shift Master");
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
@@ -61,6 +57,13 @@ function ShiftMasterGrid() {
   const [statusgriddrop, setStatusGriddrop] = useState([]);
   const [key_field, setkey_field] = useState("");
   const modified_by = sessionStorage.getItem("selectedUserCode");
+  const [Shift_Type_ID, setShift_Type_ID] = useState("");
+  const [Shift_Type_IDSC, setShift_Type_IDSC] = useState("");
+  const [Shift_Type, setShift_Type] = useState("");
+  const [Shift_TypeSC, setShift_TypeSC] = useState("");
+  const [Description, setDescription] = useState("");
+  const [DescriptionSC, setDescriptionSC] = useState("");
+
 
 
   const [createdBy, setCreatedBy] = useState("");
@@ -162,21 +165,9 @@ const handleSearch = async () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-          Shift_ID: Shift_IDSC || null,
-          Shift_Code: Shift_CodeSC || null,
-          Shift_Name: Shift_NameSC || null,
-          Status: StatusSC || null,
-          Cross_Midnight: Cross_MidnightSC || null,
-          Shift_Hours: Shift_HoursSC || null,
-        
-          Is_Night_Shift: Is_Night_ShiftSC === "" ? null : Is_Night_ShiftSC,
-        
-          Grace_In_Min: Grace_In_MinSC || null,
-          Grace_Out_Min: Grace_Out_MinSC || null,
-        
-          Start_Time: formatTimeForSQL(Start_TimeSC),
-          End_Time: formatTimeForSQL(End_TimeSC),
-        
+          Shift_Type_ID: Shift_Type_IDSC || null,
+          Shift_Type: Shift_TypeSC || null,
+          Description: DescriptionSC || null,        
           company_code,
    })
 
@@ -243,8 +234,8 @@ const handleSearch = async () => {
     },
 
     {
-      headerName: "ShiftID",
-      field: "Shift_ID",
+      headerName: "Shift Type ID",
+      field: "Shift_Type_ID",
       editable: true,
       cellStyle: { textAlign: "left" },
       // cellEditor: "agSelectCellEditor",
@@ -254,8 +245,8 @@ const handleSearch = async () => {
       // },
     },
     {
-      headerName: "Shift Code",
-      field: "Shift_Code",
+      headerName: "Shift Type",
+      field: "Shift_Type",
       editable: true,
       // cellStyle: { textAlign: "left" },
       // cellEditor: "agSelectCellEditor",
@@ -265,93 +256,16 @@ const handleSearch = async () => {
       // },
     },
     {
-      headerName: "Shift Name",
-      field: "Shift_Name",
+      headerName: "Description",
+      field: "Description",
       editable: true,
       // cellStyle: { textAlign: "left" },
       // cellEditor: "agSelectCellEditor",
       // cellEditorParams: {
       //   values: statusgriddrop,
       // },
-    },
-    {
-      headerName: "Start Time",
-      field: "Start_Time",
-      editable: true,
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return params.value.substring(11, 16); // HH:mm
-      },
-    },
-    {
-      headerName: "End Time",
-      field: "End_Time",
-      editable: true,
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return params.value.substring(11, 16); // HH:mm
-      },
     },
 
-    {
-      headerName: "Shift Hours",
-      field: "Shift_Hours",
-      editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
-    },
-    {
-      headerName: "Night Shift",
-      field: "Is_Night_Shift",
-      editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
-    },
-    {
-      headerName: "Grace In Min",
-      field: "Grace_In_Min",
-      editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
-    },
-    {
-      headerName: "Grace Out Min",
-      field: "Grace_Out_Min",
-      editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
-    },
-    {
-      headerName: "Cross Midnight",
-      field: "Cross_Midnight",
-      editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
-    },
-    {
-      headerName: "Status",
-      field: "Status",
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-      values: statusgriddrop,
-       },
-        editable: true,
-    },
     {
       headerName: "keyfield",
       field: "keyfield",
@@ -412,10 +326,10 @@ const handleSearch = async () => {
     navigate("/ShiftMasterGrid");
   };
 
-  const ShiftTypeMaster = () => {
+   const ShiftTypeMaster = () => {
     navigate("/ShiftTypeMaster");
   };
-  
+
   const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
@@ -740,33 +654,25 @@ const handleSearch = async () => {
   };
 
   const handleSave = async () => {
-        if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-          toast.warning("Error: Missing required fields");
-          return;
-        }
+        // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
+        //   toast.warning("Error: Missing required fields");
+        //   return;
+        // }
 
         setLoading(true);
 
         try {
             const response = await fetch(
-                `${config.apiBaseUrl}/Shift_MasterInsert`,
+                `${config.apiBaseUrl}/Shift_Type_MasterInsert`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        Shift_ID: Number(Shift_ID),
-                        Shift_Code: Shift_Code,
-                        Shift_Name: Shift_Name,
-                        End_Time: End_Time ,
-                        Status: Status,
-                        Cross_Midnight: Cross_Midnight,
-                        Start_Time: Start_Time,
-                        Shift_Hours: Number(Shift_Hours) || 0,
-                        Is_Night_Shift: Is_Night_Shift ? 1 : 0,
-                        Grace_In_Min: Number(Grace_In_Min),
-                       Grace_Out_Min:  Number(Grace_Out_Min),
+                        Shift_Type_ID: Number(Shift_Type_ID),
+                        Shift_Type: Shift_Type,
+                        Description: Description,
                         company_code: sessionStorage.getItem("selectedCompanyCode"),
                         created_by: sessionStorage.getItem("selectedUserCode"),
                     }),
@@ -897,79 +803,41 @@ const handleDelete = async (rowData) => {
         />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
-            <h1 className="page-title">Shift Master</h1>
+            <h1 className="page-title">Shift Type Master</h1>
             <div className="action-wrapper">
               <div onClick={handleSave} className="action-icon add">
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             </div>
-            {/* <div className="action-wrapper desktop-actions">
-                            {["add", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon add" onClick={handleNavigateToForm}>
-                                    <span className="tooltip">Add</span>
-                                    <i class="fa-solid fa-user-plus"></i>
-                                </div>
-                            )}
-                            {["delete", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon delete" onClick={deleteSelectedRows}>
-                                    <span className="tooltip">Delete</span>
-                                    <i class="fa-solid fa-user-minus"></i>
-                                </div>
-                            )}
-                            {["update", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon update" onClick={saveEditedData}>
-                                    <span className="tooltip">Update</span>
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </div>
-                            )}
-                            {["all permission", "view"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon print" onClick={generateReport}>
-                                    <span className="tooltip">Print</span>
-                                    <i class="fa-solid fa-print"></i>
-                                </div>
-                            )}
-                        </div> */}
 
-            {/* Mobile Dropdown */}
-            {/* <div className="dropdown mobile-actions">
-                            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                                <i className="fa-solid fa-list"></i>
-                            </button>
-
-                            <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                                {['add', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={handleNavigateToForm}>
-                                        <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['delete', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={deleteSelectedRows}>
-                                        <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['update', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={saveEditedData}>
-                                        <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['all permission', 'view'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={generateReport}>
-                                        <i className="fa-solid fa-print fs-4"></i>
-                                    </li>
-                                )}
-                            </ul>
-                        </div> */}
           </div>
         </div>
 
-        <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick}/>
+        <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Shift_Type_ID}
+                  onChange={(e) => setShift_Type_ID(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Shift_Type_ID ? "text-danger" : ""}`}
+                >
+                  Shift Type ID<span className="text-danger">*</span>
+                </label>
+              </div>
+            </div>
+
             <div className="col-md-2">
               <div className="inputGroup">
                 <input
@@ -979,14 +847,14 @@ const handleDelete = async (rowData) => {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_ID}
-                  onChange={(e) => setShift_ID(e.target.value)}
+                  value={Shift_Type}
+                  onChange={(e) => setShift_Type(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_ID ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Shift_Type ? "text-danger" : ""}`}
                 >
-                  Shift ID<span className="text-danger">*</span>
+                  Shift Type<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -994,179 +862,24 @@ const handleDelete = async (rowData) => {
             <div className="col-md-2">
               <div className="inputGroup">
                 <input
-                  id="TimeZone_Name"
+                  id="TimeZone_ID"
                   class="exp-input-field form-control"
                   type="text"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Code}
-                  onChange={(e) => setShift_Code(e.target.value)}
+                  value={Description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Code ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Description ? "text-danger" : ""}`}
                 >
-                  Shift Code <span className="text-danger">*</span>
+                  Description<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
 
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="UTC_Offset"
-                  class="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  autoComplete="off"
-                  required
-                  value={Shift_Name}
-                  onChange={(e) => setShift_Name(e.target.value)}
-                />
-                <label
-                  for="state"
-                  className={`exp-form-labels ${error && !Shift_Name ? "text-danger" : ""}`}
-                >
-                  Shift Name<span className="text-danger">*</span>
-                </label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="time"
-                  value={Start_Time}
-                  onChange={(e) => setStart_Time(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Start Time</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="time"
-                  value={End_Time}
-                  onChange={(e) => setEnd_Time(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">End Time</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Shift_Hours}
-                  onChange={(e) => setShift_Hours(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Shift Hours</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Is_Night_Shift}
-                  onChange={(e) => seIs_Night_Shift(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Night Shift</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Grace_In_Min}
-                  onChange={(e) => setGrace_In_Min(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Grace in Minutes</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Grace_Out_Min}
-                  onChange={(e) => setGrace_Out_Min(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Grace out Minutes</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Cross_Midnight}
-                  onChange={(e) => setCross_Midnight(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Cross Midnight</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectFocused ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
-                  onKeyDown={handleKeyDownStatus}
-                />
-                <label class="floating-label">Status</label>
-              </div>
-            </div>
-
-            {/* <div class="col-12">
-                        <div className="search-btn-wrapper">
-                            {mode === "create" ? (
-                                <div className="icon-btn save" onClick={handleInsert}>
-                                    <span className="tooltip">Save</span>
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                </div>
-                            ) : (
-                                <div className="icon-btn update" onClick={handleUpdate}>
-                                    <span className="tooltip">Update</span>
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </div>
-                            )}
-                        </div>
-                    </div> */}
           </div>
         </div>
 
@@ -1180,18 +893,18 @@ const handleDelete = async (rowData) => {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_IDSC}
-                  onChange={(e) => setShift_IDSC(e.target.value)}
+                  value={Shift_Type_IDSC}
+                  onChange={(e) => setShift_Type_IDSC(e.target.value)}
                 />
                 <label
                   htmlFor="fdate"
                   className={`exp-form-labels`}
                 >
-                  Shift ID
+                  Shift Type ID
                 </label>
               </div>
             </div>
@@ -1205,14 +918,14 @@ const handleDelete = async (rowData) => {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_CodeSC}
-                  onChange={(e) => setShift_CodeSC(e.target.value)}
+                  value={Shift_TypeSC}
+                  onChange={(e) => setShift_TypeSC(e.target.value)}
                 />
                 <label
                   htmlFor="fdate"
                   className={`exp-form-labels`}
                 >
-                  Shift Code 
+                  Shift Type
                 </label>
               </div>
             </div>
@@ -1226,139 +939,18 @@ const handleDelete = async (rowData) => {
                   placeholder=""
                   autoComplete="off"
                   required
-                  value={Shift_NameSC}
-                  onChange={(e) => setShift_NameSC(e.target.value)}
+                  value={DescriptionSC}
+                  onChange={(e) => DescriptionSC(e.target.value)}
                 />
                 <label
                   htmlFor="fdate"
                   className={`exp-form-labels`}
                 >
-                  Shift Name
+                 Description
                 </label>
               </div>
             </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="time"
-                  value={Start_TimeSC}
-                  onChange={(e) => {
-    const timeValue = e.target.value;
-    setStart_TimeSC(timeValue ? timeValue + ":00" : "");
-  }}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label htmlFor="fdate" className="exp-form-labels">Start Time</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="time"
-                  value={End_TimeSC}
-                  onChange={(e) => setEnd_TimeSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">End Time</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Shift_HoursSC}
-                  onChange={(e) => setShift_HoursSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Shift Hours</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Is_Night_ShiftSC}
-                  onChange={(e) => seIs_Night_ShiftSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Night Shift</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Grace_In_MinSC}
-                  onChange={(e) => setGrace_In_MinSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Grace in Minutes</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="number"
-                  value={Grace_Out_MinSC}
-                  onChange={(e) => setGrace_Out_MinSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Grace out Minutes</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Cross_MidnightSC}
-                  onChange={(e) => setCross_MidnightSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
-                />
-                <label className="exp-form-labels">Cross Midnight</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatusSC ? "has-value" : ""} 
-              ${isSelectFocusedSC ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatusSC}
-                  onChange={handleChangeStatusSC}
-                  options={filteredOptionStatusSC}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocusedSC(true)}
-                  onBlur={() => setIsSelectFocusedSC(false)}
-                  onKeyDown={handleKeyDownStatusSC}
-                />
-                <label class="floating-label">Status</label>
-              </div>
-            </div>
+
             <div className="col-12">
               <div className="search-btn-wrapper">
                 <div className="icon-btn search" onClick={handleSearch}>
@@ -1399,4 +991,4 @@ const handleDelete = async (rowData) => {
   );
 }
 
-export default ShiftMasterGrid;
+export default ShiftTypeMaster;
