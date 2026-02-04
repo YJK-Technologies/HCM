@@ -128,6 +128,7 @@ function ShiftMasterGrid() {
       .then((val) => setStatusdrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
+  
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -369,13 +370,9 @@ const handleSearch = async () => {
   };
 
   const tabs = [
-    { label: "Shift Master" },
-    { label: 'Shift Type Master' },
-    // { label: 'Interview Panel' },
-    // { label: 'Interview Panel Members' },
-    // { label: 'Interview schedule' },
-    // { label: 'Interview Feedback' },
-    // { label: 'Interview Decision' }
+    { label: "Shift Master" }, 
+    { label: "Shift Type Master" },
+    { label: "Shift Pattern Master" }
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -387,22 +384,9 @@ const handleSearch = async () => {
       case 'Shift Type Master':
         ShiftTypeMaster();
         break;
-      //   case 'Interview Panel':
-      //     InterviewPanel();
-      //     break;
-      //   case 'Interview Panel Members':
-      //     InterviewPanelMembers();
-      //     break;
-
-      //   case 'Interview schedule':
-      //     InterviewSchedule();
-      //     break;
-      //   case 'Interview Feedback':
-      //     InterviewFeedback();
-      //     break;
-      //   case 'Interview Decision':
-      //     InterviewDecision();
-      //     break;
+       case "Shift Pattern Master":
+        ShiftPatternMaster();
+        break;
       default:
         break;
     }
@@ -414,6 +398,10 @@ const handleSearch = async () => {
 
   const ShiftTypeMaster = () => {
     navigate("/ShiftTypeMaster");
+  };
+
+  const ShiftPatternMaster = () => {
+    navigate("/ShiftPatternMaster");
   };
   
   const onGridReady = (params) => {
