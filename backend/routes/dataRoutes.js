@@ -1231,6 +1231,7 @@ router.post("/Employee_shift_mappingLoopDelete",dataController.Employee_shift_ma
 router.post("/sp_Shift_MasterLoopDelete",dataController.sp_Shift_MasterLoopDelete)
 router.post("/Shift_Type_MasterInsert",dataController.Shift_Type_MasterInsert)
 router.post("/getShift_TypeSC",dataController.getShift_TypeSC)
+router.post("/Shift_TypeMasterDelete",dataController.Shift_TypeMasterDelete)
 
 
 
