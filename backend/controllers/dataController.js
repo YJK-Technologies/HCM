@@ -1109,6 +1109,7 @@ const saveEditedData = async (req, res) => {
         .input("annualReportURL", updatedRow.annualReportURL)
         .input("location_no", updatedRow.location_no)
         .input("company_gst_no", updatedRow.company_gst_no)
+        .input("Currency_Code", updatedRow.Currency_Code)
         .input("authorisedSignatur", sql.VarBinary, authorisedSignatur)
         .input("created_by", updatedRow.created_by)
         .input("modified_by", sql.NVarChar, req.headers['modified-by'])
@@ -1121,7 +1122,7 @@ const saveEditedData = async (req, res) => {
         .input("datetime3", updatedRow.datetime3)
         .input("datetime4", updatedRow.datetime4)
         .query(`EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id,
-          @status, @foundedDate, @websiteURL,@company_logo,@contact_no,@annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@created_by,@modified_by,
+          @status, @foundedDate, @websiteURL,@company_logo,@contact_no,@annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@Currency_Code ,@created_by,@modified_by,'',
            @tempstr1, @tempstr2, @tempstr3, @tempstr4,
           @datetime1, @datetime2, @datetime3, @datetime4`);
     }
@@ -35221,7 +35222,6 @@ const Shift_Pattern_MasterInsert = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .input("Created_date", sql.DateTime, Created_date)
       .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, @Created_date, '', ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Master insertd successfully" });
@@ -35692,7 +35692,7 @@ const Shift_Type_MasterInsert = async (req, res) => {
 };
 //Code ended by Sakthi on 03-02-26
 
-//Code exported by Sakthi on 05-02-26
+//Code exported by Sakthi on 03-02-26
 const getShift_TypeSC = async (req, res) => {
   const { Shift_Type_ID, Shift_Type, Description, company_code, keyfield} = req.body;
 
@@ -35722,6 +35722,57 @@ const getShift_TypeSC = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+//Code ended by Sakthi on 03-02-26
+
+//code exported by Sakthi on 04-02-26
+const Shift_TypeMasterUpdate = async (req, res) => {
+  const Shift_MasterData = req.body.Shift_MasterData;
+ if (!Shift_MasterData || !Shift_MasterData.length) {
+  return res.status(400).json("Invalid or empty Shift_MasterData array.");
+}
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("Shift_Type_ID", sql.Int, item.Shift_Type_ID)
+        .input("Shift_Type", sql.VarChar, item.Shift_Type)
+        .input("Description", sql.VarChar, item.Description)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, '', '', @modified_by, '', @keyfield`);
+    }
+    res.status(200).json("Shift Type Master data updated successfully");
+  } catch (err) {
+    console.error("Error in Shift_TypeMasterUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 04-02-26
+//code exported by Sakthi on 04-02-26
+const Shift_TypeMasterDelete = async (req, res) => {
+  const Shift_MasterData = req.body.Shift_MasterData;
+  if (!Shift_MasterData || !Shift_MasterData.length) {
+    return res.status(400).json("Invalid or empty Shift_MasterData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Type_Master_test @mode, '', '', '', @company_code, '', '', '', '', @keyfield`);
+    }
+    res.status(200).json("Shift_TypeMasterDelete data deleted successfully");
+  } catch (err) {
+    console.error("Error in Shift_TypeMasterDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 04-02-26
 
 module.exports = {
   login,
@@ -36923,6 +36974,8 @@ module.exports = {
     Employee_shift_mappingLoopDelete,
     sp_Shift_MasterLoopDelete,
     Shift_Type_MasterInsert,
-    getShift_TypeSC
+    getShift_TypeSC,
+    Shift_TypeMasterUpdate,
+    Shift_TypeMasterDelete
 
 };

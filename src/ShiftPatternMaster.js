@@ -11,11 +11,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
+import Select from "react-select";
+
 
 const config = require("./Apiconfig");
 
-function ShiftTypeMaster() {
-  const [activeTab, setActiveTab] = useState("Shift Type Master");
+function ShiftPatternMaster() {
+  const [activeTab, setActiveTab] = useState("Shift Pattern Master");
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -26,12 +28,25 @@ function ShiftTypeMaster() {
   const [loading, setLoading] = useState(false);
   const [key_field, setkey_field] = useState("");
   const modified_by = sessionStorage.getItem("selectedUserCode");
-  const [Shift_Type_ID, setShift_Type_ID] = useState("");
-  const [Shift_Type_IDSC, setShift_Type_IDSC] = useState("");
-  const [Shift_Type, setShift_Type] = useState("");
-  const [Shift_TypeSC, setShift_TypeSC] = useState("");
+  const [Shift_Pattern_ID, setShift_Pattern_ID] = useState("");
+  const [Shift_Pattern_IDSC, setShift_Pattern_IDSC] = useState("");
+  const [Pattern_Code, setPattern_Code] = useState("");
+  const [Pattern_CodeSC, setPattern_CodeSC] = useState("");
+  const [Rotation_Days, setRotation_Days] = useState("");
+  const [Rotation_DaysSC, setRotation_DaysSC] = useState("");
   const [Description, setDescription] = useState("");
   const [DescriptionSC, setDescriptionSC] = useState("");
+  const [hasValueChanged, setHasValueChanged] = useState(false);
+  const [hasValueChangedSC, setHasValueChangedSC] = useState(false);
+  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
+  const [statusdrop, setStatusdrop] = useState([]);
+  const [statusdropSC, setStatusdropSC] = useState([]);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [Status, setStatus] = useState("");
+  const [StatusSC, setStatusSC] = useState("");
 
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
@@ -43,6 +58,87 @@ function ShiftTypeMaster() {
   const companyMappingPermission = permissions
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
+
+  const handleChangeStatusSC = (selectedStatusSC) => {
+    setSelectedStatusSC(selectedStatusSC);
+    setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
+    setHasValueChangedSC(true);
+  };
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
+    setHasValueChanged(true);
+  };
+
+  const filteredOptionStatusSC = statusdropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+    const handleKeyDownStatus = async (e) => {
+    if (e.key === "Enter" && hasValueChanged) {
+      await handleSearch();
+      setHasValueChanged(false);
+    }
+  };
+  const handleKeyDownStatusSC = async (e) => {
+    if (e.key === "Enter" && hasValueChangedSC) {
+      await handleSearch();
+      setHasValueChangedSC(false);
+    }
+  };
+
 
   const handleSearch = async () => {
     setLoading(true);
@@ -56,9 +152,12 @@ function ShiftTypeMaster() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Shift_Type_ID: Shift_Type_IDSC || null,
-          Shift_Type: Shift_TypeSC || null,
+          Shift_Pattern_ID: Shift_Pattern_IDSC || null,
+          Pattern_Code: Pattern_CodeSC || null,
+          Rotation_Days: Rotation_DaysSC || null,
           Description: DescriptionSC || null,
+          Status: StatusSC || null,
+
           company_code,
         }),
       });
@@ -126,20 +225,34 @@ function ShiftTypeMaster() {
     },
 
     {
-      headerName: "Shift Type ID",
-      field: "Shift_Type_ID",
+      headerName: "Shift Pattern ID",
+      field: "Shift_Pattern_ID",
       editable: false,
       cellStyle: { textAlign: "left" },
     },
     {
-      headerName: "Shift Type",
-      field: "Shift_Type",
+      headerName: "Pattern Code",
+      field: "Pattern_Code",
+      editable: true,
+    },
+    {
+      headerName: "Rotation Days",
+      field: "Rotation_Days",
       editable: true,
     },
     {
       headerName: "Description",
       field: "Description",
       editable: true,
+    },
+    {
+      headerName: "Status",
+      field: "Status",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+      values: statusgriddrop,
+       },
+        editable: true,
     },
 
     {
@@ -159,10 +272,10 @@ function ShiftTypeMaster() {
   };
 
   const tabs = [
-    { label: "Shift Master" }, 
+    { label: "Shift Master" },
     { label: "Shift Type Master" },
-    { label: "Shift Pattern Master" }
-    ];
+    { label: "Shift Pattern Master" },
+  ];
 
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
@@ -189,7 +302,7 @@ function ShiftTypeMaster() {
     navigate("/ShiftTypeMaster");
   };
 
-    const ShiftPatternMaster = () => {
+  const ShiftPatternMaster = () => {
     navigate("/ShiftPatternMaster");
   };
 
@@ -403,9 +516,11 @@ function ShiftTypeMaster() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Shift_Type_ID: Number(Shift_Type_ID),
-            Shift_Type: Shift_Type,
+            Shift_Pattern_ID: Number(Shift_Pattern_ID),
+            Pattern_Code: Pattern_Code,
+            Rotation_Days: Rotation_Days,
             Description: Description,
+            Status: Status,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
           }),
@@ -461,7 +576,6 @@ function ShiftTypeMaster() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                
               },
               body: JSON.stringify(dataToSend),
             },
@@ -505,7 +619,7 @@ function ShiftTypeMaster() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "company_code": company_code
+                company_code: company_code,
               },
               body: JSON.stringify(dataToSend),
             },
@@ -541,7 +655,7 @@ function ShiftTypeMaster() {
         />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
-            <h1 className="page-title">Shift Type Master</h1>
+            <h1 className="page-title">Shift Pattern Master</h1>
             <div className="action-wrapper">
               <div onClick={handleSave} className="action-icon add">
                 <span className="tooltip">Save</span>
@@ -567,14 +681,14 @@ function ShiftTypeMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type_ID}
-                  onChange={(e) => setShift_Type_ID(e.target.value)}
+                  value={Shift_Pattern_ID}
+                  onChange={(e) => setShift_Pattern_ID(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Type_ID ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Shift_Pattern_ID ? "text-danger" : ""}`}
                 >
-                  Shift Type ID<span className="text-danger">*</span>
+                  Shift Pattern ID<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -588,14 +702,35 @@ function ShiftTypeMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type}
-                  onChange={(e) => setShift_Type(e.target.value)}
+                  value={Pattern_Code}
+                  onChange={(e) => setPattern_Code(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Type ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Pattern_Code ? "text-danger" : ""}`}
                 >
-                  Shift Type<span className="text-danger">*</span>
+                  Pattern Code<span className="text-danger">*</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Rotation_Days}
+                  onChange={(e) => setRotation_Days(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Rotation_Days ? "text-danger" : ""}`}
+                >
+                  Rotation Days<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -620,8 +755,33 @@ function ShiftTypeMaster() {
                 </label>
               </div>
             </div>
+
+            <div className="col-md-2">
+          <div
+            className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectFocused ? "is-focused" : ""}`}
+          >
+            <Select
+              id="status"
+              isClearable
+              value={selectedStatus}
+              onChange={handleChangeStatus}
+              options={filteredOptionStatus}
+              classNamePrefix="react-select"
+              placeholder=""
+              onFocus={() => setIsSelectFocused(true)}
+              onBlur={() => setIsSelectFocused(false)}
+              onKeyDown={handleKeyDownStatus}
+            />
+            <label class="floating-label">Status</label>
           </div>
         </div>
+
+          </div>
+        </div>
+
+        
 
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="header-flex">
@@ -637,11 +797,11 @@ function ShiftTypeMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type_IDSC}
-                  onChange={(e) => setShift_Type_IDSC(e.target.value)}
+                  value={Shift_Pattern_IDSC}
+                  onChange={(e) => setShift_Pattern_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift Type ID
+                  Shift Pattern ID
                 </label>
               </div>
             </div>
@@ -655,11 +815,29 @@ function ShiftTypeMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_TypeSC}
-                  onChange={(e) => setShift_TypeSC(e.target.value)}
+                  value={Pattern_CodeSC}
+                  onChange={(e) => setPattern_CodeSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift Type
+                  Pattern Code
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_Name"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Rotation_DaysSC}
+                  onChange={(e) => setRotation_DaysSC(e.target.value)}
+                />
+                <label htmlFor="fdate" className={`exp-form-labels`}>
+                  Rotation Days
                 </label>
               </div>
             </div>
@@ -679,6 +857,28 @@ function ShiftTypeMaster() {
                 <label htmlFor="fdate" className={`exp-form-labels`}>
                   Description
                 </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatusSC ? "has-value" : ""} 
+              ${isSelectFocusedSC ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatusSC}
+                  onChange={handleChangeStatusSC}
+                  options={filteredOptionStatusSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocusedSC(true)}
+                  onBlur={() => setIsSelectFocusedSC(false)}
+                  onKeyDown={handleKeyDownStatusSC}
+                />
+                <label class="floating-label">Status</label>
               </div>
             </div>
 
@@ -722,4 +922,4 @@ function ShiftTypeMaster() {
   );
 }
 
-export default ShiftTypeMaster;
+export default ShiftPatternMaster;
