@@ -32,6 +32,8 @@ function ShiftPatternMaster() {
   const [Shift_Pattern_IDSC, setShift_Pattern_IDSC] = useState("");
   const [Pattern_Code, setPattern_Code] = useState("");
   const [Pattern_CodeSC, setPattern_CodeSC] = useState("");
+  const [Pattern_Name, setPattern_Name] = useState("");
+  const [Pattern_NameSC, setPattern_NameSC] = useState("");
   const [Rotation_Days, setRotation_Days] = useState("");
   const [Rotation_DaysSC, setRotation_DaysSC] = useState("");
   const [Description, setDescription] = useState("");
@@ -146,7 +148,7 @@ function ShiftPatternMaster() {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      const response = await fetch(`${config.apiBaseUrl}/getShift_TypeSC`, {
+      const response = await fetch(`${config.apiBaseUrl}/ShiftPattern_SC`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,6 +156,7 @@ function ShiftPatternMaster() {
         body: JSON.stringify({
           Shift_Pattern_ID: Shift_Pattern_IDSC || null,
           Pattern_Code: Pattern_CodeSC || null,
+          Pattern_Name: Pattern_NameSC || null,
           Rotation_Days: Rotation_DaysSC || null,
           Description: DescriptionSC || null,
           Status: StatusSC || null,
@@ -233,6 +236,11 @@ function ShiftPatternMaster() {
     {
       headerName: "Pattern Code",
       field: "Pattern_Code",
+      editable: true,
+    },
+    {
+      headerName: "Pattern Name",
+      field: "Pattern_Name",
       editable: true,
     },
     {
@@ -509,16 +517,17 @@ function ShiftPatternMaster() {
 
     try {
       const response = await fetch(
-        `${config.apiBaseUrl}/Shift_Type_MasterInsert`,
+        `${config.apiBaseUrl}/ShiftPattern_Insert`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Shift_Pattern_ID: Number(Shift_Pattern_ID),
+            Shift_Pattern_ID: Shift_Pattern_ID,
             Pattern_Code: Pattern_Code,
-            Rotation_Days: Rotation_Days,
+            Pattern_Name: Pattern_Name,
+            Rotation_Days: Number(Rotation_Days),
             Description: Description,
             Status: Status,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -548,7 +557,7 @@ function ShiftPatternMaster() {
     setLoading(true);
 
     showConfirmationToast(
-      "Are you sure you want to update the selected shift data?",
+      "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
         try {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -571,7 +580,7 @@ function ShiftPatternMaster() {
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/Shift_TypeMasterUpdate`,
+            `${config.apiBaseUrl}/ShiftPattern_Update`,
             {
               method: "POST",
               headers: {
@@ -582,7 +591,7 @@ function ShiftPatternMaster() {
           );
 
           if (response.ok) {
-            toast.success("Shift updated successfully", {
+            toast.success("ShiftPattern updated successfully", {
               onClose: () => handleSearch(),
             });
           } else {
@@ -607,19 +616,19 @@ function ShiftPatternMaster() {
       "Are you sure you want to delete the selected shift data?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {
             Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/Shift_TypeMasterDelete`,
+            `${config.apiBaseUrl}/ShiftPattern_Delete`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                company_code: company_code,
+                "Company_Code": Company_Code
               },
               body: JSON.stringify(dataToSend),
             },
@@ -677,7 +686,7 @@ function ShiftPatternMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   placeholder=" "
                   autoComplete="off"
                   required
@@ -710,6 +719,27 @@ function ShiftPatternMaster() {
                   className={`exp-form-labels ${error && !Pattern_Code ? "text-danger" : ""}`}
                 >
                   Pattern Code<span className="text-danger">*</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Pattern_Name}
+                  onChange={(e) => setPattern_Name(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Pattern_Name ? "text-danger" : ""}`}
+                >
+                 Pattern Name<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -793,7 +823,7 @@ function ShiftPatternMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   placeholder=" "
                   autoComplete="off"
                   required
@@ -820,6 +850,24 @@ function ShiftPatternMaster() {
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
                   Pattern Code
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_Name"
+                  class="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Pattern_NameSC}
+                  onChange={(e) => setPattern_NameSC(e.target.value)}
+                />
+                <label htmlFor="fdate" className={`exp-form-labels`}>
+                 Pattern Name
                 </label>
               </div>
             </div>
