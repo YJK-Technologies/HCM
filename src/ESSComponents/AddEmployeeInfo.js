@@ -356,8 +356,11 @@ function Input({ }) {
           });
 
           if (response.status === 200) {
-            console.log("Data Updated successfully");
-            toast.success("Data Updated successfully!")
+            setTimeout(() => {
+              toast.success("Data updated successfully!", {
+                onClose: () => window.location.reload(),
+              });
+            }, 1000);
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);

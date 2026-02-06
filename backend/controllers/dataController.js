@@ -33342,8 +33342,8 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("email", sql.VarChar, item.email)
         .input("phone", sql.VarChar, item.phone)
         .input("applied_job_id", sql.Int, item.applied_job_id)
-        .input("Education", sql.Int, item.Education)
-        .input("Experience", sql.Int, item.Experience)
+        .input("Education", sql.NVarChar, item.Education)
+        .input("Experience", sql.NVarChar, item.Experience)
         .input("Related_experience", sql.Int, item.Related_experience)
         .input("Job_description", sql.Int, item.Job_description)
         .input("company_code", sql.VarChar, item.company_code)
@@ -33983,7 +33983,7 @@ const interview_decisionLoopDelete = async (req, res) => {
 
 // Code Added by Harishon 12-02-26
 const CandidateSearch = async (req, res) => {
-  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code } = req.body;
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33997,8 +33997,9 @@ const CandidateSearch = async (req, res) => {
       .input("Education", sql.VarChar, Education)
       .input("Experience", sql.VarChar, Experience)
       .input("Related_experience", sql.VarChar, Related_experience)
+      .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,'',@company_code,'','','','','','' `);
+      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','','','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34093,20 +34094,21 @@ const InterviewPanelMembers = async (req, res) => {
 };
 
 const InterviewSchedule = async (req, res) => {
-  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,company_code } = req.body;
+  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,Status,company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("schedule_id", sql.NVarChar, schedule_id )
+      .input("schedule_id", sql.Int, schedule_id )
       .input("candidate_id", sql.Int, candidate_id )
-      .input("panel_id", sql.VarChar, panel_id )
+      .input("panel_id", sql.Int, panel_id )
       .input("location", sql.VarChar, location  )
       .input("Interview_Mode", sql.VarChar, Interview_Mode  )
+      .input("Status", sql.VarChar, Status)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule 'SC',@schedule_id,@candidate_id,@panel_id,'',@location,'','',@Interview_Mode,'',@company_code,'','','','',''
+      .query(`EXEC sp_interview_schedule 'SC',@schedule_id,@candidate_id,@panel_id,'',@location,'','',@Interview_Mode,@Status,@company_code,'','','','',''
 `);
 
     if (result.recordset.length > 0) {
@@ -34123,7 +34125,7 @@ const InterviewSchedule = async (req, res) => {
 // Code Added by Harish on 17-01-26
 
 const InterviewFeedbackSC = async (req, res) => {
-  const { feedback_id,schedule_id,employee_id,rating,comments,company_code } = req.body;
+  const { feedback_id,schedule_id,employee_id,rating,comments,Recommendation, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -34135,8 +34137,9 @@ const InterviewFeedbackSC = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id )
       .input("rating", sql.Decimal(3,2), rating  )
       .input("comments", sql.VarChar, comments)
+      .input("Recommendation", sql.VarChar, Recommendation)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'','',@company_code,'','','','',''
+      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'',@Recommendation,@company_code,'','','','',''
 
 `);
 
@@ -35774,6 +35777,123 @@ const Shift_TypeMasterDelete = async (req, res) => {
 };
 //Code ended by Sakthi on 04-02-26
 
+//Code exported by Sakthi on 05-02-26
+const ShiftPattern_Insert = async (req, res) => {
+  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, company_code, created_by,  keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("Shift_Pattern_ID", sql.VarChar, Shift_Pattern_ID)
+      .input("Pattern_Code", sql.VarChar, Pattern_Code)
+      .input("Pattern_Name", sql.VarChar, Pattern_Name)
+      .input("Rotation_Days", sql.Int, Rotation_Days)
+      .input("Description", sql.VarChar, Description)
+      .input("Status", sql.VarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, @Created_by, '', '', ''`);
+
+   res.status(200).json({ success: true, message: "ShiftPattern insertd successfully" });
+  } catch (err) {
+    console.error("Error during ShiftPattern insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 05-02-26
+
+//Code exported by Sakthi on 05-02-26
+const ShiftPattern_SC = async (req, res) => {
+  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, company_code,  keyfield} = req.body;
+
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Shift_Pattern_ID", sql.VarChar, Shift_Pattern_ID)
+      .input("Pattern_Code", sql.VarChar, Pattern_Code)
+      .input("Pattern_Name", sql.VarChar, Pattern_Name)
+      .input("Rotation_Days", sql.Int, Rotation_Days)
+      .input("Description", sql.VarChar, Description)
+      .input("Status", sql.VarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', '', ''`);
+
+    // Send response
+       if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 05-02-26
+
+//code exported by Sakthi on 05-02-26
+const ShiftPattern_Update = async (req, res) => {
+  const Shift_MasterData = req.body.Shift_MasterData;
+ if (!Shift_MasterData || !Shift_MasterData.length) {
+  return res.status(400).json("Invalid or empty ShiftPatternData array.");
+}
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("Shift_Pattern_ID", sql.VarChar, item.Shift_Pattern_ID)
+        .input("Pattern_Code", sql.VarChar, item.Pattern_Code)
+        .input("Pattern_Name", sql.VarChar, item.Pattern_Name)
+        .input("Rotation_Days", sql.Int, item.Rotation_Days)
+        .input("Description", sql.VarChar, item.Description)
+        .input("Status", sql.VarChar, item.Status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @modified_by, ''`);
+    }
+    res.status(200).json("Shift Pattern data updated successfully");
+  } catch (err) {
+    console.error("Error in ShiftPattern_Update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 05-02-26
+//code exported by Sakthi on 05-02-26
+const ShiftPattern_Delete = async (req, res) => {
+  const Shift_MasterData = req.body.Shift_MasterData;
+  if (!Shift_MasterData || !Shift_MasterData.length) {
+    return res.status(400).json("Invalid or empty Shift Pattern Data array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of Shift_MasterData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_Shift_Pattern_Master @mode, '', '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`);
+    }
+    res.status(200).json("ShiftPattern_Delete data deleted successfully");
+  } catch (err) {
+    console.error("Error in ShiftPattern_Delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 05-02-26
+
+
+
 module.exports = {
   login,
   forgetPassword,
@@ -36976,6 +37096,10 @@ module.exports = {
     Shift_Type_MasterInsert,
     getShift_TypeSC,
     Shift_TypeMasterUpdate,
-    Shift_TypeMasterDelete
+    Shift_TypeMasterDelete,
+    ShiftPattern_Insert,
+    ShiftPattern_SC,
+    ShiftPattern_Update,
+    ShiftPattern_Delete
 
 };
