@@ -33342,8 +33342,8 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("email", sql.VarChar, item.email)
         .input("phone", sql.VarChar, item.phone)
         .input("applied_job_id", sql.Int, item.applied_job_id)
-        .input("Education", sql.Int, item.Education)
-        .input("Experience", sql.Int, item.Experience)
+        .input("Education", sql.NVarChar, item.Education)
+        .input("Experience", sql.NVarChar, item.Experience)
         .input("Related_experience", sql.Int, item.Related_experience)
         .input("Job_description", sql.Int, item.Job_description)
         .input("company_code", sql.VarChar, item.company_code)
@@ -33983,7 +33983,7 @@ const interview_decisionLoopDelete = async (req, res) => {
 
 // Code Added by Harishon 12-02-26
 const CandidateSearch = async (req, res) => {
-  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code } = req.body;
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33997,8 +33997,9 @@ const CandidateSearch = async (req, res) => {
       .input("Education", sql.VarChar, Education)
       .input("Experience", sql.VarChar, Experience)
       .input("Related_experience", sql.VarChar, Related_experience)
+      .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,'',@company_code,'','','','','','' `);
+      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','','','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34093,20 +34094,21 @@ const InterviewPanelMembers = async (req, res) => {
 };
 
 const InterviewSchedule = async (req, res) => {
-  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,company_code } = req.body;
+  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,Status,company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("schedule_id", sql.NVarChar, schedule_id )
+      .input("schedule_id", sql.Int, schedule_id )
       .input("candidate_id", sql.Int, candidate_id )
-      .input("panel_id", sql.VarChar, panel_id )
+      .input("panel_id", sql.Int, panel_id )
       .input("location", sql.VarChar, location  )
       .input("Interview_Mode", sql.VarChar, Interview_Mode  )
+      .input("Status", sql.VarChar, Status)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule 'SC',@schedule_id,@candidate_id,@panel_id,'',@location,'','',@Interview_Mode,'',@company_code,'','','','',''
+      .query(`EXEC sp_interview_schedule 'SC',@schedule_id,@candidate_id,@panel_id,'',@location,'','',@Interview_Mode,@Status,@company_code,'','','','',''
 `);
 
     if (result.recordset.length > 0) {
@@ -34123,7 +34125,7 @@ const InterviewSchedule = async (req, res) => {
 // Code Added by Harish on 17-01-26
 
 const InterviewFeedbackSC = async (req, res) => {
-  const { feedback_id,schedule_id,employee_id,rating,comments,company_code } = req.body;
+  const { feedback_id,schedule_id,employee_id,rating,comments,Recommendation, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -34135,8 +34137,9 @@ const InterviewFeedbackSC = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id )
       .input("rating", sql.Decimal(3,2), rating  )
       .input("comments", sql.VarChar, comments)
+      .input("Recommendation", sql.VarChar, Recommendation)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'','',@company_code,'','','','',''
+      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'',@Recommendation,@company_code,'','','','',''
 
 `);
 

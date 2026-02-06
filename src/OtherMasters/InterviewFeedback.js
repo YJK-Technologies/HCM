@@ -33,11 +33,14 @@ const getFinancialYearDates = () => {
 
   return { FirstDate, LastDate };
 };
-const { FirstDate, LastDate } = getFinancialYearDates();
 
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; // YYYY-MM-DD
+};
 function InterviewFeedback({ }) {
   const [rowData, setRowData] = useState([]);
-  const [submitted_on, setsubmitted_on] = useState(FirstDate);
+  const [submitted_on, setsubmitted_on] = useState(getTodayDate());
   const [error, setError] = useState("");
   const [rating, setrating] = useState("");
   const [comments, setcomments] = useState("");
@@ -440,7 +443,7 @@ function InterviewFeedback({ }) {
         schedule_id: scheduleidSC,
         feedback_id: feedback_id,
         employee_id: EmployeeIDSC,
-        RecommendationSC: RecommendationSC,
+        Recommendation: RecommendationSC,
         rating: Number.rating,
         comments: commentsSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),

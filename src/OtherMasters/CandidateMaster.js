@@ -23,6 +23,7 @@ function CandidateMaster() {
   const [Related_experience, setRelated_experience] = useState("");
   const [EducationSC, setEducationSC] = useState("");
   const [ExperienceSC, setExperienceSC] = useState("");
+  const [JobDescriptionSC, setJobDescriptionSC] = useState("");
   const [Related_experienceSC, setRelated_experienceSC] = useState("");
   const [Job_description, setJob_description] = useState("");
   const [email, setemail] = useState("");
@@ -40,6 +41,7 @@ function CandidateMaster() {
   const [JobID, setJobID] = useState("");
   const [JobIDSC, setJobIDSC] = useState("");
   const [Jobdrop, setJobdrop] = useState([]);
+  const [JobDrop, setJobDrop] = useState([]);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [dptSC, setdptSC] = useState("");
   const [selectedcandidate_name, setSelectedcandidatename] = useState("");
@@ -111,6 +113,24 @@ function CandidateMaster() {
     }
   }, []);
 
+    useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      
+      fetch(`${config.apiBaseUrl}/JobMaster`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      }) 
+        .then((response) => response.json())
+        .then((data) => {
+          const jobs = data.map(option => option.job_id);
+          setJobDrop(jobs);
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
@@ -150,6 +170,7 @@ function CandidateMaster() {
         applied_job_id: JobIDSC,
         Education: EducationSC,
         Experience: ExperienceSC,
+        Job_description: JobDescriptionSC,
         Related_experience: Related_experienceSC,
         company_code: sessionStorage.getItem("selectedCompanyCode")
       };
@@ -414,6 +435,10 @@ function CandidateMaster() {
       headerName: "Applied Job ID",
       field: "applied_job_id",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: JobDrop,
+      },
     },
     {
       headerName: "Education",
@@ -1012,6 +1037,28 @@ function CandidateMaster() {
               </label>
             </div>
           </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={JobDescriptionSC}
+                maxLength={100}
+                 onChange={(e) => {setJobDescriptionSC(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels`}
+              >
+                Job Description
+              </label>
+            </div>
+          </div>
           {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -1058,16 +1105,21 @@ function CandidateMaster() {
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">Candidate CV</h5>
-                    <button
-                      className="btn-close"
-                      onClick={() => {
+                   <div className="shadow-lg p-1 bg-light main-header-box">
+                <div className="header-flex">
+                  <h1 className="custom-modal-title">Candidate CV</h1>
+
+                  <div className="action-wrapper">
+                    <div className="action-icon delete"  onClick={() => {
                         URL.revokeObjectURL(currentPdfUrl);
                         setIsModalOpen(false);
-                      }}
-                    ></button>
+                      }}>
+                      <span className="tooltip">Close</span>
+                      <i className="fa-solid fa-xmark"></i>
+                    </div>
                   </div>
+                </div>
+              </div>
                   <div className="modal-body" style={{ height: "500px" }}>
                     <iframe
                       src={currentPdfUrl}

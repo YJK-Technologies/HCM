@@ -115,7 +115,7 @@ function InterviewSchedule({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/InterviewStatus`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -551,7 +551,7 @@ function InterviewSchedule({ }) {
         panel_id: PanelIDSC,
         department_id: department_idSC,
         Interview_Mode: InterviewModeSC,
-        status: statusSC,
+        Status: statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
