@@ -34139,9 +34139,7 @@ const InterviewFeedbackSC = async (req, res) => {
       .input("comments", sql.VarChar, comments)
       .input("Recommendation", sql.VarChar, Recommendation)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'',@Recommendation,@company_code,'','','','',''
-
-`);
+      .query(`EXEC sp_interview_feedback_test @mode,@feedback_id,@schedule_id,@employee_id,@rating,@comments,'',@Recommendation,@company_code,'','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34169,8 +34167,7 @@ const InterviewDecisionSC = async (req, res) => {
       .input("remarks", sql.VarChar, remarks )
       .input("Final_Status", sql.VarChar, Final_Status )
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_decision @mode,@decision_id,@candidate_id,@job_id,@decided_by,'',@remarks,@Final_Status,@company_code,'','','','',''
-`);
+      .query(`EXEC sp_interview_decision @mode,@decision_id,@candidate_id,@job_id,@decided_by,'',@remarks,@Final_Status,@company_code,'','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);

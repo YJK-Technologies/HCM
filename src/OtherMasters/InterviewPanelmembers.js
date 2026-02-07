@@ -58,6 +58,7 @@ function InterviewPanelMem({ }) {
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
   const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
+  const [panelDrop, setPaneldrop] = useState([]);
 
 
 
@@ -76,56 +77,73 @@ function InterviewPanelMem({ }) {
   };
 
 
-   const handleEmployeeID = (selectedDPT) => {
-  setselectedEmployeeID(selectedDPT || []);
+  const handleEmployeeID = (selectedDPT) => {
+    setselectedEmployeeID(selectedDPT || []);
 
-  const employeeIds = selectedDPT
-    ? selectedDPT.map(emp => emp.value).join(",")
-    : "";
+    const employeeIds = selectedDPT
+      ? selectedDPT.map(emp => emp.value).join(",")
+      : "";
 
-  setEmployeeID(employeeIds);
-};
+    setEmployeeID(employeeIds);
+  };
 
-     const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT||[]);
+  const handleEmployeeIDSC = (selectedDPT) => {
+    setselectedEmployeeIDSC(selectedDPT || []);
     setEmployeeIDSC(selectedDPT ? selectedDPT.value : '');
   };
 
-   const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
+  const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`
   }));
 
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
-        const fetchDept = async () => {
-          try {
-            const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ company_code }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-    
-            const val = await response.json();
-            setEmployeeIDdrop(val);
-          } catch (error) {
-            console.error('Error fetching departments:', error);
-          }
-        };
-    
-        if (company_code) {
-          fetchDept();
-        }
-      }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
 
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const val = await response.json();
+        setEmployeeIDdrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const panel = data.map(option => option.panel_id);
+        setPaneldrop(panel);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const handlePanelID = (selectedDPT) => {
     setselectedPanelID(selectedDPT);
@@ -234,7 +252,11 @@ function InterviewPanelMem({ }) {
     {
       headerName: "Panel ID",
       field: "panel_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: panelDrop,
+      },
     },
     {
       headerName: "Employee ID",
@@ -564,44 +586,42 @@ function InterviewPanelMem({ }) {
               </label>
             </div>
           </div>
-         <div
-  className={`employee-col ${
-    selectedEmployeeID?.length > 0 ? "expanded" : ""
-  }`}
->
-  <div
-    className={`inputGroup selectGroup 
+          <div
+            className={`employee-col ${selectedEmployeeID?.length > 0 ? "expanded" : ""
+              }`}
+          >
+            <div
+              className={`inputGroup selectGroup 
     ${selectedEmployeeID?.length > 0 ? "has-value" : ""} 
     ${isSelectEmployeeID ? "is-focused" : ""}`}
-  >
-    <Select
-      id="employee"
-      isMulti
-      isClearable
-      placeholder=" "
-      value={selectedEmployeeID}
-      onChange={handleEmployeeID}
-      onFocus={() => setisSelectEmployeeID(true)}
-      onBlur={() => setisSelectEmployeeID(false)}
-      options={filteredOptionEmployeeID}
-      classNamePrefix="react-select"
-      styles={{
-        container: (base) => ({
-          ...base,
-          width: "100%",
-        }),
-      }}
-    />
+            >
+              <Select
+                id="employee"
+                isMulti
+                isClearable
+                placeholder=" "
+                value={selectedEmployeeID}
+                onChange={handleEmployeeID}
+                onFocus={() => setisSelectEmployeeID(true)}
+                onBlur={() => setisSelectEmployeeID(false)}
+                options={filteredOptionEmployeeID}
+                classNamePrefix="react-select"
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: "100%",
+                  }),
+                }}
+              />
 
-    <label
-      className={`floating-label ${
-        error && !selectedEmployeeID?.length ? "text-danger" : ""
-      }`}
-    >
-      Employee ID{showAsterisk && <span className="text-danger">*</span>}
-    </label>
-  </div>
-</div>
+              <label
+                className={`floating-label ${error && !selectedEmployeeID?.length ? "text-danger" : ""
+                  }`}
+              >
+                Employee ID{showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -669,46 +689,46 @@ function InterviewPanelMem({ }) {
             </div>
           </div>
 
-        <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedEmployeeIDSC ? "has-value" : ""} 
               ${isSelectEmployeeIDSC ? "is-focused" : ""}`}
             >
-           <Select
-  id="employee"
-  placeholder=" "
-  isMulti
-  classNamePrefix="react-select"
-  isClearable
-  value={selectedEmployeeIDSC}
-  onChange={handleEmployeeIDSC}
-  options={filteredOptionEmployeeID}
-  styles={{
-    control: (base) => ({
-      ...base,
-      minHeight: "42px",
-      height: "auto",
-      alignItems: "flex-start",
-    }),
-    valueContainer: (base) => ({
-      ...base,
-      flexWrap: "wrap",          // allow wrapping
-      alignItems: "flex-start",
-      padding: "6px",
-    }),
-    multiValue: (base) => ({
-      ...base,
-      maxWidth: "100%",
-    }),
-    multiValueLabel: (base) => ({
-      ...base,
-      whiteSpace: "normal",      // 👈 show full text
-      overflow: "visible",
-      textOverflow: "unset",
-    }),
-  }}
-/>
+              <Select
+                id="employee"
+                placeholder=" "
+                isMulti
+                classNamePrefix="react-select"
+                isClearable
+                value={selectedEmployeeIDSC}
+                onChange={handleEmployeeIDSC}
+                options={filteredOptionEmployeeID}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    minHeight: "42px",
+                    height: "auto",
+                    alignItems: "flex-start",
+                  }),
+                  valueContainer: (base) => ({
+                    ...base,
+                    flexWrap: "wrap",          // allow wrapping
+                    alignItems: "flex-start",
+                    padding: "6px",
+                  }),
+                  multiValue: (base) => ({
+                    ...base,
+                    maxWidth: "100%",
+                  }),
+                  multiValueLabel: (base) => ({
+                    ...base,
+                    whiteSpace: "normal",      // 👈 show full text
+                    overflow: "visible",
+                    textOverflow: "unset",
+                  }),
+                }}
+              />
 
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Employee ID

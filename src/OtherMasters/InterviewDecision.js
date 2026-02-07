@@ -363,7 +363,7 @@ function InterviewDecision({ }) {
     {
       headerName: "Job ID",
       field: "job_id",
-      editable: false,
+      editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: jobDrop,
