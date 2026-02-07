@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -10,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { showConfirmationToast } from './ToastConfirmation';
 import LoadingScreen from './Loading';
+import Select from 'react-select';
 const config = require("./Apiconfig");
 
 function Department() {
@@ -25,6 +26,11 @@ function Department() {
   const [modifiedBy, setModifiedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
+  const [statusdrop, setStatusdrop] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [status, setStatus] = useState("");
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -34,6 +40,48 @@ function Department() {
 
   const reloadGridData = () => {
     window.location.reload();
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    }).then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : '');
   };
 
   const handleSearch = async () => {
@@ -48,7 +96,7 @@ function Department() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ dept_id, dept_name, company_code }), // Send  as search criteria
+          body: JSON.stringify({ dept_id, dept_name, Status: status, company_code }), // Send  as search criteria
         }
       );
       if (response.ok) {
@@ -66,7 +114,6 @@ function Department() {
     } finally {
       setLoading(false);
     }
-
   };
 
   const columnDefs = [
@@ -107,6 +154,17 @@ function Department() {
       },
     },
     {
+      headerName: "Status",
+      field: "Status",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      // minWidth: 150,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusgriddrop
+      },
+    },
+    {
       headerName: "Keyfield",
       field: "key_field",
       cellStyle: { textAlign: "center" },
@@ -139,6 +197,7 @@ function Department() {
       return {
         "Department Code": row.dept_id,
         "Department Name": row.dept_name,
+        "Status": row.Status,
       };
     });
 
@@ -277,13 +336,14 @@ function Department() {
         setLoading(true);
         try {
           const modified_by = sessionStorage.getItem('selectedUserCode');
-          // Filter the editedData state to include only the selected rows
+          const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const response = await fetch(`${config.apiBaseUrl}/UpdateDepartment`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "modified-by": modified_by
+              "modified-by": modified_by,
+              "company_code": company_code,
             },
             body: JSON.stringify({ editedData: selectedRowsData }), // Send only the selected rows for saving
           });
@@ -303,7 +363,6 @@ function Department() {
         } finally {
           setLoading(false);
         }
-
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -354,7 +413,6 @@ function Department() {
         } finally {
           setLoading(false);
         }
-
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -501,6 +559,27 @@ function Department() {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <label for="lname" className="exp-form-labels">Department Name</label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectStatus(true)}
+                  onBlur={() => setIsSelectStatus(false)}
+                />
+                <label class="floating-label">Status</label>
               </div>
             </div>
 

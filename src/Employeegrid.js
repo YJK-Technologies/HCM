@@ -383,7 +383,6 @@ function Employee() {
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: drop,
-       
       },
 
     },
