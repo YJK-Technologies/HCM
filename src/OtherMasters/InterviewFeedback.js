@@ -77,6 +77,7 @@ function InterviewFeedback({ }) {
   const [RecommendationSC, setRecommendationSC] = useState("");
   const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
   const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
+  const [employeeDrop, setEmployeeDrop] = useState([]);
 
   const navigate = useNavigate();
 
@@ -199,7 +200,7 @@ function InterviewFeedback({ }) {
     }
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
     fetch(`${config.apiBaseUrl}/Recommendation`, {
@@ -291,6 +292,24 @@ function InterviewFeedback({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Employee_ID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employee = data.map(option => option.EmployeeId);
+        setEmployeeDrop(employee);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
       await handleSearch();
@@ -340,7 +359,11 @@ function InterviewFeedback({ }) {
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employeeDrop,
+      },
     },
     {
       headerName: "Rating",
