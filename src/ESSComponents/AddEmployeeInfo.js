@@ -161,7 +161,7 @@ function Input({ }) {
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
-      toast.warning("Please enter a valid business email");
+      toast.warning("Please enter a valid email business");
       return;
     }
     setLoading(true);
@@ -293,7 +293,7 @@ function Input({ }) {
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
-      toast.warning("Please enter a valid business email");
+      toast.warning("Please enter a valid email business");
       return;
     }
 

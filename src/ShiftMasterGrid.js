@@ -244,7 +244,7 @@ const handleSearch = async () => {
     },
 
     {
-      headerName: "ShiftID",
+      headerName: "Shift ID",
       field: "Shift_ID",
       editable: true,
       cellStyle: { textAlign: "left" },
@@ -730,6 +730,7 @@ const handleSearch = async () => {
   const handleSave = async () => {
         if (!Shift_ID || !Shift_Code || !Shift_Name ) {
           toast.warning("Error: Missing required fields");
+          setError(" ")
           return;
         }
 

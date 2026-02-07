@@ -387,10 +387,11 @@ function ShiftTypeMaster() {
   };
 
   const handleSave = async () => {
-    // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-    //   toast.warning("Error: Missing required fields");
-    //   return;
-    // }
+    if (!Shift_Type_ID || !Shift_Type ) {
+      toast.warning("Error: Missing required fields");
+      setError(" ");
+      return;
+    }
 
     setLoading(true);
 
@@ -612,11 +613,8 @@ function ShiftTypeMaster() {
                   value={Description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
-                <label
-                  for="state"
-                  className={`exp-form-labels ${error && !Description ? "text-danger" : ""}`}
-                >
-                  Description<span className="text-danger">*</span>
+                <label for="state" className={`exp-form-labels`}>
+                  Description
                 </label>
               </div>
             </div>
