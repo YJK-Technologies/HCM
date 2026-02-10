@@ -1237,6 +1237,7 @@ router.post("/ShiftPattern_SC",dataController.ShiftPattern_SC)
 router.post("/ShiftPattern_Update",dataController.ShiftPattern_Update)
 router.post("/ShiftPattern_Delete",dataController.ShiftPattern_Delete)
 router.post("/Shift_TypeMasterUpdate",dataController.Shift_TypeMasterUpdate)
+router.post("/ShiftPatternDetail_SC",dataController.ShiftPatternDetail_SC)
 
 
 
