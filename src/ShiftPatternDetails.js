@@ -11,11 +11,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
+import Select from "react-select";
+
 
 const config = require("./Apiconfig");
 
-function ShiftTypeMaster() {
-  const [activeTab, setActiveTab] = useState("Shift Type Master");
+function ShiftPatternDetails() {
+  const [activeTab, setActiveTab] = useState("Shift Pattern Details");
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -26,12 +28,18 @@ function ShiftTypeMaster() {
   const [loading, setLoading] = useState(false);
   const [key_field, setkey_field] = useState("");
   const modified_by = sessionStorage.getItem("selectedUserCode");
-  const [Shift_Type_ID, setShift_Type_ID] = useState("");
-  const [Shift_Type_IDSC, setShift_Type_IDSC] = useState("");
-  const [Shift_Type, setShift_Type] = useState("");
-  const [Shift_TypeSC, setShift_TypeSC] = useState("");
-  const [Description, setDescription] = useState("");
-  const [DescriptionSC, setDescriptionSC] = useState("");
+  const [Shift_Pattern_ID, setShift_Pattern_ID] = useState("");
+  const [Shift_Pattern_IDSC, setShift_Pattern_IDSC] = useState("");
+  const [Pattern_Detail_ID, setPattern_Detail_ID] = useState("");
+  const [Pattern_CodeSC, setPattern_CodeSC] = useState("");
+  const [Day_Sequence, setDay_Sequence] = useState("");
+  const [Pattern_Detail_IDSC, setPattern_Detail_IDSC] = useState("");
+  const [Shift_ID, setShift_ID] = useState("");
+  const [Day_SequenceSC, setDay_SequenceSC] = useState("");
+  const [Is_Off_Day, setIs_Off_Day] = useState("");
+  const [Is_Off_DaySC, setIs_Off_DaySC] = useState("");
+  const [Shift_IDSC, setShift_IDSC] = useState("");
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
 
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
@@ -44,22 +52,43 @@ function ShiftTypeMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+
   const handleSearch = async () => {
     setLoading(true);
 
     try {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
-      const response = await fetch(`${config.apiBaseUrl}/getShift_TypeSC`, {
+      const response = await fetch(`${config.apiBaseUrl}/ShiftPatternDetail_SC`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Shift_Type_ID: Shift_Type_IDSC || null,
-          Shift_Type: Shift_TypeSC || null,
-          Description: DescriptionSC || null,
-          company_code,
+          Shift_Pattern_ID: Shift_Pattern_IDSC || null,
+          Pattern_Detail_ID: Pattern_Detail_IDSC || null,
+          Day_Sequence: Day_SequenceSC || null,
+          RotationShift_ID_Days: Shift_IDSC || null,
+          Is_Off_Day: Is_Off_DaySC || null,
+          Company_Code,
         }),
       });
 
@@ -126,22 +155,31 @@ function ShiftTypeMaster() {
     },
 
     {
-      headerName: "Shift Type ID",
-      field: "Shift_Type_ID",
-      editable: false,
+      headerName: "Shift Pattern ID",
+      field: "Shift_Pattern_ID",
+      editable: true,
       cellStyle: { textAlign: "left" },
     },
     {
-      headerName: "Shift Type",
-      field: "Shift_Type",
+      headerName: "Pattern Detail ID",
+      field: "Pattern_Detail_ID",
+      editable: false,
+    },
+    {
+      headerName: "Day Sequence",
+      field: "Day_Sequence",
       editable: true,
     },
     {
-      headerName: "Description",
-      field: "Description",
+      headerName: "Shift ID",
+      field: "Shift_ID",
       editable: true,
     },
-
+    {
+      headerName: "Is Off Day",
+      field: "Is_Off_Day",
+      editable: true,
+    },
     {
       headerName: "keyfield",
       field: "keyfield",
@@ -159,11 +197,11 @@ function ShiftTypeMaster() {
   };
 
   const tabs = [
-    { label: "Shift Master" }, 
+    { label: "Shift Master" },
     { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
     { label: "Shift Pattern Details" },
-    ];
+  ];
 
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
@@ -179,7 +217,7 @@ function ShiftTypeMaster() {
         break;
       case "Shift Pattern Details":
         ShiftPatternDetails();
-        break;        
+        break;
       default:
         break;
     }
@@ -193,13 +231,13 @@ function ShiftTypeMaster() {
     navigate("/ShiftTypeMaster");
   };
 
-    const ShiftPatternMaster = () => {
+  const ShiftPatternMaster = () => {
     navigate("/ShiftPatternMaster");
   };
 
   const ShiftPatternDetails = () => {
     navigate("/ShiftPatternDetails");
-  };  
+  };
 
   const onGridReady = (params) => {
     setGridApi(params.api);
@@ -395,27 +433,28 @@ function ShiftTypeMaster() {
   };
 
   const handleSave = async () => {
-    if (!Shift_Type_ID || !Shift_Type ) {
-      toast.warning("Error: Missing required fields");
-      setError(" ");
-      return;
-    }
+    // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
+    //   toast.warning("Error: Missing required fields");
+    //   return;
+    // }
 
     setLoading(true);
 
     try {
       const response = await fetch(
-        `${config.apiBaseUrl}/Shift_Type_MasterInsert`,
+        `${config.apiBaseUrl}/Shift_Pattern_DetailInsert`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Shift_Type_ID: Number(Shift_Type_ID),
-            Shift_Type: Shift_Type,
-            Description: Description,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Shift_Pattern_ID: Shift_Pattern_ID,
+            Pattern_Detail_ID: Pattern_Detail_ID,
+            Day_Sequence: Day_Sequence,
+            Shift_ID: Shift_ID,
+            Is_Off_Day: Is_Off_Day,
+            Company_Code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         },
@@ -442,42 +481,41 @@ function ShiftTypeMaster() {
     setLoading(true);
 
     showConfirmationToast(
-      "Are you sure you want to update the selected shift data?",
+      "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            Shift_MasterData: Array.isArray(rowData)
+            Shift_DetailData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                   ...row,
-                  company_code,
-                  modified_by,
+                  Company_Code,
+                  Modified_by,
                 }))
               : [
                   {
                     ...rowData,
-                    company_code,
-                    modified_by,
+                    Company_Code,
+                    Modified_by,
                   },
                 ],
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/Shift_TypeMasterUpdate`,
+            `${config.apiBaseUrl}/Shift_Pattern_DetailUpdate`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                
               },
               body: JSON.stringify(dataToSend),
             },
           );
 
           if (response.ok) {
-            toast.success("Shift updated successfully", {
+            toast.success("ShiftPattern updated successfully", {
               onClose: () => handleSearch(),
             });
           } else {
@@ -502,19 +540,19 @@ function ShiftTypeMaster() {
       "Are you sure you want to delete the selected shift data?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {
-            Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+            Shift_Pattern_DetailData: Array.isArray(rowData) ? rowData : [rowData],
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/Shift_TypeMasterDelete`,
+            `${config.apiBaseUrl}/Shift_Pattern_DetailLoopDelete`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "company_code": company_code
+                "Company_Code": Company_Code
               },
               body: JSON.stringify(dataToSend),
             },
@@ -550,7 +588,7 @@ function ShiftTypeMaster() {
         />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
-            <h1 className="page-title">Shift Type Master</h1>
+            <h1 className="page-title">Shift Pattern Details</h1>
             <div className="action-wrapper">
               <div onClick={handleSave} className="action-icon add">
                 <span className="tooltip">Save</span>
@@ -570,20 +608,62 @@ function ShiftTypeMaster() {
             <div className="col-md-2">
               <div className="inputGroup">
                 <input
+                  id="ShiftPatternID"
+                  class="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Shift_Pattern_ID}
+                  onChange={(e) => setShift_Pattern_ID(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Shift_Pattern_ID ? "text-danger" : ""}`}
+                >
+                  Shift Pattern ID<span className="text-danger">*</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="text"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Pattern_Detail_ID}
+                  onChange={(e) => setPattern_Detail_ID(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Pattern_Detail_ID ? "text-danger" : ""}`}
+                >
+                  Pattern Detail ID<span className="text-danger">*</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
                   type="number"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type_ID}
-                  onChange={(e) => setShift_Type_ID(e.target.value)}
+                  value={Day_Sequence}
+                  onChange={(e) => setDay_Sequence(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Type_ID ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Day_Sequence ? "text-danger" : ""}`}
                 >
-                  Shift Type ID<span className="text-danger">*</span>
+                 Day Sequence<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -593,18 +673,18 @@ function ShiftTypeMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type}
-                  onChange={(e) => setShift_Type(e.target.value)}
+                  value={Shift_ID}
+                  onChange={(e) => setShift_ID(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Type ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Shift_ID ? "text-danger" : ""}`}
                 >
-                  Shift Type<span className="text-danger">*</span>
+                  Shift ID<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -614,20 +694,26 @@ function ShiftTypeMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={Is_Off_Day}
+                  onChange={(e) => setIs_Off_Day(e.target.value)}
                 />
-                <label for="state" className={`exp-form-labels`}>
-                  Description
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
+                >
+                  Is Off Day<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
+
           </div>
         </div>
+
+        
 
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="header-flex">
@@ -639,15 +725,15 @@ function ShiftTypeMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_Type_IDSC}
-                  onChange={(e) => setShift_Type_IDSC(e.target.value)}
+                  value={Shift_Pattern_IDSC}
+                  onChange={(e) => setShift_Pattern_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift Type ID
+                  Shift Pattern ID
                 </label>
               </div>
             </div>
@@ -661,11 +747,29 @@ function ShiftTypeMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Shift_TypeSC}
-                  onChange={(e) => setShift_TypeSC(e.target.value)}
+                  value={Pattern_Detail_IDSC}
+                  onChange={(e) => setPattern_Detail_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift Type
+                 Pattern Detail ID 
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_Name"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Day_SequenceSC}
+                  onChange={(e) => setDay_SequenceSC(e.target.value)}
+                />
+                <label htmlFor="fdate" className={`exp-form-labels`}>
+                  Day Sequence
                 </label>
               </div>
             </div>
@@ -679,11 +783,32 @@ function ShiftTypeMaster() {
                   placeholder=""
                   autoComplete="off"
                   required
-                  value={DescriptionSC}
-                  onChange={(e) => setDescriptionSC(e.target.value)}
+                  value={Shift_IDSC}
+                  onChange={(e) => setShift_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Description
+                  Shift ID 
+                </label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Is_Off_DaySC}
+                  onChange={(e) => setIs_Off_DaySC(e.target.value)}
+                />
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
+                >
+                  Is Off Day<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -728,4 +853,4 @@ function ShiftTypeMaster() {
   );
 }
 
-export default ShiftTypeMaster;
+export default ShiftPatternDetails;

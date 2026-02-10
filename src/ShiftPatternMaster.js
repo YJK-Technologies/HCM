@@ -283,6 +283,7 @@ function ShiftPatternMaster() {
     { label: "Shift Master" },
     { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
+    { label: "Shift Pattern Details" },
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -296,6 +297,9 @@ function ShiftPatternMaster() {
         break;
       case "Shift Pattern Master":
         ShiftPatternMaster();
+        break;
+      case "Shift Pattern Details":
+        ShiftPatternDetails();
         break;
       default:
         break;
@@ -312,6 +316,10 @@ function ShiftPatternMaster() {
 
   const ShiftPatternMaster = () => {
     navigate("/ShiftPatternMaster");
+  };
+
+    const ShiftPatternDetails = () => {
+    navigate("/ShiftPatternDetails");
   };
 
   const onGridReady = (params) => {
