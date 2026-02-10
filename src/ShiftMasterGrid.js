@@ -372,7 +372,8 @@ const handleSearch = async () => {
   const tabs = [
     { label: "Shift Master" }, 
     { label: "Shift Type Master" },
-    { label: "Shift Pattern Master" }
+    { label: "Shift Pattern Master" },
+    { label: "Shift Pattern Details" },
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -386,6 +387,9 @@ const handleSearch = async () => {
         break;
        case "Shift Pattern Master":
         ShiftPatternMaster();
+        break;
+       case "Shift Pattern Details":
+        ShiftPatternDetails();
         break;
       default:
         break;
@@ -403,6 +407,10 @@ const handleSearch = async () => {
   const ShiftPatternMaster = () => {
     navigate("/ShiftPatternMaster");
   };
+
+  const ShiftPatternDetails = () => {
+    navigate("/ShiftPatternDetails");
+  };  
   
   const onGridReady = (params) => {
     setGridApi(params.api);

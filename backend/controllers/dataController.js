@@ -35384,29 +35384,37 @@ const Shift_Pattern_DetailInsert = async (req, res) => {
 };
 
 const Shift_Pattern_DetailUpdate = async (req, res) => {
-  const { Pattern_Detail_ID, Shift_Pattern_ID, Day_Sequence, Shift_ID, Is_Off_Day, Company_Code, keyfield, Modified_by, Modified_date } = req.body;
+  const Shift_DetailData = req.body.Shift_DetailData;
+
+  if (!Shift_DetailData || !Shift_DetailData.length) {
+    return res.status(400).json("Invalid or empty Shift_DetailData array.");
+  }
 
   try {
     const pool = await sql.connect(dbConfig);
-    await pool.request()
-      .input("mode", sql.NVarChar, "U")
-      .input("Pattern_Detail_ID", sql.NVarChar, Pattern_Detail_ID)
-      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
-      .input("Day_Sequence", sql.Int, Day_Sequence)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Is_Off_Day", sql.Bit, Is_Off_Day)
-      .input("Company_Code", sql.NVarChar, Company_Code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("Modified_by", sql.DateTime, Modified_by)
-      .input("Modified_date", sql.NVarChar, Modified_date)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, @keyfield, '', '', @Modified_by, @Modified_date`);
 
-    res.status(200).json({ success: true, message: "Shift_Pattern_Detail updated successfully" });
+    for (const item of Shift_DetailData) {
+    await pool.request()
+     .input("mode", sql.NVarChar, "U")
+     .input("Pattern_Detail_ID", sql.NVarChar, item.Pattern_Detail_ID)
+     .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
+     .input("Day_Sequence", sql.Int, item.Day_Sequence)
+     .input("Shift_ID", sql.Int, item.Shift_ID)
+     .input("Is_Off_Day", sql.Bit,item.Is_Off_Day ?? null)
+     .input("Company_Code", sql.NVarChar, item.Company_Code)
+     .input("keyfield", sql.NVarChar, item.keyfield)
+     .input("Modified_by", sql.NVarChar, item.Modified_by)
+     .input("Modified_date", sql.DateTime, item.Modified_date)
+     .query(`EXEC sp_Shift_Pattern_Detail @mode,@Pattern_Detail_ID,@Shift_Pattern_ID,@Day_Sequence,@Shift_ID,@Is_Off_Day,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date `);
+    }
+
+    res.status(200).json("Shift Pattern Detail updated successfully");
   } catch (err) {
-    console.error("Error during Shift_Pattern_Detail update:", err);
+    console.error("Error in Shift_Pattern_DetailUpdate:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
 
 const Shift_Pattern_DetailDelete = async (req, res) => {
   const { Pattern_Detail_ID, Shift_Pattern_ID, keyfield, Company_Code } = req.body;
@@ -35888,6 +35896,39 @@ const ShiftPattern_Delete = async (req, res) => {
   }
 };
 //Code ended by Sakthi on 05-02-26
+
+//Code exported by Sakthi on 10-02-26
+const ShiftPatternDetail_SC = async (req, res) => {
+  const { Shift_Pattern_ID, Pattern_Detail_ID, Day_Sequence,Shift_ID, Is_Off_Day, Company_Code, company_code,  keyfield} = req.body;
+
+  try {
+    // Connect to the database
+    const pool = await connection.connectToDatabase();
+
+    // Execute the query
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Pattern_Detail_ID", sql.NVarChar, Pattern_Detail_ID)
+      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
+      .input("Day_Sequence", sql.Int, Day_Sequence)
+      .input("Shift_ID", sql.Int, Shift_ID)
+      .input("Is_Off_Day", sql.Bit, Is_Off_Day)
+      .input("Company_Code", sql.NVarChar, Company_Code)
+      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', '', '', '', ''`);
+
+    // Send response
+       if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 10-02-26
 
 
 
@@ -37097,6 +37138,7 @@ module.exports = {
     ShiftPattern_Insert,
     ShiftPattern_SC,
     ShiftPattern_Update,
-    ShiftPattern_Delete
+    ShiftPattern_Delete,
+    ShiftPatternDetail_SC
 
 };
