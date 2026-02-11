@@ -128,7 +128,7 @@ function ShiftPatternMaster() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-    const handleKeyDownStatus = async (e) => {
+  const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
       await handleSearch();
       setHasValueChanged(false);
@@ -258,9 +258,9 @@ function ShiftPatternMaster() {
       field: "Status",
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-      values: statusgriddrop,
-       },
-        editable: true,
+        values: statusgriddrop,
+      },
+      editable: true,
     },
 
     {
@@ -284,6 +284,8 @@ function ShiftPatternMaster() {
     { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
     { label: "Shift Pattern Details" },
+    { label: "Employment Type Master" },
+    { label: "Employee Shift Mapping" },
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -300,6 +302,12 @@ function ShiftPatternMaster() {
         break;
       case "Shift Pattern Details":
         ShiftPatternDetails();
+        break;
+      case "Employment Type Master":
+        EmploymentTypeMaster();
+        break;
+      case "Employee Shift Mapping":
+        EmployeeShiftMapping();
         break;
       default:
         break;
@@ -318,8 +326,16 @@ function ShiftPatternMaster() {
     navigate("/ShiftPatternMaster");
   };
 
-    const ShiftPatternDetails = () => {
+  const ShiftPatternDetails = () => {
     navigate("/ShiftPatternDetails");
+  };
+
+  const EmploymentTypeMaster = () => {
+    navigate("/EmployeeTypeMaster");
+  };
+
+  const EmployeeShiftMapping = () => {
+    navigate("/EmployeeShiftMapping");
   };
 
   const onGridReady = (params) => {
@@ -327,137 +343,10 @@ function ShiftPatternMaster() {
     setGridColumnApi(params.columnApi);
   };
 
-  const generateReport = () => {
-    const selectedRows = gridApi.getSelectedRows();
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to generate a report");
-      return;
-    }
-
-    const reportData = selectedRows.map((row) => {
-      const safeValue = (val) => (val !== undefined && val !== null ? val : "");
-
-      return {
-        "TimeZone ID": safeValue(row.TimeZone_ID),
-        "TimeZone Name": safeValue(row.TimeZone_Name),
-        "Location No": safeValue(row.location_no),
-        Status: safeValue(row.status),
-        "Order No": safeValue(row.order_no),
-      };
-    });
-
-    const reportWindow = window.open("", "_blank");
-    reportWindow.document.write(
-      "<html><head><title>Company Mapping Report</title>",
-    );
-    reportWindow.document.write("<style>");
-    reportWindow.document.write(`
-      body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-      }
-      h1 {
-          color: maroon;
-          text-align: center;
-          font-size: 24px;
-          margin-bottom: 30px;
-          text-decoration: underline;
-      }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #ddd;
-          vertical-align: top;
-      }
-      th {
-          background-color: maroon;
-          color: white;
-          font-weight: bold;
-      }
-      td {
-          background-color: #fdd9b5;
-      }
-      tr:nth-child(even) td {
-          background-color: #fff0e1;
-      }
-      .report-button {
-          display: block;
-          width: 150px;
-          margin: 20px auto;
-          padding: 10px;
-          background-color: maroon;
-          color: white;
-          border: none;
-          cursor: pointer;
-          font-size: 16px;
-          text-align: center;
-          border-radius: 5px;
-      }
-      .report-button:hover {
-          background-color: darkred;
-      }
-      @media print {
-          .report-button {
-              display: none;
-          }
-          body {
-              margin: 0;
-              padding: 0;
-          }
-      }
-    `);
-    reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u>Company Mapping Report</u></h1>");
-
-    // Create table with headers
-    reportWindow.document.write("<table><thead><tr>");
-    Object.keys(reportData[0]).forEach((key) => {
-      reportWindow.document.write(`<th>${key}</th>`);
-    });
-    reportWindow.document.write("</tr></thead><tbody>");
-
-    // Populate the rows
-    reportData.forEach((row) => {
-      reportWindow.document.write("<tr>");
-      Object.values(row).forEach((value) => {
-        reportWindow.document.write(`<td>${value}</td>`);
-      });
-      reportWindow.document.write("</tr>");
-    });
-
-    reportWindow.document.write("</tbody></table>");
-
-    reportWindow.document.write(
-      '<button class="report-button" title="Print" onclick="window.print()">Print</button>',
-    );
-    reportWindow.document.write("</body></html>");
-    reportWindow.document.close();
-  };
-
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
     setSelectedRows(selectedData);
-  };
-
-  const handleNavigateToForm = () => {
-    navigate("/ShiftMaster", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
-  };
-  const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/ShiftMaster", {
-      state: {
-        mode: "update",
-        selectedRow: {
-          ...selectedRow,
-          DST_Flag: Number(selectedRow.DST_Flag), // ensures 0 or 1
-        },
-      },
-    });
   };
 
   const onCellValueChanged = (params) => {
@@ -574,17 +463,17 @@ function ShiftPatternMaster() {
           const dataToSend = {
             Shift_MasterData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -747,7 +636,7 @@ function ShiftPatternMaster() {
                   for="state"
                   className={`exp-form-labels ${error && !Pattern_Name ? "text-danger" : ""}`}
                 >
-                 Pattern Name<span className="text-danger">*</span>
+                  Pattern Name<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -795,31 +684,31 @@ function ShiftPatternMaster() {
             </div>
 
             <div className="col-md-2">
-          <div
-            className={`inputGroup selectGroup 
+              <div
+                className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
-          >
-            <Select
-              id="status"
-              isClearable
-              value={selectedStatus}
-              onChange={handleChangeStatus}
-              options={filteredOptionStatus}
-              classNamePrefix="react-select"
-              placeholder=""
-              onFocus={() => setIsSelectFocused(true)}
-              onBlur={() => setIsSelectFocused(false)}
-              onKeyDown={handleKeyDownStatus}
-            />
-            <label class="floating-label">Status</label>
-          </div>
-        </div>
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocused(true)}
+                  onBlur={() => setIsSelectFocused(false)}
+                  onKeyDown={handleKeyDownStatus}
+                />
+                <label class="floating-label">Status</label>
+              </div>
+            </div>
 
           </div>
         </div>
 
-        
+
 
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="header-flex">
@@ -875,7 +764,7 @@ function ShiftPatternMaster() {
                   onChange={(e) => setPattern_NameSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                 Pattern Name
+                  Pattern Name
                 </label>
               </div>
             </div>
