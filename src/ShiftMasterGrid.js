@@ -242,7 +242,6 @@ const handleSearch = async () => {
         );
       },
     },
-
     {
       headerName: "Shift ID",
       field: "Shift_ID",
@@ -293,7 +292,6 @@ const handleSearch = async () => {
         return params.value.substring(11, 16); // HH:mm
       },
     },
-
     {
       headerName: "Shift Hours",
       field: "Shift_Hours",
@@ -372,7 +370,7 @@ const handleSearch = async () => {
   const tabs = [
     { label: "Shift Master" }, 
     { label: "Shift Type Master" },
-    { label: "Shift Pattern Master" }
+    { label: "Shift Pattern Master" },
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -384,7 +382,7 @@ const handleSearch = async () => {
       case 'Shift Type Master':
         ShiftTypeMaster();
         break;
-       case "Shift Pattern Master":
+      case "Shift Pattern Master":
         ShiftPatternMaster();
         break;
       default:

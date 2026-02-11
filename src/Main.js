@@ -235,10 +235,7 @@ function Main() {
     { path: "/ShiftMaster", component: <ShiftMaster /> },
     { path: "/ShiftMasterGrid", component: <ShiftMasterGrid /> },
     { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
-    { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },
-    
-
-
+    { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },  
   ];
 
   return (
