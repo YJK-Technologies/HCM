@@ -128,7 +128,7 @@ function ShiftMasterGrid() {
       .then((val) => setStatusdrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-  
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -144,63 +144,61 @@ function ShiftMasterGrid() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-
   const formatTimeForSQL = (time) => {
-  if (!time) return null;          // "" or null
-  return time.length === 5 ? `${time}:00` : time; // HH:mm → HH:mm:ss
-};
+    if (!time) return null;          // "" or null
+    return time.length === 5 ? `${time}:00` : time; // HH:mm → HH:mm:ss
+  };
 
+  const handleSearch = async () => {
+    setLoading(true);
 
-const handleSearch = async () => {
-  setLoading(true);
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    const response = await fetch(`${config.apiBaseUrl}/getShiftsearchdata`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      const response = await fetch(`${config.apiBaseUrl}/getShiftsearchdata`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           Shift_ID: Shift_IDSC || null,
           Shift_Code: Shift_CodeSC || null,
           Shift_Name: Shift_NameSC || null,
           Status: StatusSC || null,
           Cross_Midnight: Cross_MidnightSC || null,
           Shift_Hours: Shift_HoursSC || null,
-        
+
           Is_Night_Shift: Is_Night_ShiftSC === "" ? null : Is_Night_ShiftSC,
-        
+
           Grace_In_Min: Grace_In_MinSC || null,
           Grace_Out_Min: Grace_Out_MinSC || null,
-        
+
           Start_Time: formatTimeForSQL(Start_TimeSC),
           End_Time: formatTimeForSQL(End_TimeSC),
-        
+
           company_code,
-   })
+        })
 
-    });
+      });
 
-    if (response.ok) {
-      const searchData = await response.json();
-      setRowData(searchData);
-      console.log("data fetched successfully");
-    } else if (response.status === 404) {
-      toast.warning("Data not found");
-      setRowData([]);
-    } else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Search failed");
+      if (response.ok) {
+        const searchData = await response.json();
+        setRowData(searchData);
+        console.log("data fetched successfully");
+      } else if (response.status === 404) {
+        toast.warning("Data not found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Search failed");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Error fetching data: " + error.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    toast.error("Error fetching data: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   const reloadGridData = () => {
@@ -208,7 +206,7 @@ const handleSearch = async () => {
   };
 
   const columnDefs = [
-        {
+    {
       headerName: "Actions",
       field: "actions",
       cellRenderer: (params) => {
@@ -347,9 +345,9 @@ const handleSearch = async () => {
       field: "Status",
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-      values: statusgriddrop,
-       },
-        editable: true,
+        values: statusgriddrop,
+      },
+      editable: true,
     },
     {
       headerName: "keyfield",
@@ -368,9 +366,12 @@ const handleSearch = async () => {
   };
 
   const tabs = [
-    { label: "Shift Master" }, 
+    { label: "Shift Master" },
     { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
+    { label: "Shift Pattern Details" },
+    { label: "Employment Type Master" },
+    { label: "Employee Shift Mapping" },
   ];
 
   const handleTabClick = (tabLabel) => {
@@ -384,6 +385,15 @@ const handleSearch = async () => {
         break;
       case "Shift Pattern Master":
         ShiftPatternMaster();
+        break;
+      case "Shift Pattern Details":
+        ShiftPatternDetails();
+        break;
+      case "Employment Type Master":
+        EmploymentTypeMaster();
+        break;
+      case "Employee Shift Mapping":
+        EmployeeShiftMapping();
         break;
       default:
         break;
@@ -401,7 +411,19 @@ const handleSearch = async () => {
   const ShiftPatternMaster = () => {
     navigate("/ShiftPatternMaster");
   };
-  
+
+  const ShiftPatternDetails = () => {
+    navigate("/ShiftPatternDetails");
+  };
+
+  const EmploymentTypeMaster = () => {
+    navigate("/EmployeeTypeMaster");
+  };
+
+  const EmployeeShiftMapping = () => {
+    navigate("/EmployeeShiftMapping");
+  };
+
   const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
@@ -581,115 +603,13 @@ const handleSearch = async () => {
     }
   };
 
-  const saveEditedData = async () => {
-    const selectedRowsData = editedData.filter((row) =>
-      selectedRows.some((selectedRow) => selectedRow.keyfield === row.keyfield),
-    );
-
-    if (selectedRowsData.length === 0) {
-      toast.warning("Please select a row to update its data");
-      return;
-    }
-
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
-
-          const response = await fetch(
-            `${config.apiBaseUrl}/Time_Zone_masterLoopUpdate`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
-                "modified-by": modified_by,
-              },
-              body: JSON.stringify({ sp_Shift_MasterData: selectedRowsData }),
-            },
-          );
-
-          if (response.status === 200) {
-            setTimeout(() => {
-              toast.success("Data Updated Successfully");
-              handleSearch();
-            }, 1000);
-            return;
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(
-              errorResponse.message || "Failed to insert sales data",
-            );
-          }
-        } catch (error) {
-          console.error("Error saving data:", error);
-          toast.error("Error Updating Data: " + error.message);
-        }
-      },
-      () => {
-        toast.info("Data update cancelled.");
-      },
-    );
-  };
-
-  const deleteSelectedRows = async () => {
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to delete");
-      return;
-    }
-
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const modified_by = sessionStorage.getItem("selectedUserCode");
-
-    const sp_Time_Zone_masterData = selectedRows.map((row) => ({
-      keyfield: row.keyfield,
-      company_code,
-    }));
-
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          const response = await fetch(
-            `${config.apiBaseUrl}/Time_Zone_masterLoopDelete`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Modified-By": modified_by,
-              },
-              body: JSON.stringify({
-                sp_Time_Zone_masterData,
-              }),
-            },
-          );
-
-          if (response.ok) {
-            toast.success("Data deleted successfully");
-            handleSearch();
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Delete failed");
-          }
-        } catch (error) {
-          console.error("Error deleting data:", error);
-          toast.error("Error Deleting Data: " + error.message);
-        }
-      },
-      () => toast.info("Data delete cancelled."),
-    );
-  };
-
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
       await handleSearch();
       setHasValueChanged(false);
     }
   };
+
   const handleKeyDownStatusSC = async (e) => {
     if (e.key === "Enter" && hasValueChangedSC) {
       await handleSearch();
@@ -726,150 +646,150 @@ const handleSearch = async () => {
   };
 
   const handleSave = async () => {
-        if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-          toast.warning("Error: Missing required fields");
-          setError(" ")
-          return;
-        }
+    if (!Shift_ID || !Shift_Code || !Shift_Name) {
+      toast.warning("Error: Missing required fields");
+      setError(" ")
+      return;
+    }
 
-        setLoading(true);
-
-        try {
-            const response = await fetch(
-                `${config.apiBaseUrl}/Shift_MasterInsert`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        Shift_ID: Number(Shift_ID),
-                        Shift_Code: Shift_Code,
-                        Shift_Name: Shift_Name,
-                        End_Time: End_Time ,
-                        Status: Status,
-                        Cross_Midnight: Cross_Midnight,
-                        Start_Time: Start_Time,
-                        Shift_Hours: Number(Shift_Hours) || 0,
-                        Is_Night_Shift: Is_Night_Shift ? 1 : 0,
-                        Grace_In_Min: Number(Grace_In_Min),
-                       Grace_Out_Min:  Number(Grace_Out_Min),
-                        company_code: sessionStorage.getItem("selectedCompanyCode"),
-                        created_by: sessionStorage.getItem("selectedUserCode"),
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message || "Data inserted successfully", {
-                    onClose: () => window.location.reload(),
-                });
-            } else {
-                toast.warning(data.message || "Insert failed");
-            }
-        } catch (error) {
-            console.error("Error inserting timezone:", error);
-            toast.error("Server error");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-        const clearInputFields = () => {
-        setShift_ID("");
-        setShift_Code("");
-        setShift_Name("");
-        setStart_Time("");
-    };
-
-
-    const handleUpdate = async (rowData) => {
     setLoading(true);
 
-    showConfirmationToast(
-    "Are you sure you want to update the selected shift data?",
-    async () => {
-      try {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-
-        const dataToSend = {
-          sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
-        };
-
-        const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopUpdate`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
-            },
-            body: JSON.stringify(dataToSend),
-          }
-        );
-
-        if (response.ok) {
-          toast.success("Shift updated successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Update failed");
-        }
-      } catch (error) {
-        console.error("Update error:", error);
-        toast.error("Error updating data: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    () => toast.info("Update cancelled")
-  );
-};
-
-const handleDelete = async (rowData) => {
-  setLoading(true);
-
-  showConfirmationToast(
-    "Are you sure you want to delete the selected shift data?",
-    async () => {
-      try {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-        const dataToSend = {
-          sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData]
-        };
-
-        const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopDelete`, {
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/Shift_MasterInsert`,
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "company_code": company_code
           },
-          body: JSON.stringify(dataToSend)
-        });
-
-        if (response.ok) {
-          toast.success("Shift deleted successfully", {
-            onClose: () => handleSearch(), // refresh data
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+          body: JSON.stringify({
+            Shift_ID: Number(Shift_ID),
+            Shift_Code: Shift_Code,
+            Shift_Name: Shift_Name,
+            End_Time: End_Time,
+            Status: Status,
+            Cross_Midnight: Cross_Midnight,
+            Start_Time: Start_Time,
+            Shift_Hours: Number(Shift_Hours) || 0,
+            Is_Night_Shift: Is_Night_Shift ? 1 : 0,
+            Grace_In_Min: Number(Grace_In_Min),
+            Grace_Out_Min: Number(Grace_Out_Min),
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            created_by: sessionStorage.getItem("selectedUserCode"),
+          }),
         }
-      } catch (error) {
-        console.error("Error deleting shift rows:", error);
-        toast.error("Error deleting shift data: " + error.message);
-      } finally {
-        setLoading(false);
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || "Data inserted successfully", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        toast.warning(data.message || "Insert failed");
       }
-    },
-    () => toast.info("Delete cancelled")
-  );
-};
+    } catch (error) {
+      console.error("Error inserting timezone:", error);
+      toast.error("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearInputFields = () => {
+    setShift_ID("");
+    setShift_Code("");
+    setShift_Name("");
+    setStart_Time("");
+  };
+
+
+  const handleUpdate = async (rowData) => {
+    setLoading(true);
+
+    showConfirmationToast(
+      "Are you sure you want to update the selected shift data?",
+      async () => {
+        try {
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+          const dataToSend = {
+            sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "company_code": company_code,
+                "modified-by": modified_by
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Shift updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Update cancelled")
+    );
+  };
+
+  const handleDelete = async (rowData) => {
+    setLoading(true);
+
+    showConfirmationToast(
+      "Are you sure you want to delete the selected shift data?",
+      async () => {
+        try {
+          const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+          const dataToSend = {
+            sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData]
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopDelete`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "company_code": company_code
+            },
+            body: JSON.stringify(dataToSend)
+          });
+
+          if (response.ok) {
+            toast.success("Shift deleted successfully", {
+              onClose: () => handleSearch(), // refresh data
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
+          }
+        } catch (error) {
+          console.error("Error deleting shift rows:", error);
+          toast.error("Error deleting shift data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Delete cancelled")
+    );
+  };
 
 
 
@@ -954,7 +874,7 @@ const handleDelete = async (rowData) => {
           </div>
         </div>
 
-        <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick}/>
+        <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
             <div className="col-md-2">
@@ -1199,7 +1119,7 @@ const handleDelete = async (rowData) => {
                   htmlFor="fdate"
                   className={`exp-form-labels`}
                 >
-                  Shift Code 
+                  Shift Code
                 </label>
               </div>
             </div>
@@ -1231,9 +1151,9 @@ const handleDelete = async (rowData) => {
                   type="time"
                   value={Start_TimeSC}
                   onChange={(e) => {
-    const timeValue = e.target.value;
-    setStart_TimeSC(timeValue ? timeValue + ":00" : "");
-  }}
+                    const timeValue = e.target.value;
+                    setStart_TimeSC(timeValue ? timeValue + ":00" : "");
+                  }}
                   maxLength={100}
                   autoComplete="off"
                   placeholder=" "

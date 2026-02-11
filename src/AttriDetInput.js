@@ -283,7 +283,7 @@ function AttriDetInput({ }) {
                 required
                 value={attributedetails_code}
                 onChange={(e) => setAttributedetails_code(e.target.value)}
-                maxLength={18}
+                maxLength={25}
                 ref={subcode}
                 readOnly={mode === "update"}
                 onKeyDown={(e) => handleKeyDown(e, detailname, subcode)}
