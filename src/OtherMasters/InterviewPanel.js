@@ -70,6 +70,7 @@ function InterviewPanel({ }) {
   const [statusdrop, setStatusdrop] = useState([]);
   const [statusgriddrop, setStatusGriddrop] = useState([]);
   const [Dptdrop, setDptdrop] = useState([]);
+  const [jobDrop, setJobDrop] = useState([]);
 
   const navigate = useNavigate();
 
@@ -126,6 +127,23 @@ function InterviewPanel({ }) {
       .then((data) => {
         const statusOption = data.map(option => option.attributedetails_name);
         setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/JobMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const job = data.map(option => option.job_id);
+        setJobDrop(job);
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
@@ -293,7 +311,11 @@ function InterviewPanel({ }) {
     {
       headerName: "Job ID",
       field: "job_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: jobDrop,
+      },
     },
     {
       headerName: "Department ID",

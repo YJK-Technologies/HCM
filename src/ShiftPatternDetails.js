@@ -16,8 +16,8 @@ import Select from "react-select";
 
 const config = require("./Apiconfig");
 
-function ShiftPatternMaster() {
-  const [activeTab, setActiveTab] = useState("Shift Pattern Master");
+function ShiftPatternDetails() {
+  const [activeTab, setActiveTab] = useState("Shift Pattern Details");
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -30,25 +30,16 @@ function ShiftPatternMaster() {
   const modified_by = sessionStorage.getItem("selectedUserCode");
   const [Shift_Pattern_ID, setShift_Pattern_ID] = useState("");
   const [Shift_Pattern_IDSC, setShift_Pattern_IDSC] = useState("");
-  const [Pattern_Code, setPattern_Code] = useState("");
+  const [Pattern_Detail_ID, setPattern_Detail_ID] = useState("");
   const [Pattern_CodeSC, setPattern_CodeSC] = useState("");
-  const [Pattern_Name, setPattern_Name] = useState("");
-  const [Pattern_NameSC, setPattern_NameSC] = useState("");
-  const [Rotation_Days, setRotation_Days] = useState("");
-  const [Rotation_DaysSC, setRotation_DaysSC] = useState("");
-  const [Description, setDescription] = useState("");
-  const [DescriptionSC, setDescriptionSC] = useState("");
-  const [hasValueChanged, setHasValueChanged] = useState(false);
-  const [hasValueChangedSC, setHasValueChangedSC] = useState(false);
-  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [isSelectFocused, setIsSelectFocused] = useState(false);
-  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
-  const [statusdrop, setStatusdrop] = useState([]);
-  const [statusdropSC, setStatusdropSC] = useState([]);
+  const [Day_Sequence, setDay_Sequence] = useState("");
+  const [Pattern_Detail_IDSC, setPattern_Detail_IDSC] = useState("");
+  const [Shift_ID, setShift_ID] = useState("");
+  const [Day_SequenceSC, setDay_SequenceSC] = useState("");
+  const [Is_Off_Day, setIs_Off_Day] = useState("");
+  const [Is_Off_DaySC, setIs_Off_DaySC] = useState("");
+  const [Shift_IDSC, setShift_IDSC] = useState("");
   const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [Status, setStatus] = useState("");
-  const [StatusSC, setStatusSC] = useState("");
 
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
@@ -61,25 +52,6 @@ function ShiftPatternMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handleChangeStatusSC = (selectedStatusSC) => {
-    setSelectedStatusSC(selectedStatusSC);
-    setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
-    setHasValueChangedSC(true);
-  };
-  const handleChangeStatus = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-    setStatus(selectedStatus ? selectedStatus.value : "");
-    setHasValueChanged(true);
-  };
-
-  const filteredOptionStatusSC = statusdropSC.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -98,70 +70,25 @@ function ShiftPatternMaster() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setStatusdropSC(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  const handleKeyDownStatus = async (e) => {
-    if (e.key === "Enter" && hasValueChanged) {
-      await handleSearch();
-      setHasValueChanged(false);
-    }
-  };
-  const handleKeyDownStatusSC = async (e) => {
-    if (e.key === "Enter" && hasValueChangedSC) {
-      await handleSearch();
-      setHasValueChangedSC(false);
-    }
-  };
-
 
   const handleSearch = async () => {
     setLoading(true);
 
     try {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
-      const response = await fetch(`${config.apiBaseUrl}/ShiftPattern_SC`, {
+      const response = await fetch(`${config.apiBaseUrl}/ShiftPatternDetail_SC`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           Shift_Pattern_ID: Shift_Pattern_IDSC || null,
-          Pattern_Code: Pattern_CodeSC || null,
-          Pattern_Name: Pattern_NameSC || null,
-          Rotation_Days: Rotation_DaysSC || null,
-          Description: DescriptionSC || null,
-          Status: StatusSC || null,
-
-          company_code,
+          Pattern_Detail_ID: Pattern_Detail_IDSC || null,
+          Day_Sequence: Day_SequenceSC || null,
+          RotationShift_ID_Days: Shift_IDSC || null,
+          Is_Off_Day: Is_Off_DaySC || null,
+          Company_Code,
         }),
       });
 
@@ -230,39 +157,29 @@ function ShiftPatternMaster() {
     {
       headerName: "Shift Pattern ID",
       field: "Shift_Pattern_ID",
-      editable: false,
+      editable: true,
       cellStyle: { textAlign: "left" },
     },
     {
-      headerName: "Pattern Code",
-      field: "Pattern_Code",
+      headerName: "Pattern Detail ID",
+      field: "Pattern_Detail_ID",
+      editable: false,
+    },
+    {
+      headerName: "Day Sequence",
+      field: "Day_Sequence",
       editable: true,
     },
     {
-      headerName: "Pattern Name",
-      field: "Pattern_Name",
+      headerName: "Shift ID",
+      field: "Shift_ID",
       editable: true,
     },
     {
-      headerName: "Rotation Days",
-      field: "Rotation_Days",
+      headerName: "Is Off Day",
+      field: "Is_Off_Day",
       editable: true,
     },
-    {
-      headerName: "Description",
-      field: "Description",
-      editable: true,
-    },
-    {
-      headerName: "Status",
-      field: "Status",
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: statusgriddrop,
-      },
-      editable: true,
-    },
-
     {
       headerName: "keyfield",
       field: "keyfield",
@@ -414,7 +331,7 @@ function ShiftPatternMaster() {
 
     try {
       const response = await fetch(
-        `${config.apiBaseUrl}/ShiftPattern_Insert`,
+        `${config.apiBaseUrl}/Shift_Pattern_DetailInsert`,
         {
           method: "POST",
           headers: {
@@ -422,12 +339,11 @@ function ShiftPatternMaster() {
           },
           body: JSON.stringify({
             Shift_Pattern_ID: Shift_Pattern_ID,
-            Pattern_Code: Pattern_Code,
-            Pattern_Name: Pattern_Name,
-            Rotation_Days: Number(Rotation_Days),
-            Description: Description,
-            Status: Status,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Pattern_Detail_ID: Pattern_Detail_ID,
+            Day_Sequence: Day_Sequence,
+            Shift_ID: Shift_ID,
+            Is_Off_Day: Is_Off_Day,
+            Company_Code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         },
@@ -457,27 +373,27 @@ function ShiftPatternMaster() {
       "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            Shift_MasterData: Array.isArray(rowData)
+            Shift_DetailData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                 ...row,
-                company_code,
-                modified_by,
+                Company_Code,
+                Modified_by,
               }))
               : [
                 {
                   ...rowData,
-                  company_code,
-                  modified_by,
+                  Company_Code,
+                  Modified_by,
                 },
               ],
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/ShiftPattern_Update`,
+            `${config.apiBaseUrl}/Shift_Pattern_DetailUpdate`,
             {
               method: "POST",
               headers: {
@@ -516,11 +432,11 @@ function ShiftPatternMaster() {
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {
-            Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+            Shift_Pattern_DetailData: Array.isArray(rowData) ? rowData : [rowData],
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/ShiftPattern_Delete`,
+            `${config.apiBaseUrl}/Shift_Pattern_DetailLoopDelete`,
             {
               method: "POST",
               headers: {
@@ -561,7 +477,7 @@ function ShiftPatternMaster() {
         />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
-            <h1 className="page-title">Shift Pattern Master</h1>
+            <h1 className="page-title">Shift Pattern Details</h1>
             <div className="action-wrapper">
               <div onClick={handleSave} className="action-icon add">
                 <span className="tooltip">Save</span>
@@ -581,7 +497,7 @@ function ShiftPatternMaster() {
             <div className="col-md-2">
               <div className="inputGroup">
                 <input
-                  id="TimeZone_ID"
+                  id="ShiftPatternID"
                   class="exp-input-field form-control"
                   type="text"
                   placeholder=" "
@@ -608,35 +524,14 @@ function ShiftPatternMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Pattern_Code}
-                  onChange={(e) => setPattern_Code(e.target.value)}
+                  value={Pattern_Detail_ID}
+                  onChange={(e) => setPattern_Detail_ID(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Pattern_Code ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Pattern_Detail_ID ? "text-danger" : ""}`}
                 >
-                  Pattern Code<span className="text-danger">*</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_ID"
-                  class="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Pattern_Name}
-                  onChange={(e) => setPattern_Name(e.target.value)}
-                />
-                <label
-                  for="state"
-                  className={`exp-form-labels ${error && !Pattern_Name ? "text-danger" : ""}`}
-                >
-                  Pattern Name<span className="text-danger">*</span>
+                  Pattern Detail ID<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -650,14 +545,14 @@ function ShiftPatternMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Rotation_Days}
-                  onChange={(e) => setRotation_Days(e.target.value)}
+                  value={Day_Sequence}
+                  onChange={(e) => setDay_Sequence(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Rotation_Days ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Day_Sequence ? "text-danger" : ""}`}
                 >
-                  Rotation Days<span className="text-danger">*</span>
+                  Day Sequence<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -667,41 +562,40 @@ function ShiftPatternMaster() {
                 <input
                   id="TimeZone_ID"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={Shift_ID}
+                  onChange={(e) => setShift_ID(e.target.value)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Description ? "text-danger" : ""}`}
+                  className={`exp-form-labels ${error && !Shift_ID ? "text-danger" : ""}`}
                 >
-                  Description<span className="text-danger">*</span>
+                  Shift ID<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
 
             <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectFocused ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
-                  onKeyDown={handleKeyDownStatus}
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Is_Off_Day}
+                  onChange={(e) => setIs_Off_Day(e.target.value)}
                 />
-                <label class="floating-label">Status</label>
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
+                >
+                  Is Off Day<span className="text-danger">*</span>
+                </label>
               </div>
             </div>
 
@@ -742,29 +636,11 @@ function ShiftPatternMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Pattern_CodeSC}
-                  onChange={(e) => setPattern_CodeSC(e.target.value)}
+                  value={Pattern_Detail_IDSC}
+                  onChange={(e) => setPattern_Detail_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Pattern Code
-                </label>
-              </div>
-            </div>
-
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_Name"
-                  class="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Pattern_NameSC}
-                  onChange={(e) => setPattern_NameSC(e.target.value)}
-                />
-                <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Pattern Name
+                  Pattern Detail ID
                 </label>
               </div>
             </div>
@@ -778,11 +654,11 @@ function ShiftPatternMaster() {
                   placeholder=" "
                   autoComplete="off"
                   required
-                  value={Rotation_DaysSC}
-                  onChange={(e) => setRotation_DaysSC(e.target.value)}
+                  value={Day_SequenceSC}
+                  onChange={(e) => setDay_SequenceSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Rotation Days
+                  Day Sequence
                 </label>
               </div>
             </div>
@@ -792,38 +668,37 @@ function ShiftPatternMaster() {
                 <input
                   id="UTC_Offset"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=""
                   autoComplete="off"
                   required
-                  value={DescriptionSC}
-                  onChange={(e) => setDescriptionSC(e.target.value)}
+                  value={Shift_IDSC}
+                  onChange={(e) => setShift_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Description
+                  Shift ID
                 </label>
               </div>
             </div>
 
             <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
-              ${selectedStatusSC ? "has-value" : ""} 
-              ${isSelectFocusedSC ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatusSC}
-                  onChange={handleChangeStatusSC}
-                  options={filteredOptionStatusSC}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocusedSC(true)}
-                  onBlur={() => setIsSelectFocusedSC(false)}
-                  onKeyDown={handleKeyDownStatusSC}
+              <div className="inputGroup">
+                <input
+                  id="TimeZone_ID"
+                  class="exp-input-field form-control"
+                  type="number"
+                  placeholder=" "
+                  autoComplete="off"
+                  required
+                  value={Is_Off_DaySC}
+                  onChange={(e) => setIs_Off_DaySC(e.target.value)}
                 />
-                <label class="floating-label">Status</label>
+                <label
+                  for="state"
+                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
+                >
+                  Is Off Day<span className="text-danger">*</span>
+                </label>
               </div>
             </div>
 
@@ -867,4 +742,4 @@ function ShiftPatternMaster() {
   );
 }
 
-export default ShiftPatternMaster;
+export default ShiftPatternDetails;
