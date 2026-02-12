@@ -245,7 +245,10 @@ function EmployeeTypeMaster() {
         })
             .then((response) => response.json())
             .then((data) => {
-                const shiftPatternIdOption = data.map((option) => option.attributedetails_name);
+                const shiftPatternIdOption = data.map((option) => ({
+                    value: option.Shift_Pattern_ID,
+                    label: `${option.Shift_Pattern_ID}-${option.Pattern_Name}`,
+                }));
                 setShiftPatternIdDropGrid(shiftPatternIdOption);
             })
             .catch((error) => console.error("Error fetching data:", error));
@@ -262,7 +265,10 @@ function EmployeeTypeMaster() {
         })
             .then((response) => response.json())
             .then((data) => {
-                const shiftTypeIdOption = data.map((option) => option.attributedetails_name);
+                const shiftTypeIdOption = data.map((option) => ({
+                    value: option.Shift_Type_ID,
+                    label: `${option.Shift_Type_ID}-${option.Shift_Type}`,
+                }));
                 setShiftTypeIdDropGrid(shiftTypeIdOption);
             })
             .catch((error) => console.error("Error fetching data:", error));
@@ -279,7 +285,10 @@ function EmployeeTypeMaster() {
         })
             .then((response) => response.json())
             .then((data) => {
-                const shiftIdOption = data.map((option) => option.attributedetails_name);
+                const shiftIdOption = data.map((option) => ({
+                    value: option.Shift_ID,
+                    label: `${option.Shift_ID}-${option.Shift_Name}`,
+                }));
                 setShiftIdDropGrid(shiftIdOption);
             })
             .catch((error) => console.error("Error fetching data:", error));
@@ -296,7 +305,10 @@ function EmployeeTypeMaster() {
         })
             .then((response) => response.json())
             .then((data) => {
-                const employeeIdOption = data.map((option) => option.attributedetails_name);
+                const employeeIdOption = data.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId}-${option.First_Name}`,
+                }));
                 setEmployeeIdDropGrid(employeeIdOption);
             })
             .catch((error) => console.error("Error fetching data:", error));
@@ -549,7 +561,11 @@ function EmployeeTypeMaster() {
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: employmentTypeDropGrid,
+                values: employeeIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = employeeIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
             },
         },
         {
@@ -558,7 +574,11 @@ function EmployeeTypeMaster() {
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: employmentTypeDropGrid,
+                values: shiftIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
             },
         },
         {
@@ -567,7 +587,11 @@ function EmployeeTypeMaster() {
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: statusDropGrid,
+                values: shiftTypeIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftTypeIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
             },
         },
         {
@@ -576,19 +600,23 @@ function EmployeeTypeMaster() {
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: statusDropGrid,
+                values: shiftPatternIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
             },
         },
         {
             headerName: "Effective From",
             field: "Effective_From",
-            editable: false,
+            editable: true,
             cellStyle: { textAlign: "left" },
         },
         {
             headerName: "Effective To",
             field: "Effective_To",
-            editable: false,
+            editable: true,
             cellStyle: { textAlign: "left" },
         },
         {
@@ -792,14 +820,14 @@ function EmployeeTypeMaster() {
         setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to update the selected Shift Pattern data?",
+            "Are you sure you want to update the selected employee shift mapping data?",
             async () => {
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        Employment_Type_MasterData: Array.isArray(rowData)
+                        Employee_shift_mappingData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 Company_Code,
@@ -814,7 +842,7 @@ function EmployeeTypeMaster() {
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Employment_Type_MasterLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopUpdate`,
                         {
                             method: "POST",
                             headers: {
@@ -825,7 +853,7 @@ function EmployeeTypeMaster() {
                     );
 
                     if (response.ok) {
-                        toast.success("Employment Type Master updated successfully", {
+                        toast.success("Employee shift mapping updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -847,16 +875,16 @@ function EmployeeTypeMaster() {
         setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to delete the selected shift data?",
+            "Are you sure you want to delete the selected employee shift mapping data?",
             async () => {
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        Employment_Type_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+                        Employee_shift_mappingData: Array.isArray(rowData) ? rowData : [rowData],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Employment_Type_MasterLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
                         {
                             method: "POST",
                             headers: {
@@ -868,7 +896,7 @@ function EmployeeTypeMaster() {
                     );
 
                     if (response.ok) {
-                        toast.success("Employment type deleted successfully", {
+                        toast.success("Employee shift mapping deleted successfully", {
                             onClose: () => handleSearch(), // refresh data
                         });
                     } else {
@@ -876,8 +904,8 @@ function EmployeeTypeMaster() {
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting shift rows:", error);
-                    toast.error("Error deleting shift data: " + error.message);
+                    console.error("Error deleting employee shift mapping rows:", error);
+                    toast.error("Error deleting employee shift mapping data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -925,7 +953,12 @@ function EmployeeTypeMaster() {
                                     autoComplete="off"
                                     required
                                     value={employeeShiftId}
-                                    onChange={(e) => setEmployeeShiftId(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= 5) {
+                                            setEmployeeShiftId(value);
+                                        }
+                                    }}
                                 />
                                 <label for="state" className={`exp-form-labels ${error && !employeeShiftId ? "text-danger" : ""}`}>
                                     Employee Shift ID<span className="text-danger">*</span>
@@ -1026,6 +1059,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                     min={new Date().toISOString().split("T")[0]}
                                     value={effectiveFrom}
                                     onChange={(e) => setEffectiveFrom(e.target.value)}
                                 />
@@ -1044,6 +1078,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                     min={new Date().toISOString().split("T")[0]}
                                     value={effectiveTo}
                                     onChange={(e) => setEffectiveTo(e.target.value)}
                                 />
@@ -1084,7 +1119,7 @@ function EmployeeTypeMaster() {
                         <h6 className="">Search Criteria:</h6>
                     </div>
                     <div className="row g-3">
-                        
+
                         <div className="col-md-2">
                             <div className="inputGroup">
                                 <input
@@ -1095,7 +1130,12 @@ function EmployeeTypeMaster() {
                                     autoComplete="off"
                                     required
                                     value={employeeShiftIdSc}
-                                    onChange={(e) => setEmployeeShiftIdSc(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= 5) {
+                                            setEmployeeShiftIdSc(value);
+                                        }
+                                    }}
                                 />
                                 <label for="state" className={`exp-form-labels`}>
                                     Employee Shift ID

@@ -495,7 +495,7 @@ function EmployeeTypeMaster() {
         setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to update the selected Shift Pattern data?",
+            "Are you sure you want to update the selected employment type master data?",
             async () => {
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
@@ -528,7 +528,7 @@ function EmployeeTypeMaster() {
                     );
 
                     if (response.ok) {
-                        toast.success("Employment Type Master updated successfully", {
+                        toast.success("Employment type master updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -550,7 +550,7 @@ function EmployeeTypeMaster() {
         setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to delete the selected shift data?",
+            "Are you sure you want to delete the selected employment type master data?",
             async () => {
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
@@ -571,7 +571,7 @@ function EmployeeTypeMaster() {
                     );
 
                     if (response.ok) {
-                        toast.success("Employment type deleted successfully", {
+                        toast.success("Employment type master deleted successfully", {
                             onClose: () => handleSearch(), // refresh data
                         });
                     } else {
@@ -579,8 +579,8 @@ function EmployeeTypeMaster() {
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting shift rows:", error);
-                    toast.error("Error deleting shift data: " + error.message);
+                    console.error("Error deleting employment type master rows:", error);
+                    toast.error("Error deleting employment type master data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -626,6 +626,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                    maxLength={50}
                                     value={employmentTypeId}
                                     onChange={(e) => setEmploymentId(e.target.value)}
                                 />
@@ -665,6 +666,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                    maxLength={255}
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
@@ -714,6 +716,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                    maxLength={50}
                                     value={employmentTypeIdSc}
                                     onChange={(e) => setEmploymentIdSc(e.target.value)}
                                 />
@@ -753,6 +756,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
+                                    maxLength={255}
                                     value={descriptionSc}
                                     onChange={(e) => setDescriptionSc(e.target.value)}
                                 />

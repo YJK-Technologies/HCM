@@ -35503,7 +35503,7 @@ const Employee_shift_mappingInsert = async (req, res) => {
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'',@Created_by,'','',''`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping insertd successfully" });
@@ -35532,7 +35532,7 @@ const Employee_shift_mappingUpdate = async (req, res) => {
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.NVarChar, Modified_by)
       .input("Modified_date", sql.DateTime, Modified_date)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping updated successfully" });
@@ -35552,7 +35552,7 @@ const Employee_shift_mappingDelete = async (req, res) => {
       .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,'',0,0,'','','',
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,'',0,0,'','','',
         '',@Company_Code,@keyfield,'','',0,0`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping deleted successfully" });
@@ -35584,7 +35584,7 @@ const Employee_shift_mappingLoopInsert = async (req, res) => {
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
         .input("Created_date", sql.DateTime, item.Created_date)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'',@Created_by,@Created_date,'',''`);
     }
     res.status(200).json("Employee_shift_mapping data inserted successfully");
@@ -35605,20 +35605,19 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
     for (const item of Employee_shift_mappingData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Emp_Shift_ID", sql.Date, item.Emp_Shift_ID)
+        .input("Emp_Shift_ID", sql.Int, item.Emp_Shift_ID)
         .input("Employee_ID", sql.NVarChar, item.Employee_ID)
         .input("Shift_ID", sql.Int, item.Shift_ID)
         .input("Shift_Type_ID", sql.Int, item.Shift_Type_ID)
-        .input("Shift_Pattern_ID", sql.Int, item.Shift_Pattern_ID)
+        .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Effective_From", sql.Date, item.Effective_From)
         .input("Effective_To", sql.Date, item.Effective_To)
         .input("Is_Current", sql.NVarChar, item.Is_Current)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .input("Modified_date", sql.DateTime, item.Modified_date)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date`);
+        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,''`);
     }
     res.status(200).json("Employee_shift_mapping data updated successfully");
   } catch (err) {
@@ -35640,7 +35639,7 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,0,'',0,0,'','','','',@Company_Code,@keyfield,'','','',''`);
+        .query(`EXEC sp_Employee_shift_mapping @mode,0,'',0,0,'','','','',@Company_Code,@keyfield,'','','',''`);
     }
     res.status(200).json("Employee_shift_mapping data deleted successfully");
   } catch (err) {
@@ -36009,7 +36008,7 @@ const Employee_shift_mappingSc = async (req, res) => {
       .input("Effective_To", sql.NVarChar, Effective_To)
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'','','','',''`);
 
     if (result.recordset.length > 0) {
