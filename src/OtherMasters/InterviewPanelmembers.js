@@ -139,7 +139,10 @@ function InterviewPanelMem({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const panel = data.map(option => option.panel_id);
+        const panel = data.map((option) => ({
+          value: option.panel_id,
+          label: `${option.panel_id}-${option.panel_name}`,
+        }));
         setPaneldrop(panel);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -255,7 +258,11 @@ function InterviewPanelMem({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: panelDrop,
+        values: panelDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = panelDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -305,13 +312,11 @@ function InterviewPanelMem({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");

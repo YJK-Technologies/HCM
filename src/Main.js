@@ -144,6 +144,34 @@ function Main() {
   // }
   // create by pavun on 7 may 2024 use: To block the view page source  End
 
+  // useEffect(() => {
+  //   const disableCopy = (e) => e.preventDefault();
+
+  //   document.addEventListener("copy", disableCopy);
+  //   document.addEventListener("cut", disableCopy);
+  //   document.addEventListener("contextmenu", disableCopy);
+
+  //   return () => {
+  //     document.removeEventListener("copy", disableCopy);
+  //     document.removeEventListener("cut", disableCopy);
+  //     document.removeEventListener("contextmenu", disableCopy);
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        ["a", "x", "v"].includes(e.key.toLowerCase())
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const routes = [
     { path: "/", component: <Home /> },
     { path: "/Login", component: <Login /> },
@@ -221,9 +249,9 @@ function Main() {
     { path: "/PFContribution", component: <EmpPFCompany /> },
     { path: "/PayslipEmpProTax", component: <EmpProfessionalTax /> },
     { path: "/PayslipEmpTDS", component: <EmpTDS /> },
-    { path: "/AddFYA", component: <AddFinancialYearAccess/>},
-    { path: "/LeaveReq", component: <LeaveReq/>},
-    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath"/> },
+    { path: "/AddFYA", component: <AddFinancialYearAccess /> },
+    { path: "/LeaveReq", component: <LeaveReq /> },
+    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath" /> },
     { path: "/CandidateMaster", component: <CandidateMaster /> },
     { path: "/JobMaster", component: <JobMaster /> },
     { path: "/InterviewPanel", component: <InterviewPanel /> },
@@ -257,7 +285,7 @@ function Main() {
         <Route
           path="/AccountInformation"
           element={
-            <div>
+            <div className="no-select">
               <Topbar />
               <div className="layout-container">
                 <SideBar className="sidebar" />
@@ -284,7 +312,7 @@ function Main() {
                 key={path}
                 path={path}
                 element={
-                  <div>
+                  <div className="no-select">
                     <Topbar />
                     <div className="layout-container">
                       <SideBar className="sidebar" />
@@ -299,7 +327,7 @@ function Main() {
               key={path}
               path={path}
               element={
-                <div>
+                <div className="no-select">
                   <SideBar className="sidebar" />
                   <Topbar />
                   <div className="layout-container">
