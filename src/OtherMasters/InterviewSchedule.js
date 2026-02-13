@@ -141,7 +141,10 @@ function InterviewSchedule({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusOption = data.map(option => option.panel_id);
+        const statusOption = data.map((option) => ({
+          value: option.panel_id,
+          label: `${option.panel_id}-${option.panel_name}`,
+        }));
         setPaneldrop(statusOption);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -158,7 +161,10 @@ function InterviewSchedule({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusOption = data.map(option => option.candidate_id);
+        const statusOption = data.map((option) => ({
+          value: option.candidate_id,
+          label: `${option.candidate_id}-${option.candidate_name}`,
+        }));
         setcandidatedrop(statusOption);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -413,7 +419,11 @@ function InterviewSchedule({ }) {
       field: "candidate_id",
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: candidatedrop,
+        values: candidatedrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = candidatedrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
       editable: true
     },
@@ -423,7 +433,11 @@ function InterviewSchedule({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: Paneldrop,
+        values: Paneldrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = Paneldrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -459,7 +473,7 @@ function InterviewSchedule({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: interviewmodeDrop,
+        values: interviewmodeDrop
       },
     },
     {
@@ -524,13 +538,11 @@ function InterviewSchedule({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");

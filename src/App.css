@@ -282,3 +282,10 @@ body::-webkit-scrollbar {
         height: 24px;
     }
 }
+
+/* .no-select {
+  -webkit-user-select: none; 
+  -moz-user-select: none;    
+  -ms-user-select: none;     
+  user-select: none;         
+} */

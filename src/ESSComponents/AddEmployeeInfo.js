@@ -226,7 +226,9 @@ function Input({ }) {
         const [{ EmployeeId }] = searchData;
         setEmployeeId(EmployeeId);
 
-        toast.success("Employee Personal Data inserted Successfully")
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
 
         console.log("Employee Personal Data Data inserted successfully");
       } else {
@@ -355,12 +357,10 @@ function Input({ }) {
             body: formData,
           });
 
-          if (response.status === 200) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+          if (response.ok) {
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -1050,11 +1050,11 @@ function Input({ }) {
     setPassportExpiryDate(formatDate(Passport_Expiry_Date));
     setOtherIdNo(Other_Id_No);
 
-    if(Photos){
-    const imageBlob = base64ToBlob(Photos);
-    setuser_image(imageBlob);
-    const imageUrl = URL.createObjectURL(imageBlob);
-    setSelectedImage(imageUrl);
+    if (Photos) {
+      const imageBlob = base64ToBlob(Photos);
+      setuser_image(imageBlob);
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setSelectedImage(imageUrl);
     }
 
     // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
