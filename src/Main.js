@@ -87,7 +87,7 @@ import InterviewPanelMem from "./OtherMasters/InterviewPanelmembers.js";
 import InterviewSchedule from "./OtherMasters/InterviewSchedule.js";
 import InterviewFeedback from "./OtherMasters/InterviewFeedback.js";
 import InterviewDecision from "./OtherMasters/InterviewDecision.js";
-import CountryMaster from "./CountryMasterGrid.js";
+import CountryMaster from "./NewCountryMasterGrid.js";
 import AddCountryMaster from "./AddCountryMaster.js";
 import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
 import TimeZoneGrid from "./TimeZoneMasterGrid.js";
