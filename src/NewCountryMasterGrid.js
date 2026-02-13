@@ -297,7 +297,7 @@ function Input({ }) {
     setLoading(true);
     try {
       const body = {
-        Country_CodeSC: Country_Code,
+        Country_Code: Country_CodeSC,
         Country_Name: Country_Name,
         Week_Start_Day: parseFloat(ISO_Code),
         Week_End_Day: parseFloat(Default_Timezone),
