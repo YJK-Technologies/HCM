@@ -129,9 +129,9 @@ const menuData = [
           { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Interview Master", path: "/CandidateMaster" }
         ],
       },
+      { label: "Interview Master", path: "/CandidateMaster" },
       { label: "Setting", path: "/WeekOff" },
     ],
   },
