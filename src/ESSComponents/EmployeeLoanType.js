@@ -40,7 +40,7 @@ function Input({ }) {
   const [Loan_Eligible_Amount, setLoan_Eligible_Amount] = useState(0);
   const [Start_Year, setStart_Year] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
@@ -152,10 +152,10 @@ function Input({ }) {
     try {
       const body = {
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Loan_id,
-        LoanEligibleAmount,
-        StartYear,
-        EndYear,
+        Loan_ID: Loan_id,
+        Loan_Eligible_Amount: LoanEligibleAmount,
+        Start_Year: StartYear,
+        End_Year: EndYear,
       };
 
       const response = await fetch(`${config.apiBaseUrl}/getLoanType`, {
@@ -196,11 +196,12 @@ function Input({ }) {
 
   const handleInsert = async () => {
     if (!Loan_ID || !Loan_Eligible_Amount || !Start_Year || !End_Year) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
+    setError(false);
+    setLoading(true);
 
     try {
       const Headers = {
@@ -221,12 +222,10 @@ function Input({ }) {
         body: JSON.stringify(Headers),
       });
 
-      if (response.status === 200) {
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+      if (response.ok) {
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert data");
@@ -266,8 +265,8 @@ function Input({ }) {
         } catch (error) {
           toast.error("Error updateing data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -306,8 +305,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");

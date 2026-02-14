@@ -30,7 +30,7 @@ function Input({ }) {
   const [annualreportURL, setAnnualReportURL] = useState("");
   const [company_gst_no, setcompany_gst_no] = useState("");
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [drop, setDrop] = useState([]);
   const [condrop, setCondrop] = useState([]);
   const [statedrop, setStatedrop] = useState([]);
@@ -99,6 +99,11 @@ function Input({ }) {
     setAnnualReportURL("");
     setSelectedImage("");
     setcompany_gst_no("")
+    setCity('');
+    setState('');
+    setCountry('');
+    setStatus('');
+    setlocation_no('');
     setselectedSignatureImage("");
     if (logo.current) {
       logo.current.value = null;
@@ -399,7 +404,7 @@ function Input({ }) {
       !contact_no ||
       !location_no
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -408,6 +413,7 @@ function Input({ }) {
       toast.warning("Please enter a valid email address");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -444,13 +450,14 @@ function Input({ }) {
         method: "POST",
         body: formData,
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+       toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -511,7 +518,7 @@ function Input({ }) {
       !contact_no ||
       !location_no 
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -520,6 +527,7 @@ function Input({ }) {
       toast.warning("Please enter a valid email address");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -557,11 +565,14 @@ function Input({ }) {
         body: formData,
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data Updated successfully");
-        setIsUpdated(true);
-        clearInputFields();
-        toast.success("Data Updated successfully!")
+        toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);

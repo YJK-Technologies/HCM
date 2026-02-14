@@ -411,10 +411,10 @@ function JobMaster({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -424,29 +424,34 @@ function JobMaster({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
 
       case 'Job Master':
         JobMaster();
         break;
+
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
       case 'Interview schedule':
         InterviewSchedule();
         break;
+
       case 'Interview Feedback':
         InterviewFeedback();
         break;
+
       case 'Interview Decision':
         InterviewDecision();
         break;
+
       default:
         break;
     }

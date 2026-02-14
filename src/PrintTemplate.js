@@ -13,7 +13,7 @@ function PrintTemplate() {
     const [Academic, setAcademic] = useState([{ relation: 'Screens', members: [{ screenName: '', templatename: '', Templates: null, documentUrl: '' }] }]);
     const [Screens, setScreens] = useState("");
     const [templatename, settemplatename] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState(false);
     const [deleteError, setDeleteError] = useState("");
     const navigate = useNavigate();
     const [saveButtonVisible, setSaveButtonVisible] = useState(true);
@@ -49,66 +49,71 @@ function PrintTemplate() {
         );
     };
 
+    const validateMember = (member) => {
+        if (!member.screenName || member.screenName.trim() === "" || !member.templatename || member.templatename.trim() === "" || !member.Templates) {
+            toast.warning("Error: Missing required fields");
+            setError(true);
+            return false;
+        }
+
+        const maxSize = 1 * 1024 * 1024; // 1MB
+        if (member.Templates.size > maxSize) {
+            toast.warning("File size exceeds 1MB");
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSave = async () => {
         setLoading(true);
 
+        try {
+            for (const relationGroup of Academic) {
+                for (const member of relationGroup.members) {
+                    if (!validateMember(member)) {
+                        setLoading(false);
+                        return;
+                    }
+                }
+            }
 
-        const employeeData = await Promise.all(
+            const employeeData = await Promise.all(
+                Academic.flatMap((relationGroup) =>
+                    relationGroup.members.map(async (member) => {
+                        const fileBase64 = await convertToBase64(member.Templates);
 
-            Academic.flatMap((relationGroup) =>
-                relationGroup.members.map(async (member) => {
-                    if (member.Templates) {
-                        const fileSize = member.Templates.size;
-                        const maxSize = 1 * 1024 * 1024; // 1MB
-
-                        if (fileSize > maxSize) {
-                            toast.warning('File size exceeds 1MB. Please upload a smaller file.');
-                            return;
-                        }
-
-                        const fileBase64 = member.Templates ? await convertToBase64(member.Templates) : null;
-                        console.log(fileBase64)
                         return {
                             Screens: member.screenName,
                             Template_name: member.templatename,
                             Templates: fileBase64,
                             created_by: sessionStorage.getItem("selectedUserCode"),
-                            company_code: sessionStorage.getItem("selectedCompanyCode")
+                            company_code: sessionStorage.getItem("selectedCompanyCode"),
                         };
-                    }
-                })
-            )
+                    })
+                )
+            );
 
-        );
-
-        try {
             const response = await fetch(`${config.apiBaseUrl}/AddPrintTemplate`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ employeeData }),
             });
+
             if (response.ok) {
-                setTimeout(() => {
-                    toast.success("Data saved successfully!", {
-                        onClose: () => window.location.reload(),
-                    });
-                }, 1000);
+                toast.success("Data saved successfully!", {
+                    onClose: () => window.location.reload(),
+                });
             } else {
                 const errorResponse = await response.json();
-                console.error(errorResponse.message);
-                toast.warning(errorResponse.message, {
-                })
+                toast.warning(errorResponse.message);
             }
         } catch (err) {
-            console.error("Error delete data:", err);
-            toast.error('Error delete data: ' + err.message, {
-            });
+            console.error("Error saving data:", err);
+            toast.error("Error saving data: " + err.message);
+        } finally {
+            setLoading(false);
         }
-        finally {
-      setLoading(false);
-    }
     };
 
     const convertToBase64 = (file) => {
@@ -199,55 +204,58 @@ function PrintTemplate() {
         window.location.reload();
     };
 
-const handleUpdate = async (relationName, index) => {
-    const relationGroup = Academic.find(group => group.relation === relationName);
-    const member = relationGroup?.members[index];
+    const handleUpdate = async (relationName, index) => {
+        const relationGroup = Academic.find(group => group.relation === relationName);
+        const member = relationGroup?.members[index];
 
-    if (!member) {
-        toast.error("Invalid record selected");
-        return;
-    }
-
-    if (!member.keyfield) {
-        toast.warning("Missing Key Field (Cannot update)");
-        return;
-    }
-
-    if (!member.screenName || !member.templatename) {
-        toast.warning("Please fill all required fields");
-        return;
-    }
-
-    const fileBase64 = member.Templates ? await convertToBase64(member.Templates) : null;
-
-    const editedData = {
-        Screens: member.screenName,
-        Template_name: member.templatename,
-        Templates: fileBase64,
-        Key_field: member.keyfield,
-        modified_by: sessionStorage.getItem("selectedUserCode"),
-        company_code: sessionStorage.getItem("selectedCompanyCode")
-    };
-
-    try {
-        const response = await fetch(`${config.apiBaseUrl}/PrintTemplateUpdate`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ editedData: [editedData] })
-        });
-
-        if (response.ok) {
-            toast.success("Template Updated Successfully!", {
-                // onClose: () => window.location.reload(),
-            });
-        } else {
-            const err = await response.json();
-            toast.warning(err.message || "Failed to update");
+        if (!member) {
+            toast.warning("Invalid record selected");
+            setError(true);
+            return;
         }
-    } catch (err) {
-        toast.error("Error updating: " + err.message);
-    }
-};
+
+        if (!member.keyfield) {
+            setError(true);
+            toast.warning("Missing Key Field (Cannot update)");
+            return;
+        }
+
+        if (!member.screenName || !member.templatename) {
+            setError(true);
+            toast.warning("Please fill all required fields");
+            return;
+        }
+
+        const fileBase64 = member.Templates ? await convertToBase64(member.Templates) : null;
+
+        const editedData = {
+            Screens: member.screenName,
+            Template_name: member.templatename,
+            Templates: fileBase64,
+            Key_field: member.keyfield,
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+            company_code: sessionStorage.getItem("selectedCompanyCode")
+        };
+
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/PrintTemplateUpdate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ editedData: [editedData] })
+            });
+
+            if (response.ok) {
+                toast.success("Template Updated Successfully!", {
+                    onClose: () => window.location.reload(),
+                });
+            } else {
+                const err = await response.json();
+                toast.warning(err.message || "Failed to update");
+            }
+        } catch (err) {
+            toast.error("Error updating: " + err.message);
+        }
+    };
 
 
     const handleDelete = async (relationName, index) => {
@@ -255,18 +263,20 @@ const handleUpdate = async (relationName, index) => {
         const member = relationGroup ? relationGroup.members[index] : null;
 
         if (!member.keyfield) {
-            setDeleteError(" ");
+            setError(true);
             toast.warning("Error: Missing required keyfield")
             return;
         }
 
         if (!member) {
-            setError(" ");
+            toast.warning("Invalid record selected");
+            setError(true);
             return;
         }
 
-        if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
-            setError(" ");
+        if (!member.screenName || !member.templatename) {
+            setError(true);
+            toast.warning("Error: Missing required fields");
             return;
         }
 
@@ -288,11 +298,9 @@ const handleUpdate = async (relationName, index) => {
             });
 
             if (response.ok) {
-                setTimeout(() => {
-                    toast.success("Data deleted successfully!", {
-                        onClose: () => window.location.reload(),
-                    });
-                }, 1000);
+                toast.success("Data deleted successfully!", {
+                    onClose: () => window.location.reload(),
+                });
             } else {
                 const errorResponse = await response.json();
                 console.error(errorResponse.message);
@@ -359,26 +367,26 @@ const handleUpdate = async (relationName, index) => {
             toast.error("Error fetching data: " + error.message);
         }
         finally {
-      setLoading(false);
-    }
+            setLoading(false);
+        }
     };
 
 
     return (
         <div className="container-fluid Topnav-screen">
-        {loading && <LoadingScreen />}
+            {loading && <LoadingScreen />}
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
                     <h1 className="page-title">Print Templates</h1>
 
                     <div className="action-wrapper desktop-actions">
-                    {saveButtonVisible &&
-                        <div onClick={handleSave} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i className="fa-solid fa-floppy-disk"></i>
-                        </div>
-}
+                        {saveButtonVisible &&
+                            <div onClick={handleSave} className="action-icon add">
+                                <span className="tooltip">Save</span>
+                                <i className="fa-solid fa-floppy-disk"></i>
+                            </div>
+                        }
                     </div>
 
                     {/* Mobile Dropdown */}
@@ -389,11 +397,11 @@ const handleUpdate = async (relationName, index) => {
 
                         <ul className="dropdown-menu dropdown-menu-end text-center">
                             {/* {['add', 'all permission'].some(p => companyPermissions.includes(p)) && ( */}
-                             {saveButtonVisible &&
-                            <li className="dropdown-item" onClick={handleSave}>
-                                <i className="fa-solid fa-floppy-disk"></i>
-                            </li>
-}
+                            {saveButtonVisible &&
+                                <li className="dropdown-item" onClick={handleSave}>
+                                    <i className="fa-solid fa-floppy-disk"></i>
+                                </li>
+                            }
                             {/* )} */}
                         </ul>
                     </div>
@@ -489,7 +497,7 @@ const handleUpdate = async (relationName, index) => {
                                             title="Please enter the Academic Name"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'screenName', e.target.value)}
                                         />
-                                        <label className={` exp-form-labels ${error && !member.screenName ? 'red' : ''}`}>Screens{showAsterisk && <span className="text-danger">*</span>}</label>
+                                        <label className={` exp-form-labels ${error && !member.screenName ? 'text-danger' : ''}`}>Screens{showAsterisk && <span className="text-danger">*</span>}</label>
                                     </div>
                                 </div>
 
@@ -504,13 +512,13 @@ const handleUpdate = async (relationName, index) => {
                                             title="Please enter the Major"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'templatename', e.target.value)}
                                         />
-                                        <label className={`exp-form-labels${error && !member.templatename ? 'red' : ''}`}>Template Name{showAsterisk && <span className="text-danger">*</span>}</label>
+                                        <label className={`exp-form-labels ${error && !member.templatename ? 'text-danger' : ''}`}>Template Name{showAsterisk && <span className="text-danger">*</span>}</label>
                                     </div>
                                 </div>
 
                                 <div className="col-md-2">
                                     <div className="inputGroup">
-                                        <div className="image-upload-container">
+                                        <div className={`image-upload-container ${error && !member.Templates ? "image-error" : ""}`}>
                                             {member.documentUrl ? (
                                                 <div className="image-preview-box">
                                                     {member.Templates?.type?.includes("pdf") ||

@@ -22,7 +22,7 @@ function AttriDetInput({ }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedHeader, setSelectedHeader] = useState('Cash');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const code = useRef(null);
   const subcode = useRef(null);
   const detailname = useRef(null);
@@ -46,6 +46,7 @@ function AttriDetInput({ }) {
 
   const clearInputFields = () => {
     setSelectedHeader("");
+    setAttributeheader_Code("");
     setAttributedetails_code("");
     setAttributedetails_name("");
     setDescriptions("");
@@ -66,10 +67,21 @@ function AttriDetInput({ }) {
     }
   }, [mode, selectedRow, isUpdated]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   fetch(`${config.apiBaseUrl}/hdrcode`)
+  //     .then((data) => data.json())
+  //     .then((val) => setCodedrop(val));
+  // }, []);
+
+  const fetchHdrCode = () => {
     fetch(`${config.apiBaseUrl}/hdrcode`)
       .then((data) => data.json())
       .then((val) => setCodedrop(val));
+  };
+
+  // Page load time la run aagum
+  useEffect(() => {
+    fetchHdrCode();
   }, []);
 
   const filteredOptionHeader = statusdrop.map((option) => ({
@@ -84,10 +96,11 @@ function AttriDetInput({ }) {
 
   const handleInsert = async () => {
     if (!attributeheader_code || !attributedetails_code || !attributedetails_name) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -106,26 +119,20 @@ function AttriDetInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
-        });
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
+      toast.error('Error inserting data: ' + error.message);
     }
     finally {
       setLoading(false);
@@ -153,7 +160,7 @@ function AttriDetInput({ }) {
 
   const handleKeyDownStatus = async (e) => {
     if (e.key === 'Enter' && hasValueChanged) {
-      setHasValueChanged(false); 
+      setHasValueChanged(false);
     }
   };
 
@@ -163,6 +170,7 @@ function AttriDetInput({ }) {
   };
   const handleClose = () => {
     setOpen2(false);
+    fetchHdrCode();
   };
 
   const handleUpdate = async () => {
@@ -173,10 +181,11 @@ function AttriDetInput({ }) {
       !descriptions
 
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
 
@@ -197,15 +206,15 @@ function AttriDetInput({ }) {
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to insert data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
