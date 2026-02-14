@@ -15,7 +15,7 @@ const config = require('../Apiconfig');
 
 function Input({ }) {
   const [employeeId, setEmployeeId] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
@@ -138,14 +138,14 @@ function Input({ }) {
 
   const handleSave = async () => {
     if (!employeeId) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
     for (const relationGroup of documents) {
       for (const member of relationGroup.members) {
         if (!member.documentName || !member.document) {
-          setError(" ");
+          setError(true);
           toast.warning("Error: Missing required fields");
           return;
         }
@@ -167,7 +167,9 @@ function Input({ }) {
         })
       )
     );
+    setError(false);
     setLoading(true)
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/AddEmpDoc`, {
         method: "POST",
@@ -177,13 +179,19 @@ function Input({ }) {
         body: JSON.stringify({ employeeData }),
       });
       if (response.ok) {
-        toast.success("Data saved successfully");
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
-        const error = await response.json();
-        toast.error(error.message || "Failed to save data");
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message, {
+        })
       }
-    } catch (error) {
-      toast.error(error.message || "Error saving data");
+    } catch (err) {
+      console.error("Error delete data:", err);
+      toast.error('Error delete data: ' + err.message, {
+      });
     } finally {
       setLoading(false);
     }
@@ -463,21 +471,22 @@ function Input({ }) {
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
-      setDeleteError(" ");
+      setError(true);
       toast.warning("Error: Missing required keyfield")
       return;
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
-    // if (!member.documentName || !member.document||member.keyfield) {
-    //   setError(" ");
-
-    //   return;
-    // }
+    if (!member.documentName || !member.document || member.keyfield) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
 
 
     const fileBase64 = member.document ? await convertToBase64(member.document) : null;
@@ -491,7 +500,8 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       modified_by: sessionStorage.getItem("selectedCompanyCode")
     };
-    setLoading(true)
+    setError(false);
+    setLoading(true);
 
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
@@ -506,11 +516,9 @@ function Input({ }) {
           });
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -522,8 +530,8 @@ function Input({ }) {
           toast.error('Error delete data: ' + err.message, {
           });
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -536,13 +544,14 @@ function Input({ }) {
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
-      setDeleteError(" ");
+      setError(true);
       toast.warning("Error: Missing required keyfield")
       return;
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -568,11 +577,9 @@ function Input({ }) {
           });
 
           if (response.ok) {
-            setTimeout(() => {
               toast.success("Data deleted successfully!", {
                 onClose: () => window.location.reload(),
               });
-            }, 1000);
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -584,8 +591,8 @@ function Input({ }) {
           toast.error('Error delete data: ' + err.message, {
           });
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");

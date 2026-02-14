@@ -89,18 +89,18 @@ const menuData = [
     isDropdown: true,
     subMenus: [
      {
+        label: "Employee Management",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Information", path: "/AddEmployeeInfo" },
+        ],
+      },
+     {
         label: "Dashboard",
         isDropdown: true,
         subMenus: [
           { label: "Admin Dashboard", path: "/ESSDashboard" },
           { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-        ],
-      },
-     {
-        label: "Employee Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Employee Information", path: "/AddEmployeeInfo" },
         ],
       },
      {
@@ -129,9 +129,9 @@ const menuData = [
           { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Interview Master", path: "/CandidateMaster" }
         ],
       },
+      { label: "Interview Master", path: "/JobMaster" },
       { label: "Setting", path: "/WeekOff" },
     ],
   },

@@ -45,7 +45,7 @@ function Input() {
   const [End_Year, setEnd_Year] = useState(LastDate);
   const [Salary_Days, setSalary_Days] = useState("");
   const [EligibleDays, setEligibledays] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [activeTab, setActiveTab] = useState("Salary Eligibility Days")
   const [loading, setLoading] = useState(false);
@@ -336,11 +336,13 @@ function Input() {
 
   const handleSave = async () => {
     if (!FromDate || !ToDate || !EligibleDays) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
+
     try {
       const formattedFromDate = new Date(FromDate).toISOString().split("T")[0];
       const formattedToDate = new Date(ToDate).toISOString().split("T")[0];
@@ -362,13 +364,11 @@ function Input() {
 
       console.log("Response Status:", response.status);
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
           toast.success("Data inserted successfully!", {
             onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         console.error("Error Response:", errorResponse);

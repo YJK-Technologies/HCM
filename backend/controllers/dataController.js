@@ -754,7 +754,7 @@ const getCompanyno = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_company_info 'F','', ' ', '', '', '', '', '',  '', '' , '', '', '','',  '','','','','',null,NULL, NULL,NULL,NULL,NULL,NULL,NULL,NULL,null,null,null`
+      `EXEC sp_company_info 'F','', ' ', '', '', '', '', '',  '', '' , '', '', '','',  '','','','','',null,NULL, '',NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,null,null,null`
     );
 
     res.json(result.recordset);
@@ -1050,9 +1050,8 @@ const addData = async (req, res) => {
       .input("datetime4", sql.NVarChar, datetime4)
       .query(
         `EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id, 
-        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@created_by,@modified_by,  
-         @tempstr1, @tempstr2, @tempstr3, @tempstr4, 
-        @datetime1, @datetime2, @datetime3, @datetime4`
+        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'',@created_by,@modified_by,  
+        '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`
       );
 
     // Return success response
@@ -1123,8 +1122,7 @@ const saveEditedData = async (req, res) => {
         .input("datetime4", updatedRow.datetime4)
         .query(`EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id,
           @status, @foundedDate, @websiteURL,@company_logo,@contact_no,@annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@Currency_Code ,@created_by,@modified_by,'',
-           @tempstr1, @tempstr2, @tempstr3, @tempstr4,
-          @datetime1, @datetime2, @datetime3, @datetime4`);
+           @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     }
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
@@ -1150,9 +1148,7 @@ const deleteData = async (req, res) => {
         .input("modified_by", sql.NVarChar, req.headers['modified-by'])
         .query(`
           EXEC sp_company_info 'D', @company_no,'','','','','','','','',
-          '','','','','','','','',
-          '','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-        `);
+          '','','','','','','','','','','','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Companies deleted successfully");
@@ -6164,7 +6160,7 @@ const commappingdeleteData = async (req, res) => {
 //                           for (const company_no of company_nosToDelete) {
 //                             try {
 //                               await pool.request().input("company_no", company_no).query(`
-//                                 EXEC sp_company_info 'D', @company_no, '', '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', '', '', ''
+//                                 EXEC sp_company_info 'D', @company_no, '', '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', '', '', '','','','',''
 //                               `);
 //                             } catch (error) {
 //                               if (error.number === 547) {
@@ -15621,8 +15617,8 @@ const CompanyUpdate = async (req, res) => {
       .input("authorisedSignatur", sql.VarBinary, authorisedSignatur)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(`EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id, 
-        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'' ,@modified_by,
-         '', '', '', '','', '', '', ''`);
+        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'','' ,@modified_by,
+         '', '', '', '', '','', '', '', ''`);
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
     console.error("Error", err);
@@ -15645,7 +15641,7 @@ const UpdateCompanyImage = async (req, res) => {
       .request()
       .input("company_no", sql.NVarChar, company_no)
       .input("company_logo", sql.VarBinary, company_logo)
-      .query(`EXEC sp_company_info 'CIU',@company_no,'','','','','','','','','','','','','',@company_logo,'','','','','','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,null`);
+      .query(`EXEC sp_company_info 'CIU',@company_no,'','','','','','','','','','','','','',@company_logo,'','','','','','','','', NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,null`);
 
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -24719,8 +24715,6 @@ const getLoanType = async (req, res) => {
       .input("Loan_Eligible_Amount", sql.Decimal(14, 2), Loan_Eligible_Amount)
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
-
-
       .query(`EXEC sp_Loan_Type 'sc',@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Send response
     if (result.recordset.length > 0) {
@@ -27541,8 +27535,7 @@ const AddSalaryCriteria = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("status", sql.NVarChar, status)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,@created_by,'',null,null,null,null,null,null,null,null
-`)
+      .query(`EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,@created_by,'',null,null,null,null,null,null,null,null`)
     res.status(200).json("Data Inserted successfully");
   } catch (err) {
     console.error("Error Updating data:", err);
@@ -33344,8 +33337,8 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("applied_job_id", sql.Int, item.applied_job_id)
         .input("Education", sql.NVarChar, item.Education)
         .input("Experience", sql.NVarChar, item.Experience)
-        .input("Related_experience", sql.Int, item.Related_experience)
-        .input("Job_description", sql.Int, item.Job_description)
+        .input("Related_experience", sql.VarChar, item.Related_experience)
+        .input("Job_description", sql.VarChar, item.Job_description)
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
@@ -34689,6 +34682,7 @@ const getCountrySearchData = async (req, res) => {
 
 const Country_MasterLoopUpdate = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  console.log(sp_Country_MasterData)
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34704,14 +34698,14 @@ const Country_MasterLoopUpdate = async (req, res) => {
         .input("Week_Start_Day", sql.NVarChar, item.Week_Start_Day)
         .input("ISO_Code", sql.NVarChar, item.ISO_Code)
         .input("Weekend_Days", sql.NVarChar, item.Weekend_Days)
-        .input("Max_Work_Hours_Day", sql.NVarChar, item.Max_Work_Hours_Day)
-        .input("Max_Work_Hours_Week", sql.NVarChar, item.Max_Work_Hours_Week)
+        .input("Max_Work_Hours_Day", sql.Int, item.Max_Work_Hours_Day)
+        .input("Max_Work_Hours_Week", sql.Int, item.Max_Work_Hours_Week)
         .input("Overtime_Allowed", sql.NVarChar, item.Overtime_Allowed)
         .input("Currency_Code", sql.NVarChar, item.Currency_Code)
         .input("Status", sql.NVarChar, item.Status)
         .input("Modified_by", sql.NVarChar, item.modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("Company_Code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default,@Week_Start_Day, @ISO_Code, @Weekend_Days, @Max_Work_Hours_Day,
         @Max_Work_Hours_Week, @Overtime_Allowed, @Currency_Code, @Status, '','', @Modified_by,'',@keyfield,@Company_Code`);
     }
@@ -34725,6 +34719,7 @@ const Country_MasterLoopUpdate = async (req, res) => {
 
 const Country_MasterLoopDelete = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34735,7 +34730,7 @@ const Country_MasterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, '', '', '', '', '', '', 0, 0, '', '', '', '','', '','',@keyfield,@Company_Code`);
     }
     res.status(200).json("Country_Master data deleted successfully");

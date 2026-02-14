@@ -33,7 +33,7 @@ function LocInfoInput({ }) {
   const [drop, setdrop] = useState([]);
   const [condrop, setcondrop] = useState([]);
   const [statedrop, setstatedrop] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
   const locationno = useRef(null);
   const locationname = useRef(null);
@@ -69,9 +69,13 @@ function LocInfoInput({ }) {
     setaddress2("");
     setaddress3("");
     setSelectedCity(null);
+    setcity("");
     setselectedState(null);
+    setstate("");
     setselectedCountry(null);
+    setcountry("");
     setselectedStatus(null);
+    setstatus("");
     setpincode("");
     setemail_id("");
     setcontact_no("");
@@ -233,7 +237,7 @@ function LocInfoInput({ }) {
       !status ||
       !contact_no
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -243,6 +247,7 @@ function LocInfoInput({ }) {
       toast.warning("Please enter a valid email address");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -269,8 +274,11 @@ function LocInfoInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else if (response.status === 400) {
         const errorResponse = await response.json();
@@ -302,7 +310,7 @@ function LocInfoInput({ }) {
       !selectedStatus ||
       !contact_no
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -311,6 +319,7 @@ function LocInfoInput({ }) {
       toast.warning("Please enter a valid email address");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -339,15 +348,15 @@ function LocInfoInput({ }) {
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
