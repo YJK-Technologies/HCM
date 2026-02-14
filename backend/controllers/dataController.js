@@ -34682,6 +34682,7 @@ const getCountrySearchData = async (req, res) => {
 
 const Country_MasterLoopUpdate = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  console.log(sp_Country_MasterData)
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34697,14 +34698,14 @@ const Country_MasterLoopUpdate = async (req, res) => {
         .input("Week_Start_Day", sql.NVarChar, item.Week_Start_Day)
         .input("ISO_Code", sql.NVarChar, item.ISO_Code)
         .input("Weekend_Days", sql.NVarChar, item.Weekend_Days)
-        .input("Max_Work_Hours_Day", sql.NVarChar, item.Max_Work_Hours_Day)
-        .input("Max_Work_Hours_Week", sql.NVarChar, item.Max_Work_Hours_Week)
+        .input("Max_Work_Hours_Day", sql.Int, item.Max_Work_Hours_Day)
+        .input("Max_Work_Hours_Week", sql.Int, item.Max_Work_Hours_Week)
         .input("Overtime_Allowed", sql.NVarChar, item.Overtime_Allowed)
         .input("Currency_Code", sql.NVarChar, item.Currency_Code)
         .input("Status", sql.NVarChar, item.Status)
         .input("Modified_by", sql.NVarChar, item.modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("Company_Code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default,@Week_Start_Day, @ISO_Code, @Weekend_Days, @Max_Work_Hours_Day,
         @Max_Work_Hours_Week, @Overtime_Allowed, @Currency_Code, @Status, '','', @Modified_by,'',@keyfield,@Company_Code`);
     }
@@ -34718,6 +34719,7 @@ const Country_MasterLoopUpdate = async (req, res) => {
 
 const Country_MasterLoopDelete = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34728,7 +34730,7 @@ const Country_MasterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, '', '', '', '', '', '', 0, 0, '', '', '', '','', '','',@keyfield,@Company_Code`);
     }
     res.status(200).json("Country_Master data deleted successfully");

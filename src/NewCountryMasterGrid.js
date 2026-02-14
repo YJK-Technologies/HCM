@@ -17,9 +17,9 @@ function Input({ }) {
   const [Country_Code, setCountry_Code] = useState('');
   const [Country_Name, setCountry_Name] = useState('');
   const [ISO_Code, setISO_Code] = useState('');
-  const [Default_Timezone, setDefault_Timezone] = useState('');
+  const [TimeZone_Default, setTimeZone_Default] = useState('');
   const [Week_Start_Day, setWeek_Start_Day] = useState('');
-  const [Week_End_Day, setWeek_End_Day] = useState('');
+  const [Weekend_Days, setWeekend_Days] = useState('');
   const [Max_Work_Hours_Day, setMax_Work_Work_Day] = useState('');
   const [Max_Work_Hours_Week, setMax_Work_Hours_Week] = useState('');
   const [Overtime_Allowed, setOvertime_Allowed] = useState('');
@@ -41,9 +41,9 @@ function Input({ }) {
   const [Country_CodeSC, setCountry_CodeSC] = useState('');
   const [Country_NameSC, setCountry_NameSC] = useState('');
   const [ISO_CodeSC, setISO_CodeSC] = useState(''); 
-  const [Default_TimezoneSC, setDefault_TimezoneSC] = useState('');
+  const [TimeZone_DefaultSC, setTimeZone_DefaultSC] = useState('');
   const [Week_Start_DaySC, setWeek_Start_DaySC] = useState('');
-  const [Week_End_DaySC, setWeek_End_DaySC] = useState('');
+  const [Weekend_DaysSC, setWeekend_DaysSC] = useState('');
   const [Max_Work_Hours_DaySC, setMax_Work_Hours_DaySC] = useState('');
   const [Max_Work_Hours_WeekSC, setMax_Work_Hours_WeekSC] = useState('');
   const [Overtime_AllowedSC, setOvertime_AllowedSC] = useState('');
@@ -98,7 +98,7 @@ function Input({ }) {
               <>
                 <span
                   className="icon mx-2"
-                  onClick={() => saveEditedData(params.data, params.node.data)}
+                  onClick={() => handleUpdate(params.data, params.node.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
@@ -106,7 +106,7 @@ function Input({ }) {
 
                 <span
                   className="icon mx-2"
-                  onClick={() => deleteSelectedRows(params.data)}
+                  onClick={() => handleDelete(params.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-solid fa-trash"></i>
@@ -141,20 +141,20 @@ function Input({ }) {
       },
     },
     {
-      headerName: "Grade Name",
+      headerName: "Country Name",
       field: "Country_Name",
       filter: 'agTextColumnFilter',
       editable: true
     },
     {
-      headerName: "Salary Range From",
-      field: "salary_range_from",
+      headerName: "ISO Code",
+      field: "ISO_Code",
       filter: 'agTextColumnFilter',
       editable: true
     },
     {
-      headerName: "Salary Range To",
-      field: "salary_range_to",
+      headerName: "TimeZone Default",
+      field: "TimeZone_Default",
       filter: 'agTextColumnFilter',
       editable: true
     },
@@ -166,7 +166,7 @@ function Input({ }) {
     },
     {
       headerName: "Week End Day",
-      field: "Week_End_Day",
+      field: "Weekend_Days",
       filter: 'agTextColumnFilter',
       editable: true
     },
@@ -195,41 +195,41 @@ function Input({ }) {
       editable: true
     },
     {
-      headerName: "Bonus/Arrears",
+      headerName: "Status",
       field: "Status",
       filter: 'agTextColumnFilter',
       editable: true
     },
-    {
-      headerName: "Other Allowance",
-      field: "Other_Allowance",
-      filter: 'agTextColumnFilter',
-      editable: true
-    },
-    {
-      headerName: "Leave Deductions",
-      field: "LeaveDeduction",
-      filter: 'agTextColumnFilter',
-      editable: true
-    },
-    {
-      headerName: "Other Deductions",
-      field: "otherDeductions",
-      filter: 'agTextColumnFilter',
-      editable: true
-    },
-    {
-      headerName: "CTC Currency",
-      field: "ctc_currency",
-      filter: 'agTextColumnFilter',
-      editable: true
-    },
-    {
-      headerName: "Minimum Take Salary",
-      field: "minimum_take_salary",
-      filter: 'agTextColumnFilter',
-      editable: true
-    },
+    // {
+    //   headerName: "Other Allowance",
+    //   field: "Other_Allowance",
+    //   filter: 'agTextColumnFilter',
+    //   editable: true
+    // },
+    // {
+    //   headerName: "Leave Deductions",
+    //   field: "LeaveDeduction",
+    //   filter: 'agTextColumnFilter',
+    //   editable: true
+    // },
+    // {
+    //   headerName: "Other Deductions",
+    //   field: "otherDeductions",
+    //   filter: 'agTextColumnFilter',
+    //   editable: true
+    // },
+    // {
+    //   headerName: "CTC Currency",
+    //   field: "ctc_currency",
+    //   filter: 'agTextColumnFilter',
+    //   editable: true
+    // },
+    // {
+    //   headerName: "Minimum Take Salary",
+    //   field: "minimum_take_salary",
+    //   filter: 'agTextColumnFilter',
+    //   editable: true
+    // },
   ]
 
   const gridOptions = {
@@ -237,7 +237,7 @@ function Input({ }) {
   };
 
   const handleSave = async () => {
-    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !Default_Timezone) {
+    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || Status) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -248,18 +248,19 @@ function Input({ }) {
       const Header = {
         Country_Code: Country_Code,
         Country_Name: Country_Name,
+        ISO_Code: ISO_Code,
         Week_Start_Day: Week_Start_Day,
-        Weekend_Days: Week_End_Day,
+        Weekend_Days: Weekend_Days,
         Max_Work_Hours_Day: parseFloat(Max_Work_Hours_Day),
         Max_Work_Hours_Week: parseFloat(Max_Work_Hours_Week),
-        Overtime_Allowed: parseFloat(Overtime_Allowed),
-        Currency_Code: parseFloat(Currency_Code),
-        Status: parseFloat(Status),
+        Overtime_Allowed: Overtime_Allowed,
+        Currency_Code: Currency_Code,
+        Status: Status,
         // Other_Allowance: parseFloat(Other_Allowance),
         // LeaveDeduction: parseFloat(LeaveDeduction),
         // otherDeductions: parseFloat(otherdeductions),
-        salary_range_from: ISO_Code,
-        salary_range_to: Default_Timezone,
+        ISO_Code: ISO_Code,
+        TimeZone_Default: TimeZone_Default,
         // ctc_currency: ctccurrency,
         // minimum_take_salary: parseFloat(minimumtakesalary),
         company_code: sessionStorage.getItem('selectedCompanyCode'),
@@ -298,16 +299,18 @@ function Input({ }) {
     try {
       const body = {
         Country_Code: Country_CodeSC,
-        Country_Name: Country_Name,
-        Week_Start_Day: parseFloat(ISO_Code),
-        Week_End_Day: parseFloat(Default_Timezone),
-        Max_Work_Hours_Day: parseFloat(Week_Start_Day),
-        Max_Work_Hours_Week: parseFloat(Week_End_Day),
-        Overtime_Allowed: parseFloat(Max_Work_Hours_Day),
-        Currency_Code: parseFloat(Max_Work_Hours_Week),
-        Status: parseFloat(Overtime_Allowed),
-        OtherAllowance: parseFloat(Currency_Code),
-        LeaveDeduction: parseFloat(Status),
+        Country_Name: Country_NameSC,
+        ISO_Code: ISO_CodeSC,
+        TimeZone_Default: TimeZone_DefaultSC,
+        Week_Start_Day: Week_Start_DaySC,
+        Weekend_Days: Weekend_DaysSC,
+        Max_Work_Hours_Day: parseFloat(Max_Work_Hours_DaySC),
+        Max_Work_Hours_Week: parseFloat(Max_Work_Hours_WeekSC),
+        Overtime_Allowed: Overtime_AllowedSC,
+        Currency_Code: Currency_CodeSC,
+        Status: StatusSC,
+        // OtherAllowance: parseFloat(Currency_Code),
+        // LeaveDeduction: parseFloat(Status),
         // otherDeductions: parseFloat(otherDeductions),
         // ctc_currency: ctc_currency,
         // salary_range_from: parseFloat(SalaryrrangeFrom),
@@ -315,7 +318,7 @@ function Input({ }) {
         // minimum_take_salary: parseFloat(minimum_take_salary),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       }
-      const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
+      const response = await fetch(`${config.apiBaseUrl}/getCountrySearchData`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -329,20 +332,23 @@ function Input({ }) {
 
           Country_Code: matchedItem.Country_Code,
           Country_Name: matchedItem.Country_Name,
+          ISO_Code: matchedItem.ISO_Code,
+          TimeZone_Default: matchedItem.TimeZone_Default,
           Week_Start_Day: matchedItem.Week_Start_Day,
-          Week_End_Day: matchedItem.Week_End_Day,
+          Weekend_Days: matchedItem.Weekend_Days,
           Max_Work_Hours_Day: matchedItem.Max_Work_Hours_Day,
           Max_Work_Hours_Week: matchedItem.Max_Work_Hours_Week,
           Overtime_Allowed: matchedItem.Overtime_Allowed,
           Currency_Code: matchedItem.Currency_Code,
           Status: matchedItem.Status,
-          Other_Allowance: matchedItem.Other_Allowance,
-          LeaveDeduction: matchedItem.LeaveDeduction,
-          otherDeductions: matchedItem.otherDeductions,
-          salary_range_from: matchedItem.salary_range_from,
-          salary_range_to: matchedItem.salary_range_to,
-          ctc_currency: matchedItem.ctc_currency,
-          minimum_take_salary: matchedItem.minimum_take_salary,
+          keyfield: matchedItem.keyfield,
+          // Other_Allowance: matchedItem.Other_Allowance,
+          // LeaveDeduction: matchedItem.LeaveDeduction,
+          // otherDeductions: matchedItem.otherDeductions,
+          // salary_range_from: matchedItem.salary_range_from,
+          // salary_range_to: matchedItem.salary_range_to,
+          // ctc_currency: matchedItem.ctc_currency,
+          // minimum_take_salary: matchedItem.minimum_take_salary,
         }));
         setrowData(newRows);
       } else if (response.status === 404) {
@@ -362,88 +368,94 @@ function Input({ }) {
     }
   };
 
-  const saveEditedData = async () => {
+  const handleUpdate = async (rowData) => {
+    setLoading(true);
+
     showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
+      "Are you sure you want to update the selected Country Master?",
       async () => {
-        setLoading(true);
         try {
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+            sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+          };
 
-          const response = await fetch(`${config.apiBaseUrl}/updateGrade `, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified_by": modified_by
-            },
-            body: JSON.stringify(dataToSend)
-          });
+          const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Company_Code": Company_Code,
+                "modified-by": modified_by
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
 
           if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
+            toast.success("Country Master updated successfully", {
+              onClose: () => handleSearch(),
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(errorResponse.message || "Update failed");
           }
         } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
+      () => toast.info("Update cancelled")
     );
   };
 
-  const deleteSelectedRows = async (rowData) => {
-    const Country_CodeDelete = { Country_CodeToDelete: Array.isArray(rowData) ? rowData : [rowData] };
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-    showConfirmationToast(
-      "Are you sure you want to delete the data in the selected rows?",
-      async () => {
+   const handleDelete = async (rowData) => {
         setLoading(true);
-        try {
-          const response = await fetch(`${config.apiBaseUrl}/deleteGrade`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code,
 
+        showConfirmationToast(
+            "Are you sure you want to delete the selected employee shift mapping data?",
+            async () => {
+                try {
+                    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+
+                    const dataToSend = {
+                        sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+                    };
+
+                    const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopDelete`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Company_Code": Company_Code
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
+
+                    if (response.ok) {
+                        toast.success("Country master detail deleted successfully", {
+                            onClose: () => handleSearch(), // refresh data
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Delete failed");
+                    }
+                } catch (error) {
+                    console.error("Error deleting employee shift mapping rows:", error);
+                    toast.error("Error deleting employee shift mapping data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
             },
-            body: JSON.stringify(Country_CodeDelete),
-          });
+            () => toast.info("Delete cancelled"),
+        );
+    };
 
-          if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data deleted successfully");
-              handleSearch();
-            }, 3000);
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to delete data");
-          }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error("Error deleting data: " + error.message);
-        } finally {
-      setLoading(false);
-    }
-      },
-      () => {
-        toast.info("Data delete cancelled.");
-      }
-    );
-  };
 
 
   // const onCellValueChanged = (params) => {
@@ -558,13 +570,13 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Salary Range From Amount"
                 value={ISO_Code}
                 onChange={(e) => setISO_Code(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !ISO_Code ? 'text-danger' : ''}`}>ISO COde{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !ISO_Code ? 'text-danger' : ''}`}>ISO Code{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -573,13 +585,13 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Salary Range To Amount"
-                value={Default_Timezone}
-                onChange={(e) => setDefault_Timezone(e.target.value)}
+                value={TimeZone_Default}
+                onChange={(e) => setTimeZone_Default(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !Default_Timezone ? 'text-danger' : ''}`}>Default Timezone{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !TimeZone_Default ? 'text-danger' : ''}`}>Default Timezone{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -588,29 +600,29 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Basic Amount"
                 value={Week_Start_Day}
                 onChange={(e) => setWeek_Start_Day(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !Week_Start_Day ? 'text-danger' : ''}`}>Week Start Day{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className="exp-form-labels">Week Start Day</label>
             </div>
           </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Week_End_Day"
+                id="Weekend_Days"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the HRA Allowance Amount"
-                value={Week_End_Day}
-                onChange={(e) => setWeek_End_Day(e.target.value)}
+                value={Weekend_Days}
+                onChange={(e) => setWeekend_Days(e.target.value)}
                 maxLength={250}
               />
-              <label className={`exp-form-labels ${error && !Week_End_Day ? 'text-danger' : ''}`}>Week End Day{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className="exp-form-labels">Week End Day</label>
             </div>
           </div>
 
@@ -623,7 +635,7 @@ function Input({ }) {
                 placeholder=""
                 required title="Please Enter the Conveyance Allowance Amount"
                 value={Max_Work_Hours_Day}
-                onChange={(e) => setMax_Work_Hours_DaySC(e.target.value)}
+                onChange={(e) => setMax_Work_Work_Day(e.target.value)}
                 maxLength={250}
               />
               <label className="exp-form-labels">Max Hours Work Day</label>
@@ -645,18 +657,18 @@ function Input({ }) {
             </div>
           </div>
 
-          {/* <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Special Allowance"
-                value={SpecialAllowance}
-                onChange={(e) => setSpecialAllowance(e.target.value)}
+                value={Overtime_Allowed}
+                onChange={(e) => setOvertime_Allowed(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !SpecialAllowance ? 'text-danger' : ''}`}>Overtime Allowed{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className="exp-form-labels">Overtime Allowed</label>
             </div>
           </div>
 
@@ -665,13 +677,13 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the  Company PF Contribution"
-                value={CompanyPfContribution}
-                onChange={(e) => setCompanyPfContribution(e.target.value)}
+                value={Currency_Code}
+                onChange={(e) => setCurrency_Code(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !CompanyPfContribution ? 'text-danger' : ''}`}>  Currency Code{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className="exp-form-labels">Currency Code</label>
             </div>
           </div>
 
@@ -680,15 +692,15 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Bonus / Arrears"
-                value={BonusArrears}
-                onChange={(e) => setBonusArrears(e.target.value)}
+                value={Status}
+                onChange={(e) => setStatus(e.target.value)}
               />
-              <label className="exp-form-labels"> Status</label>
+              <label className={` exp-form-labels ${error && !Status ? 'text-danger' : ''}`}>Status{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
-          </div> */}
+          </div>
 
           {/* <div className="col-md-2">
             <div className="inputGroup">
@@ -784,8 +796,8 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 required title="Please Enter the Grade ID"
-                value={Country_Code}
-                onChange={(e) => setCountry_Code(e.target.value)}
+                value={Country_CodeSC}
+                onChange={(e) => setCountry_CodeSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Country Code</label>
@@ -800,8 +812,8 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={Country_Name}
-                onChange={(e) => setCountry_Name(e.target.value)}
+                value={Country_NameSC}
+                onChange={(e) => setCountry_NameSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Country Name</label>
@@ -816,8 +828,8 @@ function Input({ }) {
                 type="number"
                 placeholder=""
                 required title="Please Enter the Salary Range Amount"
-                value={ISO_Code}
-                onChange={(e) => setISO_Code(e.target.value)}
+                value={ISO_CodeSC}
+                onChange={(e) => setISO_CodeSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">ISO Code</label>
@@ -829,11 +841,11 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Salary Range Amount"
-                value={Default_Timezone}
-                onChange={(e) => setDefault_Timezone(e.target.value)}
+                value={TimeZone_DefaultSC}
+                onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Default Time Zone</label>
@@ -845,11 +857,11 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Basic Amount"
-                value={Week_Start_Day}
-                onChange={(e) => setWeek_Start_Day(e.target.value)}
+                value={Week_Start_DaySC}
+                onChange={(e) => setWeek_Start_DaySC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Week Start Day</label>
@@ -859,13 +871,13 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Week_End_Day"
+                id="Weekend_Days"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the HRA Allowance Amount"
-                value={Week_End_Day}
-                onChange={(e) => setWeek_End_Day(e.target.value)}
+                value={Weekend_DaysSC}
+                onChange={(e) => setWeekend_DaysSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={250}
               />
@@ -881,7 +893,7 @@ function Input({ }) {
                 type="Number"
                 placeholder=""
                 required title="Please Enter the Conveyance Allowance Amount"
-                value={Max_Work_Hours_Day}
+                value={Max_Work_Hours_DaySC}
                 onChange={(e) => setMax_Work_Hours_DaySC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={250}
@@ -898,8 +910,8 @@ function Input({ }) {
                 type="Number"
                 placeholder=""
                 required title="Please Enter the Medical Allowance Amount"
-                value={Max_Work_Hours_Week}
-                onChange={(e) => setMax_Work_Hours_Week(e.target.value)}
+                value={Max_Work_Hours_WeekSC}
+                onChange={(e) => setMax_Work_Hours_WeekSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Max Work Hours Week</label>
@@ -911,11 +923,11 @@ function Input({ }) {
               <input
                 id="Overtime_Allowed"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Special Allowance"
-                value={Overtime_Allowed}
-                onChange={(e) => setOvertime_Allowed(e.target.value)}
+                value={Overtime_AllowedSC}
+                onChange={(e) => setOvertime_AllowedSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels"> Over Time Allowed</label>
@@ -927,11 +939,11 @@ function Input({ }) {
               <input
                 id="Currency_Code"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Company PF Contribution"
-                value={Currency_Code}
-                onChange={(e) => setCurrency_Code(e.target.value)}
+                value={Currency_CodeSC}
+                onChange={(e) => setCurrency_CodeSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels"> Currency Code</label>
@@ -943,11 +955,11 @@ function Input({ }) {
               <input
                 id="Status"
                 class="exp-input-field form-control"
-                type="Number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Bonus / Arrears"
-                value={Status}
-                onChange={(e) => setStatus(e.target.value)}
+                value={StatusSC}
+                onChange={(e) => setStatusSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels"> Status</label>
