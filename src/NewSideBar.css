@@ -103,7 +103,7 @@
   align-items: center;
   cursor: pointer;
   gap: 12px;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   transition: 0.3s ease;
 }
 
@@ -547,4 +547,13 @@
   .sidebar.collapsed {
     animation: sidebarEntrance 420ms ease both;
   }
+}
+
+.submenu-parent-link {
+  padding-left: 5px !important;   
+  gap: 10px;                       
+}
+
+.submenu-parent-link .nav-label {
+  font-size: 14px;
 }
