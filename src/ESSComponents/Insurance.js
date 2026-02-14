@@ -20,7 +20,7 @@ function Input({ }) {
     }]
   }]);
   const [employeeID, setEmployeeId] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [relativedrop, setrelationdrop] = useState([]);
   const [booleanDrop, setBooleanDrop] = useState([]);
@@ -165,7 +165,7 @@ function Input({ }) {
   const handleSave = async () => {
 
     if (!employeeID) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required keyfield")
       return;
     }
@@ -173,7 +173,7 @@ function Input({ }) {
     for (const relationGroup of familyMembers) {
       for (const member of relationGroup.members) {
         if (!member.relationName || !member.name || !member.dob || !member.Age) {
-          setError("Please fill all required fields.");
+          setError(true);
           toast.warning("Error: Missing required fields")
 
           return;
@@ -202,6 +202,7 @@ function Input({ }) {
         created_by: sessionStorage.getItem("selectedUserCode")
       }))
     );
+    setError(false);
     setLoading(true)
 
     try {
@@ -213,13 +214,19 @@ function Input({ }) {
         body: JSON.stringify({ employeeData }),
       });
       if (response.ok) {
-        toast.success("Data saved successfully");
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
-        const error = await response.json();  // This is to handle error message sent from backend
-        toast.error(error.message || "Failed to save data");
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message, {
+        })
       }
-    } catch (error) {
-      toast.error(error.message || "Error saving data");
+    } catch (err) {
+      console.error("Error delete data:", err);
+      toast.error('Error delete data: ' + err.message, {
+      });
     } finally {
       setLoading(false);
     }
@@ -236,12 +243,14 @@ function Input({ }) {
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!member.relationName || !member.name || !member.dob || !member.Age) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -249,6 +258,7 @@ function Input({ }) {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
+    setError(false);
     setLoading(true)
 
     showConfirmationToast(
@@ -264,11 +274,9 @@ function Input({ }) {
           });
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -300,12 +308,14 @@ function Input({ }) {
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!member.relationName || !member.name || !member.dob || !member.Age) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -328,6 +338,7 @@ function Input({ }) {
       Air_Ticket_Entitled: Number(member.airTicketEntitled),
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
+    setError(false);
     setLoading(true)
 
     showConfirmationToast(
@@ -343,11 +354,9 @@ function Input({ }) {
           });
 
           if (response.ok) {
-            setTimeout(() => {
               toast.success("Data updated successfully!", {
                 onClose: () => window.location.reload(),
               });
-            }, 1000);
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -971,7 +980,7 @@ function Input({ }) {
                     onChange={(e) => {
                       const value = e.target.value;
                       if (/^\d*$/.test(value)) {
-                        RelationInputChange(relationGroup.relation,index,'aadharNo',value);
+                        RelationInputChange(relationGroup.relation, index, 'aadharNo', value);
                       }
                     }}
                   />

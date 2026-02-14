@@ -32,7 +32,7 @@ function CandidateMaster() {
   const [candidate_name, setcandidate_name] = useState("");
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [activeTab, setActiveTab] = useState("Candiate Master")
+  const [activeTab, setActiveTab] = useState("Candidate Master")
   const [loading, setLoading] = useState(false);
   const [isselectedJobID, setisselectedJobID] = useState(false);
   const [isselectedJobIDSC, setisselectedJobIDSC] = useState(false);
@@ -125,7 +125,10 @@ function CandidateMaster() {
     })
       .then((response) => response.json())
       .then((data) => {
-        const jobs = data.map(option => option.job_id);
+        const jobs = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id}-${option.job_title}`,
+        }));
         setJobDrop(jobs);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -437,7 +440,11 @@ function CandidateMaster() {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: JobDrop,
+        values: JobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = JobDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -475,10 +482,10 @@ function CandidateMaster() {
   ]
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -487,7 +494,7 @@ function CandidateMaster() {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
       case 'Job Master':
@@ -496,7 +503,7 @@ function CandidateMaster() {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -627,7 +634,7 @@ function CandidateMaster() {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Masters </h1>
+          <h1 className="page-title">Candidate Master</h1>
           <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>

@@ -45,7 +45,7 @@ function Input({ }) {
   const [discretionaryBonus, setDiscretionaryBonus] = useState("");
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [IDdrop, setIDdrop] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [grade, setGrade] = useState("");
@@ -211,11 +211,13 @@ function Input({ }) {
 
   const handleSave = async () => {
     if (!annualBonus || !referralBonus || !retentionBonus || !holidayBonus || !performanceBonus || !discretionaryBonus || !startYear || !endYear) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
+
     try {
       const Header = {
         GradeID: grade,
@@ -237,13 +239,11 @@ function Input({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
           toast.success("Data inserted successfully!", {
             onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");

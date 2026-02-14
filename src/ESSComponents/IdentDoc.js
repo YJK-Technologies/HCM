@@ -12,10 +12,10 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [EmployeeId, setEmployeeId] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [documents, setDocuments] = useState([
     {
@@ -82,9 +82,9 @@ function Input({}) {
 
   const filteredOptionDocumentType = Array.isArray(documentTypeDrop)
     ? documentTypeDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   const handleChangeDocumentType = (selectedDocumentType, relation, index) => {
@@ -92,19 +92,19 @@ function Input({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      documentType: selectedDocumentType
-                        ? selectedDocumentType.value
-                        : "",
-                      selectDocumentType: selectedDocumentType,
-                    }
-                  : member
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  documentType: selectedDocumentType
+                    ? selectedDocumentType.value
+                    : "",
+                  selectDocumentType: selectedDocumentType,
+                }
+                : member
+            ),
+          }
           : doc
       )
     );
@@ -255,7 +255,7 @@ function Input({}) {
 
   const handleSave = async () => {
     if (!EmployeeId) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -269,13 +269,14 @@ function Input({}) {
           !member.expiryDate ||
           !member.document
         ) {
+          setError(true);
           toast.warning("Error: Missing required fields");
           return;
         }
 
         // 🚫 Date validation
         if (!isIssueDateValid(member.issueDate, member.expiryDate)) {
-          toast.error("Issue Date must be less than Expiry Date");
+          toast.warning("Issue Date must be less than Expiry Date");
           return; // STOP SAVE
         }
       }
@@ -301,10 +302,10 @@ function Input({}) {
         })
       )
     );
+    setError(false);
     setLoading(true);
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/addEmployeeIdentityDocument`,
+      const response = await fetch(`${config.apiBaseUrl}/addEmployeeIdentityDocument`,
         {
           method: "POST",
           headers: {
@@ -314,14 +315,17 @@ function Input({}) {
         }
       );
       if (response.ok) {
-        toast.success("Data saved successfully");
-        window.location.reload()
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
-        const error = await response.json();
-        toast.error(error.message || "Failed to save data");
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
-      toast.error(error.message || "Error saving data");
+      console.error("Error inserting data:", error);
+      toast.error('Error inserting data: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -479,11 +483,11 @@ function Input({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member
+            ),
+          }
           : item
       )
     );
@@ -494,17 +498,17 @@ function Input({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-                  documentType: "",
-                  documentNo: "",
-                  issueDate: "",
-                  expiryDate: "",
-                },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                documentType: "",
+                documentNo: "",
+                issueDate: "",
+                expiryDate: "",
+              },
+            ],
+          }
           : item
       )
     );
@@ -565,17 +569,17 @@ function Input({}) {
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-                ...doc,
-                members: doc.members.map((member, i) =>
-                  i === index
-                    ? {
-                        ...member,
-                        document: file,
-                        documentUrl: fileUrl,
-                      }
-                    : member
-                ),
-              }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                  }
+                  : member
+              ),
+            }
             : doc
         )
       );
@@ -611,7 +615,7 @@ function Input({}) {
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
       return;
     }
 
@@ -621,18 +625,11 @@ function Input({}) {
       !member.issueDate ||
       !member.expiryDate
     ) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
-    if (
-      !member.documentType ||
-      !member.documentNo ||
-      !member.issueDate ||
-      !member.expiryDate
-    ) {
-      setError(" ");
-      return;
-    }
+
 
     // 🚫 Date validation (PASTE HERE)
     if (!isIssueDateValid(member.issueDate, member.expiryDate)) {
@@ -653,6 +650,7 @@ function Input({}) {
       document: fileBase64,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
+    setError(false);
     setLoading(true);
 
     showConfirmationToast(
@@ -671,11 +669,9 @@ function Input({}) {
           );
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -707,7 +703,7 @@ function Input({}) {
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
       return;
     }
 
@@ -717,7 +713,8 @@ function Input({}) {
       !member.issueDate ||
       !member.expiryDate
     ) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -736,8 +733,7 @@ function Input({}) {
       "Are you sure you want to Delete the data in the row ?",
       async () => {
         try {
-          const response = await fetch(
-            `${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
+          const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
             {
               method: "POST",
               headers: {
@@ -750,11 +746,9 @@ function Input({}) {
           );
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -816,11 +810,11 @@ function Input({}) {
       prev.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((m, i) =>
-                i === index ? { ...m, document: null, documentUrl: "" } : m
-              ),
-            }
+            ...doc,
+            members: doc.members.map((m, i) =>
+              i === index ? { ...m, document: null, documentUrl: "" } : m
+            ),
+          }
           : doc
       )
     );
@@ -897,9 +891,8 @@ function Input({}) {
               />
               <label
                 for="cno"
-                className={`exp-form-labels ${
-                  error && !EmployeeId ? "text-danger" : ""
-                }`}
+                className={`exp-form-labels ${error && !EmployeeId ? "text-danger" : ""
+                  }`}
               >
                 Employee ID<span className="text-danger">*</span>
               </label>
@@ -1019,9 +1012,8 @@ function Input({}) {
                   />
                   <label
                     htmlFor={`cname-${index}`}
-                    className={`floating-label ${
-                      error && !member.documentType ? "text-danger" : ""
-                    }`}
+                    className={`floating-label ${error && !member.documentType ? "text-danger" : ""
+                      }`}
                   >
                     Doc Type<span className="text-danger">*</span>
                   </label>
@@ -1049,9 +1041,8 @@ function Input({}) {
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.documentNo ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.documentNo ? "text-danger" : ""
+                      }`}
                   >
                     Doc No<span className="text-danger">*</span>
                   </label>
@@ -1089,9 +1080,8 @@ function Input({}) {
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.issueDate ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.issueDate ? "text-danger" : ""
+                      }`}
                   >
                     Issue Date<span className="text-danger">*</span>
                   </label>
@@ -1131,9 +1121,8 @@ function Input({}) {
                   />
                   <label
                     htmlFor={`add2-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.expiryDate ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.expiryDate ? "text-danger" : ""
+                      }`}
                   >
                     Expiry Date<span className="text-danger">*</span>
                   </label>
@@ -1194,31 +1183,31 @@ function Input({}) {
                     {["update", "all permission"].some((permission) =>
                       identityPermissions.includes(permission)
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        title="Update"
-                        onClick={() =>
-                          handleUpdate(relationGroup.relation, index)
-                        } // Pass the specific row data
-                      >
-                        <i className="fa-solid fa-floppy-disk"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          title="Update"
+                          onClick={() =>
+                            handleUpdate(relationGroup.relation, index)
+                          } // Pass the specific row data
+                        >
+                          <i className="fa-solid fa-floppy-disk"></i>
+                        </button>
+                      )}
                     {["delete", "all permission"].some((permission) =>
                       identityPermissions.includes(permission)
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        title="Delete"
-                        onClick={() =>
-                          handleDelete(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            handleDelete(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      )}
                   </div>
                 )}
               </div>

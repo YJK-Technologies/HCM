@@ -534,10 +534,10 @@ function InterviewPanel({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -547,7 +547,7 @@ function InterviewPanel({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
 
@@ -557,7 +557,7 @@ function InterviewPanel({ }) {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 

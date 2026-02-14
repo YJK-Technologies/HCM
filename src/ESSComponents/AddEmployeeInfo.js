@@ -34,7 +34,7 @@ function Input({ }) {
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
   const [address3, setAddress3] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [permanantAddress, setPermanantAddress] = useState("");
   const [reference_Name, setReference_Name] = useState("");
   const [reference_Phone, setReference_Phone] = useState("");
@@ -149,22 +149,25 @@ function Input({ }) {
       !country ||
       !postalCode
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!validateEmail(Email)) {
+      setError(true);
       toast.warning("Please enter a valid email address")
-      setError("Please enter a valid email address");
       return;
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
+      setError(true);
       toast.warning("Please enter a valid email business");
       return;
     }
+    setError(false);
     setLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
@@ -284,17 +287,19 @@ function Input({ }) {
       !country ||
       !postalCode
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!validateEmail(Email)) {
+      setError(true);
       setError("Please enter a valid email address");
       return;
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
+      setError(true);
       toast.warning("Please enter a valid email business");
       return;
     }
