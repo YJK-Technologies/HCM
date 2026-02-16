@@ -779,7 +779,7 @@ function ShiftPatternDetails() {
                 <input
                   id="UTC_Offset"
                   class="exp-input-field form-control"
-                  type="text"
+                  type="number"
                   placeholder=""
                   autoComplete="off"
                   required
