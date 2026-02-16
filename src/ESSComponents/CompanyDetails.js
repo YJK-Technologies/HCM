@@ -59,7 +59,7 @@ function Input() {
 
 
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -281,10 +281,11 @@ function Input() {
   const handleSave = async () => {
 
     if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true)
 
     try {
@@ -310,13 +311,11 @@ function Input() {
         body: JSON.stringify(Header),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -333,9 +332,11 @@ function Input() {
   // Handle Delete operation
   const handleDelete = async () => {
     if (!EmployeeId) {
-      setError("Employee ID is required.");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true)
 
     showConfirmationToast(
@@ -355,13 +356,11 @@ function Input() {
             body: JSON.stringify(Header),
           });
 
-          if (response.status === 200) {
+          if (response.ok) {
             console.log("Data deleted successfully");
-            setTimeout(() => {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -382,11 +381,13 @@ function Input() {
 
   const handleUpdate = async () => {
     if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
+    setError(false);
+    setLoading(true);
+
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
@@ -415,11 +416,9 @@ function Input() {
           });
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to insert sales data");

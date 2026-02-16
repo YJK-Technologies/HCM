@@ -12,7 +12,7 @@ const config = require("./Apiconfig");
 function DepartmentInput({ }) {
   const [departmentCode, setDepartmentCode] = useState("");
   const [departmenntName, setDepartmenntName] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const Location = useRef(null);
   const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState([]);
@@ -62,6 +62,8 @@ function DepartmentInput({ }) {
   const clearInputFields = () => {
     setDepartmentCode("");
     setDepartmenntName("");
+    setSelectedStatus("");
+    setStatus("");
   };
 
   useEffect(() => {
@@ -83,10 +85,11 @@ function DepartmentInput({ }) {
 
   const handleInsert = async () => {
     if (!departmentCode || !departmenntName || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -104,8 +107,11 @@ function DepartmentInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
         const errorResponse = await response.json();
@@ -155,10 +161,11 @@ function DepartmentInput({ }) {
 
   const handleUpdate = async () => {
     if (!departmentCode || !departmenntName || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -179,15 +186,15 @@ function DepartmentInput({ }) {
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);

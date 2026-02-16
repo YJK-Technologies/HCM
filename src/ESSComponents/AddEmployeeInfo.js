@@ -34,7 +34,7 @@ function Input({ }) {
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
   const [address3, setAddress3] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [permanantAddress, setPermanantAddress] = useState("");
   const [reference_Name, setReference_Name] = useState("");
   const [reference_Phone, setReference_Phone] = useState("");
@@ -149,22 +149,25 @@ function Input({ }) {
       !country ||
       !postalCode
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!validateEmail(Email)) {
+      setError(true);
       toast.warning("Please enter a valid email address")
-      setError("Please enter a valid email address");
       return;
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
+      setError(true);
       toast.warning("Please enter a valid email business");
       return;
     }
+    setError(false);
     setLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
@@ -226,7 +229,9 @@ function Input({ }) {
         const [{ EmployeeId }] = searchData;
         setEmployeeId(EmployeeId);
 
-        toast.success("Employee Personal Data inserted Successfully")
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
 
         console.log("Employee Personal Data Data inserted successfully");
       } else {
@@ -282,17 +287,19 @@ function Input({ }) {
       !country ||
       !postalCode
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!validateEmail(Email)) {
+      setError(true);
       setError("Please enter a valid email address");
       return;
     }
 
     if (businessEmail && !validateEmail(businessEmail)) {
+      setError(true);
       toast.warning("Please enter a valid email business");
       return;
     }
@@ -355,12 +362,10 @@ function Input({ }) {
             body: formData,
           });
 
-          if (response.status === 200) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+          if (response.ok) {
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
@@ -1050,11 +1055,11 @@ function Input({ }) {
     setPassportExpiryDate(formatDate(Passport_Expiry_Date));
     setOtherIdNo(Other_Id_No);
 
-    if(Photos){
-    const imageBlob = base64ToBlob(Photos);
-    setuser_image(imageBlob);
-    const imageUrl = URL.createObjectURL(imageBlob);
-    setSelectedImage(imageUrl);
+    if (Photos) {
+      const imageBlob = base64ToBlob(Photos);
+      setuser_image(imageBlob);
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setSelectedImage(imageUrl);
     }
 
     // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)

@@ -80,15 +80,40 @@ jobs:
       # -------------------------------------------------
       # 6️⃣ Restart backend via PM2
       # -------------------------------------------------
-      - name: Restart backend
+      # - name: Restart backend
+      #   shell: powershell
+      #   run: |
+      #     if (pm2 list | Select-String "HCM") {
+      #       pm2 restart HCM
+      #     } else {
+      #       pm2 start C:\inetpub\wwwroot\HCM\server\https.js --name HCM
+      #     }
+      #     pm2 save
+
+      - name: Restart backend (NSSM)
         shell: powershell
         run: |
-          if (pm2 list | Select-String "HCM") {
-            pm2 restart HCM
-          } else {
-            pm2 start C:\inetpub\wwwroot\HCM\server\https.js --name HCM
+          $serviceName = "HCM"
+          $nssm = "C:\Windows\System32\nssm.exe"
+          $node = "C:\Program Files\nodejs\node.exe"
+          $app = "C:\inetpub\wwwroot\HCM\server\https.js"
+          $appDir = "C:\inetpub\wwwroot\HCM\server"
+
+          if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
+              Write-Host "Service exists. Restarting..."
+              & $nssm restart $serviceName
           }
-          pm2 save
+          else {
+              Write-Host "Service not found. Creating NSSM service..."
+
+              & $nssm install $serviceName $node $app
+              & $nssm set $serviceName AppDirectory $appDir
+              & $nssm set $serviceName Start SERVICE_AUTO_START
+              & $nssm set $serviceName AppStdout "$appDir\nssm-out.log"
+              & $nssm set $serviceName AppStderr "$appDir\nssm-err.log"
+
+              & $nssm start $serviceName
+          }
 
       # -------------------------------------------------
       # 7️⃣ Frontend npm install (LOCK FILE STRICT)

@@ -87,7 +87,7 @@ import InterviewPanelMem from "./OtherMasters/InterviewPanelmembers.js";
 import InterviewSchedule from "./OtherMasters/InterviewSchedule.js";
 import InterviewFeedback from "./OtherMasters/InterviewFeedback.js";
 import InterviewDecision from "./OtherMasters/InterviewDecision.js";
-import CountryMaster from "./CountryMasterGrid.js";
+import CountryMaster from "./NewCountryMasterGrid.js";
 import AddCountryMaster from "./AddCountryMaster.js";
 import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
 import TimeZoneGrid from "./TimeZoneMasterGrid.js";
@@ -96,6 +96,8 @@ import ShiftMasterGrid from "./ShiftMasterGrid.js";
 import ShiftTypeMaster from "./ShiftTypeMaster.js";
 import ShiftPatternMaster from "./ShiftPatternMaster.js";
 import ShiftPatternDetails from "./ShiftPatternDetails.js";
+import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
+import EmployeeShiftMapping from "./EmployeeShiftMapping.js"
 
 import { ToastContainer } from "react-toastify";
 
@@ -141,6 +143,34 @@ function Main() {
   //   // alert("right click is disable")
   // }
   // create by pavun on 7 may 2024 use: To block the view page source  End
+
+  // useEffect(() => {
+  //   const disableCopy = (e) => e.preventDefault();
+
+  //   document.addEventListener("copy", disableCopy);
+  //   document.addEventListener("cut", disableCopy);
+  //   document.addEventListener("contextmenu", disableCopy);
+
+  //   return () => {
+  //     document.removeEventListener("copy", disableCopy);
+  //     document.removeEventListener("cut", disableCopy);
+  //     document.removeEventListener("contextmenu", disableCopy);
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        ["a", "x", "v"].includes(e.key.toLowerCase())
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const routes = [
     { path: "/", component: <Home /> },
@@ -219,9 +249,9 @@ function Main() {
     { path: "/PFContribution", component: <EmpPFCompany /> },
     { path: "/PayslipEmpProTax", component: <EmpProfessionalTax /> },
     { path: "/PayslipEmpTDS", component: <EmpTDS /> },
-    { path: "/AddFYA", component: <AddFinancialYearAccess/>},
-    { path: "/LeaveReq", component: <LeaveReq/>},
-    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath"/> },
+    { path: "/AddFYA", component: <AddFinancialYearAccess /> },
+    { path: "/LeaveReq", component: <LeaveReq /> },
+    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath" /> },
     { path: "/CandidateMaster", component: <CandidateMaster /> },
     { path: "/JobMaster", component: <JobMaster /> },
     { path: "/InterviewPanel", component: <InterviewPanel /> },
@@ -238,7 +268,8 @@ function Main() {
     { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
     { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },
     { path: "/ShiftPatternDetails", component: <ShiftPatternDetails /> },
-    
+    { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
+    { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> }
 
 
   ];
@@ -254,7 +285,7 @@ function Main() {
         <Route
           path="/AccountInformation"
           element={
-            <div>
+            <div className="no-select">
               <Topbar />
               <div className="layout-container">
                 <SideBar className="sidebar" />
@@ -281,7 +312,7 @@ function Main() {
                 key={path}
                 path={path}
                 element={
-                  <div>
+                  <div className="no-select">
                     <Topbar />
                     <div className="layout-container">
                       <SideBar className="sidebar" />
@@ -296,7 +327,7 @@ function Main() {
               key={path}
               path={path}
               element={
-                <div>
+                <div className="no-select">
                   <SideBar className="sidebar" />
                   <Topbar />
                   <div className="layout-container">
