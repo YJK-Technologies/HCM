@@ -97,7 +97,8 @@ import ShiftTypeMaster from "./ShiftTypeMaster.js";
 import ShiftPatternMaster from "./ShiftPatternMaster.js";
 import ShiftPatternDetails from "./ShiftPatternDetails.js";
 import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
-import EmployeeShiftMapping from "./EmployeeShiftMapping.js"
+import EmployeeShiftMapping from "./EmployeeShiftMapping.js";
+import InterviewScheduleReport from "./InterviewScheduleReport.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -269,7 +270,8 @@ function Main() {
     { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },
     { path: "/ShiftPatternDetails", component: <ShiftPatternDetails /> },
     { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
-    { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> }
+    { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> },
+    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> }
 
 
   ];
