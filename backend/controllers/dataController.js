@@ -35673,10 +35673,8 @@ const getShift_TypeSC = async (req, res) => {
   const { Shift_Type_ID, Shift_Type, Description, company_code, keyfield} = req.body;
 
   try {
-    // Connect to the database
     const pool = await connection.connectToDatabase();
 
-    // Execute the query
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
@@ -35687,7 +35685,6 @@ const getShift_TypeSC = async (req, res) => {
       .input("keyfield", sql.NVarChar, keyfield)
       .query(`EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, '', '', '', '', @keyfield`);
 
-    // Send response
        if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
     } else {
@@ -36017,6 +36014,52 @@ const Employee_shift_mappingSc = async (req, res) => {
   }
 };
 //Code ended by pavun on 11-02-26
+
+//code exported by Sakthi on 17-02-26
+const InterviewScheduleSearch = async (req, res) => {
+  const {
+    schedule_id,
+    candidate_name,
+    email,
+    panel_name,
+    scheduled_datetime,
+    Interview_Mode,
+    Status,
+    location,
+    meeting_link,
+    timezone
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
+      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("email", sql.VarChar, email)
+      .input("panel_name", sql.NVarChar, panel_name)
+      .input("scheduled_datetime", sql.Date, scheduled_datetime ? scheduled_datetime : null)
+      .input("Interview_Mode", sql.VarChar, Interview_Mode)
+      .input("Status", sql.VarChar, Status)
+      .input("location", sql.VarChar, location)
+      .input("meeting_link", sql.VarChar, meeting_link)
+      .input("timezone", sql.VarChar, timezone)
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error during Interview Schedule Search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 17-02-26
 
 module.exports = {
   login,
@@ -37229,6 +37272,7 @@ module.exports = {
     ShiftMasterDropDown,
     ShiftTypeDropDown,
     ShiftPatternMasterDropDown,
-    Employee_shift_mappingSc
+    Employee_shift_mappingSc,
+    InterviewScheduleSearch
 
 };
