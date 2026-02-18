@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import { showConfirmationToast } from './ToastConfirmation';
 import LoadingScreen from './Loading';
+import Select from "react-select";
 const config = require('./Apiconfig');
 
 function Input({ }) {
@@ -24,23 +25,19 @@ function Input({ }) {
   const [Max_Work_Hours_Week, setMax_Work_Hours_Week] = useState('');
   const [Overtime_Allowed, setOvertime_Allowed] = useState('');
   const [Currency_Code, setCurrency_Code] = useState('');
+  const [statusDrop, setStatusDrop] = useState([]);
+  const [statusGridDrop, setStatusGridDrop] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [Status, setStatus] = useState('');
-  // const [Other_Allowance, setOther_Allowance] = useState('');
-  // const [LeaveDeduction, setLeaveDeduction] = useState('');
-  // const [minimum_take_salary, setMinimumTakeSalary] = useState('');
-  // const [ctc_currency, setCtcCurrency] = useState('');
-  // const [otherDeductions, setotherDeductions] = useState('');
-  const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [gridApi, setGridApi] = useState(null);
   const [rowData, setrowData] = useState([]);
   const [gridColumnApi, setGridColumnApi] = useState(null);
-  const [showAsterisk, setShowAsterisk] = useState(true);
   const [loading, setLoading] = useState(false);
 
   // For SC Mode
   const [Country_CodeSC, setCountry_CodeSC] = useState('');
   const [Country_NameSC, setCountry_NameSC] = useState('');
-  const [ISO_CodeSC, setISO_CodeSC] = useState(''); 
+  const [ISO_CodeSC, setISO_CodeSC] = useState('');
   const [TimeZone_DefaultSC, setTimeZone_DefaultSC] = useState('');
   const [Week_Start_DaySC, setWeek_Start_DaySC] = useState('');
   const [Weekend_DaysSC, setWeekend_DaysSC] = useState('');
@@ -48,32 +45,85 @@ function Input({ }) {
   const [Max_Work_Hours_WeekSC, setMax_Work_Hours_WeekSC] = useState('');
   const [Overtime_AllowedSC, setOvertime_AllowedSC] = useState('');
   const [Currency_CodeSC, setCurrency_CodeSC] = useState('');
+  const [statusDropSC, setStatusDropSC] = useState([]);
+  const [selectedStatusSC, setSelectedStatusSC] = useState('');
   const [StatusSC, setStatusSC] = useState('');
 
-  // selected input fields
-  // const [Gradeid, setGradeid] = useState('');
-  // const [Gradename, setGradename] = useState('');
-  // const [basic, setbasic] = useState('');
-  // const [salaryrrangefrom, setsalaryrrangefrom] = useState('');
-  // const [salaryrangeto, setsalaryrangeto] = useState('');
-  // const [Hra, setHra] = useState('');
-  // const [conveyance, setconveyance] = useState('');
-  // const [medical, setmedical] = useState('');
-  // const [SpecialAllowance, setSpecialAllowance] = useState('');
-  // const [CompanyPfContribution, setCompanyPfContribution] = useState('');
-  // const [BonusArrears, setBonusArrears] = useState('');
-  // const [OtherAllowance, setOtherAllowance] = useState('');
-  // const [Leavededuction, setLeavededuction] = useState('');
-  // const [otherdeductions, setotherdeductions] = useState('');
-  // const [ctccurrency, setCurrency] = useState('');
-  // const [minimumtakesalary, setMinimumSalary] = useState('');
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [isSelectStatusSC, setIsSelectStatusSC] = useState(false);
 
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/EmployeeGrade", { state: { mode: "update", selectedRow } });
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusDropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGridDrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const filteredOptionStatusSC = statusDropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionStatus = statusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangeStatusSC = (selectedStatusSC) => {
+    setSelectedStatusSC(selectedStatusSC);
+    setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
+  };
+
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
   const handleReload = () => {
@@ -123,21 +173,6 @@ function Input({ }) {
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 50,
-      },
-
-      cellRenderer: (params) => {
-        const handleClick = () => {
-          handleNavigateWithRowData(params.data);
-        };
-
-        return (
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={handleClick}
-          >
-            {params.value}
-          </span>
-        );
       },
     },
     {
@@ -197,39 +232,12 @@ function Input({ }) {
     {
       headerName: "Status",
       field: "Status",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusGridDrop,
+      },
       editable: true
     },
-    // {
-    //   headerName: "Other Allowance",
-    //   field: "Other_Allowance",
-    //   filter: 'agTextColumnFilter',
-    //   editable: true
-    // },
-    // {
-    //   headerName: "Leave Deductions",
-    //   field: "LeaveDeduction",
-    //   filter: 'agTextColumnFilter',
-    //   editable: true
-    // },
-    // {
-    //   headerName: "Other Deductions",
-    //   field: "otherDeductions",
-    //   filter: 'agTextColumnFilter',
-    //   editable: true
-    // },
-    // {
-    //   headerName: "CTC Currency",
-    //   field: "ctc_currency",
-    //   filter: 'agTextColumnFilter',
-    //   editable: true
-    // },
-    // {
-    //   headerName: "Minimum Take Salary",
-    //   field: "minimum_take_salary",
-    //   filter: 'agTextColumnFilter',
-    //   editable: true
-    // },
   ]
 
   const gridOptions = {
@@ -237,11 +245,13 @@ function Input({ }) {
   };
 
   const handleSave = async () => {
+    console.log(Country_Code, Country_Name, Week_Start_Day, ISO_Code, TimeZone_Default, Status)
     if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || Status) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
     }
+
     setLoading(true);
     try {
 
@@ -256,13 +266,8 @@ function Input({ }) {
         Overtime_Allowed: Overtime_Allowed,
         Currency_Code: Currency_Code,
         Status: Status,
-        // Other_Allowance: parseFloat(Other_Allowance),
-        // LeaveDeduction: parseFloat(LeaveDeduction),
-        // otherDeductions: parseFloat(otherdeductions),
         ISO_Code: ISO_Code,
         TimeZone_Default: TimeZone_Default,
-        // ctc_currency: ctccurrency,
-        // minimum_take_salary: parseFloat(minimumtakesalary),
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
@@ -309,13 +314,6 @@ function Input({ }) {
         Overtime_Allowed: Overtime_AllowedSC,
         Currency_Code: Currency_CodeSC,
         Status: StatusSC,
-        // OtherAllowance: parseFloat(Currency_Code),
-        // LeaveDeduction: parseFloat(Status),
-        // otherDeductions: parseFloat(otherDeductions),
-        // ctc_currency: ctc_currency,
-        // salary_range_from: parseFloat(SalaryrrangeFrom),
-        // salary_range_to: parseFloat(SalaryrangeTo),
-        // minimum_take_salary: parseFloat(minimum_take_salary),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       }
       const response = await fetch(`${config.apiBaseUrl}/getCountrySearchData`, {
@@ -323,7 +321,7 @@ function Input({ }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(body) // Send company_no and company_name as search criteria
+        body: JSON.stringify(body)
       });
       if (response.ok) {
         const fetchedData = await response.json();
@@ -342,13 +340,6 @@ function Input({ }) {
           Currency_Code: matchedItem.Currency_Code,
           Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
-          // Other_Allowance: matchedItem.Other_Allowance,
-          // LeaveDeduction: matchedItem.LeaveDeduction,
-          // otherDeductions: matchedItem.otherDeductions,
-          // salary_range_from: matchedItem.salary_range_from,
-          // salary_range_to: matchedItem.salary_range_to,
-          // ctc_currency: matchedItem.ctc_currency,
-          // minimum_take_salary: matchedItem.minimum_take_salary,
         }));
         setrowData(newRows);
       } else if (response.status === 404) {
@@ -413,75 +404,53 @@ function Input({ }) {
     );
   };
 
-   const handleDelete = async (rowData) => {
-        setLoading(true);
+  const handleDelete = async (rowData) => {
+    setLoading(true);
 
-        showConfirmationToast(
-            "Are you sure you want to delete the selected employee shift mapping data?",
-            async () => {
-                try {
-                    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    showConfirmationToast(
+      "Are you sure you want to delete the selected employee shift mapping data?",
+      async () => {
+        try {
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
-                    const dataToSend = {
-                        sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
-                    };
+          const dataToSend = {
+            sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+          };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopDelete`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Company_Code": Company_Code
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Country master detail deleted successfully", {
-                            onClose: () => handleSearch(), // refresh data
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Delete failed");
-                    }
-                } catch (error) {
-                    console.error("Error deleting employee shift mapping rows:", error);
-                    toast.error("Error deleting employee shift mapping data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
+          const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Company_Code": Company_Code
+              },
+              body: JSON.stringify(dataToSend),
             },
-            () => toast.info("Delete cancelled"),
-        );
-    };
+          );
 
-
-
-  // const onCellValueChanged = (params) => {
-  //   const updatedRowData = [...rowData];
-  //   const rowIndex = updatedRowData.findIndex(
-  //     (row) => row.ProjectID === params.data.ProjectID
-  //   );
-  //   if (rowIndex !== -1) {
-  //     updatedRowData[rowIndex][params.colDef.field] = params.newValue;
-  //     setrowData(updatedRowData);
-
-  //     // Add the edited row data to the state
-  //     setEditedData((prevData) => [...prevData, updatedRowData[rowIndex]]);
-  //   }
-  // };
+          if (response.ok) {
+            toast.success("Country master detail deleted successfully", {
+              onClose: () => handleSearch(), // refresh data
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
+          }
+        } catch (error) {
+          console.error("Error deleting employee shift mapping rows:", error);
+          toast.error("Error deleting employee shift mapping data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Delete cancelled"),
+    );
+  };
 
   const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
   };
-
-  // const onSelectionChanged = () => {
-  //   const selectedNodes = gridApi.getSelectedNodes();
-  //   const selectedData = selectedNodes.map((node) => node.data);
-  //   setSelectedRows(selectedData);
-  // };
 
 
   return (
@@ -493,19 +462,16 @@ function Input({ }) {
           <h1 className="page-title">Country Master</h1>
 
           <div className="action-wrapper desktop-actions">
-              {saveButtonVisible && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
-              <div className="action-icon print" onClick={handleReload}>
-                <span className="tooltip">Reload</span>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
-              </div>
+            <div className="action-icon add" onClick={handleSave}>
+              <span className="tooltip">save</span>
+              <i class="fa-solid fa-floppy-disk"></i>
+            </div>
+            <div className="action-icon print" onClick={handleReload}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
+            </div>
           </div>
 
-          {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
               <i className="fa-solid fa-list"></i>
@@ -513,14 +479,10 @@ function Input({ }) {
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              {saveButtonVisible && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
-              {/*})}*/}
-              
+              <li className="dropdown-item" onClick={handleSave}>
+                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              </li>
+
               <li className="dropdown-item" onClick={handleReload}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
@@ -542,10 +504,9 @@ function Input({ }) {
                 required title="Please Enter the Grade ID"
                 value={Country_Code}
                 onChange={(e) => setCountry_Code(e.target.value)}
-                // onKeyPress={handleKeyPress}
                 maxLength={50}
               />
-              <label for="cname" className={` exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label for="cname" className={` exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -561,7 +522,7 @@ function Input({ }) {
                 onChange={(e) => setCountry_Name(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Country_Name ? 'text-danger' : ''}`}>  Country Name {showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !Country_Name ? 'text-danger' : ''}`}>Country Name<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -576,7 +537,7 @@ function Input({ }) {
                 value={ISO_Code}
                 onChange={(e) => setISO_Code(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !ISO_Code ? 'text-danger' : ''}`}>ISO Code{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !ISO_Code ? 'text-danger' : ''}`}>ISO Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -591,7 +552,7 @@ function Input({ }) {
                 value={TimeZone_Default}
                 onChange={(e) => setTimeZone_Default(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !TimeZone_Default ? 'text-danger' : ''}`}>Default Timezone{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !TimeZone_Default ? 'text-danger' : ''}`}>Default Timezone<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -606,7 +567,7 @@ function Input({ }) {
                 value={Week_Start_Day}
                 onChange={(e) => setWeek_Start_Day(e.target.value)}
               />
-              <label className="exp-form-labels">Week Start Day</label>
+              <label className={`exp-form-labels ${error && !Week_Start_Day ? 'text-danger' : ''}`}>Week Start Day<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -688,96 +649,25 @@ function Input({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Bonus / Arrears"
-                value={Status}
-                onChange={(e) => setStatus(e.target.value)}
-              />
-              <label className={` exp-form-labels ${error && !Status ? 'text-danger' : ''}`}>Status{showAsterisk && <span className="text-danger">*</span>}</label>
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectStatus(true)}
+                  onBlur={() => setIsSelectStatus(false)}
+                />
+                <label className={`floating-label ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
+              </div>
             </div>
-          </div>
-
-          {/* <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the Other Allowance"
-                value={OtherAllowance}
-                onChange={(e) => setOtherAllowance(e.target.value)}
-              />
-              <label className="exp-form-labels"> Other Allowance</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the Leave Deductions"
-                value={Leavededuction}
-                onChange={(e) => setLeavededuction(e.target.value)}
-                maxLength={250}
-              />
-              <label className="exp-form-labels"> Leave Deductions</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the Other Deductions"
-                value={otherdeductions}
-                onChange={(e) => setotherdeductions(e.target.value)}
-              />
-              <label className="exp-form-labels">  Other Deductions</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the CTC Currency"
-                value={ctccurrency}
-                onChange={(e) => setCurrency(e.target.value)}
-                maxLength={10}
-              />
-              <label className={` exp-form-labels ${error && !ctccurrency ? 'text-danger' : ''}`}> CTC Currency{showAsterisk && <span className="text-danger">*</span>}</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the  Minimum Take Salary"
-                value={minimumtakesalary}
-                onChange={(e) => setMinimumSalary(e.target.value)}
-              />
-              <label className="exp-form-labels">Minimum Take Salary</label>
-            </div>
-          </div> */}
 
         </div>
       </div>
@@ -798,7 +688,6 @@ function Input({ }) {
                 required title="Please Enter the Grade ID"
                 value={Country_CodeSC}
                 onChange={(e) => setCountry_CodeSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Country Code</label>
             </div>
@@ -814,7 +703,6 @@ function Input({ }) {
                 required title="Please Enter the Grade Name"
                 value={Country_NameSC}
                 onChange={(e) => setCountry_NameSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Country Name</label>
             </div>
@@ -830,7 +718,6 @@ function Input({ }) {
                 required title="Please Enter the Salary Range Amount"
                 value={ISO_CodeSC}
                 onChange={(e) => setISO_CodeSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">ISO Code</label>
             </div>
@@ -846,7 +733,6 @@ function Input({ }) {
                 required title="Please Enter the Salary Range Amount"
                 value={TimeZone_DefaultSC}
                 onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Default Time Zone</label>
             </div>
@@ -862,7 +748,6 @@ function Input({ }) {
                 required title="Please Enter the Basic Amount"
                 value={Week_Start_DaySC}
                 onChange={(e) => setWeek_Start_DaySC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Week Start Day</label>
             </div>
@@ -878,7 +763,6 @@ function Input({ }) {
                 required title="Please Enter the HRA Allowance Amount"
                 value={Weekend_DaysSC}
                 onChange={(e) => setWeekend_DaysSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={250}
               />
               <label className="exp-form-labels">Week End Day</label>
@@ -895,7 +779,6 @@ function Input({ }) {
                 required title="Please Enter the Conveyance Allowance Amount"
                 value={Max_Work_Hours_DaySC}
                 onChange={(e) => setMax_Work_Hours_DaySC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={250}
               />
               <label className="exp-form-labels">Max Work Hours Day</label>
@@ -912,7 +795,6 @@ function Input({ }) {
                 required title="Please Enter the Medical Allowance Amount"
                 value={Max_Work_Hours_WeekSC}
                 onChange={(e) => setMax_Work_Hours_WeekSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">Max Work Hours Week</label>
             </div>
@@ -928,7 +810,6 @@ function Input({ }) {
                 required title="Please Enter the Special Allowance"
                 value={Overtime_AllowedSC}
                 onChange={(e) => setOvertime_AllowedSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels"> Over Time Allowed</label>
             </div>
@@ -944,31 +825,32 @@ function Input({ }) {
                 required title="Please Enter the Company PF Contribution"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels"> Currency Code</label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Status"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Bonus / Arrears"
-                value={StatusSC}
-                onChange={(e) => setStatusSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <label className="exp-form-labels"> Status</label>
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatusSC ? "has-value" : ""} 
+              ${isSelectStatusSC ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatusSC}
+                  onChange={handleChangeStatusSC}
+                  options={filteredOptionStatusSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectStatusSC(true)}
+                  onBlur={() => setIsSelectStatusSC(false)}
+                />
+                <label class="floating-label">Status</label>
+              </div>
             </div>
-          </div>
 
-          
-
-          {/* Search + Reload Buttons */}
           <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
@@ -991,11 +873,8 @@ function Input({ }) {
           <AgGridReact
             rowData={rowData}
             columnDefs={columnDefs}
-            // defaultColDef={defaultColDef}
             onGridReady={onGridReady}
-            // onCellValueChanged={onCellValueChanged}
             rowSelection="multiple"
-            // onSelectionChanged={onSelectionChanged}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             pagination={true}
