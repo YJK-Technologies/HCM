@@ -198,6 +198,14 @@ const menuData = [
         ],
       },
       {
+        label: "Interview Panel Management",
+        isDropdown: true,
+        subMenus: [
+           { label: "Interview Master", path: "/JobMaster" },
+           { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
+        ],
+      },
+      {
         label: "Masters",
         isDropdown: true,
         subMenus: [
@@ -208,7 +216,6 @@ const menuData = [
           { label: "Employee Holiday", path: "/HoliDays" },
         ],
       },
-      { label: "Interview Master", path: "/JobMaster" },
       { label: "Setting", path: "/WeekOff" },
     ],
   },
