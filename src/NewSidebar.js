@@ -2,7 +2,33 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NewSideBar.css";
 import logo from './main.png'
-
+import {
+  BsBuilding,
+  BsDiagram3,
+  BsGeoAlt,
+  BsShieldLock,
+  BsPerson,
+  BsPersonLinesFill,
+  BsCalendarCheck,
+  BsBank,
+  BsUpcScan,
+  BsQrCodeScan,
+  BsBriefcase,
+  BsAward,
+  BsPeople,
+  BsCashStack,
+  BsFileEarmarkText,
+  BsClockHistory,
+  BsGlobe,
+  BsClock,
+  BsCalendar3,
+  BsGraphUp,
+  BsKanban,
+  BsListTask,
+  BsGear,
+  BsBell,
+  BsSun,
+} from "react-icons/bs";
 import {
   BsPeopleFill,
   BsWrenchAdjustable,
@@ -13,11 +39,11 @@ import {
 
 // Helper function to normalize paths (ensure leading slash is present and no trailing slash)
 const cleanPath = (path) => {
-    if (!path) return '';
-    // Ensure path starts with /
-    let cleaned = path.startsWith('/') ? path : '/' + path;
-    // Remove trailing slash if present
-    return cleaned.endsWith('/') ? cleaned.slice(0, -1) : cleaned;
+  if (!path) return '';
+  // Ensure path starts with /
+  let cleaned = path.startsWith('/') ? path : '/' + path;
+  // Remove trailing slash if present
+  return cleaned.endsWith('/') ? cleaned.slice(0, -1) : cleaned;
 };
 
 // Recursive function to filter the menu structure based on permissions
@@ -37,18 +63,69 @@ const filterMenuByPermission = (menuItems, allowedPaths) => {
     } else if (item.path) {
       // 2. If it's a link (leaf node), check permission based on its path
       const itemPath = cleanPath(item.path);
-      
+
       // Check if the normalized path is in the list of allowed paths
       if (allowedPaths.includes(itemPath)) {
         acc.push(newItem);
       }
-    } 
+    }
     // Ignore items that are just structural labels without a path/submenus (if not filtered by the recursive call).
 
     return acc;
   }, []);
 };
 
+const leafIconMap = {
+  // --- ADMIN ---
+  Company: BsBuilding,
+  "Company Mapping": BsDiagram3,
+  Location: BsGeoAlt,
+  Role: BsShieldLock,
+  "Role Mapping": BsPersonLinesFill,
+  "Role Rights": BsShieldLock,
+  User: BsPerson,
+
+  // --- MASTERS ---
+  Attribute: BsListTask,
+  "Print Templates": BsFileEarmarkText,
+  "Bank Account": BsBank,
+  "Barcode Generator": BsUpcScan,
+  "Barcode Scanner": BsQrCodeScan,
+  Department: BsBriefcase,
+  "Designation Info": BsAward,
+  Intermediary: BsPeople,
+  "Number Series": BsListTask,
+  Warehouse: BsBuilding,
+  "Financial Year Access": BsCalendarCheck,
+
+  // --- HCM ---
+  "Employee Information": BsPerson,
+  "Admin Dashboard": BsGraphUp,
+  "Employee Dashboard": BsGraphUp,
+  "Salary Process": BsCashStack,
+  "Payslip Master": BsFileEarmarkText,
+  "Country Master": BsGlobe,
+  "Time Zone Master": BsClock,
+  "Shift Master": BsClockHistory,
+  Grade: BsAward,
+  Leave: BsCalendar3,
+  Loan: BsCashStack,
+  Announcement: BsBell,
+  "Employee Holiday": BsSun,
+  "Interview Master": BsPeople,
+  Setting: BsGear,
+
+  // --- PMS ---
+  Project: BsKanban,
+  "Project Mapping": BsDiagram3,
+  Task: BsListTask,
+  "Setting Screen": BsGear,
+  "Open Tickets": BsListTask,
+  "Task Update": BsClockHistory,
+  "Task Hours & Time Tracking": BsClock,
+  "Project Progress": BsGraphUp,
+  "Project Chart Report": BsGraphUp,
+};
 
 const menuData = [
   {
@@ -60,7 +137,7 @@ const menuData = [
       { label: "Company Mapping", path: "/CompanyMapping" },
       { label: "Location", path: "/Location" },
       { label: "Role", path: "/Role" },
-      { label: "Role Mapping", path: "/UserRoleMapping"},
+      { label: "Role Mapping", path: "/UserRoleMapping" },
       { label: "Role Rights", path: "/UserRights" },
       { label: "User", path: "/User" },
     ],
@@ -88,7 +165,14 @@ const menuData = [
     icon: BsPersonVcard,
     isDropdown: true,
     subMenus: [
-     {
+      {
+        label: "Employee Management",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Information", path: "/AddEmployeeInfo" },
+        ],
+      },
+      {
         label: "Dashboard",
         isDropdown: true,
         subMenus: [
@@ -96,14 +180,7 @@ const menuData = [
           { label: "Employee Dashboard", path: "/EmployeeDashboard" },
         ],
       },
-     {
-        label: "Employee Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Employee Information", path: "/AddEmployeeInfo" },
-        ],
-      },
-     {
+      {
         label: "Payroll Management",
         isDropdown: true,
         subMenus: [
@@ -111,13 +188,21 @@ const menuData = [
           { label: "Payslip Master", path: "/PayslipSalaryDays" },
         ],
       },
-     {
+      {
         label: "Shift Management",
         isDropdown: true,
         subMenus: [
           { label: "Country Master", path: "/CountryMaster" },
           { label: "Time Zone Master", path: "/TimeZoneGrid" },
           { label: "Shift Master", path: "/ShiftMasterGrid" },
+        ],
+      },
+      {
+        label: "Interview Panel Management",
+        isDropdown: true,
+        subMenus: [
+           { label: "Interview Master", path: "/JobMaster" },
+           { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
         ],
       },
       {
@@ -129,7 +214,6 @@ const menuData = [
           { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Interview Master", path: "/CandidateMaster" }
         ],
       },
       { label: "Setting", path: "/WeekOff" },
@@ -185,11 +269,11 @@ const Sidebar = () => {
     try {
       const permissionsJSON = sessionStorage.getItem("permissions");
       const permissions = permissionsJSON ? JSON.parse(permissionsJSON) : [];
-      
+
       return Array.isArray(permissions)
         ? permissions.map((permission) =>
-            permission.screen_type ? cleanPath(permission.screen_type) : ''
-          ).filter(path => path.length > 0) 
+          permission.screen_type ? cleanPath(permission.screen_type) : ''
+        ).filter(path => path.length > 0)
         : [];
     } catch (e) {
       console.error("Failed to parse permissions from sessionStorage:", e);
@@ -198,8 +282,8 @@ const Sidebar = () => {
   }, []);
 
   const filteredMenuData = useMemo(() => {
-    if (allowedPaths.length === 0) return []; 
-    
+    if (allowedPaths.length === 0) return [];
+
     return filterMenuByPermission(menuData, allowedPaths);
   }, [allowedPaths]);
 
@@ -236,7 +320,10 @@ const Sidebar = () => {
         className={`nav-item ${isOpen ? "open" : ""} ${isActive || isSubActive ? "active" : ""}`}
       >
         {item.isDropdown ? (
-          <div className="nav-link" onClick={() => toggleDropdown(keyPrefix)}>
+          <div
+            className={`nav-link ${item.isDropdown && keyPrefix.includes('-') ? 'submenu-parent-link' : ''}`}
+            onClick={() => toggleDropdown(keyPrefix)}
+          >
             {Icon && <Icon className="menu-icon" size={18} />}
             <span className="nav-label">{item.label}</span>
             <BsChevronDown className={`dropdown-arrow ${isOpen ? "rotated" : ""}`} />
@@ -253,6 +340,7 @@ const Sidebar = () => {
             {/* Render filtered submenus */}
             {item.subMenus.map((sub, i) => {
               const subKey = `${keyPrefix}-${i}`;
+              const LeafIcon = leafIconMap[sub.label];
               return sub.isDropdown
                 ? renderMenuItem(sub, subKey)
                 : (
@@ -261,6 +349,7 @@ const Sidebar = () => {
                       to={sub.path}
                       className={`dropdown-item text-wrap ${cleanPath(location.pathname) === cleanPath(sub.path) ? "active" : ""}`}
                     >
+                      {LeafIcon && <LeafIcon className="menu-icon me-2" size={14} />}
                       {sub.label}
                     </Link>
                   </li>
@@ -295,7 +384,7 @@ const Sidebar = () => {
               src={logo}
               alt="Logo"
               style={{
-                width: "100%", 
+                width: "100%",
                 height: "100%",
                 objectFit: "contain",
               }}

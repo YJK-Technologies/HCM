@@ -40,7 +40,7 @@ function Input({ }) {
   const [Taxable_Amount, setTaxable_Amount] = useState(0);
   const [Start_Years, setStart_Years] = useState(FirstDate);
   const [End_Years, setEnd_Years] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
   const [rowData, setRowData] = useState([]);
@@ -182,10 +182,11 @@ function Input({ }) {
 
   const handleInsert = async () => {
     if (!Start_Year || !End_Year || !Employee_Salary || !Taxable_Amount) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true)
 
     try {
@@ -204,13 +205,11 @@ function Input({ }) {
         }),
 
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(), // Reloads the page after the toast closes
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -256,8 +255,8 @@ function Input({ }) {
           console.error("Error update rows:", error);
           toast.error('Error update Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -297,8 +296,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -380,92 +379,92 @@ function Input({ }) {
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-          <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-              <h1 className="page-title">TDS</h1>
+          <h1 className="page-title">TDS</h1>
           <div className="action-wrapper">
             <div onClick={handleInsert} className="action-icon add">
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
           </div>
-            </div>
-          </div>
+        </div>
+      </div>
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      id="date"
-                      class="exp-input-field form-control"
-                      type="date"
-                      placeholder=""
-                      required title="Please Choose the Start Year"
-                      value={Start_Year}
-                      onChange={(e) => setStart_Year(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !Start_Year ? 'text-danger' : ''}`}>
-                          Start Year<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="date"
-                      class="exp-input-field form-control"
-                      type="date"
-                      required title="Please Choose the End Year"
-                      placeholder=""
-                      value={End_Year}
-                      onChange={(e) => setEnd_Year(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !End_Year ? 'text-danger' : ''}`}>
-                          End Year<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="fdate"
-                      class="exp-input-field form-control"
-                      type="text"
-                      placeholder=""
-                      required title="Please Enter the Employee Salary"
-                      value={Employee_Salary}
-                      onChange={(e) => setEmployee_Salary(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !Employee_Salary ? 'text-danger' : ''}`}>
-                          Employee Salary<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="fdate"
-                      class="exp-input-field form-control"
-                      type="text"
-                      placeholder=""
-                      required title="Please Enter the Taxable Amount"
-                      value={Taxable_Amount}
-                      onChange={(e) => setTaxable_Amount(e.target.value)}
-                    />
-                        <label for="add1" className={`exp-form-labels ${error && !Taxable_Amount ? 'text-danger' : ''}`}>
-                          Taxable Amount<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-              </div>
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={Start_Year}
+                onChange={(e) => setStart_Year(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Start_Year ? 'text-danger' : ''}`}>
+                Start Year<span className="text-danger">*</span>
+              </label>
             </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                required title="Please Choose the End Year"
+                placeholder=""
+                value={End_Year}
+                onChange={(e) => setEnd_Year(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !End_Year ? 'text-danger' : ''}`}>
+                End Year<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Employee Salary"
+                value={Employee_Salary}
+                onChange={(e) => setEmployee_Salary(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Employee_Salary ? 'text-danger' : ''}`}>
+                Employee Salary<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Taxable Amount"
+                value={Taxable_Amount}
+                onChange={(e) => setTaxable_Amount(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels ${error && !Taxable_Amount ? 'text-danger' : ''}`}>
+                Taxable Amount<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="header-flex">
@@ -475,53 +474,53 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      type="date"
-                      className="exp-input-field form-control"
-                      required title="Please Choose the Start Year"
-                      value={Start_Years}
-                      onChange={(e) => setStart_Years(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Start Year</label>
-                  </div>
-                </div>
+              <input
+                type="date"
+                className="exp-input-field form-control"
+                required title="Please Choose the Start Year"
+                value={Start_Years}
+                onChange={(e) => setStart_Years(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Start Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      required title="Please Choose the End Year"
-                      type="date"
-                      className="exp-input-field form-control"
-                      value={End_Years}
-                      onChange={(e) => setEnd_Years(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">End Year</label>
-                  </div>
-                </div>
+              <input
+                required title="Please Choose the End Year"
+                type="date"
+                className="exp-input-field form-control"
+                value={End_Years}
+                onChange={(e) => setEnd_Years(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">End Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input type="Number"
-                      className="exp-input-field form-control"
-                      required title="Please Enter the Employee Salary"
-                      value={Employee_Salarys}
-                      onChange={(e) => setEmployee_Salarys(Number(e.target.value))}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Employee Salary</label>
-                  </div>
-                </div>
+              <input type="Number"
+                className="exp-input-field form-control"
+                required title="Please Enter the Employee Salary"
+                value={Employee_Salarys}
+                onChange={(e) => setEmployee_Salarys(Number(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Employee Salary</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input type="Number"
-                      className="exp-input-field form-control"
-                      required title="Please Enter the Taxable Amount"
-                      value={Taxable_Amounts}
-                      onChange={(e) => setTaxable_Amounts(Number(e.target.value))}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Taxable Amount</label>
-                  </div>
-                </div>
+              <input type="Number"
+                className="exp-input-field form-control"
+                required title="Please Enter the Taxable Amount"
+                value={Taxable_Amounts}
+                onChange={(e) => setTaxable_Amounts(Number(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Taxable Amount</label>
+            </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -538,26 +537,26 @@ function Input({ }) {
             </div>
           </div>
 
-              </div>
-              </div>
+        </div>
+      </div>
 
 
       <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
         <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                <AgGridReact
-                  rowData={rowData}
-                  columnDefs={columnDefs}
-                  rowSelection="multiple"
-                  pagination={true}
-                  paginationAutoPageSize={true}
-                  gridOptions={gridOptions}
-                  onGridReady={(params) => {
-                    gridApiRef.current = params.api;
-                    gridColumnApiRef.current = params.columnApi;
-                  }}
-                />
-              </div>
-            </div>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            rowSelection="multiple"
+            pagination={true}
+            paginationAutoPageSize={true}
+            gridOptions={gridOptions}
+            onGridReady={(params) => {
+              gridApiRef.current = params.api;
+              gridColumnApiRef.current = params.columnApi;
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

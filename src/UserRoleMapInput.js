@@ -15,7 +15,7 @@ function UserRoleInput({ }) {
   const [role_id, setrole_id] = useState("");
   const [usercodedrop, setusercodedrop] = useState([]);
   const [roleiddrop, setroleiddrop] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const navigate = useNavigate();
@@ -37,8 +37,9 @@ function UserRoleInput({ }) {
 
   const clearInputFields = () => {
     setSelectedUser("");
+    setuser_code("");
     setSelectedRole("");
-
+    setrole_id("");
   };
 
   useEffect(() => {
@@ -106,10 +107,11 @@ function UserRoleInput({ }) {
       !user_code ||
       !role_id
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -127,16 +129,16 @@ function UserRoleInput({ }) {
       });
 
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data');
       }
     } catch (error) {
       console.error("Error inserting data:", error);
@@ -177,10 +179,11 @@ function UserRoleInput({ }) {
   const handleUpdate = async () => {
     if (!user_code ||
       !role_id) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -199,15 +202,15 @@ function UserRoleInput({ }) {
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);

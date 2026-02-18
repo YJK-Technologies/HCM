@@ -24,7 +24,7 @@ const LeaveRequestPage = () => {
   const [SlotDrop, setSlotDrop] = useState([]);
   const [SelectedSlot, setSelectedSlot] = useState("");
   const [rowData, setrowData] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [Managerdrop, setManagerdrop] = useState([]);
   const [selectedmanager, setselectedmanager] = useState('');
   const gridRef = useRef()
@@ -134,9 +134,10 @@ const LeaveRequestPage = () => {
       const toDateObj = new Date(ToDate);
 
       if (fromDateObj > toDateObj) {
+        setError(true);
         toast.warning("From Date should not be after To Date");
       } else {
-        setError("");
+        setError(false);
       }
     }
   };
@@ -164,7 +165,7 @@ const LeaveRequestPage = () => {
       !Reason ||
       !ReportingManager ||
       !AlternativeReponsablePerson) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -181,6 +182,7 @@ const LeaveRequestPage = () => {
       created_by: sessionStorage.getItem("selectedUserCode"),
       AlternativeReponsablePerson,
     };
+    setError(false);
     setLoading(true);
     try {
 
@@ -195,22 +197,19 @@ const LeaveRequestPage = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Form Submitted Successfully", data);
-        toast.success("Form Submitted Successfully");
-        // setLeaveType("");
-        // setFromDate("");
-        // setToDate("");
-        // setSelect_Slots("");
-        // setReason("");
-        // setReportingManager("");
-        // setReasponsiblePerson("");
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
-        const errorData = await response.json();
-        toast.error(`Error: ${errorData.message || 'Something went wrong.'}`);
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message, {
+        })
       }
-
-    } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("There was an error submitting the form. Please try again.");
+    } catch (err) {
+      console.error("Error inserted data:", err);
+      toast.error('Error inserted data: ' + err.message, {
+      });
     } finally {
       setLoading(false);
     }
@@ -296,6 +295,14 @@ const LeaveRequestPage = () => {
   ];
 
   const handleSearchItem = async () => {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+
+    if (from > to) {
+      toast.warning("From Date should not be greater than To Date");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/getEmployeeLeavesearch`, {
@@ -306,10 +313,10 @@ const LeaveRequestPage = () => {
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
           EmployeeId: sessionStorage.getItem('selectedUserCode'),
-          FromDate:fromDate,
-          ToDate:toDate,
-          LeaveStatus:LeaveStatus,
-          LeaveType:leaveType
+          FromDate: fromDate,
+          ToDate: toDate,
+          LeaveStatus: LeaveStatus,
+          LeaveType: leaveType
         })
       });
       if (response.ok) {
@@ -318,7 +325,6 @@ const LeaveRequestPage = () => {
         console.log("data fetched successfully")
       } else if (response.status === 404) {
         setLeaveRowData([]);
-        clearInputs([]);
         toast.warning("Data not found")
         console.log("Data not found");
       } else {
@@ -424,7 +430,7 @@ const LeaveRequestPage = () => {
     <div className="container-fluid Topnav-screen">
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-            <h1 className="page-title">Apply Leave</h1>
+          <h1 className="page-title">Apply Leave</h1>
           <div className="action-wrapper">
             <div className="action-icon delete" onClick={goBack}>
               <span className="tooltip">Close</span>
@@ -438,137 +444,137 @@ const LeaveRequestPage = () => {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-          <div className="col-md-8">
+          <div className="col-md-6">
             <div className="row g-3">
 
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <div
-              className={`inputGroup selectGroup 
+                  className={`inputGroup selectGroup 
               ${SelectedLeave ? "has-value" : ""} 
               ${isSelectLeave ? "is-focused" : ""}`}
-            >
-                <Select
-                  id="LeaveType"
-                  value={SelectedLeave}
-                  onChange={handleLeaveType}
-                  options={filterOptionLeaveType}
-                  placeholder=" "
-                onFocus={() => setIsSelectLeave(true)}
-                onBlur={() => setIsSelectLeave(false)}
-                classNamePrefix="react-select"
-                isClearable
-                />
-                <label className={`floating-label ${error && !LeaveType ? 'text-danger' : ''}`}>
-                  Leave Type<span className="text-danger">*</span>
-                </label>
-              </div>
+                >
+                  <Select
+                    id="LeaveType"
+                    value={SelectedLeave}
+                    onChange={handleLeaveType}
+                    options={filterOptionLeaveType}
+                    placeholder=" "
+                    onFocus={() => setIsSelectLeave(true)}
+                    onBlur={() => setIsSelectLeave(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                  />
+                  <label className={`floating-label ${error && !LeaveType ? 'text-danger' : ''}`}>
+                    Leave Type<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
 
-              <div className="col-md-6">
-                 <div
-              className={`inputGroup selectGroup 
+              <div className="col-md-3">
+                <div
+                  className={`inputGroup selectGroup 
               ${SelectedSlot ? "has-value" : ""} 
               ${isSelectSlot ? "is-focused" : ""}`}
-            >
-                <Select
-                  id="Select_slots"
-                  value={SelectedSlot}
-                  onChange={handleSelect_Slots}
-                  options={filterOptionSelect_Slots}
-                   placeholder=" "
-                onFocus={() => setIsSelectSlot(true)}
-                onBlur={() => setIsSelectSlot(false)}
-                classNamePrefix="react-select"
-                isClearable
-                />
-                <label className="floating-label">Select Slot</label>
-              </div>
-              </div>
-
-              <div className="col-md-6">
-                <div className="inputGroup">
-                <input
-                  type="date"
-                  className="exp-input-field form-control"
-                  value={FromDate}
-                  onChange={handleFromDate}
-                  placeholder=" "
-                  autoComplete="off"
-                />
-                <label className={`exp-form-labels ${error && !FromDate ? 'text-danger' : ''}`}>
-                  From Date<span className="text-danger">*</span>
-                </label>
-              </div>
+                >
+                  <Select
+                    id="Select_slots"
+                    value={SelectedSlot}
+                    onChange={handleSelect_Slots}
+                    options={filterOptionSelect_Slots}
+                    placeholder=" "
+                    onFocus={() => setIsSelectSlot(true)}
+                    onBlur={() => setIsSelectSlot(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                  />
+                  <label className="floating-label">Select Slot</label>
+                </div>
               </div>
 
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <div className="inputGroup">
-                <input
-                  type="date"
-                  className="exp-input-field form-control"
-                  value={ToDate}
-                  onChange={handleToDateChange}
-                  placeholder=" "
-                   autoComplete="off"
-                />
-                <label className={`exp-form-labels ${error && !ToDate ? 'text-danger' : ''}`}>
-                  To Date<span className="text-danger">*</span>
-                </label>
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={FromDate}
+                    onChange={handleFromDate}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels ${error && !FromDate ? 'text-danger' : ''}`}>
+                    From Date<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={ToDate}
+                    onChange={handleToDateChange}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels ${error && !ToDate ? 'text-danger' : ''}`}>
+                    To Date<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
 
               <div className="col-md-12">
                 <div className="inputGroup">
-                <textarea
-                  className="form-control"
-                  value={Reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  rows="3"
-                  placeholder=" "
-                  autoComplete="off"
-                />
-                <label className={`exp-form-labels ${error && !Reason ? 'text-danger' : ''}`}>
-                  Reason<span className="text-danger">*</span>
-                </label>
-              </div>
+                  <textarea
+                    className="form-control"
+                    value={Reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    rows="3"
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels ${error && !Reason ? 'text-danger' : ''}`}>
+                    Reason<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
 
               <div className="col-md-6">
                 <div
-              className={`inputGroup selectGroup 
+                  className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
-            >
-                <Select
-                  value={selectedmanager}
-                  options={filteredOptionManager}
-                  onChange={handleChangemanager}
-                  placeholder=" "
-                onFocus={() => setIsSelectManager(true)}
-                onBlur={() => setIsSelectManager(false)}
-                classNamePrefix="react-select"
-                isClearable
-                />
-                <label className={`floating-label ${error && !ReportingManager ? 'text-danger' : ''}`}>
-                  Reporting Manager<span className="text-danger">*</span>
-                </label>
-              </div>
+                >
+                  <Select
+                    value={selectedmanager}
+                    options={filteredOptionManager}
+                    onChange={handleChangemanager}
+                    placeholder=" "
+                    onFocus={() => setIsSelectManager(true)}
+                    onBlur={() => setIsSelectManager(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                  />
+                  <label className={`floating-label ${error && !ReportingManager ? 'text-danger' : ''}`}>
+                    Reporting Manager<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
 
               <div className="col-md-6">
                 <div className="inputGroup">
-                <input
-                  type="text"
-                  className="exp-input-field form-control"
-                  value={AlternativeReponsablePerson}
-                  onChange={(e) => setReasponsiblePerson(e.target.value)}
-                  placeholder=" "
-                  autoComplete="off"
-                />
-                <label className={`exp-form-labels ${error && !AlternativeReponsablePerson ? 'text-danger' : ''}`}>
-                  Responsible Person<span className="text-danger">*</span>
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={AlternativeReponsablePerson}
+                    onChange={(e) => setReasponsiblePerson(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels ${error && !AlternativeReponsablePerson ? 'text-danger' : ''}`}>
+                    Responsible Person<span className="text-danger">*</span>
                   </label>
-              </div>
+                </div>
               </div>
 
             </div>
@@ -581,23 +587,27 @@ const LeaveRequestPage = () => {
               </button> */}
               {(LeaveStatus === "Pending" || LeaveStatus === "Rejected" || LeaveStatus === "") && (
                 <div className="search-btn-wrapper">
-                <div className="icon-btn save"  onClick={handleSave}>
-                  <span className="tooltip">Apply</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
+                  <div className="icon-btn save" onClick={handleSave}>
+                    <span className="tooltip">Apply</span>
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </div>
                 </div>
               )}
             </div>
           </div>
-          <div className="col-md-4">
-             <div className="inputGroup">
+          <div className="col-md-6">
+            <div className="inputGroup">
               <h5>Leave Balance</h5>
-              <div className="ag-theme-alpine" style={{ height: 300, width: "100%", borderRadius: "10px" }}>
+              <div className="ag-theme-alpine" style={{ height: 220, width: "100%", borderRadius: "10px" }}>
                 <AgGridReact
                   rowData={rowData}
                   columnDefs={columnDefs}
-                  // rowHeight={30}
-                  domLayout="autoHeight"
+                  defaultColDef={{
+                    flex: 1,
+                    resizable: true,
+                    sortable: true,
+                    filter: true,
+                  }}
                 />
               </div>
             </div>
@@ -613,32 +623,32 @@ const LeaveRequestPage = () => {
 
           <div className="col-md-2">
             <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={fromDate}
-               placeholder=" "
+              <input
+                type="date"
+                className="exp-input-field form-control"
+                value={fromDate}
+                placeholder=" "
                 autoComplete="off"
-              onChange={(e) => setfromDate(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
-            />
-            <label className="exp-form-labels">From Date</label>
-          </div>
+                onChange={(e) => setfromDate(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+              />
+              <label className="exp-form-labels">From Date</label>
+            </div>
           </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={toDate}
-               placeholder=" "
+              <input
+                type="date"
+                className="exp-input-field form-control"
+                value={toDate}
+                placeholder=" "
                 autoComplete="off"
-              onChange={(e) => settoDate(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
-            />
-            <label className="exp-form-labels">To Date</label>
-          </div>
+                onChange={(e) => settoDate(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+              />
+              <label className="exp-form-labels">To Date</label>
+            </div>
           </div>
 
           <div className="col-md-2">
@@ -647,20 +657,20 @@ const LeaveRequestPage = () => {
               ${selectedLeave ? "has-value" : ""} 
               ${isSearchLeave ? "is-focused" : ""}`}
             >
-            <Select
-              id="LeaveType"
-              value={selectedLeave}
-              onChange={handleLeaves}
-              options={filterOptionLeaves}
-              placeholder=" "
+              <Select
+                id="LeaveType"
+                value={selectedLeave}
+                onChange={handleLeaves}
+                options={filterOptionLeaves}
+                placeholder=" "
                 onFocus={() => setIsSearchLeave(true)}
                 onBlur={() => setIsSearchLeave(false)}
                 classNamePrefix="react-select"
                 isClearable
-              onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
-            />
-            <label className="floating-label">Leave Type</label>
-          </div>
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+              />
+              <label className="floating-label">Leave Type</label>
+            </div>
           </div>
 
           <div className="col-md-2">
@@ -669,23 +679,23 @@ const LeaveRequestPage = () => {
               ${selectedStatus ? "has-value" : ""} 
               ${isSearchStatus ? "is-focused" : ""}`}
             >
-            <Select
-              id="Select_slots"
-              value={selectedStatus}
-              onChange={handleStatus}
-              options={filterOptionStatus}
-              placeholder=" "
+              <Select
+                id="Select_slots"
+                value={selectedStatus}
+                onChange={handleStatus}
+                options={filterOptionStatus}
+                placeholder=" "
                 onFocus={() => setIsSearchStatus(true)}
                 onBlur={() => setIsSearchStatus(false)}
                 classNamePrefix="react-select"
                 isClearable
-              onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
-            />
-            <label className="floating-label">Leave Status</label>
-          </div>
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+              />
+              <label className="floating-label">Leave Status</label>
+            </div>
           </div>
 
-           <div className="col-12">
+          <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearchItem}>
                 <span className="tooltip">Search</span>
@@ -704,17 +714,17 @@ const LeaveRequestPage = () => {
             </div>
           </div>
 
-          <div className="col-12">
-          <div className="ag-theme-alpine" style={{ height: '400px', width: '100%' }}>
-            <AgGridReact
-              rowData={leaveRowData}
-              columnDefs={leaveColumnDefs}
-              defaultColDef={defaultColDef}
-              rowSelection="single"
-              ref={gridRef}
-            // onSelectionChanged={handleRowSelected}
-            />
-          </div>
+          <div className="col-12 mt-3">
+            <div className="ag-theme-alpine" style={{ height: '400px', width: '100%' }}>
+              <AgGridReact
+                rowData={leaveRowData}
+                columnDefs={leaveColumnDefs}
+                defaultColDef={defaultColDef}
+                rowSelection="single"
+                ref={gridRef}
+              // onSelectionChanged={handleRowSelected}
+              />
+            </div>
           </div>
         </div>
       </div>

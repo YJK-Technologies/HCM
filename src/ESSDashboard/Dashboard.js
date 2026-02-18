@@ -712,10 +712,6 @@ const startTimer = () => {
       field: "marital_status",
     },
     {
-      headerName: "Shift",
-      field: "shift",
-    },
-    {
       headerName: "DOJ",
       field: "DOJ",
       valueFormatter: (params) => {

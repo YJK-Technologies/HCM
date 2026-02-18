@@ -24,7 +24,7 @@ function UserComMap_input({ }) {
   const [companynodrop, setcompanynodrop] = useState([]);
   const [locationnodrop, setlocationnodrop] = useState([]);
   const [statusdrop, setStatusdrop] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
   const usercode = useRef(null);
   const companycode = useRef(null);
@@ -53,8 +53,11 @@ function UserComMap_input({ }) {
     setSelectedUser("");
     setuser_code("");
     setSelectedCompany("");
+    setcompany_no("");
     setSelectedLocation("");
+    setlocation_no("");
     setSelectedStatus("");
+    setstatus("");
     setorder_no("");
   };
 
@@ -164,10 +167,11 @@ function UserComMap_input({ }) {
 
   const handleInsert = async () => {
     if (!user_code || !company_no || !location_no || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -189,8 +193,11 @@ function UserComMap_input({ }) {
         }
       );
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else if (response.status === 400) {
         const errorResponse = await response.json();
@@ -246,10 +253,11 @@ function UserComMap_input({ }) {
 
   const handleUpdate = async () => {
     if (!user_code || !company_no || !location_no || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -275,8 +283,11 @@ function UserComMap_input({ }) {
       //   clearInputFields();
       //   toast.success("Data Updated successfully!")
       if (response.ok) {
-        toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+         toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
         const errorResponse = await response.json();

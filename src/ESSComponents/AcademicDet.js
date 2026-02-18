@@ -15,7 +15,7 @@ function Input({ }) {
 
   const [Academic, setAcademic] = useState([{ relation: 'Academic', members: [{ academicName: '', major: '', institution: '', academicYear: '', document: null, documentUrl: '', keyfield: '' }] }]);
   const [EmployeeId, setEmployeeId] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [document, setDocument] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
@@ -74,7 +74,7 @@ function Input({ }) {
   const handleSave = async () => {
     if (
       !EmployeeId) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -82,7 +82,7 @@ function Input({ }) {
     for (const relationGroup of Academic) {
       for (const member of relationGroup.members) {
         if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
-          setError(" ");
+          setError(true);
           toast.warning("Error: Missing required fields");
           return;
         }
@@ -121,7 +121,8 @@ function Input({ }) {
       )
 
     );
-    setLoading(true)
+    setError(false);
+    setLoading(true);
 
     try {
       const response = await fetch(`${config.apiBaseUrl}/addEmployeeAcademicDetails`, {
@@ -132,11 +133,9 @@ function Input({ }) {
         body: JSON.stringify({ employeeData }),
       });
       if (response.ok) {
-        setTimeout(() => {
-          toast.success("Data saved successfully!", {
+          toast.success("Data inserted successfully!", {
             onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -419,18 +418,20 @@ function Input({ }) {
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
-      setDeleteError(" ");
+      setError(true);
       toast.warning("Error: Missing required keyfield")
       return;
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -447,6 +448,7 @@ function Input({ }) {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
+    setError(false);
     setLoading(true)
 
     try {
@@ -459,11 +461,9 @@ function Input({ }) {
       });
 
       if (response.ok) {
-        setTimeout(() => {
           toast.success("Data updated successfully!", {
             onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -484,18 +484,20 @@ function Input({ }) {
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
-      setDeleteError(" ");
+      setError(true);
       toast.warning("Error: Missing required keyfield")
       return;
     }
 
     if (!member) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
     if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
 
@@ -506,6 +508,7 @@ function Input({ }) {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
+    setError(false);
     setLoading(true)
 
     try {
@@ -518,11 +521,9 @@ function Input({ }) {
       });
 
       if (response.ok) {
-        setTimeout(() => {
           toast.success("Data deleted successfully!", {
             onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);

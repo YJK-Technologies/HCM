@@ -754,7 +754,7 @@ const getCompanyno = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_company_info 'F','', ' ', '', '', '', '', '',  '', '' , '', '', '','',  '','','','','',null,NULL, NULL,NULL,NULL,NULL,NULL,NULL,NULL,null,null,null`
+      `EXEC sp_company_info 'F','', ' ', '', '', '', '', '',  '', '' , '', '', '','',  '','','','','',null,NULL, '',NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,null,null,null`
     );
 
     res.json(result.recordset);
@@ -1050,9 +1050,8 @@ const addData = async (req, res) => {
       .input("datetime4", sql.NVarChar, datetime4)
       .query(
         `EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id, 
-        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@created_by,@modified_by,  
-         @tempstr1, @tempstr2, @tempstr3, @tempstr4, 
-        @datetime1, @datetime2, @datetime3, @datetime4`
+        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'',@created_by,@modified_by,  
+        '', @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`
       );
 
     // Return success response
@@ -1123,8 +1122,7 @@ const saveEditedData = async (req, res) => {
         .input("datetime4", updatedRow.datetime4)
         .query(`EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id,
           @status, @foundedDate, @websiteURL,@company_logo,@contact_no,@annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,@Currency_Code ,@created_by,@modified_by,'',
-           @tempstr1, @tempstr2, @tempstr3, @tempstr4,
-          @datetime1, @datetime2, @datetime3, @datetime4`);
+           @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     }
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
@@ -1150,9 +1148,7 @@ const deleteData = async (req, res) => {
         .input("modified_by", sql.NVarChar, req.headers['modified-by'])
         .query(`
           EXEC sp_company_info 'D', @company_no,'','','','','','','','',
-          '','','','','','','','',
-          '','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-        `);
+          '','','','','','','','','','','','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Companies deleted successfully");
@@ -6164,7 +6160,7 @@ const commappingdeleteData = async (req, res) => {
 //                           for (const company_no of company_nosToDelete) {
 //                             try {
 //                               await pool.request().input("company_no", company_no).query(`
-//                                 EXEC sp_company_info 'D', @company_no, '', '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', '', '', ''
+//                                 EXEC sp_company_info 'D', @company_no, '', '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', '', '', '','','','',''
 //                               `);
 //                             } catch (error) {
 //                               if (error.number === 547) {
@@ -15621,8 +15617,8 @@ const CompanyUpdate = async (req, res) => {
       .input("authorisedSignatur", sql.VarBinary, authorisedSignatur)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(`EXEC sp_company_info @mode, @company_no, @company_name, @short_name, @address1, @address2, @address3, @city, @state, @pincode, @country, @email_id, 
-        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'' ,@modified_by,
-         '', '', '', '','', '', '', ''`);
+        @status, @foundedDate, @websiteURL, @company_logo, @contact_no, @annualReportURL,@location_no,@company_gst_no,@authorisedSignatur,'','' ,@modified_by,
+         '', '', '', '', '','', '', '', ''`);
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
     console.error("Error", err);
@@ -15645,7 +15641,7 @@ const UpdateCompanyImage = async (req, res) => {
       .request()
       .input("company_no", sql.NVarChar, company_no)
       .input("company_logo", sql.VarBinary, company_logo)
-      .query(`EXEC sp_company_info 'CIU',@company_no,'','','','','','','','','','','','','',@company_logo,'','','','','','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,null`);
+      .query(`EXEC sp_company_info 'CIU',@company_no,'','','','','','','','','','','','','',@company_logo,'','','','','','','','', NULL,NULL,'',NULL,NULL,NULL,NULL,NULL,null`);
 
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -24719,8 +24715,6 @@ const getLoanType = async (req, res) => {
       .input("Loan_Eligible_Amount", sql.Decimal(14, 2), Loan_Eligible_Amount)
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
-
-
       .query(`EXEC sp_Loan_Type 'sc',@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Send response
     if (result.recordset.length > 0) {
@@ -27541,8 +27535,7 @@ const AddSalaryCriteria = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("status", sql.NVarChar, status)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,@created_by,'',null,null,null,null,null,null,null,null
-`)
+      .query(`EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,@created_by,'',null,null,null,null,null,null,null,null`)
     res.status(200).json("Data Inserted successfully");
   } catch (err) {
     console.error("Error Updating data:", err);
@@ -33344,8 +33337,8 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("applied_job_id", sql.Int, item.applied_job_id)
         .input("Education", sql.NVarChar, item.Education)
         .input("Experience", sql.NVarChar, item.Experience)
-        .input("Related_experience", sql.Int, item.Related_experience)
-        .input("Job_description", sql.Int, item.Job_description)
+        .input("Related_experience", sql.VarChar, item.Related_experience)
+        .input("Job_description", sql.VarChar, item.Job_description)
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
@@ -34689,6 +34682,7 @@ const getCountrySearchData = async (req, res) => {
 
 const Country_MasterLoopUpdate = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  console.log(sp_Country_MasterData)
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34704,14 +34698,14 @@ const Country_MasterLoopUpdate = async (req, res) => {
         .input("Week_Start_Day", sql.NVarChar, item.Week_Start_Day)
         .input("ISO_Code", sql.NVarChar, item.ISO_Code)
         .input("Weekend_Days", sql.NVarChar, item.Weekend_Days)
-        .input("Max_Work_Hours_Day", sql.NVarChar, item.Max_Work_Hours_Day)
-        .input("Max_Work_Hours_Week", sql.NVarChar, item.Max_Work_Hours_Week)
+        .input("Max_Work_Hours_Day", sql.Int, item.Max_Work_Hours_Day)
+        .input("Max_Work_Hours_Week", sql.Int, item.Max_Work_Hours_Week)
         .input("Overtime_Allowed", sql.NVarChar, item.Overtime_Allowed)
         .input("Currency_Code", sql.NVarChar, item.Currency_Code)
         .input("Status", sql.NVarChar, item.Status)
         .input("Modified_by", sql.NVarChar, item.modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("Company_Code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default,@Week_Start_Day, @ISO_Code, @Weekend_Days, @Max_Work_Hours_Day,
         @Max_Work_Hours_Week, @Overtime_Allowed, @Currency_Code, @Status, '','', @Modified_by,'',@keyfield,@Company_Code`);
     }
@@ -34725,6 +34719,7 @@ const Country_MasterLoopUpdate = async (req, res) => {
 
 const Country_MasterLoopDelete = async (req, res) => {
   const sp_Country_MasterData = req.body.sp_Country_MasterData;
+  
   if (!sp_Country_MasterData || !sp_Country_MasterData.length) {
     return res.status(400).json("Invalid or empty sp_Country_MasterData array.");
   }
@@ -34735,7 +34730,7 @@ const Country_MasterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Company_Code", sql.NVarChar, req.headers['company_code'])
         .query(`EXEC sp_Country_Master @mode, '', '', '', '', '', '', 0, 0, '', '', '', '','', '','',@keyfield,@Company_Code`);
     }
     res.status(200).json("Country_Master data deleted successfully");
@@ -35503,7 +35498,7 @@ const Employee_shift_mappingInsert = async (req, res) => {
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'',@Created_by,'','',''`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping insertd successfully" });
@@ -35532,7 +35527,7 @@ const Employee_shift_mappingUpdate = async (req, res) => {
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.NVarChar, Modified_by)
       .input("Modified_date", sql.DateTime, Modified_date)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping updated successfully" });
@@ -35552,7 +35547,7 @@ const Employee_shift_mappingDelete = async (req, res) => {
       .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,'',0,0,'','','',
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,'',0,0,'','','',
         '',@Company_Code,@keyfield,'','',0,0`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping deleted successfully" });
@@ -35584,7 +35579,7 @@ const Employee_shift_mappingLoopInsert = async (req, res) => {
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
         .input("Created_date", sql.DateTime, item.Created_date)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'',@Created_by,@Created_date,'',''`);
     }
     res.status(200).json("Employee_shift_mapping data inserted successfully");
@@ -35605,20 +35600,19 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
     for (const item of Employee_shift_mappingData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Emp_Shift_ID", sql.Date, item.Emp_Shift_ID)
+        .input("Emp_Shift_ID", sql.Int, item.Emp_Shift_ID)
         .input("Employee_ID", sql.NVarChar, item.Employee_ID)
         .input("Shift_ID", sql.Int, item.Shift_ID)
         .input("Shift_Type_ID", sql.Int, item.Shift_Type_ID)
-        .input("Shift_Pattern_ID", sql.Int, item.Shift_Pattern_ID)
+        .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Effective_From", sql.Date, item.Effective_From)
         .input("Effective_To", sql.Date, item.Effective_To)
         .input("Is_Current", sql.NVarChar, item.Is_Current)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .input("Modified_date", sql.DateTime, item.Modified_date)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date`);
+        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,''`);
     }
     res.status(200).json("Employee_shift_mapping data updated successfully");
   } catch (err) {
@@ -35640,7 +35634,7 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Employee_shift_mapping_Test @mode,0,'',0,0,'','','','',@Company_Code,@keyfield,'','','',''`);
+        .query(`EXEC sp_Employee_shift_mapping @mode,0,'',0,0,'','','','',@Company_Code,@keyfield,'','','',''`);
     }
     res.status(200).json("Employee_shift_mapping data deleted successfully");
   } catch (err) {
@@ -35679,10 +35673,8 @@ const getShift_TypeSC = async (req, res) => {
   const { Shift_Type_ID, Shift_Type, Description, company_code, keyfield} = req.body;
 
   try {
-    // Connect to the database
     const pool = await connection.connectToDatabase();
 
-    // Execute the query
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
@@ -35693,7 +35685,6 @@ const getShift_TypeSC = async (req, res) => {
       .input("keyfield", sql.NVarChar, keyfield)
       .query(`EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, '', '', '', '', @keyfield`);
 
-    // Send response
        if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
     } else {
@@ -36009,7 +36000,7 @@ const Employee_shift_mappingSc = async (req, res) => {
       .input("Effective_To", sql.NVarChar, Effective_To)
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@Company_Code,'','','','',''`);
 
     if (result.recordset.length > 0) {
@@ -36023,6 +36014,52 @@ const Employee_shift_mappingSc = async (req, res) => {
   }
 };
 //Code ended by pavun on 11-02-26
+
+//code exported by Sakthi on 17-02-26
+const InterviewScheduleSearch = async (req, res) => {
+  const {
+    schedule_id,
+    candidate_name,
+    email,
+    panel_name,
+    scheduled_datetime,
+    Interview_Mode,
+    Status,
+    location,
+    meeting_link,
+    timezone
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
+      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("email", sql.VarChar, email)
+      .input("panel_name", sql.NVarChar, panel_name)
+      .input("scheduled_datetime", sql.Date, scheduled_datetime ? scheduled_datetime : null)
+      .input("Interview_Mode", sql.VarChar, Interview_Mode)
+      .input("Status", sql.VarChar, Status)
+      .input("location", sql.VarChar, location)
+      .input("meeting_link", sql.VarChar, meeting_link)
+      .input("timezone", sql.VarChar, timezone)
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error during Interview Schedule Search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 17-02-26
 
 module.exports = {
   login,
@@ -37235,6 +37272,7 @@ module.exports = {
     ShiftMasterDropDown,
     ShiftTypeDropDown,
     ShiftPatternMasterDropDown,
-    Employee_shift_mappingSc
+    Employee_shift_mappingSc,
+    InterviewScheduleSearch
 
 };

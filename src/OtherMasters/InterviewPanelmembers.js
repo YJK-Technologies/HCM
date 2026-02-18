@@ -62,7 +62,7 @@ function InterviewPanelMem({ }) {
 
 
 
-  const [activeTab, setActiveTab] = useState("Interview Panel Members")
+  const [activeTab, setActiveTab] = useState("Panel Members")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
 
@@ -88,8 +88,16 @@ function InterviewPanelMem({ }) {
   };
 
   const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT || []);
-    setEmployeeIDSC(selectedDPT ? selectedDPT.value : '');
+    setselectedEmployeeIDSC(selectedDPT);
+
+    if (!selectedDPT || selectedDPT.length === 0) {
+      setEmployeeIDSC("");
+      return;
+    }
+
+    const values = selectedDPT.map(opt => opt.value);
+
+    setEmployeeIDSC(values.join(","));
   };
 
   const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
@@ -139,7 +147,10 @@ function InterviewPanelMem({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const panel = data.map(option => option.panel_id);
+        const panel = data.map((option) => ({
+          value: option.panel_id,
+          label: `${option.panel_id}-${option.panel_name}`,
+        }));
         setPaneldrop(panel);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -255,7 +266,11 @@ function InterviewPanelMem({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: panelDrop,
+        values: panelDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = panelDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -305,13 +320,11 @@ function InterviewPanelMem({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -457,10 +470,10 @@ function InterviewPanelMem({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -470,7 +483,7 @@ function InterviewPanelMem({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
 
@@ -480,7 +493,7 @@ function InterviewPanelMem({ }) {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -533,7 +546,7 @@ function InterviewPanelMem({ }) {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Panel Members</h1>
+          <h1 className="page-title">Panel Members</h1>
           <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
@@ -704,30 +717,32 @@ function InterviewPanelMem({ }) {
                 value={selectedEmployeeIDSC}
                 onChange={handleEmployeeIDSC}
                 options={filteredOptionEmployeeID}
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    minHeight: "42px",
-                    height: "auto",
-                    alignItems: "flex-start",
-                  }),
-                  valueContainer: (base) => ({
-                    ...base,
-                    flexWrap: "wrap",          // allow wrapping
-                    alignItems: "flex-start",
-                    padding: "6px",
-                  }),
-                  multiValue: (base) => ({
-                    ...base,
-                    maxWidth: "100%",
-                  }),
-                  multiValueLabel: (base) => ({
-                    ...base,
-                    whiteSpace: "normal",      // 👈 show full text
-                    overflow: "visible",
-                    textOverflow: "unset",
-                  }),
-                }}
+                onFocus={() => setisSelectEmployeeIDSC(true)}
+                onBlur={() => setisSelectEmployeeIDSC(false)}
+              // styles={{
+              //   control: (base) => ({
+              //     ...base,
+              //     minHeight: "42px",
+              //     height: "auto",
+              //     alignItems: "flex-start",
+              //   }),
+              //   valueContainer: (base) => ({
+              //     ...base,
+              //     flexWrap: "wrap",          
+              //     alignItems: "flex-start",
+              //     padding: "6px",
+              //   }),
+              //   multiValue: (base) => ({
+              //     ...base,
+              //     maxWidth: "100%",
+              //   }),
+              //   multiValueLabel: (base) => ({
+              //     ...base,
+              //     whiteSpace: "normal",      
+              //     overflow: "visible",
+              //     textOverflow: "unset",
+              //   }),
+              // }}
               />
 
               <label htmlFor="selecteddpt" className={`floating-label`}>

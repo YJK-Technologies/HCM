@@ -79,6 +79,7 @@ function InterviewDecision({ }) {
   const [statusdrop, setStatusdrop] = useState([]);
   const [statusDrop, setStatusDrop] = useState([]);
   const [conditateDrop, setConditateDrop] = useState([]);
+  const [decisionDrop, setDecisionDrop] = useState([]);
   const [jobDrop, setJobDrop] = useState([]);
 
   const navigate = useNavigate();
@@ -270,7 +271,10 @@ function InterviewDecision({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const jobs = data.map(option => option.job_id);
+        const jobs = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id}-${option.job_title}`,
+        }));
         setJobDrop(jobs);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -288,8 +292,29 @@ function InterviewDecision({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const jobs = data.map(option => option.candidate_id);
+        const jobs = data.map((option) => ({
+          value: option.candidate_id,
+          label: `${option.candidate_id}-${option.candidate_name}`,
+        }));
         setConditateDrop(jobs);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Decision_ID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const jobs = data.map(option => option.decision_id);
+        setDecisionDrop(jobs);
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
@@ -352,13 +377,21 @@ function InterviewDecision({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: conditateDrop,
+        values: conditateDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = conditateDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
       headerName: "Decision Id",
       field: "decision_id",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: decisionDrop,
+      },
     },
     {
       headerName: "Job ID",
@@ -366,7 +399,11 @@ function InterviewDecision({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: jobDrop,
+        values: jobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = jobDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -445,13 +482,11 @@ function InterviewDecision({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
           toast.success("Data inserted successfully!", {
-            // onClose: () => window.location.reload(),
+            onClose: () => window.location.reload(),
           });
-        }, 1000);
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -472,7 +507,7 @@ function InterviewDecision({ }) {
         decision_id: decision_id,
         remarks: remarksSC,
         decided_by: decided_bySC,
-        status: statusSC,
+        Final_Status: statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -601,10 +636,10 @@ function InterviewDecision({ }) {
     );
   };
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -615,29 +650,34 @@ function InterviewDecision({ }) {
     setActiveTab(tabLabel);
     switch (tabLabel) {
 
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
-
         break;
+
       case 'Job Master':
         JobMaster();
         break;
+
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+        
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
       case 'Interview schedule':
         InterviewSchedule();
         break;
+
       case 'Interview Feedback':
         InterviewFeedback();
         break;
+
       case 'Interview Decision':
         InterviewDecision();
         break;
+        
       default:
         break;
     }

@@ -37,7 +37,7 @@ function Input({ }) {
   const [rowData, setRowData] = useState([]);
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [companyContribution, setCompanyContribution] = useState("");
   const [employeePF, setEmployeePF] = useState("");
   const [Start_Year, setStart_Year] = useState(FirstDate);
@@ -126,10 +126,12 @@ function Input({ }) {
 
   const handleSave = async () => {
     if (!companyContribution || !employeePF || !startYear || !endYear) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
+    setLoading(true);
 
     try {
       const Header = {
@@ -150,11 +152,9 @@ function Input({ }) {
       });
       if (response.status === 200) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -167,6 +167,14 @@ function Input({ }) {
   };
 
   const handleSearch = async () => {
+    const start = new Date(Start_Year);
+    const end = new Date(End_Year);
+
+    if (start > end) {
+      toast.warning("Start Year should not be greater than End Year");
+      return;
+    }
+
     setLoading(true);
     try {
       const body = {
@@ -249,8 +257,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -289,8 +297,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");

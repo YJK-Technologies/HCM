@@ -32,7 +32,7 @@ function CandidateMaster() {
   const [candidate_name, setcandidate_name] = useState("");
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [activeTab, setActiveTab] = useState("Candiate Master")
+  const [activeTab, setActiveTab] = useState("Candidate Master")
   const [loading, setLoading] = useState(false);
   const [isselectedJobID, setisselectedJobID] = useState(false);
   const [isselectedJobIDSC, setisselectedJobIDSC] = useState(false);
@@ -113,23 +113,26 @@ function CandidateMaster() {
     }
   }, []);
 
-    useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      
-      fetch(`${config.apiBaseUrl}/JobMaster`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
-      }) 
-        .then((response) => response.json())
-        .then((data) => {
-          const jobs = data.map(option => option.job_id);
-          setJobDrop(jobs);
-        })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/JobMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const jobs = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id}-${option.job_title}`,
+        }));
+        setJobDrop(jobs);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -437,7 +440,11 @@ function CandidateMaster() {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: JobDrop,
+        values: JobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = JobDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -460,7 +467,7 @@ function CandidateMaster() {
       field: "Job_description",
       editable: true,
     },
-   
+
     {
       headerName: "Candidate CV",
       field: "Canditate_CV",
@@ -475,10 +482,10 @@ function CandidateMaster() {
   ]
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -487,7 +494,7 @@ function CandidateMaster() {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
       case 'Job Master':
@@ -496,7 +503,7 @@ function CandidateMaster() {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -545,81 +552,72 @@ function CandidateMaster() {
 
 
 
- const handleSave = async () => {
-  // Required fields check
-  if (
-    !candidate_name ||
-    !email ||
-    !phone ||
-    !JobID ||
-    !Education ||
-    !Experience ||
-    !Related_experience ||
-    !Job_description 
-  ) {
-    setError(" ");
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    toast.warning("Please enter a valid Email address");
-    return;
-  }
-
-  // Phone number validation
-  if (phone.length !== 10) {
-    toast.warning("Phone number must be 10 digits");
-    return;
-  }
-
-  // ---------- API CALL ----------
-  setLoading(true);
-
-  try {
-    const formData = new FormData();
-
-    formData.append("candidate_name", candidate_name.trim());
-    formData.append("email", email.trim());
-    formData.append("phone", phone);
-    formData.append("applied_job_id", JobID);
-    formData.append("Education", Education);
-    formData.append("Experience", Experience);
-    formData.append("Related_experience", Related_experience);
-    formData.append("Job_description", Job_description);
-    formData.append(
-      "company_code",
-      sessionStorage.getItem("selectedCompanyCode")
-    );
-    formData.append(
-      "created_by",
-      sessionStorage.getItem("selectedUserCode")
-    );
-    formData.append("Canditate_CV", candidate_CV);
-
-    const response = await fetch(
-      `${config.apiBaseUrl}/candidate_masterInsert`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (response.ok) {
-      toast.success("Data inserted successfully!");
-    } else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Failed to insert data");
+  const handleSave = async () => {
+    if (
+      !candidate_name ||
+      !email ||
+      !phone ||
+      !JobID ||
+      !Education ||
+      !Experience ||
+      !Related_experience ||
+      !Job_description
+    ) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  } catch (error) {
-    console.error("Error inserting data:", error);
-    toast.error("Error inserting data");
-  } finally {
-    setLoading(false);
-  }
-};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.warning("Please enter a valid Email address");
+      return;
+    }
+
+    if (phone.length !== 10) {
+      toast.warning("Phone number must be 10 digits");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("candidate_name", candidate_name.trim());
+      formData.append("email", email.trim());
+      formData.append("phone", phone);
+      formData.append("applied_job_id", JobID);
+      formData.append("Education", Education);
+      formData.append("Experience", Experience);
+      formData.append("Related_experience", Related_experience);
+      formData.append("Job_description", Job_description);
+      formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
+      formData.append("Canditate_CV", candidate_CV);
+
+      const response = await fetch(`${config.apiBaseUrl}/candidate_masterInsert`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to insert data");
+      }
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error("Error inserting data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -636,7 +634,7 @@ function CandidateMaster() {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Masters </h1>
+          <h1 className="page-title">Candidate Master</h1>
           <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
@@ -649,7 +647,6 @@ function CandidateMaster() {
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -684,11 +681,11 @@ function CandidateMaster() {
               <label
                 htmlFor="email"
                 className={`exp-form-labels ${error && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-                    ? 'text-danger'
-                    : ''
+                  ? 'text-danger'
+                  : ''
                   }`}
               >
-                Email <span className="text-danger">*</span>
+                Email<span className="text-danger">*</span>
               </label>
             </div>
 
@@ -720,7 +717,7 @@ function CandidateMaster() {
                 htmlFor="fdate"
                 className={`exp-form-labels ${error && !phone ? 'text-danger' : ''}`}
               >
-                Phone <span className="text-danger">*</span>
+                Phone<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -766,7 +763,7 @@ function CandidateMaster() {
                 htmlFor="fdate"
                 className={`exp-form-labels ${error && !Education ? 'text-danger' : ''}`}
               >
-                Education <span className="text-danger">*</span>
+                Education<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -788,7 +785,7 @@ function CandidateMaster() {
                 htmlFor="fdate"
                 className={`exp-form-labels ${error && !Experience ? 'text-danger' : ''}`}
               >
-                Experience <span className="text-danger">*</span>
+                Experience<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -804,13 +801,13 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experience}
                 maxLength={100}
-                 onChange={(e) => {setRelated_experience(e.target.value); }}
+                onChange={(e) => { setRelated_experience(e.target.value); }}
               />
               <label
                 htmlFor="fdate"
                 className={`exp-form-labels ${error && !Related_experience ? 'text-danger' : ''}`}
               >
-                Related Experience <span className="text-danger">*</span>
+                Related Experience<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -826,13 +823,13 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Job_description}
                 maxLength={100}
-                 onChange={(e) => { setJob_description(e.target.value); }}
+                onChange={(e) => { setJob_description(e.target.value); }}
               />
               <label
                 htmlFor="fdate"
                 className={`exp-form-labels ${error && !Job_description ? 'text-danger' : ''}`}
               >
-                Job Description <span className="text-danger">*</span>
+                Job Description<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -947,7 +944,7 @@ function CandidateMaster() {
               <label for="sname" className="exp-form-labels">Phone</label>
             </div>
           </div>
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedJobIDSC ? "has-value" : ""} 
@@ -989,7 +986,7 @@ function CandidateMaster() {
                 htmlFor="fdate"
                 className={`exp-form-labels`}
               >
-                Education 
+                Education
               </label>
             </div>
           </div>
@@ -1011,7 +1008,7 @@ function CandidateMaster() {
                 htmlFor="fdate"
                 className={`exp-form-labels`}
               >
-                Experience 
+                Experience
               </label>
             </div>
           </div>
@@ -1027,13 +1024,13 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experienceSC}
                 maxLength={100}
-                 onChange={(e) => {setRelated_experienceSC(e.target.value); }}
+                onChange={(e) => { setRelated_experienceSC(e.target.value); }}
               />
               <label
                 htmlFor="fdate"
                 className={`exp-form-labels`}
               >
-                Related Experience 
+                Related Experience
               </label>
             </div>
           </div>
@@ -1049,7 +1046,7 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={JobDescriptionSC}
                 maxLength={100}
-                 onChange={(e) => {setJobDescriptionSC(e.target.value); }}
+                onChange={(e) => { setJobDescriptionSC(e.target.value); }}
               />
               <label
                 htmlFor="fdate"
@@ -1105,21 +1102,21 @@ function CandidateMaster() {
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
-                   <div className="shadow-lg p-1 bg-light main-header-box">
-                <div className="header-flex">
-                  <h1 className="custom-modal-title">Candidate CV</h1>
+                  <div className="shadow-lg p-1 bg-light main-header-box">
+                    <div className="header-flex">
+                      <h1 className="custom-modal-title">Candidate CV</h1>
 
-                  <div className="action-wrapper">
-                    <div className="action-icon delete"  onClick={() => {
-                        URL.revokeObjectURL(currentPdfUrl);
-                        setIsModalOpen(false);
-                      }}>
-                      <span className="tooltip">Close</span>
-                      <i className="fa-solid fa-xmark"></i>
+                      <div className="action-wrapper">
+                        <div className="action-icon delete" onClick={() => {
+                          URL.revokeObjectURL(currentPdfUrl);
+                          setIsModalOpen(false);
+                        }}>
+                          <span className="tooltip">Close</span>
+                          <i className="fa-solid fa-xmark"></i>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
                   <div className="modal-body" style={{ height: "500px" }}>
                     <iframe
                       src={currentPdfUrl}
