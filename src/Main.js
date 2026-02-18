@@ -158,19 +158,19 @@ function Main() {
   //   };
   // }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        ["a", "x", "v"].includes(e.key.toLowerCase())
-      ) {
-        e.preventDefault();
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     if (
+  //       (e.ctrlKey || e.metaKey) &&
+  //       ["a", "c", "x", "v"].includes(e.key.toLowerCase())
+  //     ) {
+  //       e.preventDefault();
+  //     }
+  //   };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  //   document.addEventListener("keydown", handleKeyDown);
+  //   return () => document.removeEventListener("keydown", handleKeyDown);
+  // }, []);
 
   const routes = [
     { path: "/", component: <Home /> },
