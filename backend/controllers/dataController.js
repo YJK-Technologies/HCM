@@ -23648,8 +23648,7 @@ const addEmployeeHoliday = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_Holidays
-@mode,@HolidayDate,@Description,'','',@company_code,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
+      .query(`EXEC sp_Holidays @mode,@HolidayDate,@Description,'','',@company_code,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     res.status(200).json("Employee details data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
