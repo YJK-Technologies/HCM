@@ -246,7 +246,7 @@ function Input({ }) {
 
   const handleSave = async () => {
     console.log(Country_Code, Country_Name, Week_Start_Day, ISO_Code, TimeZone_Default, Status)
-    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || Status) {
+    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || !Status) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
