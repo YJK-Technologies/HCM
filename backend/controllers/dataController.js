@@ -36047,7 +36047,7 @@ const InterviewScheduleSearch = async (req, res) => {
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
       .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone, 
-        '', '', '', '', 0 `);
+        '', '', '', '', 0, '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36086,30 +36086,8 @@ const InterviewFeedbackSearch = async (req, res) => {
       .input("role", sql.NVarChar, role || "")
       .input("recommendation", sql.VarChar, recommendation || "")
       .input("rating", sql.Int, rating ? rating : 0)
-      .input(
-        "submitted_on",
-        sql.Date,
-        submitted_on ? submitted_on : "1900-01-01"
-      )
-      .query(`
-        EXEC sp_interview_schedule_panel 
-          @mode, 
-          @schedule_id, 
-          @candidate_name, 
-          '',                -- email (not used in SCF)
-          '',                -- panel_name
-          '',                -- Interview_Mode
-          '',                -- Status
-          '',                -- scheduled_datetime
-          '',                -- location
-          '',                -- meeting_link
-          '',                -- timezone
-          @employee_id,
-          @role,
-          @recommendation,
-          @submitted_on,
-          @rating
-      `);
+      .input("submitted_on",sql.Date, submitted_on ? submitted_on : "1900-01-01")
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36125,6 +36103,48 @@ const InterviewFeedbackSearch = async (req, res) => {
   }
 };
 //code ended by Sakthi on 19-02-26
+
+//code exported by Sakthi on 20-02-26
+const InterviewProgressSearch = async (req, res) => {
+  const {
+    candidate_name,
+    schedule_id,
+    rating,
+    submitted_on,
+    Final_Status,
+    decided_on,
+    remarks
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SCP")
+      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
+      .input("candidate_name", sql.NVarChar, candidate_name || "")
+      .input("submitted_on", sql.Date, submitted_on ? submitted_on : "1900-01-01")
+      .input("rating", sql.Int, rating ? rating : 0)
+      .input("Final_Status", sql.VarChar, Final_Status || "")
+      .input("decided_on", sql.Date, decided_on || null)
+      .input("remarks", sql.VarChar, remarks || "")
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({ message: "Progress report data not found" });
+    }
+
+  } catch (err) {
+    console.error("Error during Interview Progress Search:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//code ended by Sakthi on 20-02-26
 
 module.exports = {
   login,
@@ -37339,6 +37359,7 @@ module.exports = {
     ShiftPatternMasterDropDown,
     Employee_shift_mappingSc,
     InterviewScheduleSearch,
-    InterviewFeedbackSearch
+    InterviewFeedbackSearch,
+    InterviewProgressSearch
 
 };
