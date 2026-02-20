@@ -140,17 +140,17 @@ function Input({ }) {
         maxLength: 10,
       },
     },
-    {
-      headerName: "Announcement Duration",
-      field: "AnnouncementValidFor",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: DurationGridDrop,
-        maxLength: 10,
-      },
-    },
+    // {
+    //   headerName: "Announcement Duration",
+    //   field: "AnnouncementValidFor",
+    //   editable: true,
+    //   cellStyle: { textAlign: "left" },
+    //   cellEditor: "agSelectCellEditor",
+    //   cellEditorParams: {
+    //     values: DurationGridDrop,
+    //     maxLength: 10,
+    //   },
+    // },
     {
       headerName: "Message Type",
       field: "Messagetype",
