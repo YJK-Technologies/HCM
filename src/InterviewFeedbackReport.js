@@ -289,9 +289,9 @@ function InterviewFeedbackReport() {
             // Status: statusSC,
             // location: locationSC,
             employee_id: EmployeeIDSC,
-            Role: RoleSC,
+            role: RoleSC,
             rating: Number(ratingSC),
-            Recommendation: RecommendationSC,
+            recommendation: RecommendationSC,
             comments: commentsSC,
             submitted_on: submitted_onSC,
             // meeting_link: meetingLinkSc,
@@ -815,7 +815,7 @@ function InterviewFeedbackReport() {
                 options={filteredOptionEmployeeID}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
-                Employee ID
+                Interview ID
               </label>
             </div>
           </div>
@@ -910,6 +910,7 @@ function InterviewFeedbackReport() {
                 placeholder=""
                 title="Please Enter the Employee PF"
                 required
+                isClearable
                 autoComplete="off"
                 value={submitted_onSC}
                 onChange={(e) => setsubmitted_onSC(e.target.value)}
