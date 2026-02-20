@@ -114,7 +114,7 @@ function Input({ }) {
       headerName: "Effective Date",
       field: "EffetiveDate",
       filter: 'agDateColumnFilter',
-      editable: true,
+      editable: false,
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
@@ -168,6 +168,23 @@ function Input({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
+
+    const effective = new Date(EffectiveDate);
+    const end = new Date(EndDate);
+
+    if (effective > end) {
+      toast.warning("End Date must be greater than or equal to Effective Date");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (effective < today) {
+      toast.warning("Effective Date cannot be in the past");
+      return;
+    }
+
     setLoading(true);
     try {
       const data = {
@@ -244,8 +261,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -284,8 +301,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -388,6 +405,15 @@ function Input({ }) {
   };
 
   const handleSearch = async () => {
+    if (EffetiveDate && Enddate) {
+      const effective = new Date(EffetiveDate);
+      const end = new Date(Enddate);
+
+      if (effective > end) {
+        toast.warning("End Date must be greater than or equal to Effective Date");
+        return;
+      }
+    }
     setLoading(true);
     try {
       const body = {
@@ -439,7 +465,7 @@ function Input({ }) {
     }
   };
 
-    const onGridReady = (params) => {
+  const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
   };
@@ -476,11 +502,11 @@ function Input({ }) {
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-                {saveButtonVisible && (
+              {saveButtonVisible && (
                 <li className="dropdown-item" onClick={handleSave}>
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
-                )}
+              )}
               {/* )} */}
 
               <li className="dropdown-item" onClick={handleReload}>
@@ -585,7 +611,7 @@ function Input({ }) {
                 onChange={(e) => setEffectiveDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !EffectiveDate ? 'text-danger' : ''}`}>Effective Date{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !EffectiveDate ? 'text-danger' : ''}`}>Effective From Date{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -601,7 +627,7 @@ function Input({ }) {
                 onChange={(e) => setEndDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>End Date{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>Effective End Date{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -801,7 +827,7 @@ function Input({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
-             onGridReady={onGridReady}
+            onGridReady={onGridReady}
           />
         </div>
       </div>

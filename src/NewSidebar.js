@@ -203,6 +203,7 @@ const menuData = [
         subMenus: [
            { label: "Interview Master", path: "/JobMaster" },
            { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
+           { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
         ],
       },
       {

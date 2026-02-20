@@ -99,6 +99,7 @@ import ShiftPatternDetails from "./ShiftPatternDetails.js";
 import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
 import EmployeeShiftMapping from "./EmployeeShiftMapping.js";
 import InterviewScheduleReport from "./InterviewScheduleReport.js";
+import InterviewFeedbackReport from "./InterviewFeedbackReport.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -159,19 +160,19 @@ function Main() {
   //   };
   // }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        ["a", "x", "v"].includes(e.key.toLowerCase())
-      ) {
-        e.preventDefault();
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     if (
+  //       (e.ctrlKey || e.metaKey) &&
+  //       ["a", "c", "x", "v"].includes(e.key.toLowerCase())
+  //     ) {
+  //       e.preventDefault();
+  //     }
+  //   };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  //   document.addEventListener("keydown", handleKeyDown);
+  //   return () => document.removeEventListener("keydown", handleKeyDown);
+  // }, []);
 
   const routes = [
     { path: "/", component: <Home /> },
@@ -271,7 +272,8 @@ function Main() {
     { path: "/ShiftPatternDetails", component: <ShiftPatternDetails /> },
     { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
     { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> },
-    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> }
+    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> },
+    { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> }
 
 
   ];
