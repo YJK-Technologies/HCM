@@ -1243,6 +1243,7 @@ router.post("/ShiftTypeDropDown",dataController.ShiftTypeDropDown)
 router.post("/ShiftPatternMasterDropDown",dataController.ShiftPatternMasterDropDown)
 router.post("/Employee_shift_mappingSc",dataController.Employee_shift_mappingSc)
 router.post("/InterviewScheduleSearch",dataController.InterviewScheduleSearch)
+router.post("/InterviewFeedbackSearch",dataController.InterviewFeedbackSearch)
 
 
 

@@ -99,6 +99,7 @@ import ShiftPatternDetails from "./ShiftPatternDetails.js";
 import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
 import EmployeeShiftMapping from "./EmployeeShiftMapping.js";
 import InterviewScheduleReport from "./InterviewScheduleReport.js";
+import InterviewFeedbackReport from "./InterviewFeedbackReport.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -271,7 +272,8 @@ function Main() {
     { path: "/ShiftPatternDetails", component: <ShiftPatternDetails /> },
     { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
     { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> },
-    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> }
+    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> },
+    { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> }
 
 
   ];
