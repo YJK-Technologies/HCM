@@ -34650,21 +34650,27 @@ const deleteCountryMaster = async (req, res) => {
 };
 
 const getCountrySearchData = async (req, res) => {
-  const {
-    Country_Code,Country_Name,TimeZone_Default, Week_Start_Day,company_code
-  } = req.body;
+  const { Country_Code,Country_Name,TimeZone_Default, Week_Start_Day,ISO_Code,Weekend_Days,Max_Work_Hours_Day,
+    Max_Work_Hours_Week,Overtime_Allowed,Currency_Code,Status,company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
-
     const result = await pool.request()
       .input("mode", sql.NVarChar, "SC")
       .input("Country_Code", sql.NVarChar, Country_Code)
       .input("Country_Name", sql.NVarChar, Country_Name)
       .input("TimeZone_Default", sql.NVarChar, TimeZone_Default)
       .input("Week_Start_Day", sql.NVarChar, Week_Start_Day)
+      .input("ISO_Code", sql.Char, ISO_Code)
+      .input("Weekend_Days", sql.NVarChar, Weekend_Days)
+      .input("Max_Work_Hours_Day", sql.Int, Max_Work_Hours_Day)
+      .input("Max_Work_Hours_Week", sql.Int, Max_Work_Hours_Week)
+      .input("Overtime_Allowed", sql.VarChar, Overtime_Allowed)
+      .input("Currency_Code", sql.VarChar, Currency_Code)
+      .input("Status", sql.VarChar, Status)
       .input("Company_Code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default, @Week_Start_Day,'','',0,0,'','','','','', '','','',@Company_Code`);
+      .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default, @Week_Start_Day,@ISO_Code,@Weekend_Days,@Max_Work_Hours_Day,@Max_Work_Hours_Week,@Overtime_Allowed,
+        @Currency_Code,@Status,'','', '','','',@Company_Code`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
