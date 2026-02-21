@@ -100,6 +100,8 @@ import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
 import EmployeeShiftMapping from "./EmployeeShiftMapping.js";
 import InterviewScheduleReport from "./InterviewScheduleReport.js";
 import InterviewFeedbackReport from "./InterviewFeedbackReport.js";
+import CandidateInterviewReport from "./CandidateInterviewReport.js";
+import PanelPerformanceReport from "./PanelPerformanceReport.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -273,9 +275,11 @@ function Main() {
     { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
     { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> },
     { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> },
-    { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> }
+    { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> },
+    { path: "/CandidateInterviewRe", component: <CandidateInterviewReport /> },
+    { path: "/PanelPerformanceRepo", component: <PanelPerformanceReport /> }
 
-
+ 
   ];
 
   return (

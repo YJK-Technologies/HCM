@@ -204,7 +204,9 @@ const menuData = [
            { label: "Interview Master", path: "/JobMaster" },
            { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
            { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
-        ],
+           { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },
+           { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
+        ], 
       },
       {
         label: "Masters",
