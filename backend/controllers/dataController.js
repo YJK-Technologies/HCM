@@ -34650,21 +34650,27 @@ const deleteCountryMaster = async (req, res) => {
 };
 
 const getCountrySearchData = async (req, res) => {
-  const {
-    Country_Code,Country_Name,TimeZone_Default, Week_Start_Day,company_code
-  } = req.body;
+  const { Country_Code,Country_Name,TimeZone_Default, Week_Start_Day,ISO_Code,Weekend_Days,Max_Work_Hours_Day,
+    Max_Work_Hours_Week,Overtime_Allowed,Currency_Code,Status,company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
-
     const result = await pool.request()
       .input("mode", sql.NVarChar, "SC")
       .input("Country_Code", sql.NVarChar, Country_Code)
       .input("Country_Name", sql.NVarChar, Country_Name)
       .input("TimeZone_Default", sql.NVarChar, TimeZone_Default)
       .input("Week_Start_Day", sql.NVarChar, Week_Start_Day)
+      .input("ISO_Code", sql.Char, ISO_Code)
+      .input("Weekend_Days", sql.NVarChar, Weekend_Days)
+      .input("Max_Work_Hours_Day", sql.Int, Max_Work_Hours_Day)
+      .input("Max_Work_Hours_Week", sql.Int, Max_Work_Hours_Week)
+      .input("Overtime_Allowed", sql.VarChar, Overtime_Allowed)
+      .input("Currency_Code", sql.VarChar, Currency_Code)
+      .input("Status", sql.VarChar, Status)
       .input("Company_Code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default, @Week_Start_Day,'','',0,0,'','','','','', '','','',@Company_Code`);
+      .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default, @Week_Start_Day,@ISO_Code,@Weekend_Days,@Max_Work_Hours_Day,@Max_Work_Hours_Week,@Overtime_Allowed,
+        @Currency_Code,@Status,'','', '','','',@Company_Code`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -36046,7 +36052,7 @@ const InterviewScheduleSearch = async (req, res) => {
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
       .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone, 
-        '', '', '', '', 0, '', '', '' `);
+        '', '', '', '', 0, '', '', '', '', '', '', 0 `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36086,7 +36092,7 @@ const InterviewFeedbackSearch = async (req, res) => {
       .input("recommendation", sql.VarChar, recommendation || "")
       .input("rating", sql.Int, rating ? rating : 0)
       .input("submitted_on",sql.Date, submitted_on ? submitted_on : "1900-01-01")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '' `);
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '', '', '', '', 0 `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36123,12 +36129,12 @@ const InterviewProgressSearch = async (req, res) => {
       .input("mode", sql.NVarChar, "SCP")
       .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
       .input("candidate_name", sql.NVarChar, candidate_name || "")
-      .input("submitted_on", sql.Date, submitted_on ? submitted_on : "1900-01-01")
+      .input("submitted_on", sql.NVarChar, submitted_on)
       .input("rating", sql.Int, rating ? rating : 0)
       .input("Final_Status", sql.VarChar, Final_Status || "")
       .input("decided_on", sql.Date, decided_on || null)
       .input("remarks", sql.VarChar, remarks || "")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks `);
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks, '', '', '', 0 `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36144,6 +36150,82 @@ const InterviewProgressSearch = async (req, res) => {
   }
 };
 //code ended by Sakthi on 20-02-26
+
+//code exported by Sakthi on 21-02-26
+const PanelPerformanceSearch = async (req, res) => {
+  const {
+    schedule_id,
+    panel_name,
+    rating
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SCPP")
+      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
+      .input("panel_name", sql.NVarChar, panel_name || "")
+      .input("rating", sql.Int, rating ? rating : 0)
+      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '', '', '', @rating, '', '', '', '', '', '', 0 `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({ message: "Panel performance data not found" });
+    }
+
+  } catch (err) {
+    console.error("Error during Panel Performance Search:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//code ended by Sakthi on 21-02-26
+
+//code exported by Sakthi on 24-02-26
+const HiringDecisionSearch = async (req, res) => {
+  const {
+    candidate_name,
+    job_title,
+    department_id,
+    country_code,
+    final_status,
+    decided_by,
+    decided_on
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SCD")
+      .input("candidate_name", sql.NVarChar, candidate_name || "")
+      .input("job_title", sql.NVarChar, job_title || "")
+      .input("department_id", sql.VarChar, department_id || "")
+      .input("country_code", sql.VarChar, country_code || "")
+      .input("final_status", sql.VarChar, final_status || "")
+      .input("decided_by", sql.Int, decided_by ? decided_by : 0)
+      .input("decided_on", sql.Date, decided_on || null)
+      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', '', 0, @final_status, @decided_on, '', '', '', '', @job_title, @department_id, @country_code, @decided_by `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({ message: "Hiring decision data not found" });
+    }
+
+  } catch (err) {
+    console.error("Error during Hiring Decision Search:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//code ended by Sakthi on 24-02-26
 
 module.exports = {
   login,
@@ -37359,6 +37441,8 @@ module.exports = {
     Employee_shift_mappingSc,
     InterviewScheduleSearch,
     InterviewFeedbackSearch,
-    InterviewProgressSearch
+    InterviewProgressSearch,
+    PanelPerformanceSearch,
+    HiringDecisionSearch
 
 };
