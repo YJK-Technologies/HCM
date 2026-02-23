@@ -16,7 +16,7 @@ import * as XLSX from "xlsx";
 
 const config = require("./Apiconfig");
 
-function CandidateInterviewReport() {
+function HiringDecisionReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -35,13 +35,19 @@ function CandidateInterviewReport() {
   const [ratingSC, setratingSC] = useState("");
   const [decided_on, setdecided_on] = useState("");
   const [remarksSC, setremarksSC] = useState("");
+  const [job_titleSC, setjob_titleSC] = useState("");
+  const [dptSC, setdptSC] = useState("");
+  const [selecteddptSC, setselecteddeptSC] = useState("");
+  const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
+  const [DPTdrop, setDPTdrop] = useState([]);
+  const [Country_CodeSC, setCountry_CodeSC] = useState("");
+  const [decided_bySC, setdecided_bySC] = useState("");
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
     .filter((permission) => permission.screen_type === "Company")
     .map((permission) => permission.permission_type.toLowerCase());
-
 
   const handlescandidate_name = (selectedDPT) => {
     setSelectedcandidatename(selectedDPT);
@@ -51,6 +57,11 @@ function CandidateInterviewReport() {
   const handleChangeStatusSC = (selectedStatus) => {
     setSelectedStatusSC(selectedStatus);
     setstatusSC(selectedStatus ? selectedStatus.value : "");
+  };
+
+  const handleDPTSC = (selectedDPT) => {
+    setselecteddeptSC(selectedDPT);
+    setdptSC(selectedDPT ? selectedDPT.value : "");
   };
 
   const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
@@ -63,6 +74,10 @@ function CandidateInterviewReport() {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionDPtSC = DPTdrop.map((option) => ({
+    value: option.dept_id,
+    label: `${option.dept_id} - ${option.dept_name}`,
+  }));
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -107,12 +122,41 @@ function CandidateInterviewReport() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const val = await response.json();
+        setDPTdrop(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
   const handleSearch = async () => {
     setLoading(true);
 
     try {
       const response = await fetch(
-        `${config.apiBaseUrl}/InterviewProgressSearch`,
+        `${config.apiBaseUrl}/HiringDecisionSearch`,
         {
           method: "POST",
           headers: {
@@ -123,15 +167,20 @@ function CandidateInterviewReport() {
             candidate_name: canditatename,
             // email: emailSC,
             // panel_name: panel_nameSC,
-            scheduled_datetime: scheduled_datetimeSC,
+            // scheduled_datetime: scheduled_datetimeSC,
             // Interview_Mode: InterviewModeSC,
             // Status: statusSC,
             // location: locationSC,
             // employee_id: EmployeeIDSC,
             // role: RoleSC,
-            rating: Number(ratingSC),
+            // rating: Number(ratingSC),
+            country_code: Country_CodeSC,
+            Final_Status: statusSC,
             decided_on: decided_on,
-            remarks: remarksSC,
+            job_title: job_titleSC,
+            department_id: dptSC,
+            decided_by: decided_bySC,
+            // remarks: remarksSC,
             // recommendation: RecommendationSC,
             // comments: commentsSC,
             // submitted_on: submitted_onSC,
@@ -175,55 +224,47 @@ function CandidateInterviewReport() {
       editable: false,
     },
     {
-      headerName: "Schedule Date",
-      field: "scheduled_datetime",
+      headerName: "Job Title",
+      field: "job_title",
       editable: false,
-      // valueFormatter: (params) => formatDate(params.value),
-      // filterParams: {
-      //   comparator: (filterLocalDateAtMidnight, cellValue) => {
-      //     const cellDate = new Date(cellValue.split('/').join('-'));
-      //     if (cellDate < filterLocalDateAtMidnight) {
-      //       return -1;
-      //     } else if (cellDate > filterLocalDateAtMidnight) {
-      //       return 1;
-      //     }
-      //     return 0;
-      //   },
-      // },
     },
     {
-      headerName: "Rating",
-      field: "rating",
+      headerName: "Department ID",
+      field: "department_id",
+      editable: false,
+    },
+    {
+      headerName: "Country Code",
+      field: "country_code",
       editable: false,
     },
     {
       headerName: "Final Status",
-      field: "Final_Status",
+      field: "final_status",
+      editable: false,
+    },
+    {
+      headerName: "Decided By",
+      field: "decided_by",
       editable: false,
     },
     {
       headerName: "Decided On",
       field: "decided_on",
       editable: false,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+       valueFormatter: (params) => formatDate(params.value),
+       filterParams: {
+         comparator: (filterLocalDateAtMidnight, cellValue) => {
+           const cellDate = new Date(cellValue.split("/").join("-"));
+           if (cellDate < filterLocalDateAtMidnight) {
+             return -1;
+           } else if (cellDate > filterLocalDateAtMidnight) {
+             return 1;
+           }
+           return 0;
+         },
+       },
     },
-    {
-      headerName: "Remarks",
-      field: "remarks",
-      editable: false,
-    },
-
     // {
     //   headerName: "Meeting Link",
     //   field: "meeting_link",
@@ -269,7 +310,7 @@ function CandidateInterviewReport() {
     reportWindow.document.write(`
     <html>
     <head>
-      <title>Candidate Interview Report</title>
+      <title>Hiring Decision Report</title>
       <style>
         body {
           font-family: 'Segoe UI', sans-serif;
@@ -374,7 +415,7 @@ function CandidateInterviewReport() {
       <div class="header">
         <img src="${logoUrl}" class="logo" />
         <div class="title-section">
-          <h2>Candidate Interview Report</h2>
+          <h2>Hiring Decision Report</h2>
         </div>
       </div>
 
@@ -387,11 +428,12 @@ function CandidateInterviewReport() {
         <thead>
           <tr>
             <th>Candidate Name</th>
-            <th>Schedule Date</th>
-            <th>Rating</th>
+            <th>Job Title</th>
+            <th>Department ID</th>
+            <th>Country Code</th>
             <th>Final Status</th>
+            <th>Decided By</th>
             <th>Decided On</th>
-            <th>Remarks</th>
           </tr>
         </thead>
         <tbody>
@@ -401,11 +443,12 @@ function CandidateInterviewReport() {
       reportWindow.document.write(`
       <tr>
         <td>${row.candidate_name || ""}</td>
-        <td>${row.scheduled_datetime ? formatDate(row.scheduled_datetime) : ""}</td>
-        <td>${row.rating || ""}</td>
-        <td>${row.Final_Status || ""}</td>
+        <td>${row.job_title || ""}</td>
+        <td>${row.department_id || ""}</td>
+        <td>${row.country_code || ""}</td>
+        <td>${row.final_status || ""}</td>
+        <td>${row.decided_by || ""}</td>
         <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
-        <td>${row.remarks || ""}</td>
       </tr>
     `);
     });
@@ -446,15 +489,16 @@ function CandidateInterviewReport() {
     const doc = new jsPDF();
 
     doc.setFontSize(14);
-    doc.text("Candidate Interview Report", 14, 15);
+    doc.text("Hiring Decision Report", 14, 15);
 
     const tableColumn = [
       "Candidate Name",
-      "Schedule Date",
-      "Rating",
+      "Job Title",
+      "Department ID",
+      "Country Code",
       "Final Status",
+      "Decided By",
       "Decided On",
-      "Remarks",
     ];
 
     const tableRows = [];
@@ -462,11 +506,12 @@ function CandidateInterviewReport() {
     selectedRows.forEach((row) => {
       const rowData = [
         row.candidate_name || "",
-        row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
-        row.rating || "",
-        row.Final_Status || "",
+        row.job_title || "",
+        row.department_id || "",
+        row.country_code || "",
+        row.final_status || "",
+        row.decided_by || "",
         row.decided_on ? formatDate(row.decided_on) : "",
-        row.remarks || "",
       ];
 
       tableRows.push(rowData);
@@ -478,18 +523,18 @@ function CandidateInterviewReport() {
       startY: 20,
     });
 
-    doc.save("Candidate Interview Report.pdf");
+    doc.save("Hiring Decision Report.pdf");
   };
 
   const transformRowData = (data) => {
     return data.map((row) => ({
       "Candidate Name": row.candidate_name || "",
-      "Schedule Date": row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
-      "Rating": row.rating || "",
-      "Final Status": row.Final_Status || "",
+      "Job Title": row.job_title || "",
+      "Department ID": row.department_id || "",
+      "Country Code": row.country_code || "",
+      "Final Status": row.final_status || "",
+      "Decided By": row.decided_by || "",
       "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
-      Remarks: row.remarks || "",
-
     }));
   };
 
@@ -503,7 +548,7 @@ function CandidateInterviewReport() {
       return;
     }
 
-    const headerData = [["Candidate Interview Report"]];
+    const headerData = [["Hiring Decision Report"]];
 
     const transformedData = transformRowData(selectedRows);
 
@@ -516,10 +561,10 @@ function CandidateInterviewReport() {
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
-      "Candidate Interview Report",
+      "Hiring Decision Report",
     );
 
-    XLSX.writeFile(workbook, "Candidate_Interview_Report.xlsx");
+    XLSX.writeFile(workbook, "Hiring_Decision_Report.xlsx");
   };
 
   return (
@@ -532,7 +577,7 @@ function CandidateInterviewReport() {
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Candidate Interview Report</h1>
+          <h1 className="page-title">Hiring Decision Report</h1>
 
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>
@@ -614,16 +659,40 @@ function CandidateInterviewReport() {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="date"
+                type="text"
                 placeholder=""
-                title="Please Enter the Employee PF"
                 required
+                title="Please enter the Annual Bonus"
                 autoComplete="off"
-                value={scheduled_datetimeSC}
-                onChange={(e) => setscheduled_datetimeSC(e.target.value)}
+                value={job_titleSC}
+                onChange={(e) => setjob_titleSC(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
-                Schedule Date
+                Job Title
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selecteddptSC ? "has-value" : ""} 
+              ${isSelectDepartmentSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectDepartmentSC(true)}
+                onBlur={() => setIsSelectDepartmentSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selecteddptSC}
+                onChange={handleDPTSC}
+                options={filteredOptionDPtSC}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Department ID
               </label>
             </div>
           </div>
@@ -635,14 +704,14 @@ function CandidateInterviewReport() {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Employee PF"
                 required
+                title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={ratingSC}
-                onChange={(e) => setratingSC(e.target.value)}
+                value={Country_CodeSC}
+                onChange={(e) => setCountry_CodeSC(e.target.value)}
               />
-              <label for="add1" className={`exp-form-labels`}>
-                Rating
+              <label for="sname" className={`exp-form-labels`}>
+                Country Code
               </label>
             </div>
           </div>
@@ -675,6 +744,25 @@ function CandidateInterviewReport() {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={decided_bySC}
+                onChange={(e) => setdecided_bySC(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Decided By
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
                 type="date"
                 placeholder=""
                 required
@@ -686,22 +774,6 @@ function CandidateInterviewReport() {
               <label for="sname" className="exp-form-labels">
                 Decided On
               </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Company Contribution"
-                autoComplete="off"
-                value={remarksSC}
-                onChange={(e) => setremarksSC((e.target.value))}
-              />
-              <label for="sname" className="exp-form-labels">Remarks</label>
             </div>
           </div>
 
@@ -742,4 +814,4 @@ function CandidateInterviewReport() {
   );
 }
 
-export default CandidateInterviewReport;
+export default HiringDecisionReport;

@@ -146,12 +146,12 @@ function PanelPerformanceReport() {
     {
       headerName: "Average Rating",
       field: "avg_rating",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Total Interviews",
       field: "total_interviews",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Keyfield",
