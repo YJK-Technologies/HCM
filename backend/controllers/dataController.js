@@ -23628,28 +23628,24 @@ const DailyattendanceandTime = async (req, res) => {
 // Code Ended by Harish on 10/01/25
 
 const addEmployeeHoliday = async (req, res) => {
-  const { HolidayDate, Description, company_code, created_by, modified_by, tempstr1, tempstr2, tempstr3, tempstr4, datetime1, datetime2, datetime3, datetime4, } = req.body;
+  const { Holiday_Date, Country_Code, Location_ID, Holiday_Name, Holiday_Type, Is_Paid, 
+    Status, created_by } = req.body;
   let pool;
   try {
     pool = await sql.connect(dbConfig);
-    const result = await pool
+    await pool
       .request()
       .input("mode", sql.NVarChar, "I") // Insert mode
-      .input("HolidayDate", sql.Date, HolidayDate)
-      .input("Description", sql.NVarChar, Description)
-      .input("company_code", sql.NVarChar, company_code)
+      .input("Holiday_Date", sql.Date, Holiday_Date)
+      .input("Country_Code", sql.NVarChar, Country_Code)
+      .input("Location_ID", sql.Int, Location_ID)
+      .input("Holiday_Name", sql.NVarChar, Holiday_Name)
+      .input("Holiday_Type", sql.NVarChar, Holiday_Type)
+      .input("Is_Paid", sql.NVarChar, Is_Paid)
+      .input("Status", sql.NVarChar, Status)
       .input("created_by", sql.NVarChar, created_by)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("tempstr1", sql.NVarChar, tempstr1)
-      .input("tempstr2", sql.NVarChar, tempstr2)
-      .input("tempstr3", sql.NVarChar, tempstr3)
-      .input("tempstr4", sql.NVarChar, tempstr4)
-      .input("datetime1", sql.NVarChar, datetime1)
-      .input("datetime2", sql.NVarChar, datetime2)
-      .input("datetime3", sql.NVarChar, datetime3)
-      .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_Holidays @mode,@HolidayDate,@Description,'','',@company_code,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
-    res.status(200).json("Employee details data inserted successfully");
+      .query(`EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@created_by,'','','',''`);
+    res.status(200).json("Employee holiday data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
 
@@ -23685,11 +23681,16 @@ const updateEmployeeHoliday = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "U") // Insert mode
-        .input("HolidayDate", sql.Date, updatedRow.HolidayDate)
-        .input("Description", sql.NVarChar, updatedRow.Description)
-        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("Holiday_Date", sql.Date, updatedRow.Holiday_Date)
+        .input("Country_Code", sql.NVarChar, updatedRow.Country_Code)
+        .input("Location_ID", sql.Int, updatedRow.Location_ID)
+        .input("Holiday_Name", sql.NVarChar, updatedRow.Holiday_Name)
+        .input("Holiday_Type", sql.NVarChar, updatedRow.Holiday_Type)
+        .input("Is_Paid", sql.NVarChar, updatedRow.Is_Paid)
+        .input("Status", sql.NVarChar, updatedRow.Status)
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Holidays @mode,@HolidayDate,@Description,'','',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','','',@modified_by,'','',@keyfield`);
     }
 
     res.status(200).json("Employeedata updated successfully");
@@ -23861,27 +23862,27 @@ const updatePendingCustomer = async (req, res) => {
 //code ended by pavun
 
 //code added by mathu
-
 const getsearchHoliday = async (req, res) => {
-  const { startdate, enddate, Description, company_code } = req.body;
+  const { StartDate, EndDate, Country_Code, Location_ID, Holiday_Name, Holiday_Type, Is_Paid, 
+    Status } = req.body;
   try {
-    // Connect to the database
     const pool = await connection.connectToDatabase();
-    // Execute the query
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("startdate", sql.NVarChar, startdate)
-      .input("enddate", sql.NVarChar, enddate)
-      .input("Description", sql.NVarChar, Description)
-      .input("company_code", sql.NVarChar, company_code)
-
-      .query(`EXEC sp_Holidays @mode,'',@Description,@startdate,@enddate,@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
-    // Send response
+      .input("StartDate", sql.NVarChar, StartDate)
+      .input("EndDate", sql.NVarChar, EndDate)
+      .input("Country_Code", sql.NVarChar, Country_Code)
+      .input("Location_ID", sql.Int, Location_ID)
+      .input("Holiday_Name", sql.NVarChar, Holiday_Name)
+      .input("Holiday_Type", sql.NVarChar, Holiday_Type)
+      .input("Is_Paid", sql.NVarChar, Is_Paid)
+      .input("Status", sql.NVarChar, Status)
+      .query(`EXEC sp_Holiday_Master_test @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,'','','','',''`);
     if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
+      res.status(200).json(result.recordset);
     } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+      res.status(404).json("Data not found"); 
     }
   } catch (err) {
     console.error("Error", err);
@@ -23889,6 +23890,7 @@ const getsearchHoliday = async (req, res) => {
   }
 };
 //End by mathu
+
 //Code added By AK on 2025-01-13 CODE START
 const AddBonusDetails = async (req, res) => {
   const { company_code, GradeID, Annual_bonus, Referral_bonus, Retention_bonus, Holiday_bonus, Performance_bonus,
@@ -27090,10 +27092,8 @@ const deleteEmployeeHoliday = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
-        .input("company_code", sql.NVarChar, req.headers['company_code'])
-        .input("HolidayDate", sql.Date, updatedRow.HolidayDate)
-
-        .query(`EXEC sp_Holidays @mode,@HolidayDate,'','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .query(`EXEC sp_Holiday_Master_test @mode,0,'','',0,'','','','','','','','','','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -36227,6 +36227,26 @@ const HiringDecisionSearch = async (req, res) => {
 };
 //code ended by Sakthi on 24-02-26
 
+//code added by pavun on 23-02-26
+const getHolidayType = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Holiday_Type','','', '' ,'','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//code ended by pavun on 23-02-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -37443,6 +37463,7 @@ module.exports = {
     InterviewFeedbackSearch,
     InterviewProgressSearch,
     PanelPerformanceSearch,
-    HiringDecisionSearch
+    HiringDecisionSearch,
+    getHolidayType
 
 };
