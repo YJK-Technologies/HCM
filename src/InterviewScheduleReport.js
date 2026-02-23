@@ -282,17 +282,17 @@ function InterviewScheduleReport() {
     {
       headerName: "Status",
       field: "Status",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Candidate Name",
       field: "candidate_name",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Schedule Date",
       field: "scheduled_datetime",
-      editable: true,
+      editable: false,
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
@@ -309,17 +309,17 @@ function InterviewScheduleReport() {
     {
       headerName: "Email",
       field: "email",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Location",
       field: "location",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Panel Name",
       field: "panel_name",
-      editable: true,
+      editable: false,
     },
     // {
     //   headerName: "Meeting Link",
@@ -329,12 +329,12 @@ function InterviewScheduleReport() {
     {
       headerName: "Status",
       field: "Status",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: statusgriddrop,
       },
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Keyfield",

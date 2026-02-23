@@ -206,6 +206,8 @@ const menuData = [
            { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
            { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },
            { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
+           { label: "Hiring Decision Report", path: "/HiringDecisionReport" },
+           { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
         ], 
       },
       {
