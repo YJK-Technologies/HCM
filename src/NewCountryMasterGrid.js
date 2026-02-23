@@ -385,8 +385,8 @@ function Input({ }) {
         TimeZone_Default: TimeZone_DefaultSC,
         Week_Start_Day: Week_Start_DaySC,
         Weekend_Days: Weekend_DaysSC,
-        Max_Work_Hours_Day: Number(Max_Work_Hours_DaySC),
-        Max_Work_Hours_Week: Number(Max_Work_Hours_WeekSC),
+        Max_Work_Hours_Day: parseFloat(Max_Work_Hours_DaySC),
+        Max_Work_Hours_Week: parseFloat(Max_Work_Hours_WeekSC),
         Overtime_Allowed: Overtime_AllowedSC,
         Currency_Code: Currency_CodeSC,
         Status: StatusSC,
@@ -669,11 +669,17 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
                 placeholder=""
-                required title="Please Enter the Conveyance Allowance Amount"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
+                required
                 value={Max_Work_Hours_Day}
-                onChange={(e) => setMax_Work_Work_Day(e.target.value)}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, ""); 
+                  setMax_Work_Work_Day(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Hours Work Day</label>
             </div>
@@ -684,11 +690,17 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Medical Allowance Amount"
                 value={Max_Work_Hours_Week}
-                onChange={(e) => setMax_Work_Hours_Week(e.target.value)}
+                onChange={(e) => {
+                  // const value= e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_Week(e.target.value);
+                  }}
               />
               <label className="exp-form-labels">Max Hours Work Week</label>
             </div>
@@ -722,6 +734,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the  Company PF Contribution"
                 value={Currency_Code}
                 onChange={(e) => setCurrency_Code(e.target.value)}
@@ -769,6 +782,7 @@ function Input({ }) {
                 placeholder=""
                 required title="Please Enter the Grade ID"
                 value={Country_CodeSC}
+                maxLength={10}
                 onChange={(e) => setCountry_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels">Country Code</label>
@@ -785,6 +799,7 @@ function Input({ }) {
                 required title="Please Enter the Grade Name"
                 value={Country_NameSC}
                 onChange={(e) => setCountry_NameSC(e.target.value)}
+                maxLength={100}
               />
               <label className="exp-form-labels">Country Name</label>
             </div>
@@ -799,6 +814,7 @@ function Input({ }) {
                 placeholder=""
                 required title="Please Enter the Salary Range Amount"
                 value={ISO_CodeSC}
+                maxLength={3}
                 onChange={(e) => setISO_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels">ISO Code</label>
@@ -812,6 +828,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required title="Please Enter the Salary Range Amount"
                 value={TimeZone_DefaultSC}
                 onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
@@ -827,6 +844,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the Basic Amount"
                 value={Week_Start_DaySC}
                 onChange={(e) => setWeek_Start_DaySC(e.target.value)}
@@ -845,7 +863,7 @@ function Input({ }) {
                 required title="Please Enter the HRA Allowance Amount"
                 value={Weekend_DaysSC}
                 onChange={(e) => setWeekend_DaysSC(e.target.value)}
-                maxLength={250}
+                maxLength={50}
               />
               <label className="exp-form-labels">Week End Day</label>
             </div>
@@ -856,12 +874,17 @@ function Input({ }) {
               <input
                 id="Max_Work_Hours_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Conveyance Allowance Amount"
                 value={Max_Work_Hours_DaySC}
-                onChange={(e) => setMax_Work_Hours_DaySC(e.target.value)}
-                maxLength={250}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_DaySC(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Work Hours Day</label>
             </div>
@@ -872,11 +895,17 @@ function Input({ }) {
               <input
                 id="Max_Work_Hours_Week"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Medical Allowance Amount"
                 value={Max_Work_Hours_WeekSC}
-                onChange={(e) => setMax_Work_Hours_WeekSC(e.target.value)}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_WeekSC(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Work Hours Week</label>
             </div>
@@ -910,6 +939,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the Company PF Contribution"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
