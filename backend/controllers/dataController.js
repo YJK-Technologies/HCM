@@ -36046,7 +36046,7 @@ const InterviewScheduleSearch = async (req, res) => {
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
       .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone, 
-        '', '', '', '', 0, '', '', '', '', '', '', 0 `);
+        '', '', '', '', 0, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36086,7 +36086,8 @@ const InterviewFeedbackSearch = async (req, res) => {
       .input("recommendation", sql.VarChar, recommendation || "")
       .input("rating", sql.Int, rating ? rating : 0)
       .input("submitted_on",sql.Date, submitted_on ? submitted_on : "1900-01-01")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '', '', '', '', 0 `);
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '',
+      '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36128,7 +36129,8 @@ const InterviewProgressSearch = async (req, res) => {
       .input("Final_Status", sql.VarChar, Final_Status || "")
       .input("decided_on", sql.Date, decided_on || null)
       .input("remarks", sql.VarChar, remarks || "")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks, '', '', '', 0 `);
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '',
+         '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks, '', '', '', 0, 0, '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36162,7 +36164,8 @@ const PanelPerformanceSearch = async (req, res) => {
       .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
       .input("panel_name", sql.NVarChar, panel_name || "")
       .input("rating", sql.Int, rating ? rating : 0)
-      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '', '', '', @rating, '', '', '', '', '', '', 0 `);
+      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
+         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36204,7 +36207,8 @@ const HiringDecisionSearch = async (req, res) => {
       .input("final_status", sql.VarChar, final_status || "")
       .input("decided_by", sql.Int, decided_by ? decided_by : 0)
       .input("decided_on", sql.Date, decided_on || null)
-      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '', '', '', '', '', '', '', 0, @final_status, @decided_on, '', '', '', '', @job_title, @department_id, @country_code, @decided_by `);
+      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '', '',
+         '', '', '', '', '', 0, @final_status, @decided_on,'', @department_id, @job_title, @country_code, @decided_by, 0, '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36220,6 +36224,39 @@ const HiringDecisionSearch = async (req, res) => {
   }
 };
 //code ended by Sakthi on 24-02-26
+
+//Code exported by Sakthi on 24-02-26
+const CandidateAppliedSearch = async (req, res) => {
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SCCA")
+      .input("candidate_name", sql.NVarChar,candidate_name)
+      .input("email", sql.VarChar, email)
+      .input("phone", sql.VarChar, phone)
+      .input("applied_job_id", sql.Int, applied_job_id)
+      .input("Education", sql.VarChar, Education)
+      .input("Experience", sql.VarChar, Experience)
+      .input("Related_experience", sql.VarChar, Related_experience)
+      .input("Job_description", sql.VarChar, Job_description)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, @email, '', '', '', '', '', '',
+         '', '', '', '', '', 0, '', '','', '', '', '', 0, @applied_job_id, @phone, @Education, @Experience, @Related_experience, @Job_description, @company_code `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during CRM_Tag insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by Sakthi on 24-02-26
 
 module.exports = {
   login,
@@ -37437,6 +37474,7 @@ module.exports = {
     InterviewFeedbackSearch,
     InterviewProgressSearch,
     PanelPerformanceSearch,
-    HiringDecisionSearch
+    HiringDecisionSearch,
+    CandidateAppliedSearch
 
 };

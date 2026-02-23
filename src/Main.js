@@ -102,6 +102,8 @@ import InterviewScheduleReport from "./InterviewScheduleReport.js";
 import InterviewFeedbackReport from "./InterviewFeedbackReport.js";
 import CandidateInterviewReport from "./CandidateInterviewReport.js";
 import PanelPerformanceReport from "./PanelPerformanceReport.js";
+import HiringDecisionReport from "./HiringDecisionReport.js";
+import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -277,7 +279,9 @@ function Main() {
     { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> },
     { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> },
     { path: "/CandidateInterviewRe", component: <CandidateInterviewReport /> },
-    { path: "/PanelPerformanceRepo", component: <PanelPerformanceReport /> }
+    { path: "/PanelPerformanceRepo", component: <PanelPerformanceReport /> },
+    { path: "/HiringDecisionReport", component: <HiringDecisionReport /> },
+    { path: "/TotalCandidatesAppli", component: <TotalCandidatesApplied /> }
 
  
   ];

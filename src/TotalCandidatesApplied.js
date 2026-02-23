@@ -1,0 +1,887 @@
+import React, { useState, useEffect, useRef } from "react";
+import "./input.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import TabButtons from "./ESSComponents/Tabs";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import "ag-grid-enterprise";
+import { showConfirmationToast } from "./ToastConfirmation";
+import "./apps.css";
+import LoadingScreen from "./Loading";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+const config = require("./Apiconfig");
+
+function TotalCandidatesApplied() {
+  const [EducationSC, setEducationSC] = useState("");
+  const [ExperienceSC, setExperienceSC] = useState("");
+  const [JobDescriptionSC, setJobDescriptionSC] = useState("");
+  const [Related_experienceSC, setRelated_experienceSC] = useState("");
+  const [emailSC, setemailSC] = useState("");
+  const [phoneSC, setphoneSC] = useState("");
+  const [rowData, setRowData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isselectedJobIDSC, setisselectedJobIDSC] = useState(false);
+  const [selectedJobIDSC, setselectedJobIDSC] = useState("");
+  const [JobIDSC, setJobIDSC] = useState("");
+  const [Jobdrop, setJobdrop] = useState([]);
+  const [JobDrop, setJobDrop] = useState([]);
+  const [selectedcandidate_name, setSelectedcandidatename] = useState("");
+  const [canditatename, set_candidatename] = useState("");
+  const [isselectedscheduleid, setIsscheduleid] = useState("");
+  const [canditatenameDrop, setcanditatenameDrop] = useState([]);
+  const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [gridApi, setGridApi] = useState(null);
+  const [pinnedRowData, setPinnedRowData] = useState([]);
+  const cv = useRef(null);
+
+  //purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
+  const companyPermissions = permissions
+    .filter((permission) => permission.screen_type === "Company")
+    .map((permission) => permission.permission_type.toLowerCase());
+
+  const handleJobIDSC = (selectedDPT) => {
+    setselectedJobIDSC(selectedDPT);
+    setJobIDSC(selectedDPT ? selectedDPT.value : "");
+  };
+
+  const filteredOptionJobID = Jobdrop.map((option) => ({
+    value: option.job_id,
+    label: `${option.job_id} - ${option.job_title}`,
+  }));
+
+  const handlescandidate_name = (selectedDPT) => {
+    setSelectedcandidatename(selectedDPT);
+    set_candidatename(selectedDPT ? selectedDPT.value : "");
+  };
+
+  const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
+    value: option.candidate_name,
+    label: `${option.candidate_id} - ${option.candidate_name}`,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/CanditateID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const val = await response.json();
+        setcanditatenameDrop(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/JobMaster`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const jobs = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id}-${option.job_title}`,
+        }));
+        setJobDrop(jobs);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/JobMaster`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const val = await response.json();
+        setJobdrop(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  const formatDate = (isoDateString) => {
+    const date = new Date(isoDateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const body = {
+        candidate_name: canditatename,
+        email: emailSC,
+        phone: phoneSC,
+        applied_job_id: JobIDSC,
+        Education: EducationSC,
+        Experience: ExperienceSC,
+        Job_description: JobDescriptionSC,
+        Related_experience: Related_experienceSC,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/CandidateAppliedSearch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+        const newRows = fetchedData.map((matchedItem) => ({
+          candidate_id: matchedItem.candidate_id,
+          email: matchedItem.email,
+          Canditate_CV: matchedItem.Canditate_CV,
+          phone: matchedItem.phone,
+          candidate_name: matchedItem.candidate_name,
+          applied_job_id: matchedItem.applied_job_id,
+          Education: matchedItem.Education,
+          Experience: matchedItem.Experience,
+          Related_experience: matchedItem.Related_experience,
+          Job_description: matchedItem.Job_description,
+          keyfield: matchedItem.keyfield,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }));
+        setRowData(newRows);
+
+        //  Get last column field name dynamically
+        const lastColumnField = columnDefs[columnDefs.length - 1].field;
+
+        setPinnedRowData([
+          {
+            [lastColumnField]: `Total Candidates Applied: ${newRows.length}`,
+          },
+        ]);
+        const totalRow = {
+          candidate_id: null,
+          candidate_name: "",
+          email: "",
+          phone: "",
+          applied_job_id: "",
+          Education: "",
+          Experience: "",
+          Related_experience: "Total Candidates Applied:",
+          Job_description: ` ${newRows.length}`,
+          keyfield: "",
+        };
+
+        setRowData([...newRows, totalRow]);
+      } else if (response.status === 404) {
+        console.log("Data Not found");
+        toast.warning("Data Not found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to insert sales data");
+        console.error(errorResponse.details || errorResponse.message);
+        setRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePdfClick = (url) => {
+    setCurrentPdfUrl(url);
+    setIsModalOpen(true); // Show the modal
+  };
+
+  const reloadGridData = () => {
+    setRowData([]);
+  };
+
+  const columnDefs = [
+    {
+      headerName: "Candidate Id",
+      field: "candidate_id",
+      editable: false,
+    },
+    {
+      headerName: "Candidate Name",
+      field: "candidate_name",
+      editable: false,
+    },
+    {
+      headerName: "Email",
+      field: "email",
+      editable: false,
+    },
+    {
+      headerName: "Phone",
+      field: "phone",
+      editable: false,
+    },
+    {
+      headerName: "Applied Job ID",
+      field: "applied_job_id",
+      editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: JobDrop.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = JobDrop.find((d) => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Education",
+      field: "Education",
+      editable: false,
+    },
+    {
+      headerName: "Experience",
+      field: "Experience",
+      editable: false,
+    },
+    {
+      headerName: "Related Experience",
+      field: "Related_experience",
+      editable: false,
+    },
+    {
+      headerName: "Job Description",
+      field: "Job_description",
+      editable: false,
+    },
+    // {
+    //   headerName: "Candidate CV",
+    //   field: "Canditate_CV",
+    //   cellRenderer: CVLinkRenderer,
+    // },
+    {
+      headerName: "Keyfield ",
+      field: "keyfield",
+      editable: false,
+      hide: true,
+    },
+  ];
+
+  // const handleRowSelection = (row) => {
+  //   setFromDate(formatDate(row.FromDate)); // Ensure correct format
+  //   setToDate(formatDate(row.ToDate));
+  //   setEligibledays(row.Salary_Days);
+  //   // setSelectedRow(row);
+  // };
+
+  const generateReport = () => {
+    if (!gridApi) return;
+
+    const selectedRows = gridApi.getSelectedRows();
+
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to print");
+      return;
+    }
+
+    const logoUrl = "/favicon.ico"; // <-- put your logo inside public folder
+
+    const reportWindow = window.open("", "_blank");
+
+    reportWindow.document.write(`
+      <html>
+      <head>
+        <title>Hiring Decision Report</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(90deg, #4e73df, #1cc88a);
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: #4e73df;
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: #f2f2f2;
+          }
+  
+          tr:hover {
+            background-color: #e2e6f0;
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #1cc88a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            background: #17a673;
+          }
+  
+          @media print {
+            .print-btn {
+              display: none;
+            }
+            body {
+              background: white;
+            }
+          }
+        </style>
+      </head>
+      <body>
+  
+        <div class="header">
+          <img src="${logoUrl}" class="logo" />
+          <div class="title-section">
+            <h2>Hiring Decision Report</h2>
+          </div>
+        </div>
+  
+        <div class="sub-info">
+          <div>Total Records: ${selectedRows.length}</div>
+          <div>Printed Date: ${new Date().toLocaleDateString()}</div>
+        </div>
+  
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th>Job Title</th>
+              <th>Department ID</th>
+              <th>Country Code</th>
+              <th>Final Status</th>
+              <th>Decided By</th>
+              <th>Decided On</th>
+            </tr>
+          </thead>
+          <tbody>
+    `);
+
+    selectedRows.forEach((row) => {
+      reportWindow.document.write(`
+        <tr>
+          <td>${row.candidate_name || ""}</td>
+          <td>${row.job_title || ""}</td>
+          <td>${row.department_id || ""}</td>
+          <td>${row.country_code || ""}</td>
+          <td>${row.final_status || ""}</td>
+          <td>${row.decided_by || ""}</td>
+          <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
+        </tr>
+      `);
+    });
+
+    reportWindow.document.write(`
+          </tbody>
+        </table>
+  
+        <div style="text-align:center;">
+          <button class="print-btn" onclick="window.print()">Print</button>
+        </div>
+  
+        <div class="footer">
+          © ${new Date().getFullYear()} YJK Technologies | Confidential Report
+        </div>
+  
+      </body>
+      </html>
+    `);
+
+    reportWindow.document.close();
+  };
+
+  const exportToPDF = () => {
+    if (!gridApi) return;
+
+    const selectedRows = gridApi.getSelectedRows();
+
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to export");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(14);
+    doc.text("Hiring Decision Report", 14, 15);
+
+    const tableColumn = [
+      "Candidate Name",
+      "Job Title",
+      "Department ID",
+      "Country Code",
+      "Final Status",
+      "Decided By",
+      "Decided On",
+    ];
+
+    const tableRows = [];
+
+    selectedRows.forEach((row) => {
+      const rowData = [
+        row.candidate_name || "",
+        row.job_title || "",
+        row.department_id || "",
+        row.country_code || "",
+        row.final_status || "",
+        row.decided_by || "",
+        row.decided_on ? formatDate(row.decided_on) : "",
+      ];
+
+      tableRows.push(rowData);
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
+
+    doc.save("Hiring Decision Report.pdf");
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Candidate Name": row.candidate_name || "",
+      "Job Title": row.job_title || "",
+      "Department ID": row.department_id || "",
+      "Country Code": row.country_code || "",
+      "Final Status": row.final_status || "",
+      "Decided By": row.decided_by || "",
+      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!gridApi) return;
+
+    const selectedRows = gridApi.getSelectedRows();
+
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to export.");
+      return;
+    }
+
+    const headerData = [["Hiring Decision Report"]];
+
+    const transformedData = transformRowData(selectedRows);
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    // Main table starts from row 5 (same pattern as your Task report)
+    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hiring Decision Report");
+
+    XLSX.writeFile(workbook, "Hiring_Decision_Report.xlsx");
+  };
+
+  return (
+    <div class="container-fluid Topnav-screen ">
+      {loading && <LoadingScreen />}
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Total Candidates Applied</h1>
+
+          <div className="action-wrapper desktop-actions">
+            {["all permission", "view"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i className="fa-solid fa-print"></i>
+              </div>
+            )}
+            {["all permission", "PDF"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={exportToPDF}>
+                <span className="tooltip">Pdf</span>
+                <i className="fa-solid fa-file-pdf"></i>
+              </div>
+            )}
+            {["all permission", "Excel"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <div className="header-flex">
+          <h6 className="">Search Criteria:</h6>
+        </div>
+        <div className="row g-3">
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedcandidate_name ? "has-value" : ""} 
+              ${isselectedscheduleid ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsscheduleid(true)}
+                onBlur={() => setIsscheduleid(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedcandidate_name}
+                onChange={handlescandidate_name}
+                options={filteredOptioncandidate_name}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Candiate Name
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Eligibility Salary Days"
+                autoComplete="off"
+                value={emailSC}
+                maxLength={30}
+                onChange={(e) => setemailSC(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <label for="sname" className="exp-form-labels">
+                Email{" "}
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                autoComplete="off"
+                value={phoneSC}
+                maxLength={13}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setphoneSC(value);
+                }}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <label for="sname" className="exp-form-labels">
+                Phone
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedJobIDSC ? "has-value" : ""} 
+              ${isselectedJobIDSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisselectedJobIDSC(true)}
+                onBlur={() => setisselectedJobIDSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedJobIDSC}
+                onChange={handleJobIDSC}
+                options={filteredOptionJobID}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Applied Job ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={EducationSC}
+                maxLength={100}
+                onChange={(e) => {
+                  setEducationSC(e.target.value);
+                }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Education
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={ExperienceSC}
+                maxLength={100}
+                onChange={(e) => {
+                  setExperienceSC(e.target.value);
+                }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Experience
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Related_experienceSC}
+                maxLength={100}
+                onChange={(e) => {
+                  setRelated_experienceSC(e.target.value);
+                }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Related Experience
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={JobDescriptionSC}
+                maxLength={100}
+                onChange={(e) => {
+                  setJobDescriptionSC(e.target.value);
+                }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Job Description
+              </label>
+            </div>
+          </div>
+
+          {/* Search + Reload Buttons */}
+          <div className="col-12">
+            <div className="search-btn-wrapper">
+              <div className="icon-btn search" onClick={handleSearch}>
+                <span className="tooltip">Search</span>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <div className="icon-btn reload" onClick={reloadGridData}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-rotate-right"></i>
+              </div>
+            </div>
+          </div>
+
+          {isModalOpen && (
+            <div
+              className="modal fade show d-block"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                  <div className="shadow-lg p-1 bg-light main-header-box">
+                    <div className="header-flex">
+                      <h1 className="custom-modal-title">Candidate CV</h1>
+
+                      <div className="action-wrapper">
+                        <div
+                          className="action-icon delete"
+                          onClick={() => {
+                            URL.revokeObjectURL(currentPdfUrl);
+                            setIsModalOpen(false);
+                          }}
+                        >
+                          <span className="tooltip">Close</span>
+                          <i className="fa-solid fa-xmark"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-body" style={{ height: "500px" }}>
+                    <iframe
+                      src={currentPdfUrl}
+                      title="CV Preview"
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            rowSelection="multiple"
+            // onRowClicked={(event) => handleRowSelection(event.data)}
+            pagination={true}
+            paginationAutoPageSize={true}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+export default TotalCandidatesApplied;
