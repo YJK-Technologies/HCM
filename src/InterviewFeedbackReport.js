@@ -336,7 +336,7 @@ function InterviewFeedbackReport() {
     {
       headerName: "Interviewer Id",
       field: "interviewer_id",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Candidate Name",
@@ -379,7 +379,7 @@ function InterviewFeedbackReport() {
     {
       headerName: "Rating",
       field: "rating",
-      editable: true,
+      editable: false,
     },
 
     // {

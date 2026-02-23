@@ -1247,6 +1247,7 @@ router.post("/InterviewFeedbackSearch",dataController.InterviewFeedbackSearch)
 router.post("/InterviewProgressSearch",dataController.InterviewProgressSearch)
 router.post("/PanelPerformanceSearch",dataController.PanelPerformanceSearch)
 router.post("/HiringDecisionSearch",dataController.HiringDecisionSearch)
+router.post("/CandidateAppliedSearch",dataController.CandidateAppliedSearch)
 
 
 
