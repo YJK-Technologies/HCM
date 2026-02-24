@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import { useNavigate } from "react-router-dom";
-import TabButtons from '../ESSComponents/Tabs';
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
+import TabButtons from "../ESSComponents/Tabs";
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
 import Select from "react-select";
 
-const config = require('../Apiconfig');
+const config = require("../Apiconfig");
 
 const getFinancialYearDates = () => {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
-  console.log(currentMonth)
+  console.log(currentMonth);
   let startYear, endYear;
 
   if (currentMonth < 4) {
     startYear = currentYear - 1;
     endYear = currentYear;
   } else {
-
     startYear = currentYear;
     endYear = currentYear + 1;
   }
@@ -35,7 +34,7 @@ const getFinancialYearDates = () => {
 };
 const { FirstDate, LastDate } = getFinancialYearDates();
 
-function InterviewPanelMem({ }) {
+function InterviewPanelMem({}) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [member_id, setmember_id] = useState("");
@@ -60,9 +59,7 @@ function InterviewPanelMem({ }) {
   const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
   const [panelDrop, setPaneldrop] = useState([]);
 
-
-
-  const [activeTab, setActiveTab] = useState("Panel Members")
+  const [activeTab, setActiveTab] = useState("Panel Members");
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
 
@@ -71,17 +68,16 @@ function InterviewPanelMem({ }) {
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-
 
   const handleEmployeeID = (selectedDPT) => {
     setselectedEmployeeID(selectedDPT || []);
 
     const employeeIds = selectedDPT
-      ? selectedDPT.map(emp => emp.value).join(",")
+      ? selectedDPT.map((emp) => emp.value).join(",")
       : "";
 
     setEmployeeID(employeeIds);
@@ -95,38 +91,37 @@ function InterviewPanelMem({ }) {
       return;
     }
 
-    const values = selectedDPT.map(opt => opt.value);
+    const values = selectedDPT.map((opt) => opt.value);
 
     setEmployeeIDSC(values.join(","));
   };
 
-  const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
+  const filteredOptionEmployeeID = EmployeeIDdrop.map((option) => ({
     value: option.EmployeeId,
-    label: `${option.EmployeeId} - ${option.First_Name}`
+    label: `${option.EmployeeId} - ${option.First_Name}`,
   }));
 
-
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const fetchDept = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ company_code }),
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
 
         const val = await response.json();
         setEmployeeIDdrop(val);
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error("Error fetching departments:", error);
       }
     };
 
@@ -136,14 +131,14 @@ function InterviewPanelMem({ }) {
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -153,44 +148,47 @@ function InterviewPanelMem({ }) {
         }));
         setPaneldrop(panel);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handlePanelID = (selectedDPT) => {
     setselectedPanelID(selectedDPT);
-    setPanelID(selectedDPT ? selectedDPT.value : '');
+    setPanelID(selectedDPT ? selectedDPT.value : "");
   };
   const handlePanelIDSC = (selectedDPT) => {
     setselectedPanelIDSC(selectedDPT);
-    setPanelIDSC(selectedDPT ? selectedDPT.value : '');
+    setPanelIDSC(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptionPanelID = PanelDrop.map(option => ({
+  const filteredOptionPanelID = PanelDrop.map((option) => ({
     value: option.panel_id,
-    label: `${option.panel_id} - ${option.panel_name}`
+    label: `${option.panel_id} - ${option.panel_name}`,
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const fetchDept = async () => {
       try {
-        const response = await fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `${config.apiBaseUrl}/InterviewPanelData`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
           },
-          body: JSON.stringify({ company_code }),
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
 
         const val = await response.json();
         setPanelDrop(val);
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error("Error fetching departments:", error);
       }
     };
 
@@ -199,19 +197,18 @@ function InterviewPanelMem({ }) {
     }
   }, []);
 
-
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setStatusdrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleKeyDownStatus = async (e) => {
@@ -231,13 +228,16 @@ function InterviewPanelMem({ }) {
         const showIcons = isWideEnough;
 
         return (
-          <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
             {showIcons && (
               <>
                 <span
                   className="icon mx-2"
                   onClick={() => handleUpdate(params.data, params.node.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
                 </span>
@@ -245,7 +245,7 @@ function InterviewPanelMem({ }) {
                 <span
                   className="icon mx-2"
                   onClick={() => handleDelete(params.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-solid fa-trash"></i>
                 </span>
@@ -258,7 +258,7 @@ function InterviewPanelMem({ }) {
     {
       headerName: "Member ID",
       field: "member_id",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Panel ID",
@@ -266,31 +266,31 @@ function InterviewPanelMem({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: panelDrop.map(d => d.value),
+        values: panelDrop.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = panelDrop.find(d => d.value === params.value);
+        const dept = panelDrop.find((d) => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Role",
       field: "Role",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Keyfield",
       field: "keyfield",
       editable: false,
-      hide: true
+      hide: true,
       // hide: true
     },
-  ]
+  ];
 
   const gridOptions = {
     pagination: true,
@@ -309,17 +309,20 @@ function InterviewPanelMem({ }) {
         panel_id: PanelID,
         Role: Role,
         employee_id: EmployeeID,
-        company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode')
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        created_by: sessionStorage.getItem("selectedUserCode"),
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/interview_panel_membersInsert`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.apiBaseUrl}/interview_panel_membersInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Header),
         },
-        body: JSON.stringify(Header),
-      });
+      );
       if (response.ok) {
         console.log("Data inserted successfully");
         toast.success("Data inserted successfully!", {
@@ -332,7 +335,7 @@ function InterviewPanelMem({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
 
@@ -348,13 +351,16 @@ function InterviewPanelMem({ }) {
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/InterviewPanelMembers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.apiBaseUrl}/InterviewPanelMembers`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      });
+      );
 
       if (response.ok) {
         const fetchedData = await response.json();
@@ -384,7 +390,7 @@ function InterviewPanelMem({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
   };
 
   const handleUpdate = async (rowData) => {
@@ -393,20 +399,27 @@ function InterviewPanelMem({ }) {
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const dataToSend = { interview_panel_membersData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+            interview_panel_membersData: Array.isArray(rowData)
+              ? rowData
+              : [rowData],
+          };
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_panel_membersLoopUpdate`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_panel_membersLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                company_code: company_code,
+                "modified-by": modified_by,
+              },
+              body: JSON.stringify(dataToSend),
             },
-            body: JSON.stringify(dataToSend)
-          });
+          );
 
           if (response.ok) {
             toast.success("Data updated successfully", {
@@ -414,18 +427,20 @@ function InterviewPanelMem({ }) {
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
           }
         } catch (error) {
           console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          toast.error("Error Deleting Data: " + error.message);
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data updated cancelled.");
-      }
+      },
     );
   };
 
@@ -435,18 +450,25 @@ function InterviewPanelMem({ }) {
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-          const dataToSend = { interview_panel_membersData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+            interview_panel_membersData: Array.isArray(rowData)
+              ? rowData
+              : [rowData],
+          };
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_panel_membersLoopDelete`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_panel_membersLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                company_code: company_code,
+              },
+              body: JSON.stringify(dataToSend),
             },
-            body: JSON.stringify(dataToSend)
-          });
+          );
 
           if (response.ok) {
             toast.success("Data deleted successfully", {
@@ -454,56 +476,57 @@ function InterviewPanelMem({ }) {
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
           }
         } catch (error) {
           console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          toast.error("Error Deleting Data: " + error.message);
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
   const tabs = [
-    { label: 'Job Master' },
-    { label: 'Candidate Master' },
-    { label: 'Interview Panel' },
-    { label: 'Panel Members' },
-    { label: 'Interview schedule' },
-    { label: 'Interview Feedback' },
-    { label: 'Interview Decision' }
+    { label: "Job Master" },
+    { label: "Candidate Master" },
+    { label: "Interview Panel" },
+    { label: "Panel Members" },
+    { label: "Interview schedule" },
+    { label: "Interview Feedback" },
+    { label: "Interview Decision" },
   ];
-
 
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candidate Master':
+      case "Candidate Master":
         CandidateMaster();
         break;
 
-      case 'Job Master':
+      case "Job Master":
         JobMaster();
         break;
-      case 'Interview Panel':
+      case "Interview Panel":
         InterviewPanel();
         break;
-      case 'Panel Members':
+      case "Panel Members":
         InterviewPanelMembers();
         break;
 
-      case 'Interview schedule':
+      case "Interview schedule":
         InterviewSchedule();
         break;
-      case 'Interview Feedback':
+      case "Interview Feedback":
         InterviewFeedback();
         break;
-      case 'Interview Decision':
+      case "Interview Decision":
         InterviewDecision();
         break;
       default:
@@ -539,11 +562,14 @@ function InterviewPanelMem({ }) {
     navigate("/InterviewDecision");
   };
 
-
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Panel Members</h1>
@@ -555,10 +581,13 @@ function InterviewPanelMem({ }) {
           </div>
         </div>
       </div>
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -594,19 +623,19 @@ function InterviewPanelMem({ }) {
                 onChange={handlePanelID}
                 options={filteredOptionPanelID}
               />
-              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedPanelID ? 'text-danger' : ''}`}>
+              <label
+                htmlFor="selecteddpt"
+                className={`floating-label ${error && !selectedPanelID ? "text-danger" : ""}`}
+              >
                 Panel ID{showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
-          <div
-            className={`employee-col ${selectedEmployeeID?.length > 0 ? "expanded" : ""
-              }`}
-          >
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-    ${selectedEmployeeID?.length > 0 ? "has-value" : ""} 
-    ${isSelectEmployeeID ? "is-focused" : ""}`}
+              ${selectedEmployeeID?.length > 0 ? "has-value" : ""} 
+              ${isSelectEmployeeID ? "is-focused" : ""}`}
             >
               <Select
                 id="employee"
@@ -628,10 +657,12 @@ function InterviewPanelMem({ }) {
               />
 
               <label
-                className={`floating-label ${error && !selectedEmployeeID?.length ? "text-danger" : ""
-                  }`}
+                className={`floating-label ${
+                  error && !selectedEmployeeID?.length ? "text-danger" : ""
+                }`}
               >
-                Employee ID{showAsterisk && <span className="text-danger">*</span>}
+                Employee ID
+                {showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -648,9 +679,14 @@ function InterviewPanelMem({ }) {
                 autoComplete="off"
                 value={Role}
                 maxLength={50}
-                onChange={(e) => setRole((e.target.value))}
+                onChange={(e) => setRole(e.target.value)}
               />
-              <label for="add1" className={`exp-form-labels ${error && !Role ? 'text-danger' : ''}`}>Role<span className="text-danger">*</span></label>
+              <label
+                for="add1"
+                className={`exp-form-labels ${error && !Role ? "text-danger" : ""}`}
+              >
+                Role<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
         </div>
@@ -661,7 +697,6 @@ function InterviewPanelMem({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -669,12 +704,15 @@ function InterviewPanelMem({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Choose the Start Year"
+                required
+                title="Please Choose the Start Year"
                 autoComplete="off"
                 value={member_id}
                 onChange={(e) => setmember_id(e.target.value)}
               />
-              <label For="city" className="exp-form-labels">Member ID</label>
+              <label For="city" className="exp-form-labels">
+                Member ID
+              </label>
             </div>
           </div>
 
@@ -719,30 +757,36 @@ function InterviewPanelMem({ }) {
                 options={filteredOptionEmployeeID}
                 onFocus={() => setisSelectEmployeeIDSC(true)}
                 onBlur={() => setisSelectEmployeeIDSC(false)}
-              // styles={{
-              //   control: (base) => ({
-              //     ...base,
-              //     minHeight: "42px",
-              //     height: "auto",
-              //     alignItems: "flex-start",
-              //   }),
-              //   valueContainer: (base) => ({
-              //     ...base,
-              //     flexWrap: "wrap",          
-              //     alignItems: "flex-start",
-              //     padding: "6px",
-              //   }),
-              //   multiValue: (base) => ({
-              //     ...base,
-              //     maxWidth: "100%",
-              //   }),
-              //   multiValueLabel: (base) => ({
-              //     ...base,
-              //     whiteSpace: "normal",      
-              //     overflow: "visible",
-              //     textOverflow: "unset",
-              //   }),
-              // }}
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: "100%",
+                  }),
+                }}
+                // styles={{
+                //   control: (base) => ({
+                //     ...base,
+                //     minHeight: "42px",
+                //     height: "auto",
+                //     alignItems: "flex-start",
+                //   }),
+                //   valueContainer: (base) => ({
+                //     ...base,
+                //     flexWrap: "wrap",
+                //     alignItems: "flex-start",
+                //     padding: "6px",
+                //   }),
+                //   multiValue: (base) => ({
+                //     ...base,
+                //     maxWidth: "100%",
+                //   }),
+                //   multiValueLabel: (base) => ({
+                //     ...base,
+                //     whiteSpace: "normal",
+                //     overflow: "visible",
+                //     textOverflow: "unset",
+                //   }),
+                // }}
               />
 
               <label htmlFor="selecteddpt" className={`floating-label`}>
@@ -762,9 +806,11 @@ function InterviewPanelMem({ }) {
                 required
                 autoComplete="off"
                 value={RoleSC}
-                onChange={(e) => setRoleSC((e.target.value))}
+                onChange={(e) => setRoleSC(e.target.value)}
               />
-              <label for="add1" className={`exp-form-labels`}>Role</label>
+              <label for="add1" className={`exp-form-labels`}>
+                Role
+              </label>
             </div>
           </div>
           {/* Search + Reload Buttons */}
@@ -784,7 +830,10 @@ function InterviewPanelMem({ }) {
         </div>
       </div>
 
-      <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
         <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
           <AgGridReact
             columnDefs={columnDefs}
