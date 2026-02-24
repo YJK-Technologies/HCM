@@ -208,8 +208,10 @@ const menuData = [
            { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
            { label: "Hiring Decision Report", path: "/HiringDecisionReport" },
            { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
+           { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
+           { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
         ], 
-      },
+      }, 
       {
         label: "Masters",
         isDropdown: true,
