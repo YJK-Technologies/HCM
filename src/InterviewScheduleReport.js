@@ -93,6 +93,20 @@ function InterviewScheduleReport() {
   }));
 
   useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      fetch(`${config.apiBaseUrl}/status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      })
+        .then((data) => data.json())
+        .then((val) => setStatusdrop(val))
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+  useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const fetchDept = async () => {
