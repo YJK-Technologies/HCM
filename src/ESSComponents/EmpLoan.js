@@ -51,7 +51,48 @@ function Input({ }) {
   const [isSelectloanid, setIsSelectloanid] = useState(false);
   const [isSelectapprovedby, setIsSelectapprovedby] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [approvedByGropGrid, setApprovedByGropGrid] = useState([]);
+  const [loanIdDropGrid, setLoanIdDropGrid] = useState([]);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getTeamManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const approvedByOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId}-${option.manager}`,
+        }));
+        setApprovedByGropGrid(approvedByOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getLoanID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const loanIdOption = data.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setLoanIdDropGrid(loanIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const columnDefs = [
     {
@@ -95,14 +136,28 @@ function Input({ }) {
     {
       headerName: "Loan ID",
       field: "loanID",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
       editable: true,
+      cellEditorParams: {
+        values: loanIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = loanIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Approved By",
       field: "ApprovedBy",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
       editable: true,
+      cellEditorParams: {
+        values: approvedByGropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = approvedByGropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Loan Eligible Amount",

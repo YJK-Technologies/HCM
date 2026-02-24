@@ -23,7 +23,9 @@ function Input({ }) {
   const [Weekend_Days, setWeekend_Days] = useState('');
   const [Max_Work_Hours_Day, setMax_Work_Work_Day] = useState('');
   const [Max_Work_Hours_Week, setMax_Work_Hours_Week] = useState('');
+  const [overTimeDrop, setOverTimeDrop] = useState([]);
   const [Overtime_Allowed, setOvertime_Allowed] = useState('');
+  const [selectedOvertime_Allowed, setSelectedOvertime_Allowed] = useState('');
   const [Currency_Code, setCurrency_Code] = useState('');
   const [statusDrop, setStatusDrop] = useState([]);
   const [statusGridDrop, setStatusGridDrop] = useState([]);
@@ -43,14 +45,20 @@ function Input({ }) {
   const [Weekend_DaysSC, setWeekend_DaysSC] = useState('');
   const [Max_Work_Hours_DaySC, setMax_Work_Hours_DaySC] = useState('');
   const [Max_Work_Hours_WeekSC, setMax_Work_Hours_WeekSC] = useState('');
+  const [overTimeDropSc, setOverTimeDropSc] = useState([]);
   const [Overtime_AllowedSC, setOvertime_AllowedSC] = useState('');
+  const [selectedOvertime_AllowedSc, setSelectedOvertime_AllowedSc] = useState('');
   const [Currency_CodeSC, setCurrency_CodeSC] = useState('');
   const [statusDropSC, setStatusDropSC] = useState([]);
   const [selectedStatusSC, setSelectedStatusSC] = useState('');
   const [StatusSC, setStatusSC] = useState('');
 
   const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [isSelectOverTime, setIsSelectOverTime] = useState(false);
   const [isSelectStatusSC, setIsSelectStatusSC] = useState(false);
+  const [isSelectOverTimeSC, setIsSelectOverTimeSC] = useState(false);
+
+  const [overTimeDropGrid, setOverTimeDropGrid] = useState([]);
 
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -77,6 +85,21 @@ function Input({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
+    fetch(`${config.apiBaseUrl}/getboolean`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setOverTimeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
     fetch(`${config.apiBaseUrl}/status`, {
       method: "POST",
       headers: {
@@ -86,6 +109,21 @@ function Input({ }) {
     })
       .then((data) => data.json())
       .then((val) => setStatusDropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getboolean`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setOverTimeDropSc(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -106,7 +144,29 @@ function Input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getboolean`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const overTimeOption = data.map(option => option.attributedetails_name);
+        setOverTimeDropGrid(overTimeOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const filteredOptionStatusSC = statusDropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionOverTimeSc = overTimeDropSc.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
@@ -116,14 +176,29 @@ function Input({ }) {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionOverTime = overTimeDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
   };
 
+  const handleChangeOverTimeSc = (selectedOvertime_AllowedSc) => {
+    setSelectedOvertime_AllowedSc(selectedOvertime_AllowedSc);
+    setOvertime_AllowedSC(selectedOvertime_AllowedSc ? selectedOvertime_AllowedSc.value : "");
+  };
+
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : "");
+  };
+
+  const handleChangeOverTime = (selectedOvertime_Allowed) => {
+    setSelectedOvertime_Allowed(selectedOvertime_Allowed);
+    setOvertime_Allowed(selectedOvertime_Allowed ? selectedOvertime_Allowed.value : "");
   };
 
   const handleReload = () => {
@@ -220,8 +295,11 @@ function Input({ }) {
     {
       headerName: "Overtime Allowed",
       field: "Overtime_Allowed",
-      filter: 'agTextColumnFilter',
-      editable: true
+      cellEditor: "agSelectCellEditor",
+      editable: true,
+      cellEditorParams: {
+        values: overTimeDropGrid,
+      },
     },
     {
       headerName: "Currency Code",
@@ -279,13 +357,11 @@ function Input({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -326,8 +402,6 @@ function Input({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-
-
           Country_Code: matchedItem.Country_Code,
           Country_Name: matchedItem.Country_Name,
           ISO_Code: matchedItem.ISO_Code,
@@ -504,9 +578,9 @@ function Input({ }) {
                 required title="Please Enter the Grade ID"
                 value={Country_Code}
                 onChange={(e) => setCountry_Code(e.target.value)}
-                maxLength={50}
+                maxLength={10}
               />
-              <label for="cname" className={` exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
+              <label for="cname" className={`exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -532,6 +606,7 @@ function Input({ }) {
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={3}
                 placeholder=""
                 required title="Please Enter the Salary Range From Amount"
                 value={ISO_Code}
@@ -548,6 +623,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required title="Please Enter the Salary Range To Amount"
                 value={TimeZone_Default}
                 onChange={(e) => setTimeZone_Default(e.target.value)}
@@ -563,6 +639,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the Basic Amount"
                 value={Week_Start_Day}
                 onChange={(e) => setWeek_Start_Day(e.target.value)}
@@ -581,7 +658,7 @@ function Input({ }) {
                 required title="Please Enter the HRA Allowance Amount"
                 value={Weekend_Days}
                 onChange={(e) => setWeekend_Days(e.target.value)}
-                maxLength={250}
+                maxLength={50}
               />
               <label className="exp-form-labels">Week End Day</label>
             </div>
@@ -592,12 +669,17 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
                 placeholder=""
-                required title="Please Enter the Conveyance Allowance Amount"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
+                required
                 value={Max_Work_Hours_Day}
-                onChange={(e) => setMax_Work_Work_Day(e.target.value)}
-                maxLength={250}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, ""); 
+                  setMax_Work_Work_Day(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Hours Work Day</label>
             </div>
@@ -608,28 +690,40 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Medical Allowance Amount"
                 value={Max_Work_Hours_Week}
-                onChange={(e) => setMax_Work_Hours_Week(e.target.value)}
+                onChange={(e) => {
+                  // const value= e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_Week(e.target.value);
+                  }}
               />
               <label className="exp-form-labels">Max Hours Work Week</label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="add3"
-                class="exp-input-field form-control"
-                type="text"
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedOvertime_Allowed ? "has-value" : ""} 
+              ${isSelectOverTime ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedOvertime_Allowed}
+                onChange={handleChangeOverTime}
+                options={filteredOptionOverTime}
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Special Allowance"
-                value={Overtime_Allowed}
-                onChange={(e) => setOvertime_Allowed(e.target.value)}
+                onFocus={() => setIsSelectOverTime(true)}
+                onBlur={() => setIsSelectOverTime(false)}
               />
-              <label className="exp-form-labels">Overtime Allowed</label>
+              <label className={`floating-label`}>Overtime Allowed</label>
             </div>
           </div>
 
@@ -640,6 +734,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the  Company PF Contribution"
                 value={Currency_Code}
                 onChange={(e) => setCurrency_Code(e.target.value)}
@@ -649,25 +744,25 @@ function Input({ }) {
           </div>
 
           <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectStatus(true)}
-                  onBlur={() => setIsSelectStatus(false)}
-                />
-                <label className={`floating-label ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+              />
+              <label className={`floating-label ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
             </div>
+          </div>
 
         </div>
       </div>
@@ -687,6 +782,7 @@ function Input({ }) {
                 placeholder=""
                 required title="Please Enter the Grade ID"
                 value={Country_CodeSC}
+                maxLength={10}
                 onChange={(e) => setCountry_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels">Country Code</label>
@@ -703,6 +799,7 @@ function Input({ }) {
                 required title="Please Enter the Grade Name"
                 value={Country_NameSC}
                 onChange={(e) => setCountry_NameSC(e.target.value)}
+                maxLength={100}
               />
               <label className="exp-form-labels">Country Name</label>
             </div>
@@ -713,10 +810,11 @@ function Input({ }) {
               <input
                 id="Week_Start_Day"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Salary Range Amount"
                 value={ISO_CodeSC}
+                maxLength={3}
                 onChange={(e) => setISO_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels">ISO Code</label>
@@ -730,6 +828,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required title="Please Enter the Salary Range Amount"
                 value={TimeZone_DefaultSC}
                 onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
@@ -745,6 +844,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the Basic Amount"
                 value={Week_Start_DaySC}
                 onChange={(e) => setWeek_Start_DaySC(e.target.value)}
@@ -763,7 +863,7 @@ function Input({ }) {
                 required title="Please Enter the HRA Allowance Amount"
                 value={Weekend_DaysSC}
                 onChange={(e) => setWeekend_DaysSC(e.target.value)}
-                maxLength={250}
+                maxLength={50}
               />
               <label className="exp-form-labels">Week End Day</label>
             </div>
@@ -774,12 +874,17 @@ function Input({ }) {
               <input
                 id="Max_Work_Hours_Day"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Conveyance Allowance Amount"
                 value={Max_Work_Hours_DaySC}
-                onChange={(e) => setMax_Work_Hours_DaySC(e.target.value)}
-                maxLength={250}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_DaySC(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Work Hours Day</label>
             </div>
@@ -790,28 +895,40 @@ function Input({ }) {
               <input
                 id="Max_Work_Hours_Week"
                 class="exp-input-field form-control"
-                type="Number"
+                type="time"
+                maxLength={2}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 placeholder=""
                 required title="Please Enter the Medical Allowance Amount"
                 value={Max_Work_Hours_WeekSC}
-                onChange={(e) => setMax_Work_Hours_WeekSC(e.target.value)}
+                onChange={(e) => {
+                  // const value = e.target.value.replace(/\D/g, "");
+                  setMax_Work_Hours_WeekSC(e.target.value);
+                }}
               />
               <label className="exp-form-labels">Max Work Hours Week</label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Overtime_Allowed"
-                class="exp-input-field form-control"
-                type="text"
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedOvertime_AllowedSc ? "has-value" : ""} 
+              ${isSelectOverTimeSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedOvertime_AllowedSc}
+                onChange={handleChangeOverTimeSc}
+                options={filteredOptionOverTimeSc}
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Special Allowance"
-                value={Overtime_AllowedSC}
-                onChange={(e) => setOvertime_AllowedSC(e.target.value)}
+                onFocus={() => setIsSelectOverTimeSC(true)}
+                onBlur={() => setIsSelectOverTimeSC(false)}
               />
-              <label className="exp-form-labels"> Over Time Allowed</label>
+              <label className={`floating-label`}>Overtime Allowed</label>
             </div>
           </div>
 
@@ -822,6 +939,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={10}
                 required title="Please Enter the Company PF Contribution"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
@@ -831,25 +949,25 @@ function Input({ }) {
           </div>
 
           <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectStatusSC ? "is-focused" : ""}`}
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatusSC}
-                  onChange={handleChangeStatusSC}
-                  options={filteredOptionStatusSC}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectStatusSC(true)}
-                  onBlur={() => setIsSelectStatusSC(false)}
-                />
-                <label class="floating-label">Status</label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatusSC}
+                onChange={handleChangeStatusSC}
+                options={filteredOptionStatusSC}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectStatusSC(true)}
+                onBlur={() => setIsSelectStatusSC(false)}
+              />
+              <label class="floating-label">Status</label>
             </div>
+          </div>
 
           <div className="col-12">
             <div className="search-btn-wrapper">
