@@ -5,12 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
-import TabButtons from "./ESSComponents/Tabs";
-import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
-import { showConfirmationToast } from "./ToastConfirmation";
 import "./apps.css";
 import LoadingScreen from "./Loading";
 import * as XLSX from "xlsx";
@@ -41,7 +38,6 @@ function TotalCandidatesApplied() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gridApi, setGridApi] = useState(null);
   const [pinnedRowData, setPinnedRowData] = useState([]);
-  const cv = useRef(null);
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -249,6 +245,10 @@ function TotalCandidatesApplied() {
     setRowData([]);
   };
 
+  const onGridReady = (params) => {
+    setGridApi(params.api);
+  };
+
   const columnDefs = [
     {
       headerName: "Candidate Id",
@@ -326,7 +326,9 @@ function TotalCandidatesApplied() {
   const generateReport = () => {
     if (!gridApi) return;
 
-    const selectedRows = gridApi.getSelectedRows();
+    const selectedRows = gridApi
+      .getSelectedRows()
+      .filter((row) => row.candidate_id !== null);
 
     if (selectedRows.length === 0) {
       toast.warning("Please select at least one row to print");
@@ -340,7 +342,7 @@ function TotalCandidatesApplied() {
     reportWindow.document.write(`
       <html>
       <head>
-        <title>Hiring Decision Report</title>
+        <title>Total Candidates Applied</title>
         <style>
           body {
             font-family: 'Segoe UI', sans-serif;
@@ -445,7 +447,7 @@ function TotalCandidatesApplied() {
         <div class="header">
           <img src="${logoUrl}" class="logo" />
           <div class="title-section">
-            <h2>Hiring Decision Report</h2>
+            <h2>Total Candidates Applied</h2>
           </div>
         </div>
   
@@ -457,13 +459,15 @@ function TotalCandidatesApplied() {
         <table>
           <thead>
             <tr>
+              <th>Candidate Id</th>
               <th>Candidate Name</th>
-              <th>Job Title</th>
-              <th>Department ID</th>
-              <th>Country Code</th>
-              <th>Final Status</th>
-              <th>Decided By</th>
-              <th>Decided On</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Applied Job ID</th>
+              <th>Education</th>
+              <th>Experience</th>
+              <th>Related Experience</th>
+              <th>Job Description</th>
             </tr>
           </thead>
           <tbody>
@@ -472,13 +476,15 @@ function TotalCandidatesApplied() {
     selectedRows.forEach((row) => {
       reportWindow.document.write(`
         <tr>
+          <td>${row.candidate_id || ""}</td>
           <td>${row.candidate_name || ""}</td>
-          <td>${row.job_title || ""}</td>
-          <td>${row.department_id || ""}</td>
-          <td>${row.country_code || ""}</td>
-          <td>${row.final_status || ""}</td>
-          <td>${row.decided_by || ""}</td>
-          <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
+          <td>${row.email || ""}</td>
+          <td>${row.phone || ""}</td>
+          <td>${row.applied_job_id || ""}</td>
+          <td>${row.Education || ""}</td>
+          <td>${row.Experience || ""}</td>
+          <td>${row.Related_experience || ""}</td>
+          <td>${row.Job_description || ""}</td>
         </tr>
       `);
     });
@@ -505,7 +511,9 @@ function TotalCandidatesApplied() {
   const exportToPDF = () => {
     if (!gridApi) return;
 
-    const selectedRows = gridApi.getSelectedRows();
+    const selectedRows = gridApi
+      .getSelectedRows()
+      .filter((row) => row.candidate_id !== null);
 
     if (selectedRows.length === 0) {
       toast.warning("Please select at least one row to export");
@@ -515,29 +523,33 @@ function TotalCandidatesApplied() {
     const doc = new jsPDF();
 
     doc.setFontSize(14);
-    doc.text("Hiring Decision Report", 14, 15);
+    doc.text("Total Candidates Applied", 14, 15);
 
     const tableColumn = [
+      "Candidate Id",
       "Candidate Name",
-      "Job Title",
-      "Department ID",
-      "Country Code",
-      "Final Status",
-      "Decided By",
-      "Decided On",
+      "Email",
+      "Phone",
+      "Applied Job ID",
+      "Education",
+      "Experience",
+      "Related Experience",
+      "Job Description",
     ];
 
     const tableRows = [];
 
     selectedRows.forEach((row) => {
       const rowData = [
+        row.candidate_id || "",
         row.candidate_name || "",
-        row.job_title || "",
-        row.department_id || "",
-        row.country_code || "",
-        row.final_status || "",
-        row.decided_by || "",
-        row.decided_on ? formatDate(row.decided_on) : "",
+        row.email || "",
+        row.phone || "",
+        row.applied_job_id || "",
+        row.Education || "",
+        row.Experience || "",
+        row.Related_experience || "",
+        row.Job_description || "",
       ];
 
       tableRows.push(rowData);
@@ -549,32 +561,36 @@ function TotalCandidatesApplied() {
       startY: 20,
     });
 
-    doc.save("Hiring Decision Report.pdf");
+    doc.save("Total Candidates Applied.pdf");
   };
 
   const transformRowData = (data) => {
     return data.map((row) => ({
+      "Candidate Id": row.candidate_id || "",
       "Candidate Name": row.candidate_name || "",
-      "Job Title": row.job_title || "",
-      "Department ID": row.department_id || "",
-      "Country Code": row.country_code || "",
-      "Final Status": row.final_status || "",
-      "Decided By": row.decided_by || "",
-      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
+      Email: row.email || "",
+      Phone: row.phone || "",
+      "Applied Job ID": row.applied_job_id || "",
+      Education: row.Education || "",
+      Experience: row.Experience || "",
+      "Related Experience": row.Related_experience || "",
+      "Job Description": row.Job_description || "",
     }));
   };
 
   const handleExportToExcel = () => {
     if (!gridApi) return;
 
-    const selectedRows = gridApi.getSelectedRows();
+    const selectedRows = gridApi
+      .getSelectedRows()
+      .filter((row) => row.candidate_id !== null);
 
     if (selectedRows.length === 0) {
       toast.warning("Please select at least one row to export.");
       return;
     }
 
-    const headerData = [["Hiring Decision Report"]];
+    const headerData = [["Total Candidates Applied"]];
 
     const transformedData = transformRowData(selectedRows);
 
@@ -584,9 +600,13 @@ function TotalCandidatesApplied() {
     XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Hiring Decision Report");
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Total Candidates Applied",
+    );
 
-    XLSX.writeFile(workbook, "Hiring_Decision_Report.xlsx");
+    XLSX.writeFile(workbook, "Total Candidates Applied.xlsx");
   };
 
   return (
@@ -623,7 +643,7 @@ function TotalCandidatesApplied() {
             ) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
-                <i class="fa-solid fa-file-excel"></i>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             )}
           </div>
@@ -631,9 +651,7 @@ function TotalCandidatesApplied() {
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-        <div className="header-flex">
-          <h6 className="">Search Criteria:</h6>
-        </div>
+
         <div className="row g-3">
           <div className="col-md-2">
             <div
@@ -870,7 +888,7 @@ function TotalCandidatesApplied() {
         className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
         style={{ width: "100%" }}
       >
-        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+        <div className="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
           <AgGridReact
             rowData={rowData}
             columnDefs={columnDefs}
@@ -878,6 +896,7 @@ function TotalCandidatesApplied() {
             // onRowClicked={(event) => handleRowSelection(event.data)}
             pagination={true}
             paginationAutoPageSize={true}
+            onGridReady={onGridReady}
           />
         </div>
       </div>
