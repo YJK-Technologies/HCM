@@ -1,41 +1,39 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import LoadingScreen from "./Loading";
-import { useRef } from "react";
-import * as XLSX from "xlsx";
+import Select from "react-select";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Select from "react-select";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
-function TotalInterviewsScheduled({}) {
+function TotalInterviewsScheduled({ }) {
   const [rowData, setRowData] = useState([]);
-  const [locationSC, setlocationSC] = useState("");
-  const [department_idSC, setdepartment_idSC] = useState("");
-  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
-  const [statusSC, setstatusSC] = useState("");
-  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
+  const [location, setLocation] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [status, setStatus] = useState("");
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [PanelDrop, setPanelDrop] = useState([]);
-  const [isSelectPanelSC, setisSelectPanelSC] = useState(false);
-  const [selectedPanelIDSC, setselectedPanelIDSC] = useState("");
-  const [PanelIDSC, setPanelIDSC] = useState("");
-  const [selectedscheduleidSC, setselectedscheduleidSC] = useState("");
-  const [scheduleidSC, setscheduleidSC] = useState("");
-  const [isselectedscheduleidSC, setIsscheduleidSC] = useState("");
+  const [isSelectPanelId, setisSelectPanelId] = useState(false);
+  const [selectedPanelId, setselectedPanelId] = useState("");
+  const [panelId, setPanelId] = useState("");
+  const [selectedScheduleId, setSelectedScheduleId] = useState("");
+  const [scheduleId, setScheduleId] = useState("");
+  const [isSelectedScheduleId, setIsSelectedScheduleId] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
-  const [isselectedcanditateidSC, setIscanditateidSC] = useState("");
+  const [isSelectedCanditateId, setIsSelectedCanditateId] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
-  const [selectedcandidate_nameSC, setSelectedcandidatenameSC] = useState("");
-  const [canditatenameSC, set_candidatenameSC] = useState("");
+  const [selectedCandidateId, setSelectedCandidateId] = useState("");
+  const [canditateId, setCandidateId] = useState("");
   const [InterviewModedrop, setInterviewModeDrop] = useState([]);
-  const [selectedInterviewModeSC, setselectedInterviewModeSC] = useState("");
-  const [InterviewModeSC, setInterviewModeSC] = useState("");
-  const [isSelectInterviewModeSC, setisSelectInterviewModeSC] = useState(false);
+  const [selectedInterviewMode, setselectedInterviewMode] = useState("");
+  const [interviewMode, setInterviewMode] = useState("");
+  const [isSelectInterviewMode, setisSelectInterviewMode] = useState(false);
   const [statusgriddrop, setStatusGriddrop] = useState([]);
   const [Paneldrop, setPaneldrop] = useState([]);
   const [candidatedrop, setcandidatedrop] = useState([]);
@@ -44,7 +42,10 @@ function TotalInterviewsScheduled({}) {
   const [statusdrop, setStatusdrop] = useState([]);
   const gridRef = useRef();
   const [gridApi, setGridApi] = useState(null);
-  const [totalCount, setTotalCount] = useState(0);
+  const gridApiRef = useRef(null);
+
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -57,12 +58,12 @@ function TotalInterviewsScheduled({}) {
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+    .filter((permission) => permission.screen_type === "TotalInterviewsSched")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handleInterviewModeSC = (selectedDPT) => {
-    setselectedInterviewModeSC(selectedDPT);
-    setInterviewModeSC(selectedDPT ? selectedDPT.value : "");
+  const handleInterviewMode = (selectedDPT) => {
+    setselectedInterviewMode(selectedDPT);
+    setInterviewMode(selectedDPT ? selectedDPT.value : "");
   };
 
   const filteredOptionInterviewMode = InterviewModedrop.map((option) => ({
@@ -176,12 +177,12 @@ function TotalInterviewsScheduled({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  const handlescandidate_nameSC = (selectedDPT) => {
-    setSelectedcandidatenameSC(selectedDPT);
-    set_candidatenameSC(selectedDPT ? selectedDPT.value : "");
+  const handleCandidateId = (selectedDPT) => {
+    setSelectedCandidateId(selectedDPT);
+    setCandidateId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
+  const filteredOptionCandidateId = canditatenameDrop.map((option) => ({
     value: option.candidate_id,
     label: `${option.candidate_id} - ${option.candidate_name}`,
   }));
@@ -215,12 +216,12 @@ function TotalInterviewsScheduled({}) {
     }
   }, []);
 
-  const handleschedule_idSC = (selectedDPT) => {
-    setselectedscheduleidSC(selectedDPT);
-    setscheduleidSC(selectedDPT ? selectedDPT.value : "");
+  const handleScheduleId = (selectedDPT) => {
+    setSelectedScheduleId(selectedDPT);
+    setScheduleId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptionschedule_id = scheduleidDrop.map((option) => ({
+  const filteredOptionScheduleId = scheduleidDrop.map((option) => ({
     value: option.schedule_id,
     label: option.schedule_id,
   }));
@@ -254,17 +255,17 @@ function TotalInterviewsScheduled({}) {
     }
   }, []);
 
-  const handlePanelIDSC = (selectedDPT) => {
-    setselectedPanelIDSC(selectedDPT);
-    setPanelIDSC(selectedDPT ? selectedDPT.value : "");
+  const handlePanelId = (selectedDPT) => {
+    setselectedPanelId(selectedDPT);
+    setPanelId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleChangeStatusSC = (selectedStatus) => {
-    setSelectedStatusSC(selectedStatus);
-    setstatusSC(selectedStatus ? selectedStatus.value : "");
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
-  const filteredOptionPanelID = PanelDrop.map((option) => ({
+  const filteredOptionPanelId = PanelDrop.map((option) => ({
     value: option.panel_id,
     label: `${option.panel_id} - ${option.panel_name}`,
   }));
@@ -322,6 +323,8 @@ function TotalInterviewsScheduled({}) {
 
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Schedule ID",
       field: "schedule_id",
       editable: false,
@@ -329,86 +332,42 @@ function TotalInterviewsScheduled({}) {
     {
       headerName: "Candidate ID",
       field: "candidate_id",
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: candidatedrop.map((d) => d.value),
-      },
-      valueFormatter: (params) => {
-        const dept = candidatedrop.find((d) => d.value === params.value);
-        return dept ? dept.label : params.value;
-      },
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Panel ID",
       field: "panel_id",
-      editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: Paneldrop.map((d) => d.value),
-      },
-      valueFormatter: (params) => {
-        const dept = Paneldrop.find((d) => d.value === params.value);
-        return dept ? dept.label : params.value;
-      },
+      editable: false,
     },
     {
       headerName: "Schedule Date",
       field: "scheduled_datetime",
-      editable: true,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+      editable: false,
     },
     {
       headerName: "Time Zone",
       field: "timezone",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Location",
       field: "location",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Interview Mode",
       field: "Interview_Mode",
-      editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: interviewmodeDrop,
-      },
+      editable: false,
     },
     {
       headerName: "Meeting Link",
       field: "meeting_link",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Status",
       field: "Status",
-      editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: statusgriddrop,
-      },
-      editable: true,
-    },
-    {
-      headerName: "Keyfield",
-      field: "keyfield",
       editable: false,
-      hide: true,
-      // hide: true
     },
   ];
 
@@ -417,74 +376,22 @@ function TotalInterviewsScheduled({}) {
     paginationPageSize: 10,
   };
 
-  //   const handleSearch = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const body = {
-  //         candidate_id: canditatenameSC,
-  //         schedule_id: scheduleidSC,
-  //         panel_id: PanelIDSC,
-  //         department_id: department_idSC,
-  //         Interview_Mode: InterviewModeSC,
-  //         Status: statusSC,
-  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
-  //       };
-
-  //       const response = await fetch(`${config.apiBaseUrl}/TotalInterviewSchedule`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(body),
-  //       });
-
-  //       if (response.ok) {
-  //         const fetchedData = await response.json();
-  //         const newRows = fetchedData.map((matchedItem) => ({
-  //           schedule_id: matchedItem.schedule_id,
-  //           candidate_id: matchedItem.candidate_id,
-  //           panel_id: matchedItem.panel_id,
-  //           scheduled_datetime: matchedItem.scheduled_datetime,
-  //           timezone: matchedItem.timezone,
-  //           location: matchedItem.location,
-  //           timezone: matchedItem.timezone,
-  //           meeting_link: matchedItem.meeting_link,
-  //           Status: matchedItem.Status,
-  //           keyfield: matchedItem.keyfield,
-  //           Interview_Mode: matchedItem.Interview_Mode,
-  //         }));
-  //         setRowData(newRows);
-  //       } else if (response.status === 404) {
-  //         console.log("Data Not found");
-  //         toast.warning("Data Not found");
-  //         setRowData([]);
-  //       } else {
-  //         const errorResponse = await response.json();
-  //         toast.warning(errorResponse.message || "Failed to insert sales data");
-  //         console.error(errorResponse.details || errorResponse.message);
-  //         setRowData([]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching search data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
   const handleSearch = async () => {
     setLoading(true);
     try {
       const body = {
-        candidate_id: canditatenameSC,
-        schedule_id: scheduleidSC,
-        panel_id: PanelIDSC,
-        department_id: department_idSC,
-        Interview_Mode: InterviewModeSC,
-        Status: statusSC,
+        candidate_id: Number(canditateId),
+        schedule_id: Number(scheduleId),
+        panel_id: Number(panelId),
+        Interview_Mode: interviewMode,
+        Status: status,
+        from_date: fromDate,
+        to_date: toDate,
+        location: location,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/TotalInterviewSchedule`,
+      const response = await fetch(`${config.apiBaseUrl}/TotalInterviewSchedule`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -539,6 +446,7 @@ function TotalInterviewsScheduled({}) {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
+    gridApiRef.current = params.api;
   };
 
   const generateReport = () => {
@@ -723,122 +631,258 @@ function TotalInterviewsScheduled({}) {
     reportWindow.document.close();
   };
 
-const exportToPDF = () => {
-  const api = gridRef.current?.api;
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
-  if (!api) {
-    toast.warning("Grid not ready");
-    return;
-  }
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
 
-  const selectedRows = api
-    .getSelectedRows()
-    .filter((row) => row.schedule_id !== null);
+  const exportToPDF = () => {
+    if (!gridApiRef.current) return;
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to export");
-    return;
-  }
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
 
-  const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-  doc.setFontSize(14);
-  doc.text("Total Interviews Scheduled", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-  doc.setFontSize(11);
-  doc.text(`Total Records: ${selectedRows.length}`, 14, 22);
+    const headers = [
+      [
+        "Schedule ID",
+        "Candidate ID",
+        "Panel ID",
+        "Schedule Date",
+        "Time Zone",
+        "Location",
+        "Interview Mode",
+        "Meeting Link",
+        "Status",
+      ],
+    ];
 
-  const tableColumn = [
-    "Schedule ID",
-    "Candidate ID",
-    "Panel ID",
-    "Schedule Date",
-    "Time Zone",
-    "Location",
-    "Interview Mode",
-    "Meeting Link",
-    "Status",
-  ];
+    // ✅ Table body
+    const body = dataSource.map((row) => [
+      row.schedule_id || "",
+      row.candidate_id || "",
+      row.panel_id || "",
+      row.scheduled_datetime || "",
+      row.timezone || "",
+      row.location || "",
+      row.Interview_Mode || "",
+      row.meeting_link || "",
+      row.Status || "",
+    ]);
 
-  const tableRows = selectedRows.map((row) => [
-    row.schedule_id || "",
-    row.candidate_id || "",
-    row.panel_id || "",
-    row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
-    row.timezone || "",
-    row.location || "",
-    row.Interview_Mode || "",
-    row.meeting_link || "",
-    row.Status || "",
-  ]);
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: 28,
-  });
+    /* ================= HEADER DESIGN ================= */
 
-  doc.save("Total_Interviews_Scheduled.pdf");
-};
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
 
-  const transformInterviewRowData = (data) => {
-  return data.map((row) => ({
-    "Schedule ID": row.schedule_id || "",
-    "Candidate ID": row.candidate_id || "",
-    "Panel ID": row.panel_id || "",
-    "Schedule Date": row.scheduled_datetime
-      ? formatDate(row.scheduled_datetime)
-      : "",
-    "Time Zone": row.timezone || "",
-    Location: row.location || "",
-    "Interview Mode": row.Interview_Mode || "",
-    "Meeting Link": row.meeting_link || "",
-    Status: row.Status || "",
-  }));
-};
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Total Interviews Scheduled", pageWidth / 2, 40, {
+      align: "center",
+    });
+
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
+
+    autoTable(doc, {
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
+      },
+
+      margin: { left: 20, right: 20 },
+    });
+
+    doc.save("Total_Interviews_Scheduled.pdf");
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Schedule ID": row.schedule_id || "",
+      "Candidate ID": row.candidate_id || "",
+      "Panel ID": row.panel_id || "",
+      "Schedule Date": row.scheduled_datetime
+        ? formatDate(row.scheduled_datetime)
+        : "",
+      "Time Zone": row.timezone || "",
+      Location: row.location || "",
+      "Interview Mode": row.Interview_Mode || "",
+      "Meeting Link": row.meeting_link || "",
+      Status: row.Status || "",
+    }));
+  };
 
   const handleExportToExcel = () => {
-  const api = gridRef.current?.api;
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
 
-  if (!api) {
-    toast.warning("Grid not ready");
-    return;
-  }
+    const screenName = "Total Interviews Scheduled";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-  const selectedRows = api
-    .getSelectedRows()
-    .filter((row) => row.schedule_id !== null);
+    /* ================= THEME COLORS ================= */
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to export.");
-    return;
-  }
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
 
-  // Title row
-  const headerData = [
-    ["Total Interviews Scheduled"],
-    [`Total Records: ${selectedRows.length}`],
-  ];
+    /* ================= HEADER ================= */
 
-  const transformedData = transformInterviewRowData(selectedRows);
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
-  const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-  // Start table from row 5
-  XLSX.utils.sheet_add_json(worksheet, transformedData, {
-    origin: "A5",
-  });
+    /* ================= TABLE DATA ================= */
 
-  const workbook = XLSX.utils.book_new();
+    const transformedData = transformRowData(rowData);
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Total Interviews Scheduled"
-  );
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
 
-  XLSX.writeFile(workbook, "Total_Interviews_Scheduled.xlsx");
-};
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: totalColumns - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Interview Schedule"
+    );
+
+    XLSX.writeFile(workbook, "Total_Interviews_Scheduled.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -850,78 +894,140 @@ const exportToPDF = () => {
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Completion Rate</h1>
+          <h1 className="page-title">Total Interviews Schedule</h1>
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
-                <i className="fa-solid fa-file-excel"></i>
+                <i class="fa-solid fa-file-excel"></i>
               </div>
             )}
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Schedule From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Schedule To
+              </label>
+            </div>
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedscheduleidSC ? "has-value" : ""} 
-              ${isselectedscheduleidSC ? "is-focused" : ""}`}
+              ${selectedScheduleId ? "has-value" : ""} 
+              ${isSelectedScheduleId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsscheduleidSC(true)}
-                onBlur={() => setIsscheduleidSC(false)}
+                onFocus={() => setIsSelectedScheduleId(true)}
+                onBlur={() => setIsSelectedScheduleId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedscheduleidSC}
-                onChange={handleschedule_idSC}
-                options={filteredOptionschedule_id}
+                value={selectedScheduleId}
+                onChange={handleScheduleId}
+                options={filteredOptionScheduleId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Schedule ID
               </label>
             </div>
           </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedcandidate_nameSC ? "has-value" : ""} 
-              ${isselectedcanditateidSC ? "is-focused" : ""}`}
+              ${selectedCandidateId ? "has-value" : ""} 
+              ${isSelectedCanditateId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIscanditateidSC(true)}
-                onBlur={() => setIscanditateidSC(false)}
+                onFocus={() => setIsSelectedCanditateId(true)}
+                onBlur={() => setIsSelectedCanditateId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedcandidate_nameSC}
-                onChange={handlescandidate_nameSC}
-                options={filteredOptioncandidate_name}
+                value={selectedCandidateId}
+                onChange={handleCandidateId}
+                options={filteredOptionCandidateId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Candiate ID
@@ -932,42 +1038,43 @@ const exportToPDF = () => {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedPanelIDSC ? "has-value" : ""} 
-              ${isSelectPanelSC ? "is-focused" : ""}`}
+              ${selectedPanelId ? "has-value" : ""} 
+              ${isSelectPanelId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectPanelSC(true)}
-                onBlur={() => setisSelectPanelSC(false)}
+                onFocus={() => setisSelectPanelId(true)}
+                onBlur={() => setisSelectPanelId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedPanelIDSC}
-                onChange={handlePanelIDSC}
-                options={filteredOptionPanelID}
+                value={selectedPanelId}
+                onChange={handlePanelId}
+                options={filteredOptionPanelId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Panel ID
               </label>
             </div>
           </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedInterviewModeSC ? "has-value" : ""} 
-              ${isSelectInterviewModeSC ? "is-focused" : ""}`}
+              ${selectedInterviewMode ? "has-value" : ""} 
+              ${isSelectInterviewMode ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectInterviewModeSC(true)}
-                onBlur={() => setisSelectInterviewModeSC(false)}
+                onFocus={() => setisSelectInterviewMode(true)}
+                onBlur={() => setisSelectInterviewMode(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedInterviewModeSC}
-                onChange={handleInterviewModeSC}
+                value={selectedInterviewMode}
+                onChange={handleInterviewMode}
                 options={filteredOptionInterviewMode}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
@@ -975,6 +1082,7 @@ const exportToPDF = () => {
               </label>
             </div>
           </div>
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -985,8 +1093,8 @@ const exportToPDF = () => {
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={locationSC}
-                onChange={(e) => setlocationSC(e.target.value)}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Location
@@ -997,19 +1105,19 @@ const exportToPDF = () => {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedStatusSC ? "has-value" : ""} 
-              ${isSelectFocusedSC ? "is-focused" : ""}`}
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
             >
               <Select
                 id="status"
                 isClearable
-                value={selectedStatusSC}
-                onChange={handleChangeStatusSC}
+                value={selectedStatus}
+                onChange={handleChangeStatus}
                 options={filteredOptionStatus}
                 placeholder=""
                 classNamePrefix="react-select"
-                onFocus={() => setIsSelectFocusedSC(true)}
-                onBlur={() => setIsSelectFocusedSC(false)}
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
               />
               <label for="status" class="floating-label">
                 Status

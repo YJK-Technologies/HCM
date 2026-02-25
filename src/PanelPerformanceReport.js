@@ -1,28 +1,24 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
 function PanelPerformanceReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
   const [ratingSC, setratingSC] = useState("");
   const [panel_nameSC, setpanel_nameSC] = useState("");
   const [selectedscheduleidSC, setselectedscheduleidSC] = useState("");
@@ -30,11 +26,12 @@ function PanelPerformanceReport() {
   const [isselectedscheduleidSC, setIsscheduleidSC] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [totalInterviewsSC, settotalInterviewsSC] = useState("");
-  
+  const gridApiRef = useRef(null);
+
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+    .filter((permission) => permission.screen_type === "PanelPerformanceRepo")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const handleschedule_idSC = (selectedDPT) => {
@@ -80,8 +77,7 @@ function PanelPerformanceReport() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/PanelPerformanceSearch`,
+      const response = await fetch(`${config.apiBaseUrl}/PanelPerformanceSearch`,
         {
           method: "POST",
           headers: {
@@ -89,23 +85,8 @@ function PanelPerformanceReport() {
           },
           body: JSON.stringify({
             schedule_id: totalInterviewsSC,
-            // candidate_name: canditatename,
-            // email: emailSC,
             panel_name: panel_nameSC,
-            // scheduled_datetime: scheduled_datetimeSC,
-            // Interview_Mode: InterviewModeSC,
-            // Status: statusSC,
-            // location: locationSC,
-            // employee_id: EmployeeIDSC,
-            // role: RoleSC,
             rating: Number(ratingSC),
-            // decided_on: decided_on,
-            // remarks: remarksSC,
-            // recommendation: RecommendationSC,
-            // comments: commentsSC,
-            // submitted_on: submitted_onSC,
-            // meeting_link: meetingLinkSc,
-            // timezone: timezoneSc,
           }),
         },
       );
@@ -139,6 +120,8 @@ function PanelPerformanceReport() {
 
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Panel Name",
       field: "panel_name",
       editable: false,
@@ -152,12 +135,6 @@ function PanelPerformanceReport() {
       headerName: "Total Interviews",
       field: "total_interviews",
       editable: false,
-    },
-    {
-      headerName: "Keyfield",
-      field: "keyfield",
-      editable: false,
-      hide: true,
     },
   ];
 
@@ -173,7 +150,7 @@ function PanelPerformanceReport() {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const generateReport = () => {
@@ -357,94 +334,239 @@ function PanelPerformanceReport() {
     window.location.reload();
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
+
   const exportToPDF = () => {
-    if (!gridApi) return;
+    if (!gridApiRef.current) return;
 
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    doc.setFontSize(14);
-    doc.text("Candidate Interview Report", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-    const tableColumn = [
-      "Candidate Name",
-      "Schedule Date",
-      "Rating",
-      "Final Status",
-      "Decided On",
-      "Remarks",
+    const headers = [
+      [
+        "Panel Name",
+        "Average Rating",
+        "Total Interviews",
+      ],
     ];
 
-    const tableRows = [];
+    // ✅ Table body
+    const body = dataSource.map((row) => [
+      row.panel_name || "",
+      row.avg_rating || "",
+      row.total_interviews || "",
+    ]);
 
-    selectedRows.forEach((row) => {
-      const rowData = [
-        row.candidate_name || "",
-        row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
-        row.rating || "",
-        row.Final_Status || "",
-        row.decided_on ? formatDate(row.decided_on) : "",
-        row.remarks || "",
-      ];
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-      tableRows.push(rowData);
+    /* ================= HEADER DESIGN ================= */
+
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Panel Performance Report", pageWidth / 2, 40, {
+      align: "center",
     });
+
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
 
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
+      },
+
+      margin: { left: 20, right: 20 },
     });
 
-    doc.save("Candidate Interview Report.pdf");
+    doc.save("Panel_Performance_Report.pdf");
   };
 
   const transformRowData = (data) => {
     return data.map((row) => ({
-      "Candidate Name": row.candidate_name || "",
-      "Schedule Date": row.scheduled_datetime
-        ? formatDate(row.scheduled_datetime)
-        : "",
-      Rating: row.rating || "",
-      "Final Status": row.Final_Status || "",
-      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
-      Remarks: row.remarks || "",
+      "Panel Name": row.panel_name || "",
+      "Average Rating": row.avg_rating || "",
+      "Total Interviews": row.total_interviews || "",
     }));
   };
 
   const handleExportToExcel = () => {
-    if (!gridApi) return;
-
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export.");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const headerData = [["Candidate Interview Report"]];
+    const screenName = "Panel Performance Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const transformedData = transformRowData(selectedRows);
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    // Main table starts from row 5 (same pattern as your Task report)
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+    const headerRowIndex = headerData.length;
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: totalColumns - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell = worksheet[
+        XLSX.utils.encode_cell({ r: headerRowIndex, c: C })
+      ];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[
+          XLSX.utils.encode_cell({ r: R, c: C })
+        ];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
-      "Candidate Interview Report",
+      "Panel Performance"
     );
 
-    XLSX.writeFile(workbook, "Candidate_Interview_Report.xlsx");
+    XLSX.writeFile(workbook, "Panel_Performance_Report.xlsx");
   };
 
   return (
@@ -460,25 +582,19 @@ function PanelPerformanceReport() {
           <h1 className="page-title">Panel Performance Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -496,11 +612,19 @@ function PanelPerformanceReport() {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
                 <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
                 </li>
               )}
             </ul>

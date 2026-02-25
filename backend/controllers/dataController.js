@@ -36022,18 +36022,7 @@ const Employee_shift_mappingSc = async (req, res) => {
 
 //code exported by Sakthi on 17-02-26
 const InterviewScheduleSearch = async (req, res) => {
-  const {
-    schedule_id,
-    candidate_name,
-    email,
-    panel_name,
-    scheduled_datetime,
-    Interview_Mode,
-    Status,
-    location,
-    meeting_link,
-    timezone
-  } = req.body;
+  const { schedule_id, candidate_name, email, panel_name, Interview_Mode, Status, location, meeting_link, timezone, from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36041,18 +36030,19 @@ const InterviewScheduleSearch = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
+      .input("schedule_id", sql.Int, schedule_id)
       .input("candidate_name", sql.NVarChar, candidate_name)
       .input("email", sql.VarChar, email)
       .input("panel_name", sql.NVarChar, panel_name)
-      .input("scheduled_datetime", sql.Date, scheduled_datetime ? scheduled_datetime : null)
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
       .input("Interview_Mode", sql.VarChar, Interview_Mode)
       .input("Status", sql.VarChar, Status)
       .input("location", sql.VarChar, location)
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, @scheduled_datetime, @location, @meeting_link, @timezone, 
-        '', '', '', '', 0, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '' `);
+      .query(` EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, '', @location, @meeting_link, @timezone, 
+        '', '', '', '', 0, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date,'','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36069,15 +36059,7 @@ const InterviewScheduleSearch = async (req, res) => {
 
 //code exported by Sakthi on 19-02-26
 const InterviewFeedbackSearch = async (req, res) => {
-  const {
-    candidate_name,
-    schedule_id,
-    employee_id,
-    role,
-    recommendation,
-    rating,
-    submitted_on
-  } = req.body;
+  const { candidate_name, schedule_id, employee_id, role, recommendation, rating, from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36085,15 +36067,17 @@ const InterviewFeedbackSearch = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SCF")
-      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
-      .input("candidate_name", sql.NVarChar, candidate_name || "")
-      .input("employee_id", sql.VarChar, employee_id || "")
-      .input("role", sql.NVarChar, role || "")
-      .input("recommendation", sql.VarChar, recommendation || "")
-      .input("rating", sql.Int, rating ? rating : 0)
-      .input("submitted_on",sql.Date, submitted_on ? submitted_on : "1900-01-01")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '',
-      '', '', '', '', '', '', @employee_id, @role, @recommendation, @submitted_on, @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '' `);
+      .input("schedule_id", sql.Int, schedule_id)
+      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("employee_id", sql.VarChar, employee_id)
+      .input("role", sql.NVarChar, role)
+      .input("recommendation", sql.VarChar, recommendation)
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
+      .input("rating", sql.Int, rating)
+      // .input("submitted_on",sql.Date, submitted_on ? submitted_on : "1900-01-01")
+      .query(` EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, @candidate_name, '', '',
+      '', '', '', '', '', '', @employee_id, @role, @recommendation, '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date,'','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36112,15 +36096,7 @@ const InterviewFeedbackSearch = async (req, res) => {
 
 //code exported by Sakthi on 20-02-26
 const InterviewProgressSearch = async (req, res) => {
-  const {
-    candidate_name,
-    schedule_id,
-    rating,
-    submitted_on,
-    Final_Status,
-    decided_on,
-    remarks
-  } = req.body;
+  const { candidate_name, schedule_id, rating, Final_Status, remarks, from_date, to_date, start_date, end_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36128,15 +36104,17 @@ const InterviewProgressSearch = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SCP")
-      .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
-      .input("candidate_name", sql.NVarChar, candidate_name || "")
-      .input("submitted_on", sql.NVarChar, submitted_on)
-      .input("rating", sql.Int, rating ? rating : 0)
-      .input("Final_Status", sql.VarChar, Final_Status || "")
-      .input("decided_on", sql.Date, decided_on || null)
-      .input("remarks", sql.VarChar, remarks || "")
-      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '', '', '', '', '',
-         '', '', '', '', '', @submitted_on, @rating, @Final_Status, @decided_on, @remarks, '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '' `);
+      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("rating", sql.Int, rating)
+      .input("Final_Status", sql.VarChar, Final_Status)
+      .input("remarks", sql.VarChar, remarks)
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
+      .input("start_date", sql.NVarChar, start_date)
+      .input("end_date", sql.NVarChar, end_date)
+      .query(` EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, '', '', '', '', '', '',
+         '', '', '', '', '', '', @rating, @Final_Status, '', @remarks, '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '',
+         @from_date, @to_date, @start_date, @end_date `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36170,8 +36148,8 @@ const PanelPerformanceSearch = async (req, res) => {
       .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
       .input("panel_name", sql.NVarChar, panel_name || "")
       .input("rating", sql.Int, rating ? rating : 0)
-      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
-         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '' `);
+      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
+         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36190,15 +36168,7 @@ const PanelPerformanceSearch = async (req, res) => {
 
 //code exported by Sakthi on 24-02-26
 const HiringDecisionSearch = async (req, res) => {
-  const {
-    candidate_name,
-    job_title,
-    department_id,
-    country_code,
-    final_status,
-    decided_by,
-    decided_on
-  } = req.body;
+  const { candidate_name, job_title, department_id, country_code, final_status, decided_by, start_date, end_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36206,15 +36176,17 @@ const HiringDecisionSearch = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SCD")
-      .input("candidate_name", sql.NVarChar, candidate_name || "")
-      .input("job_title", sql.NVarChar, job_title || "")
-      .input("department_id", sql.VarChar, department_id || "")
-      .input("country_code", sql.VarChar, country_code || "")
-      .input("final_status", sql.VarChar, final_status || "")
-      .input("decided_by", sql.Int, decided_by ? decided_by : 0)
-      .input("decided_on", sql.Date, decided_on || null)
-      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '', '',
-         '', '', '', '', '', 0, @final_status, @decided_on,'', @department_id, @job_title, @country_code, @decided_by, 0, '', '', '', '', '', '', 0, 0, 0, '' `);
+      .input("candidate_name", sql.NVarChar, candidate_name)
+      .input("job_title", sql.NVarChar, job_title)
+      .input("department_id", sql.VarChar, department_id)
+      .input("country_code", sql.VarChar, country_code)
+      .input("final_status", sql.VarChar, final_status)
+      .input("decided_by", sql.Int, decided_by)
+      .input("start_date", sql.NVarChar, start_date)
+      .input("end_date", sql.NVarChar, end_date)
+      .query(`EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, '', '', '', '', '', '', '',
+         '', '', '', '', '', 0, @final_status, '','', @department_id, @job_title, @country_code, @decided_by, 0, '', '', '', '', '', '', 0, 0, 0, '',
+         '','',@start_date, @end_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36249,8 +36221,8 @@ const CandidateAppliedSearch = async (req, res) => {
       .input("Related_experience", sql.VarChar, Related_experience)
       .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, @email, '', '', '', '', '', '',
-         '', '', '', '', '', 0, '', '','', '', '', '', 0, @applied_job_id, @phone, @Education, @Experience, @Related_experience, @Job_description, @company_code, 0, 0, 0, '' `);
+      .query(`EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, @email, '', '', '', '', '', '',
+         '', '', '', '', '', 0, '', '','', '', '', '', 0, @applied_job_id, @phone, @Education, @Experience, @Related_experience, @Job_description, @company_code, 0, 0, 0, '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36266,7 +36238,7 @@ const CandidateAppliedSearch = async (req, res) => {
 
 //code exported by Sakthi on 24-02-26
 const TotalInterviewSchedule = async (req, res) => {
-  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,Status,company_code } = req.body;
+  const { schedule_id,panel_id,candidate_id,location,Interview_Mode,Status,company_code,to_date,from_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36280,8 +36252,11 @@ const TotalInterviewSchedule = async (req, res) => {
       .input("Interview_Mode", sql.VarChar, Interview_Mode  )
       .input("Status", sql.VarChar, Status)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', '', @Interview_Mode, @Status, '', @location, '',
-         '', '', '', '', '', 0, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, @candidate_id, @panel_id, 0, '' `);
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
+      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', '', @Interview_Mode, @Status, '', @location, '',
+         '', '', '', '', '', 0, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, @candidate_id, @panel_id, 0, '',
+         @from_date, @to_date, '', '' `);
  
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36297,7 +36272,7 @@ const TotalInterviewSchedule = async (req, res) => {
 
 //code exported by Sakthi on 24-02-26
 const InterviewCompletionRateSC = async (req, res) => {
-  const { feedback_id,schedule_id,employee_id,rating,comments,Recommendation, company_code } = req.body;
+  const { feedback_id,schedule_id,employee_id,rating,comments,Recommendation, company_code, to_date, from_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36311,8 +36286,11 @@ const InterviewCompletionRateSC = async (req, res) => {
       .input("comments", sql.VarChar, comments)
       .input("Recommendation", sql.VarChar, Recommendation)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', '', '', '', '', '', '',
-         '', @employee_id, '', @recommendation, '', @rating, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, 0, 0, @feedback_id, @comments`);
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
+      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', '', '', '', '', '', '',
+         '', @employee_id, '', @recommendation, '', @rating, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, 0, 0, @feedback_id, @comments,
+         @from_date, @to_date, '', ''`);
 
     if (result.recordset.length > 0) {  
       res.status(200).json(result.recordset);
