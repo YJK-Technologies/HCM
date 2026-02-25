@@ -36,6 +36,17 @@ import {
   BsCalendarEvent,
   BsChevronDown,
 } from "react-icons/bs";
+import {
+  MdOutlineEventNote,
+  MdOutlineRateReview,
+  MdOutlinePersonSearch,
+  MdOutlineAnalytics,
+  MdOutlineGavel,
+  MdOutlineGroupAdd,
+  MdOutlineEventAvailable,
+} from "react-icons/md";
+
+import { AiOutlinePercentage } from "react-icons/ai";
 
 // Helper function to normalize paths (ensure leading slash is present and no trailing slash)
 const cleanPath = (path) => {
@@ -114,6 +125,14 @@ const leafIconMap = {
   "Employee Holiday": BsSun,
   "Interview Master": BsPeople,
   Setting: BsGear,
+  "Interview Schedule Report": MdOutlineEventNote,
+  "Interview Feedback Report": MdOutlineRateReview,
+  "Candidate Interview Report": MdOutlinePersonSearch,
+  "Panel Performance Report": MdOutlineAnalytics,
+  "Hiring Decision Report": MdOutlineGavel,
+  "Total Candidates Applied": MdOutlineGroupAdd,
+  "Total Interviews Scheduled": MdOutlineEventAvailable,
+  "Interview Completion Rate": AiOutlinePercentage,
 
   // --- PMS ---
   Project: BsKanban,
@@ -202,6 +221,12 @@ const menuData = [
         isDropdown: true,
         subMenus: [
            { label: "Interview Master", path: "/JobMaster" },
+        ], 
+      }, 
+      {
+        label: "Interview Panel Reports",
+        isDropdown: true,
+        subMenus: [
            { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
            { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
            { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },

@@ -1,72 +1,44 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
-import { useNavigate } from "react-router-dom";
-import TabButtons from "./ESSComponents/Tabs";
-import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import Select from "react-select";
-import { useRef } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
-const getFinancialYearDates = () => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
-  console.log(currentMonth);
-  let startYear, endYear;
-
-  if (currentMonth < 4) {
-    startYear = currentYear - 1;
-    endYear = currentYear;
-  } else {
-    startYear = currentYear;
-    endYear = currentYear + 1;
-  }
-
-  const FirstDate = `${startYear}-04-01`;
-  const LastDate = `${endYear}-03-31`;
-
-  return { FirstDate, LastDate };
-};
-
-const getTodayDate = () => {
-  const today = new Date();
-  return today.toISOString().split("T")[0]; // YYYY-MM-DD
-};
-function InterviewCompletionRate({}) {
+function InterviewCompletionRate({ }) {
   const [rowData, setRowData] = useState([]);
-  const [commentsSC, setcommentsSC] = useState("");
+  const [comments, setComments] = useState("");
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  const [selectedscheduleidSC, setselectedscheduleidSC] = useState("");
-  const [scheduleidSC, setscheduleidSC] = useState("");
-  const [isselectedscheduleidSC, setIsscheduleidSC] = useState("");
-  const [isselectedfeedback_id, setIsfeedback_id] = useState("");
+  const [selectedScheduleId, setSelectedScheduleId] = useState("");
+  const [scheduleId, setScheduleId] = useState("");
+  const [isSelectedScheduleId, setIsSelectedScheduleId] = useState("");
+  const [isSelectedFeedbackId, setIsSelectedFeedbackId] = useState(false);
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [feedback_idDrop, setfeedback_idDrop] = useState([]);
   const [RecommendationDrop, setRecommendationDrop] = useState([]);
   const [recommendationDrop, setRecommendationdrop] = useState([]);
-
   const [loading, setLoading] = useState(false);
-  const [selectedfeedback_id, setselectedfeedback_id] = useState("");
-  const [feedback_id, setfeedback_id] = useState("");
-  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
-  const [EmployeeIDSC, setEmployeeIDSC] = useState("");
+  const [selectedFeedbackId, setSelectedFeedbackId] = useState("");
+  const [feedbackId, setFeedbackId] = useState("");
+  const [selectedEmployeeId, setselectedEmployeeId] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
-  const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
-  const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
-  const [RecommendationSC, setRecommendationSC] = useState("");
-  const [isSelectRecommendationSC, setisSelectRecommendationSC] =
-    useState(false);
+  const [isSelectEmployeeId, setIsSelectEmployeeId] = useState(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState("");
+  const [recommendation, setRecommendation] = useState("");
+  const [isSelectRecommendation, setIsSelectRecommendation] = useState(false);
   const [employeeDrop, setEmployeeDrop] = useState([]);
   const gridRef = useRef(null);
+  const gridApiRef = useRef(null);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const formatDate = (isoDateString) => {
     if (!isoDateString) return ""; // ✅ null / undefined / empty handle
@@ -85,43 +57,43 @@ function InterviewCompletionRate({}) {
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+    .filter((permission) => permission.screen_type === "InterviewCompletionR")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handlefeedback_id = (selectedDPT) => {
-    setselectedfeedback_id(selectedDPT);
-    setfeedback_id(selectedDPT ? selectedDPT.value : "");
+  const handleFeedbackId = (selectedDPT) => {
+    setSelectedFeedbackId(selectedDPT);
+    setFeedbackId(selectedDPT ? selectedDPT.value : "");
   };
-  const filteredOptionfeedback_id = feedback_idDrop.map((option) => ({
+  const filteredOptionFeedbackId = feedback_idDrop.map((option) => ({
     value: option.feedback_id,
     label: option.feedback_id,
   }));
 
-  const handleRecommendationSC = (selectedDPT) => {
-    setselectedRecommendationSC(selectedDPT);
-    setRecommendationSC(selectedDPT ? selectedDPT.value : "");
+  const handleRecommendation = (selectedDPT) => {
+    setSelectedRecommendation(selectedDPT);
+    setRecommendation(selectedDPT ? selectedDPT.value : "");
   };
   const filteredOptionRecommendation = RecommendationDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
-  const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT);
-    setEmployeeIDSC(selectedDPT ? selectedDPT.value : "");
+  const handleEmployeeId = (selectedDPT) => {
+    setselectedEmployeeId(selectedDPT);
+    setEmployeeId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptionEmployeeID = EmployeeIDdrop.map((option) => ({
+  const filteredOptionEmployeeId = EmployeeIDdrop.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`,
   }));
 
-  const handleschedule_idSC = (selectedDPT) => {
-    setselectedscheduleidSC(selectedDPT);
-    setscheduleidSC(selectedDPT ? selectedDPT.value : "");
+  const handleCcheduleId = (selectedDPT) => {
+    setSelectedScheduleId(selectedDPT);
+    setScheduleId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptionschedule_id = scheduleidDrop.map((option) => ({
+  const filteredOptionScheduleId = scheduleidDrop.map((option) => ({
     value: option.schedule_id,
     label: option.schedule_id,
   }));
@@ -280,15 +252,10 @@ function InterviewCompletionRate({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  const handleKeyDownStatus = async (e) => {
-    if (e.key === "Enter" && hasValueChanged) {
-      await handleSearch();
-      setHasValueChanged(false);
-    }
-  };
-
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Schedule ID",
       field: "schedule_id",
       editable: false,
@@ -297,10 +264,6 @@ function InterviewCompletionRate({}) {
       headerName: "Employee ID",
       field: "employee_id",
       editable: false,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: employeeDrop,
-      },
     },
     {
       headerName: "Rating",
@@ -316,104 +279,39 @@ function InterviewCompletionRate({}) {
       headerName: "Submitted On",
       field: "submitted_on",
       editable: false,
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // ✅ If null → empty
-        return formatDate(params.value);
-      },
     },
     {
       headerName: "Recommendation",
       field: "Recommendation",
       editable: false,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: recommendationDrop,
-      },
-      cellRenderer: (params) => {
-        if (params.data.totalRow) {
-          return `${params.data.totalText}`;
-        }
-        return params.value;
-      },
-    },
-    {
-      headerName: "Keyfield",
-      field: "keyfield",
-      editable: false,
-      hide: true,
-      // hide: true
     },
   ];
+
+  const onGridReady = (params) => {
+    gridApiRef.current = params.api;
+  };
 
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
   };
 
-  //   const handleSearch = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const body = {
-  //         schedule_id: scheduleidSC,
-  //         feedback_id: feedback_id,
-  //         employee_id: EmployeeIDSC,
-  //         Recommendation: RecommendationSC,
-  //         rating: Number.rating,
-  //         comments: commentsSC,
-  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
-  //       };
-
-  //       const response = await fetch(`${config.apiBaseUrl}/InterviewCompletionRateSC`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(body),
-  //       });
-
-  //       if (response.ok) {
-  //         const fetchedData = await response.json();
-  //         const newRows = fetchedData.map((matchedItem) => ({
-  //           schedule_id: matchedItem.schedule_id,
-  //           employee_id: matchedItem.employee_id,
-  //           rating: matchedItem.rating,
-  //           comments: matchedItem.comments,
-  //           Recommendation: matchedItem.Recommendation,
-  //           submitted_on: matchedItem.submitted_on,
-  //           keyfield: matchedItem.keyfield,
-  //         }));
-  //         setRowData(newRows);
-  //       } else if (response.status === 404) {
-  //         console.log("Data Not found");
-  //         toast.warning("Data Not found");
-  //         setRowData([]);
-  //       } else {
-  //         const errorResponse = await response.json();
-  //         toast.warning(errorResponse.message || "Failed to insert sales data");
-  //         console.error(errorResponse.details || errorResponse.message);
-  //         setRowData([]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching search data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
   const handleSearch = async () => {
     setLoading(true);
     try {
       const body = {
-        schedule_id: scheduleidSC || 0,
-        feedback_id: feedback_id || 0,
-        employee_id: EmployeeIDSC || "",
-        Recommendation: RecommendationSC || "",
+        schedule_id: Number(scheduleId),
+        feedback_id: Number(feedbackId),
+        employee_id: employeeId,
+        Recommendation: recommendation,
         rating: 0,
-        comments: commentsSC || "",
+        comments: comments,
+        from_date: fromDate,
+        to_date: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/InterviewCompletionRateSC`,
+      const response = await fetch(`${config.apiBaseUrl}/InterviewCompletionRateSC`,
         {
           method: "POST",
           headers: {
@@ -442,8 +340,8 @@ function InterviewCompletionRate({}) {
         // ✅ Decide label dynamically based on selected combo
         let totalLabel = "Total Candidate";
 
-        if (RecommendationSC) {
-          totalLabel = `Total ${RecommendationSC} Candidate`;
+        if (recommendation) {
+          totalLabel = `Total ${recommendation} Candidate`;
         }
 
         // ✅ Push Total Row
@@ -479,38 +377,38 @@ function InterviewCompletionRate({}) {
     setRowData([]);
   };
 
-const generateReport = () => {
-  const api = gridRef.current?.api;
-  if (!api) return;
+  const generateReport = () => {
+    const api = gridRef.current?.api;
+    if (!api) return;
 
-  const selectedRows = api
-    .getSelectedRows()
-    .filter((row) => row.schedule_id !== null);
+    const selectedRows = api
+      .getSelectedRows()
+      .filter((row) => row.schedule_id !== null);
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to print");
-    return;
-  }
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to print");
+      return;
+    }
 
-  // ✅ Get Selected Recommendation
-  const selectedRecommendation = RecommendationSC || "";
+    // ✅ Get Selected Recommendation
+    const selectedRecommendation = recommendation || "";
 
-  // ✅ Dynamic Title Text
-  let recommendationText = "Candidates";
+    // ✅ Dynamic Title Text
+    let recommendationText = "Candidates";
 
-  if (selectedRecommendation.toLowerCase() === "select") {
-    recommendationText = "Selected Candidate";
-  } else if (selectedRecommendation.toLowerCase() === "hold") {
-    recommendationText = "Hold Candidate";
-  } else if (selectedRecommendation.toLowerCase() === "next round") {
-    recommendationText = "Next Round Candidate";
-  } else if (selectedRecommendation.toLowerCase() === "reject") {
-    recommendationText = "Reject Candidate";
-  }
+    if (selectedRecommendation.toLowerCase() === "select") {
+      recommendationText = "Selected Candidate";
+    } else if (selectedRecommendation.toLowerCase() === "hold") {
+      recommendationText = "Hold Candidate";
+    } else if (selectedRecommendation.toLowerCase() === "next round") {
+      recommendationText = "Next Round Candidate";
+    } else if (selectedRecommendation.toLowerCase() === "reject") {
+      recommendationText = "Reject Candidate";
+    }
 
-  const reportWindow = window.open("", "_blank");
+    const reportWindow = window.open("", "_blank");
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
   <html>
   <head>
     <title>Interview Completion Report</title>
@@ -624,8 +522,8 @@ const generateReport = () => {
     <tbody>
   `);
 
-  selectedRows.forEach((row) => {
-    reportWindow.document.write(`
+    selectedRows.forEach((row) => {
+      reportWindow.document.write(`
       <tr>
         <td>${row.schedule_id || ""}</td>
         <td>${row.employee_id || ""}</td>
@@ -635,9 +533,9 @@ const generateReport = () => {
         <td>${row.Recommendation || ""}</td>
       </tr>
     `);
-  });
+    });
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
     </tbody>
   </table>
 
@@ -649,53 +547,120 @@ const generateReport = () => {
   </html>
   `);
 
-  reportWindow.document.close();
-};
+    reportWindow.document.close();
+  };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
 
   const exportToPDF = () => {
-    const api = gridRef.current?.api;
-    if (!api) return;
+    if (!gridApiRef.current) return;
 
-    const selectedRows = api
-      .getSelectedRows()
-      .filter((row) => row.schedule_id !== null);
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    doc.setFontSize(14);
-    doc.text("Interview Completion Report", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-    doc.setFontSize(11);
-    doc.text(`Total Records: ${selectedRows.length}`, 14, 22);
-
-    const tableColumn = [
-      "Schedule ID",
-      "Employee ID",
-      "Rating",
-      "Comments",
-      "Submitted On",
-      "Recommendation",
+    const headers = [
+      [
+        "Schedule ID",
+        "Employee ID",
+        "Rating",
+        "Comments",
+        "Submitted On",
+        "Recommendation",
+      ],
     ];
 
-    const tableRows = selectedRows.map((row) => [
+    // ✅ Table body
+    const body = dataSource.map((row) => [
       row.schedule_id || "",
       row.employee_id || "",
       row.rating || "",
       row.comments || "",
-      row.submitted_on ? formatDate(row.submitted_on) : "",
+      row.submitted_on || "",
       row.Recommendation || "",
     ]);
 
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    /* ================= HEADER DESIGN ================= */
+
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Interview Completion Report", pageWidth / 2, 40, {
+      align: "center",
+    });
+
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
+
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 28,
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
+      },
+
+      margin: { left: 20, right: 20 },
     });
 
     doc.save("Interview_Completion_Report.pdf");
@@ -713,39 +678,123 @@ const generateReport = () => {
   };
 
   const handleExportToExcel = () => {
-    const api = gridRef.current?.api;
-    if (!api) return;
-
-    const selectedRows = api
-      .getSelectedRows()
-      .filter((row) => row.schedule_id !== null);
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export.");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const headerData = [
-      ["Interview Completion Report"],
-      [`Total Records: ${selectedRows.length}`],
-    ];
+    const screenName = "Interview Completion Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const transformedData = transformRowData(selectedRows);
+    /* ================= READ THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER DATA ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
     XLSX.utils.sheet_add_json(worksheet, transformedData, {
-      origin: "A5",
+      origin: `A${headerData.length + 1}`,
     });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: totalColumns - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell = worksheet[
+        XLSX.utils.encode_cell({ r: headerRowIndex, c: C })
+      ];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[
+          XLSX.utils.encode_cell({ r: R, c: C })
+        ];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
-      "Interview Completion Report",
+      "Interview Completion"
     );
 
-    XLSX.writeFile(workbook, "Interview_Completion_Report.xlsx");
+    XLSX.writeFile(
+      workbook,
+      "Interview_Completion_Report.xlsx"
+    );
   };
 
   return (
@@ -758,55 +807,116 @@ const generateReport = () => {
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Feedback</h1>
+          <h1 className="page-title">Interview Completion Rate</h1>
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
-                <i className="fa-solid fa-file-excel"></i>
+                <i class="fa-solid fa-file-excel"></i>
               </div>
             )}
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Submitted From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Submitted To
+              </label>
+            </div>
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedfeedback_id ? "has-value" : ""} 
-              ${isselectedfeedback_id ? "is-focused" : ""}`}
+              ${selectedFeedbackId ? "has-value" : ""} 
+              ${isSelectedFeedbackId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsfeedback_id(true)}
-                onBlur={() => setIsfeedback_id(false)}
+                onFocus={() => setIsSelectedFeedbackId(true)}
+                onBlur={() => setIsSelectedFeedbackId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedfeedback_id}
-                onChange={handlefeedback_id}
-                options={filteredOptionfeedback_id}
+                value={selectedFeedbackId}
+                onChange={handleFeedbackId}
+                options={filteredOptionFeedbackId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Feedback ID
@@ -817,20 +927,20 @@ const generateReport = () => {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedscheduleidSC ? "has-value" : ""} 
-              ${isselectedscheduleidSC ? "is-focused" : ""}`}
+              ${selectedScheduleId ? "has-value" : ""} 
+              ${isSelectedScheduleId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsscheduleidSC(true)}
-                onBlur={() => setIsscheduleidSC(false)}
+                onFocus={() => setIsSelectedScheduleId(true)}
+                onBlur={() => setIsSelectedScheduleId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedscheduleidSC}
-                onChange={handleschedule_idSC}
-                options={filteredOptionschedule_id}
+                value={selectedScheduleId}
+                onChange={handleCcheduleId}
+                options={filteredOptionScheduleId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Schedule ID
@@ -841,42 +951,43 @@ const generateReport = () => {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedEmployeeIDSC ? "has-value" : ""} 
-              ${isSelectEmployeeIDSC ? "is-focused" : ""}`}
+              ${selectedEmployeeId ? "has-value" : ""} 
+              ${isSelectEmployeeId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectEmployeeIDSC(true)}
-                onBlur={() => setisSelectEmployeeIDSC(false)}
+                onFocus={() => setIsSelectEmployeeId(true)}
+                onBlur={() => setIsSelectEmployeeId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedEmployeeIDSC}
-                onChange={handleEmployeeIDSC}
-                options={filteredOptionEmployeeID}
+                value={selectedEmployeeId}
+                onChange={handleEmployeeId}
+                options={filteredOptionEmployeeId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Employee ID
               </label>
             </div>
           </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedRecommendationSC ? "has-value" : ""} 
-              ${isSelectRecommendationSC ? "is-focused" : ""}`}
+              ${selectedRecommendation ? "has-value" : ""} 
+              ${isSelectRecommendation ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectRecommendationSC(true)}
-                onBlur={() => setisSelectRecommendationSC(false)}
+                onFocus={() => setIsSelectRecommendation(true)}
+                onBlur={() => setIsSelectRecommendation(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedRecommendationSC}
-                onChange={handleRecommendationSC}
+                value={selectedRecommendation}
+                onChange={handleRecommendation}
                 options={filteredOptionRecommendation}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
@@ -884,6 +995,7 @@ const generateReport = () => {
               </label>
             </div>
           </div>
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -894,8 +1006,8 @@ const generateReport = () => {
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={commentsSC}
-                onChange={(e) => setcommentsSC(e.target.value)}
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Comments
@@ -933,6 +1045,7 @@ const generateReport = () => {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onGridReady={onGridReady}
           />
         </div>
       </div>

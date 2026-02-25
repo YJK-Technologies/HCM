@@ -1,120 +1,83 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
 function InterviewFeedbackReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-  const navigate = useNavigate();
-  const [statusdrop, setStatusdrop] = useState([]);
-  const [statusgriddrop, setStatusGriddrop] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [rowDataReport, setrowDataReport] = useState(" ");
-
-  const [selectedscheduleidSC, setselectedscheduleidSC] = useState("");
-  const [isselectedscheduleidSC, setIsscheduleidSC] = useState("");
+  const [selectedScheduleId, setSelectedScheduleId] = useState("");
+  const [isSelectedScheduleId, setIsSelectedScheduleId] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
-  const [scheduleidSC, setscheduleidSC] = useState("");
-  const [selectedcandidate_name, setSelectedcandidatename] = useState("");
-  const [isselectedscheduleid, setIsscheduleid] = useState("");
-  const [canditatename, set_candidatename] = useState("");
+  const [scheduleId, setscheduleId] = useState("");
+  const [selectedCandidateName, setSelectedCandidateName] = useState("");
+  const [isSelectedCandidateName, setIsSelectedCandidateName] = useState("");
+  const [canditateName, setCandidateName] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
-  const [emailSC, setemailSC] = useState("");
-  const [panel_nameSC, setpanel_nameSC] = useState("");
-  const [selectedInterviewModeSC, setselectedInterviewModeSC] = useState("");
-  const [isSelectInterviewModeSC, setisSelectInterviewModeSC] = useState(false);
-  const [InterviewModedrop, setInterviewModeDrop] = useState([]);
-  const [InterviewModeSC, setInterviewModeSC] = useState("");
-  const [locationSC, setlocationSC] = useState("");
-  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
-  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
-  const [statusSC, setstatusSC] = useState("");
-  const [scheduled_datetimeSC, setscheduled_datetimeSC] = useState("");
-  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
-  const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
-  const [EmployeeIDSC, setEmployeeIDSC] = useState("");
+  const [selectedInterviewId, setselectedInterviewId] = useState("");
+  const [isSelectInterviewId, setIsSelectInterviewId] = useState(false);
+  const [interviewId, setInterviewId] = useState("");
   const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
-  const [RoleSC, setRoleSC] = useState("");
-  const [ratingSC, setratingSC] = useState("");
-  const [RecommendationSC, setRecommendationSC] = useState("");
-  const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
-  const [isSelectRecommendationSC, setisSelectRecommendationSC] =useState(false);
+  const [role, setRole] = useState("");
+  const [rating, setRating] = useState("");
+  const [recommendation, setRecommendation] = useState("");
+  const [selectedRecommendation, setselectedRecommendation] = useState("");
+  const [isSelectRecommendation, setIsSelectRecommendation] = useState(false);
   const [RecommendationDrop, setRecommendationDrop] = useState([]);
-  const [commentsSC, setcommentsSC] = useState("");
-  const [submitted_onSC, setsubmitted_onSC] = useState("");
- 
+  const [comments, setComments] = useState("");
+  const gridApiRef = useRef(null);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
     .filter((permission) => permission.screen_type === "Company")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handleschedule_idSC = (selectedDPT) => {
-    setselectedscheduleidSC(selectedDPT);
-    setscheduleidSC(selectedDPT ? selectedDPT.value : "");
+  const handleScheduleId = (selectedDPT) => {
+    setSelectedScheduleId(selectedDPT);
+    setscheduleId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handlescandidate_name = (selectedDPT) => {
-    setSelectedcandidatename(selectedDPT);
-    set_candidatename(selectedDPT ? selectedDPT.value : "");
+  const handleCandidateName = (selectedDPT) => {
+    setSelectedCandidateName(selectedDPT);
+    setCandidateName(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleInterviewModeSC = (selectedDPT) => {
-    setselectedInterviewModeSC(selectedDPT);
-    setInterviewModeSC(selectedDPT ? selectedDPT.value : "");
+  const handleEmployeeId = (selectedDPT) => {
+    setselectedInterviewId(selectedDPT);
+    setInterviewId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleChangeStatusSC = (selectedStatus) => {
-    setSelectedStatusSC(selectedStatus);
-    setstatusSC(selectedStatus ? selectedStatus.value : "");
+  const handleRecommendation = (selectedDPT) => {
+    setselectedRecommendation(selectedDPT);
+    setRecommendation(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT);
-    setEmployeeIDSC(selectedDPT ? selectedDPT.value : "");
-  };
-
-  const handleRecommendationSC = (selectedDPT) => {
-    setselectedRecommendationSC(selectedDPT);
-    setRecommendationSC(selectedDPT ? selectedDPT.value : "");
-  };
-
-  const filteredOptionschedule_id = scheduleidDrop.map((option) => ({
+  const filteredOptionScheduleId = scheduleidDrop.map((option) => ({
     value: option.schedule_id,
     label: option.schedule_id,
   }));
 
-  const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
+  const filteredOptionCandidateName = canditatenameDrop.map((option) => ({
     value: option.candidate_name,
     label: `${option.candidate_id} - ${option.candidate_name}`,
   }));
 
-  const filteredOptionInterviewMode = InterviewModedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const filteredOptionEmployeeID = EmployeeIDdrop.map((option) => ({
+  const filteredOptionEmployeeId = EmployeeIDdrop.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`,
   }));
@@ -181,34 +144,6 @@ function InterviewFeedbackReport() {
     }
   }, []);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    const fetchDept = async () => {
-      try {
-        const response = await fetch(`${config.apiBaseUrl}/InterviewMode`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ company_code }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const val = await response.json();
-        setInterviewModeDrop(val);
-      } catch (error) {
-        console.error("Error fetching departments:", error);
-      }
-    };
-
-    if (company_code) {
-      fetchDept();
-    }
-  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -280,22 +215,15 @@ function InterviewFeedbackReport() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            schedule_id: scheduleidSC,
-            candidate_name: canditatename,
-            // email: emailSC,
-            // panel_name: panel_nameSC,
-            // scheduled_datetime: scheduled_datetimeSC,
-            // Interview_Mode: InterviewModeSC,
-            // Status: statusSC,
-            // location: locationSC,
-            employee_id: EmployeeIDSC,
-            role: RoleSC,
-            rating: Number(ratingSC),
-            recommendation: RecommendationSC,
-            comments: commentsSC,
-            submitted_on: submitted_onSC,
-            // meeting_link: meetingLinkSc,
-            // timezone: timezoneSc,
+            schedule_id: Number(scheduleId),
+            candidate_name: canditateName,
+            employee_id: interviewId,
+            role: role,
+            rating: Number(rating),
+            recommendation: recommendation,
+            comments: comments,
+            from_date: fromDate,
+            to_date: toDate,
           }),
         },
       );
@@ -329,6 +257,8 @@ function InterviewFeedbackReport() {
 
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Schedule Id",
       field: "schedule_id",
       editable: false,
@@ -407,7 +337,7 @@ function InterviewFeedbackReport() {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const generateReport = () => {
@@ -595,53 +525,121 @@ function InterviewFeedbackReport() {
     window.location.reload();
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
+
   const exportToPDF = () => {
-    if (!gridApi) return;
+    if (!gridApiRef.current) return;
 
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    doc.setFontSize(14);
-    doc.text("Interview Feedback Report", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-    const tableColumn = [
-      "Schedule ID",
-      "Interviewer Id",
-      "Candidate Name",
-      "Submitted On",
-      "Recommendation",
-      "Comments",
-      "Role",
-      "Rating",
+    const headers = [
+      [
+        "Schedule ID",
+        "Interviewer Id",
+        "Candidate Name",
+        "Submitted On",
+        "Recommendation",
+        "Comments",
+        "Role",
+        "Rating",
+      ],
     ];
 
-    const tableRows = [];
+    // ✅ Table body
+    const body = dataSource.map((row) => [
+      row.schedule_id,
+      row.interviewer_id,
+      row.candidate_name,
+      row.submitted_on,
+      row.recommendation,
+      row.comments,
+      row.role,
+      row.rating,
+    ]);
 
-    selectedRows.forEach((row) => {
-      const rowData = [
-        row.schedule_id || "",
-        row.interviewer_id || "",
-        row.candidate_name || "",
-        row.submitted_on ? formatDate(row.submitted_on) : "",
-        row.recommendation || "",
-        row.comments || "",
-        row.role || "",
-        row.rating || "",
-      ];
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-      tableRows.push(rowData);
+    /* ================= HEADER DESIGN ================= */
+
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Interview Feedback Report", pageWidth / 2, 40, {
+      align: "center",
     });
 
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
+
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
+      },
+
+      margin: { left: 20, right: 20 },
     });
 
     doc.save("Interview_Feedback_Report.pdf");
@@ -652,8 +650,8 @@ function InterviewFeedbackReport() {
       "Schedule ID": row.schedule_id || "",
       "Interviewer Id": row.interviewer_id || "",
       "Candidate Name": row.candidate_name || "",
-      "Submitted On": row.submitted_on ? formatDate(row.submitted_on) : "",
-      "Recommendation": row.recommendation || "", 
+      "Submitted On": row.submitted_on || "",
+      "Recommendation": row.recommendation || "",
       "Comments": row.comments || "",
       "Role": row.role || "",
       "Rating": row.rating || "",
@@ -661,26 +659,110 @@ function InterviewFeedbackReport() {
   };
 
   const handleExportToExcel = () => {
-    if (!gridApi) return;
-
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export.");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const headerData = [["Interview Feedback Report"]];
+    const screenName = "Interview Feedback Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const transformedData = transformRowData(selectedRows);
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    // Main table starts from row 5 (same pattern as your Task report)
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Feedback Report");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Feedback");
 
     XLSX.writeFile(workbook, "Interview_Feedback_Report.xlsx");
   };
@@ -698,25 +780,19 @@ function InterviewFeedbackReport() {
           <h1 className="page-title">Interview Feedback Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -734,11 +810,19 @@ function InterviewFeedbackReport() {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
                 <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
                 </li>
               )}
             </ul>
@@ -748,23 +832,64 @@ function InterviewFeedbackReport() {
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                isClearable
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label htmlFor="add1" className={`exp-form-labels`}>
+                Submitted From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                isClearable
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label htmlFor="add1" className={`exp-form-labels`}>
+                Submitted To
+              </label>
+            </div>
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedscheduleidSC ? "has-value" : ""} 
-              ${isselectedscheduleidSC ? "is-focused" : ""}`}
+              ${selectedScheduleId ? "has-value" : ""} 
+              ${isSelectedScheduleId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsscheduleidSC(true)}
-                onBlur={() => setIsscheduleidSC(false)}
+                onFocus={() => setIsSelectedScheduleId(true)}
+                onBlur={() => setIsSelectedScheduleId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedscheduleidSC}
-                onChange={handleschedule_idSC}
-                options={filteredOptionschedule_id}
+                value={selectedScheduleId}
+                onChange={handleScheduleId}
+                options={filteredOptionScheduleId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Schedule ID
@@ -775,20 +900,20 @@ function InterviewFeedbackReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedcandidate_name ? "has-value" : ""} 
-              ${isselectedscheduleid ? "is-focused" : ""}`}
+              ${selectedCandidateName ? "has-value" : ""} 
+              ${isSelectedCandidateName ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsscheduleid(true)}
-                onBlur={() => setIsscheduleid(false)}
+                onFocus={() => setIsSelectedCandidateName(true)}
+                onBlur={() => setIsSelectedCandidateName(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedcandidate_name}
-                onChange={handlescandidate_name}
-                options={filteredOptioncandidate_name}
+                value={selectedCandidateName}
+                onChange={handleCandidateName}
+                options={filteredOptionCandidateName}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Candiate Name
@@ -799,20 +924,20 @@ function InterviewFeedbackReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedEmployeeIDSC ? "has-value" : ""} 
-              ${isSelectEmployeeIDSC ? "is-focused" : ""}`}
+              ${selectedInterviewId ? "has-value" : ""} 
+              ${isSelectInterviewId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectEmployeeIDSC(true)}
-                onBlur={() => setisSelectEmployeeIDSC(false)}
+                onFocus={() => setIsSelectInterviewId(true)}
+                onBlur={() => setIsSelectInterviewId(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedEmployeeIDSC}
-                onChange={handleEmployeeIDSC}
-                options={filteredOptionEmployeeID}
+                value={selectedInterviewId}
+                onChange={handleEmployeeId}
+                options={filteredOptionEmployeeId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Interview ID
@@ -830,8 +955,8 @@ function InterviewFeedbackReport() {
                 title="Please Enter the Employee PF"
                 required
                 autoComplete="off"
-                value={RoleSC}
-                onChange={(e) => setRoleSC(e.target.value)}
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>
                 Role
@@ -849,8 +974,8 @@ function InterviewFeedbackReport() {
                 title="Please Enter the Employee PF"
                 required
                 autoComplete="off"
-                value={ratingSC}
-                onChange={(e) => setratingSC(e.target.value)}
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>
                 Rating
@@ -861,19 +986,19 @@ function InterviewFeedbackReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedRecommendationSC ? "has-value" : ""} 
-              ${isSelectRecommendationSC ? "is-focused" : ""}`}
+              ${selectedRecommendation ? "has-value" : ""} 
+              ${isSelectRecommendation ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setisSelectRecommendationSC(true)}
-                onBlur={() => setisSelectRecommendationSC(false)}
+                onFocus={() => setIsSelectRecommendation(true)}
+                onBlur={() => setIsSelectRecommendation(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedRecommendationSC}
-                onChange={handleRecommendationSC}
+                value={selectedRecommendation}
+                onChange={handleRecommendation}
                 options={filteredOptionRecommendation}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
@@ -892,31 +1017,11 @@ function InterviewFeedbackReport() {
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={commentsSC}
-                onChange={(e) => setcommentsSC(e.target.value)}
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Comments
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                title="Please Enter the Employee PF"
-                required
-                isClearable
-                autoComplete="off"
-                value={submitted_onSC}
-                onChange={(e) => setsubmitted_onSC(e.target.value)}
-              />
-              <label htmlFor="add1" className={`exp-form-labels`}>
-                Submitted On
               </label>
             </div>
           </div>
