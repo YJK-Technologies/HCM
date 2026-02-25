@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -8,52 +8,51 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
 function CandidateInterviewReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-  const navigate = useNavigate();
   const [statusdrop, setStatusdrop] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const [selectedcandidate_name, setSelectedcandidatename] = useState("");
-  const [isselectedscheduleid, setIsscheduleid] = useState("");
-  const [canditatename, set_candidatename] = useState("");
+  const [selectedCandidateName, setSelectedCandidateName] = useState("");
+  const [isSelectedCandidateName, setIsSelectedCandidateName] = useState("");
+  const [canditateName, setCandidateName] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
-  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
-  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
-  const [statusSC, setstatusSC] = useState("");
-  const [scheduled_datetimeSC, setscheduled_datetimeSC] = useState("");
-  const [ratingSC, setratingSC] = useState("");
-  const [decided_on, setdecided_on] = useState("");
-  const [remarksSC, setremarksSC] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [status, setStatus] = useState("");
+  const [rating, setRating] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [scheduleFrom, setScheduleFrom] = useState('');
+  const [scheduleTo, setScheduleTo] = useState('');
+  const [decidedFrom, setDecidedFrom] = useState('');
+  const [decidedTo, setDecidedTo] = useState('');
+  const gridApiRef = useRef(null);
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+    .filter((permission) => permission.screen_type === "CandidateInterviewRe")
     .map((permission) => permission.permission_type.toLowerCase());
 
 
-  const handlescandidate_name = (selectedDPT) => {
-    setSelectedcandidatename(selectedDPT);
-    set_candidatename(selectedDPT ? selectedDPT.value : "");
+  const handleCandidateName = (selectedDPT) => {
+    setSelectedCandidateName(selectedDPT);
+    setCandidateName(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleChangeStatusSC = (selectedStatus) => {
-    setSelectedStatusSC(selectedStatus);
-    setstatusSC(selectedStatus ? selectedStatus.value : "");
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
-  const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
+  const filteredOptionCandidateName = canditatenameDrop.map((option) => ({
     value: option.candidate_name,
     label: `${option.candidate_id} - ${option.candidate_name}`,
   }));
@@ -111,32 +110,21 @@ function CandidateInterviewReport() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/InterviewProgressSearch`,
+      const response = await fetch(`${config.apiBaseUrl}/InterviewProgressSearch`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // schedule_id: scheduleidSC,
-            candidate_name: canditatename,
-            // email: emailSC,
-            // panel_name: panel_nameSC,
-            scheduled_datetime: scheduled_datetimeSC,
-            // Interview_Mode: InterviewModeSC,
-            // Status: statusSC,
-            // location: locationSC,
-            // employee_id: EmployeeIDSC,
-            // role: RoleSC,
-            rating: Number(ratingSC),
-            decided_on: decided_on,
-            remarks: remarksSC,
-            // recommendation: RecommendationSC,
-            // comments: commentsSC,
-            // submitted_on: submitted_onSC,
-            // meeting_link: meetingLinkSc,
-            // timezone: timezoneSc,
+            candidate_name: canditateName,
+            from_date: scheduleFrom,
+            to_date: scheduleTo,
+            rating: Number(rating),
+            remarks: remarks,
+            Final_Status: status,
+            start_date: decidedFrom,
+            end_date: decidedTo,
           }),
         },
       );
@@ -170,6 +158,8 @@ function CandidateInterviewReport() {
 
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Candidate Name",
       field: "candidate_name",
       editable: false,
@@ -178,18 +168,6 @@ function CandidateInterviewReport() {
       headerName: "Schedule Date",
       field: "scheduled_datetime",
       editable: false,
-      // valueFormatter: (params) => formatDate(params.value),
-      // filterParams: {
-      //   comparator: (filterLocalDateAtMidnight, cellValue) => {
-      //     const cellDate = new Date(cellValue.split('/').join('-'));
-      //     if (cellDate < filterLocalDateAtMidnight) {
-      //       return -1;
-      //     } else if (cellDate > filterLocalDateAtMidnight) {
-      //       return 1;
-      //     }
-      //     return 0;
-      //   },
-      // },
     },
     {
       headerName: "Rating",
@@ -205,18 +183,6 @@ function CandidateInterviewReport() {
       headerName: "Decided On",
       field: "decided_on",
       editable: false,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Remarks",
@@ -249,7 +215,7 @@ function CandidateInterviewReport() {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const generateReport = () => {
@@ -433,52 +399,120 @@ function CandidateInterviewReport() {
     window.location.reload();
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
+
   const exportToPDF = () => {
-    if (!gridApi) return;
+    if (!gridApiRef.current) return;
 
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    doc.setFontSize(14);
-    doc.text("Candidate Interview Report", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-    const tableColumn = [
-      "Candidate Name",
-      "Schedule Date",
-      "Rating",
-      "Final Status",
-      "Decided On",
-      "Remarks",
+    const headers = [
+      [
+        "Candidate Name",
+        "Schedule Date",
+        "Rating",
+        "Final Status",
+        "Decided On",
+        "Remarks",
+      ],
     ];
 
-    const tableRows = [];
+    // ✅ Table body
+    const body = dataSource.map((row) => [
+      row.candidate_name || "",
+      row.scheduled_datetime || "",
+      row.rating || "",
+      row.Final_Status || "",
+      row.decided_on || "",
+      row.remarks || "",
+    ]);
 
-    selectedRows.forEach((row) => {
-      const rowData = [
-        row.candidate_name || "",
-        row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
-        row.rating || "",
-        row.Final_Status || "",
-        row.decided_on ? formatDate(row.decided_on) : "",
-        row.remarks || "",
-      ];
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-      tableRows.push(rowData);
+    /* ================= HEADER DESIGN ================= */
+
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Condidate Interview Report", pageWidth / 2, 40, {
+      align: "center",
     });
+
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
 
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
+      },
+
+      margin: { left: 20, right: 20 },
     });
 
-    doc.save("Candidate Interview Report.pdf");
+    doc.save("Condidate_Interview_Report.pdf");
   };
 
   const transformRowData = (data) => {
@@ -494,30 +528,103 @@ function CandidateInterviewReport() {
   };
 
   const handleExportToExcel = () => {
-    if (!gridApi) return;
-
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export.");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const headerData = [["Candidate Interview Report"]];
+    const screenName = "Candidate Interview Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const transformedData = transformRowData(selectedRows);
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const headerBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    // Main table starts from row 5 (same pattern as your Task report)
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const headerRowIndex = headerData.length;
+    const totalCols = Object.keys(transformedData[0]).length;
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    for (let C = 0; C < totalCols; C++) {
+      const cell = worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: headerBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalCols; C++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalCols).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Candidate Interview Report",
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidate Interview");
 
     XLSX.writeFile(workbook, "Candidate_Interview_Report.xlsx");
   };
@@ -535,25 +642,19 @@ function CandidateInterviewReport() {
           <h1 className="page-title">Candidate Interview Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -571,11 +672,19 @@ function CandidateInterviewReport() {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
                 <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
                 </li>
               )}
             </ul>
@@ -585,26 +694,22 @@ function CandidateInterviewReport() {
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
           <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${selectedcandidate_name ? "has-value" : ""} 
-              ${isselectedscheduleid ? "is-focused" : ""}`}
-            >
-              <Select
-                id="department"
-                placeholder=" "
-                onFocus={() => setIsscheduleid(true)}
-                onBlur={() => setIsscheduleid(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                value={selectedcandidate_name}
-                onChange={handlescandidate_name}
-                options={filteredOptioncandidate_name}
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={scheduleFrom}
+                onChange={(e) => setScheduleFrom(e.target.value)}
               />
-              <label htmlFor="selecteddpt" className={`floating-label`}>
-                Candiate Name
+              <label for="sname" className="exp-form-labels">
+                Schedule From
               </label>
             </div>
           </div>
@@ -619,53 +724,11 @@ function CandidateInterviewReport() {
                 title="Please Enter the Employee PF"
                 required
                 autoComplete="off"
-                value={scheduled_datetimeSC}
-                onChange={(e) => setscheduled_datetimeSC(e.target.value)}
+                value={scheduleTo}
+                onChange={(e) => setScheduleTo(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
-                Schedule Date
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                title="Please Enter the Employee PF"
-                required
-                autoComplete="off"
-                value={ratingSC}
-                onChange={(e) => setratingSC(e.target.value)}
-              />
-              <label for="add1" className={`exp-form-labels`}>
-                Rating
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${selectedStatusSC ? "has-value" : ""} 
-              ${isSelectFocusedSC ? "is-focused" : ""}`}
-            >
-              <Select
-                id="status"
-                isClearable
-                value={selectedStatusSC}
-                onChange={handleChangeStatusSC}
-                options={filteredOptionStatus}
-                placeholder=""
-                classNamePrefix="react-select"
-                onFocus={() => setIsSelectFocusedSC(true)}
-                onBlur={() => setIsSelectFocusedSC(false)}
-              />
-              <label for="status" class="floating-label">
-                Final Status
+                Schedule To
               </label>
             </div>
           </div>
@@ -680,11 +743,96 @@ function CandidateInterviewReport() {
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={decided_on}
-                onChange={(e) => setdecided_on(e.target.value)}
+                value={decidedFrom}
+                onChange={(e) => setDecidedFrom(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
-                Decided On
+                Decided From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={decidedTo}
+                onChange={(e) => setDecidedTo(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Decided To
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCandidateName ? "has-value" : ""} 
+              ${isSelectedCandidateName ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectedCandidateName(true)}
+                onBlur={() => setIsSelectedCandidateName(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedCandidateName}
+                onChange={handleCandidateName}
+                options={filteredOptionCandidateName}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Candiate Name
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>
+                Rating
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
+                placeholder=""
+                classNamePrefix="react-select"
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+              />
+              <label for="status" class="floating-label">
+                Final Status
               </label>
             </div>
           </div>
@@ -698,8 +846,8 @@ function CandidateInterviewReport() {
                 placeholder=""
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={remarksSC}
-                onChange={(e) => setremarksSC((e.target.value))}
+                value={remarks}
+                onChange={(e) => setRemarks((e.target.value))}
               />
               <label for="sname" className="exp-form-labels">Remarks</label>
             </div>
