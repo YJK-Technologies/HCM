@@ -293,11 +293,7 @@ function InterviewScheduleReport() {
       //   values: InterviewModedrop.map((option) => option.attributedetails_name),
       // },
     },
-    {
-      headerName: "Status",
-      field: "Status",
-      editable: false,
-    },
+    
     {
       headerName: "Candidate Name",
       field: "candidate_name",
