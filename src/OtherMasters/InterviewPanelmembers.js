@@ -9,7 +9,7 @@ import TabButtons from "../ESSComponents/Tabs";
 import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
 const getFinancialYearDates = () => {
@@ -34,14 +34,12 @@ const getFinancialYearDates = () => {
 };
 const { FirstDate, LastDate } = getFinancialYearDates();
 
-function InterviewPanelMem({}) {
+function InterviewPanelMem({ }) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [member_id, setmember_id] = useState("");
   const [Role, setRole] = useState("");
   const [RoleSC, setRoleSC] = useState("");
-  const [statusSC, setstatusSC] = useState("");
-  const [hasValueChanged, setHasValueChanged] = useState(false);
   const [selectedPanelID, setselectedPanelID] = useState("");
   const [PanelID, setPanelID] = useState("");
   const [selectedPanelIDSC, setselectedPanelIDSC] = useState("");
@@ -54,47 +52,71 @@ function InterviewPanelMem({}) {
   const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState([]);
   const [EmployeeIDSC, setEmployeeIDSC] = useState("");
   const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
-  const [showAsterisk, setShowAsterisk] = useState(true);
   const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
   const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
   const [panelDrop, setPaneldrop] = useState([]);
+  const [empColSize, setEmpColSize] = useState(2);
+  const [empColSizeSc, setEmpColSizeSc] = useState(2);
 
   const [activeTab, setActiveTab] = useState("Panel Members");
   const [loading, setLoading] = useState(false);
-  const [statusdrop, setStatusdrop] = useState([]);
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  const handleEmployeeID = (selected) => {
+    const safeSelected = selected || [];
+    setselectedEmployeeID(safeSelected);
 
-  const handleEmployeeID = (selectedDPT) => {
-    setselectedEmployeeID(selectedDPT || []);
-
-    const employeeIds = selectedDPT
-      ? selectedDPT.map((emp) => emp.value).join(",")
-      : "";
-
+    // comma-separated IDs (already you have)
+    const employeeIds = safeSelected.map(emp => emp.value).join(",");
     setEmployeeID(employeeIds);
+
+    // 🔥 DYNAMIC COLUMN SIZE LOGIC
+    const count = safeSelected.length;
+
+    if (count <= 1) setEmpColSize(2);
+    else if (count === 2) setEmpColSize(3);
+    else if (count === 3) setEmpColSize(4);
+    else if (count === 4) setEmpColSize(5);
+    else if (count === 5) setEmpColSize(6);
+    else if (count === 6) setEmpColSize(7);
+    else if (count === 7) setEmpColSize(8);
+    else if (count === 8) setEmpColSize(9);
+    else if (count >= 9) setEmpColSize(10);
   };
 
-  const handleEmployeeIDSC = (selectedDPT) => {
-    setselectedEmployeeIDSC(selectedDPT);
+  const handleEmployeeIDSC = (selected) => {
+    const safeSelected = selected || [];
+    setselectedEmployeeIDSC(safeSelected);
 
-    if (!selectedDPT || selectedDPT.length === 0) {
-      setEmployeeIDSC("");
-      return;
-    }
+    // comma-separated IDs (already you have)
+    const employeeIds = safeSelected.map(emp => emp.value).join(",");
+    setEmployeeIDSC(employeeIds);
 
-    const values = selectedDPT.map((opt) => opt.value);
+    // 🔥 DYNAMIC COLUMN SIZE LOGIC
+    const count = safeSelected.length;
 
-    setEmployeeIDSC(values.join(","));
+    if (count <= 1) setEmpColSizeSc(2);
+    else if (count === 2) setEmpColSizeSc(3);
+    else if (count === 3) setEmpColSizeSc(4);
+    else if (count === 4) setEmpColSizeSc(5);
+    else if (count === 5) setEmpColSizeSc(6);
+    else if (count === 6) setEmpColSizeSc(7);
+    else if (count >= 7) setEmpColSizeSc(8);
   };
+
+  // const handleEmployeeIDSC = (selectedDPT) => {
+  //   setselectedEmployeeIDSC(selectedDPT);
+
+  //   if (!selectedDPT || selectedDPT.length === 0) {
+  //     setEmployeeIDSC("");
+  //     return;
+  //   }
+
+  //   const values = selectedDPT.map((opt) => opt.value);
+
+  //   setEmployeeIDSC(values.join(","));
+  // };
 
   const filteredOptionEmployeeID = EmployeeIDdrop.map((option) => ({
     value: option.EmployeeId,
@@ -197,27 +219,6 @@ function InterviewPanelMem({}) {
     }
   }, []);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/status`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setStatusdrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  const handleKeyDownStatus = async (e) => {
-    if (e.key === "Enter" && hasValueChanged) {
-      await handleSearch();
-      setHasValueChanged(false);
-    }
-  };
-
   const columnDefs = [
     {
       headerName: "Actions",
@@ -313,8 +314,7 @@ function InterviewPanelMem({}) {
         created_by: sessionStorage.getItem("selectedUserCode"),
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/interview_panel_membersInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/interview_panel_membersInsert`,
         {
           method: "POST",
           headers: {
@@ -347,7 +347,6 @@ function InterviewPanelMem({}) {
         panel_id: PanelIDSC,
         employee_id: EmployeeIDSC,
         Role: RoleSC,
-        status: statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -562,6 +561,130 @@ function InterviewPanelMem({}) {
     navigate("/InterviewDecision");
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Member ID": row.member_id || "",
+      "Panel ID": row.panel_id || "",
+      "Employee ID": row.employee_id || "",
+      "Role": row.Role || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Panel Members Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Panel Members");
+
+    XLSX.writeFile(workbook, "Panel_Members_Search_Report.xlsx");
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -627,14 +750,15 @@ function InterviewPanelMem({}) {
                 htmlFor="selecteddpt"
                 className={`floating-label ${error && !selectedPanelID ? "text-danger" : ""}`}
               >
-                Panel ID{showAsterisk && <span className="text-danger">*</span>}
+                Panel ID<span className="text-danger">*</span>
               </label>
             </div>
           </div>
-          <div className="col-md-2">
+
+          <div className={`col-md-${empColSize}`}>
             <div
-              className={`inputGroup selectGroup 
-              ${selectedEmployeeID?.length > 0 ? "has-value" : ""} 
+              className={`inputGroup selectGroup
+              ${selectedEmployeeID.length > 0 ? "has-value" : ""}
               ${isSelectEmployeeID ? "is-focused" : ""}`}
             >
               <Select
@@ -648,21 +772,10 @@ function InterviewPanelMem({}) {
                 onBlur={() => setisSelectEmployeeID(false)}
                 options={filteredOptionEmployeeID}
                 classNamePrefix="react-select"
-                styles={{
-                  container: (base) => ({
-                    ...base,
-                    width: "100%",
-                  }),
-                }}
               />
 
-              <label
-                className={`floating-label ${
-                  error && !selectedEmployeeID?.length ? "text-danger" : ""
-                }`}
-              >
-                Employee ID
-                {showAsterisk && <span className="text-danger">*</span>}
+              <label className={`floating-label ${error && selectedEmployeeID.length === 0 ? "text-danger" : ""}`}>
+                Employee ID<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -740,10 +853,10 @@ function InterviewPanelMem({}) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          <div className={`col-md-${empColSizeSc}`}>
             <div
               className={`inputGroup selectGroup 
-              ${selectedEmployeeIDSC ? "has-value" : ""} 
+              ${selectedEmployeeIDSC.length > 0 ? "has-value" : ""} 
               ${isSelectEmployeeIDSC ? "is-focused" : ""}`}
             >
               <Select
@@ -757,36 +870,6 @@ function InterviewPanelMem({}) {
                 options={filteredOptionEmployeeID}
                 onFocus={() => setisSelectEmployeeIDSC(true)}
                 onBlur={() => setisSelectEmployeeIDSC(false)}
-                styles={{
-                  container: (base) => ({
-                    ...base,
-                    width: "100%",
-                  }),
-                }}
-                // styles={{
-                //   control: (base) => ({
-                //     ...base,
-                //     minHeight: "42px",
-                //     height: "auto",
-                //     alignItems: "flex-start",
-                //   }),
-                //   valueContainer: (base) => ({
-                //     ...base,
-                //     flexWrap: "wrap",
-                //     alignItems: "flex-start",
-                //     padding: "6px",
-                //   }),
-                //   multiValue: (base) => ({
-                //     ...base,
-                //     maxWidth: "100%",
-                //   }),
-                //   multiValueLabel: (base) => ({
-                //     ...base,
-                //     whiteSpace: "normal",
-                //     overflow: "visible",
-                //     textOverflow: "unset",
-                //   }),
-                // }}
               />
 
               <label htmlFor="selecteddpt" className={`floating-label`}>
@@ -824,6 +907,11 @@ function InterviewPanelMem({}) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

@@ -284,6 +284,16 @@ function InterviewCompletionRate({ }) {
       headerName: "Recommendation",
       field: "Recommendation",
       editable: false,
+      cellRenderer: params => {
+        if (params.data?.totalRow) {
+          return (
+            <strong>
+              {params.data.totalText}
+            </strong>
+          );
+        }
+        return params.value;
+      },
     },
   ];
 
@@ -324,40 +334,25 @@ function InterviewCompletionRate({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
 
-        const newRows = fetchedData.map((item) => ({
-          schedule_id: item.schedule_id,
-          employee_id: item.employee_id,
-          rating: item.rating,
-          comments: item.comments,
-          Recommendation: item.Recommendation,
-          submitted_on: item.submitted_on,
-          keyfield: item.keyfield,
-        }));
+        const totalCount = fetchedData.length;
 
-        // ✅ Count records
-        const totalCount = newRows.length;
-
-        // ✅ Decide label dynamically based on selected combo
         let totalLabel = "Total Candidate";
-
         if (recommendation) {
           totalLabel = `Total ${recommendation} Candidate`;
         }
 
-        // ✅ Push Total Row
-        newRows.push({
-          schedule_id: null,
-          employee_id: "",
-          rating: null,
-          comments: "",
-          Recommendation: "",
-          submitted_on: null,
-          keyfield: "",
+        const rows = fetchedData.map((item) => ({
+          ...item,
+          totalRow: false,
+        }));
+
+        // ✅ Add TOTAL ROW
+        rows.push({
           totalRow: true,
           totalText: `${totalLabel} : ${totalCount}`,
         });
 
-        setRowData(newRows);
+        setRowData(rows);
       } else if (response.status === 404) {
         toast.warning("Data Not found");
         setRowData([]);
@@ -390,6 +385,14 @@ function InterviewCompletionRate({ }) {
       return;
     }
 
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
     // ✅ Get Selected Recommendation
     const selectedRecommendation = recommendation || "";
 
@@ -406,7 +409,16 @@ function InterviewCompletionRate({ }) {
       recommendationText = "Reject Candidate";
     }
 
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
 
     reportWindow.document.write(`
   <html>
@@ -418,12 +430,13 @@ function InterviewCompletionRate({ }) {
         margin: 0;
         padding: 20px;
         background-color: #f4f6f9;
+        color: ${fontColor};
       }
 
       .header {
         display: flex;
         align-items: center;
-        background: linear-gradient(90deg, #4e73df, #1cc88a);
+        background: ${tableHeaderBg};
         padding: 15px 20px;
         color: white;
         border-radius: 8px;
@@ -449,7 +462,7 @@ function InterviewCompletionRate({ }) {
       }
 
       th {
-        background-color: #4e73df;
+        background-color: ${tableHeaderBg};
         color: white;
         padding: 10px;
         text-align: left;
@@ -461,17 +474,17 @@ function InterviewCompletionRate({ }) {
       }
 
       tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: ${rowAltColor};
       }
 
       tr:hover {
-        background-color: #e2e6f0;
+        background-color: ${hoverColor};
       }
 
       .print-btn {
         margin-top: 20px;
         padding: 10px 20px;
-        background: #1cc88a;
+        background: ${headerGradientStart};
         color: white;
         border: none;
         border-radius: 5px;
@@ -480,7 +493,7 @@ function InterviewCompletionRate({ }) {
       }
 
       .print-btn:hover {
-        background: #17a673;
+        opacity: 0.85;
       }
 
       @media print {
@@ -496,6 +509,7 @@ function InterviewCompletionRate({ }) {
   <body>
 
   <div class="header">
+    <img src="${logoUrl}" class="logo" />
     <div class="title-section">
       <h2>Interview Completion Report</h2>
     </div>

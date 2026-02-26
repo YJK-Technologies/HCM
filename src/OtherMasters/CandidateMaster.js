@@ -13,6 +13,7 @@ import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 function CandidateMaster() {
@@ -415,7 +416,7 @@ function CandidateMaster() {
       },
     },
     {
-      headerName: "Candidate Id",
+      headerName: "Candidate ID",
       field: "candidate_id",
       editable: false,
     },
@@ -474,7 +475,7 @@ function CandidateMaster() {
       cellRenderer: CVLinkRenderer,
     },
     {
-      headerName: "Keyfield ",
+      headerName: "Keyfield",
       field: "keyfield",
       editable: false,
       hide: true
@@ -619,14 +620,135 @@ function CandidateMaster() {
     }
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Candidate ID": row.candidate_id || "",
+      "Candidate Name": row.candidate_name || "",
+      "Email": row.email || "",
+      "Phone": row.phone || "",
+      "Applied Job ID": row.applied_job_id || "",
+      "Education": row.Education || "",
+      "Experience": row.Experience || "",
+      "Related Experience": row.Related_experience || "",
+      "Job Description": row.Job_description || "",
+      // "Candidate CV": row.Canditate_CV || "",
+    }));
+  };
 
-  // const handleRowSelection = (row) => {
-  //   setFromDate(formatDate(row.FromDate)); // Ensure correct format
-  //   setToDate(formatDate(row.ToDate));
-  //   setEligibledays(row.Salary_Days);
-  //   // setSelectedRow(row);
-  // };
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Candidate Master Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidate Master");
+
+    XLSX.writeFile(workbook, "Candidate_Master_Search_Report.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1091,6 +1213,11 @@ function CandidateMaster() {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

@@ -1,227 +1,322 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap');
 
-.container1 {
+.hcm-dark-theme {
+  background-color: #020617; /* Deep Slate Black */
+  color: #f8fafc;
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
-  width: 100%;
-  background-color: #485461;
-  background-image: linear-gradient(135deg, #485461 0%, #28313b 74%);
+  position: relative;
   overflow-x: hidden;
 }
 
-.navbar1 {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10;
-  height: 3rem;
+.bg-overlay {
+  position: absolute;
+  /* top: 0;  */
+  /* left: 0;  */
+  right: 0; 
+  /* height: 100%; */
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  z-index: 0;
 }
 
-.menu{
-  max-width: 72rem;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 2rem;
+.hcm-navbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  color: #fff;
+  padding: 30px 10%;
+  position: relative;
+  z-index: 10;
 }
 
-.logo {
-  width: 50px;
-  height: 50px;
-}
+.logo { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
+.logo span { color: #38bdf8; }
 
-.logo span {
-  font-weight: 300;
-}
+.nav-group { display: flex; gap: 2rem; align-items: center; }
+.text-link { background: none; border: none; color: #94a3b8; cursor: pointer; font-weight: 500; }
+.text-link:hover { color: white; }
 
-.hamburger_menu{
-  height: 4rem;
-  width: 3rem;
+.cta-outline {
+  border: 1px solid #334155;
+  background: rgba(255,255,255,0.05);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
   cursor: pointer;
+}
+
+/* Hero Card Design */
+.hero-center {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-} 
-
-.bar {
-  width: 1.9rem;
-  height: 1.5px;
-  border-radius: 2px;
-  background-color: #eee;
-  transition: 0.5s;
+  justify-content: center;
+  padding: 100px 5%;
   position: relative;
-}
-
-.bar:before,
-.bar:after {
-  content: "";
-  position: absolute;
-  width: inherit;
-  height: inherit;
-  background-color: #eee;
-  transition: 0.5s;
-}
-
-.bar:before {
-  transform: translateY(-9px);
-}
-
-.bar:after {
-  transform: translateY(9px);
-}
-
-.main {
-  position: relative;
-  width: 100%;
-  left: 0;
   z-index: 5;
-  overflow: hidden;
-  transform-origin: left;
-  transform-style: preserve-3d;
-  transition: 0.5s;
 }
 
-#header {
-  min-height: 100vh;
-  width: 100%;
-  background: url("./home.jpg") no-repeat top center / cover;
-  position: relative;
-}
-
-.overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  /* background-color: rgba(43, 51, 59, 0.8); */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.inner {
-  max-width: 35rem;
+.glass-hero-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 60px;
+  border-radius: 40px;
   text-align: center;
-  color: #fff;
-  padding: 0 2rem;
+  max-width: 900px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-.title1 {
-  color: #fff;
-  font-size: 2.7rem;
-}
-
-.button {
-  margin-bottom: 10px;
-  margin-top: 1rem;
-  padding: 0.6rem 1.8rem;
-  background-color: #1179e7;
-  border: none;
-  border-radius: 25px;
-  color: #fff;
-  text-transform: uppercase;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.container.active .bar {
-  transform: rotate(360deg);
-  background-color: transparent;
-}
-
-.container.active .bar:before {
-  transform: translateY(0) rotate(45deg);
-}
-
-.container.active .bar:after {
-  transform: translateY(0) rotate(-45deg);
-}
-
-.container.active .main {
-  animation: main-animation 0.5s ease;
-  cursor: pointer;
-  transform: perspective(9000px) rotateY(15deg) translateZ(300px) scale(0.5);
-}
-
-@keyframes main-animation {
-  from {
-    transform: translate(0);
-  }
-
-  to {
-    transform: perspective(9000px) rotateY(15deg) translateZ(300px) scale(0.5);
-  }
-}
-
-.links {
-  position: absolute;
-  width: 30%;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-ul {
-  list-style: none;
-}
-
-.links a {
-  text-decoration: none;
-  color: #eee;
-  padding: 0.7rem 0;
-  display: inline-block;
-  font-size: 1rem;
-  font-weight: 300;
-  text-transform: uppercase;
+.status-pill {
+  color: #22c55e;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
   letter-spacing: 1px;
-  transition: 0.3s;
-  opacity: 0;
-  transform: translateY(10px);
-  animation: hide 0.5s forwards ease;
 }
 
-/* .links a:hover {
-  color: #fff;
+.glass-hero-card h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+}
+
+.glass-hero-card h1 span {
+  color: #38bdf8;
+}
+
+.glass-hero-card p {
+  color: #94a3b8;
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+/* Modern Input Box */
+.search-box-mockup {
+  /* background: rgba(255, 255, 255, 0.05); */
+  /* border: 1px solid #334155; */
+  padding: 8px;
+  border-radius: 16px;
+  /* display: flex; */
+  max-width: 500px;
+  margin: 0 auto 40px;
+}
+
+.search-box-mockup input {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  flex: 1;
+  outline: none;
+}
+
+.search-box-mockup button {
+  background: #38bdf8;
+  color: #020617;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 25px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Bento Grid */
+.feature-row { padding: 0 10% 100px; }
+.bento-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; }
+
+.bento-item {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #334155;
+  padding: 30px;
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.bento-item:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: #38bdf8;
+}
+
+.bento-item h3 { margin-bottom: 10px; color: #38bdf8; }
+
+.brand-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;         
+  justify-content: center; 
+  margin-top: 10px;
+}
+
+.brand-logo {
+  width: 30px;     
+  height: 30px;
+  object-fit: contain;
+  filter: brightness(1.2);
+}
+
+.brand-icons strong {
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #f8fafc;     
+}
+
+/* Prevent hero stretching too wide on large screens */
+.hero-center {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Background overlay full coverage fix */
+.bg-overlay {
+  min-height: 100vh;
+}
+
+/* ============================= */
+/* LARGE DESKTOP (1440px+) */
+/* ============================= */
+/* @media (min-width: 1440px) {
+  .glass-hero-card {
+    max-width: 1000px;
+  }
+
+  .glass-hero-card h1 {
+    font-size: 4rem;
+  }
+
+  .glass-hero-card p {
+    font-size: 1.3rem;
+  }
 } */
 
- a button:hover {
-  cursor: pointer;
-  color: #fff;
-  background:linear-gradient();
-}
-
-.container.active .links a {
-  animation: appear 0.5s forwards ease var(--i);
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* ============================= */
+/* LAPTOPS (1024px – 1366px) */
+/* ============================= */
+@media (max-width: 1366px) {
+  .hero-center {
+    padding: 80px 5%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0px);
+
+  .glass-hero-card {
+    padding: 50px;
   }
 }
 
-@keyframes hide {
-  from {
-    opacity: 1;
-    transform: translateY(0px);
+/* ============================= */
+/* TABLETS (768px – 1023px) */
+/* ============================= */
+@media (max-width: 1023px) {
+  .glass-hero-card {
+    padding: 40px;
+    border-radius: 32px;
   }
-  to {
-    opacity: 0;
-    transform: translateY(10px);
+
+  .glass-hero-card h1 {
+    font-size: 2.6rem;
+  }
+
+  .glass-hero-card p {
+    font-size: 1.05rem;
+  }
+
+  .search-box-mockup {
+    max-width: 100%;
   }
 }
 
+/* ============================= */
+/* SMALL TABLETS & LARGE PHONES */
+/* ============================= */
+@media (max-width: 768px) {
+  .hero-center {
+    padding: 70px 20px;
+  }
 
+  .glass-hero-card {
+    padding: 35px 25px;
+  }
+
+  .glass-hero-card h1 {
+    font-size: 2.2rem;
+    line-height: 1.2;
+  }
+
+  .status-pill {
+    font-size: 0.7rem;
+  }
+
+  .search-box-mockup button {
+    font-size: 0.95rem;
+  }
+}
+
+/* ============================= */
+/* MOBILE (480px and below) */
+/* ============================= */
+@media (max-width: 480px) {
+  .hcm-navbar {
+    padding: 15px 20px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .cta-outline {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .hero-center {
+    padding: 60px 15px;
+  }
+
+  .glass-hero-card {
+    padding: 28px 20px;
+    border-radius: 22px;
+  }
+
+  .glass-hero-card h1 {
+    font-size: 1.8rem;
+    letter-spacing: -1px;
+  }
+
+  .glass-hero-card p {
+    font-size: 0.95rem;
+  }
+
+  .search-box-mockup button {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .brand-icons {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .brand-icons strong {
+    font-size: 0.85rem;
+  }
+}
+
+/* ============================= */
+/* EXTRA SMALL DEVICES (320px) */
+/* ============================= */
+@media (max-width: 360px) {
+  .glass-hero-card h1 {
+    font-size: 1.6rem;
+  }
+
+  .glass-hero-card p {
+    font-size: 0.9rem;
+  }
+
+  .cta-outline {
+    font-size: 0.8rem;
+  }
+}
