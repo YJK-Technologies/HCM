@@ -254,6 +254,11 @@ function WarehouseGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
   const generateReport = () => {
     const selectedRows = gridApi.getSelectedRows();
@@ -261,86 +266,151 @@ function WarehouseGrid() {
       toast.warning("Please select at least one row to generate a report");
       return
     };
-    const reportData = selectedRows.map((row) => {
-      return {
-        /* Date: moment(row.expenses_date).format("YYYY-MM-DD"),
-        Type: row.expenses_type,
-        Expenditure: row.expenses_amount,
-        "Spent By": row.expenses_spentby,
-        Remarks: row.remarks,*/
-        "Warehouse Code": row.warehouse_code,
-        "Warehouse Name": row.warehouse_name,
-        "Status": row.status,
-        "Location No": row.location_no,
 
+    const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
+      return {
+        "Warehouse Code": formatValue(row.warehouse_code),
+        "Warehouse Name": formatValue(row.warehouse_name),
+        "Location No": formatValue(row.location_no),
+        "Status": formatValue(row.status),
       };
     });
 
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
     reportWindow.document.write("<html><head><title>Warehouse</title>");
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
       body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-      }
-      h1 {
-          color: maroon;
-          text-align: center;
-          font-size: 24px;
-          margin-bottom: 30px;
-          text-decoration: underline;
-      }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #ddd;
-          vertical-align: top;
-      }
-      th {
-          background-color: maroon;
-          color: white;
-          font-weight: bold;
-      }
-      td {
-          background-color: #fdd9b5;
-      }
-      tr:nth-child(even) td {
-          background-color: #fff0e1;
-      }
-      .report-button {
-          display: block;
-          width: 150px;
-          margin: 20px auto;
-          padding: 10px;
-          background-color: maroon;
-          color: white;
-          border: none;
-          cursor: pointer;
-          font-size: 16px;
-          text-align: center;
-          border-radius: 5px;
-      }
-      .report-button:hover {
-          background-color: darkred;
-      }
-      @media print {
-          .report-button {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: ${fontColor};
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: ${tableHeaderBg};
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: ${tableHeaderBg};
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: ${rowAltColor};
+          }
+  
+          tr:hover {
+            background-color: ${hoverColor};
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: ${headerGradientStart};
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            opacity: 0.85;
+          }
+  
+          @media print {
+            .print-btn {
               display: none;
+            }
+            body {
+              background: white;
+            }
           }
-          body {
-              margin: 0;
-              padding: 0;
-          }
-      }
     `);
     reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u>Warehouse Information</u></h1>");
+    reportWindow.document.write(`<div class="header">
+    <img src="${logoUrl}" class="logo" />
+    <div class="title-section">
+      <h2>Warehouse Report</h2>
+    </div>
+    </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+    <strong>Total Records: ${selectedRows.length}</strong>
+    <span style="float:right;">
+      Printed Date: ${new Date().toLocaleDateString()}
+    </span>
+  </div>`);
+    // reportWindow.document.write("<h1><u>Warehouse Report</u></h1>");
 
     // Create table with headers
     reportWindow.document.write("<table><thead><tr>");
@@ -360,9 +430,11 @@ function WarehouseGrid() {
 
     reportWindow.document.write("</tbody></table>");
 
-    reportWindow.document.write(
-      '<button class="report-button" onclick="window.print()">Print</button>'
-    );
+    reportWindow.document.write(`
+  <div style="text-align:center;">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+`);
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };

@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -86,6 +87,20 @@ function Input({ }) {
       },
     },
     {
+      headerName: "Start Year",
+      field: "Start_year",
+      filter: 'agTextColumnFilter',
+      editable: true,
+    },
+    {
+      headerName: "End Year",
+      field: "End_Year",
+      filter: 'agTextColumnFilter',
+      sortable: true,
+      textAlign: "center",
+      editable: true,
+    },
+    {
       headerName: "Loan ID",
       field: "Loan_ID",
       editable: true,
@@ -103,20 +118,6 @@ function Input({ }) {
         maxLength: 150,
         valueFormatter: (params) => formatDate(params.value)
       }
-    },
-    {
-      headerName: "Start Year",
-      field: "Start_year",
-      filter: 'agTextColumnFilter',
-      editable: true,
-    },
-    {
-      headerName: "End Year",
-      field: "End_Year",
-      filter: 'agTextColumnFilter',
-      sortable: true,
-      textAlign: "center",
-      editable: true,
     },
     {
       headerName: "Keyfield",
@@ -399,6 +400,130 @@ function Input({ }) {
     navigate("/PayslipEmpTDS");
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Loan ID": row.Loan_ID || "",
+      "Loan Eligible Amount": row.Loan_Eligible_Amount || "",
+      "Start Year": row.Start_year || "",
+      "End Year": row.End_Year || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Loan Type Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Type");
+
+    XLSX.writeFile(workbook, "Loan_Type_Search_Report.xlsx");
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -417,39 +542,6 @@ function Input({ }) {
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Loan_ID"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Loan ID"
-                value={Loan_ID}
-                autoComplete="off"
-                onChange={(e) => handleLoanIdChange(e)}
-                maxLength={20}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !Loan_ID ? 'text-danger' : ''}`}>Loan ID<span className="text-danger">*</span></label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Loan_Eligible_Amount"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the Loan Amount"
-                value={Loan_Eligible_Amount}
-                autoComplete="off"
-                onChange={(e) => setLoan_Eligible_Amount(Number(e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !Loan_Eligible_Amount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
-            </div>
-          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -483,6 +575,39 @@ function Input({ }) {
             </div>
           </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Loan_ID"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Loan ID"
+                value={Loan_ID}
+                autoComplete="off"
+                onChange={(e) => handleLoanIdChange(e)}
+                maxLength={20}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Loan_ID ? 'text-danger' : ''}`}>Loan ID<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Loan_Eligible_Amount"
+                class="exp-input-field form-control"
+                type="Number"
+                placeholder=""
+                required title="Please Enter the Loan Amount"
+                value={Loan_Eligible_Amount}
+                autoComplete="off"
+                onChange={(e) => setLoan_Eligible_Amount(Number(e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Loan_Eligible_Amount ? 'text-danger' : ''}`}>Loan Eligible Amount<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -491,6 +616,36 @@ function Input({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="StartYear"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={StartYear}
+                onChange={(e) => setStartYear(e.target.value)}
+              />
+              <label For="city" className="exp-form-labels">Start Year</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="EndYear"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                value={EndYear}
+                onChange={(e) => setEndYear(e.target.value)}
+              />
+              <label For="city" className="exp-form-labels">End Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -524,35 +679,6 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="StartYear"
-                class="exp-input-field form-control"
-                type="Date"
-                placeholder=""
-                required title="Please Choose the Start Year"
-                value={StartYear}
-                onChange={(e) => setStartYear(e.target.value)}
-              />
-              <label For="city" className="exp-form-labels">Start Year</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="EndYear"
-                class="exp-input-field form-control"
-                type="Date"
-                placeholder=""
-                required title="Please Choose the End Year"
-                value={EndYear}
-                onChange={(e) => setEndYear(e.target.value)}
-              />
-              <label For="city" className="exp-form-labels">End Year</label>
-            </div>
-          </div>
         </div>
 
         {/* Search + Reload Buttons */}
@@ -566,6 +692,11 @@ function Input({ }) {
             <div className="icon-btn reload" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-rotate-right"></i>
+            </div>
+
+            <div className="icon-btn excel" onClick={handleExportToExcel}>
+              <span className="tooltip">Excel</span>
+              <i className="fa-solid fa-file-excel"></i>
             </div>
           </div>
         </div>

@@ -271,9 +271,24 @@ function HiringDecisionReport() {
       return;
     }
 
-    const logoUrl = "/favicon.ico"; // <-- put your logo inside public folder
+    /* ================= READ THEME COLORS ================= */
 
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
 
     reportWindow.document.write(`
     <html>
@@ -285,12 +300,13 @@ function HiringDecisionReport() {
           margin: 0;
           padding: 20px;
           background-color: #f4f6f9;
+          color: ${fontColor};
         }
 
         .header {
           display: flex;
           align-items: center;
-          background: linear-gradient(90deg, #4e73df, #1cc88a);
+          background: ${tableHeaderBg};
           padding: 15px 20px;
           color: white;
           border-radius: 8px;
@@ -327,7 +343,7 @@ function HiringDecisionReport() {
         }
 
         th {
-          background-color: #4e73df;
+          background-color: ${tableHeaderBg};
           color: white;
           padding: 10px;
           text-align: left;
@@ -339,11 +355,11 @@ function HiringDecisionReport() {
         }
 
         tr:nth-child(even) {
-          background-color: #f2f2f2;
+          background-color: ${rowAltColor};
         }
 
         tr:hover {
-          background-color: #e2e6f0;
+          background-color: ${hoverColor};
         }
 
         .footer {
@@ -356,7 +372,7 @@ function HiringDecisionReport() {
         .print-btn {
           margin-top: 20px;
           padding: 10px 20px;
-          background: #1cc88a;
+          background: ${headerGradientStart};
           color: white;
           border: none;
           border-radius: 5px;
@@ -365,7 +381,7 @@ function HiringDecisionReport() {
         }
 
         .print-btn:hover {
-          background: #17a673;
+          opacity: 0.85;
         }
 
         @media print {

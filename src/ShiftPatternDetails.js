@@ -11,8 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
-import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
@@ -322,10 +321,11 @@ function ShiftPatternDetails() {
   };
 
   const handleSave = async () => {
-    // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-    //   toast.warning("Error: Missing required fields");
-    //   return;
-    // }
+    if (!Shift_Pattern_ID || !Pattern_Detail_ID  || !Day_Sequence || !Shift_ID || !Is_Off_Day ) {
+      toast.warning("Error: Missing required fields");
+      setError(" ");
+      return;
+    }
 
     setLoading(true);
 
@@ -466,6 +466,131 @@ function ShiftPatternDetails() {
     );
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Shift Pattern ID": row.Shift_Pattern_ID || "",
+      "Pattern Detail ID": row.Pattern_Detail_ID || "",
+      "Day Sequence": row.Day_Sequence || "",
+      "Shift ID": row.Shift_ID || "",
+      "Is Off Day": row.Is_Off_Day || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Shift Pattern Details Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shift Pattern Details");
+
+    XLSX.writeFile(workbook, "Shift_Pattern_Details_Search_Report.xlsx");
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
@@ -602,8 +727,6 @@ function ShiftPatternDetails() {
           </div>
         </div>
 
-
-
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="header-flex">
             <h6 className="">Search Criteria:</h6>
@@ -693,11 +816,8 @@ function ShiftPatternDetails() {
                   value={Is_Off_DaySC}
                   onChange={(e) => setIs_Off_DaySC(e.target.value)}
                 />
-                <label
-                  for="state"
-                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
-                >
-                  Is Off Day<span className="text-danger">*</span>
+                <label htmlFor="state" className={`exp-form-labels`}>
+                  Is Off Day
                 </label>
               </div>
             </div>
@@ -712,6 +832,11 @@ function ShiftPatternDetails() {
                 <div className="icon-btn reload" onClick={reloadGridData}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
+                </div>
+
+                <div className="icon-btn excel" onClick={handleExportToExcel}>
+                  <span className="tooltip">Excel</span>
+                  <i className="fa-solid fa-file-excel"></i>
                 </div>
               </div>
             </div>
