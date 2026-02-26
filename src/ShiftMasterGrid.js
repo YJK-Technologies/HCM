@@ -3,19 +3,16 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
-// import "./apps.css";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import labels from "./Labels";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
-
+import * as XLSX from "xlsx-js-style";
 const config = require("./Apiconfig");
 
 function ShiftMasterGrid() {
@@ -435,21 +432,6 @@ function ShiftMasterGrid() {
     setSelectedRows(selectedData);
   };
 
-  const handleNavigateToForm = () => {
-    navigate("/ShiftMaster", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
-  };
-  const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/ShiftMaster", {
-      state: {
-        mode: "update",
-        selectedRow: {
-          ...selectedRow,
-          DST_Flag: Number(selectedRow.DST_Flag), // ensures 0 or 1
-        },
-      },
-    });
-  };
-
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
@@ -665,7 +647,136 @@ function ShiftMasterGrid() {
     );
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Shift ID": row.Shift_ID || "",
+      "Shift Code": row.Shift_Code || "",
+      "Shift Name": row.Shift_Name || "",
+      "Start Time": row.Start_Time || "",
+      "End Time": row.End_Time || "",
+      "Shift Hours": row.Shift_Hours || "",
+      "Night Shift": row.Is_Night_Shift || "",
+      "Grace In Min": row.Grace_In_Min || "",
+      "Grace Out Min": row.Grace_Out_Min || "",
+      "Cross Midnight": row.Cross_Midnight || "",
+      "Status": row.Status || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Shift Master Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shift Master");
+
+    XLSX.writeFile(workbook, "Shift_Master_Search_Report.xlsx");
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -685,66 +796,6 @@ function ShiftMasterGrid() {
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             </div>
-            {/* <div className="action-wrapper desktop-actions">
-                            {["add", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon add" onClick={handleNavigateToForm}>
-                                    <span className="tooltip">Add</span>
-                                    <i class="fa-solid fa-user-plus"></i>
-                                </div>
-                            )}
-                            {["delete", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon delete" onClick={deleteSelectedRows}>
-                                    <span className="tooltip">Delete</span>
-                                    <i class="fa-solid fa-user-minus"></i>
-                                </div>
-                            )}
-                            {["update", "all permission"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon update" onClick={saveEditedData}>
-                                    <span className="tooltip">Update</span>
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </div>
-                            )}
-                            {["all permission", "view"].some((permission) => companyMappingPermission.includes(permission)) && (
-                                <div className="action-icon print" onClick={generateReport}>
-                                    <span className="tooltip">Print</span>
-                                    <i class="fa-solid fa-print"></i>
-                                </div>
-                            )}
-                        </div> */}
-
-            {/* Mobile Dropdown */}
-            {/* <div className="dropdown mobile-actions">
-                            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                                <i className="fa-solid fa-list"></i>
-                            </button>
-
-                            <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                                {['add', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={handleNavigateToForm}>
-                                        <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['delete', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={deleteSelectedRows}>
-                                        <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['update', 'all permission'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={saveEditedData}>
-                                        <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                                    </li>
-                                )}
-
-                                {['all permission', 'view'].some(p => companyMappingPermission.includes(p)) && (
-                                    <li className="dropdown-item" onClick={generateReport}>
-                                        <i className="fa-solid fa-print fs-4"></i>
-                                    </li>
-                                )}
-                            </ul>
-                        </div> */}
           </div>
         </div>
 
@@ -1150,6 +1201,11 @@ function ShiftMasterGrid() {
                 <div className="icon-btn reload" onClick={reloadGridData}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
+                </div>
+
+                <div className="icon-btn excel" onClick={handleExportToExcel}>
+                  <span className="tooltip">Excel</span>
+                  <i className="fa-solid fa-file-excel"></i>
                 </div>
               </div>
             </div>

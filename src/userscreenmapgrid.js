@@ -209,6 +209,12 @@ function UserScreenMapGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
   const generateReport = () => {
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
@@ -226,71 +232,139 @@ function UserScreenMapGrid() {
       };
     });
 
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
-    reportWindow.document.write("<html><head><title>Role Rights</title>");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write("<html><head><title>Role Rights Report</title>");
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
          body {
-             font-family: Arial, sans-serif;
-             margin: 20px;
-         }
-         h1 {
-             color: maroon;
-             text-align: center;
-             font-size: 24px;
-             margin-bottom: 30px;
-             text-decoration: underline;
-         }
-         table {
-             width: 100%;
-             border-collapse: collapse;
-             margin-bottom: 20px;
-         }
-         th, td {
-             padding: 10px;
-             text-align: left;
-             border: 1px solid #ddd;
-             vertical-align: top;
-         }
-         th {
-             background-color: maroon;
-             color: white;
-             font-weight: bold;
-         }
-         td {
-             background-color: #fdd9b5;
-         }
-         tr:nth-child(even) td {
-             background-color: #fff0e1;
-         }
-         .report-button {
-             display: block;
-             width: 150px;
-             margin: 20px auto;
-             padding: 10px;
-             background-color: maroon;
-             color: white;
-             border: none;
-             cursor: pointer;
-             font-size: 16px;
-             text-align: center;
-             border-radius: 5px;
-         }
-         .report-button:hover {
-             background-color: darkred;
-         }
-         @media print {
-             .report-button {
-                 display: none;
-             }
-             body {
-                 margin: 0;
-                 padding: 0;
-             }
-         }
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: ${fontColor};
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: ${tableHeaderBg};
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: ${tableHeaderBg};
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: ${rowAltColor};
+          }
+  
+          tr:hover {
+            background-color: ${hoverColor};
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: ${headerGradientStart};
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            opacity: 0.85;
+          }
+  
+          @media print {
+            .print-btn {
+              display: none;
+            }
+            body {
+              background: white;
+            }
+          }
        `);
     reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u> Role Rights Information </u></h1>");
+    reportWindow.document.write(`<div class="header">
+    <img src="${logoUrl}" class="logo" />
+    <div class="title-section">
+      <h2>Role Rights Report</h2>
+    </div>
+    </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+    <strong>Total Records: ${selectedRows.length}</strong>
+    <span style="float:right;">
+      Printed Date: ${new Date().toLocaleDateString()}
+    </span>
+  </div>`);
+    // reportWindow.document.write("<h1><u> Role Rights Report </u></h1>");
 
     reportWindow.document.write("<table><thead><tr>");
     Object.keys(reportData[0]).forEach((key) => {
@@ -308,9 +382,11 @@ function UserScreenMapGrid() {
 
     reportWindow.document.write("</tbody></table>");
 
-    reportWindow.document.write(
-      '<button class="report-button" title="Print" onclick="window.print()">Print</button>'
-    );
+    reportWindow.document.write(`
+  <div style="text-align:center;">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+`);
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
@@ -496,128 +572,128 @@ function UserScreenMapGrid() {
 
   return (
     <div className="container-fluid Topnav-screen">
-        {loading && <LoadingScreen />}
-        <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      {loading && <LoadingScreen />}
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
-          <div className="header-flex">
-               <h1 className="page-title">Role Rights</h1>
-            <div className="action-wrapper desktop-actions">
-              {['add', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
-                <div className="action-icon add" onClick={handleNavigatesToForm}>
-                  <span className="tooltip">Add</span>
-                  <i class="fa-solid fa-user-plus"></i>
-                </div>
-              )}
-              {['delete', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
-                <div className="action-icon delete" onClick={deleteSelectedRows}>
-                  <span className="tooltip">Delete</span>
-                  <i class="fa-solid fa-user-minus"></i>
-                </div>
-              )}
-              {['update', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
-                <div className="action-icon update" onClick={saveEditedData}>
-                  <span className="tooltip">Update</span>
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </div>
-              )}
-              {['all permission', 'view'].some(permission => UserScreenPermission.includes(permission)) && (
-                <div className="action-icon print" onClick={generateReport}>
-                  <span className="tooltip">Print</span>
-                  <i class="fa-solid fa-print"></i>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Dropdown */}
-            <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                {['add', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigatesToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                  </li>
-                )}
-
-                {['delete', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
-                )}
-
-                {['update', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
-
-                {['all permission', 'view'].some(p => UserScreenPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
-                  </li>
-                )}
-
-              </ul>
-            </div>
-
+        <div className="header-flex">
+          <h1 className="page-title">Role Rights</h1>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
+              <div className="action-icon add" onClick={handleNavigatesToForm}>
+                <span className="tooltip">Add</span>
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+            )}
+            {['delete', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
+              <div className="action-icon delete" onClick={deleteSelectedRows}>
+                <span className="tooltip">Delete</span>
+                <i class="fa-solid fa-user-minus"></i>
+              </div>
+            )}
+            {['update', 'all permission'].some(permission => UserScreenPermission.includes(permission)) && (
+              <div className="action-icon update" onClick={saveEditedData}>
+                <span className="tooltip">Update</span>
+                <i class="fa-solid fa-pen-to-square"></i>
+              </div>
+            )}
+            {['all permission', 'view'].some(permission => UserScreenPermission.includes(permission)) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i class="fa-solid fa-print"></i>
+              </div>
+            )}
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {['add', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={handleNavigatesToForm}>
+                  <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                </li>
+              )}
+
+              {['delete', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={deleteSelectedRows}>
+                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                </li>
+              )}
+
+              {['update', 'all permission'].some(p => UserScreenPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={saveEditedData}>
+                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                </li>
+              )}
+
+              {['all permission', 'view'].some(p => UserScreenPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print fs-4"></i>
+                </li>
+              )}
+
+            </ul>
+          </div>
+
         </div>
+      </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-            <div className="col-md-2">
-              <div class="inputGroup">
-                <input
-                  id="wcode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please fill the user code here"
-                  value={role_id}
-                  onChange={(e) => setrole_id(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="tcode" class="exp-form-labels">Role Id</label>
-              </div>
+          <div className="col-md-2">
+            <div class="inputGroup">
+              <input
+                id="wcode"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please fill the user code here"
+                value={role_id}
+                onChange={(e) => setrole_id(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={18}
+              />
+              <label for="tcode" class="exp-form-labels">Role Id</label>
             </div>
+          </div>
 
-            <div className="col-md-2">
-              <div class="inputGroup">
-                <input
-                  id="wcode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please fill the screen type here"
-                  value={screen_type}
-                  onChange={(e) => setscreen_type(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={50}
-                />
-                <label for="tcode" class="exp-form-labels">Screen Type</label>
-              </div>
+          <div className="col-md-2">
+            <div class="inputGroup">
+              <input
+                id="wcode"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please fill the screen type here"
+                value={screen_type}
+                onChange={(e) => setscreen_type(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={50}
+              />
+              <label for="tcode" class="exp-form-labels">Screen Type</label>
             </div>
-            <div className="col-md-2">
-              <div class="inputGroup">
-                <input
-                  id="wcode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please allow the permission here"
-                  value={permission_type}
-                  onChange={(e) => setpermission_type(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={50}
-                />
-                <label for="tcode" class="exp-form-labels">Permission Type</label>
-              </div>
+          </div>
+          <div className="col-md-2">
+            <div class="inputGroup">
+              <input
+                id="wcode"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please allow the permission here"
+                value={permission_type}
+                onChange={(e) => setpermission_type(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={50}
+              />
+              <label for="tcode" class="exp-form-labels">Permission Type</label>
             </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -634,25 +710,25 @@ function UserScreenMapGrid() {
             </div>
           </div>
 
-          </div>
-          </div>
+        </div>
+      </div>
 
       <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div class="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
-            <AgGridReact
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              onGridReady={onGridReady}
-              onCellValueChanged={onCellValueChanged}
-              rowSelection="multiple"
-              onSelectionChanged={onSelectionChanged}
-              pagination={true}
-              paginationAutoPageSize={true}
-              onRowSelected={onRowSelected}
-            />
-          </div>
+        <div class="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            onGridReady={onGridReady}
+            onCellValueChanged={onCellValueChanged}
+            rowSelection="multiple"
+            onSelectionChanged={onSelectionChanged}
+            pagination={true}
+            paginationAutoPageSize={true}
+            onRowSelected={onRowSelected}
+          />
         </div>
+      </div>
       {/* <div className="shadow-lg p-2 bg-body-tertiary rounded mt-2 mb-2">
         <div className="row ms-2">
           <div className="d-flex justify-content-start">

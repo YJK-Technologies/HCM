@@ -7,6 +7,7 @@ import Select from 'react-select'
 import { showConfirmationToast } from '../ToastConfirmation';
 import { AgGridReact } from "ag-grid-react";
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -76,6 +77,7 @@ function Input({ }) {
   const [isSelectmessagetype, setIsSelectmessagetype] = useState(false);
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -110,7 +112,7 @@ function Input({ }) {
       },
     },
     {
-      headerName: "Announcement Id",
+      headerName: "Announcement ID",
       field: "Announcement_id",
       editable: true,
       cellStyle: { textAlign: "left" },
@@ -196,18 +198,6 @@ function Input({ }) {
       field: "Start_Date",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Start Time",
@@ -223,18 +213,6 @@ function Input({ }) {
       field: "End_Date",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "End Time",
@@ -417,7 +395,7 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-    setLoading(true);
+        setLoading(true);
 
         try {
           const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -447,8 +425,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -463,7 +441,7 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-    setLoading(true);
+        setLoading(true);
 
         try {
           const response = await fetch(`${config.apiBaseUrl}/deleteAnnouncement`, {
@@ -489,8 +467,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -730,6 +708,137 @@ function Input({ }) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Announcement ID": row.Announcement_id || "",
+      "Select Type": row.SelectType || "",
+      "Select Details": row.SelectDetails || "",
+      "Message Type": row.Messagetype || "",
+      "Message Title": row.MessageTitle || "",
+      "Status": row.status || "",
+      "Request for Do Not Show Again": row.RequestfordoNotShowAgainOption || "",
+      "Start Date": row.Start_Date || "",
+      "Start Time": row.Start_Time || "",
+      "End Date": row.End_Date || "",
+      "End Time": row.End_Time || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Announcement Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Announcement");
+
+    XLSX.writeFile(workbook, "Announcement_Search_Report.xlsx");
   };
 
   return (
@@ -1198,6 +1307,11 @@ function Input({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>
