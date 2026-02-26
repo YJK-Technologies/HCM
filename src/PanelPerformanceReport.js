@@ -127,7 +127,7 @@ function PanelPerformanceReport() {
       editable: false,
     },
     {
-      headerName: "Average Rating",
+      headerName: "Rating",
       field: "avg_rating",
       editable: false,
     },
@@ -163,26 +163,42 @@ function PanelPerformanceReport() {
       return;
     }
 
-    const logoUrl = "/favicon.ico"; // <-- put your logo inside public folder
+    /* ================= READ THEME COLORS ================= */
 
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
 
     reportWindow.document.write(`
     <html>
     <head>
-      <title>Candidate Interview Report</title>
+      <title>Panel Performance Report</title>
       <style>
         body {
           font-family: 'Segoe UI', sans-serif;
           margin: 0;
           padding: 20px;
           background-color: #f4f6f9;
+          color: ${fontColor};
         }
 
         .header {
           display: flex;
           align-items: center;
-          background: linear-gradient(90deg, #4e73df, #1cc88a);
+          background: ${tableHeaderBg};
           padding: 15px 20px;
           color: white;
           border-radius: 8px;
@@ -219,7 +235,7 @@ function PanelPerformanceReport() {
         }
 
         th {
-          background-color: #4e73df;
+          background-color: ${tableHeaderBg};
           color: white;
           padding: 10px;
           text-align: left;
@@ -231,11 +247,11 @@ function PanelPerformanceReport() {
         }
 
         tr:nth-child(even) {
-          background-color: #f2f2f2;
+          background-color: ${rowAltColor};
         }
 
         tr:hover {
-          background-color: #e2e6f0;
+          background-color: ${hoverColor};
         }
 
         .footer {
@@ -248,7 +264,7 @@ function PanelPerformanceReport() {
         .print-btn {
           margin-top: 20px;
           padding: 10px 20px;
-          background: #1cc88a;
+          background: ${headerGradientStart};
           color: white;
           border: none;
           border-radius: 5px;
@@ -257,9 +273,9 @@ function PanelPerformanceReport() {
         }
 
         .print-btn:hover {
-          background: #17a673;
+          opacity: 0.85;
         }
-
+          
         @media print {
           .print-btn {
             display: none;
@@ -275,7 +291,7 @@ function PanelPerformanceReport() {
       <div class="header">
         <img src="${logoUrl}" class="logo" />
         <div class="title-section">
-          <h2>Candidate Interview Report</h2>
+          <h2>Panel Performance Report</h2>
         </div>
       </div>
 
@@ -287,12 +303,9 @@ function PanelPerformanceReport() {
       <table>
         <thead>
           <tr>
-            <th>Candidate Name</th>
-            <th>Schedule Date</th>
+            <th>Panel Name</th>
             <th>Rating</th>
-            <th>Final Status</th>
-            <th>Decided On</th>
-            <th>Remarks</th>
+            <th>Total Interviews</th>
           </tr>
         </thead>
         <tbody>
@@ -301,12 +314,9 @@ function PanelPerformanceReport() {
     selectedRows.forEach((row) => {
       reportWindow.document.write(`
       <tr>
-        <td>${row.candidate_name || ""}</td>
-        <td>${row.scheduled_datetime ? formatDate(row.scheduled_datetime) : ""}</td>
-        <td>${row.rating || ""}</td>
-        <td>${row.Final_Status || ""}</td>
-        <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
-        <td>${row.remarks || ""}</td>
+        <td>${row.panel_name || ""}</td>
+        <td>${row.avg_rating|| ""}</td>
+        <td>${row.total_interviews || ""}</td>
       </tr>
     `);
     });
