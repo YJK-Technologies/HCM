@@ -1,70 +1,64 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
 function HiringDecisionReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-  const navigate = useNavigate();
   const [statusdrop, setStatusdrop] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const [selectedcandidate_name, setSelectedcandidatename] = useState("");
-  const [isselectedscheduleid, setIsscheduleid] = useState("");
-  const [canditatename, set_candidatename] = useState("");
+  const [selectedCandidateName, setSelectedCandidateName] = useState("");
+  const [isSelectedCandidateName, setIsSelectedCandidateName] = useState("");
+  const [canditateName, setCandidateName] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
-  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
-  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
-  const [statusSC, setstatusSC] = useState("");
-  const [scheduled_datetimeSC, setscheduled_datetimeSC] = useState("");
-  const [ratingSC, setratingSC] = useState("");
-  const [decided_on, setdecided_on] = useState("");
-  const [remarksSC, setremarksSC] = useState("");
-  const [job_titleSC, setjob_titleSC] = useState("");
-  const [dptSC, setdptSC] = useState("");
-  const [selecteddptSC, setselecteddeptSC] = useState("");
-  const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [status, setStatus] = useState("");
+  const [jobTitle, setjobTitle] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState("");
+  const [isSelectDepartmentId, setIsSelectDepartmentIs] = useState(false);
   const [DPTdrop, setDPTdrop] = useState([]);
-  const [Country_CodeSC, setCountry_CodeSC] = useState("");
-  const [decided_bySC, setdecided_bySC] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [decidedBy, setDecidedBy] = useState("");
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const gridApiRef = useRef(null);
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+    .filter((permission) => permission.screen_type === "HiringDecisionReport")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  const handlescandidate_name = (selectedDPT) => {
-    setSelectedcandidatename(selectedDPT);
-    set_candidatename(selectedDPT ? selectedDPT.value : "");
+  const handleCandidateName = (selectedDPT) => {
+    setSelectedCandidateName(selectedDPT);
+    setCandidateName(selectedDPT ? selectedDPT.value : "");
   };
 
-  const handleChangeStatusSC = (selectedStatus) => {
-    setSelectedStatusSC(selectedStatus);
-    setstatusSC(selectedStatus ? selectedStatus.value : "");
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
-  const handleDPTSC = (selectedDPT) => {
-    setselecteddeptSC(selectedDPT);
-    setdptSC(selectedDPT ? selectedDPT.value : "");
+  const handleDepartmentId = (selectedDPT) => {
+    setSelectedDepartmentId(selectedDPT);
+    setDepartmentId(selectedDPT ? selectedDPT.value : "");
   };
 
-  const filteredOptioncandidate_name = canditatenameDrop.map((option) => ({
+  const filteredOptionCandidateName = canditatenameDrop.map((option) => ({
     value: option.candidate_name,
     label: `${option.candidate_id} - ${option.candidate_name}`,
   }));
@@ -74,7 +68,7 @@ function HiringDecisionReport() {
     label: option.attributedetails_name,
   }));
 
-  const filteredOptionDPtSC = DPTdrop.map((option) => ({
+  const filteredOptionDepartmentId = DPTdrop.map((option) => ({
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`,
   }));
@@ -155,37 +149,21 @@ function HiringDecisionReport() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/HiringDecisionSearch`,
+      const response = await fetch(`${config.apiBaseUrl}/HiringDecisionSearch`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // schedule_id: scheduleidSC,
-            candidate_name: canditatename,
-            // email: emailSC,
-            // panel_name: panel_nameSC,
-            // scheduled_datetime: scheduled_datetimeSC,
-            // Interview_Mode: InterviewModeSC,
-            // Status: statusSC,
-            // location: locationSC,
-            // employee_id: EmployeeIDSC,
-            // role: RoleSC,
-            // rating: Number(ratingSC),
-            country_code: Country_CodeSC,
-            Final_Status: statusSC,
-            decided_on: decided_on,
-            job_title: job_titleSC,
-            department_id: dptSC,
-            decided_by: decided_bySC,
-            // remarks: remarksSC,
-            // recommendation: RecommendationSC,
-            // comments: commentsSC,
-            // submitted_on: submitted_onSC,
-            // meeting_link: meetingLinkSc,
-            // timezone: timezoneSc,
+            candidate_name: canditateName,
+            country_code: countryCode,
+            Final_Status: status,
+            job_title: jobTitle,
+            department_id: departmentId,
+            decided_by: decidedBy,
+            start_date: fromDate,
+            end_date: toDate
           }),
         },
       );
@@ -219,6 +197,8 @@ function HiringDecisionReport() {
 
   const columnDefs = [
     {
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
       headerName: "Candidate Name",
       field: "candidate_name",
       editable: false,
@@ -252,18 +232,6 @@ function HiringDecisionReport() {
       headerName: "Decided On",
       field: "decided_on",
       editable: false,
-       valueFormatter: (params) => formatDate(params.value),
-       filterParams: {
-         comparator: (filterLocalDateAtMidnight, cellValue) => {
-           const cellDate = new Date(cellValue.split("/").join("-"));
-           if (cellDate < filterLocalDateAtMidnight) {
-             return -1;
-           } else if (cellDate > filterLocalDateAtMidnight) {
-             return 1;
-           }
-           return 0;
-         },
-       },
     },
     // {
     //   headerName: "Meeting Link",
@@ -290,7 +258,7 @@ function HiringDecisionReport() {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const generateReport = () => {
@@ -476,54 +444,122 @@ function HiringDecisionReport() {
     window.location.reload();
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  // Convert HEX color to RGB array (jsPDF needs RGB)
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [
+      (num >> 16) & 255,
+      (num >> 8) & 255,
+      num & 255,
+    ];
+  };
+
   const exportToPDF = () => {
-    if (!gridApi) return;
+    if (!gridApiRef.current) return;
 
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const doc = new jsPDF();
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    doc.setFontSize(14);
-    doc.text("Hiring Decision Report", 14, 15);
+    const headerBgColor = hexToRgb(getCSSVariable("--but"));
+    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
 
-    const tableColumn = [
-      "Candidate Name",
-      "Job Title",
-      "Department ID",
-      "Country Code",
-      "Final Status",
-      "Decided By",
-      "Decided On",
+    const headers = [
+      [
+        "Candidate Name",
+        "Job Title",
+        "Department ID",
+        "Country Code",
+        "Final Status",
+        "Decided By",
+        "Decided On",
+      ],
     ];
 
-    const tableRows = [];
+    // ✅ Table body
+    const body = dataSource.map((row) => [
+      row.candidate_name || "",
+      row.job_title || "",
+      row.department_id || "",
+      row.country_code || "",
+      row.final_status || "",
+      row.decided_by || "",
+      row.decided_on || "",
+    ]);
 
-    selectedRows.forEach((row) => {
-      const rowData = [
-        row.candidate_name || "",
-        row.job_title || "",
-        row.department_id || "",
-        row.country_code || "",
-        row.final_status || "",
-        row.decided_by || "",
-        row.decided_on ? formatDate(row.decided_on) : "",
-      ];
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-      tableRows.push(rowData);
+    /* ================= HEADER DESIGN ================= */
+
+    // Header background bar
+    doc.setFillColor(...headerBgColor);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    // Title (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(255);
+    doc.text("Hiring Decision Report", pageWidth / 2, 40, {
+      align: "center",
     });
+
+    // Sub-title
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
+      pageWidth / 2,
+      60,
+      { align: "center" }
+    );
+
+    /* ================= TABLE DESIGN ================= */
 
     autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
+      startY: 90,
+      head: headers,
+      body: body,
+
+      styles: {
+        fontSize: 10,
+        cellPadding: 8,
+        textColor: fontColor,
+        valign: "middle",
+      },
+
+      headStyles: {
+        fillColor: tableHeaderColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+      },
+
+      alternateRowStyles: {
+        fillColor: rowAltColor,
+      },
+
+      columnStyles: {
+        7: { halign: "center", fontStyle: "bold" },
+      },
+
+      margin: { left: 20, right: 20 },
     });
 
-    doc.save("Hiring Decision Report.pdf");
+    doc.save("Hiring_Decision_Report.pdf");
   };
 
   const transformRowData = (data) => {
@@ -534,35 +570,117 @@ function HiringDecisionReport() {
       "Country Code": row.country_code || "",
       "Final Status": row.final_status || "",
       "Decided By": row.decided_by || "",
-      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
+      "Decided On": row.decided_on || "",
     }));
   };
 
   const handleExportToExcel = () => {
-    if (!gridApi) return;
-
-    const selectedRows = gridApi.getSelectedRows();
-
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to export.");
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
       return;
     }
 
-    const headerData = [["Hiring Decision Report"]];
+    const screenName = "Hiring Decision Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const transformedData = transformRowData(selectedRows);
+    /* ================= READ THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    // Main table starts from row 5 (same pattern as your Task report)
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: "A5" });
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: totalColumns - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Hiring Decision Report",
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hiring Decision");
 
     XLSX.writeFile(workbook, "Hiring_Decision_Report.xlsx");
   };
@@ -580,25 +698,19 @@ function HiringDecisionReport() {
           <h1 className="page-title">Hiring Decision Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -616,11 +728,19 @@ function HiringDecisionReport() {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
+              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
                 <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
                 </li>
               )}
             </ul>
@@ -630,23 +750,62 @@ function HiringDecisionReport() {
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Decided From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Decided To
+              </label>
+            </div>
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedcandidate_name ? "has-value" : ""} 
-              ${isselectedscheduleid ? "is-focused" : ""}`}
+              ${selectedCandidateName ? "has-value" : ""} 
+              ${isSelectedCandidateName ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsscheduleid(true)}
-                onBlur={() => setIsscheduleid(false)}
+                onFocus={() => setIsSelectedCandidateName(true)}
+                onBlur={() => setIsSelectedCandidateName(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selectedcandidate_name}
-                onChange={handlescandidate_name}
-                options={filteredOptioncandidate_name}
+                value={selectedCandidateName}
+                onChange={handleCandidateName}
+                options={filteredOptionCandidateName}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Candiate Name
@@ -664,8 +823,8 @@ function HiringDecisionReport() {
                 required
                 title="Please enter the Annual Bonus"
                 autoComplete="off"
-                value={job_titleSC}
-                onChange={(e) => setjob_titleSC(e.target.value)}
+                value={jobTitle}
+                onChange={(e) => setjobTitle(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Job Title
@@ -676,20 +835,20 @@ function HiringDecisionReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selecteddptSC ? "has-value" : ""} 
-              ${isSelectDepartmentSC ? "is-focused" : ""}`}
+              ${selectedDepartmentId ? "has-value" : ""} 
+              ${isSelectDepartmentId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsSelectDepartmentSC(true)}
-                onBlur={() => setIsSelectDepartmentSC(false)}
+                onFocus={() => setIsSelectDepartmentIs(true)}
+                onBlur={() => setIsSelectDepartmentIs(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selecteddptSC}
-                onChange={handleDPTSC}
-                options={filteredOptionDPtSC}
+                value={selectedDepartmentId}
+                onChange={handleDepartmentId}
+                options={filteredOptionDepartmentId}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Department ID
@@ -707,8 +866,8 @@ function HiringDecisionReport() {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={Country_CodeSC}
-                onChange={(e) => setCountry_CodeSC(e.target.value)}
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Country Code
@@ -719,19 +878,19 @@ function HiringDecisionReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedStatusSC ? "has-value" : ""} 
-              ${isSelectFocusedSC ? "is-focused" : ""}`}
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
             >
               <Select
                 id="status"
                 isClearable
-                value={selectedStatusSC}
-                onChange={handleChangeStatusSC}
+                value={selectedStatus}
+                onChange={handleChangeStatus}
                 options={filteredOptionStatus}
                 placeholder=""
                 classNamePrefix="react-select"
-                onFocus={() => setIsSelectFocusedSC(true)}
-                onBlur={() => setIsSelectFocusedSC(false)}
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
               />
               <label for="status" class="floating-label">
                 Final Status
@@ -749,30 +908,11 @@ function HiringDecisionReport() {
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={decided_bySC}
-                onChange={(e) => setdecided_bySC(e.target.value)}
+                value={decidedBy}
+                onChange={(e) => setDecidedBy(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Decided By
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Company Contribution"
-                autoComplete="off"
-                value={decided_on}
-                onChange={(e) => setdecided_on(e.target.value)}
-              />
-              <label for="sname" className="exp-form-labels">
-                Decided On
               </label>
             </div>
           </div>
