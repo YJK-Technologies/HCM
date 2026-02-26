@@ -29,7 +29,7 @@ function Desgination() {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const Status = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  const [loading, setLoading] = useState(false);    
+  const [loading, setLoading] = useState(false);
   const [createdBy, setCreatedBy] = useState("");
   const [modifiedBy, setModifiedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
@@ -48,14 +48,14 @@ function Desgination() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
+
     fetch(`${config.apiBaseUrl}/status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ company_code })
-    })      .then((response) => response.json())
+    }).then((response) => response.json())
       .then((data) => {
         // Extract city names from the fetched data
         const statusOption = data.map(option => option.attributedetails_name);
@@ -66,7 +66,7 @@ function Desgination() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
+
     fetch(`${config.apiBaseUrl}/status`, {
       method: 'POST',
       headers: {
@@ -94,7 +94,7 @@ function Desgination() {
   const handleSearch = async () => {
     const company_code = sessionStorage.getItem('selectedCompanyCode')
     setLoading(true);
-        
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/DesginationSerachData`, {
         method: "POST",
@@ -120,7 +120,7 @@ function Desgination() {
     } catch (error) {
       console.error("Error saving data:", error);
       toast.error("Error updating data: " + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -171,7 +171,7 @@ function Desgination() {
       headerName: "Desgination",
       field: "desgination",
       editable: true,
-      cellStyle: { textAlign: "left"},
+      cellStyle: { textAlign: "left" },
       // minWidth: 150,
       cellEditorParams: {
         maxLength: 50,
@@ -214,6 +214,11 @@ function Desgination() {
     setGridColumnApi(params.columnApi);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
   const generateReport = () => {
     const selectedRows = gridApi.getSelectedRows();
@@ -223,79 +228,149 @@ function Desgination() {
     };
 
     const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
       return {
-        "Department ID": row.dept_id,
-        "Desgination ID": row.desgination_id,
-        "Desgination": row.desgination,
-        "Status": row.status,
+        "Department ID": formatValue(row.dept_id),
+        "Desgination ID": formatValue(row.desgination_id),
+        "Desgination": formatValue(row.desgination),
+        "Status": formatValue(row.status),
       };
     });
 
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
-    reportWindow.document.write("<html><head><title>Desgiantion Info</title>");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write("<html><head><title>Desgiantion Report</title>");
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
       body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-      }
-      h1 {
-          color: maroon;
-          text-align: center;
-          font-size: 24px;
-          margin-bottom: 30px;
-          text-decoration: underline;
-      }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #ddd;
-          vertical-align: top;
-      }
-      th {
-          background-color: maroon;
-          color: white;
-          font-weight: bold;
-      }
-      td {
-          background-color: #fdd9b5;
-      }
-      tr:nth-child(even) td {
-          background-color: #fff0e1;
-      }
-      .report-button {
-          display: block;
-          width: 150px;
-          margin: 20px auto;
-          padding: 10px;
-          background-color: maroon;
-          color: white;
-          border: none;
-          cursor: pointer;
-          font-size: 16px;
-          text-align: center;
-          border-radius: 5px;
-      }
-      .report-button:hover {
-          background-color: darkred;
-      }
-      @media print {
-          .report-button {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: ${fontColor};
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: ${tableHeaderBg};
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: ${tableHeaderBg};
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: ${rowAltColor};
+          }
+  
+          tr:hover {
+            background-color: ${hoverColor};
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: ${headerGradientStart};
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            opacity: 0.85;
+          }
+  
+          @media print {
+            .print-btn {
               display: none;
+            }
+            body {
+              background: white;
+            }
           }
-          body {
-              margin: 0;
-              padding: 0;
-          }
-      }
     `);
     reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u>Desgination Information</u></h1>");
+    reportWindow.document.write(`<div class="header">
+    <img src="${logoUrl}" class="logo" />
+    <div class="title-section">
+      <h2>Desgination Report</h2>
+    </div>
+    </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+    <strong>Total Records: ${selectedRows.length}</strong>
+    <span style="float:right;">
+      Printed Date: ${new Date().toLocaleDateString()}
+    </span>
+  </div>`);
+    // reportWindow.document.write("<h1><u>Desgination Report</u></h1>");
 
     // Create table with headers
     reportWindow.document.write("<table><thead><tr>");
@@ -315,9 +390,11 @@ function Desgination() {
 
     reportWindow.document.write("</tbody></table>");
 
-    reportWindow.document.write(
-      '<button class="report-button" onclick="window.print()">Print</button>'
-    );
+     reportWindow.document.write(`
+  <div style="text-align:center;">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+`);
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
@@ -363,8 +440,8 @@ function Desgination() {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        
-setLoading(true);
+
+        setLoading(true);
 
         try {
           const response = await fetch(`${config.apiBaseUrl}/UpdateDesgintion`, {
@@ -389,10 +466,10 @@ setLoading(true);
         } catch (error) {
           console.error("Error saving data:", error);
           toast.error("Error Updating Data: " + error.message);
-        }finally {
+        } finally {
           setLoading(false);
         }
-    
+
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -445,7 +522,7 @@ setLoading(true);
         finally {
           setLoading(false);
         }
-    
+
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -493,120 +570,120 @@ setLoading(true);
   return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
-        <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
-          <div className="header-flex">
-              <h1 className="page-title">Designation Info</h1>
+        <div className="header-flex">
+          <h1 className="page-title">Designation Info</h1>
 
-            <div className="action-wrapper desktop-actions">
-              {['add', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
-                <div className="action-icon add" onClick={handleNavigateToForm}>
-                  <span className="tooltip">Add</span>
-                   <i class="fa-solid fa-user-plus"></i>
-                </div>
-              )}
-              {['delete', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
-                <div className="action-icon delete"
-                  onClick={deleteSelectedRows}
-                >
-                  <span className="tooltip">Delete</span>
-                  <i class="fa-solid fa-user-minus"></i>
-                </div>
-              )}
-              {['update', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
-                <div className="action-icon update"
-                  onClick={saveEditedData}
-                >
-                  <span className="tooltip">Update</span>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleNavigateToForm}>
+                <span className="tooltip">Add</span>
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+            )}
+            {['delete', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+              <div className="action-icon delete"
+                onClick={deleteSelectedRows}
+              >
+                <span className="tooltip">Delete</span>
+                <i class="fa-solid fa-user-minus"></i>
+              </div>
+            )}
+            {['update', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+              <div className="action-icon update"
+                onClick={saveEditedData}
+              >
+                <span className="tooltip">Update</span>
                 <i class="fa-solid fa-pen-to-square"></i>
-                </div>
-              )}
+              </div>
+            )}
 
 
-              {['all permission', 'view'].some(permission => companyPermissions.includes(permission)) && (
-                <div className="action-icon print"
-                  onClick={generateReport}
-                >
-                  <span className="tooltip">Print</span>
-                  <i class="fa-solid fa-print"></i>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Dropdown */}
-            <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                {['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigateToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                  </li>
-                )}
-
-                {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
-                )}
-
-                {['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
-
-                {['all permission', 'view'].some(p => companyPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
-                  </li>
-                )}
-
-              </ul>
-            </div>
-
+            {['all permission', 'view'].some(permission => companyPermissions.includes(permission)) && (
+              <div className="action-icon print"
+                onClick={generateReport}
+              >
+                <span className="tooltip">Print</span>
+                <i class="fa-solid fa-print"></i>
+              </div>
+            )}
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleNavigateToForm}>
+                  <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                </li>
+              )}
+
+              {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={deleteSelectedRows}>
+                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                </li>
+              )}
+
+              {['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={saveEditedData}>
+                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                </li>
+              )}
+
+              {['all permission', 'view'].some(p => companyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print fs-4"></i>
+                </li>
+              )}
+
+            </ul>
+          </div>
+
         </div>
+      </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="depID"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please fill the department ID here"
-                  value={dept_id}
-                  onChange={(e) => setdept_id(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="cname" class="exp-form-labels">Department ID</label>
-              </div>
+              <input
+                id="depID"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please fill the department ID here"
+                value={dept_id}
+                onChange={(e) => setdept_id(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={18}
+              />
+              <label for="cname" class="exp-form-labels">Department ID</label>
             </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="desID"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please fill the Desgiantion ID here"
-                  value={desgination_id}
-                  onChange={(e) => setdesgination_id(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={250}
-                />
-                <label for="cname" class="exp-form-labels">Desgination ID</label>
-              </div>
+              <input
+                id="desID"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please fill the Desgiantion ID here"
+                value={desgination_id}
+                onChange={(e) => setdesgination_id(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={250}
+              />
+              <label for="cname" class="exp-form-labels">Desgination ID</label>
             </div>
+          </div>
 
           <div className="col-md-2">
             <div
@@ -614,22 +691,22 @@ setLoading(true);
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
             >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
                 classNamePrefix="react-select"
                 placeholder=""
                 onFocus={() => setIsSelectFocused(true)}
                 onBlur={() => setIsSelectFocused(false)}
-                  onKeyDown={handleKeyDownStatus}
-                  ref={Status}
-                />
-                <label class="floating-label">Status</label>
-              </div>
+                onKeyDown={handleKeyDownStatus}
+                ref={Status}
+              />
+              <label class="floating-label">Status</label>
             </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -645,29 +722,29 @@ setLoading(true);
               </div>
             </div>
           </div>
-                
-                </div>
-                </div>
 
-          {/* <p >Result Set</p> */}
+        </div>
+      </div>
+
+      {/* <p >Result Set</p> */}
 
 
       <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-            <AgGridReact
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              onGridReady={onGridReady}
-              onCellValueChanged={onCellValueChanged}
-              rowSelection="multiple"
-              onSelectionChanged={onSelectionChanged}
-              pagination={true}
-              paginationAutoPageSize={true}
-              onRowSelected={onRowSelected}
-            />
-            </div>
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            onGridReady={onGridReady}
+            onCellValueChanged={onCellValueChanged}
+            rowSelection="multiple"
+            onSelectionChanged={onSelectionChanged}
+            pagination={true}
+            paginationAutoPageSize={true}
+            onRowSelected={onRowSelected}
+          />
         </div>
+      </div>
 
       {/* <div className="shadow-lg p-2 bg-body-tertiary rounded mt-2 mb-2">
         <div className="row ms-2">

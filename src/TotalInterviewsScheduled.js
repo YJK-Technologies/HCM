@@ -9,6 +9,7 @@ import Select from "react-select";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx-js-style";
+import { time } from "ag-grid-enterprise";
 
 const config = require("./Apiconfig");
 
@@ -34,15 +35,12 @@ function TotalInterviewsScheduled({ }) {
   const [selectedInterviewMode, setselectedInterviewMode] = useState("");
   const [interviewMode, setInterviewMode] = useState("");
   const [isSelectInterviewMode, setisSelectInterviewMode] = useState(false);
-  const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [Paneldrop, setPaneldrop] = useState([]);
-  const [candidatedrop, setcandidatedrop] = useState([]);
-  const [interviewmodeDrop, setInterviewmodeDrop] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
-  const gridRef = useRef();
   const [gridApi, setGridApi] = useState(null);
   const gridApiRef = useRef(null);
+  const [timeZone, setTimeZone] = useState('');
+  const [meetingLink, setMeetingLink] = useState('');
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -73,63 +71,6 @@ function TotalInterviewsScheduled({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/InterviewStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const statusOption = data.map((option) => option.attributedetails_name);
-        setStatusGriddrop(statusOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const statusOption = data.map((option) => ({
-          value: option.panel_id,
-          label: `${option.panel_id}-${option.panel_name}`,
-        }));
-        setPaneldrop(statusOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/CanditateID`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const statusOption = data.map((option) => ({
-          value: option.candidate_id,
-          label: `${option.candidate_id}-${option.candidate_name}`,
-        }));
-        setcandidatedrop(statusOption);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const fetchDept = async () => {
       try {
@@ -155,26 +96,6 @@ function TotalInterviewsScheduled({ }) {
     if (company_code) {
       fetchDept();
     }
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    fetch(`${config.apiBaseUrl}/InterviewMode`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const interviewMode = data.map(
-          (option) => option.attributedetails_name,
-        );
-        setInterviewmodeDrop(interviewMode);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleCandidateId = (selectedDPT) => {
@@ -368,6 +289,16 @@ function TotalInterviewsScheduled({ }) {
       headerName: "Status",
       field: "Status",
       editable: false,
+      cellRenderer: (params) => {
+      if (params.data?.totalRow) {
+        return (
+          <strong>
+            {params.data.totalText}
+          </strong>
+        );
+      }
+      return params.value;
+    },
     },
   ];
 
@@ -389,6 +320,8 @@ function TotalInterviewsScheduled({ }) {
         to_date: toDate,
         location: location,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        meeting_link: meetingLink,
+        timezone: timeZone
       };
 
       const response = await fetch(`${config.apiBaseUrl}/TotalInterviewSchedule`,
@@ -402,7 +335,9 @@ function TotalInterviewsScheduled({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
 
-        const newRows = fetchedData.map((item) => ({
+        const totalCount = fetchedData.length;
+
+        const rows = fetchedData.map((item) => ({
           schedule_id: item.schedule_id,
           candidate_id: item.candidate_id,
           panel_id: item.panel_id,
@@ -413,22 +348,15 @@ function TotalInterviewsScheduled({ }) {
           Status: item.Status,
           Interview_Mode: item.Interview_Mode,
           keyfield: item.keyfield,
+          totalRow: false,
         }));
 
-        const totalRow = {
-          schedule_id: null,
-          candidate_id: "",
-          panel_id: "",
-          scheduled_datetime: "",
-          timezone: "",
-          location: "",
-          meeting_link: "",
-          Status: "",
-          Interview_Mode: "",
-          keyfield: "",
-        };
+        rows.push({
+          totalRow: true,
+          totalText: `Total Interview Schedule : ${totalCount}`,
+        });
 
-        setRowData([...newRows, totalRow]);
+        setRowData(rows);
       } else {
         toast.warning("Data Not found");
         setRowData([]);
@@ -461,8 +389,24 @@ function TotalInterviewsScheduled({ }) {
       return;
     }
 
-    const logoUrl = "/favicon.ico";
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
 
     reportWindow.document.write(`
   <html>
@@ -474,12 +418,13 @@ function TotalInterviewsScheduled({ }) {
             margin: 0;
             padding: 20px;
             background-color: #f4f6f9;
+            color: ${fontColor};
           }
   
           .header {
             display: flex;
             align-items: center;
-            background: linear-gradient(90deg, #4e73df, #1cc88a);
+            background: ${tableHeaderBg};
             padding: 15px 20px;
             color: white;
             border-radius: 8px;
@@ -516,7 +461,7 @@ function TotalInterviewsScheduled({ }) {
           }
   
           th {
-            background-color: #4e73df;
+            background-color: ${tableHeaderBg};
             color: white;
             padding: 10px;
             text-align: left;
@@ -528,11 +473,11 @@ function TotalInterviewsScheduled({ }) {
           }
   
           tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: ${rowAltColor};
           }
   
           tr:hover {
-            background-color: #e2e6f0;
+            background-color: ${hoverColor};
           }
   
           .footer {
@@ -545,7 +490,7 @@ function TotalInterviewsScheduled({ }) {
           .print-btn {
             margin-top: 20px;
             padding: 10px 20px;
-            background: #1cc88a;
+            background: ${headerGradientStart};
             color: white;
             border: none;
             border-radius: 5px;
@@ -554,7 +499,7 @@ function TotalInterviewsScheduled({ }) {
           }
   
           .print-btn:hover {
-            background: #17a673;
+            opacity: 0.85;
           }
   
           @media print {
@@ -1121,6 +1066,44 @@ function TotalInterviewsScheduled({ }) {
               />
               <label for="status" class="floating-label">
                 Status
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={meetingLink}
+                onChange={(e) => setMeetingLink(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Meeting Link
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="time"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={timeZone}
+                onChange={(e) => setTimeZone(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Time Zone
               </label>
             </div>
           </div>

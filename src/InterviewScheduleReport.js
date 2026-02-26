@@ -316,126 +316,141 @@ function InterviewScheduleReport() {
       return;
     }
 
-    const logoUrl = "/favicon.ico"; //
+    /* ================= READ THEME COLORS ================= */
 
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
 
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+
     reportWindow.document.write(`
-    <html>
-    <head>
-      <title>Interview Schedule Report</title>
-      <style>
-        body {
-          font-family: 'Segoe UI', sans-serif;
-          margin: 0;
-          padding: 20px;
-          background-color: #f4f6f9;
-        }
+  <html>
+  <head>
+    <title>Interview Schedule Report</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f6f9;
+        color: ${fontColor};
+      }
 
-        .header {
-          display: flex;
-          align-items: center;
-          background: linear-gradient(90deg, #4e73df, #1cc88a);
-          padding: 15px 20px;
-          color: white;
-          border-radius: 8px;
-        }
-        
-        .logo {
-          height: 60px;
-        }
-        
-        .title-section {
-          flex: 1;
-          text-align: center;
-        }
-      
-        .title-section h2 {
-          margin: 0;
-        }
+      .header {
+        display: flex;
+        align-items: center;
+        background: ${tableHeaderBg};
+        padding: 15px 20px;
+        color: white;
+        border-radius: 8px;
+      }
 
-        .sub-info {
-          margin: 15px 0;
-          font-size: 14px;
-          color: #555;
-          display: flex;
-          justify-content: space-between;
-        }
+      .logo {
+        height: 55px;
+      }
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+      .title-section {
+        flex: 1;
+        text-align: center;
+      }
 
-        th {
-          background-color: #4e73df;
-          color: white;
-          padding: 10px;
-          text-align: left;
-        }
+      .title-section h2 {
+        margin: 0;
+      }
 
-        td {
-          padding: 8px;
-          border-bottom: 1px solid #ddd;
-        }
+      .sub-info {
+        margin: 15px 0;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
 
-        tr:nth-child(even) {
-          background-color: #f2f2f2;
-        }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
 
-        tr:hover {
-          background-color: #e2e6f0;
-        }
+      th {
+        background-color: ${tableHeaderBg};
+        color: white;
+        padding: 10px;
+        text-align: left;
+      }
 
-        .footer {
-          margin-top: 30px;
-          text-align: center;
-          font-size: 13px;
-          color: #777;
-        }
+      td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
 
+      tr:nth-child(even) {
+        background-color: ${rowAltColor};
+      }
+
+      tr:hover {
+        background-color: ${hoverColor};
+      }
+
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 13px;
+        opacity: 0.7;
+      }
+
+      .print-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: ${headerGradientStart};
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .print-btn:hover {
+        opacity: 0.85;
+      }
+
+      @media print {
         .print-btn {
-          margin-top: 20px;
-          padding: 10px 20px;
-          background: #1cc88a;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 14px;
+          display: none;
         }
-
-        .print-btn:hover {
-          background: #17a673;
+        body {
+          background: white;
         }
+      }
+    </style>
+  </head>
+  <body>
 
-        @media print {
-          .print-btn {
-            display: none;
-          }
-          body {
-            background: white;
-          }
-        }
-      </style>
-    </head>
-    <body>
-
-      <div class="header">
-        <img src="${logoUrl}" class="logo" />
-        <div class="title-section">
-          <h2>Interview Schedule Report</h2>
-        </div>
+    <div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Interview Schedule Report</h2>
       </div>
+    </div>
 
-      <div class="sub-info">
-        <div>Total Records: ${selectedRows.length}</div>
-        <div>Printed Date: ${new Date().toLocaleDateString()}</div>
-      </div>
+    <div class="sub-info">
+      <div>Total Records: ${selectedRows.length}</div>
+      <div>Printed Date: ${new Date().toLocaleDateString()}</div>
+    </div>
 
       <table>
         <thead>
@@ -469,19 +484,19 @@ function InterviewScheduleReport() {
     });
 
     reportWindow.document.write(`
-        </tbody>
-      </table>
+      </tbody>
+    </table>
 
-      <div style="text-align:center;">
-        <button class="print-btn" onclick="window.print()">Print</button>
-      </div>
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
 
-      <div class="footer">
-        © ${new Date().getFullYear()} YJK Technologies | Confidential Report
-      </div>
+    <div class="footer">
+      © ${new Date().getFullYear()} YJK Technologies | Confidential Report
+    </div>
 
-    </body>
-    </html>
+  </body>
+  </html>
   `);
 
     reportWindow.document.close();
