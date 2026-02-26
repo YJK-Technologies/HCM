@@ -202,7 +202,7 @@ function TotalCandidatesApplied() {
           candidate_name: "",
           email: "",
           phone: "",
-          applied_job_id: "",
+          applied_job_id: null,
           Education: "",
           Experience: "",
           Related_experience: "Total Candidates Applied:",

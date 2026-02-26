@@ -173,7 +173,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
               {/* FORM SECTION */}
               <div className="form-row shadow-lg p-3 bg-light mt-2 container-form-box">
 
-                <div className="form-block col-md-3 col-sm-6 mb-2">
+                <div className="form-block col-md-4 col-sm-6 mb-2">
                   <div className="inputGroup">
                     <input
                       type="text"
@@ -189,7 +189,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3 col-sm-6 mb-2">
+                <div className="form-block col-md-4 col-sm-6 mb-2">
                   <div className="inputGroup">
                     <input
                       type="text"
@@ -205,7 +205,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3 col-sm-6 mb-2">
+                <div className="form-block col-md-4 col-sm-6 mb-2">
                   <div className="inputGroup">
                     <input
                       type="text"

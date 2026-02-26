@@ -287,12 +287,9 @@ function PanelPerformanceReport() {
       <table>
         <thead>
           <tr>
-            <th>Candidate Name</th>
-            <th>Schedule Date</th>
-            <th>Rating</th>
-            <th>Final Status</th>
-            <th>Decided On</th>
-            <th>Remarks</th>
+            <th>Panel Name</th>
+            <th>Average Rating</th>
+            <th>Total Interviews</th>
           </tr>
         </thead>
         <tbody>
@@ -301,12 +298,9 @@ function PanelPerformanceReport() {
     selectedRows.forEach((row) => {
       reportWindow.document.write(`
       <tr>
-        <td>${row.candidate_name || ""}</td>
-        <td>${row.scheduled_datetime ? formatDate(row.scheduled_datetime) : ""}</td>
-        <td>${row.rating || ""}</td>
-        <td>${row.Final_Status || ""}</td>
-        <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
-        <td>${row.remarks || ""}</td>
+        <td>${row.panel_name || ""}</td>
+        <td>${row.avg_rating || ""}</td>
+        <td>${row.total_interviews || ""}</td>
       </tr>
     `);
     });
@@ -667,7 +661,7 @@ function PanelPerformanceReport() {
                 onChange={(e) => setratingSC(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>
-                Rating
+                Average Rating
               </label>
             </div>
           </div>

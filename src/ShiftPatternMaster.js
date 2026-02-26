@@ -405,10 +405,11 @@ function ShiftPatternMaster() {
   };
 
   const handleSave = async () => {
-    // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-    //   toast.warning("Error: Missing required fields");
-    //   return;
-    // }
+    if (!Shift_Pattern_ID || !Pattern_Code  || !Pattern_Name || !Rotation_Days || !Description ) {
+      toast.warning("Error: Missing required fields");
+      setError(" ");
+      return;
+    }
 
     setLoading(true);
 
