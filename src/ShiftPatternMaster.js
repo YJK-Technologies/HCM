@@ -411,6 +411,7 @@ function ShiftPatternMaster() {
       return;
     }
 
+
     setLoading(true);
 
     try {
