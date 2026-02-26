@@ -87,6 +87,20 @@ function Input({ }) {
       },
     },
     {
+      headerName: "Start Year",
+      field: "Start_year",
+      filter: 'agTextColumnFilter',
+      editable: true,
+    },
+    {
+      headerName: "End Year",
+      field: "End_Year",
+      filter: 'agTextColumnFilter',
+      sortable: true,
+      textAlign: "center",
+      editable: true,
+    },
+    {
       headerName: "Loan ID",
       field: "Loan_ID",
       editable: true,
@@ -104,20 +118,6 @@ function Input({ }) {
         maxLength: 150,
         valueFormatter: (params) => formatDate(params.value)
       }
-    },
-    {
-      headerName: "Start Year",
-      field: "Start_year",
-      filter: 'agTextColumnFilter',
-      editable: true,
-    },
-    {
-      headerName: "End Year",
-      field: "End_Year",
-      filter: 'agTextColumnFilter',
-      sortable: true,
-      textAlign: "center",
-      editable: true,
     },
     {
       headerName: "Keyfield",
@@ -546,39 +546,6 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Loan_ID"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Loan ID"
-                value={Loan_ID}
-                autoComplete="off"
-                onChange={(e) => handleLoanIdChange(e)}
-                maxLength={20}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !Loan_ID ? 'text-danger' : ''}`}>Loan ID<span className="text-danger">*</span></label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Loan_Eligible_Amount"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required title="Please Enter the Loan Amount"
-                value={Loan_Eligible_Amount}
-                autoComplete="off"
-                onChange={(e) => setLoan_Eligible_Amount(Number(e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !Loan_Eligible_Amount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
                 id="Start_Year"
                 class="exp-input-field form-control"
                 type="Date"
@@ -608,6 +575,39 @@ function Input({ }) {
             </div>
           </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Loan_ID"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Loan ID"
+                value={Loan_ID}
+                autoComplete="off"
+                onChange={(e) => handleLoanIdChange(e)}
+                maxLength={20}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Loan_ID ? 'text-danger' : ''}`}>Loan ID<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Loan_Eligible_Amount"
+                class="exp-input-field form-control"
+                type="Number"
+                placeholder=""
+                required title="Please Enter the Loan Amount"
+                value={Loan_Eligible_Amount}
+                autoComplete="off"
+                onChange={(e) => setLoan_Eligible_Amount(Number(e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Loan_Eligible_Amount ? 'text-danger' : ''}`}>Loan Eligible Amount<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -616,6 +616,36 @@ function Input({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="StartYear"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={StartYear}
+                onChange={(e) => setStartYear(e.target.value)}
+              />
+              <label For="city" className="exp-form-labels">Start Year</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="EndYear"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                value={EndYear}
+                onChange={(e) => setEndYear(e.target.value)}
+              />
+              <label For="city" className="exp-form-labels">End Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -649,35 +679,6 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="StartYear"
-                class="exp-input-field form-control"
-                type="Date"
-                placeholder=""
-                required title="Please Choose the Start Year"
-                value={StartYear}
-                onChange={(e) => setStartYear(e.target.value)}
-              />
-              <label For="city" className="exp-form-labels">Start Year</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="EndYear"
-                class="exp-input-field form-control"
-                type="Date"
-                placeholder=""
-                required title="Please Choose the End Year"
-                value={EndYear}
-                onChange={(e) => setEndYear(e.target.value)}
-              />
-              <label For="city" className="exp-form-labels">End Year</label>
-            </div>
-          </div>
         </div>
 
         {/* Search + Reload Buttons */}

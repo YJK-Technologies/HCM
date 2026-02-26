@@ -677,7 +677,7 @@ function PanelPerformanceReport() {
                 onChange={(e) => setratingSC(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>
-                Rating
+                Average Rating
               </label>
             </div>
           </div>

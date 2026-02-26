@@ -321,10 +321,11 @@ function ShiftPatternDetails() {
   };
 
   const handleSave = async () => {
-    // if (!Shift_ID || !Shift_Code || !Shift_Name ) {
-    //   toast.warning("Error: Missing required fields");
-    //   return;
-    // }
+    if (!Shift_Pattern_ID || !Pattern_Detail_ID  || !Day_Sequence || !Shift_ID || !Is_Off_Day ) {
+      toast.warning("Error: Missing required fields");
+      setError(" ");
+      return;
+    }
 
     setLoading(true);
 
@@ -815,11 +816,8 @@ function ShiftPatternDetails() {
                   value={Is_Off_DaySC}
                   onChange={(e) => setIs_Off_DaySC(e.target.value)}
                 />
-                <label
-                  for="state"
-                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
-                >
-                  Is Off Day<span className="text-danger">*</span>
+                <label htmlFor="state" className={`exp-form-labels`}>
+                  Is Off Day
                 </label>
               </div>
             </div>
