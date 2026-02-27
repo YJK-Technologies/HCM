@@ -61,6 +61,15 @@ function InterviewPanelMem({ }) {
   const [activeTab, setActiveTab] = useState("Panel Members");
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setmember_id("");
+    setselectedPanelIDSC("");
+    setPanelIDSC("");
+    setselectedEmployeeIDSC("");
+    setEmployeeIDSC("");
+    setRoleSC("");
+  };
+
   const navigate = useNavigate();
 
   const handleEmployeeID = (selected) => {
@@ -390,6 +399,7 @@ function InterviewPanelMem({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {

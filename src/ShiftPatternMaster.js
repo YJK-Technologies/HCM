@@ -61,6 +61,16 @@ function ShiftPatternMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const searchClearInputFields = () => {
+    setShift_Pattern_IDSC("");
+    setPattern_CodeSC("");
+    setPattern_NameSC("");
+    setRotation_DaysSC("");
+    setDescriptionSC("");
+    setSelectedStatusSC("");
+    setStatusSC("");
+  };
+
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
@@ -185,7 +195,8 @@ function ShiftPatternMaster() {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
@@ -405,7 +416,7 @@ function ShiftPatternMaster() {
   };
 
   const handleSave = async () => {
-    if (!Shift_Pattern_ID || !Pattern_Code  || !Pattern_Name || !Rotation_Days || !Description ) {
+    if (!Shift_Pattern_ID || !Pattern_Code || !Pattern_Name || !Rotation_Days || !Description) {
       toast.warning("Error: Missing required fields");
       setError(" ");
       return;

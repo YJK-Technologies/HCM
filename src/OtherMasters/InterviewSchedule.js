@@ -90,14 +90,21 @@ function InterviewSchedule({ }) {
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselectedscheduleidSC("");
+    setscheduleidSC("");
+    setSelectedcandidatenameSC("");
+    set_candidatenameSC("");
+    setselectedPanelIDSC("");
+    setPanelIDSC("");
+    setselectedInterviewModeSC("");
+    setInterviewModeSC("");
+    setlocationSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
-
 
   const handleInterviewMode = (selectedDPT) => {
     setselectedInterviewMode(selectedDPT);
@@ -594,7 +601,8 @@ function InterviewSchedule({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {

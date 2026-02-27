@@ -71,6 +71,21 @@ function ShiftMasterGrid() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const searchClearInputFields = () => {
+    setShift_IDSC("");
+    setShift_CodeSC("");
+    setShift_NameSC("");
+    setStart_TimeSC("");
+    setEnd_TimeSC("");
+    setShift_HoursSC("");
+    seIs_Night_ShiftSC("");
+    setGrace_In_MinSC("");
+    setGrace_Out_MinSC("");
+    setCross_MidnightSC("");
+    setSelectedStatusSC("");
+    setStatusSC("");
+  };
+
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
@@ -199,7 +214,8 @@ function ShiftMasterGrid() {
 
 
   const reloadGridData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
