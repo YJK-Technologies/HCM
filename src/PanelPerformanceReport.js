@@ -26,6 +26,8 @@ function PanelPerformanceReport() {
   const [isselectedscheduleidSC, setIsscheduleidSC] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [totalInterviewsSC, settotalInterviewsSC] = useState("");
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const gridApiRef = useRef(null);
 
   //purpose of set user permisssion
@@ -87,6 +89,8 @@ function PanelPerformanceReport() {
             schedule_id: totalInterviewsSC,
             panel_name: panel_nameSC,
             rating: Number(ratingSC),
+            from_date: fromDate,
+            to_date: toDate,
           }),
         },
       );
@@ -134,6 +138,11 @@ function PanelPerformanceReport() {
     {
       headerName: "Total Interviews",
       field: "total_interviews",
+      editable: false,
+    },
+    {
+      headerName: "Submitted On",
+      field: "submitted_on",
       editable: false,
     },
   ];
@@ -722,6 +731,40 @@ function PanelPerformanceReport() {
               <label for="add1" className={`exp-form-labels`}>
                 Total Interviews
               </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Submitted From</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Submitted To</label>
             </div>
           </div>
 

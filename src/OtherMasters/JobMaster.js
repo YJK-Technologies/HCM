@@ -31,12 +31,26 @@ function JobMaster({ }) {
   const [activeTab, setActiveTab] = useState("Job Master")
   const [loading, setLoading] = useState(false);
   const [isSelectDepartment, setIsSelectDepartment] = useState(false);
+  const [isSelectCountry, setIsSelectCountry] = useState(false);
+  const [isSelectemployment, setIsSelectemployment] = useState(false);
+  const [isSelectemploymentSC, setIsSelectemploymentSC] = useState(false);
+  const [isSelectCountrySC, setIsSelectCountrySC] = useState(false);
   const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
   const [departmentList, setDepartmentList] = useState([]);
   const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
   const [selecteddpt, setselecteddept] = useState("");
+  const [selectedCountry, setselectedCountry] = useState("");
+  const [selectedemployment, setselectedemployment] = useState("");
+  const [selectedemploymentSC, setselectedemploymentSC] = useState("");
+  const [selectedCountrySC, setselectedCountrySC] = useState("");
   const [DPTdrop, setDPTdrop] = useState([]);
-  const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [Countrydrop, setCountrydrop] = useState([]);
+  const [CountrydropGR, setCountrydropGR] = useState([]);
+  const [CountrydropSC, setCountrydropSC] = useState([]);
+  const [employmentdrop, setEmploymentdrop] = useState([]);
+  const [employmentdropGR, setEmploymentdropGR] = useState([]);
+  const [employmentdropSC, setEmploymentdropSC] = useState([]);
+  const [departmentDrop, setDepartmentDrop] = useState([]); 
   const [dpt, setdpt] = useState("");
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
@@ -55,15 +69,110 @@ function JobMaster({ }) {
     setdptSC(selectedDPT ? selectedDPT.value : '');
   };
 
+    const handleCountryChange = (selectedCountry) => {
+    setselectedCountry(selectedCountry);
+    setCountry_Code(selectedCountry ? selectedCountry.value : '');
+  };
+    const handleEmploymentChange = (selectedEmployment) => {
+    setselectedemployment(selectedEmployment);
+    setemployment_type(selectedEmployment ? selectedEmployment.value : '');
+  };
+
+  const handleEmploymentChangeSC = (selectedEmploymentSC) => {
+    setselectedemploymentSC(selectedEmploymentSC);
+    setemployment_typeSC(selectedEmploymentSC ? selectedEmploymentSC.value : '');
+  };
+
+  const handleCountryChangeSC = (selectedCountrySC) => {
+    setselectedCountrySC(selectedCountrySC);
+    setCountry_CodeSC(selectedCountrySC ? selectedCountrySC.value : '');
+  };
+
   const filteredOptionDPt = DPTdrop.map(option => ({
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
+  
   const filteredOptionDPtSC = DPTdrop.map(option => ({
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
+  
+  const filteredOptionCountry = Countrydrop.map(option => ({
+    value: option.Country_Code,
+    label: `${option.Country_Code} - ${option.Country_Name}`
+  }));
 
+  const filteredOptionEmployment = employmentdrop.map(option => ({
+    value: option.attributedetails_name,
+    label: `${option.attributedetails_name}`
+  }));
+  const filteredOptionEmploymentSC = employmentdropSC.map(option => ({
+    value: option.attributedetails_name,
+    label: `${option.attributedetails_name}`
+  }));
+
+  const filteredOptionCountrySC = CountrydropSC.map(option => ({
+    value: option.Country_Code,
+    label: `${option.Country_Code} - ${option.Country_Name}`
+  }));
+
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+  
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydropSC(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setEmploymentdrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setEmploymentdropSC(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -115,6 +224,77 @@ function JobMaster({ }) {
       // .then((val) => setDPTdrop(val))
       .catch((error) =>
         console.error("Error fetching department data:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const Countryptions = data.map((option) => ({
+          value: option.Country_Code,
+          label: `${option.Country_Code} - ${option.Country_Name}`,
+        }));
+        setCountrydropGR(Countryptions); 
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) => 
+        console.error("Error fetching country data:", error)
+      );
+  }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const Countryptions = data.map((option) => ({
+          value: option.Country_Code,
+          label: `${option.Country_Code} - ${option.Country_Name}`,
+        }));
+        setCountrydropGR(Countryptions); 
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) => 
+        console.error("Error fetching country data:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employmentptions = data.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setEmploymentdropGR(employmentptions); 
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) => 
+        console.error("Error fetching employee type data:", error)
       );
   }, []);
 
@@ -181,7 +361,17 @@ function JobMaster({ }) {
     {
       headerName: "Country Code",
       field: "Country_Code",
-      editable: true
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: CountrydropGR.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const country = CountrydropGR.find(d => d.value === params.value);
+        return country ? country.label : params.value;
+      },
+
     }, {
       headerName: "Location",
       field: "location",
@@ -189,7 +379,16 @@ function JobMaster({ }) {
     }, {
       headerName: "Employment Type",
       field: "employment_type",
-      editable: true
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employmentdropGR.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const employment = employmentdropGR.find(d => d.value === params.value);
+        return employment ? employment.label : params.value;
+      },
     }, {
       headerName: "Updated On",
       field: "updated_on",
@@ -676,18 +875,24 @@ function JobMaster({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCountry ? "has-value" : ""} 
+              ${isSelectCountry ? "is-focused" : ""}`}
+            >
+             <Select
+                id="country"
                 type="text"
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={Country_Code}
-                onChange={(e) => setCountry_Code((e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
+                onFocus={() => setIsSelectCountry(true)}
+                onBlur={() => setIsSelectCountry(false)}
+                isClearable
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                options={filteredOptionCountry}
+                />
+              <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -708,18 +913,24 @@ function JobMaster({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedemployment ? "has-value" : ""} 
+              ${isSelectemployment ? "is-focused" : ""}`}
+            >
+              <Select
                 id="fdate"
-                class="exp-input-field form-control"
                 type="text"
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={employment_type}
-                onChange={(e) => setemployment_type((e.target.value))}
+                onFocus={() => setIsSelectemployment(true)}
+                onBlur={() => setIsSelectemployment(false)}
+                isClearable
+                value={selectedemployment}
+                onChange={handleEmploymentChange}
+                options={filteredOptionEmployment}
               />
-              <label for="sname" className={`exp-form-labels ${error && !employment_type ? 'text-danger' : ''}`}>Employment Type<span className="text-danger">*</span></label>
+              <label for="sname" className={`floating-label ${error && !employment_type ? 'text-danger' : ''}`}>Employment Type<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -820,21 +1031,26 @@ function JobMaster({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCountrySC ? "has-value" : ""} 
+              ${isSelectCountrySC ? "is-focused" : ""}`}
+            >
+             <Select
+                id="country"
                 type="text"
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={Country_CodeSC}
-                onChange={(e) => setCountry_CodeSC((e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels`}>Country Code</label>
+                onFocus={() => setIsSelectCountrySC(true)}
+                onBlur={() => setIsSelectCountrySC(false)}
+                isClearable
+                value={selectedCountrySC}
+                onChange={handleCountryChangeSC}
+                options={filteredOptionCountrySC}
+                />
+              <label for="sname" className={`floating-label`}>Country Code</label>
             </div>
           </div>
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -852,18 +1068,24 @@ function JobMaster({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedemploymentSC ? "has-value" : ""} 
+              ${isSelectemploymentSC ? "is-focused" : ""}`}
+            >
+              <Select
                 id="fdate"
-                class="exp-input-field form-control"
                 type="text"
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={employment_typeSC}
-                onChange={(e) => setemployment_typeSC((e.target.value))}
+                onFocus={() => setIsSelectemploymentSC(true)}
+                onBlur={() => setIsSelectemploymentSC(false)}
+                isClearable
+                value={selectedemploymentSC}
+                onChange={handleEmploymentChangeSC}
+                options={filteredOptionEmploymentSC}
               />
-              <label for="sname" className={`exp-form-labels`}>Employment Type</label>
+              <label for="sname" className={`floating-label`}>Employment Type</label>
             </div>
           </div>
 

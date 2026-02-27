@@ -43,7 +43,9 @@ function Input({ }) {
   const navigate = useNavigate();
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
+  const [Start_YearSC, setStart_YearSC] = useState('');
   const [End_Year, setEnd_Year] = useState(LastDate);
+  const [End_YearSC, setEnd_YearSC] = useState('');
   const [rowData, setRowData] = useState([]);
   const [Empsalaryfrom, setEmpsalaryfrom] = useState(0);
   const [EmpsalaryTo, setEmpsalaryTo] = useState(0);
@@ -358,6 +360,8 @@ function Input({ }) {
         Employee_Salary_From: Empsalaryfrom,
         Employee_Salary_To: EmpsalaryTo,
         Taxable_Amount: TaxAMt,
+        Start_Year: Start_YearSC,
+        End_Year: End_YearSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -628,6 +632,37 @@ function Input({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={Start_YearSC}
+                onChange={(e) => setStart_YearSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>Start Year</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                value={End_YearSC}
+                onChange={(e) => setEnd_YearSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}> End Year</label>
+            </div>
+          </div>
+
 
           <div className="col-md-2">
             <div className="inputGroup">
