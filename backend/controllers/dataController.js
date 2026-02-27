@@ -24621,7 +24621,7 @@ const allPfDetail = async (req, res) => {
 // Code Added by harish on 16/01/2025
 
 const ProfessionalTaxSC = async (req, res) => {
-  const { company_code, Employee_Salary_From, Employee_Salary_To, Taxable_Amount } = req.body;
+  const { company_code, Employee_Salary_From, Employee_Salary_To, Taxable_Amount,Start_Year,End_Year } = req.body;
 
   try {
     // Connect to the database
@@ -24635,7 +24635,9 @@ const ProfessionalTaxSC = async (req, res) => {
       .input("Employee_Salary_From", sql.Decimal(10, 2), Employee_Salary_From)
       .input("Employee_Salary_To", sql.Decimal(10, 2), Employee_Salary_To)
       .input("Taxable_Amount", sql.Decimal(10, 2), Taxable_Amount)
-      .query(`EXEC sp_Professional_Tax 'sc',@company_code,@Employee_Salary_From,@Employee_Salary_To,@Taxable_Amount,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .input("Start_Year", sql.Date, Start_Year)
+      .input("End_Year", sql.Date, End_Year)
+      .query(`EXEC sp_Professional_Tax 'sc',@company_code,@Employee_Salary_From,@Employee_Salary_To,@Taxable_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
 
     // Send response
@@ -35059,6 +35061,24 @@ const getEmployeeType = async (req, res) => {
   }
 };
 //Code ended by pavun on 29-01-26
+//Code added by sakthi on 27-02-26
+const getEmployeeTypeDD = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'EmployeeType','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by sakthi on 27-02-26
 
 //Code Added by pavun on 30-01-26
 const Employment_Type_MasterInsert = async (req, res) => {
@@ -36134,7 +36154,9 @@ const PanelPerformanceSearch = async (req, res) => {
   const {
     schedule_id,
     panel_name,
-    rating
+    rating, 
+    from_date, 
+    to_date
   } = req.body;
 
   try {
@@ -36146,8 +36168,10 @@ const PanelPerformanceSearch = async (req, res) => {
       .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
       .input("panel_name", sql.NVarChar, panel_name || "")
       .input("rating", sql.Int, rating ? rating : 0)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
       .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
-         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', '', '', '', '' `);
+         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date, '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -37544,7 +37568,8 @@ module.exports = {
     CandidateAppliedSearch,
     getHolidayType,
     TotalInterviewSchedule,
-    InterviewCompletionRateSC
+    InterviewCompletionRateSC,
+    getEmployeeTypeDD
 
 
 };
