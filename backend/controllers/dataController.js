@@ -33341,9 +33341,7 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
-        .query(`
-          EXEC sp_candidate_master  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','',@modified_by,''
-        `);
+        .query(`EXEC sp_candidate_master_Test  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','','','',@modified_by,''`);
 
       // 👇 capture NEW keyfield
       if (result.recordset?.length) {
@@ -33379,7 +33377,7 @@ const candidate_masterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','', '', '', ''`);
+        .query(`EXEC sp_candidate_master_Test @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', '', ''`);
     }
     res.status(200).json("candidate_master data deleted successfully");
   } catch (err) {
@@ -33413,7 +33411,7 @@ const candidate_masterInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Canditate_CV", sql.VarBinary, Canditate_CV)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, @created_by, '', '', ''`);
+      .query(`EXEC sp_candidate_master_Test @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, '', '', @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "candidate_master insertd successfully" });
   } catch (err) {
@@ -33975,7 +33973,7 @@ const interview_decisionLoopDelete = async (req, res) => {
 
 // Code Added by Harishon 12-02-26
 const CandidateSearch = async (req, res) => {
-  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description } = req.body;
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description, fromDate, toDate } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33991,7 +33989,9 @@ const CandidateSearch = async (req, res) => {
       .input("Related_experience", sql.VarChar, Related_experience)
       .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','','','','','' `);
+      .input("fromDate", sql.VarChar, fromDate)
+      .input("toDate", sql.VarChar, toDate)
+      .query(`EXEC sp_candidate_master_Test @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','',@fromDate,@toDate,'','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34273,7 +34273,7 @@ const CanditateID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SE")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master 'SE',0,'','','',0,'','','','','',@company_code,'','','','','',''`);
+      .query(`EXEC sp_candidate_master_Test 'SE',0,'','','',0,'','','','','',@company_code,'','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34411,25 +34411,21 @@ const Recommendation = async (req, res) => {
   }
 };
 
-
-
-
-
 const TimeZonemasterUpdate = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, DST_Applicable, modified_by, keyfield } = req.body;
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, Status, company_code, DST_Applicable, modified_by, keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "U")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_ID", sql.Int, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Flag", sql.Bit, DST_Flag)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '','', @modified_by, ''`);
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, @keyfield, @company_code, '', '', @modified_by, ''`);
     res.status(200).json({ success: true, message: "TimeZonemaster updated successfully" });
   } catch (err) {
     console.error("Error during TimeZonemaster update:", err);
@@ -34437,16 +34433,15 @@ const TimeZonemasterUpdate = async (req, res) => {
   }
 };
 
-
 const TimeZonemasterDelete = async (req, res) => {
-  const { TimeZone_ID} = req.body;
+  const { keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
-      .input("modified_by", sql.NVarChar, req.headers['modified-by'])
-      .query(`EXEC Sp_Time_Zone_master 'D', @TimeZone_ID, '','','', '', '', @modified_by, '', '',''`);
+      .input("keyfield",  sql.NVarChar, keyfield)
+      .input("company_code", sql.NVarChar, req.headers['company_code'])
+      .query(`EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', '', @company_code, '', '', @modified_by, ''`);
     res.status(200).json({ success: true, message: "Sp_Time_Zone_master deleted successfully" });
   } catch (err) {
     console.error("Error during dbo.Sp_Time _Zone_master delete:", err);
@@ -34458,8 +34453,8 @@ const TimeZonemasterDelete = async (req, res) => {
 const getTimeZoneData = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      "EXEC Sp_Time_Zone_master_test 'F', '', '','','', '', '', '', '', '', '',''");
+    const result = await sql
+    .query(`EXEC Sp_Time_Zone_master 'F', 0, '', '', 0, '', '', '', '', '', '',''`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -34469,24 +34464,23 @@ const getTimeZoneData = async (req, res) => {
 
 
 const getTimeZonesearchdata = async (req, res) => {
-const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
+const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable, Status, company_code } = req.body;
   try {
-    // Connect to the database
     const pool = await connection.connectToDatabase();
-    // Execute the query
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_ID", sql.Int, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset,'', '', @DST_Applicable, '', '', '','', ''`);
-    // Send response
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, '', @company_code, '', '', '', ''`);
     if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
+      res.status(200).json(result.recordset); 
     } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+      res.status(404).json("Data not found"); 
     }
   } catch (err) {
     console.error("Error", err);
@@ -34761,20 +34755,18 @@ const GetCountry = async (req, res) => {
 };
 
 const TimeZonemasterInsert = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, DST_Applicable ,
-    keyfield} = req.body;
+  const { TimeZone_Name, UTC_Offset, Status, company_code, created_by, DST_Applicable } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-     .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, '', '', '', '', ''`);
+     .query(`EXEC Sp_Time_Zone_master @mode, 0, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, '', @company_code, @created_by, '', '', ''`);
 res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
@@ -34783,25 +34775,25 @@ res.status(200).json({ success: true, message: "interview_schedule insertd succe
 };
 
 const Time_Zone_masterLoopUpdate = async (req, res) => {
-  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
-  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
-    return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
+  const Time_Zone_masterData = req.body.Time_Zone_masterData;
+  if (!Time_Zone_masterData || !Time_Zone_masterData.length) {
+    return res.status(400).json("Invalid or empty Time_Zone_masterData array.");
   }
 
   try {
     const pool = await sql.connect(dbConfig);
-    for (const item of sp_Time_Zone_masterData) {
+    for (const item of Time_Zone_masterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("TimeZone_ID", sql.NVarChar, item.TimeZone_ID)
+        .input("TimeZone_ID", sql.Int, item.TimeZone_ID)
         .input("TimeZone_Name", sql.NVarChar, item.TimeZone_Name)
         .input("UTC_Offset", sql.NVarChar, item.UTC_Offset)
-        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
-        .input("DST_Flag", sql.Bit, item.DST_Flag)
-        .input("company_code", sql.NVarChar, item.company_code)
+        .input("DST_Applicable", sql.Int, item.DST_Applicable)
+        .input("Status", sql.NVarChar, item.Status)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '', '', @modified_by, @modified_date`);
+        .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, @keyfield, @company_code, '', '', @modified_by, ''`);
     }
     res.status(200).json("Time_Zone_master data updated successfully");
   } catch (err) {
@@ -34811,55 +34803,23 @@ const Time_Zone_masterLoopUpdate = async (req, res) => {
 };
 
 const  Time_Zone_masterLoopDelete = async (req, res) => {
-  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
-  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
+  const Time_Zone_masterData = req.body.Time_Zone_masterData;
+  if (!Time_Zone_masterData || !Time_Zone_masterData.length) {
     return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
   }
 
   try {
     const pool = await sql.connect(dbConfig);
-    for (const item of sp_Time_Zone_masterData) {
+    for (const item of Time_Zone_masterData) {
       await pool.request().input("mode", sql.NVarChar, "D")
-      
-        .input("company_code", sql.NVarChar, item.company_code)
-        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
+        .input("company_code", sql.NVarChar, req.headers['company_code'])
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC Sp_Time_Zone_master_test @mode, '', '', '', '', @company_code, @DST_Applicable, @keyfield, '', '', '', ''`);
+        .query(`EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', @keyfield, @company_code, '', '', '', ''`);
     }
     res.status(200).json("Time_Zone_master data deleted successfully");
   } catch (err) {
     console.error("Error in Time_Zone_masterLoopDelete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
-  }
-};
-
-const Time_Zone_master_sc = async (req, res) => {
-  const { company_code, TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
-
-  try {
-    // Connect to the database
-    const pool = await connection.connectToDatabase();
-
-    // Execute the query
-    const result = await pool
-      .request()
-      .input("mode", sql.NVarChar, "SC")
-      .input("company_code", sql.NVarChar, company_code)
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
-      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
-      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .query(` EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, '', @company_code, @DST_Applicable, '', '', '', '', ''`);
-
-    // Send response
-    if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
-    } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
-    }
-  } catch (err) {
-    console.error("Error", err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
 
@@ -37514,7 +37474,6 @@ module.exports = {
     GetCountry,
     Time_Zone_masterLoopUpdate,
     Time_Zone_masterLoopDelete,
-    Time_Zone_master_sc,
     Shift_MasterInsert,
     getShiftsearchdata,
     sp_Shift_MasterLoopUpdate,

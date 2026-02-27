@@ -44,6 +44,12 @@ function ShiftTypeMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const searchClearInputFields = () => {
+    setShift_Type_IDSC("");
+    setShift_TypeSC("");
+    setDescriptionSC("");
+  };
+
   const handleSearch = async () => {
     setLoading(true);
 
@@ -83,7 +89,8 @@ function ShiftTypeMaster() {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [

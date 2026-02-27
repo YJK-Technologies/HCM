@@ -71,9 +71,6 @@ function InterviewDecision({ }) {
   const [selectedJobIDSC, setselectedJobIDSC] = useState("");
   const [JobIDSC, setJobIDSC] = useState("");
   const [isSelectjobIDSC, setisSelectjobIDSC] = useState(false);
-
-
-
   const [activeTab, setActiveTab] = useState("Interview Decision")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
@@ -83,15 +80,21 @@ function InterviewDecision({ }) {
   const [jobDrop, setJobDrop] = useState([]);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselecteddecision_id("");
+    setdecision_id("");
+    setSelectedcandidatenameSC("");
+    set_candidatenameSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setdecided_bySC("");
+    setremarksSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
 
   const handledecision_id = (selectedDPT) => {
@@ -543,7 +546,8 @@ function InterviewDecision({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
