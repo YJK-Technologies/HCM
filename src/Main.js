@@ -90,8 +90,7 @@ import InterviewDecision from "./OtherMasters/InterviewDecision.js";
 import CountryMaster from "./NewCountryMasterGrid.js";
 import AddCountryMaster from "./AddCountryMaster.js";
 import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
-import TimeZoneGrid from "./TimeZoneMasterGrid.js";
-import ShiftMaster from "./ShiftMaster.js";
+import TimeZoneGrid from "./TimeZoneMaster.js";
 import ShiftMasterGrid from "./ShiftMasterGrid.js";
 import ShiftTypeMaster from "./ShiftTypeMaster.js";
 import ShiftPatternMaster from "./ShiftPatternMaster.js";
@@ -271,7 +270,6 @@ function Main() {
     { path: "/AddCountryMaster", component: <AddCountryMaster /> },
     { path: "/AddTimeZoneMaster", component: <AddTimeZoneMaster /> },
     { path: "/TimeZoneGrid", component: <TimeZoneGrid /> },
-    { path: "/ShiftMaster", component: <ShiftMaster /> },
     { path: "/ShiftMasterGrid", component: <ShiftMasterGrid /> },
     { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
     { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },

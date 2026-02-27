@@ -1,77 +1,52 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
-import TabButtons from "./ESSComponents/Tabs";
 import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
 function TimeZoneMaster() {
     const [rowData, setRowData] = useState([]);
     const [gridApi, setGridApi] = useState(null);
-    const [gridColumnApi, setGridColumnApi] = useState(null);
-    const navigate = useNavigate();
     const [editedData, setEditedData] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [employmentTypeId, setEmploymentId] = useState('');
-    const [employmentType, setEmploymentType] = useState('');
-    const [selectedEmploymentType, setSelectedEmploymentType] = useState('');
-    const [employmentTypeDrop, setEmploymentTypeDrop] = useState([]);
-    const [description, setDescription] = useState('');
+
+    const [timeZoneName, setTimeZoneName] = useState('');
+    const [utcOffset, setUtcOffset] = useState('');
     const [status, setStatus] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [statusDrop, setStatusDrop] = useState([]);
-
-    const [employmentTypeIdSc, setEmploymentIdSc] = useState('');
-    const [employmentTypeSc, setEmploymentTypeSc] = useState('');
-    const [selectedEmploymentTypeSc, setSelectedEmploymentTypeSc] = useState('');
-    const [employmentTypeDropSc, setEmploymentTypeDropSc] = useState([]);
-    const [descriptionSc, setDescriptionSc] = useState('');
-    const [statusSc, setStatusSc] = useState('');
-    const [selectedStatusSc, setSelectedStatusSc] = useState('');
-    const [statusDropSc, setStatusDropSc] = useState([]);
+    const [dstApplicable, setDstApplicable] = useState('');
+    const [selectedDstApplicable, setSelectedDstApplicable] = useState('');
+    const [dstApplicableDrop, setDstApplicableDrop] = useState([]);
     const [statusDropGrid, setStatusDropGrid] = useState([]);
-    const [employmentTypeDropGrid, setEmploymentTypeDropGrid] = useState([]);
-
-    const [isSelectStatus, setIsSelectStatus] = useState(false);
-    const [isSelectedEmploymentType, setIsSelectEmploymentType] = useState(false);
-    const [isSelectStatusSc, setIsSelectStatusSc] = useState(false);
-    const [isSelectedEmploymentTypeSc, setIsSelectEmploymentTypeSc] = useState(false);
-
-    const [timeZoneId, setTimeZoneId] = useState('');
-    const [timeZoneName, setTimeZoneName] = useState('');
-    const [utcOffset, setUtcOffset] = useState('');
-    const [dstFlag, setDstFlag] = useState('');
-    const [selectedDstFlag, setSelectedDstFlag] = useState('');
-    const [dstFlagDrop, setDstFlagDrop] = useState([]);
-    const [dstFlagDropGrid, setDstFlagDropGrid] = useState([]);
+    const [dstApplicableDropGrid, setDstApplicableDropGrid] = useState([]);
 
     const [timeZoneIdSc, setTimeZoneIdSc] = useState('');
     const [timeZoneNameSc, setTimeZoneNameSc] = useState('');
     const [utcOffsetSc, setUtcOffsetSc] = useState('');
-    const [dstFlagSc, setDstFlagSc] = useState('');
-    const [selectedDstFlagSc, setSelectedDstFlagSc] = useState('');
-    const [dstFlagDropSc, setDstFlagDropSc] = useState([]);
+    const [statusSc, setStatusSc] = useState('');
+    const [selectedStatusSc, setSelectedStatusSc] = useState('');
+    const [statusDropSc, setStatusDropSc] = useState([]);
+    const [dstApplicableSc, setDstApplicableSc] = useState('');
+    const [selectedDstApplicableSc, setSelectedDstApplicableSc] = useState('');
+    const [dstApplicableDropSc, setDstApplicableDropSc] = useState([]);
 
-    const [isSelectedDstFlag, setIsSelectedDstFlag] = useState('');
-    const [isSelectedDstFlagSc, setIsSelectedDstFlagSc] = useState('');
-
-    const [createdBy, setCreatedBy] = useState("");
-    const [modifiedBy, setModifiedBy] = useState("");
-    const [createdDate, setCreatedDate] = useState("");
-    const [modifiedDate, setModifiedDate] = useState("");
+    const [isSelectedStatus, setIsSelectedStatus] = useState('');
+    const [isSelectedDstApplicable, setIsSelectedDstApplicable] = useState('');
+    const [isSelectedStatusSc, setIsSelectedStatusSc] = useState('');
+    const [isSelectedDstApplicableSc, setIsSelectedDstApplicableSc] = useState('');
 
     //code added by Harish purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -79,127 +54,24 @@ function TimeZoneMaster() {
         .filter((permission) => permission.screen_type === "TimeZoneGrid")
         .map((permission) => permission.permission_type.toLowerCase());
 
-    const handleChangeStatusSc = (selectedStatusSc) => {
-        setSelectedStatusSc(selectedStatusSc);
-        setStatusSc(selectedStatusSc ? selectedStatusSc.value : "");
+    const addClearInputFields = () => {
+        setTimeZoneName("");
+        setUtcOffset("");
+        setStatus("");
+        setSelectedStatus("");
+        setDstApplicable("");
+        setSelectedDstApplicable("");
     };
 
-    const handleChangeEmploymentTypeSc = (selectedEmploymentTypeSc) => {
-        setSelectedEmploymentTypeSc(selectedEmploymentTypeSc);
-        setEmploymentTypeSc(selectedEmploymentTypeSc ? selectedEmploymentTypeSc.value : "");
+    const searchClearInputFields = () => {
+        setTimeZoneIdSc("");
+        setTimeZoneNameSc("");
+        setUtcOffsetSc("");
+        setStatusSc("");
+        setSelectedStatusSc("");
+        setDstApplicableSc("");
+        setSelectedDstApplicableSc("");
     };
-
-    const filteredOptionStatusSc = statusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    const filteredOptionEmploymentTypeSc = employmentTypeDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setDstFlagDrop(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setDstFlagDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const statusOption = data.map((option) => option.attributedetails_name);
-                setDstFlagDropGrid(statusOption);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    const filteredOptionDst = dstFlagDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    const filteredOptionDstSc = dstFlagDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    const handleChangeDst = (selectedDstFlag) => {
-        setSelectedDstFlag(selectedDstFlag);
-        setDstFlag(selectedDstFlag ? selectedDstFlag.value : "");
-    };
-
-    const handleChangeDstSc = (selectedDstFlagSc) => {
-        setSelectedDstFlagSc(selectedDstFlagSc);
-        setDstFlagSc(selectedDstFlagSc ? selectedDstFlagSc.value : "");
-    };
-
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const statusOption = data.map((option) => option.attributedetails_name);
-                setStatusDropGrid(statusOption);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/getEmptype`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const employeeTypeOption = data.map((option) => option.attributedetails_name);
-                setEmploymentTypeDropGrid(employeeTypeOption);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -233,23 +105,25 @@ function TimeZoneMaster() {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmptype`, {
+        fetch(`${config.apiBaseUrl}/status`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ company_code }),
         })
-            .then((data) => data.json())
-            .then((val) => setEmploymentTypeDrop(val))
+            .then((response) => response.json())
+            .then((data) => {
+                const statusOption = data.map((option) => option.attributedetails_name);
+                setStatusDropGrid(statusOption);
+            })
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getEmptype`, {
+        fetch(`${config.apiBaseUrl}/getBool`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -257,27 +131,103 @@ function TimeZoneMaster() {
             body: JSON.stringify({ company_code }),
         })
             .then((data) => data.json())
-            .then((val) => setEmploymentTypeDropSc(val))
+            .then((val) => setDstApplicableDrop(val))
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getBool`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setDstApplicableDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getBool`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const statusOption = data.map(
+                    (option) => Number(option.attributedetails_name)
+                );
+                setDstApplicableDropGrid(statusOption);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    const filteredOptionStatus = statusDrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const filteredOptionStatusSc = statusDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const filteredOptionDstApplicable = dstApplicableDrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const filteredOptionDstApplicableSc = dstApplicableDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const handleChangeStatus = (selectedStatus) => {
+        setSelectedStatus(selectedStatus);
+        setStatus(selectedStatus ? selectedStatus.value : "");
+    };
+
+    const handleChangeStatusSc = (selectedStatusSc) => {
+        setSelectedStatusSc(selectedStatusSc);
+        setStatusSc(selectedStatusSc ? selectedStatusSc.value : "");
+    };
+
+    const handleChangeDstApplicable = (selectedDstApplicable) => {
+        setSelectedDstApplicable(selectedDstApplicable);
+        setDstApplicable(selectedDstApplicable ? selectedDstApplicable.value : "");
+    };
+
+    const handleChangeDstApplicableSc = (selectedDstApplicableSc) => {
+        setSelectedDstApplicableSc(selectedDstApplicableSc);
+        setDstApplicableSc(selectedDstApplicableSc ? selectedDstApplicableSc.value : "");
+    };
 
     const handleSearch = async () => {
         setLoading(true);
 
         try {
-            const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+            const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-            const response = await fetch(`${config.apiBaseUrl}/Employment_Type_MasterSc`, {
+            const response = await fetch(`${config.apiBaseUrl}/getTimeZonesearchdata`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    Employment_Type_ID: employmentTypeIdSc,
-                    Employment_Type: employmentTypeSc,
-                    Description: descriptionSc,
+                    TimeZone_ID: timeZoneIdSc ? timeZoneIdSc : null,
+                    TimeZone_Name: timeZoneNameSc,
+                    UTC_Offset: utcOffsetSc,
+                    DST_Applicable: dstApplicableSc ? dstApplicableSc : null,
                     Status: statusSc,
-                    Company_Code,
+                    company_code,
                 }),
             });
 
@@ -301,7 +251,8 @@ function TimeZoneMaster() {
     };
 
     const reloadGridData = () => {
-        window.location.reload();
+        setRowData([]);
+        searchClearInputFields();
     };
 
     const columnDefs = [
@@ -342,26 +293,30 @@ function TimeZoneMaster() {
                 );
             },
         },
-
         {
-            headerName: "Employment Type ID",
-            field: "Employment_Type_ID",
+            headerName: "Time Zone ID",
+            field: "TimeZone_ID",
             editable: false,
             cellStyle: { textAlign: "left" },
         },
         {
-            headerName: "Employment Type",
-            field: "Employment_Type",
+            headerName: "Time Zone Name",
+            field: "TimeZone_Name",
+            editable: true,
+        },
+        {
+            headerName: "UTC Offset",
+            field: "UTC_Offset",
+            editable: true,
+        },
+        {
+            headerName: "DST Applicable",
+            field: "DST_Applicable",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: employmentTypeDropGrid,
+                values: dstApplicableDropGrid,
             },
-        },
-        {
-            headerName: "Description",
-            field: "Description",
-            editable: true,
         },
         {
             headerName: "Status",
@@ -399,7 +354,6 @@ function TimeZoneMaster() {
 
     const onGridReady = (params) => {
         setGridApi(params.api);
-        setGridColumnApi(params.columnApi);
     };
 
     const onSelectionChanged = () => {
@@ -447,24 +401,8 @@ function TimeZoneMaster() {
         }).format(date);
     };
 
-    const handleRowClick = (rowData) => {
-        setCreatedBy(rowData.created_by);
-        setModifiedBy(rowData.modified_by);
-        const formattedCreatedDate = formatDate(rowData.created_date);
-        const formattedModifiedDate = formatDate(rowData.modified_date);
-        setCreatedDate(formattedCreatedDate);
-        setModifiedDate(formattedModifiedDate);
-    };
-
-    // Handler for when a row is selected
-    const onRowSelected = (event) => {
-        if (event.node.isSelected()) {
-            handleRowClick(event.data);
-        }
-    };
-
     const handleSave = async () => {
-        if (!timeZoneId || !timeZoneName || !utcOffset || !dstFlag) {
+        if (!timeZoneName || !utcOffset || !status) {
             toast.warning("Missing Required Fields");
             setError(true);
             return;
@@ -480,12 +418,12 @@ function TimeZoneMaster() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        TimeZone_ID: timeZoneId,
                         TimeZone_Name: timeZoneName,
                         UTC_Offset: utcOffset,
                         Status: status,
-                        Company_Code: sessionStorage.getItem("selectedCompanyCode"),
-                        Created_by: sessionStorage.getItem("selectedUserCode"),
+                        DST_Applicable: dstApplicable,
+                        company_code: sessionStorage.getItem("selectedCompanyCode"),
+                        created_by: sessionStorage.getItem("selectedUserCode"),
                     }),
                 },
             );
@@ -494,7 +432,10 @@ function TimeZoneMaster() {
 
             if (response.ok) {
                 toast.success(data.message || "Data inserted successfully", {
-                    onClose: () => window.location.reload(),
+                    onClose: () => {
+                        addClearInputFields();
+                        setError(false)
+                    }
                 });
             } else {
                 toast.warning(data.message || "Insert failed");
@@ -508,32 +449,32 @@ function TimeZoneMaster() {
     };
 
     const handleUpdate = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to update the selected employment type master data?",
+            "Are you sure you want to update the selected time zone master data?",
             async () => {
+                setLoading(true);
                 try {
-                    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
-                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        Employment_Type_MasterData: Array.isArray(rowData)
+                        Time_Zone_masterData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
-                                Company_Code,
-                                Modified_by,
+                                company_code,
+                                modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
-                                    Company_Code,
-                                    Modified_by,
+                                    company_code,
+                                    modified_by,
                                 },
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Employment_Type_MasterLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/Time_Zone_masterLoopUpdate`,
                         {
                             method: "POST",
                             headers: {
@@ -544,7 +485,7 @@ function TimeZoneMaster() {
                     );
 
                     if (response.ok) {
-                        toast.success("Employment type master updated successfully", {
+                        toast.success("Time zone master updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -563,46 +504,171 @@ function TimeZoneMaster() {
     };
 
     const handleDelete = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
-            "Are you sure you want to delete the selected employment type master data?",
+            "Are you sure you want to delete the selected time zone master data?",
             async () => {
+                setLoading(true);
                 try {
-                    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        Employment_Type_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+                        Time_Zone_masterData: Array.isArray(rowData) ? rowData : [rowData],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Employment_Type_MasterLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/Time_Zone_masterLoopDelete`,
                         {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                "Company_Code": Company_Code
+                                "company_code": company_code
                             },
                             body: JSON.stringify(dataToSend),
                         },
                     );
 
                     if (response.ok) {
-                        toast.success("Employment type master deleted successfully", {
-                            onClose: () => handleSearch(), // refresh data
+                        toast.success("Time zone master deleted successfully", {
+                            onClose: () => handleSearch(),
                         });
                     } else {
                         const errorResponse = await response.json();
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting employment type master rows:", error);
-                    toast.error("Error deleting employment type master data: " + error.message);
+                    console.error("Error deleting time zone master rows:", error);
+                    toast.error("Error deleting time zone master data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
             },
             () => toast.info("Delete cancelled"),
         );
+    };
+
+    const getCSSVariable = (variableName) => {
+        return getComputedStyle(document.documentElement)
+            .getPropertyValue(variableName)
+            .trim();
+    };
+
+    const transformRowData = (data) => {
+        return data.map((row) => ({
+            "Time Zone ID": row.TimeZone_ID || "",
+            "Time Zone Name": row.TimeZone_Name || "",
+            "UTC Offset": row.UTC_Offset || "",
+            "DST Applicable": row.DST_Applicable || "",
+            "Status": row.Status || "",
+        }));
+    };
+
+    const handleExportToExcel = () => {
+        if (!rowData || rowData.length === 0) {
+            toast.warning("There is no data to export.");
+            return;
+        }
+
+        const screenName = "Time Zone Master Search Report";
+        const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+        /* ================= THEME COLORS ================= */
+
+        const titleBg = getCSSVariable("--but").replace("#", "");
+        const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+        const fontColor = getCSSVariable("--font-color").replace("#", "");
+        const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+        /* ================= HEADER ================= */
+
+        const headerData = [
+            [screenName],
+            company ? [`Company Name: ${company}`] : [],
+            [],
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+        /* ================= TABLE DATA ================= */
+
+        const transformedData = transformRowData(rowData);
+
+        XLSX.utils.sheet_add_json(worksheet, transformedData, {
+            origin: `A${headerData.length + 1}`,
+        });
+
+        const range = XLSX.utils.decode_range(worksheet["!ref"]);
+        const headerRowIndex = headerData.length;
+
+        /* ================= TITLE STYLE ================= */
+
+        worksheet["A1"].s = {
+            font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: titleBg } },
+            alignment: { horizontal: "center", vertical: "center" },
+        };
+
+        worksheet["!merges"] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+        ];
+
+        /* ================= TABLE HEADER STYLE ================= */
+
+        const totalColumns = Object.keys(transformedData[0]).length;
+
+        for (let C = 0; C < totalColumns; C++) {
+            const cell =
+                worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+            if (!cell) continue;
+
+            cell.s = {
+                font: { bold: true, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: tableHeaderBg } },
+                alignment: { horizontal: "center" },
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" },
+                },
+            };
+        }
+
+        /* ================= TABLE BODY STYLE ================= */
+
+        for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+            for (let C = 0; C < totalColumns; C++) {
+                const cell =
+                    worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+                if (!cell) continue;
+
+                cell.s = {
+                    font: { color: { rgb: fontColor } },
+                    fill:
+                        R % 2 === 0
+                            ? { fgColor: { rgb: altRowBg } }
+                            : undefined,
+                    border: {
+                        top: { style: "thin" },
+                        bottom: { style: "thin" },
+                        left: { style: "thin" },
+                        right: { style: "thin" },
+                    },
+                };
+            }
+        }
+
+        /* ================= COLUMN WIDTH ================= */
+
+        worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+        /* ================= EXPORT ================= */
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Time Zone Master");
+
+        XLSX.writeFile(workbook, "Time_Zone_Master_Search_Report.xlsx");
     };
 
     return (
@@ -628,24 +694,6 @@ function TimeZoneMaster() {
 
                 <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                     <div className="row g-3">
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={timeZoneId}
-                                    onChange={(e) => setTimeZoneId(e.target.value)}
-                                />
-                                <label for="state" className={`exp-form-labels ${error && !timeZoneId ? "text-danger" : ""}`}>
-                                    Time Zone ID<span className="text-danger">*</span>
-                                </label>
-                            </div>
-                        </div>
 
                         <div className="col-md-2">
                             <div className="inputGroup">
@@ -686,90 +734,120 @@ function TimeZoneMaster() {
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedDstFlag ? "has-value" : ""} 
-                                    ${isSelectedDstFlag ? "is-focused" : ""}`}
+                                    ${selectedDstApplicable ? "has-value" : ""} 
+                                    ${isSelectedDstApplicable ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedDstFlag}
-                                    onChange={handleChangeDst}
-                                    options={filteredOptionDst}
+                                    value={selectedDstApplicable}
+                                    onChange={handleChangeDstApplicable}
+                                    options={filteredOptionDstApplicable}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedDstFlag(true)}
-                                    onBlur={() => setIsSelectedDstFlag(false)}
+                                    onFocus={() => setIsSelectedDstApplicable(true)}
+                                    onBlur={() => setIsSelectedDstApplicable(false)}
                                 />
-                                <label className={`floating-label ${error && !dstFlag ? "text-danger" : ""}`}>DST Flag<span className="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-
-
-                <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-                    <div className="header-flex">
-                        <h6 className="">Search Criteria:</h6>
-                    </div>
-                    <div className="row g-3">
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="TimeZone_ID"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={employmentTypeIdSc}
-                                    onChange={(e) => setEmploymentIdSc(e.target.value)}
-                                />
-                                <label for="state" className={`exp-form-labels`}>
-                                    Employee Type ID
-                                </label>
+                                <label className={`floating-label`}>DST Applicable</label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedEmploymentTypeSc ? "has-value" : ""} 
-                                    ${isSelectedEmploymentTypeSc ? "is-focused" : ""}`}
+                                    ${selectedStatus ? "has-value" : ""} 
+                                    ${isSelectedStatus ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedEmploymentTypeSc}
-                                    onChange={handleChangeEmploymentTypeSc}
-                                    options={filteredOptionEmploymentTypeSc}
+                                    value={selectedStatus}
+                                    onChange={handleChangeStatus}
+                                    options={filteredOptionStatus}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectEmploymentTypeSc(true)}
-                                    onBlur={() => setIsSelectEmploymentTypeSc(false)}
+                                    onFocus={() => setIsSelectedStatus(true)}
+                                    onBlur={() => setIsSelectedStatus(false)}
                                 />
-                                <label class="floating-label">Employee Type</label>
+                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+                    <div className="header-flex">
+                        <h6 className="">Search Criteria:</h6>
+                    </div>
+                    <div className="row g-3">
+
+                        <div className="col-md-2">
+                            <div className="inputGroup">
+                                <input
+                                    class="exp-input-field form-control"
+                                    type="number"
+                                    placeholder=" "
+                                    autoComplete="off"
+                                    required
+                                    maxLength={50}
+                                    value={timeZoneIdSc}
+                                    onChange={(e) => setTimeZoneIdSc(e.target.value)}
+                                />
+                                <label for="state" className={`exp-form-labels`}>Time Zone ID</label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
                             <div className="inputGroup">
                                 <input
-                                    id="TimeZone_ID"
                                     class="exp-input-field form-control"
                                     type="text"
                                     placeholder=" "
                                     autoComplete="off"
                                     required
-                                    maxLength={255}
-                                    value={descriptionSc}
-                                    onChange={(e) => setDescriptionSc(e.target.value)}
+                                    maxLength={50}
+                                    value={timeZoneNameSc}
+                                    onChange={(e) => setTimeZoneNameSc(e.target.value)}
                                 />
-                                <label for="state" className={`exp-form-labels`} >
-                                    Description
-                                </label>
+                                <label for="state" className={`exp-form-labels`}>Time Zone Name</label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+                            <div className="inputGroup">
+                                <input
+                                    class="exp-input-field form-control"
+                                    type="text"
+                                    placeholder=" "
+                                    autoComplete="off"
+                                    required
+                                    maxLength={50}
+                                    value={utcOffsetSc}
+                                    onChange={(e) => setUtcOffsetSc(e.target.value)}
+                                />
+                                <label for="state" className={`exp-form-labels`}>UTC Offset</label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedDstApplicableSc ? "has-value" : ""} 
+                                    ${isSelectedDstApplicableSc ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedDstApplicableSc}
+                                    onChange={handleChangeDstApplicableSc}
+                                    options={filteredOptionDstApplicableSc}
+                                    classNamePrefix="react-select"
+                                    placeholder=" "
+                                    onFocus={() => setIsSelectedDstApplicableSc(true)}
+                                    onBlur={() => setIsSelectedDstApplicableSc(false)}
+                                />
+                                <label className={`floating-label`}>DST Applicable</label>
                             </div>
                         </div>
 
@@ -777,7 +855,7 @@ function TimeZoneMaster() {
                             <div
                                 className={`inputGroup selectGroup 
                                     ${selectedStatusSc ? "has-value" : ""} 
-                                    ${isSelectStatusSc ? "is-focused" : ""}`}
+                                    ${isSelectedStatusSc ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
@@ -787,10 +865,10 @@ function TimeZoneMaster() {
                                     options={filteredOptionStatusSc}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectStatusSc(true)}
-                                    onBlur={() => setIsSelectStatusSc(false)}
+                                    onFocus={() => setIsSelectedStatusSc(true)}
+                                    onBlur={() => setIsSelectedStatusSc(false)}
                                 />
-                                <label className="floating-label">Status</label>
+                                <label className={`floating-label`}>Status</label>
                             </div>
                         </div>
 
@@ -804,6 +882,11 @@ function TimeZoneMaster() {
                                 <div className="icon-btn reload" onClick={reloadGridData}>
                                     <span className="tooltip">Reload</span>
                                     <i className="fa-solid fa-rotate-right"></i>
+                                </div>
+
+                                <div className="icon-btn excel" onClick={handleExportToExcel}>
+                                    <span className="tooltip">Excel</span>
+                                    <i className="fa-solid fa-file-excel"></i>
                                 </div>
                             </div>
                         </div>
@@ -825,7 +908,6 @@ function TimeZoneMaster() {
                             onSelectionChanged={onSelectionChanged}
                             pagination={true}
                             paginationAutoPageSize={true}
-                            onRowSelected={onRowSelected}
                         />
                     </div>
                 </div>

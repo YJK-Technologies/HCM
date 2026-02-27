@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
 import bgImage from "./background.png";
@@ -6,13 +7,27 @@ import Logo from "./main.png";
 const Home = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        navigate("/Login");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navigate]);
+
   return (
     <div className="hcm-dark-theme">
       {/* Dynamic Background Overlay */}
       <div className="bg-overlay" style={{ backgroundImage: `url(${bgImage})` }}></div>
 
       <nav className="hcm-navbar">
-        <div className="logo">HCM<span>.</span>PRO</div>
+        <div className="logo">HCM</div>
         <div className="nav-group">
           {/* <button className="text-link">Product</button> */}
           {/* <button className="text-link">Pricing</button> */}

@@ -26,30 +26,6 @@ function EmployeeTypeMaster() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [employmentTypeId, setEmploymentId] = useState('');
-    const [employmentType, setEmploymentType] = useState('');
-    const [selectedEmploymentType, setSelectedEmploymentType] = useState('');
-    const [employmentTypeDrop, setEmploymentTypeDrop] = useState([]);
-    const [description, setDescription] = useState('');
-    // const [status, setStatus] = useState('');
-    // const [selectedStatus, setSelectedStatus] = useState('');
-    // const [statusDrop, setStatusDrop] = useState([]);
-
-    const [employmentTypeIdSc, setEmploymentIdSc] = useState('');
-    const [employmentTypeSc, setEmploymentTypeSc] = useState('');
-    const [selectedEmploymentTypeSc, setSelectedEmploymentTypeSc] = useState('');
-    const [employmentTypeDropSc, setEmploymentTypeDropSc] = useState([]);
-    const [descriptionSc, setDescriptionSc] = useState('');
-    // const [statusSc, setStatusSc] = useState('');
-    // const [selectedStatusSc, setSelectedStatusSc] = useState('');
-    // const [statusDropSc, setStatusDropSc] = useState([]);
-    // const [statusDropGrid, setStatusDropGrid] = useState([]);
-    const [employmentTypeDropGrid, setEmploymentTypeDropGrid] = useState([]);
-
-    // const [isSelectStatus, setIsSelectStatus] = useState(false);
-    const [isSelectedEmploymentType, setIsSelectEmploymentType] = useState(false);
-    // const [isSelectStatusSc, setIsSelectStatusSc] = useState(false);
-    const [isSelectedEmploymentTypeSc, setIsSelectEmploymentTypeSc] = useState(false);
 
     const [employeeShiftId, setEmployeeShiftId] = useState('');
     const [employeeId, setEmployeeId] = useState('');
@@ -116,6 +92,21 @@ function EmployeeTypeMaster() {
     const companyMappingPermission = permissions
         .filter((permission) => permission.screen_type === "Company Mapping")
         .map((permission) => permission.permission_type.toLowerCase());
+
+    const searchClearInputFields = () => {
+        setEmployeeShiftIdSc("");
+        setSelectedEmployeeIdSc("");
+        setEmployeeIdSc("");
+        setSelectedShiftIdSc("");
+        setShiftIdSc("");
+        setSelectedShiftTypeIdSc("");
+        setShiftTypeIdSc("");
+        setSelectedShiftPatternIdSc("");
+        setEffectiveFromSc("");
+        setEffectiveToSc("");
+        setSelectedStatusSc("");
+        setStatusSc("");
+    };
 
     const handleChangeStatus = (selectedStatus) => {
         setSelectedStatus(selectedStatus);
@@ -508,7 +499,8 @@ function EmployeeTypeMaster() {
     };
 
     const reloadGridData = () => {
-        window.location.reload();
+        setRowData([]);
+        searchClearInputFields();
     };
 
     const columnDefs = [
@@ -817,11 +809,11 @@ function EmployeeTypeMaster() {
     };
 
     const handleUpdate = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to update the selected employee shift mapping data?",
             async () => {
+                setLoading(true);
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
@@ -872,11 +864,11 @@ function EmployeeTypeMaster() {
     };
 
     const handleDelete = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to delete the selected employee shift mapping data?",
             async () => {
+                setLoading(true);
                 try {
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
