@@ -51,6 +51,14 @@ function ShiftPatternDetails() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const searchClearInputFields = () => {
+    setShift_Pattern_IDSC("");
+    setPattern_Detail_IDSC("");
+    setDay_SequenceSC("");
+    setShift_IDSC("");
+    setIs_Off_DaySC("");
+  };
+
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -111,7 +119,8 @@ function ShiftPatternDetails() {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
@@ -321,7 +330,7 @@ function ShiftPatternDetails() {
   };
 
   const handleSave = async () => {
-    if (!Shift_Pattern_ID || !Pattern_Detail_ID  || !Day_Sequence || !Shift_ID || !Is_Off_Day ) {
+    if (!Shift_Pattern_ID || !Pattern_Detail_ID || !Day_Sequence || !Shift_ID || !Is_Off_Day) {
       toast.warning("Error: Missing required fields");
       setError(" ");
       return;
