@@ -50,7 +50,7 @@ function JobMaster({ }) {
   const [employmentdrop, setEmploymentdrop] = useState([]);
   const [employmentdropGR, setEmploymentdropGR] = useState([]);
   const [employmentdropSC, setEmploymentdropSC] = useState([]);
-  const [departmentDrop, setDepartmentDrop] = useState([]); 
+  const [departmentDrop, setDepartmentDrop] = useState([]);
   const [dpt, setdpt] = useState("");
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
@@ -59,6 +59,18 @@ function JobMaster({ }) {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setjob_titleSC("");
+    setselecteddeptSC("");
+    setdptSC("");
+    setselectedCountrySC("");
+    setCountry_CodeSC("");
+    setlocationSC("");
+    setselectedemploymentSC("");
+    setemployment_typeSC("");
+  };
 
   const handleDPT = (selectedDPT) => {
     setselecteddept(selectedDPT);
@@ -69,11 +81,11 @@ function JobMaster({ }) {
     setdptSC(selectedDPT ? selectedDPT.value : '');
   };
 
-    const handleCountryChange = (selectedCountry) => {
+  const handleCountryChange = (selectedCountry) => {
     setselectedCountry(selectedCountry);
     setCountry_Code(selectedCountry ? selectedCountry.value : '');
   };
-    const handleEmploymentChange = (selectedEmployment) => {
+  const handleEmploymentChange = (selectedEmployment) => {
     setselectedemployment(selectedEmployment);
     setemployment_type(selectedEmployment ? selectedEmployment.value : '');
   };
@@ -92,12 +104,12 @@ function JobMaster({ }) {
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
-  
+
   const filteredOptionDPtSC = DPTdrop.map(option => ({
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
-  
+
   const filteredOptionCountry = Countrydrop.map(option => ({
     value: option.Country_Code,
     label: `${option.Country_Code} - ${option.Country_Name}`
@@ -118,7 +130,7 @@ function JobMaster({ }) {
   }));
 
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/GetCountry`, {
       method: 'POST',
@@ -131,8 +143,8 @@ function JobMaster({ }) {
       .then((val) => setCountrydrop(val))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
-  
-    useEffect(() => {
+
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/GetCountry`, {
       method: 'POST',
@@ -146,7 +158,7 @@ function JobMaster({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
       method: 'POST',
@@ -160,7 +172,7 @@ function JobMaster({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
       method: 'POST',
@@ -243,10 +255,10 @@ function JobMaster({ }) {
           value: option.Country_Code,
           label: `${option.Country_Code} - ${option.Country_Name}`,
         }));
-        setCountrydropGR(Countryptions); 
+        setCountrydropGR(Countryptions);
       })
       // .then((val) => setDPTdrop(val))
-      .catch((error) => 
+      .catch((error) =>
         console.error("Error fetching country data:", error)
       );
   }, []);
@@ -266,10 +278,10 @@ function JobMaster({ }) {
           value: option.Country_Code,
           label: `${option.Country_Code} - ${option.Country_Name}`,
         }));
-        setCountrydropGR(Countryptions); 
+        setCountrydropGR(Countryptions);
       })
       // .then((val) => setDPTdrop(val))
-      .catch((error) => 
+      .catch((error) =>
         console.error("Error fetching country data:", error)
       );
   }, []);
@@ -290,10 +302,10 @@ function JobMaster({ }) {
           value: option.attributedetails_name,
           label: `${option.attributedetails_name}`,
         }));
-        setEmploymentdropGR(employmentptions); 
+        setEmploymentdropGR(employmentptions);
       })
       // .then((val) => setDPTdrop(val))
-      .catch((error) => 
+      .catch((error) =>
         console.error("Error fetching employee type data:", error)
       );
   }, []);
@@ -514,15 +526,16 @@ function JobMaster({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -573,11 +586,11 @@ function JobMaster({ }) {
 
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { job_masterData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -695,15 +708,25 @@ function JobMaster({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Job ID": row.job_id || "",
-      "Job Title": row.job_title || "",
-      "Department": row.department_id || "",
-      "Country Code": row.Country_Code || "",
-      "Location": row.location || "",
-      "Employment Type": row.employment_type || "",
-      "Updated On": row.updated_on || "",
-    }));
+    return data.map((row) => {
+      const deptObj = departmentDrop.find(
+        (d) => d.value === row.department_id
+      );
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Job ID": row.job_id || "",
+        "Job Title": row.job_title || "",
+        "Department": `${row.department_id} - ${deptName}` || "",
+        "Country Code": row.Country_Code || "",
+        "Location": row.location || "",
+        "Employment Type": row.employment_type || "",
+        "Updated On": row.updated_on || "",
+      };
+    });
   };
 
   const handleExportToExcel = () => {
@@ -880,7 +903,7 @@ function JobMaster({ }) {
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
             >
-             <Select
+              <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
@@ -891,7 +914,7 @@ function JobMaster({ }) {
                 value={selectedCountry}
                 onChange={handleCountryChange}
                 options={filteredOptionCountry}
-                />
+              />
               <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Country Code<span className="text-danger">*</span></label>
             </div>
           </div>
@@ -1036,7 +1059,7 @@ function JobMaster({ }) {
               ${selectedCountrySC ? "has-value" : ""} 
               ${isSelectCountrySC ? "is-focused" : ""}`}
             >
-             <Select
+              <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
@@ -1047,7 +1070,7 @@ function JobMaster({ }) {
                 value={selectedCountrySC}
                 onChange={handleCountryChangeSC}
                 options={filteredOptionCountrySC}
-                />
+              />
               <label for="sname" className={`floating-label`}>Country Code</label>
             </div>
           </div>

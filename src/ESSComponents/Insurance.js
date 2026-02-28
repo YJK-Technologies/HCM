@@ -259,12 +259,12 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
     setError(false);
-    setLoading(true)
-
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data in the row?",
       async () => {
         try {
+          setLoading(true)
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeFamily`, {
             method: "POST",
             headers: {
@@ -339,12 +339,12 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
     setError(false);
-    setLoading(true)
-
+    
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
       async () => {
         try {
+          setLoading(true)
           const response = await fetch(`${config.apiBaseUrl}/updateEmployeeFamily`, {
             method: "POST",
             headers: {

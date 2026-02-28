@@ -447,12 +447,12 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the selected Country Master?",
       async () => {
         try {
+          setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -492,12 +492,12 @@ function Input({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to delete the selected employee shift mapping data?",
       async () => {
         try {
+          setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {

@@ -278,7 +278,7 @@ function InterviewDecision({ }) {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(jobs);
       })
@@ -299,7 +299,7 @@ function InterviewDecision({ }) {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.candidate_id,
-          label: `${option.candidate_id}-${option.candidate_name}`,
+          label: `${option.candidate_id} - ${option.candidate_name}`,
         }));
         setConditateDrop(jobs);
       })
@@ -551,11 +551,11 @@ function InterviewDecision({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -593,11 +593,11 @@ function InterviewDecision({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_decisionData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -715,15 +715,33 @@ function InterviewDecision({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Candidate ID": row.candidate_id || "",
+    return data.map((row) => {
+      const conObj = conditateDrop.find(
+        (d) => d.value === row.candidate_id
+      );
+
+      const conName = conObj
+        ? conObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const jobObj = jobDrop.find(
+        (d) => d.value === row.job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+      "Candidate ID": `${row.candidate_id} - ${conName}` || "",
       "Decision ID": row.decision_id || "",
-      "Job ID": row.job_id || "",
+      "Job ID": `${row.job_id} - ${jobName}` || "",
       "Decided By": row.decided_by || "",
       "Decided On": row.decided_on || "",
       "Remarks": row.remarks || "",
       "Final Status": row.Final_Status || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {

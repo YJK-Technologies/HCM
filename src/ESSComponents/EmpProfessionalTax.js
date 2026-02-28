@@ -55,6 +55,14 @@ function Input({ }) {
   const [activeTab, setActiveTab] = useState("Professional Tax");
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setStart_YearSC("");
+    setEnd_YearSC("");
+    setEmpsalaryfrom(0);
+    setEmpsalaryTo(0);
+    setTaxAMt(0);
+  };
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -202,11 +210,11 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -311,14 +319,15 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };

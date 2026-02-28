@@ -813,8 +813,8 @@ function EmployeeTypeMaster() {
         showConfirmationToast(
             "Are you sure you want to update the selected employee shift mapping data?",
             async () => {
-                setLoading(true);
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -868,8 +868,8 @@ function EmployeeTypeMaster() {
         showConfirmationToast(
             "Are you sure you want to delete the selected employee shift mapping data?",
             async () => {
-                setLoading(true);
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {

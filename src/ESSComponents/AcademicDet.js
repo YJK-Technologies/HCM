@@ -449,9 +449,9 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
     setError(false);
-    setLoading(true)
-
+    
     try {
+      setLoading(true)
       const response = await fetch(`${config.apiBaseUrl}/updateEmployeeAcademicDetails`, {
         method: "POST",
         headers: {
@@ -509,9 +509,9 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
     setError(false);
-    setLoading(true)
-
+    
     try {
+      setLoading(true)
       const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeAcademicDetails`, {
         method: "POST",
         headers: {

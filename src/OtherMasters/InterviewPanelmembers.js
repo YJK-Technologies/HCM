@@ -175,7 +175,7 @@ function InterviewPanelMem({ }) {
       .then((data) => {
         const panel = data.map((option) => ({
           value: option.panel_id,
-          label: `${option.panel_id}-${option.panel_name}`,
+          label: `${option.panel_id} - ${option.panel_name}`,
         }));
         setPaneldrop(panel);
       })
@@ -403,11 +403,11 @@ function InterviewPanelMem({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -454,11 +454,11 @@ function InterviewPanelMem({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {
@@ -578,12 +578,22 @@ function InterviewPanelMem({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
+    return data.map((row) => {
+      const panelObj = panelDrop.find(
+        (d) => d.value === row.panel_id
+      );
+
+      const panelName = panelObj
+        ? panelObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
       "Member ID": row.member_id || "",
-      "Panel ID": row.panel_id || "",
+      "Panel ID": `${row.panel_id} - ${panelName}` || "",
       "Employee ID": row.employee_id || "",
       "Role": row.Role || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {

@@ -277,12 +277,12 @@ function Input({ }) {
       return;
     }
     setError(false);
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             Account_NO: Account_NO,
@@ -402,9 +402,9 @@ function Input({ }) {
       return;
     }
     setError(false);
-    setLoading(true)
-
+    
     try {
+      setLoading(true)
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
       formData.append("Account_NO", Account_NO);

@@ -24635,8 +24635,8 @@ const ProfessionalTaxSC = async (req, res) => {
       .input("Employee_Salary_From", sql.Decimal(10, 2), Employee_Salary_From)
       .input("Employee_Salary_To", sql.Decimal(10, 2), Employee_Salary_To)
       .input("Taxable_Amount", sql.Decimal(10, 2), Taxable_Amount)
-      .input("Start_Year", sql.Date, Start_Year)
-      .input("End_Year", sql.Date, End_Year)
+      .input("Start_Year", sql.NVarChar, Start_Year)
+      .input("End_Year", sql.NVarChar, End_Year)
       .query(`EXEC sp_Professional_Tax 'sc',@company_code,@Employee_Salary_From,@Employee_Salary_To,@Taxable_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
 
@@ -24716,8 +24716,8 @@ const getLoanType = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Loan_ID", sql.VarChar, Loan_ID)
       .input("Loan_Eligible_Amount", sql.Decimal(14, 2), Loan_Eligible_Amount)
-      .input("Start_Year", sql.Date, Start_Year)
-      .input("End_Year", sql.Date, End_Year)
+      .input("Start_Year", sql.NVarChar, Start_Year)
+      .input("End_Year", sql.NVarChar, End_Year)
       .query(`EXEC sp_Loan_Type 'sc',@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Send response
     if (result.recordset.length > 0) {

@@ -291,7 +291,10 @@ function InterviewFeedback({ }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const employee = data.map(option => option.EmployeeId);
+        const employee = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
         setEmployeeDrop(employee);
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -349,7 +352,11 @@ function InterviewFeedback({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: employeeDrop,
+        values: employeeDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
       },
     },
     {
@@ -490,11 +497,11 @@ function InterviewFeedback({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -532,11 +539,11 @@ function InterviewFeedback({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_feedbackData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -647,14 +654,24 @@ function InterviewFeedback({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
+    return data.map((row) => {
+      const empObj = employeeDrop.find(
+        (d) => d.value === row.employee_id
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
       "Schedule ID": row.schedule_id || "",
-      "Employee ID": row.employee_id || "",
+      "Employee ID": `${row.employee_id} - ${empName}` || "",
       "Rating": row.rating || "",
       "Comments": row.comments || "",
       "Recommendation": row.Recommendation || "",
       "Submitted On": row.submitted_on || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {
