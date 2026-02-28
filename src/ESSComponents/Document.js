@@ -501,12 +501,12 @@ function Input({ }) {
       modified_by: sessionStorage.getItem("selectedCompanyCode")
     };
     setError(false);
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
       async () => {
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/updateempDoc`, {
             method: "POST",
             headers: {
@@ -562,12 +562,12 @@ function Input({ }) {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode")
     };
-    setLoading(true)
-
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data in the row ?",
       async () => {
         try {
+          setLoading(true)
           const response = await fetch(`${config.apiBaseUrl}/delempdoc`, {
             method: "POST",
             headers: {

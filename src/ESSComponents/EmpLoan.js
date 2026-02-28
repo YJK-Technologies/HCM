@@ -45,7 +45,7 @@ function Input({ }) {
   const [loandrop, setloandrop] = useState([]);
   const [selectedLoan, setSelectedLoan] = useState("");
   const [selectedloan, setselectedloan] = useState("");
-  const [rowData, setRowData] = useState('');
+  const [rowData, setRowData] = useState([]);
   const [isSelectedloanID, setIsSelectedloanID] = useState(false);
   const [isSelectedABY, setIsSelectABY] = useState(false);
   const [isSelectloanid, setIsSelectloanid] = useState(false);
@@ -276,8 +276,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -321,8 +321,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeLoan`, {
             method: "POST",
             headers: {
