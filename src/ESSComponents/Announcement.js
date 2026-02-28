@@ -78,6 +78,23 @@ function Input({ }) {
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setAnnouncement_id("");
+    setselecttype("");
+    settype("");
+    setselecteddetails("");
+    setdetails("");
+    setstartDate("");
+    setEndDate("");
+    setstart_time("");
+    setend_time("");
+    setselectedmessagetype("");
+    setmessagetype("");
+    setmessageTitle("");
+    setselectedstatus("");
+    setstatus("");
+  };
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -275,7 +292,8 @@ function Input({ }) {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setrowData([]);
+    searchClearInputFields();
   };
 
   const reloadData = () => {

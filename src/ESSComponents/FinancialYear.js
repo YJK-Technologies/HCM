@@ -52,6 +52,12 @@ function Input() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setSalary_Days("");
+  };
+
   const formatDate = (isoDateString) => {
     if (!isoDateString) return "";
     const date = new Date(isoDateString);
@@ -192,6 +198,7 @@ function Input() {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [

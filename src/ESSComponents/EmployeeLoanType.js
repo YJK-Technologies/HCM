@@ -53,6 +53,13 @@ function Input({ }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStartYear("");
+    setEndYear("");
+    setLoan_id("");
+    setLoanEligibleAmount(0);
+  };
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -141,6 +148,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   }
 
   const onGridReady = (params) => {

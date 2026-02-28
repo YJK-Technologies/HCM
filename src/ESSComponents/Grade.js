@@ -58,6 +58,24 @@ function Input({ }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setGradeID("");
+    setGradeName("");
+    setSalaryrrangeFrom("");
+    setSalaryrangeTo("");
+    setBasic("");
+    setHRA("");
+    setConveyance("");
+    setMedical("");
+    setSpecial_Allowance("");
+    setCompany_Pf_Contribution("");
+    setBonus_Arrears("");
+    setOther_Allowance("");
+    setLeaveDeduction("");
+    setotherDeductions("");
+    setCtcCurrency("");
+    setMinimumTakeSalary("");
+  };
 
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/EmployeeGrade", { state: { mode: "update", selectedRow } });
@@ -69,6 +87,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setrowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
@@ -382,8 +401,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -423,8 +442,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -597,16 +616,16 @@ function Input({ }) {
           <h1 className="page-title">Add Grade Details</h1>
 
           <div className="action-wrapper desktop-actions">
-              {saveButtonVisible && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
-              <div className="action-icon print" onClick={handleReload}>
-                <span className="tooltip">Reload</span>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+            {saveButtonVisible && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
               </div>
+            )}
+            <div className="action-icon print" onClick={handleReload}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
+            </div>
           </div>
 
           {/* Mobile Dropdown */}
@@ -624,7 +643,7 @@ function Input({ }) {
                 </li>
               )}
               {/*})}*/}
-              
+
               <li className="dropdown-item" onClick={handleReload}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>

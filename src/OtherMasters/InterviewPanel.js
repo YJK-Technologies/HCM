@@ -146,7 +146,7 @@ function InterviewPanel({ }) {
       .then((data) => {
         const job = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(job);
       })
@@ -614,12 +614,30 @@ function InterviewPanel({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
+    return data.map((row) => {
+      const jobObj = jobDrop.find(
+        (d) => d.value === row.job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const deptObj = Dptdrop.find(
+        (d) => d.value === row.department_id
+      );
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
       "Panel Name": row.panel_name || "",
-      "Job ID": row.job_id || "",
-      "Department ID": row.department_id || "",
+      "Job ID": `${row.job_id} - ${jobName}` || "",
+      "Department ID": `${row.department_id} - ${deptName}` || "",
       "Status": row.Status || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {
