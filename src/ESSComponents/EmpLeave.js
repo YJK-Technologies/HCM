@@ -50,6 +50,17 @@ function Input({ }) {
   const [isSelecttypes, setIsSelecttypes] = useState(false);
   const [isSelectAL, setIsSelectAL] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const searchClearInputFields = () => {
+    setLeaveid("");
+    setFilterCode("");
+    setselectedtype("");
+    settype("");
+    setSelectedaccrual("");
+    setaccrual("");
+    setExceedleave("");
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
@@ -513,7 +524,8 @@ function Input({ }) {
   };
 
   const reloadData = () => {
-    setrowData([])
+    setrowData([]);
+    searchClearInputFields();
   };
 
   const getCSSVariable = (variableName) => {

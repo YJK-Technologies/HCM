@@ -55,6 +55,14 @@ function Input({ }) {
   const [activeTab, setActiveTab] = useState("Professional Tax");
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setStart_YearSC("");
+    setEnd_YearSC("");
+    setEmpsalaryfrom(0);
+    setEmpsalaryTo(0);
+    setTaxAMt(0);
+  };
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -311,6 +319,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleDelete = async (rowData) => {
