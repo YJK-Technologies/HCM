@@ -49,6 +49,13 @@ function Input({ }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setCompany_Fund(0);
+    setEmployee_Fund(0);
+  };
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -222,7 +229,8 @@ function Input({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {

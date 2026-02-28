@@ -60,6 +60,13 @@ function Input({ }) {
 
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setAnnual_bonus(0);
+    setReferral_bonus(0);
+  };
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getID`, {
       method: "POST",
@@ -313,6 +320,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {

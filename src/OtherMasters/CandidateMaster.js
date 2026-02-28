@@ -144,7 +144,7 @@ function CandidateMaster() {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(jobs);
       })
@@ -652,19 +652,28 @@ function CandidateMaster() {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Applied Date": row.created_date || "",
-      "Candidate ID": row.candidate_id || "",
-      "Candidate Name": row.candidate_name || "",
-      "Email": row.email || "",
-      "Phone": row.phone || "",
-      "Applied Job ID": row.applied_job_id || "",
-      "Education": row.Education || "",
-      "Experience": row.Experience || "",
-      "Related Experience": row.Related_experience || "",
-      "Job Description": row.Job_description || "",
-      // "Candidate CV": row.Canditate_CV || "",
-    }));
+    return data.map((row) => {
+      const jobObj = JobDrop.find(
+        (d) => d.value === row.applied_job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Applied Date": row.created_date || "",
+        "Candidate ID": row.candidate_id || "",
+        "Candidate Name": row.candidate_name || "",
+        "Email": row.email || "",
+        "Phone": row.phone || "",
+        "Applied Job ID": `${row.applied_job_id} - ${jobName}` || "",
+        "Education": row.Education || "",
+        "Experience": row.Experience || "",
+        "Related Experience": row.Related_experience || "",
+        "Job Description": row.Job_description || "",
+      };
+    });
   };
 
   const handleExportToExcel = () => {

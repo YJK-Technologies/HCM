@@ -51,6 +51,13 @@ function Input({ }) {
   const [activeTab, setActiveTab] = useState("TDS")
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setStart_Years("");
+    setEnd_Years("");
+    setEmployee_Salarys(0);
+    setTaxable_Amounts(0);
+  };
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -308,6 +315,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const tabs = [

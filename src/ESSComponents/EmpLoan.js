@@ -54,6 +54,19 @@ function Input({ }) {
   const [approvedByGropGrid, setApprovedByGropGrid] = useState([]);
   const [loanIdDropGrid, setLoanIdDropGrid] = useState([]);
 
+  const searchClearInputFields = () => {
+    setEmployeeID("");
+    setLoanid("");
+    setselectedloan("");
+    setapprovedby("");
+    setselectedapprovedby("");
+    setloanEligibleamount("");
+    setEffectivedate("");
+    setEnddate("");
+    setHowmanymonth("");
+    setEMIamount("");
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getTeamManager`, {
@@ -425,6 +438,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const formatDate = (isoDateString) => {
