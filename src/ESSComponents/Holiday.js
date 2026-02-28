@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { showConfirmationToast } from '../ToastConfirmation';
 import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
+import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
 const getTodayDate = () => {
@@ -57,6 +58,8 @@ function HoliDays() {
   const [isSelectIsPaidSc, setIsSelectIsPaidSc] = useState(false);
   const [isSelectHolidayType, setIsSelectHolidayType] = useState(false);
   const [isSelectHolidayTypeSc, setIsSelectHolidayTypeSc] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -672,6 +675,7 @@ function HoliDays() {
 
   return (
     <div className="container-fluid Topnav-screen">
+      {loading && <LoadingScreen />}
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">

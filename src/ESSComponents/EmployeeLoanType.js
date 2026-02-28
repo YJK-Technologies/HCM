@@ -47,8 +47,8 @@ function Input({ }) {
   const [gridApi, setGridApi] = useState(null);
   const [Loan_id, setLoan_id] = useState("");
   const [LoanEligibleAmount, setLoanEligibleAmount] = useState(0);
-  const [StartYear, setStartYear] = useState(FirstDate);
-  const [EndYear, setEndYear] = useState(LastDate);
+  const [StartYear, setStartYear] = useState('');
+  const [EndYear, setEndYear] = useState('');
   const [activeTab, setActiveTab] = useState("Loan Type")
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -239,11 +239,11 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
 
           const response = await fetch(`${config.apiBaseUrl}/updateLoanType`, {
@@ -276,11 +276,11 @@ function Input({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };

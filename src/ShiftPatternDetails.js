@@ -376,12 +376,12 @@ function ShiftPatternDetails() {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
         try {
+          setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
           const Modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -432,12 +432,12 @@ function ShiftPatternDetails() {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
         try {
+          setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {

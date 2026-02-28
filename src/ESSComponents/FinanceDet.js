@@ -290,12 +290,12 @@ function Input({ }) {
       return;
     }
     setError(false);
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data ?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             PFNo: PFNo,
@@ -340,12 +340,12 @@ function Input({ }) {
       return;
     }
     setError(false);
-    setLoading(true)
-
+    
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             salaryType: salaryType,

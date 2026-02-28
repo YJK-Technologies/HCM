@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import Select from 'react-select';
 import { AgGridReact } from "ag-grid-react";
 import LoadingScreen from '../Loading';
+import { showConfirmationToast } from '../ToastConfirmation';
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -395,7 +396,11 @@ function Input({ }) {
 
 
   const handleUpdate = async (rowData) => {
+            showConfirmationToast(
+          "Are you sure you want to Update the data in the selected rows?",
+          async () => {
     try {
+      setLoading(true);
       const modified_by = sessionStorage.getItem('selectedUserCode');
       const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
       const response = await fetch(`${config.apiBaseUrl}/updateProjectMapping`, {
@@ -419,10 +424,19 @@ function Input({ }) {
       console.error("Error deleting rows:", error);
       toast.error('Error Deleting Data: ' + error.message);
     }
+          },
+          () => {
+            toast.info("Data updated cancelled.");
+          }
+        );
   };
 
   const handleDelete = async (rowData) => {
+            showConfirmationToast(
+          "Are you sure you want to Delete the data in the selected rows?",
+          async () => {
     try {
+      setLoading(true);
       const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
       const response = await fetch(`${config.apiBaseUrl}/deleteProjectMapping`, {
         method: "POST",
@@ -444,7 +458,11 @@ function Input({ }) {
       console.error("Error deleting rows:", error);
       toast.error('Error Deleting Data: ' + error.message);
     }
-  };
+      },
+      () => {
+        toast.info("Data deleted cancelled.");
+      }
+    );  };
 
   return (
     <div class="container-fluid Topnav-screen">

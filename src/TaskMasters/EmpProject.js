@@ -486,7 +486,12 @@ function Project({ }) {
   };
 
   const saveEditedData = async () => {
+        showConfirmationToast(
+      "Are you sure you want to Update the data in the selected rows?",
+      async () => {
+
     try {
+      setLoading(true);
       const modified_by = sessionStorage.getItem('selectedUserCode');
       const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.ProjectID === row.ProjectID) : [editedData];
       console.log(selectedRowsData)
@@ -514,6 +519,11 @@ function Project({ }) {
       console.error("Error saving data:", error);
       toast.error("Error Updating Data: " + error.message);
     }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
   };
 
   const deleteSelectedRows = async (rowData) => {
@@ -523,6 +533,7 @@ function Project({ }) {
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteProject`, {
             method: "POST",
             headers: {

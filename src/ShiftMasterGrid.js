@@ -578,12 +578,12 @@ function ShiftMasterGrid() {
 
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the selected shift data?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -623,12 +623,12 @@ function ShiftMasterGrid() {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = {

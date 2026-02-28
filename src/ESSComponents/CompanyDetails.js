@@ -337,12 +337,12 @@ function Input() {
       return;
     }
     setError(false);
-    setLoading(true)
-
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data?",
       async () => {
         try {
+          setLoading(true)
           const Header = {
             EmployeeId: EmployeeId,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -386,12 +386,12 @@ function Input() {
       return;
     }
     setError(false);
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             department_ID: dpt,

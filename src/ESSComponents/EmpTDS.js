@@ -39,8 +39,8 @@ function Input({ }) {
   const [Employee_Salarys, setEmployee_Salarys] = useState(0);
   const [Taxable_Amounts, setTaxable_Amounts] = useState(0);
   const [Taxable_Amount, setTaxable_Amount] = useState(0);
-  const [Start_Years, setStart_Years] = useState(FirstDate);
-  const [End_Years, setEnd_Years] = useState(LastDate);
+  const [Start_Years, setStart_Years] = useState('');
+  const [End_Years, setEnd_Years] = useState('');
   const [error, setError] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
@@ -225,12 +225,11 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
-
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -267,11 +266,11 @@ function Input({ }) {
 
 
   const handleDelete = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { deletedData: Array.isArray(rowData) ? rowData : [rowData] };

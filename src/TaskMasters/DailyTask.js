@@ -634,7 +634,9 @@ function Input({ }) {
   };
 
   const saveEditedData = async () => {
-
+    showConfirmationToast(
+      "Are you sure you want to update the data in the selected rows?",
+      async () => {
     try {
       const modified_by = sessionStorage.getItem('selectedUserCode');
       const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.TaskMasterID === row.TaskMasterID) : [editedData];
@@ -666,8 +668,11 @@ function Input({ }) {
       console.error("Error saving data:", error);
       toast.error("Error Updating Data: " + error.message);
     }
-
-
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
   };
 
   const deleteSelectedRows = async (rowData) => {
