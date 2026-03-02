@@ -131,7 +131,7 @@ function PanelPerformanceReport() {
       editable: false,
     },
     {
-      headerName: "Rating",
+      headerName: "Average Rating",
       field: "avg_rating",
       editable: false,
     },
@@ -313,7 +313,7 @@ function PanelPerformanceReport() {
         <thead>
           <tr>
             <th>Panel Name</th>
-            <th>Rating</th>
+            <th>Average Rating</th>
             <th>Total Interviews</th>
           </tr>
         </thead>
