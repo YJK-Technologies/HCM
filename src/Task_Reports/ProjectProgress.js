@@ -436,10 +436,10 @@ const MyAgGridComponent = () => {
           <h1 className="page-title">Project Progress</h1>
 
             <div className="action-wrapper">
-              <div className="action-icon print" onClick={handleExportToExcel}>
-                 <span className="tooltip">Excel</span>
-                <i class="fa-solid fa-file-excel"></i>
-              </div>
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+              <span className="tooltip">Excel</span>
+              <i className="fa-solid fa-file-excel"></i>
+            </div>
             </div>
 
         </div>

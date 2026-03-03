@@ -193,9 +193,9 @@ const MyAgGridComponent = () => {
       }
     } catch (error) {
       console.error("Error updating user details:", error);
-    }finally {
+    } finally {
       setLoading(false);
-    } 
+    }
   };
 
   const reloadGridData = () => {
@@ -510,9 +510,9 @@ const MyAgGridComponent = () => {
           <h1 className="page-title">Task Hours & Time Tracking</h1>
 
           <div className="action-wrapper">
-            <div className="action-icon print" onClick={handleExportToExcel}>
+            <div className="icon-btn excel" onClick={handleExportToExcel}>
               <span className="tooltip">Excel</span>
-              <i class="fa-solid fa-file-excel"></i>
+              <i className="fa-solid fa-file-excel"></i>
             </div>
           </div>
 
@@ -646,25 +646,25 @@ const MyAgGridComponent = () => {
         <div className="d-flex justify-content-end me-2">
 
           <div className="action-wrapper">
-            <div className="action-icon print" onClick={handleExcel}>
+            <div className="icon-btn excel" onClick={handleExcel}>
               <span className="tooltip">Excel</span>
-              <i class="fa-solid fa-file-excel"></i>
+              <i className="fa-solid fa-file-excel"></i>
             </div>
           </div>
 
         </div>
 
-          <div className='pt-3 ms-2'>
-            <div className="ag-theme-alpine" style={{ height: 300, width: '100%' }}>
-              <AgGridReact
-                columnDefs={columnTask}
-                rowData={rowDataTask}
-                rowHeight={27}
-                headerHeight={27}
-                onCellClicked={(params) => handleNavigateWithRowData(params.data)}
-              />
-            </div>
+        <div className='pt-3 ms-2'>
+          <div className="ag-theme-alpine" style={{ height: 300, width: '100%' }}>
+            <AgGridReact
+              columnDefs={columnTask}
+              rowData={rowDataTask}
+              rowHeight={27}
+              headerHeight={27}
+              onCellClicked={(params) => handleNavigateWithRowData(params.data)}
+            />
           </div>
+        </div>
       </div>
     </div>
   );

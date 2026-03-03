@@ -20,6 +20,7 @@
   opacity: 0.4;
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   z-index: 0;
+  background-image: url("./background.png");
 }
 
 .hcm-navbar {
