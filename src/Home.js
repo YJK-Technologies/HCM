@@ -24,7 +24,7 @@ const Home = () => {
   return (
     <div className="hcm-dark-theme">
       {/* Dynamic Background Overlay */}
-      <div className="bg-overlay" style={{ backgroundImage: `url(${bgImage})` }}></div>
+      <div className="bg-overlay"></div>
 
       <nav className="hcm-navbar">
         <div className="logo">HCM</div>

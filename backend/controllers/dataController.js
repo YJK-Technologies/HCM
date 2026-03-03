@@ -27347,9 +27347,7 @@ const ESSManager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "M")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-
-  `);
+      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -36308,6 +36306,26 @@ const getHolidayType = async (req, res) => {
 };
 //code ended by pavun on 23-02-26
 
+//Code added by pavun on 03-03-26
+const getInterviewDashboardCount = async (req, res) => {
+  const { mode, company_code, fromDate, toDate } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("fromDate", sql.NVarChar, fromDate)
+      .input("toDate", sql.NVarChar, toDate)
+      .query(`EXEC sp_interview_panel_dashboard @mode,@fromDate,@toDate,@company_code`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by pavun on 03-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -37528,7 +37546,8 @@ module.exports = {
     getHolidayType,
     TotalInterviewSchedule,
     InterviewCompletionRateSC,
-    getEmployeeTypeDD
+    getEmployeeTypeDD,
+    getInterviewDashboardCount
 
 
 };

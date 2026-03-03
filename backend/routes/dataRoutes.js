@@ -1251,6 +1251,7 @@ router.post("/CandidateAppliedSearch",dataController.CandidateAppliedSearch)
 router.post("/getHolidayType",dataController.getHolidayType)
 router.post("/TotalInterviewSchedule",dataController.TotalInterviewSchedule)
 router.post("/InterviewCompletionRateSC",dataController.InterviewCompletionRateSC)
+router.post("/getInterviewDashboardCount",dataController.getInterviewDashboardCount)
 
 
 

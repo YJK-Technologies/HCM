@@ -23,18 +23,23 @@ import {
   BsClock,
   BsCalendar3,
   BsGraphUp,
+  BsSpeedometer2,
+  BsGraphUpArrow,
   BsKanban,
   BsListTask,
   BsGear,
+  BsSliders,
   BsBell,
   BsSun,
-} from "react-icons/bs";
-import {
-  BsPeopleFill,
-  BsWrenchAdjustable,
-  BsPersonVcard,
+  BsClipboardCheck,
+  BsBarChartSteps,
+  BsFileBarGraph,
+  BsPersonCheck,
   BsCalendarEvent,
   BsChevronDown,
+  BsPersonVcard,
+  BsWrenchAdjustable,
+  BsPeopleFill
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -46,7 +51,10 @@ import {
   MdOutlineEventAvailable,
 } from "react-icons/md";
 
-import { AiOutlinePercentage } from "react-icons/ai";
+import {
+  AiOutlinePercentage,
+  AiOutlineFileDone,
+} from "react-icons/ai";
 
 // Helper function to normalize paths (ensure leading slash is present and no trailing slash)
 const cleanPath = (path) => {
@@ -86,14 +94,14 @@ const filterMenuByPermission = (menuItems, allowedPaths) => {
   }, []);
 };
 
-const leafIconMap = {
+export const leafIconMap = {
   // --- ADMIN ---
   Company: BsBuilding,
   "Company Mapping": BsDiagram3,
   Location: BsGeoAlt,
   Role: BsShieldLock,
   "Role Mapping": BsPersonLinesFill,
-  "Role Rights": BsShieldLock,
+  "Role Rights": BsClipboardCheck,
   User: BsPerson,
 
   // --- MASTERS ---
@@ -105,16 +113,16 @@ const leafIconMap = {
   Department: BsBriefcase,
   "Designation Info": BsAward,
   Intermediary: BsPeople,
-  "Number Series": BsListTask,
+  "Number Series": BsBarChartSteps,
   Warehouse: BsBuilding,
   "Financial Year Access": BsCalendarCheck,
 
   // --- HCM ---
-  "Employee Information": BsPerson,
-  "Admin Dashboard": BsGraphUp,
-  "Employee Dashboard": BsGraphUp,
+  "Employee Information": BsPersonCheck,
+  "Admin Dashboard": BsSpeedometer2,
+  "Employee Dashboard": BsFileBarGraph,
   "Salary Process": BsCashStack,
-  "Payslip Master": BsFileEarmarkText,
+  "Payslip Master": AiOutlineFileDone,
   "Country Master": BsGlobe,
   "Time Zone Master": BsClock,
   "Shift Master": BsClockHistory,
@@ -123,8 +131,11 @@ const leafIconMap = {
   Loan: BsCashStack,
   Announcement: BsBell,
   "Employee Holiday": BsSun,
+  "Setting": BsGear,
+
+  // --- INTERVIEW ---
   "Interview Master": BsPeople,
-  Setting: BsGear,
+  "Interview Dashboard": BsGraphUp,
   "Interview Schedule Report": MdOutlineEventNote,
   "Interview Feedback Report": MdOutlineRateReview,
   "Candidate Interview Report": MdOutlinePersonSearch,
@@ -138,12 +149,12 @@ const leafIconMap = {
   Project: BsKanban,
   "Project Mapping": BsDiagram3,
   Task: BsListTask,
-  "Setting Screen": BsGear,
-  "Open Tickets": BsListTask,
+  "Setting Screen": BsSliders,
+  "Open Tickets": BsClipboardCheck,
   "Task Update": BsClockHistory,
   "Task Hours & Time Tracking": BsClock,
-  "Project Progress": BsGraphUp,
-  "Project Chart Report": BsGraphUp,
+  "Project Progress": BsGraphUpArrow,
+  "Project Chart Report": BsFileBarGraph,
 };
 
 const menuData = [
@@ -220,7 +231,8 @@ const menuData = [
         label: "Interview Panel Management",
         isDropdown: true,
         subMenus: [
-           { label: "Interview Master", path: "/JobMaster" },
+          { label: "Interview Dashboard", path: "/InterviewDashboard" },
+          { label: "Interview Master", path: "/JobMaster" },
         ], 
       }, 
       {
