@@ -250,7 +250,7 @@ const InterviewDashboard = () => {
                         <ResponsiveContainer>
                             <BarChart data={panelData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8F0F5" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} fontSize={12}/>
                                 <YAxis axisLine={false} tickLine={false} />
                                 <Tooltip cursor={{ fill: '#F4F7F9' }} />
                                 <Bar

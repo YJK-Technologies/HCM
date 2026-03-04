@@ -237,15 +237,14 @@ function ShiftPatternMaster() {
         );
       },
     },
-
+    // {
+    //   headerName: "Shift Pattern ID",
+    //   field: "Shift_Pattern_ID",
+    //   editable: false,
+    //   cellStyle: { textAlign: "left" },
+    // },
     {
-      headerName: "Shift Pattern ID",
-      field: "Shift_Pattern_ID",
-      editable: false,
-      cellStyle: { textAlign: "left" },
-    },
-    {
-      headerName: "Pattern Code",
+      headerName: "Shift Pattern Code",
       field: "Pattern_Code",
       editable: true,
     },
@@ -292,10 +291,10 @@ function ShiftPatternMaster() {
 
   const tabs = [
     { label: "Shift Master" },
-    { label: "Shift Type Master" },
+    // { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
     { label: "Shift Pattern Details" },
-    { label: "Employment Type Master" },
+    // { label: "Employment Type Master" },
     { label: "Employee Shift Mapping" },
   ];
 
@@ -305,18 +304,18 @@ function ShiftPatternMaster() {
       case "Shift Master":
         ShiftMaster();
         break;
-      case "Shift Type Master":
-        ShiftTypeMaster();
-        break;
+      // case "Shift Type Master":
+      //   ShiftTypeMaster();
+      //   break;
       case "Shift Pattern Master":
         ShiftPatternMaster();
         break;
       case "Shift Pattern Details":
         ShiftPatternDetails();
         break;
-      case "Employment Type Master":
-        EmploymentTypeMaster();
-        break;
+      // case "Employment Type Master":
+      //   EmploymentTypeMaster();
+      //   break;
       case "Employee Shift Mapping":
         EmployeeShiftMapping();
         break;
@@ -416,7 +415,7 @@ function ShiftPatternMaster() {
   };
 
   const handleSave = async () => {
-    if (!Shift_Pattern_ID || !Pattern_Code || !Pattern_Name || !Rotation_Days || !Description) {
+    if (!Pattern_Code || !Pattern_Name || !Rotation_Days || !Description) {
       toast.warning("Error: Missing required fields");
       setError(" ");
       return;
@@ -426,22 +425,20 @@ function ShiftPatternMaster() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/ShiftPattern_Insert`,
+      const response = await fetch(`${config.apiBaseUrl}/ShiftPattern_Insert`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Shift_Pattern_ID: Shift_Pattern_ID,
             Pattern_Code: Pattern_Code,
             Pattern_Name: Pattern_Name,
             Rotation_Days: Number(Rotation_Days),
             Description: Description,
             Status: Status,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-            created_by: sessionStorage.getItem("selectedUserCode"),
+            Company_Code: sessionStorage.getItem("selectedCompanyCode"),
+            Created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         },
       );
@@ -470,21 +467,21 @@ function ShiftPatternMaster() {
       async () => {
         try {
           setLoading(true);
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
             Shift_MasterData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                 ...row,
-                company_code,
-                modified_by,
+                Company_Code,
+                Modified_by,
               }))
               : [
                 {
                   ...rowData,
-                  company_code,
-                  modified_by,
+                  Company_Code,
+                  Modified_by,
                 },
               ],
           };
@@ -532,8 +529,7 @@ function ShiftPatternMaster() {
             Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/ShiftPattern_Delete`,
+          const response = await fetch(`${config.apiBaseUrl}/ShiftPattern_Delete`,
             {
               method: "POST",
               headers: {
@@ -571,7 +567,6 @@ function ShiftPatternMaster() {
 
   const transformRowData = (data) => {
     return data.map((row) => ({
-      "Shift Pattern ID": row.Shift_Pattern_ID || "",
       "Pattern Code": row.Pattern_Code || "",
       "Pattern Name": row.Pattern_Name || "",
       "Rotation Days": row.Rotation_Days || "",
@@ -717,7 +712,8 @@ function ShiftPatternMaster() {
         />
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
-            <div className="col-md-2">
+
+            {/* <div className="col-md-2">
               <div className="inputGroup">
                 <input
                   id="TimeZone_ID"
@@ -736,7 +732,7 @@ function ShiftPatternMaster() {
                   Shift Pattern ID<span className="text-danger">*</span>
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -754,7 +750,7 @@ function ShiftPatternMaster() {
                   for="state"
                   className={`exp-form-labels ${error && !Pattern_Code ? "text-danger" : ""}`}
                 >
-                  Pattern Code<span className="text-danger">*</span>
+                  Shift Pattern Code<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -852,7 +848,8 @@ function ShiftPatternMaster() {
             <h6 className="">Search Criteria:</h6>
           </div>
           <div className="row g-3">
-            <div className="col-md-2">
+
+            {/* <div className="col-md-2">
               <div className="inputGroup">
                 <input
                   id="TimeZone_ID"
@@ -868,7 +865,7 @@ function ShiftPatternMaster() {
                   Shift Pattern ID
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -883,7 +880,7 @@ function ShiftPatternMaster() {
                   onChange={(e) => setPattern_CodeSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Pattern Code
+                  Shift Pattern Code
                 </label>
               </div>
             </div>
