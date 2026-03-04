@@ -36,8 +36,8 @@ function ShiftMasterGrid() {
   const [End_TimeSC, setEnd_TimeSC] = useState("");
   const [Shift_Hours, setShift_Hours] = useState("");
   const [Shift_HoursSC, setShift_HoursSC] = useState("");
-  const [Is_Night_Shift, seIs_Night_Shift] = useState("");
-  const [Is_Night_ShiftSC, seIs_Night_ShiftSC] = useState("");
+  const [Is_Night_Shift, setIs_Night_Shift] = useState("");
+  const [Is_Night_ShiftSC, setIs_Night_ShiftSC] = useState("");
   const [Grace_In_Min, setGrace_In_Min] = useState("");
   const [Grace_In_MinSC, setGrace_In_MinSC] = useState("");
   const [Grace_Out_Min, setGrace_Out_Min] = useState("");
@@ -56,14 +56,22 @@ function ShiftMasterGrid() {
   const [Status, setStatus] = useState("");
   const [StatusSC, setStatusSC] = useState("");
   const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [key_field, setkey_field] = useState("");
-  const modified_by = sessionStorage.getItem("selectedUserCode");
 
+  const [nightShiftDrop, setNightShiftDrop] = useState([]);
+  const [nightShiftDropSc, setNightShiftDropSc] = useState([]);
+  const [nightShiftDropGrid, setNightShiftDropGrid] = useState([]);
+  const [crossNightDrop, setCrossNightDrop] = useState([]);
+  const [crossNightDropSc, setCrossNightDropSc] = useState([]);
+  const [crossNightDropGrid, setCrossNightDropGrid] = useState([]);
+  const [selectedNightShift, setSelectedNightShift] = useState('');
+  const [selectedNightShiftSc, setSelectedNightShiftSc] = useState("");
+  const [selectedCrossNight, setSelectedCrossNight] = useState("");
+  const [selectedCrossNightSc, setSelectedCrossNightSc] = useState("");
 
-  const [createdBy, setCreatedBy] = useState("");
-  const [modifiedBy, setModifiedBy] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
-  const [modifiedDate, setModifiedDate] = useState("");
+  const [isSelectedNightShift, setIsSelectedNightShift] = useState(false);
+  const [isSelectedNightShiftSc, setIsSelectedNightShiftSc] = useState(false);
+  const [isSelectedCrossNight, setIsSelectedCrossNight] = useState(false);
+  const [isSelectedCrossNightSc, setIsSelectedCrossNightSc] = useState(false);
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -78,7 +86,8 @@ function ShiftMasterGrid() {
     setStart_TimeSC("");
     setEnd_TimeSC("");
     setShift_HoursSC("");
-    seIs_Night_ShiftSC("");
+    setIs_Night_Shift("");
+    setIs_Night_ShiftSC("");
     setGrace_In_MinSC("");
     setGrace_Out_MinSC("");
     setCross_MidnightSC("");
@@ -89,23 +98,62 @@ function ShiftMasterGrid() {
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
-    setHasValueChangedSC(true);
   };
+
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : "");
-    setHasValueChanged(true);
+  };
+
+  const handleChangeCrossSC = (selectedCrossNightSc) => {
+    setSelectedCrossNightSc(selectedCrossNightSc);
+    setCross_MidnightSC(selectedCrossNightSc ? selectedCrossNightSc.value : "");
+  };
+
+  const handleChangeCross = (selectedCrossNight) => {
+    setSelectedCrossNight(selectedCrossNight);
+    setCross_Midnight(selectedCrossNight ? selectedCrossNight.value : "");
+  };
+
+  const handleChangeNightSC = (selectedNightShiftSc) => {
+    setSelectedNightShiftSc(selectedNightShiftSc);
+    setIs_Night_ShiftSC(selectedNightShiftSc ? selectedNightShiftSc.value : "");
+  };
+
+  const handleChangeNight = (selectedCrossNight) => {
+    setSelectedNightShift(selectedCrossNight);
+    setIs_Night_Shift(selectedCrossNight ? selectedCrossNight.value : "");
   };
 
   const filteredOptionStatusSC = statusdropSC.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
+
   const filteredOptionStatus = statusdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionCrossSC = crossNightDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionCross = crossNightDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionNightSC = nightShiftDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionNight = nightShiftDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -124,8 +172,6 @@ function ShiftMasterGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -143,7 +189,6 @@ function ShiftMasterGrid() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-
     fetch(`${config.apiBaseUrl}/status`, {
       method: "POST",
       headers: {
@@ -156,9 +201,136 @@ function ShiftMasterGrid() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const nightOption = data.map(option => option.attributedetails_name);
+        setNightShiftDropGrid(nightOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setNightShiftDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setNightShiftDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const crossOption = data.map(option => option.attributedetails_name);
+        setCrossNightDropGrid(crossOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCrossNightDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCrossNightDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const formatTimeForSQL = (time) => {
-    if (!time) return null;          // "" or null
-    return time.length === 5 ? `${time}:00` : time; // HH:mm → HH:mm:ss
+    if (!time) return null;       
+    return time.length === 5 ? `${time}:00` : time; 
+  };
+
+  const calculateShiftHours = (start, end) => {
+    if (!start || !end) return "";
+
+    const startParts = start.split(":").map(Number);
+    const endParts = end.split(":").map(Number);
+
+    const sh = startParts[0];
+    const sm = startParts[1];
+    const eh = endParts[0];
+    const em = endParts[1];
+
+    let startMinutes = sh * 60 + sm;
+    let endMinutes = eh * 60 + em;
+
+    // Cross midnight handling
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60;
+    }
+
+    const diffMinutes = endMinutes - startMinutes;
+    return (diffMinutes / 60).toFixed(2);
+  };
+
+  const handleStartTimeChange = (e) => {
+    const value = e.target.value;
+    setStart_Time(value);
+    setShift_Hours(calculateShiftHours(value, End_Time));
+  };
+
+  const handleEndTimeChange = (e) => {
+    const value = e.target.value;
+    setEnd_Time(value);
+    setShift_Hours(calculateShiftHours(Start_Time, value));
   };
 
   const handleSearch = async () => {
@@ -179,15 +351,11 @@ function ShiftMasterGrid() {
           Status: StatusSC || null,
           Cross_Midnight: Cross_MidnightSC || null,
           Shift_Hours: Shift_HoursSC || null,
-
           Is_Night_Shift: Is_Night_ShiftSC === "" ? null : Is_Night_ShiftSC,
-
           Grace_In_Min: Grace_In_MinSC || null,
           Grace_Out_Min: Grace_Out_MinSC || null,
-
           Start_Time: formatTimeForSQL(Start_TimeSC),
           End_Time: formatTimeForSQL(End_TimeSC),
-
           company_code,
         })
 
@@ -253,105 +421,63 @@ function ShiftMasterGrid() {
         );
       },
     },
-    {
-      headerName: "Shift ID",
-      field: "Shift_ID",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   maxLength: 18,
-      //   values: usercodedrop,
-      // },
-    },
+    // {
+    //   headerName: "Shift ID",
+    //   field: "Shift_ID",
+    //   editable: true,
+    // },
     {
       headerName: "Shift Code",
       field: "Shift_Code",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   maxLength: 18,
-      //   values: locationnodrop,
-      // },
     },
     {
       headerName: "Shift Name",
       field: "Shift_Name",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
     },
     {
       headerName: "Start Time",
       field: "Start_Time",
       editable: true,
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return params.value.substring(11, 16); // HH:mm
-      },
     },
     {
       headerName: "End Time",
       field: "End_Time",
       editable: true,
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return params.value.substring(11, 16); // HH:mm
-      },
     },
     {
       headerName: "Shift Hours",
       field: "Shift_Hours",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
     },
     {
       headerName: "Night Shift",
       field: "Is_Night_Shift",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: nightShiftDropGrid,
+      },
     },
     {
       headerName: "Grace In Min",
       field: "Grace_In_Min",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
     },
     {
       headerName: "Grace Out Min",
       field: "Grace_Out_Min",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
     },
     {
       headerName: "Cross Midnight",
       field: "Cross_Midnight",
       editable: true,
-      // cellStyle: { textAlign: "left" },
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: statusgriddrop,
-      // },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: crossNightDropGrid,
+      },
     },
     {
       headerName: "Status",
@@ -380,10 +506,10 @@ function ShiftMasterGrid() {
 
   const tabs = [
     { label: "Shift Master" },
-    { label: "Shift Type Master" },
+    // { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
     { label: "Shift Pattern Details" },
-    { label: "Employment Type Master" },
+    // { label: "Employment Type Master" },
     { label: "Employee Shift Mapping" },
   ];
 
@@ -393,18 +519,18 @@ function ShiftMasterGrid() {
       case "Shift Master":
         ShiftMaster();
         break;
-      case 'Shift Type Master':
-        ShiftTypeMaster();
-        break;
+      // case 'Shift Type Master':
+      //   ShiftTypeMaster();
+      //   break;
       case "Shift Pattern Master":
         ShiftPatternMaster();
         break;
       case "Shift Pattern Details":
         ShiftPatternDetails();
         break;
-      case "Employment Type Master":
-        EmploymentTypeMaster();
-        break;
+      // case "Employment Type Master":
+      //   EmploymentTypeMaster();
+      //   break;
       case "Employee Shift Mapping":
         EmployeeShiftMapping();
         break;
@@ -475,50 +601,8 @@ function ShiftMasterGrid() {
     }
   };
 
-  const handleKeyDownStatus = async (e) => {
-    if (e.key === "Enter" && hasValueChanged) {
-      await handleSearch();
-      setHasValueChanged(false);
-    }
-  };
-
-  const handleKeyDownStatusSC = async (e) => {
-    if (e.key === "Enter" && hasValueChangedSC) {
-      await handleSearch();
-      setHasValueChangedSC(false);
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return ""; // Return 'N/A' if the date is missing
-    const date = new Date(dateString);
-
-    // Format as DD/MM/YYYY
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
-  };
-
-  const handleRowClick = (rowData) => {
-    setCreatedBy(rowData.created_by);
-    setModifiedBy(rowData.modified_by);
-    const formattedCreatedDate = formatDate(rowData.created_date);
-    const formattedModifiedDate = formatDate(rowData.modified_date);
-    setCreatedDate(formattedCreatedDate);
-    setModifiedDate(formattedModifiedDate);
-  };
-
-  // Handler for when a row is selected
-  const onRowSelected = (event) => {
-    if (event.node.isSelected()) {
-      handleRowClick(event.data);
-    }
-  };
-
   const handleSave = async () => {
-    if (!Shift_ID || !Shift_Code || !Shift_Name) {
+    if (!Shift_Code || !Shift_Name || !Is_Night_Shift || !Status) {
       toast.warning("Error: Missing required fields");
       setError(" ")
       return;
@@ -527,15 +611,13 @@ function ShiftMasterGrid() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/Shift_MasterInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/Shift_MasterInsert`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            Shift_ID: Number(Shift_ID),
             Shift_Code: Shift_Code,
             Shift_Name: Shift_Name,
             End_Time: End_Time,
@@ -543,7 +625,7 @@ function ShiftMasterGrid() {
             Cross_Midnight: Cross_Midnight,
             Start_Time: Start_Time,
             Shift_Hours: Number(Shift_Hours) || 0,
-            Is_Night_Shift: Is_Night_Shift ? 1 : 0,
+            Is_Night_Shift: Is_Night_Shift,
             Grace_In_Min: Number(Grace_In_Min),
             Grace_Out_Min: Number(Grace_Out_Min),
             company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -569,16 +651,8 @@ function ShiftMasterGrid() {
     }
   };
 
-  const clearInputFields = () => {
-    setShift_ID("");
-    setShift_Code("");
-    setShift_Name("");
-    setStart_Time("");
-  };
-
-
   const handleUpdate = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to update the selected shift data?",
       async () => {
@@ -623,7 +697,7 @@ function ShiftMasterGrid() {
   };
 
   const handleDelete = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
@@ -671,7 +745,6 @@ function ShiftMasterGrid() {
 
   const transformRowData = (data) => {
     return data.map((row) => ({
-      "Shift ID": row.Shift_ID || "",
       "Shift Code": row.Shift_Code || "",
       "Shift Name": row.Shift_Name || "",
       "Start Time": row.Start_Time || "",
@@ -818,7 +891,7 @@ function ShiftMasterGrid() {
         <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
-            <div className="col-md-2">
+            {/* <div className="col-md-2">
               <div className="inputGroup">
                 <input
                   id="TimeZone_ID"
@@ -837,7 +910,7 @@ function ShiftMasterGrid() {
                   Shift ID<span className="text-danger">*</span>
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -853,9 +926,8 @@ function ShiftMasterGrid() {
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Code ? "text-danger" : ""}`}
-                >
-                  Shift Code <span className="text-danger">*</span>
+                  className={`exp-form-labels ${error && !Shift_Code ? "text-danger" : ""}`}>
+                  Shift Code<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -886,7 +958,7 @@ function ShiftMasterGrid() {
                   className="exp-input-field form-control"
                   type="time"
                   value={Start_Time}
-                  onChange={(e) => setStart_Time(e.target.value)}
+                  onChange={handleStartTimeChange}
                   maxLength={100}
                   autoComplete="off"
                   placeholder=" "
@@ -900,7 +972,7 @@ function ShiftMasterGrid() {
                   className="exp-input-field form-control"
                   type="time"
                   value={End_Time}
-                  onChange={(e) => setEnd_Time(e.target.value)}
+                  onChange={handleEndTimeChange}
                   maxLength={100}
                   autoComplete="off"
                   placeholder=" "
@@ -923,17 +995,23 @@ function ShiftMasterGrid() {
               </div>
             </div>
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Is_Night_Shift}
-                  onChange={(e) => seIs_Night_Shift(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedNightShift ? "has-value" : ""} 
+              ${isSelectedNightShift ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedNightShift}
+                  onChange={handleChangeNight}
+                  options={filteredOptionNight}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedNightShift(true)}
+                  onBlur={() => setIsSelectedNightShift(false)}
                 />
-                <label className="exp-form-labels">Night Shift</label>
+                <label className={`floating-label ${error && !Is_Night_Shift ? "text-danger" : ""}`}>Night Shift<span className="text-danger">*</span></label>
               </div>
             </div>
             <div className="col-md-2">
@@ -965,17 +1043,23 @@ function ShiftMasterGrid() {
               </div>
             </div>
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Cross_Midnight}
-                  onChange={(e) => setCross_Midnight(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedCrossNight ? "has-value" : ""} 
+              ${isSelectedCrossNight ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedCrossNight}
+                  onChange={handleChangeCross}
+                  options={filteredOptionCross}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedCrossNight(true)}
+                  onBlur={() => setIsSelectedCrossNight(false)}
                 />
-                <label className="exp-form-labels">Cross Midnight</label>
+                <label className="floating-label">Cross Midnight</label>
               </div>
             </div>
             <div className="col-md-2">
@@ -994,27 +1078,11 @@ function ShiftMasterGrid() {
                   placeholder=""
                   onFocus={() => setIsSelectFocused(true)}
                   onBlur={() => setIsSelectFocused(false)}
-                  onKeyDown={handleKeyDownStatus}
                 />
-                <label class="floating-label">Status</label>
+                <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
               </div>
             </div>
 
-            {/* <div class="col-12">
-                        <div className="search-btn-wrapper">
-                            {mode === "create" ? (
-                                <div className="icon-btn save" onClick={handleInsert}>
-                                    <span className="tooltip">Save</span>
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                </div>
-                            ) : (
-                                <div className="icon-btn update" onClick={handleUpdate}>
-                                    <span className="tooltip">Update</span>
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </div>
-                            )}
-                        </div>
-                    </div> */}
           </div>
         </div>
 
@@ -1023,7 +1091,7 @@ function ShiftMasterGrid() {
             <h6 className="">Search Criteria:</h6>
           </div>
           <div className="row g-3">
-            <div className="col-md-2">
+            {/* <div className="col-md-2">
               <div className="inputGroup">
                 <input
                   id="TimeZone_ID"
@@ -1042,7 +1110,7 @@ function ShiftMasterGrid() {
                   Shift ID
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="col-md-2">
               <div className="inputGroup">
@@ -1131,17 +1199,23 @@ function ShiftMasterGrid() {
               </div>
             </div>
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Is_Night_ShiftSC}
-                  onChange={(e) => seIs_Night_ShiftSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedNightShiftSc ? "has-value" : ""} 
+              ${isSelectedNightShiftSc ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedNightShiftSc}
+                  onChange={handleChangeNightSC}
+                  options={filteredOptionNightSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedNightShiftSc(true)}
+                  onBlur={() => setIsSelectedNightShiftSc(false)}
                 />
-                <label className="exp-form-labels">Night Shift</label>
+                <label className="floating-label">Night Shift</label>
               </div>
             </div>
             <div className="col-md-2">
@@ -1173,17 +1247,23 @@ function ShiftMasterGrid() {
               </div>
             </div>
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  value={Cross_MidnightSC}
-                  onChange={(e) => setCross_MidnightSC(e.target.value)}
-                  maxLength={100}
-                  autoComplete="off"
-                  placeholder=" "
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedCrossNightSc ? "has-value" : ""} 
+              ${isSelectedCrossNightSc ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedCrossNightSc}
+                  onChange={handleChangeCrossSC}
+                  options={filteredOptionCrossSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedCrossNightSc(true)}
+                  onBlur={() => setIsSelectedCrossNightSc(false)}
                 />
-                <label className="exp-form-labels">Cross Midnight</label>
+                <label className="floating-label">Cross Midnight</label>
               </div>
             </div>
             <div className="col-md-2">
@@ -1202,7 +1282,6 @@ function ShiftMasterGrid() {
                   placeholder=""
                   onFocus={() => setIsSelectFocusedSC(true)}
                   onBlur={() => setIsSelectFocusedSC(false)}
-                  onKeyDown={handleKeyDownStatusSC}
                 />
                 <label class="floating-label">Status</label>
               </div>
@@ -1243,7 +1322,6 @@ function ShiftMasterGrid() {
               onSelectionChanged={onSelectionChanged}
               pagination={true}
               paginationAutoPageSize={true}
-              onRowSelected={onRowSelected}
             />
           </div>
         </div>

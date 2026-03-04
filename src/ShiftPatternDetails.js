@@ -12,6 +12,7 @@ import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
 import * as XLSX from "xlsx-js-style";
+import Select from "react-select";
 
 const config = require("./Apiconfig");
 
@@ -40,16 +41,239 @@ function ShiftPatternDetails() {
   const [Shift_IDSC, setShift_IDSC] = useState("");
   const [statusgriddrop, setStatusGriddrop] = useState([]);
 
-  const [createdBy, setCreatedBy] = useState("");
-  const [modifiedBy, setModifiedBy] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
-  const [modifiedDate, setModifiedDate] = useState("");
+  const [patternIdDrop, setPatternIdDrop] = useState([]);
+  const [patternIdDropSc, setPatternIdDropSc] = useState([]);
+  const [patternIdDropGrid, setPatternIdDropGrid] = useState([]);
+  const [shiftIdDrop, setShiftIdDrop] = useState([]);
+  const [shiftIdDropSc, setShiftIdDropSc] = useState([]);
+  const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
+  const [dayOffDrop, setDayOffDrop] = useState([]);
+  const [dayOffDropSc, setDayOffDropSc] = useState([]);
+  const [dayOffDropGrid, setDayOffDropGrid] = useState([]);
+
+  const [selectedPatternId, setSelectedPatternId] = useState('');
+  const [selectedPatternIdSc, setSelectedPatternIdSc] = useState('');
+  const [selectedShiftId, setSelectedShiftId] = useState('');
+  const [selectedShiftIdSc, setSelectedShiftIdSc] = useState('');
+  const [selectedDayOff, setSelectedDayOff] = useState('');
+  const [selectedDayOffSc, setSelectedDayOffSc] = useState('');
+
+  const [isSelectedPatternId, setIsSelectedPatternId] = useState(false);
+  const [isSelectedPatternIdSc, setIsSelectedPatternIdSc] = useState(false);
+  const [isSelectedShiftId, setIsSelectedShiftId] = useState(false);
+  const [isSelectedShiftIdSc, setIsSelectedShiftIdSc] = useState(false);
+  const [isSelectedDayOff, setIsSelectedDayOff] = useState(false);
+  const [isSelectedDayOffSc, setIsSelectedDayOffSc] = useState(false);
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyMappingPermission = permissions
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const dayOption = data.map(option => option.attributedetails_name);
+        setDayOffDropGrid(dayOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setDayOffDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getKids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setDayOffDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ Company_Code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const patternOption = data.map((option) => ({
+          value: option.Pattern_Code,
+          label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+        }));
+        setPatternIdDropGrid(patternOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setPatternIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setPatternIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftOption = data.map((option) => ({
+          value: option.Shift_Code,
+          label: `${option.Shift_Code} - ${option.Shift_Name}`,
+        }));
+        setShiftIdDropGrid(shiftOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionPattern = patternIdDrop.map((option) => ({
+    value: option.Pattern_Code,
+    label: `${option.Pattern_Code}-${option.Pattern_Name}`,
+  }));
+
+  const filteredOptionPatternSc = patternIdDropSc.map((option) => ({
+    value: option.Pattern_Code,
+    label: `${option.Pattern_Code}-${option.Pattern_Name}`,
+  }));
+
+  const filteredOptionShift = shiftIdDrop.map((option) => ({
+    value: option.Shift_Code,
+    label: `${option.Shift_Code} - ${option.Shift_Name}`,
+  }));
+
+  const filteredOptionShiftSc = shiftIdDropSc.map((option) => ({
+    value: option.Shift_Code,
+    label: `${option.Shift_Code} - ${option.Shift_Name}`,
+  }));
+
+  const filteredOptionDay = dayOffDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionDaySc = dayOffDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangePattern = (selectedPatternId) => {
+    setSelectedPatternId(selectedPatternId);
+    setShift_Pattern_ID(selectedPatternId ? selectedPatternId.value : "");
+  };
+
+  const handleChangePatternSc = (selectedPatternIdSc) => {
+    setSelectedPatternIdSc(selectedPatternIdSc);
+    setShift_Pattern_IDSC(selectedPatternIdSc ? selectedPatternIdSc.value : "");
+  };
+
+  const handleChangeShift = (selectedShiftId) => {
+    setSelectedShiftId(selectedShiftId);
+    setShift_ID(selectedShiftId ? selectedShiftId.value : "");
+  };
+
+  const handleChangeShiftSc = (selectedShiftIdSc) => {
+    setSelectedShiftIdSc(selectedShiftIdSc);
+    setShift_IDSC(selectedShiftIdSc ? selectedShiftIdSc.value : "");
+  };
+
+  const handleChangeDay = (selectedDayOff) => {
+    setSelectedDayOff(selectedDayOff);
+    setIs_Off_Day(selectedDayOff ? selectedDayOff.value : "");
+  };
+
+  const handleChangeDaySc = (selectedDayOffSc) => {
+    setSelectedDayOffSc(selectedDayOffSc);
+    setIs_Off_DaySC(selectedDayOffSc ? selectedDayOffSc.value : "");
+  };
+
 
   const searchClearInputFields = () => {
     setShift_Pattern_IDSC("");
@@ -161,15 +385,20 @@ function ShiftPatternDetails() {
         );
       },
     },
-
     {
-      headerName: "Shift Pattern ID",
+      headerName: "Shift Pattern Code",
       field: "Shift_Pattern_ID",
       editable: true,
-      cellStyle: { textAlign: "left" },
+      cellEditorParams: {
+        values: patternIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = patternIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
-      headerName: "Pattern Detail ID",
+      headerName: "Pattern Detail Code",
       field: "Pattern_Detail_ID",
       editable: false,
     },
@@ -179,14 +408,25 @@ function ShiftPatternDetails() {
       editable: true,
     },
     {
-      headerName: "Shift ID",
+      headerName: "Shift Code",
       field: "Shift_ID",
       editable: true,
+      cellEditorParams: {
+        values: shiftIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Is Off Day",
       field: "Is_Off_Day",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: dayOffDropGrid,
+      },
     },
     {
       headerName: "keyfield",
@@ -206,10 +446,10 @@ function ShiftPatternDetails() {
 
   const tabs = [
     { label: "Shift Master" },
-    { label: "Shift Type Master" },
+    // { label: "Shift Type Master" },
     { label: "Shift Pattern Master" },
     { label: "Shift Pattern Details" },
-    { label: "Employment Type Master" },
+    // { label: "Employment Type Master" },
     { label: "Employee Shift Mapping" },
   ];
 
@@ -219,18 +459,18 @@ function ShiftPatternDetails() {
       case "Shift Master":
         ShiftMaster();
         break;
-      case "Shift Type Master":
-        ShiftTypeMaster();
-        break;
+      // case "Shift Type Master":
+      //   ShiftTypeMaster();
+      //   break;
       case "Shift Pattern Master":
         ShiftPatternMaster();
         break;
       case "Shift Pattern Details":
         ShiftPatternDetails();
         break;
-      case "Employment Type Master":
-        EmploymentTypeMaster();
-        break;
+      // case "Employment Type Master":
+      //   EmploymentTypeMaster();
+      //   break;
       case "Employee Shift Mapping":
         EmployeeShiftMapping();
         break;
@@ -301,34 +541,6 @@ function ShiftPatternDetails() {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ""; // Return 'N/A' if the date is missing
-    const date = new Date(dateString);
-
-    // Format as DD/MM/YYYY
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
-  };
-
-  const handleRowClick = (rowData) => {
-    setCreatedBy(rowData.created_by);
-    setModifiedBy(rowData.modified_by);
-    const formattedCreatedDate = formatDate(rowData.created_date);
-    const formattedModifiedDate = formatDate(rowData.modified_date);
-    setCreatedDate(formattedCreatedDate);
-    setModifiedDate(formattedModifiedDate);
-  };
-
-  // Handler for when a row is selected
-  const onRowSelected = (event) => {
-    if (event.node.isSelected()) {
-      handleRowClick(event.data);
-    }
-  };
-
   const handleSave = async () => {
     if (!Shift_Pattern_ID || !Pattern_Detail_ID || !Day_Sequence || !Shift_ID || !Is_Off_Day) {
       toast.warning("Error: Missing required fields");
@@ -376,7 +588,7 @@ function ShiftPatternDetails() {
   };
 
   const handleUpdate = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
@@ -401,8 +613,7 @@ function ShiftPatternDetails() {
               ],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/Shift_Pattern_DetailUpdate`,
+          const response = await fetch(`${config.apiBaseUrl}/Shift_Pattern_DetailUpdate`,
             {
               method: "POST",
               headers: {
@@ -432,7 +643,7 @@ function ShiftPatternDetails() {
   };
 
   const handleDelete = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
@@ -482,13 +693,31 @@ function ShiftPatternDetails() {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Shift Pattern ID": row.Shift_Pattern_ID || "",
-      "Pattern Detail ID": row.Pattern_Detail_ID || "",
+    return data.map((row) => {
+      const patternObj = patternIdDropGrid.find(
+        (d) => d.value === row.Shift_Pattern_ID
+      );
+
+      const patternName = patternObj
+        ? patternObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const shiftObj = shiftIdDropGrid.find(
+        (d) => d.value === row.Shift_ID
+      );
+
+      const shiftName = shiftObj
+        ? shiftObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+      "Shift Pattern Code": `${row.Shift_Pattern_ID} - ${patternName}` || "",
+      "Pattern Detail Code": row.Pattern_Detail_ID || "",
       "Day Sequence": row.Day_Sequence || "",
-      "Shift ID": row.Shift_ID || "",
+      "Shift Code": `${row.Shift_ID} - ${shiftName}` || "",
       "Is Off Day": row.Is_Off_Day || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {
@@ -629,22 +858,27 @@ function ShiftPatternDetails() {
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="ShiftPatternID"
-                  class="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Shift_Pattern_ID}
-                  onChange={(e) => setShift_Pattern_ID(e.target.value)}
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedPatternId ? "has-value" : ""} 
+              ${isSelectedPatternId ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedPatternId}
+                  onChange={handleChangePattern}
+                  options={filteredOptionPattern}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedPatternId(true)}
+                  onBlur={() => setIsSelectedPatternId(false)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_Pattern_ID ? "text-danger" : ""}`}
+                  className={`floating-label ${error && !Shift_Pattern_ID ? "text-danger" : ""}`}
                 >
-                  Shift Pattern ID<span className="text-danger">*</span>
+                  Shift Pattern Code<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -665,7 +899,7 @@ function ShiftPatternDetails() {
                   for="state"
                   className={`exp-form-labels ${error && !Pattern_Detail_ID ? "text-danger" : ""}`}
                 >
-                  Pattern Detail ID<span className="text-danger">*</span>
+                  Pattern Detail Code<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
@@ -692,41 +926,51 @@ function ShiftPatternDetails() {
             </div>
 
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_ID"
-                  class="exp-input-field form-control"
-                  type="number"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Shift_ID}
-                  onChange={(e) => setShift_ID(e.target.value)}
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedShiftId ? "has-value" : ""} 
+              ${isSelectedShiftId ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedShiftId}
+                  onChange={handleChangeShift}
+                  options={filteredOptionShift}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedShiftId(true)}
+                  onBlur={() => setIsSelectedShiftId(false)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Shift_ID ? "text-danger" : ""}`}
+                  className={`floating-label ${error && !Shift_ID ? "text-danger" : ""}`}
                 >
-                  Shift ID<span className="text-danger">*</span>
+                  Shift Code<span className="text-danger">*</span>
                 </label>
               </div>
             </div>
 
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_ID"
-                  class="exp-input-field form-control"
-                  type="number"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Is_Off_Day}
-                  onChange={(e) => setIs_Off_Day(e.target.value)}
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedDayOff ? "has-value" : ""} 
+              ${isSelectedDayOff ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedDayOff}
+                  onChange={handleChangeDay}
+                  options={filteredOptionDay}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedDayOff(true)}
+                  onBlur={() => setIsSelectedDayOff(false)}
                 />
                 <label
                   for="state"
-                  className={`exp-form-labels ${error && !Is_Off_Day ? "text-danger" : ""}`}
+                  className={`floating-label ${error && !Is_Off_Day ? "text-danger" : ""}`}
                 >
                   Is Off Day<span className="text-danger">*</span>
                 </label>
@@ -742,19 +986,24 @@ function ShiftPatternDetails() {
           </div>
           <div className="row g-3">
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_ID"
-                  class="exp-input-field form-control"
-                  type="text"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Shift_Pattern_IDSC}
-                  onChange={(e) => setShift_Pattern_IDSC(e.target.value)}
+               <div
+                className={`inputGroup selectGroup 
+              ${selectedPatternIdSc ? "has-value" : ""} 
+              ${isSelectedPatternIdSc ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedPatternIdSc}
+                  onChange={handleChangePatternSc}
+                  options={filteredOptionPatternSc}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedPatternIdSc(true)}
+                  onBlur={() => setIsSelectedPatternIdSc(false)}
                 />
-                <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift Pattern ID
+                <label htmlFor="fdate" className={`floating-label`}>
+                  Shift Pattern Code
                 </label>
               </div>
             </div>
@@ -772,7 +1021,7 @@ function ShiftPatternDetails() {
                   onChange={(e) => setPattern_Detail_IDSC(e.target.value)}
                 />
                 <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Pattern Detail ID
+                  Pattern Detail Code
                 </label>
               </div>
             </div>
@@ -796,36 +1045,46 @@ function ShiftPatternDetails() {
             </div>
 
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="UTC_Offset"
-                  class="exp-input-field form-control"
-                  type="number"
+               <div
+                className={`inputGroup selectGroup 
+              ${selectedShiftIdSc ? "has-value" : ""} 
+              ${isSelectedShiftIdSc ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedShiftIdSc}
+                  onChange={handleChangeShiftSc}
+                  options={filteredOptionShiftSc}
+                  classNamePrefix="react-select"
                   placeholder=""
-                  autoComplete="off"
-                  required
-                  value={Shift_IDSC}
-                  onChange={(e) => setShift_IDSC(e.target.value)}
+                  onFocus={() => setIsSelectedShiftIdSc(true)}
+                  onBlur={() => setIsSelectedShiftIdSc(false)}
                 />
-                <label htmlFor="fdate" className={`exp-form-labels`}>
-                  Shift ID
+                <label htmlFor="fdate" className={`floating-label`}>
+                  Shift Code
                 </label>
               </div>
             </div>
 
             <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="TimeZone_ID"
-                  class="exp-input-field form-control"
-                  type="number"
-                  placeholder=" "
-                  autoComplete="off"
-                  required
-                  value={Is_Off_DaySC}
-                  onChange={(e) => setIs_Off_DaySC(e.target.value)}
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedDayOffSc ? "has-value" : ""} 
+              ${isSelectedDayOffSc ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedDayOffSc}
+                  onChange={handleChangeDaySc}
+                  options={filteredOptionDaySc}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectedDayOffSc(true)}
+                  onBlur={() => setIsSelectedDayOffSc(false)}
                 />
-                <label htmlFor="state" className={`exp-form-labels`}>
+                <label htmlFor="state" className={`floating-label`}>
                   Is Off Day
                 </label>
               </div>
@@ -867,7 +1126,6 @@ function ShiftPatternDetails() {
               onSelectionChanged={onSelectionChanged}
               pagination={true}
               paginationAutoPageSize={true}
-              onRowSelected={onRowSelected}
             />
           </div>
         </div>
