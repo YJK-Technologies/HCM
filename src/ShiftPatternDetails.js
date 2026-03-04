@@ -389,6 +389,7 @@ function ShiftPatternDetails() {
       headerName: "Shift Pattern Code",
       field: "Shift_Pattern_ID",
       editable: true,
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: patternIdDropGrid.map(d => d.value),
       },
@@ -411,6 +412,7 @@ function ShiftPatternDetails() {
       headerName: "Shift Code",
       field: "Shift_ID",
       editable: true,
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: shiftIdDropGrid.map(d => d.value),
       },
@@ -551,8 +553,7 @@ function ShiftPatternDetails() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/Shift_Pattern_DetailInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/Shift_Pattern_DetailInsert`,
         {
           method: "POST",
           headers: {
@@ -565,7 +566,7 @@ function ShiftPatternDetails() {
             Shift_ID: Shift_ID,
             Is_Off_Day: Is_Off_Day,
             Company_Code: sessionStorage.getItem("selectedCompanyCode"),
-            created_by: sessionStorage.getItem("selectedUserCode"),
+            Created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         },
       );
