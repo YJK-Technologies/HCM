@@ -321,3 +321,84 @@
     font-size: 0.8rem;
   }
 }
+
+/* --- Entrance Animations --- */
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base states */
+.fade-down, .fade-up, 
+.reveal-text-1, .reveal-text-2, .reveal-text-3, .reveal-text-4 {
+  opacity: 0;
+}
+
+/* Active states (Triggered by JS) */
+.active.fade-down {
+  animation: slideDownFade 0.6s ease forwards;
+}
+
+.active.fade-up {
+  animation: slideUpFade 0.8s ease-out forwards;
+}
+
+/* Staggered text reveal (One by one) */
+.active .reveal-text-1 { animation: slideUpFade 0.6s 0.3s ease forwards; }
+.active .reveal-text-2 { animation: slideUpFade 0.6s 0.5s ease forwards; }
+.active .reveal-text-3 { animation: slideUpFade 0.6s 0.7s ease forwards; }
+.active .reveal-text-4 { animation: slideUpFade 0.6s 0.9s ease forwards; }
+
+/* --- Style Cleanups --- */
+
+.glass-hero-card {
+  /* Floating animation removed */
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* Subtle hover effect (no floating, just slight scale) */
+.glass-hero-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.static-dot {
+  color: #22c55e;
+  margin-right: 8px;
+}
+
+.btn-solid {
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-solid:hover {
+  background: #7dd3fc; /* Bright blue on hover */
+}
+
+.btn-solid:active {
+  transform: scale(0.98); /* Subtle click feel */
+}
+
+.trusted-text {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: block;
+}
