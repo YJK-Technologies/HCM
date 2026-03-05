@@ -35,6 +35,7 @@ import {
   BsBarChartSteps,
   BsFileBarGraph,
   BsPersonCheck,
+  BsBarChartLine,
   BsCalendarEvent,
   BsChevronDown,
   BsPersonVcard,
@@ -119,6 +120,7 @@ export const leafIconMap = {
 
   // --- HCM ---
   "Employee Information": BsPersonCheck,
+  "Department Dashboard": BsBarChartLine,
   "Admin Dashboard": BsSpeedometer2,
   "Employee Dashboard": BsFileBarGraph,
   "Salary Process": BsCashStack,
@@ -206,6 +208,7 @@ const menuData = [
         label: "Dashboard",
         isDropdown: true,
         subMenus: [
+          { label: "Department Dashboard", path: "/DepartmentDashboard" },
           { label: "Admin Dashboard", path: "/ESSDashboard" },
           { label: "Employee Dashboard", path: "/EmployeeDashboard" },
         ],
