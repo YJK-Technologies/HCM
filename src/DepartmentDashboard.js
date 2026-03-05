@@ -45,6 +45,11 @@ const DepartmentDashboard = () => {
   const [countryFromDate, setCountryFromDate] = useState(startDate);
   const [countryToDate, setCountryToDate] = useState(endDate);
 
+  // ================= NATIONALITY =================
+const [nationalityData, setNationalityData] = useState([]);
+const [nationalityFromDate, setNationalityFromDate] = useState(startDate);
+const [nationalityToDate, setNationalityToDate] = useState(endDate);
+
   // ================= LEAVE STATUS =================
   const [leaveData, setLeaveData] = useState([]);
   const [leaveFromDate, setLeaveFromDate] = useState(startDate);
@@ -119,6 +124,10 @@ const DepartmentDashboard = () => {
   }, [countryFromDate, countryToDate]);
 
   useEffect(() => {
+  fetchChartData("NAT", nationalityFromDate, nationalityToDate, setNationalityData, "Nationality", "EmployeeCount");
+  }, [nationalityFromDate, nationalityToDate]);
+
+  useEffect(() => {
     fetchChartData("LS", leaveFromDate, leaveToDate, setLeaveData, "LeaveStatus", "LeaveCount");
   }, [leaveFromDate, leaveToDate]);
 
@@ -173,7 +182,7 @@ const DepartmentDashboard = () => {
     <div className="hcm-chart-container">
         <div className="chart-header mobile-stack">
             <div className="header-text">
-                <h2>Country-wise Employee Count</h2>
+                <h2>Nationality-wise Employee Count</h2>
                 <p>Employees within selected date range</p>
             </div>
             <div className="filter-container mobile-filter">
@@ -182,8 +191,8 @@ const DepartmentDashboard = () => {
                     <input
                         type="date"
                         className="input-bg"
-                        value={countryFromDate}
-                        onChange={(e) => setCountryFromDate(e.target.value)}
+                        value={nationalityFromDate}
+                        onChange={(e) => setNationalityFromDate(e.target.value)}
                     />
                 </div>
                 <div className="filter-group">
@@ -191,8 +200,8 @@ const DepartmentDashboard = () => {
                     <input
                         type="date"
                         className="input-bg"
-                        value={countryToDate}
-                        onChange={(e) => setCountryToDate(e.target.value)}
+                        value={nationalityToDate}
+                        onChange={(e) => setNationalityToDate(e.target.value)}
                     />
                 </div>
             </div>
@@ -200,7 +209,7 @@ const DepartmentDashboard = () => {
 
         <div style={{ width: "100%", height: 320 }}>
             <ResponsiveContainer>
-                <BarChart data={countryData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <BarChart data={nationalityData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8F0F5" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} fontSize={12} />
                     <YAxis axisLine={false} tickLine={false} />
