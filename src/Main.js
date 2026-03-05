@@ -106,8 +106,8 @@ import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
 import TotalInterviewsScheduled from "./TotalInterviewsScheduled.js";
 import InterviewCompletionRate from "./InterviewCompletionRate.js";
 import InterviewDashboard from "./InterviewDashboard.js";
-
 import { ToastContainer } from "react-toastify";
+import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -286,6 +286,7 @@ function Main() {
     { path: "/TotalInterviewsSched", component: <TotalInterviewsScheduled /> },
     { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
     { path: "/InterviewDashboard", component: <InterviewDashboard /> },
+    { path: "/GenerateShift", component: <GenerateShift /> },
 
   
   ];

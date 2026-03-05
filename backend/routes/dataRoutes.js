@@ -1252,6 +1252,8 @@ router.post("/getHolidayType",dataController.getHolidayType)
 router.post("/TotalInterviewSchedule",dataController.TotalInterviewSchedule)
 router.post("/InterviewCompletionRateSC",dataController.InterviewCompletionRateSC)
 router.post("/getInterviewDashboardCount",dataController.getInterviewDashboardCount)
+router.post("/getGenerateShift",dataController.getGenerateShift)
+router.post("/getEmpShiftReport",dataController.getEmpShiftReport)
 
 
 

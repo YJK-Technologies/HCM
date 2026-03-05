@@ -351,11 +351,10 @@
 .app-card-base {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
   border: none;
-  border-radius: 1rem !important;
+  /* border-radius: 1rem !important; */
   overflow: hidden;
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   padding: 20px;
-  /* Add default padding */
 }
 
 .app-card-base:hover {
@@ -825,6 +824,7 @@
 
 .leave-balance-container {
     padding: 0 calc(var(--bs-gutter-x) * 0.5);
+    /* max-height: 450px; */
     /* margin-bottom: var(--bs-gutter-x); */
     width: 100%;
 }
@@ -898,7 +898,8 @@
 
 .leave-item-col {
     padding: 2px;
-    width: 25%; 
+    /* width: 25%;  */
+    width: 20%; 
     flex-grow: 1; 
 }
 
@@ -924,8 +925,8 @@
 }
 
 .leave-icon-base {
-    width: 40px;
-    height: 40px;
+    /* width: 40px;
+    height: 40px; */
     margin: 0 auto;
     display: flex;
     justify-content: center;
@@ -1221,5 +1222,36 @@
 
   .chart-select-group .react-select-container {
     width: 100%;
+  }
+}
+
+/* Horizontal Row Layout for Inputs */
+.border-custom {
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+}
+
+.border-custom:focus {
+  border-color: #4361ee !important;
+  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25) !important;
+  outline: none;
+}
+
+/* Responsive: Mobile-la space pathala na mattum wrap aagum */
+@media (max-width: 768px) {
+  .app-card-base .d-flex.flex-row {
+    gap: 10px !important;
+  }
+  
+  .app-card-base input[type="date"] {
+    width: 120px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-card-base .d-flex.justify-content-between {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px;
   }
 }
