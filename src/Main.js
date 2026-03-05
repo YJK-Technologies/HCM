@@ -106,6 +106,8 @@ import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
 import TotalInterviewsScheduled from "./TotalInterviewsScheduled.js";
 import InterviewCompletionRate from "./InterviewCompletionRate.js";
 import InterviewDashboard from "./InterviewDashboard.js";
+import DepartmentDashboard from "./DepartmentDashboard.js";
+
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
@@ -287,6 +289,7 @@ function Main() {
     { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
     { path: "/InterviewDashboard", component: <InterviewDashboard /> },
     { path: "/GenerateShift", component: <GenerateShift /> },
+    { path: "/DepartmentDashboard", component: <DepartmentDashboard /> },
 
   
   ];

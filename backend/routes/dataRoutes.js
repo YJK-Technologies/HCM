@@ -1254,6 +1254,7 @@ router.post("/InterviewCompletionRateSC",dataController.InterviewCompletionRateS
 router.post("/getInterviewDashboardCount",dataController.getInterviewDashboardCount)
 router.post("/getGenerateShift",dataController.getGenerateShift)
 router.post("/getEmpShiftReport",dataController.getEmpShiftReport)
+router.post("/getDepartmentDashboard",dataController.getDepartmentDashboard)
 
 
 
