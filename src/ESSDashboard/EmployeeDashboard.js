@@ -32,6 +32,7 @@ const Dashboard = (payslip) => {
   const Today = new Date().toISOString().split("T")[0];
   const [isCalendarVisible, setIsCalendarVisible] = useState(true);
   const [rowData, setRowData] = useState('');
+  const [rempShiftRowData, setEmpShiftRowData] = useState('');
   const [NewJoinees, setNewJoinees] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [startdate, setstartdate] = useState(Today);
@@ -47,6 +48,120 @@ const Dashboard = (payslip) => {
   const [holidayRowData, setHolidayRowData] = useState([]);
   const [payslipData, setPayslipData] = useState({});
 
+  const [shiftFromDate, setShiftFromDate] = useState('');
+  const [shiftToDate, setShiftToDate] = useState('');
+  const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
+  const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
+  const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmployeeIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/DeptID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setDepartmentDrop(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftPatternIdOption = data.map((option) => ({
+          value: option.Pattern_Code,
+          label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+        }));
+        setShiftPatternIdDropGrid(shiftPatternIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftOption = data.map((option) => ({
+          value: option.Shift_Code,
+          label: `${option.Shift_Code} - ${option.Shift_Name}`,
+        }));
+        setShiftIdDropGrid(shiftOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const today = new Date();
+
+    // Get current day (0 = Sunday, 1 = Monday ...)
+    const day = today.getDay();
+
+    // Calculate Monday
+    const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(today.setDate(diffToMonday));
+
+    // Calculate Sunday
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const formatDate = (date) => date.toISOString().split("T")[0];
+
+    setShiftFromDate(formatDate(monday));
+    setShiftToDate(formatDate(sunday));
+  }, []);
+
+  useEffect(() => {
+    handleEmpShiftReportSearch();
+  },[])
 
   const {
     Location_name,
@@ -179,43 +294,43 @@ const Dashboard = (payslip) => {
       .then((val) => setLeaveData(val));
   }, []);
 
-const reloadGridData = async () => {
-  try {
-    const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        start_date: startdate,
-        end_date: enddate,
-        userid: sessionStorage.getItem("selectedUserCode"),
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    });
+  const reloadGridData = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start_date: startdate,
+          end_date: enddate,
+          userid: sessionStorage.getItem("selectedUserCode"),
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-      const newRows = data.map((item) => ({
-        work_date: formatDates(item.work_date),
-        First_CheckIn: item.First_CheckIn,
-        Last_CheckOut: item.Last_CheckOut,
-        total_worked_hours: item.total_worked_hours,
-        Total_login_Hours: item.Total_login_Hours,
-      }));
+        const newRows = data.map((item) => ({
+          work_date: formatDates(item.work_date),
+          First_CheckIn: item.First_CheckIn,
+          Last_CheckOut: item.Last_CheckOut,
+          total_worked_hours: item.total_worked_hours,
+          Total_login_Hours: item.Total_login_Hours,
+        }));
 
-      setRowData(newRows);
-      toast.success("Grid refreshed successfully");
-    } else {
-      setRowData([]);
-      toast.warning("No data found");
+        setRowData(newRows);
+        toast.success("Grid refreshed successfully");
+      } else {
+        setRowData([]);
+        toast.warning("No data found");
+      }
+    } catch (error) {
+      console.error("Error reloading grid:", error);
+      toast.error("Failed to reload grid");
     }
-  } catch (error) {
-    console.error("Error reloading grid:", error);
-    toast.error("Failed to reload grid");
-  }
-};
+  };
 
 
   const handleSearch = async () => {
@@ -243,6 +358,37 @@ const reloadGridData = async () => {
           Total_login_Hours: matchedItem.Total_login_Hours,
         }));
         setRowData(newRows);
+      } else if (response.status === 404) {
+        setRowData([]);
+        toast.warning("Data not found");
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data: " + error.message);
+    }
+  };
+
+  const handleEmpShiftReportSearch = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          From_Date: shiftFromDate,
+          To_Date: shiftToDate,
+          Employee_ID: sessionStorage.getItem('selectedUserCode'),
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        const searchData = await response.json();
+        setEmpShiftRowData(searchData);
       } else if (response.status === 404) {
         setRowData([]);
         toast.warning("Data not found");
@@ -317,6 +463,81 @@ const reloadGridData = async () => {
       sortable: true,
       filter: true,
       cellStyle: { textAlign: "left" }
+    },
+  ];
+
+  const empShiftCols = [
+    {
+      headerName: "Employee Id",
+      field: "Employee_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employeeIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Department",
+      field: "dept_id",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: departmentDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = departmentDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Designation",
+      field: "desgination_id",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift Pattern",
+      field: "Shift_Pattern_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftPatternIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Date",
+      field: "Date",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift",
+      field: "Shift_Code",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Start Time",
+      field: "Start_Time",
+      minWidth: 100
+    },
+    {
+      headerName: "End Time",
+      field: "End_Time",
+      minWidth: 100
     },
   ];
 
@@ -850,39 +1071,87 @@ const reloadGridData = async () => {
 
       <div className="info-card-row">
 
-        <div className="leave-balance-container mt-3">
-          <div className="dashboard-card-base leave-balance-card rounded-4 shadow-lg">
-            <div className="d-flex justify-content-between align-items-center">
-              <h6 className="card-title-heading">Leave Balance</h6>
-              <div className="d-flex justify-content-end ">
-                <button className="apply-leave-btn border-none p-1" onClick={handleLeave} style={{ fontSize: "12px" }}>Apply Leave</button>
+        <div className="leave-balance-container mt-2">
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+            {/* Header Section */}
+            <div className="d-flex justify-content-between align-items-center flex-wrap spacing-mb-2">
+              <h6 className="card-title-heading mb-0">Shift Routine</h6>
+
+              <div className="d-flex flex-row align-items-center gap-3">
+                <div className="d-flex align-items-center gap-2">
+                  {/* <label className="font-size-small font-weight-bold text-muted-color mb-0">From:</label>
+                  <input
+                    type="date"
+                    className="form-control form-control-sm border-custom"
+                    style={{ width: "135px", height: "32px", fontSize: "12px" }}
+                    value={startdate}
+                    onChange={(e) => setstartdate(e.target.value)}
+                  /> */}
+                  <div className="inputGroup">
+                    <input
+                      id="startdate"
+                      className="exp-input-field form-control"
+                      type="date"
+                      placeholder=" "
+                      autoComplete="off"
+                      value={shiftFromDate}
+                      onChange={(e) => setShiftFromDate(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleEmpShiftReportSearch()}
+                    />
+                    <label className="exp-form-labels">From Date</label>
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center gap-2">
+                  {/* <label className="font-size-small font-weight-bold text-muted-color mb-0">To:</label>
+                  <input
+                    type="date"
+                    className="form-control form-control-sm border-custom"
+                    style={{ width: "135px", height: "32px", fontSize: "12px" }}
+                    value={enddate}
+                    onChange={(e) => setenddate(e.target.value)}
+                  /> */}
+                  <div className="inputGroup">
+                    <input
+                      id="enddate"
+                      className="exp-input-field form-control"
+                      type="date"
+                      autoComplete="off"
+                      placeholder=" "
+                      value={shiftToDate}
+                      onChange={(e) => setShiftToDate(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleEmpShiftReportSearch()}
+                    />
+                    <label className="exp-form-labels">To Date</label>
+                  </div>
+                </div>
+
+                {/* Search Button */}
+                <button
+                  className="btn btn-sm btn-primary d-flex align-items-center justify-content-center"
+                  onClick={handleEmpShiftReportSearch}
+                  style={{ height: "32px", width: "35px" }}
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </button>
               </div>
             </div>
-            <div className="leave-data-grid-row">
-              {leaveData.length > 0 ? (
-                leaveData.map((leave, index) => (
-                  <div key={index} className="leave-item-col mt-3">
-                    <div className="leave-type-card h-100">
-                      <div className={`leave-icon-base fs-6 leave-icon ${leave.leavetype} rounded-5`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-capsule" viewBox="0 0 16 16">
-                          <path d="M1.828 8.9 8.9 1.827a4 4 0 1 1 5.657 5.657l-7.07 7.071A4 4 0 1 1 1.827 8.9Zm9.128.771 2.893-2.893a3 3 0 1 0-4.243-4.242L6.713 5.429z" />
-                        </svg>
-                      </div>
-                      <h6 className="fw-bolder fs-7 mt-4 mb-0">{leave.leavetype}</h6>
-                      <h6 className="fs-7 text-dark ms-0 text-muted-color">Total Leave: {leave.totalleave}</h6>
-                      <h6 className="fs-7 text-primary font-weight-bold">Available: {leave.availableleave}</h6>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p>No leave data available.</p>
-              )}
+
+            {/* AG Grid Section */}
+            <div className="ag-theme-alpine" style={{ height: "315px", width: "100%" }}>
+              <AgGridReact
+                columnDefs={empShiftCols}
+                rowData={rempShiftRowData}
+                rowHeight={30}
+                pagination={true}
+                paginationAutoPageSize={true}
+              />
             </div>
           </div>
         </div>
 
-        <div className="payslip-analysis-container mt-3">
-          <div className="dashboard-card-base payslip-analysis-card rounded-4 shadow-lg h-100">
+        <div className="payslip-analysis-container mt-2">
+          <div className="dashboard-card-base payslip-analysis-card rounded shadow-lg h-100">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start mt-0">
                 <div className="d-flex justify-content-start">
@@ -917,8 +1186,8 @@ const reloadGridData = async () => {
           </div>
         </div>
 
-        <div className="holiday-calendar-container mt-3">
-          <div className="dashboard-card-base alloted-holidays-card rounded-4 shadow-lg p-0 h-100">
+        <div className="holiday-calendar-container mt-2">
+          <div className="dashboard-card-base alloted-holidays-card rounded shadow-lg p-0 h-100">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between mb-1" style={{ maxHeight: "100px", paddingBottom: "10px" }}>
                 <div className="d-flex justify-content-start">
@@ -995,10 +1264,10 @@ const reloadGridData = async () => {
 
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
 
         <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded-xl app-shadow-lg height-full">
+          <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
             <div className="display-flex flex-between-center flex-wrap">
               <h6 className="card-title-heading">New Joinees</h6>
             </div>
@@ -1057,7 +1326,7 @@ const reloadGridData = async () => {
         </div>
 
         <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded-xl app-shadow-lg height-full" >
+          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
             <div className="display-flex flex-between-center">
               <h6 className="card-title-heading">Upcoming Birthdays</h6>
             </div>
@@ -1090,21 +1359,41 @@ const reloadGridData = async () => {
         </div>
 
         <div className="grid-col-lg-6">
-          <div className="app-card-base rounded-xl birthday-card-wrapper app-shadow-lg height-full">
+          <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
             <div className="d-flex justify-content-between align-items-center">
-              <h6 className="card-title-heading spacing-mb-2">Productivity</h6>
+              <h6 className="card-title-heading">Leave Balance</h6>
+              <div className="d-flex justify-content-end ">
+                <button className="apply-leave-btn border-none p-1" onClick={handleLeave} style={{ fontSize: "12px" }}>Apply Leave</button>
+              </div>
             </div>
-            <div className="productivity-chart-container" style={{ width: "100%", height: "315px", padding: "20px" }}>
-              <Line data={chartData} options={chartOptions} />
+            <div className="leave-data-grid-row">
+              {leaveData.length > 0 ? (
+                leaveData.map((leave, index) => (
+                  <div key={index} className="leave-item-col mt-2">
+                    <div className="leave-type-card h-100">
+                      <div className={`leave-icon-base fs-6 leave-icon ${leave.leavetype} rounded-5`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-capsule" viewBox="0 0 16 16">
+                          <path d="M1.828 8.9 8.9 1.827a4 4 0 1 1 5.657 5.657l-7.07 7.071A4 4 0 1 1 1.827 8.9Zm9.128.771 2.893-2.893a3 3 0 1 0-4.243-4.242L6.713 5.429z" />
+                        </svg>
+                      </div>
+                      <h6 className="fw-bolder fs-7 mt-4 mb-0">{leave.leavetype}</h6>
+                      <h6 className="fs-7 text-dark ms-0 text-muted-color">Total Leave: {leave.totalleave}</h6>
+                      <h6 className="fs-7 text-primary font-weight-bold">Available: {leave.availableleave}</h6>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No leave data available.</p>
+              )}
             </div>
           </div>
         </div>
 
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
-          <div className="birthday-card-wrapper rounded-xl app-shadow-lg height-full">
+          <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
             <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Search Criteria</h6>
 
             <div className="dashboard-row mb-2-me-1">
@@ -1156,11 +1445,13 @@ const reloadGridData = async () => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={Employeecol}
                   rowData={rowData}
                   suppressLoadingOverlay={true}
+                  pagination={true}
+                  paginationAutoPageSize={true}
                 />
               </div>
             </div>

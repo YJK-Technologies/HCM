@@ -40,7 +40,8 @@ import {
   BsChevronDown,
   BsPersonVcard,
   BsWrenchAdjustable,
-  BsPeopleFill
+  BsPeopleFill,
+  BsArrowRepeat
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -134,6 +135,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Setting": BsGear,
+  "Generate Shift": BsArrowRepeat,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -264,6 +266,7 @@ const menuData = [
         ],
       },
       { label: "Setting", path: "/WeekOff" },
+      { label: "Generate Shift", path: "/GenerateShift" },
     ],
   },
   {

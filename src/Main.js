@@ -109,6 +109,7 @@ import InterviewDashboard from "./InterviewDashboard.js";
 import DepartmentDashboard from "./DepartmentDashboard.js";
 
 import { ToastContainer } from "react-toastify";
+import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -287,6 +288,7 @@ function Main() {
     { path: "/TotalInterviewsSched", component: <TotalInterviewsScheduled /> },
     { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
     { path: "/InterviewDashboard", component: <InterviewDashboard /> },
+    { path: "/GenerateShift", component: <GenerateShift /> },
     { path: "/DepartmentDashboard", component: <DepartmentDashboard /> },
 
   
