@@ -106,6 +106,7 @@ import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
 import TotalInterviewsScheduled from "./TotalInterviewsScheduled.js";
 import InterviewCompletionRate from "./InterviewCompletionRate.js";
 import InterviewDashboard from "./InterviewDashboard.js";
+import DepartmentDashboard from "./DepartmentDashboard.js";
 
 import { ToastContainer } from "react-toastify";
 
@@ -286,6 +287,7 @@ function Main() {
     { path: "/TotalInterviewsSched", component: <TotalInterviewsScheduled /> },
     { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
     { path: "/InterviewDashboard", component: <InterviewDashboard /> },
+    { path: "/DepartmentDashboard", component: <DepartmentDashboard /> },
 
   
   ];

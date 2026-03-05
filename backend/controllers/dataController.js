@@ -36285,6 +36285,31 @@ const getInterviewDashboardCount = async (req, res) => {
 };
 //Code ended by pavun on 03-03-26
 
+//code added by sakthi on 05-03-26
+const getDepartmentDashboard = async (req, res) => {
+  const { mode, company_code, fromDate, toDate } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, fromDate)
+      .input("to_date", sql.Date, toDate)
+      .query(`EXEC sp_Department_Dashboard @mode, @company_code, @from_date, @to_date `);
+
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error("Error fetching Department Dashboard:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};//code ended by sakthi on 05-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -37506,7 +37531,8 @@ module.exports = {
     TotalInterviewSchedule,
     InterviewCompletionRateSC,
     getEmployeeTypeDD,
-    getInterviewDashboardCount
+    getInterviewDashboardCount,
+    getDepartmentDashboard
 
 
 };
