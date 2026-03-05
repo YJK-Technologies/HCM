@@ -35,11 +35,13 @@ import {
   BsBarChartSteps,
   BsFileBarGraph,
   BsPersonCheck,
+  BsBarChartLine,
   BsCalendarEvent,
   BsChevronDown,
   BsPersonVcard,
   BsWrenchAdjustable,
-  BsPeopleFill
+  BsPeopleFill,
+  BsArrowRepeat
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -119,6 +121,7 @@ export const leafIconMap = {
 
   // --- HCM ---
   "Employee Information": BsPersonCheck,
+  "Department Dashboard": BsBarChartLine,
   "Admin Dashboard": BsSpeedometer2,
   "Employee Dashboard": BsFileBarGraph,
   "Salary Process": BsCashStack,
@@ -132,6 +135,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Setting": BsGear,
+  "Generate Shift": BsArrowRepeat,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -206,6 +210,7 @@ const menuData = [
         label: "Dashboard",
         isDropdown: true,
         subMenus: [
+          { label: "Department Dashboard", path: "/DepartmentDashboard" },
           { label: "Admin Dashboard", path: "/ESSDashboard" },
           { label: "Employee Dashboard", path: "/EmployeeDashboard" },
         ],
@@ -261,6 +266,7 @@ const menuData = [
         ],
       },
       { label: "Setting", path: "/WeekOff" },
+      { label: "Generate Shift", path: "/GenerateShift" },
     ],
   },
   {

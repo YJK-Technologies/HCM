@@ -36285,6 +36285,78 @@ const getInterviewDashboardCount = async (req, res) => {
 };
 //Code ended by pavun on 03-03-26
 
+//code added by pavun on 05-03-26
+const getGenerateShift = async (req, res) => {
+  const { department_ID, designation_ID, Employee_ID, From_Date, To_Date, company_code, created_by } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'GS')
+      .input("department_ID", sql.NVarChar, department_ID)
+      .input("designation_ID", sql.NVarChar, designation_ID)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_Employee_Shift_Report @mode,@department_ID,@designation_ID,@Employee_ID,@From_Date,@To_Date,@company_code,@created_by,'','',''`);
+      res.status(200).json({ message: "Shift Generated Successfully" });
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getEmpShiftReport = async (req, res) => {
+  const { Employee_ID, From_Date, To_Date, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'ESR')
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Shift_Report @mode,'','',@Employee_ID,@From_Date,@To_Date,@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//code ended by pavun on 05-03-26
+
+//code added by sakthi on 05-03-26
+const getDepartmentDashboard = async (req, res) => {
+  const { mode, company_code, fromDate, toDate } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, fromDate)
+      .input("to_date", sql.Date, toDate)
+      .query(`EXEC sp_Department_Dashboard @mode, @company_code, @from_date, @to_date `);
+
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error("Error fetching Department Dashboard:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};//code ended by sakthi on 05-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -37506,7 +37578,10 @@ module.exports = {
     TotalInterviewSchedule,
     InterviewCompletionRateSC,
     getEmployeeTypeDD,
-    getInterviewDashboardCount
+    getInterviewDashboardCount,
+    getGenerateShift,
+    getEmpShiftReport,
+    getDepartmentDashboard
 
 
 };
