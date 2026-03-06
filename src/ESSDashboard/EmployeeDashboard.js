@@ -78,7 +78,7 @@ const Dashboard = (payslip) => {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/DeptID`, {
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -468,6 +468,24 @@ const Dashboard = (payslip) => {
 
   const empShiftCols = [
     {
+      headerName: "Date",
+      field: "Date",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift",
+      field: "Shift_Code",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
       headerName: "Employee Id",
       field: "Employee_ID",
       minWidth: 130,
@@ -508,24 +526,6 @@ const Dashboard = (payslip) => {
       },
       valueFormatter: (params) => {
         const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
-        return dept ? dept.label : params.value;
-      },
-    },
-    {
-      headerName: "Date",
-      field: "Date",
-      minWidth: 130
-    },
-    {
-      headerName: "Shift",
-      field: "Shift_Code",
-      minWidth: 130,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: shiftIdDropGrid.map(d => d.value),
-      },
-      valueFormatter: (params) => {
-        const dept = shiftIdDropGrid.find(d => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
@@ -1069,7 +1069,7 @@ const Dashboard = (payslip) => {
         </div>
       </div>
 
-      <div className="info-card-row">
+      <div className="info-card-row dashboard-row">
 
         <div className="leave-balance-container mt-2">
           <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
@@ -1159,7 +1159,7 @@ const Dashboard = (payslip) => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3 mt-4">
+              <div className="col-md-12 mt-4">
                 <div className="inputGroup">
                   <input
                     type="month"
@@ -1191,7 +1191,7 @@ const Dashboard = (payslip) => {
             <div className="card-body p-4">
               <div className="d-flex justify-content-between mb-1" style={{ maxHeight: "100px", paddingBottom: "10px" }}>
                 <div className="d-flex justify-content-start">
-                  <h6 className="card-title-heading">Alloted Holidays</h6>
+                  <h6 className="card-title-heading">Allotted Holidays</h6>
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
@@ -1398,7 +1398,7 @@ const Dashboard = (payslip) => {
 
             <div className="dashboard-row mb-2-me-1">
 
-              <div className="grid-col-md-4">
+              <div className="grid-col-md-3">
                 <div className="inputGroup">
                   <input
                     id="startdate"
@@ -1414,7 +1414,7 @@ const Dashboard = (payslip) => {
                 </div>
               </div>
 
-              <div className="grid-col-md-4">
+              <div className="grid-col-md-3">
                 <div className="inputGroup">
                   <input
                     id="enddate"
