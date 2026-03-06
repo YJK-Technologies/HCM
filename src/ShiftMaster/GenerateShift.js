@@ -195,7 +195,7 @@ function GenerateShift({ }) {
             const data = await response.json();
 
             if (response.ok) {
-                toast.success(data.message || "Data inserted successfully", {
+                toast.success(data.message || "Shift Generated & Email Sent", {
                     onClose: () => window.location.reload(),
                 });
             } else {

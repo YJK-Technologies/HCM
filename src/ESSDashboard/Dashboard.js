@@ -10,8 +10,8 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-  Tooltip,
-  Legend,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
   Title,
   ArcElement
 } from "chart.js";
@@ -23,8 +23,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import config from '../Apiconfig';
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx-js-style";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip, // Add this
+  Legend
+} from "recharts";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title, ArcElement);
+ChartJS.register(BarElement, CategoryScale, LinearScale, ChartTooltip, ChartLegend, Title, ArcElement);
 
 const Dashboard = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -75,6 +84,80 @@ const Dashboard = () => {
   const [isSelectShift, setIsSelectShift] = useState(false);
   const navigate = useNavigate();
 
+  const [shiftEmpId, setShiftEmpId] = useState('');
+  const [selectedShiftEmpId, setSelectedShiftEmpId] = useState('');
+  const [shiftEmpIdDrop, setShiftEmpIdDrop] = useState([]);
+  const [shiftEmpIdDropGrid, setShiftEmpIdDropGrid] = useState([]);
+  const [shiftDeptId, setShiftDeptId] = useState('');
+  const [selectedShiftDeptId, setSelectedShiftDeptId] = useState('');
+  const [shiftDeptIdDrop, setShiftDeptIdDrop] = useState([]);
+  const [shiftDeptIdDropGrid, setShiftDeptIdDropGrid] = useState([]);
+  const [shiftDesigId, setShiftDesigId] = useState('');
+  const [selectedShiftDesigId, setSelectedShiftDesigId] = useState('');
+  const [shiftDesigIdDrop, setShiftDesigIdDrop] = useState([]);
+  const [shiftDesigIdDropGrid, setShiftDesigIdDropGrid] = useState([]);
+  const [shiftPatternId, setShiftPatternId] = useState('');
+  const [selectedShiftPatternId, setSelectedShiftPatternId] = useState('');
+  const [shiftPatternIdDrop, setShiftPatternIdDrop] = useState([]);
+  const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
+  const [shiftDay, setShiftDay] = useState('');
+  const [shiftFromDate, setShiftFromDate] = useState('');
+  const [shiftToDate, setShiftToDate] = useState('');
+  const [shiftCode, setShiftCode] = useState('');
+  const [selectedShiftCode, setSelectedShiftCode] = useState('');
+  const [shiftCodeDrop, setShiftCodeDrop] = useState([]);
+  const [shiftCodeDropGrid, setShiftCodeDropGrid] = useState([]);
+  const [shiftStartTime, setShiftStartTime] = useState('');
+  const [shiftEndTime, setShiftEndTime] = useState('');
+  const [shiftRowData, setShiftRowData] = useState([]);
+
+  const [isSelectedShiftEmpId, setIsSelectedShiftEmpId] = useState(false);
+  const [isSelectedShiftDeptId, setIsSelectedShiftDeptId] = useState(false);
+  const [isSelectedShiftDesigId, setIsSelectedShiftDesigId] = useState(false);
+  const [isSelectedShiftPatternId, setIsSelectedShiftPatternId] = useState(false);
+  const [isSelectedShiftCode, setIsSelectedShiftCode] = useState(false);
+  const [shiftData, setShiftData] = useState([]);
+
+  const fetchShiftPatternSummary = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/shiftPatternChart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+        })
+      });
+
+      const data = await response.json();
+
+      const colors = [
+        "#4CAF50",
+        "#2196F3",
+        "#FF9800",
+        "#9C27B0",
+        "#F44336",
+        "#00BCD4",
+        "#8BC34A",
+        "#FFC107"
+      ];
+
+      const formatted = data.map((item, index) => ({
+        name: item.Shift_Name,
+        value: item.Employee_Count,
+        color: colors[index % colors.length]
+      }));
+
+      setShiftData(formatted);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchShiftPatternSummary();
+  }, []);
+
   useEffect(() => {
     if (typeof totalActiveEmployees === 'number') {
       setFormattedTotalActiveEmployees(totalActiveEmployees.toLocaleString('en-IN'));
@@ -98,6 +181,224 @@ const Dashboard = () => {
       setFormatedTotalPayslip('0');
     }
   }, [TotalPayslips]);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setShiftEmpIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setShiftDeptIdDropGrid(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftPatternIdOption = data.map((option) => ({
+          value: option.Pattern_Code,
+          label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+        }));
+        setShiftPatternIdDropGrid(shiftPatternIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftOption = data.map((option) => ({
+          value: option.Shift_Code,
+          label: `${option.Shift_Code} - ${option.Shift_Name}`,
+        }));
+        setShiftCodeDropGrid(shiftOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftEmpIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftDeptIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftPatternIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftCodeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionEmpId = shiftEmpIdDrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId} - ${option.First_Name}`,
+  }));
+
+  const filteredOptionDeptId = shiftDeptIdDrop.map((option) => ({
+    value: option.dept_id,
+    label: `${option.dept_id} - ${option.dept_name}`,
+  }));
+
+  const filteredOptionShiftCode = shiftCodeDrop.map((option) => ({
+    value: option.Shift_Code,
+    label: `${option.Shift_Code} - ${option.Shift_Name}`,
+  }));
+
+  const filteredOptionShiftPatternId = shiftPatternIdDrop.map((option) => ({
+    value: option.Pattern_Code,
+    label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+  }));
+
+  const handleChangeEmpId = (selectedShiftEmpId) => {
+    setSelectedShiftEmpId(selectedShiftEmpId);
+    setShiftEmpId(selectedShiftEmpId ? selectedShiftEmpId.value : "");
+  };
+
+  const handleChangeDeptId = (selectedShiftDeptId) => {
+    setSelectedShiftDeptId(selectedShiftDeptId);
+    setShiftDeptId(selectedShiftDeptId ? selectedShiftDeptId.value : "");
+    fetchDesignation(selectedShiftDeptId ? selectedShiftDeptId.value : '');
+  };
+
+  const handleChangeDesigId = (selectedShiftDesigId) => {
+    setSelectedShiftDesigId(selectedShiftDesigId);
+    setShiftDesigId(selectedShiftDesigId ? selectedShiftDesigId.value : "");
+  };
+
+  const handleChangeShiftCode = (selectedShiftCode) => {
+    setSelectedShiftCode(selectedShiftCode);
+    setShiftCode(selectedShiftCode ? selectedShiftCode.value : "");
+  };
+
+  const handleChangeShiftPatternId = (selectedShiftPatternId) => {
+    setSelectedShiftPatternId(selectedShiftPatternId);
+    setShiftPatternId(selectedShiftPatternId ? selectedShiftPatternId.value : "");
+  };
+
+  const fetchDesignation = async (selectedValue) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dept_id: selectedValue, company_code: sessionStorage.getItem("selectedCompanyCode") }),
+      });
+
+      const data = await response.json();
+      const formattedData = [
+        { value: 'All', label: 'All' },
+        ...data.map((product) => ({
+          value: product.Desgination,
+          label: product.Desgination,
+        }))
+      ];
+
+      setShiftDesigIdDrop(formattedData);
+      return formattedData;
+    } catch (error) {
+      console.error('Error fetching product codes:', error);
+      return [];
+    }
+  };
+
 
   useEffect(() => {
     const fetchTotalActiveEmployees = async () => {
@@ -287,42 +588,20 @@ const Dashboard = () => {
       .then((val) => setMaritalStatusDrop(val));
   }, []);
 
-useEffect(() => {
-  const savedSeconds = localStorage.getItem("loggedSeconds");
-  const savedCheckIn = localStorage.getItem("isCheckedIn");
+  useEffect(() => {
+    const savedSeconds = localStorage.getItem("loggedSeconds");
+    const savedCheckIn = localStorage.getItem("isCheckedIn");
 
-  if (savedSeconds) {
-    setSecondsPassed(Number(savedSeconds));
-    setTimer(formatTime(Number(savedSeconds)));
-  }
+    if (savedSeconds) {
+      setSecondsPassed(Number(savedSeconds));
+      setTimer(formatTime(Number(savedSeconds)));
+    }
 
-  if (savedCheckIn === "true") {
-    setIsCheckedIn(true);
+    if (savedCheckIn === "true") {
+      setIsCheckedIn(true);
 
-    // Resume timer automatically
-    const startTime = Date.now() - Number(savedSeconds || 0) * 1000;
-
-    const id = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      setSecondsPassed(elapsed);
-      setTimer(formatTime(elapsed));
-      localStorage.setItem("loggedSeconds", elapsed);
-    }, 1000);
-
-    setIntervalId(id);
-  }
-}, []);
-
-const startTimer = () => {
-  setIsCheckedIn(prev => {
-    const newState = !prev;
-
-    // SAVE CHECK-IN STATE
-    localStorage.setItem("isCheckedIn", newState.toString());
-
-    if (newState) {
-      // ▶️ START TIMER
-      const startTime = Date.now() - secondsPassed * 1000;
+      // Resume timer automatically
+      const startTime = Date.now() - Number(savedSeconds || 0) * 1000;
 
       const id = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -332,19 +611,41 @@ const startTimer = () => {
       }, 1000);
 
       setIntervalId(id);
-    } else {
-      // ⏹ STOP TIMER
-      if (intervalId) {
-        clearInterval(intervalId);
-        setIntervalId(null);
+    }
+  }, []);
+
+  const startTimer = () => {
+    setIsCheckedIn(prev => {
+      const newState = !prev;
+
+      // SAVE CHECK-IN STATE
+      localStorage.setItem("isCheckedIn", newState.toString());
+
+      if (newState) {
+        // ▶️ START TIMER
+        const startTime = Date.now() - secondsPassed * 1000;
+
+        const id = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          setSecondsPassed(elapsed);
+          setTimer(formatTime(elapsed));
+          localStorage.setItem("loggedSeconds", elapsed);
+        }, 1000);
+
+        setIntervalId(id);
+      } else {
+        // ⏹ STOP TIMER
+        if (intervalId) {
+          clearInterval(intervalId);
+          setIntervalId(null);
+        }
+
+        localStorage.removeItem("loggedSeconds");
       }
 
-      localStorage.removeItem("loggedSeconds");
-    }
-
-    return newState;
-  });
-};
+      return newState;
+    });
+  };
 
   const formatTime = (seconds) => {
     const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -667,9 +968,87 @@ const startTimer = () => {
     },
   ];
 
-
-
   // AG Grid columns
+  const ShiftColDefs = [
+    {
+      headerName: "Date",
+      field: "Date",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift Pattern",
+      field: "Shift_Pattern_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftPatternIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Day Sequence",
+      field: "Day_Sequence",
+      minWidth: 130,
+    },
+    {
+      headerName: "Shift",
+      field: "Shift_Code",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftCodeDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftCodeDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Employee ID",
+      field: "Employee_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftEmpIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftEmpIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Department",
+      field: "dept_id",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftDeptIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftDeptIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Designation",
+      field: "desgination_id",
+      minWidth: 130
+    },
+    {
+      headerName: "Start Time",
+      field: "Start_Time",
+      minWidth: 100
+    },
+    {
+      headerName: "End Time",
+      field: "End_Time",
+      minWidth: 100
+    },
+  ];
+
   const columnDefs = [
     {
       headerName: "Employee ID",
@@ -778,33 +1157,33 @@ const startTimer = () => {
   //   }
   // };
 
-const handleTime = async () => {
-  try {
-    const route = isCheckedIn ? "/DailyLogOUT" : "/DailyLogin";
+  const handleTime = async () => {
+    try {
+      const route = isCheckedIn ? "/DailyLogOUT" : "/DailyLogin";
 
-    const response = await fetch(`${config.apiBaseUrl}${route}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userID: sessionStorage.getItem('selectedUserCode'),
-        DeviceDetails: deviceDetails,
-        IP_Address: ipAddress,
-        Location: location,
-      }),
-    });
+      const response = await fetch(`${config.apiBaseUrl}${route}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userID: sessionStorage.getItem('selectedUserCode'),
+          DeviceDetails: deviceDetails,
+          IP_Address: ipAddress,
+          Location: location,
+        }),
+      });
 
-    if (response.status === 200) {
-      startTimer(); // 🔥 ONLY THIS
-    } else if (response.status === 400) {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message);
-    } else {
-      toast.error("Failed to insert data");
+      if (response.status === 200) {
+        startTimer(); // 🔥 ONLY THIS
+      } else if (response.status === 400) {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message);
+      } else {
+        toast.error("Failed to insert data");
+      }
+    } catch (error) {
+      toast.error("Error inserting data: " + error.message);
     }
-  } catch (error) {
-    toast.error("Error inserting data: " + error.message);
-  }
-};
+  };
 
   // useEffect(() => {
   //   if (sessionStorage.getItem("elapsedTime")) {
@@ -863,6 +1242,45 @@ const handleTime = async () => {
         console.log("Data not found");
         toast.warning("Data not found");
         setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to data");
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data:", error);
+    }
+  };
+
+  const handleShiftSearch = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getAdEmpShiftReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          From_Date: shiftFromDate,
+          To_Date: shiftToDate,
+          Employee_ID: shiftEmpId,
+          department_ID: shiftDeptId,
+          designation_ID: shiftDesigId,
+          Shift_Pattern_ID: shiftPatternId,
+          Shift_Code: shiftCode,
+          Day_Sequence: shiftDay,
+          Start_Time: shiftStartTime,
+          End_Time: shiftEndTime,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        })
+      });
+      if (response.ok) {
+        const searchData = await response.json();
+        setShiftRowData(searchData);
+        console.log(searchData)
+      } else if (response.status === 404) {
+        console.log("Data not found");
+        toast.warning("Data not found");
+        setShiftRowData([]);
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to data");
@@ -1095,41 +1513,332 @@ const handleTime = async () => {
     { headerName: 'Attendance Status', field: 'AttendanceStatus' }
   ];
 
-const stopTimer = () => {
-  if (intervalId) {
-    clearInterval(intervalId);
-    setIntervalId(null);
-  }
+  const stopTimer = () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
 
-  localStorage.removeItem("loggedSeconds");
-  localStorage.setItem("isCheckedIn", "false");
-  setIsCheckedIn(false);
-};
-useEffect(() => {
-  const storedCheckIn = localStorage.getItem("isCheckedIn");
-  const checkInTime = localStorage.getItem("checkInTime");
+    localStorage.removeItem("loggedSeconds");
+    localStorage.setItem("isCheckedIn", "false");
+    setIsCheckedIn(false);
+  };
+  useEffect(() => {
+    const storedCheckIn = localStorage.getItem("isCheckedIn");
+    const checkInTime = localStorage.getItem("checkInTime");
 
-  if (storedCheckIn === "true" && checkInTime) {
-    const elapsedSeconds = Math.floor(
-      (Date.now() - Number(checkInTime)) / 1000
-    );
-
-    setIsCheckedIn(true);
-    setSecondsPassed(elapsedSeconds);
-    setTimer(formatTime(elapsedSeconds));
-
-    // 🔥 Restart timer after screen switch
-    const id = setInterval(() => {
-      const seconds = Math.floor(
+    if (storedCheckIn === "true" && checkInTime) {
+      const elapsedSeconds = Math.floor(
         (Date.now() - Number(checkInTime)) / 1000
       );
-      setSecondsPassed(seconds);
-      setTimer(formatTime(seconds));
-    }, 1000);
 
-    setIntervalId(id);
-  }
-}, []);
+      setIsCheckedIn(true);
+      setSecondsPassed(elapsedSeconds);
+      setTimer(formatTime(elapsedSeconds));
+
+      // 🔥 Restart timer after screen switch
+      const id = setInterval(() => {
+        const seconds = Math.floor(
+          (Date.now() - Number(checkInTime)) / 1000
+        );
+        setSecondsPassed(seconds);
+        setTimer(formatTime(seconds));
+      }, 1000);
+
+      setIntervalId(id);
+    }
+  }, []);
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformShiftRowData = (data) => {
+    return data.map((row) => {
+      const patternObj = shiftPatternIdDropGrid.find(
+        (d) => d.value === row.Shift_Pattern_ID
+      );
+
+      const patternName = patternObj
+        ? patternObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const shiftObj = shiftCodeDropGrid.find(
+        (d) => d.value === row.Shift_Code
+      );
+
+      const shiftName = shiftObj
+        ? shiftObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const empObj = shiftEmpIdDropGrid.find(
+        (d) => d.value === row.Employee_ID
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const deptObj = shiftDeptIdDropGrid.find(
+        (d) => d.value === row.dept_id
+      );
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Date": row.Date || "",
+        "Shift Pattern": `${row.Shift_Pattern_ID} - ${patternName}` || "",
+        "Day Sequence": row.Day_Sequence || "",
+        "Shift": `${row.Shift_Code} - ${shiftName}` || "",
+        "Employee ID": `${row.Employee_ID} - ${empName}` || "",
+        "Department": `${row.dept_id} - ${deptName}` || "",
+        "Designation": row.desgination_id || "",
+        "Start Time": row.Start_Time || "",
+        "End Time": row.End_Time || "",
+      };
+    });
+  };
+
+  const handleExportToExcelShift = () => {
+    if (!shiftRowData || shiftRowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Employee Shift Detail Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformShiftRowData(shiftRowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Shift Detail");
+
+    XLSX.writeFile(workbook, "Employee_Shift_Detail_Search_Report.xlsx");
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      return {
+        "Employee ID": row.Employeeid || "",
+        "Employee Name": row.First_Name || "",
+        "Department": row.department_ID || "",
+        "Designation": row.designation_ID || "",
+        "Manager": row.manager || "",
+        "Shift": row.shift || "",
+        "Aadhaar No": row.AAdhar_no || "",
+        "PF No": row.PFNo || "",
+        "Account No": row.Account_NO || "",
+        "Marital Status": row.marital_status || "",
+        "DOJ": row.DOJ || "",
+        "DOL": row.DOL || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Employee Detail Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Detail");
+
+    XLSX.writeFile(workbook, "Employee_Detail_Search_Report.xlsx");
+  };
 
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
@@ -1171,7 +1880,7 @@ useEffect(() => {
         <div className="dashboard-row">
 
           <div className="grid-col-md-4">
-            <div className="info-card-base card-gradient-blue">
+            <div className="info-card-base rounded card-gradient-blue">
               <img src={Circle} className='card-pulse-image' alt='' />
               <div className="text-color-white font-weight-bold">Total Active Employees</div>
               <div className="text-color-white font-size-4 display-flex spacing-mt-2"> {formattedTotalActiveEmployees}</div>
@@ -1179,7 +1888,7 @@ useEffect(() => {
           </div>
 
           <div className="grid-col-md-4">
-            <div className="info-card-base card-gradient-pink" style={{ cursor: "pointer" }}>
+            <div className="info-card-base rounded card-gradient-pink" style={{ cursor: "pointer" }}>
               <img src={Circle} className='card-pulse-image' alt='' />
               <div className="text-color-white font-weight-bold">Total Salary Generated</div>
               <div className="text-color-white font-size-4 display-flex spacing-mt-2">
@@ -1190,7 +1899,7 @@ useEffect(() => {
           </div>
 
           <div className="grid-col-md-4">
-            <div className="info-card-base card-gradient-indigo" style={{ cursor: "pointer" }}>
+            <div className="info-card-base rounded card-gradient-indigo" style={{ cursor: "pointer" }}>
               <img src={Circle} className='card-pulse-image' alt='' />
               <div className="text-color-white font-weight-bold">Number of Salary Generated</div>
               <div className="text-color-white font-size-4 display-flex spacing-mt-2">
@@ -1202,9 +1911,9 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="dashboard-row">
-        <div className="grid-col-lg-6">
-          <div className="app-card-base attendance-card-wrapper rounded-xl app-shadow-lg height-full">
+      <div className="dashboard-row spacing-mt-2">
+        <div className="grid-col-lg-4 grid-col-md-6 spacing-mb-3">
+          <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
             <div className="display-flex flex-between-center">
               <h6 className="card-title-heading spacing-mb-0">Today Attendance</h6>
               <button className="shadow-none-custom app-btn btn-outline-primary-custom" onClick={handleToggle}>
@@ -1220,7 +1929,7 @@ useEffect(() => {
                   <p>Loading...</p>
                 )
               ) : (
-                <div className="app-grid-theme" style={{ height: 255, width: '100%' }}>
+                <div className="app-grid-theme ag-theme-alpine" style={{ height: 255, width: '100%' }}>
                   <AgGridReact
                     rowData={leaveRowData}
                     columnDefs={columnLeave}
@@ -1232,75 +1941,130 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="grid-col-lg-6">
-          <div className="app-card-base leave-list-wrapper rounded-xl app-shadow-lg height-full" style={{ maxHeight: "465px", paddingBottom: "80px" }}>
+        {/* 2. SHIFT PATTERN SUMMARY (Center) */}
+        <div className="grid-col-lg-4 grid-col-md-6 spacing-mb-3">
+          <div className="app-card-base shift-pattern-wrapper rounded app-shadow-lg height-full">
             <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading">Leave Approvals</h6>
+              <h6 className="card-title-heading spacing-mb-0">Shift Pattern</h6>
             </div>
-            <ul className="app-list-group spacing-mt-3" style={{ height: "250px" }}>
-              {leaveRequests.length > 0 ? (
+
+            <div className="shift-chart-container" style={{ position: 'relative', height: '240px', marginTop: '30px' }}>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={shiftData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                  // label={({ name, value }) => `${name} (${value})`}
+                  >
+
+                    {shiftData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* <div className="shift-legend-list spacing-mt-3">
+              {shiftData.map((item, idx) => (
+                <div key={idx} className="shift-legend-item">
+                  <span className="dot" style={{ backgroundColor: item.color }}></span>
+                  <span className="label">{item.name}</span>
+                  <span className="count">{item.value}</span>
+                </div>
+              ))}
+            </div> */}
+          </div>
+        </div>
+
+        <div className="grid-col-lg-4 grid-col-12 spacing-mb-3">
+          <div className="app-card-base leave-list-wrapper rounded app-shadow-lg height-full" style={{ maxHeight: "465px", overflow: 'hidden' }}>
+
+            {/* Header with Count */}
+            <div className="display-flex flex-between-center spacing-mb-3 padding-horizontal-2">
+              <h6 className="card-title-heading spacing-mb-0">Leave Approvals</h6>
+              <span className="leave-count-badge">
+                {leaveRequests.filter(r => r.status === "Pending").length} Pending
+              </span>
+            </div>
+
+            {/* Scrollable List Container */}
+            <div className="custom-list-container" style={{ height: "380px", overflowY: "auto" }}>
+              {leaveRequests.filter(r => r.status === "Pending").length > 0 ? (
                 leaveRequests.map((request, index) => (
-                  request.status === "Pending" && (
-                    <li
-                      key={index}
-                      className="leave-request-item display-flex flex-col flex-md-row-custom flex-between-center align-start"
-                    >
-                      <div className="display-flex align-start spacing-mb-2 spacing-mt-md-0 grid-col-12">
+                  <div key={index} className="leave-item-modern">
+
+                    {/* Left Side: Checkbox & Emp Info */}
+                    <div className="leave-item-left">
+                      <div className="checkbox-wrapper">
                         <input
                           type="checkbox"
-                          className="app-checkbox-input spacing-me-3 spacing-mt-1"
+                          className="app-checkbox-input"
                           id={`select-row-${index}`}
-                          onChange={(e) =>
-                            handleRowSelection(request.id, request.FromDate, e.target.checked)
-                          }
+                          onChange={(e) => handleRowSelection(request.id, request.FromDate, e.target.checked)}
                         />
-                        <label htmlFor={`select-row-${index}`} className="grid-col-12">
-                          <div className="font-weight-bold text-color-dark">{request.EmployeeId}</div>
-                          <small className="text-muted-color display-block-custom spacing-mb-1">{request.EmployeeName}</small>
-                          <div className="display-flex flex-wrap flex-gap-2 text-muted-color font-size-small request-detail-badge-group">
-                            <span><strong>Leave Type:</strong> {request.LeaveType}</span>
-                            <span><strong>From:</strong> {request.FromDate}</span>
-                            <span><strong>To:</strong> {request.ToDate}</span>
-                            <span><strong>Days:</strong> {request.LeaveDays}</span>
-                          </div>
-                        </label>
                       </div>
+                      <div className="emp-details">
+                        <div className="emp-info-header">
+                          <span className="emp-id-text">{request.EmployeeId}</span>
+                          <span className="separator">-</span>
+                          <span className="emp-name-text">{request.EmployeeName}</span>
+                        </div>
+                        <div className="leave-type-pill">{request.LeaveType}</div>
+                      </div>
+                    </div>
 
-                      <div className="display-flex flex-end request-action-icons spacing-mt-2 spacing-mt-md-0">
-                        <span
-                          className="action-icon-base icon-approve spacing-me-2"
+                    {/* Center: Date Info */}
+                    <div className="leave-item-center">
+                      <div className="date-box">
+                        <span className="date-label">Duration ({request.LeaveDays} Days)</span>
+                        <div className="date-range-text">
+                          {request.FromDate} <i className="fa-solid fa-arrow-right"></i> {request.ToDate}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side: Quick Actions */}
+                    <div className="leave-item-right">
+                      <div className="action-button-group">
+                        <button
+                          className="btn-action-minimal approve"
                           onClick={() => handleApproval(request.id, request.FromDate, true)}
-                          title="Approve"
-                          role="button"
-                          tabIndex="0"
                         >
-                          <i className="fa-solid fa-circle-check"></i>
-                        </span>
-
-                        <span
-                          className="action-icon-base icon-reject"
+                          <i className="fa-solid fa-check"></i>
+                        </button>
+                        <div className="action-divider"></div>
+                        <button
+                          className="btn-action-minimal reject"
                           onClick={() => handleApproval(request.id, request.FromDate, false)}
-                          title="Reject"
-                          role="button"
-                          tabIndex="0"
                         >
-                          <i className="fa-solid fa-circle-xmark"></i>
-                        </span>
+                          <i className="fa-solid fa-xmark"></i>
+                        </button>
                       </div>
-                    </li>
-                  )
+                    </div>
+                  </div>
                 ))
               ) : (
-                <li className="leave-request-item text-align-center text-muted-color">No data available</li>
+                <div className="no-data-state">
+                  <i className="fa-solid fa-calendar-check"></i>
+                  <p>All caught up!</p>
+                </div>
               )}
-            </ul>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded-xl app-shadow-lg height-full">
+          <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
             <div className="display-flex flex-between-center flex-wrap">
               <h6 className="card-title-heading">New Joinees</h6>
             </div>
@@ -1359,7 +2123,7 @@ useEffect(() => {
         </div>
 
         <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded-xl app-shadow-lg height-full" >
+          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
             <div className="display-flex flex-between-center">
               <h6 className="card-title-heading">Upcoming Birthdays</h6>
             </div>
@@ -1392,7 +2156,7 @@ useEffect(() => {
         </div>
 
         <div className="grid-col-lg-6">
-          <div className="app-card-base rounded-xl birthday-card-wrapper app-shadow-lg height-full">
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
             <div className="display-flex flex-between-center">
               <h6 className="card-title-heading spacing-mb-2">My Team</h6>
               <div className="display-flex flex-end">
@@ -1432,7 +2196,7 @@ useEffect(() => {
                 </div>
               </div>
             ) : (
-              <div className="app-grid-theme spacing-mt-4 rounded-xl" style={{ height: 255, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl" style={{ height: 255, width: '100%' }}>
                 <AgGridReact
                   columnDefs={columnDefsList}
                   rowData={rowDataTeamList}
@@ -1444,11 +2208,248 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
-          <div className="birthday-card-wrapper rounded-xl app-shadow-lg height-full">
+          <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
+            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Employee Shift Details</h6>
+
+            <div className="dashboard-row mb-2-me-1">
+
+              <div className="grid-col-md-3">
+                <div className="inputGroup">
+                  <input
+                    id="status"
+                    className="exp-input-field form-control"
+                    type="date"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={shiftFromDate}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    onChange={(e) => setShiftFromDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">From Date</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-3">
+                <div className="inputGroup">
+                  <input
+                    id="status"
+                    className="exp-input-field form-control"
+                    type="date"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={shiftToDate}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    onChange={(e) => setShiftToDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">To Date</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-5">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedShiftEmpId ? "has-value" : ""} 
+                  ${isSelectedShiftEmpId ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedShiftEmpId(true)}
+                    onBlur={() => setIsSelectedShiftEmpId(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    type="text"
+                    options={filteredOptionEmpId}
+                    onChange={handleChangeEmpId}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    value={selectedShiftEmpId}
+                  />
+                  <label className="floating-label">Employee ID</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-5">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedShiftDeptId ? "has-value" : ""} 
+                  ${isSelectedShiftDeptId ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedShiftDeptId(true)}
+                    onBlur={() => setIsSelectedShiftDeptId(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    type="text"
+                    options={filteredOptionDeptId}
+                    onChange={handleChangeDeptId}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    value={selectedShiftDeptId}
+                  />
+                  <label className="floating-label">Department ID</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-5">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedShiftDesigId ? "has-value" : ""} 
+                  ${isSelectedShiftDesigId ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedShiftDesigId(true)}
+                    onBlur={() => setIsSelectedShiftDesigId(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    type="text"
+                    options={shiftDesigIdDrop}
+                    onChange={handleChangeDesigId}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    value={selectedShiftDesigId}
+                  />
+                  <label className="floating-label">Designation ID</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-5">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedShiftPatternId ? "has-value" : ""} 
+                  ${isSelectedShiftPatternId ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedShiftPatternId(true)}
+                    onBlur={() => setIsSelectedShiftPatternId(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    type="text"
+                    options={filteredOptionShiftPatternId}
+                    onChange={handleChangeShiftPatternId}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    value={selectedShiftPatternId}
+                  />
+                  <label className="floating-label">Shift Pattern ID</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-5">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedShiftCode ? "has-value" : ""} 
+                  ${isSelectedShiftCode ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedShiftCode(true)}
+                    onBlur={() => setIsSelectedShiftCode(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    type="text"
+                    options={filteredOptionShiftCode}
+                    onChange={handleChangeShiftCode}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    value={selectedShiftCode}
+                  />
+                  <label className="floating-label">Shift Code</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-3">
+                <div className="inputGroup">
+                  <input
+                    id="status"
+                    className="exp-input-field form-control"
+                    type="number"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={shiftDay}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    onChange={(e) => setShiftDay(e.target.value)}
+                  />
+                  <label className="exp-form-labels">Day Sequence</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-3">
+                <div className="inputGroup">
+                  <input
+                    id="status"
+                    className="exp-input-field form-control"
+                    type="time"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={shiftStartTime}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    onChange={(e) => setShiftStartTime(e.target.value)}
+                  />
+                  <label className="exp-form-labels">Start Time</label>
+                </div>
+              </div>
+
+              <div className="grid-col-md-3">
+                <div className="inputGroup">
+                  <input
+                    id="status"
+                    className="exp-input-field form-control"
+                    type="time"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={shiftEndTime}
+                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                    onChange={(e) => setShiftEndTime(e.target.value)}
+                  />
+                  <label className="exp-form-labels">End Time</label>
+                </div>
+              </div>
+
+              <div className="ms-2">
+                <div className="search-btn-wrapper">
+                  <div className="icon-btn search" onClick={handleShiftSearch}>
+                    <span className="tooltip">Search</span>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
+                  <div className="icon-btn reload" onClick={reloadGridData}>
+                    <span className="tooltip">Reload</span>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+                  <div className="icon-btn excel" onClick={handleExportToExcelShift}>
+                    <span className="tooltip">Excel</span>
+                    <i className="fa-solid fa-file-excel"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-body">
+              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+                <AgGridReact
+                  columnDefs={ShiftColDefs}
+                  rowData={shiftRowData}
+                  suppressRowClickSelection={true}
+                  onGridReady={(params) => {
+                    gridApiRef.current = params.api;
+                    gridColumnApiRef.current = params.columnApi;
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-row spacing-mt-2">
+        <div className="grid-col-12">
+          <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
             <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Employee Details</h6>
-            
+
             <div className="dashboard-row mb-2-me-1">
               <div className="grid-col-md-3">
                 <div className="inputGroup">
@@ -1634,12 +2635,16 @@ useEffect(() => {
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
+                  <div className="icon-btn excel" onClick={handleExportToExcel}>
+                    <span className="tooltip">Excel</span>
+                    <i className="fa-solid fa-file-excel"></i>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={columnDefs}
                   rowData={rowData}

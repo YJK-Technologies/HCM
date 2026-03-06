@@ -233,7 +233,7 @@ const menuData = [
         ],
       },
       {
-        label: "Interview Panel Management",
+        label: "Interview Management",
         isDropdown: true,
         subMenus: [
           { label: "Interview Dashboard", path: "/InterviewDashboard" },

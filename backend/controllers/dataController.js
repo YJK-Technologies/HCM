@@ -7,7 +7,9 @@ const dbConfig = require("../config/dbConfig");
 const multer = require('multer')
 const CryptoJS = require('crypto-js');
 const upload = multer({ storage: multer.memoryStorage() });//add in top of the datacontroller page
-const path = require("path");
+const path = require("path")
+const PDFDocument = require("pdfkit");
+const moment = require("moment");
 const fs = require("fs");
 const otpStorage = {};
 
@@ -36286,13 +36288,143 @@ const getInterviewDashboardCount = async (req, res) => {
 //Code ended by pavun on 03-03-26
 
 //code added by pavun on 05-03-26
+const generateShiftPDF = (employee, shifts) => {
+  const pdfDir = path.join(__dirname, "pdf");
+  if (!fs.existsSync(pdfDir)) {
+    fs.mkdirSync(pdfDir);
+  }
+
+  const filePath = path.join(pdfDir, `Shift_${employee.Employee_ID}.pdf`);
+  const doc = new PDFDocument({
+    margin: 40,
+    size: "A4",
+  });
+
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- CONFIGURATION (Matching Sample Colors) ---
+  const colors = {
+    primary: "#0f4c81",    // Dark Blue (Table Header)
+    secondary: "#f4f6f9",  // Light Gray (Background)
+    text: "#333333",
+    rowAlt: "#f7f7f7",     // Zebra striping
+    border: "#dddddd"
+  };
+
+  /* ---------- HEADER WITH LOGO ---------- */
+  // Note: Ensure your logo exists at this path or use a placeholder
+  const logoPath = path.join(__dirname, "public", "favicon.ico"); 
+  
+  // Header Background Box (The blue bar from your sample)
+  doc.rect(0, 0, 600, 100).fill(colors.primary);
+
+  if (fs.existsSync(logoPath)) {
+    doc.image(logoPath, 40, 25, { height: 50 });
+  }
+
+  doc
+    .fillColor("white")
+    .fontSize(22)
+    .font("Helvetica-Bold")
+    .text("Employee Shift Schedule", 160, 40, { align: "left" });
+
+  doc.moveDown(4);
+
+  /* ---------- SUB-INFO SECTION ---------- */
+  doc.fillColor(colors.text).fontSize(10).font("Helvetica");
+  
+  const currentY = 115;
+  doc.text(`Employee Name: ${employee.First_Name || ""}`, 40, currentY);
+  doc.text(`Employee ID: ${employee.Employee_ID}`, 40, currentY + 15);
+  
+  doc.text(`Total Records: ${shifts.length}`, 400, currentY, { align: "right" });
+  doc.text(`Printed Date: ${moment().format("DD-MM-YYYY")}`, 400, currentY + 15, { align: "right" });
+
+  /* ---------- TABLE DESIGN ---------- */
+  const tableX = 40;
+  const column = {
+    date: tableX + 10,
+    shift: tableX + 130,
+    start: tableX + 270,
+    end: tableX + 390
+  };
+
+  let y = 160;
+
+  const drawHeader = () => {
+    // Header background
+    doc.rect(tableX, y, 520, 30).fill(colors.primary);
+
+    doc
+      .fillColor("white")
+      .font("Helvetica-Bold")
+      .fontSize(11)
+      .text("Date", column.date, y + 10)
+      .text("Shift Name", column.shift, y + 10)
+      .text("Start Time", column.start, y + 10)
+      .text("End Time", column.end, y + 10);
+
+    y += 30;
+  };
+
+  drawHeader();
+
+  /* ---------- TABLE BODY ---------- */
+  shifts.forEach((shift, index) => {
+    // Page breaking logic
+    if (y > 730) {
+      doc.addPage();
+      y = 40;
+      drawHeader();
+    }
+
+    // Zebra Striping
+    const isEven = index % 2 === 0;
+    if (isEven) {
+      doc.rect(tableX, y, 520, 25).fill(colors.rowAlt);
+    }
+
+    // Border Bottom
+    doc.moveTo(tableX, y + 25)
+       .lineTo(tableX + 520, y + 25)
+       .strokeColor(colors.border)
+       .lineWidth(0.5)
+       .stroke();
+
+    doc
+      .fillColor(colors.text)
+      .font("Helvetica")
+      .fontSize(10)
+      .text(moment(shift.Date).format("DD-MM-YYYY"), column.date, y + 8)
+      .text(shift.Shift_Name || shift.Shift_Code || "-", column.shift, y + 8)
+      .text(shift.Start_Time || "-", column.start, y + 8)
+      .text(shift.End_Time || "-", column.end, y + 8);
+
+    y += 25;
+  });
+
+  /* ---------- FOOTER ---------- */
+  const pageCount = doc.bufferedPageRange().count;
+  // doc.fontSize(9).fillColor("gray");
+  // doc.text(
+  //   `© ${new Date().getFullYear()} YJK Technologies | Confidential Report`,
+  //   0,
+  //   doc.page.height - 50,
+  //   { align: "center" }
+  // );
+
+  doc.end();
+  return filePath;
+};
+
 const getGenerateShift = async (req, res) => {
   const { department_ID, designation_ID, Employee_ID, From_Date, To_Date, company_code, created_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
+
     const result = await pool
       .request()
-      .input("mode", sql.NVarChar, 'GS')
+      .input("mode", sql.NVarChar, "GS")
       .input("department_ID", sql.NVarChar, department_ID)
       .input("designation_ID", sql.NVarChar, designation_ID)
       .input("Employee_ID", sql.NVarChar, Employee_ID)
@@ -36300,11 +36432,51 @@ const getGenerateShift = async (req, res) => {
       .input("To_Date", sql.NVarChar, To_Date)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Employee_Shift_Report @mode,@department_ID,@designation_ID,@Employee_ID,@From_Date,@To_Date,@company_code,@created_by,'','',''`);
-      res.status(200).json({ message: "Shift Generated Successfully" });
+      .query(`EXEC sp_Employee_Shift_Report @mode,@department_ID,@designation_ID,@Employee_ID,
+        @From_Date,@To_Date,@company_code,@created_by,'','',''`);
+
+    const shifts = result.recordset;
+    const grouped = {};
+    shifts.forEach(row => {
+      if (!grouped[row.Employee_ID]) {
+        grouped[row.Employee_ID] = [];
+      }
+      grouped[row.Employee_ID].push(row);
+    });
+
+    for (const empId in grouped) {
+
+      const empShifts = grouped[empId];
+      const employee = empShifts[0];
+
+      const pdfPath = generateShiftPDF(employee, empShifts);
+
+      await transporter.sendMail({
+        from: "alert@yjktechnologies.com",
+        to: employee.email,
+        subject: "Your Shift Schedule",
+        text: "Please find attached your shift schedule",
+        attachments: [
+          {
+            filename: `Shift_${empId}.pdf`,
+            path: pdfPath
+          }
+        ]
+      });
+
+      // ✅ Mail sent success → Delete PDF
+      if (fs.existsSync(pdfPath)) {
+        fs.unlinkSync(pdfPath);
+      }
+    }
+
+    res.status(200).json({
+      message: "Shift Generated & Email Sent Successfully"
+    });
+
   } catch (err) {
-    console.error("Error during update:", err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -36356,6 +36528,74 @@ const getDepartmentDashboard = async (req, res) => {
     });
   }
 };//code ended by sakthi on 05-03-26
+
+//code added by pavun on 06-03-26
+const getDepartment = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_department 'FD','','',@company_code,'','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getAdEmpShiftReport = async (req, res) => { /*Admin Dashboard Screen Mode */
+  const { From_Date, To_Date, Employee_ID, department_ID, designation_ID, Shift_Pattern_ID, Shift_Code,
+    Day_Sequence, Start_Time, End_Time, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'ESR')
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("department_ID", sql.NVarChar, department_ID)
+      .input("designation_ID", sql.NVarChar, designation_ID)
+      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
+      .input("Shift_Code", sql.NVarChar, Shift_Code)
+      .input("Day_Sequence", sql.Int, Day_Sequence)
+      .input("Start_Time", sql.NVarChar, Start_Time)
+      .input("End_Time", sql.NVarChar, End_Time)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Daily_Shift_Report @mode,@From_Date,@To_Date,@Employee_ID,@department_ID,@designation_ID,@Shift_Pattern_ID,@Shift_Code,@Day_Sequence,@Start_Time,@End_Time,@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const shiftPatternChart = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'TSPS')
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Shift_Report @mode,'','','','','',@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//code ended by pavun on 06-03-26
 
 module.exports = {
   login,
@@ -37581,7 +37821,10 @@ module.exports = {
     getInterviewDashboardCount,
     getGenerateShift,
     getEmpShiftReport,
-    getDepartmentDashboard
+    getDepartmentDashboard,
+    getDepartment,
+    getAdEmpShiftReport,
+    shiftPatternChart
 
 
 };
