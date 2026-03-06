@@ -153,11 +153,15 @@
   border-radius: 20px !important;
 }
 
+.dashboard-row {
+  --bs-gutter-x: 10px;
+}
+
 /* ===================================================== */
 /* 2. GRID SYSTEM (COLS)               */
 /* ===================================================== */
 .dashboard-row {
-  --bs-gutter-x: 1.5rem;
+  /* --bs-gutter-x: 1.5rem; */
   --bs-gutter-y: 0;
   display: flex;
   flex-wrap: wrap;
@@ -174,6 +178,10 @@
 
 .grid-col-12 {
   width: 100%;
+}
+
+.grid-col-md-3 {
+  width: 15%;
 }
 
 .grid-col-md-4 {
@@ -288,12 +296,12 @@
 .dashboard-layout {
   width: 100%;
   max-width: 100%;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
 .info-card-base {
   padding: 20px;
-  border-radius: 12px;
+  /* border-radius: 12px; */
   position: relative;
   overflow: hidden;
   height: 120px;
@@ -304,7 +312,7 @@
 
 .info-card-base:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); */
 }
 
 .card-gradient-blue {
@@ -1254,4 +1262,280 @@
     align-items: flex-start !important;
     gap: 15px;
   }
+}
+
+.flex-center{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Shift Pattern Specific Styles */
+.shift-pattern-wrapper {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.shift-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Label inside the Doughnut Hole */
+.shift-chart-center-label {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.shift-chart-center-label .total-count {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #333;
+  line-height: 1;
+}
+
+.shift-chart-center-label small {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Custom Legend below the chart */
+.shift-legend-list {
+  border-top: 1px solid #f1f3f5;
+  padding-top: 15px;
+}
+
+.shift-legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.shift-legend-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.shift-legend-item .label {
+  flex-grow: 1;
+  color: #555;
+}
+
+.shift-legend-item .count {
+  font-weight: 700;
+  color: #222;
+  background: #f8f9fa;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Updated Responsive Grid for 3-column layout */
+@media (min-width: 992px) {
+  .grid-col-lg-4 {
+    width: 33.333333%;
+  }
+}
+
+/* Ensure equal heights for cards in the same row */
+.dashboard-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dashboard-row > [class*="grid-col-"] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card Container */
+.leave-item-modern {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin: 10px 10px 10px 10px;
+  background: #fcfcfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.leave-item-modern:hover {
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Left Section: Employee Info */
+.leave-item-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.emp-details {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Employee ID - Name inline alignment */
+.emp-info-header {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Gap between ID, hyphen, and Name */
+  margin-bottom: 2px;
+}
+
+.emp-id-text {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.85rem;
+}
+
+.separator {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.emp-name-text {
+  color: #64748b;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px; /* Adjust based on your column width */
+}
+
+.leave-type-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #eff6ff;
+  color: #2563eb;
+  /* padding: 2px 8px; */
+  border-radius: 20px;
+  width: fit-content;
+}
+
+/* Center Section: Dates */
+.leave-item-center {
+  flex: 1.2;
+  text-align: center;
+  border-left: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  padding: 0 10px;
+}
+
+.date-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.date-range-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Right Section: Action Buttons */
+.leave-item-right {
+  display: flex;
+  gap: 8px;
+  padding-left: 10px;
+}
+
+/* New Modern Action Group Design */
+.action-button-group {
+  display: flex;
+  align-items: center;
+  background: #f8fafc; /* Very light gray background */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.action-button-group:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-action-minimal {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.action-divider {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+}
+
+/* Hover effects for the group buttons */
+.btn-action-minimal.approve {
+  color: #10b981; /* Emerald Green */
+}
+
+.btn-action-minimal.approve:hover {
+  background-color: #dcfce7;
+}
+
+.btn-action-minimal.reject {
+  color: #ef4444; /* Rose Red */
+}
+
+.btn-action-minimal.reject:hover {
+  background-color: #fee2e2;
+}
+
+/* Mobile check: ensure it doesn't break on small screens */
+@media (max-width: 1200px) {
+  .emp-info-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+/* Header Badge */
+.leave-count-badge {
+  background: #3b82f6;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* No Data State */
+.no-data-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: #cbd5e1;
+}
+
+.no-data-state i {
+  font-size: 3rem;
+  margin-bottom: 10px;
 }

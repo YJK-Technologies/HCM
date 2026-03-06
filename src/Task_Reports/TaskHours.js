@@ -32,6 +32,7 @@ const MyAgGridComponent = () => {
   const columnEmployee = [
     { headerName: 'Date', field: 'work_date', sort: 'asc', valueFormatter: (params) => formatDate(params.value), width: '110' },
     { headerName: 'Employee ID', field: 'user', editable: true, width: '170' },
+    { headerName: 'Shift Code', field: 'Shift_Code', editable: true, width: '170' },
     // { headerName: 'Employee Name', field: 'user' },
     { headerName: 'Status', field: 'Status', width: '90' },
     { headerName: 'Check In', field: 'First_CheckIn', width: '100' },
@@ -174,6 +175,7 @@ const MyAgGridComponent = () => {
             Total_login_Hours: task.Total_login_Hours,
             user: `${task.user} - ${task.user_name}`, // Combine user and user_name
             userid: task.TaskTitle,
+            Shift_Code: task.Shift_Code,
             work_date: task.work_date,
             Status: task.Status,
             Balance_Hours: task.Balance_Hours,
