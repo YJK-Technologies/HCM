@@ -27023,7 +27023,7 @@ const DailyLogin = async (req, res) => {
       .input("Location", sql.VarChar, Location)
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,@company_code,@created_by,'',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`);
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
