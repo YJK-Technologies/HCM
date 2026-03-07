@@ -204,6 +204,7 @@ const menuData = [
         isDropdown: true,
         subMenus: [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
+          { label: "Employee Requests", path: "/VisaRequest" },
         ],
       },
       {
