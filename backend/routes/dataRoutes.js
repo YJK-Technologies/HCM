@@ -1258,6 +1258,7 @@ router.post("/getDepartmentDashboard",dataController.getDepartmentDashboard)
 router.post("/getDepartment",dataController.getDepartment)
 router.post("/getAdEmpShiftReport",dataController.getAdEmpShiftReport)
 router.post("/shiftPatternChart",dataController.shiftPatternChart)
+router.post("/Shift_Summary_Report",dataController.Shift_Summary_Report)
 
 
 

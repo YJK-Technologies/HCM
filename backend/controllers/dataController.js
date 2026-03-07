@@ -36597,6 +36597,35 @@ const shiftPatternChart = async (req, res) => {
 };
 //code ended by pavun on 06-03-26
 
+//code added by sakthi on 07-03-26
+const Shift_Summary_Report = async (req, res) => {
+  const { From_Date, To_Date, Employee_ID, Shift_Name, Company_Code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("Shift_Name", sql.NVarChar, Shift_Name)
+      .input("company_code", sql.NVarChar, Company_Code)
+      .query(`EXEC sp_Shift_Summary_Report @mode, @From_Date, @To_Date, @Employee_ID, @Shift_Name, @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Shift Summary Report:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};//code ended by sakthi on 07-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -37824,7 +37853,8 @@ module.exports = {
     getDepartmentDashboard,
     getDepartment,
     getAdEmpShiftReport,
-    shiftPatternChart
+    shiftPatternChart,
+    Shift_Summary_Report
 
 
 };
