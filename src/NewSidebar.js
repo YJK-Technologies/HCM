@@ -202,6 +202,7 @@ const menuData = [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
+          { label: "Loan Request", path: "/LoanRequest" },
         ],
       },
       {
