@@ -1277,6 +1277,7 @@ router.post("/loan_requestsLoopInsert",dataController.loan_requestsLoopInsert)
 router.post("/loan_requestsLoopUpdate",dataController.loan_requestsLoopUpdate)
 router.post("/loan_requestsLoopDelete",dataController.loan_requestsLoopDelete)
 router.post("/getVisaType",dataController.getVisaType)
+router.post("/visaRequestSearch",dataController.visaRequestSearch)
 
 
 

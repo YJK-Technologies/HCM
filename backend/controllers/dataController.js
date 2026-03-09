@@ -37267,6 +37267,42 @@ const getVisaType = async (req, res) => {
     res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
+
+const visaRequestSearch = async (req, res) => {
+  const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id, purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level, sponsor_name, estimated_cost, Remarks, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("visa_request_id", sql.NVarChar, visa_request_id)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("passport_id", sql.NVarChar, passport_id)
+      .input("destination_country_id", sql.NVarChar, destination_country_id)
+      .input("visa_type_id", sql.NVarChar, visa_type_id)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("travel_start_date", sql.NVarChar, travel_start_date)
+      .input("travel_end_date", sql.NVarChar, travel_end_date)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("sponsor_name", sql.NVarChar, sponsor_name)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, '', '', '', '', ''`);
+
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during visa_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
 //Code ended pavun on 07-03-26
 
 module.exports = {
@@ -38515,6 +38551,7 @@ module.exports = {
     loan_requestsLoopInsert,
     loan_requestsLoopUpdate,
     loan_requestsLoopDelete,
-    getVisaType
+    getVisaType,
+    visaRequestSearch
 
 };
