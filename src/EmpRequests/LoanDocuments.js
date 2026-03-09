@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function LoanApprovals({}) {
+function LoanDocuments({}) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,15 +24,15 @@ function LoanApprovals({}) {
   const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
   const [isLoanReqFocus, setIsLoanReqFocus] = useState(false);
   const [isLoanReqFocusSC, setIsLoanReqFocusSC] = useState(false);
-  const [approval_id, setapproval_id] = useState("");
-  const [approver_id, setapprover_id] = useState("");
-  const [approval_level, setapproval_level] = useState("");
-  const [empIdDrop, setEmpIdDrop] = useState([]);
+  const [document_id, setdocument_id] = useState("");
+  const [document_type, setdocument_type] = useState("");
+  const [file_path, setfile_path] = useState("");
+  const [uploaded_by, setuploaded_by] = useState([]);
   const [selectedStatus, setselectedStatus] = useState("");
   const [selectedStatusSC, setselectedStatusSC] = useState("");
   const [ApprovalStatus, setApprovalStatus] = useState("");
   const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
-  const [approval_date, setapproval_date] = useState("");
+  const [uploaded_at, setuploaded_at] = useState("");
   const [approval_dateSC, setapproval_dateSC] = useState("");
   const [remarks, setRemarks] = useState("");
   const [remarksSC, setRemarksSC] = useState("");
@@ -46,20 +46,7 @@ function LoanApprovals({}) {
   const [approval_levelSC, setapproval_levelSC] = useState("");
   const [empIdDropSc, setEmpIdDropSc] = useState([]);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setEmpIdDrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
@@ -328,13 +315,13 @@ const handleSave = async () => {
 
   try {
     const Header = {
-      approval_id: approval_id,
-      loan_request_id: loanReqId,
-      approver_id: approver_id,
-      approval_level: approval_level,
-      approval_status: ApprovalStatus,
-      approval_date: approval_date,
-      remarks: remarks,
+    //   approval_id: approval_id,
+    //   loan_request_id: loanReqId,
+    //   approver_id: approver_id,
+    //   approval_level: approval_level,
+    //   approval_status: ApprovalStatus,
+    //   approval_date: approval_date,
+    //   remarks: remarks,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       keyfield: '',
       created_by: sessionStorage.getItem("selectedUserCode"),
@@ -371,13 +358,13 @@ const handleSearch = async () => {
 
   try {
     const body = {
-      approval_id: approval_idSC ? approval_idSC : 0,
-      loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
-      approver_id: approver_idSC ? approver_idSC : 0,
-      approval_level: approval_levelSC ? approval_levelSC : 0,
-      approval_status: ApprovalStatusSC || "",
-      approval_date: approval_dateSC || "",
-      remarks: remarksSc || "",
+    //   approval_id: approval_idSC ? approval_idSC : 0,
+    //   loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
+    //   approver_id: approver_idSC ? approver_idSC : 0,
+    //   approval_level: approval_levelSC ? approval_levelSC : 0,
+    //   approval_status: ApprovalStatusSC || "",
+    //   approval_date: approval_dateSC || "",
+    //   remarks: remarksSc || "",
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
 
@@ -664,12 +651,12 @@ const handleSearch = async () => {
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Loan Approval</h1>
+          <h1 className="page-title">Loan Documents</h1>
           <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
+            {/* <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -684,14 +671,14 @@ const handleSearch = async () => {
                 placeholder=""
                 required
                 autoComplete="off"
-                value={approval_id}
-                onChange={(e) => setapproval_id(e.target.value)}
+                value={document_id}
+                onChange={(e) => setdocument_id(e.target.value)}
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !approval_id ? "text-danger" : ""}`}
+                className={`exp-form-labels ${error && !document_id ? "text-danger" : ""}`}
               >
-                Approval ID<span className="text-danger">*</span>
+                Document ID<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -727,11 +714,11 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approver_id}
-                onChange={(e) => setapprover_id(e.target.value)}
+                value={document_type}
+                onChange={(e) => setdocument_type(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                Approver ID
+                Document Type
               </label>
             </div>
           </div>
@@ -741,43 +728,45 @@ const handleSearch = async () => {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approval_level}
-                onChange={(e) => setapproval_level(e.target.value)}
+                value={file_path}
+                onChange={(e) => setfile_path(e.target.value)}
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !approval_level ? "text-danger" : ""}`}
+                className={`exp-form-labels ${error && !file_path ? "text-danger" : ""}`}
               >
-                Approval Level<span className="text-danger">*</span>
+                File Path<span className="text-danger">*</span>
               </label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-                ${selectedStatus ? "has-value" : ""} 
-                ${isSearchStatus ? "is-focused" : ""}`}
-            >
-              <Select
-                id="Select_slots"
-                value={selectedStatus}
-                onChange={handleStatus}
-                options={filterOptionStatus}
-                placeholder=" "
-                onFocus={() => setIsSearchStatus(true)}
-                onBlur={() => setIsSearchStatus(false)}
-                classNamePrefix="react-select"
-                isClearable
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={uploaded_by}
+                onChange={(e) => setuploaded_by(e.target.value)}
               />
-              <label className="floating-label">Approval Status</label>
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !uploaded_by ? "text-danger" : ""}`}
+              >
+                Uploaded By<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
+
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -789,14 +778,14 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approval_date}
-                onChange={(e) => setapproval_date(e.target.value)}
+                value={uploaded_at}
+                onChange={(e) => setuploaded_at(e.target.value)}
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !approval_date ? "text-danger" : ""}`}
+                className={`exp-form-labels ${error && !uploaded_at ? "text-danger" : ""}`}
               >
-                Approval Date<span className="text-danger">*</span>
+                Uploaded Date<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -1002,4 +991,4 @@ const handleSearch = async () => {
     </div>
   );
 }
-export default LoanApprovals;
+export default LoanDocuments;
