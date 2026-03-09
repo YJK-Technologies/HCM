@@ -26,30 +26,6 @@ function EmployeeTypeMaster() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [employmentTypeId, setEmploymentId] = useState('');
-    const [employmentType, setEmploymentType] = useState('');
-    const [selectedEmploymentType, setSelectedEmploymentType] = useState('');
-    const [employmentTypeDrop, setEmploymentTypeDrop] = useState([]);
-    const [description, setDescription] = useState('');
-    // const [status, setStatus] = useState('');
-    // const [selectedStatus, setSelectedStatus] = useState('');
-    // const [statusDrop, setStatusDrop] = useState([]);
-
-    const [employmentTypeIdSc, setEmploymentIdSc] = useState('');
-    const [employmentTypeSc, setEmploymentTypeSc] = useState('');
-    const [selectedEmploymentTypeSc, setSelectedEmploymentTypeSc] = useState('');
-    const [employmentTypeDropSc, setEmploymentTypeDropSc] = useState([]);
-    const [descriptionSc, setDescriptionSc] = useState('');
-    // const [statusSc, setStatusSc] = useState('');
-    // const [selectedStatusSc, setSelectedStatusSc] = useState('');
-    // const [statusDropSc, setStatusDropSc] = useState([]);
-    // const [statusDropGrid, setStatusDropGrid] = useState([]);
-    const [employmentTypeDropGrid, setEmploymentTypeDropGrid] = useState([]);
-
-    // const [isSelectStatus, setIsSelectStatus] = useState(false);
-    const [isSelectedEmploymentType, setIsSelectEmploymentType] = useState(false);
-    // const [isSelectStatusSc, setIsSelectStatusSc] = useState(false);
-    const [isSelectedEmploymentTypeSc, setIsSelectEmploymentTypeSc] = useState(false);
 
     const [employeeShiftId, setEmployeeShiftId] = useState('');
     const [employeeId, setEmployeeId] = useState('');
@@ -116,6 +92,21 @@ function EmployeeTypeMaster() {
     const companyMappingPermission = permissions
         .filter((permission) => permission.screen_type === "Company Mapping")
         .map((permission) => permission.permission_type.toLowerCase());
+
+    const searchClearInputFields = () => {
+        setEmployeeShiftIdSc("");
+        setSelectedEmployeeIdSc("");
+        setEmployeeIdSc("");
+        setSelectedShiftIdSc("");
+        setShiftIdSc("");
+        setSelectedShiftTypeIdSc("");
+        setShiftTypeIdSc("");
+        setSelectedShiftPatternIdSc("");
+        setEffectiveFromSc("");
+        setEffectiveToSc("");
+        setSelectedStatusSc("");
+        setStatusSc("");
+    };
 
     const handleChangeStatus = (selectedStatus) => {
         setSelectedStatus(selectedStatus);
@@ -188,8 +179,8 @@ function EmployeeTypeMaster() {
     }));
 
     const filteredOptionShiftPatternId = shiftPatternIdDrop.map((option) => ({
-        value: option.Shift_Pattern_ID,
-        label: `${option.Shift_Pattern_ID}-${option.Pattern_Name}`,
+        value: option.Pattern_Code,
+        label: `${option.Pattern_Code}-${option.Pattern_Name}`,
     }));
 
     const filteredOptionStatusSc = statusDropSc.map((option) => ({
@@ -213,8 +204,8 @@ function EmployeeTypeMaster() {
     }));
 
     const filteredOptionShiftPatternIdSc = shiftPatternIdDropSc.map((option) => ({
-        value: option.Shift_Pattern_ID,
-        label: `${option.Shift_Pattern_ID}-${option.Pattern_Name}`,
+        value: option.Pattern_Code,
+        label: `${option.Pattern_Code}-${option.Pattern_Name}`,
     }));
 
     useEffect(() => {
@@ -246,8 +237,8 @@ function EmployeeTypeMaster() {
             .then((response) => response.json())
             .then((data) => {
                 const shiftPatternIdOption = data.map((option) => ({
-                    value: option.Shift_Pattern_ID,
-                    label: `${option.Shift_Pattern_ID}-${option.Pattern_Name}`,
+                    value: option.Pattern_Code,
+                    label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
                 }));
                 setShiftPatternIdDropGrid(shiftPatternIdOption);
             })
@@ -267,7 +258,7 @@ function EmployeeTypeMaster() {
             .then((data) => {
                 const shiftTypeIdOption = data.map((option) => ({
                     value: option.Shift_Type_ID,
-                    label: `${option.Shift_Type_ID}-${option.Shift_Type}`,
+                    label: `${option.Shift_Type_ID} - ${option.Shift_Type}`,
                 }));
                 setShiftTypeIdDropGrid(shiftTypeIdOption);
             })
@@ -287,7 +278,7 @@ function EmployeeTypeMaster() {
             .then((data) => {
                 const shiftIdOption = data.map((option) => ({
                     value: option.Shift_ID,
-                    label: `${option.Shift_ID}-${option.Shift_Name}`,
+                    label: `${option.Shift_ID} - ${option.Shift_Name}`,
                 }));
                 setShiftIdDropGrid(shiftIdOption);
             })
@@ -307,7 +298,7 @@ function EmployeeTypeMaster() {
             .then((data) => {
                 const employeeIdOption = data.map((option) => ({
                     value: option.EmployeeId,
-                    label: `${option.EmployeeId}-${option.First_Name}`,
+                    label: `${option.EmployeeId} - ${option.First_Name}`,
                 }));
                 setEmployeeIdDropGrid(employeeIdOption);
             })
@@ -476,10 +467,8 @@ function EmployeeTypeMaster() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    Emp_Shift_ID: employeeShiftIdSc,
+                    // Emp_Shift_ID: employeeShiftIdSc,
                     Employee_ID: employeeIdSc,
-                    Shift_ID: shiftIdSc,
-                    Shift_Type_ID: shiftTypeIdSc,
                     Shift_Pattern_ID: shiftPatternIdSc,
                     Effective_From: effectiveFromSc,
                     Effective_To: effectiveToSc,
@@ -508,7 +497,8 @@ function EmployeeTypeMaster() {
     };
 
     const reloadGridData = () => {
-        window.location.reload();
+        setRowData([]);
+        searchClearInputFields();
     };
 
     const columnDefs = [
@@ -569,33 +559,7 @@ function EmployeeTypeMaster() {
             },
         },
         {
-            headerName: "Shift ID",
-            field: "Shift_ID",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: shiftIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = shiftIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
-            },
-        },
-        {
-            headerName: "Shift Type ID",
-            field: "Shift_Type_ID",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: shiftTypeIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = shiftTypeIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
-            },
-        },
-        {
-            headerName: "Shift Pattern ID",
+            headerName: "Shift Pattern Code",
             field: "Shift_Pattern_ID",
             editable: true,
             cellEditor: "agSelectCellEditor",
@@ -646,10 +610,10 @@ function EmployeeTypeMaster() {
 
     const tabs = [
         { label: "Shift Master" },
-        { label: "Shift Type Master" },
+        // { label: "Shift Type Master" },
         { label: "Shift Pattern Master" },
         { label: "Shift Pattern Details" },
-        { label: "Employment Type Master" },
+        // { label: "Employment Type Master" },
         { label: "Employee Shift Mapping" },
     ];
 
@@ -659,18 +623,18 @@ function EmployeeTypeMaster() {
             case "Shift Master":
                 ShiftMaster();
                 break;
-            case "Shift Type Master":
-                ShiftTypeMaster();
-                break;
+            // case "Shift Type Master":
+            //     ShiftTypeMaster();
+            //     break;
             case "Shift Pattern Master":
                 ShiftPatternMaster();
                 break;
             case "Shift Pattern Details":
                 ShiftPatternDetails();
                 break;
-            case "Employment Type Master":
-                EmploymentTypeMaster();
-                break;
+            // case "Employment Type Master":
+            //     EmploymentTypeMaster();
+            //     break;
             case "Employee Shift Mapping":
                 EmployeeShiftMapping();
                 break;
@@ -770,7 +734,7 @@ function EmployeeTypeMaster() {
     };
 
     const handleSave = async () => {
-        if (!employeeShiftId || !employeeId || !shiftId || !shiftTypeId || !shiftPatternId || !effectiveFrom || !effectiveTo || !status) {
+        if (!employeeId || !shiftPatternId || !effectiveFrom || !effectiveTo || !status) {
             toast.warning("Missing Required Fields");
             setError(" ");
             return;
@@ -785,10 +749,8 @@ function EmployeeTypeMaster() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        Emp_Shift_ID: employeeShiftId,
+                        // Emp_Shift_ID: employeeShiftId,
                         Employee_ID: employeeId,
-                        Shift_ID: shiftId,
-                        Shift_Type_ID: shiftTypeId,
                         Shift_Pattern_ID: shiftPatternId,
                         Effective_From: effectiveFrom,
                         Effective_To: effectiveTo,
@@ -817,12 +779,12 @@ function EmployeeTypeMaster() {
     };
 
     const handleUpdate = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to update the selected employee shift mapping data?",
             async () => {
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -872,12 +834,12 @@ function EmployeeTypeMaster() {
     };
 
     const handleDelete = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to delete the selected employee shift mapping data?",
             async () => {
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
@@ -921,16 +883,32 @@ function EmployeeTypeMaster() {
     };
 
     const transformRowData = (data) => {
-        return data.map((row) => ({
-            "Employee Shift ID": row.Emp_Shift_ID || "",
-            "Employee ID": row.Employee_ID || "",
-            "Shift ID": row.Shift_ID || "",
-            "Shift Type ID": row.Shift_Type_ID || "",
-            "Shift Pattern ID": row.Shift_Pattern_ID || "",
-            "Effective From": row.Effective_From || "",
-            "Effective To": row.Effective_To || "",
-            "Status": row.Is_Current || "",
-        }));
+        return data.map((row) => {
+            const patternObj = shiftPatternIdDropGrid.find(
+                (d) => d.value === row.Shift_Pattern_ID
+            );
+
+            const patternName = patternObj
+                ? patternObj.label.split(" - ").slice(1).join(" - ")
+                : "";
+
+            const empObj = employeeIdDropGrid.find(
+                (d) => d.value === row.Employee_ID
+            );
+
+            const empName = empObj
+                ? empObj.label.split(" - ").slice(1).join(" - ")
+                : "";
+
+            return {
+                "Employee Shift ID": row.Emp_Shift_ID || "",
+                "Employee ID": `${row.Employee_ID} - ${empName}` || "",
+                "Shift Pattern Code": `${row.Shift_Pattern_ID} - ${patternName}` || "",
+                "Effective From": row.Effective_From || "",
+                "Effective To": row.Effective_To || "",
+                "Status": row.Is_Current || "",
+            };
+        });
     };
 
     const handleExportToExcel = () => {
@@ -1071,7 +1049,7 @@ function EmployeeTypeMaster() {
                 <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                     <div className="row g-3">
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div className="inputGroup">
                                 <input
                                     id="TimeZone_ID"
@@ -1092,7 +1070,7 @@ function EmployeeTypeMaster() {
                                     Employee Shift ID<span className="text-danger">*</span>
                                 </label>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-2">
                             <div
@@ -1115,7 +1093,7 @@ function EmployeeTypeMaster() {
                             </div>
                         </div>
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
                                     ${selectedShiftId ? "has-value" : ""} 
@@ -1155,7 +1133,7 @@ function EmployeeTypeMaster() {
                                 />
                                 <label className={`floating-label ${error && !shiftTypeId ? "text-danger" : ""}`}>Shift Type ID<span className="text-danger">*</span></label>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-2">
                             <div
@@ -1248,7 +1226,7 @@ function EmployeeTypeMaster() {
                     </div>
                     <div className="row g-3">
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div className="inputGroup">
                                 <input
                                     id="TimeZone_ID"
@@ -1269,7 +1247,7 @@ function EmployeeTypeMaster() {
                                     Employee Shift ID
                                 </label>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-2">
                             <div
@@ -1292,7 +1270,7 @@ function EmployeeTypeMaster() {
                             </div>
                         </div>
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
                                     ${selectedShiftIdSc ? "has-value" : ""} 
@@ -1332,7 +1310,7 @@ function EmployeeTypeMaster() {
                                 />
                                 <label className={`floating-label`}>Shift Type ID</label>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-2">
                             <div

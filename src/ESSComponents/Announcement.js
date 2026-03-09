@@ -78,6 +78,23 @@ function Input({ }) {
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const searchClearInputFields = () => {
+    setAnnouncement_id("");
+    setselecttype("");
+    settype("");
+    setselecteddetails("");
+    setdetails("");
+    setstartDate("");
+    setEndDate("");
+    setstart_time("");
+    setend_time("");
+    setselectedmessagetype("");
+    setmessagetype("");
+    setmessageTitle("");
+    setselectedstatus("");
+    setstatus("");
+  };
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -275,7 +292,8 @@ function Input({ }) {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setrowData([]);
+    searchClearInputFields();
   };
 
   const reloadData = () => {
@@ -395,9 +413,9 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        setLoading(true);
-
+        
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -441,9 +459,9 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-        setLoading(true);
-
+        
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteAnnouncement`, {
             method: "POST",
             headers: {

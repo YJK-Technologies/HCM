@@ -7,7 +7,9 @@ const dbConfig = require("../config/dbConfig");
 const multer = require('multer')
 const CryptoJS = require('crypto-js');
 const upload = multer({ storage: multer.memoryStorage() });//add in top of the datacontroller page
-const path = require("path");
+const path = require("path")
+const PDFDocument = require("pdfkit");
+const moment = require("moment");
 const fs = require("fs");
 const otpStorage = {};
 
@@ -24621,7 +24623,7 @@ const allPfDetail = async (req, res) => {
 // Code Added by harish on 16/01/2025
 
 const ProfessionalTaxSC = async (req, res) => {
-  const { company_code, Employee_Salary_From, Employee_Salary_To, Taxable_Amount } = req.body;
+  const { company_code, Employee_Salary_From, Employee_Salary_To, Taxable_Amount,Start_Year,End_Year } = req.body;
 
   try {
     // Connect to the database
@@ -24635,7 +24637,9 @@ const ProfessionalTaxSC = async (req, res) => {
       .input("Employee_Salary_From", sql.Decimal(10, 2), Employee_Salary_From)
       .input("Employee_Salary_To", sql.Decimal(10, 2), Employee_Salary_To)
       .input("Taxable_Amount", sql.Decimal(10, 2), Taxable_Amount)
-      .query(`EXEC sp_Professional_Tax 'sc',@company_code,@Employee_Salary_From,@Employee_Salary_To,@Taxable_Amount,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .input("Start_Year", sql.NVarChar, Start_Year)
+      .input("End_Year", sql.NVarChar, End_Year)
+      .query(`EXEC sp_Professional_Tax 'sc',@company_code,@Employee_Salary_From,@Employee_Salary_To,@Taxable_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
 
     // Send response
@@ -24714,8 +24718,8 @@ const getLoanType = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Loan_ID", sql.VarChar, Loan_ID)
       .input("Loan_Eligible_Amount", sql.Decimal(14, 2), Loan_Eligible_Amount)
-      .input("Start_Year", sql.Date, Start_Year)
-      .input("End_Year", sql.Date, End_Year)
+      .input("Start_Year", sql.NVarChar, Start_Year)
+      .input("End_Year", sql.NVarChar, End_Year)
       .query(`EXEC sp_Loan_Type 'sc',@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Send response
     if (result.recordset.length > 0) {
@@ -27019,7 +27023,7 @@ const DailyLogin = async (req, res) => {
       .input("Location", sql.VarChar, Location)
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,@company_code,@created_by,'',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`);
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -27345,9 +27349,7 @@ const ESSManager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "M")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-
-  `);
+      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -29827,8 +29829,8 @@ const ESSEmployeeDashboard = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "ED")
-      .input("start_date", sql.Date, start_date)
-      .input("end_date", sql.Date, end_date)
+      .input("start_date", sql.NVarChar, start_date)
+      .input("end_date", sql.NVarChar, end_date)
       .input("userid", sql.VarChar, userid)
       .input("company_code", sql.VarChar, company_code)
       .input("Status", sql.VarChar, Status)
@@ -33339,9 +33341,7 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
-        .query(`
-          EXEC sp_candidate_master  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','',@modified_by,''
-        `);
+        .query(`EXEC sp_candidate_master_Test  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','','','',@modified_by,''`);
 
       // 👇 capture NEW keyfield
       if (result.recordset?.length) {
@@ -33377,7 +33377,7 @@ const candidate_masterLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','', '', '', ''`);
+        .query(`EXEC sp_candidate_master_Test @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', '', ''`);
     }
     res.status(200).json("candidate_master data deleted successfully");
   } catch (err) {
@@ -33411,7 +33411,7 @@ const candidate_masterInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Canditate_CV", sql.VarBinary, Canditate_CV)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, @created_by, '', '', ''`);
+      .query(`EXEC sp_candidate_master_Test @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, '', '', @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "candidate_master insertd successfully" });
   } catch (err) {
@@ -33973,7 +33973,7 @@ const interview_decisionLoopDelete = async (req, res) => {
 
 // Code Added by Harishon 12-02-26
 const CandidateSearch = async (req, res) => {
-  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description } = req.body;
+  const { candidate_name, email,phone,Education,Experience,Related_experience, applied_job_id, company_code, Job_description, fromDate, toDate } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -33989,7 +33989,9 @@ const CandidateSearch = async (req, res) => {
       .input("Related_experience", sql.VarChar, Related_experience)
       .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','','','','','' `);
+      .input("fromDate", sql.VarChar, fromDate)
+      .input("toDate", sql.VarChar, toDate)
+      .query(`EXEC sp_candidate_master_Test @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','',@fromDate,@toDate,'','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34271,7 +34273,7 @@ const CanditateID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SE")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_candidate_master 'SE',0,'','','',0,'','','','','',@company_code,'','','','','',''`);
+      .query(`EXEC sp_candidate_master_Test 'SE',0,'','','',0,'','','','','',@company_code,'','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -34409,25 +34411,21 @@ const Recommendation = async (req, res) => {
   }
 };
 
-
-
-
-
 const TimeZonemasterUpdate = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code, DST_Applicable, modified_by, keyfield } = req.body;
+  const { TimeZone_ID, TimeZone_Name, UTC_Offset, Status, company_code, DST_Applicable, modified_by, keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "U")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_ID", sql.Int, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Flag", sql.Bit, DST_Flag)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '','', @modified_by, ''`);
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, @keyfield, @company_code, '', '', @modified_by, ''`);
     res.status(200).json({ success: true, message: "TimeZonemaster updated successfully" });
   } catch (err) {
     console.error("Error during TimeZonemaster update:", err);
@@ -34435,16 +34433,15 @@ const TimeZonemasterUpdate = async (req, res) => {
   }
 };
 
-
 const TimeZonemasterDelete = async (req, res) => {
-  const { TimeZone_ID} = req.body;
+  const { keyfield } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
-      .input("modified_by", sql.NVarChar, req.headers['modified-by'])
-      .query(`EXEC Sp_Time_Zone_master 'D', @TimeZone_ID, '','','', '', '', @modified_by, '', '',''`);
+      .input("keyfield",  sql.NVarChar, keyfield)
+      .input("company_code", sql.NVarChar, req.headers['company_code'])
+      .query(`EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', '', @company_code, '', '', @modified_by, ''`);
     res.status(200).json({ success: true, message: "Sp_Time_Zone_master deleted successfully" });
   } catch (err) {
     console.error("Error during dbo.Sp_Time _Zone_master delete:", err);
@@ -34456,8 +34453,8 @@ const TimeZonemasterDelete = async (req, res) => {
 const getTimeZoneData = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      "EXEC Sp_Time_Zone_master_test 'F', '', '','','', '', '', '', '', '', '',''");
+    const result = await sql
+    .query(`EXEC Sp_Time_Zone_master 'F', 0, '', '', 0, '', '', '', '', '', '',''`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -34467,24 +34464,23 @@ const getTimeZoneData = async (req, res) => {
 
 
 const getTimeZonesearchdata = async (req, res) => {
-const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
+const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable, Status, company_code } = req.body;
   try {
-    // Connect to the database
     const pool = await connection.connectToDatabase();
-    // Execute the query
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
+      .input("TimeZone_ID", sql.Int, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset,'', '', @DST_Applicable, '', '', '','', ''`);
-    // Send response
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, '', @company_code, '', '', '', ''`);
     if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
+      res.status(200).json(result.recordset); 
     } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+      res.status(404).json("Data not found"); 
     }
   } catch (err) {
     console.error("Error", err);
@@ -34759,20 +34755,18 @@ const GetCountry = async (req, res) => {
 };
 
 const TimeZonemasterInsert = async (req, res) => {
-  const { TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Flag, company_code,created_by, DST_Applicable ,
-    keyfield} = req.body;
+  const { TimeZone_Name, UTC_Offset, Status, company_code, created_by, DST_Applicable } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
       .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
       .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .input("DST_Flag", sql.Bit, DST_Flag)
+      .input("DST_Applicable", sql.Int, DST_Applicable)
+      .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-     .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, '', '', '', '', ''`);
+     .query(`EXEC Sp_Time_Zone_master @mode, 0, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, '', @company_code, @created_by, '', '', ''`);
 res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
@@ -34781,25 +34775,25 @@ res.status(200).json({ success: true, message: "interview_schedule insertd succe
 };
 
 const Time_Zone_masterLoopUpdate = async (req, res) => {
-  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
-  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
-    return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
+  const Time_Zone_masterData = req.body.Time_Zone_masterData;
+  if (!Time_Zone_masterData || !Time_Zone_masterData.length) {
+    return res.status(400).json("Invalid or empty Time_Zone_masterData array.");
   }
 
   try {
     const pool = await sql.connect(dbConfig);
-    for (const item of sp_Time_Zone_masterData) {
+    for (const item of Time_Zone_masterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("TimeZone_ID", sql.NVarChar, item.TimeZone_ID)
+        .input("TimeZone_ID", sql.Int, item.TimeZone_ID)
         .input("TimeZone_Name", sql.NVarChar, item.TimeZone_Name)
         .input("UTC_Offset", sql.NVarChar, item.UTC_Offset)
-        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
-        .input("DST_Flag", sql.Bit, item.DST_Flag)
-        .input("company_code", sql.NVarChar, item.company_code)
+        .input("DST_Applicable", sql.Int, item.DST_Applicable)
+        .input("Status", sql.NVarChar, item.Status)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Flag, @company_code, @DST_Applicable, @keyfield, '', '', @modified_by, @modified_date`);
+        .query(`EXEC Sp_Time_Zone_master @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, @keyfield, @company_code, '', '', @modified_by, ''`);
     }
     res.status(200).json("Time_Zone_master data updated successfully");
   } catch (err) {
@@ -34809,20 +34803,18 @@ const Time_Zone_masterLoopUpdate = async (req, res) => {
 };
 
 const  Time_Zone_masterLoopDelete = async (req, res) => {
-  const sp_Time_Zone_masterData = req.body.sp_Time_Zone_masterData;
-  if (!sp_Time_Zone_masterData || !sp_Time_Zone_masterData.length) {
+  const Time_Zone_masterData = req.body.Time_Zone_masterData;
+  if (!Time_Zone_masterData || !Time_Zone_masterData.length) {
     return res.status(400).json("Invalid or empty sp_Time_Zone_masterData array.");
   }
 
   try {
     const pool = await sql.connect(dbConfig);
-    for (const item of sp_Time_Zone_masterData) {
+    for (const item of Time_Zone_masterData) {
       await pool.request().input("mode", sql.NVarChar, "D")
-      
-        .input("company_code", sql.NVarChar, item.company_code)
-        .input("DST_Applicable", sql.VarChar, item.DST_Applicable)
+        .input("company_code", sql.NVarChar, req.headers['company_code'])
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC Sp_Time_Zone_master_test @mode, '', '', '', '', @company_code, @DST_Applicable, @keyfield, '', '', '', ''`);
+        .query(`EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', @keyfield, @company_code, '', '', '', ''`);
     }
     res.status(200).json("Time_Zone_master data deleted successfully");
   } catch (err) {
@@ -34831,60 +34823,28 @@ const  Time_Zone_masterLoopDelete = async (req, res) => {
   }
 };
 
-const Time_Zone_master_sc = async (req, res) => {
-  const { company_code, TimeZone_ID, TimeZone_Name, UTC_Offset, DST_Applicable } = req.body;
-
-  try {
-    // Connect to the database
-    const pool = await connection.connectToDatabase();
-
-    // Execute the query
-    const result = await pool
-      .request()
-      .input("mode", sql.NVarChar, "SC")
-      .input("company_code", sql.NVarChar, company_code)
-      .input("TimeZone_ID", sql.NVarChar, TimeZone_ID)
-      .input("TimeZone_Name", sql.NVarChar, TimeZone_Name)
-      .input("UTC_Offset", sql.NVarChar, UTC_Offset)
-      .input("DST_Applicable", sql.VarChar, DST_Applicable)
-      .query(` EXEC Sp_Time_Zone_master_test @mode, @TimeZone_ID, @TimeZone_Name, @UTC_Offset, '', @company_code, @DST_Applicable, '', '', '', '', ''`);
-
-    // Send response
-    if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
-    } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
-    }
-  } catch (err) {
-    console.error("Error", err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
-  }
-};
-
 //Code Added by harish on 28-01-26
 
 const Shift_MasterInsert = async (req, res) => {
-  const { Shift_ID, Shift_Code, Shift_Name, Start_Time, End_Time, Shift_Hours, Is_Night_Shift, Grace_In_Min, Grace_Out_Min, Status, Cross_Midnight, company_code, created_by,  keyfield } = req.body;
+  const { Shift_Code, Shift_Name, Start_Time, End_Time, Shift_Hours, Is_Night_Shift, Grace_In_Min, Grace_Out_Min, Status, Cross_Midnight, company_code, created_by,  keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("Shift_ID", sql.Int, Shift_ID)
       .input("Shift_Code", sql.NVarChar, Shift_Code)
       .input("Shift_Name", sql.NVarChar, Shift_Name)
       .input("Start_Time", sql.NVarChar, Start_Time)
       .input("End_Time", sql.NVarChar, End_Time)
       .input("Shift_Hours", sql.Decimal(4,2), Shift_Hours)
-      .input("Is_Night_Shift", sql.Bit, Is_Night_Shift)
+      .input("Is_Night_Shift", sql.NVarChar, Is_Night_Shift)
       .input("Grace_In_Min", sql.Int, Grace_In_Min)
       .input("Grace_Out_Min", sql.Int, Grace_Out_Min)
       .input("Status", sql.NVarChar, Status)
       .input("Cross_Midnight", sql.NVarChar, Cross_Midnight)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @Cross_Midnight, @company_code, @created_by, '', '', '', @keyfield`);
+      .query(`EXEC sp_Shift_Master @mode, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Cross_Midnight, @Status, '', @company_code, @created_by, '', '', ''`);
 
    res.status(200).json({ success: true, message: "interview_schedule insertd successfully" });
   } catch (err) {
@@ -34905,19 +34865,18 @@ const getShiftsearchdata = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("Shift_ID", sql.Int, Shift_ID)
       .input("Shift_Code", sql.NVarChar, Shift_Code)
       .input("Shift_Name", sql.NVarChar, Shift_Name)
       .input("Status", sql.NVarChar, Status)
       .input("Start_Time", sql.NVarChar, Start_Time)
       .input("End_Time", sql.NVarChar, End_Time)
       .input("Shift_Hours", sql.Decimal(5,2), Shift_Hours)
-      .input("Is_Night_Shift", sql.Bit, Is_Night_Shift)
+      .input("Is_Night_Shift", sql.NVarChar, Is_Night_Shift)
       .input("Grace_In_Min", sql.Int, Grace_In_Min)
       .input("Grace_Out_Min", sql.Int, Grace_Out_Min)
       .input("Cross_Midnight", sql.VarChar, Cross_Midnight)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status,@Cross_Midnight,@company_code, '', '', '', '', '' `);
+      .query(`EXEC sp_Shift_Master @mode, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Cross_Midnight, @Status, '', @company_code, '', '', '', '' `);
 
     // Send response
        if (result.recordset.length > 0) {
@@ -34941,7 +34900,6 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
     for (const item of sp_Shift_MasterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Shift_ID", sql.Int, item.Shift_ID)
         .input("Shift_Code", sql.NVarChar, item.Shift_Code)
         .input("Shift_Name", sql.NVarChar, item.Shift_Name)
         .input("Start_Time", sql.NVarChar, item.Start_Time)
@@ -34955,7 +34913,7 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Master_test @mode, @Shift_ID, @Shift_Code,@Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Status, @Cross_Midnight, @company_code,'','', @modified_by,'', @keyfield`);
+        .query(`EXEC sp_Shift_Master @mode, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Cross_Midnight, @Status, @keyfield, @company_code, '','', @modified_by,''`);
     }
     res.status(200).json("Shift_Master data updated successfully");
   } catch (err) {
@@ -34978,9 +34936,9 @@ const sp_Shift_MasterLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Master_test @mode, '', '', '', '', '', 0, 0, 0, 0, '', '', @company_code, '', '', '', '', @keyfield`);
+        .query(`EXEC sp_Shift_Master @mode, '', '', '', '', 0, '', 0, 0, '', '', @keyfield, @company_code, '', '', '', ''`);
     }
-    res.status(200).json("sp_Shift_Master_test data deleted successfully");
+    res.status(200).json("sp_Shift_Master data deleted successfully");
   } catch (err) {
     console.error("Error in sp_Shift_MasterLoopDelete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35059,6 +35017,24 @@ const getEmployeeType = async (req, res) => {
   }
 };
 //Code ended by pavun on 29-01-26
+//Code added by sakthi on 27-02-26
+const getEmployeeTypeDD = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'EmployeeType','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by sakthi on 27-02-26
 
 //Code Added by pavun on 30-01-26
 const Employment_Type_MasterInsert = async (req, res) => {
@@ -35177,13 +35153,12 @@ const Employment_Type_MasterLoopDelete = async (req, res) => {
 };
 
 const Shift_Pattern_MasterInsert = async (req, res) => {
-  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name, Rotation_Days, Description, Status, Company_Code, Created_by, Created_date } = req.body;
+  const { Pattern_Code, Pattern_Name, Rotation_Days, Description, Status, Company_Code, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Pattern_Code", sql.NVarChar, Pattern_Code)
       .input("Pattern_Name", sql.NVarChar, Pattern_Name)
       .input("Rotation_Days", sql.Int, Rotation_Days)
@@ -35191,7 +35166,7 @@ const Shift_Pattern_MasterInsert = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, @Created_date, '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Master insertd successfully" });
   } catch (err) {
@@ -35201,13 +35176,12 @@ const Shift_Pattern_MasterInsert = async (req, res) => {
 };
 
 const Shift_Pattern_MasterUpdate = async (req, res) => {
-  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name, Rotation_Days, Description, Status, Company_Code, keyfield, Modified_by, Modified_date } = req.body;
+  const { Pattern_Code, Pattern_Name, Rotation_Days, Description, Status, Company_Code, keyfield, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "U")
-      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Pattern_Code", sql.NVarChar, Pattern_Code)
       .input("Pattern_Name", sql.NVarChar, Pattern_Name)
       .input("Rotation_Days", sql.Int, Rotation_Days)
@@ -35216,8 +35190,7 @@ const Shift_Pattern_MasterUpdate = async (req, res) => {
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.DateTime, Modified_by)
-      .input("Modified_date", sql.NVarChar, Modified_date)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, @Modified_date`);
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Master updated successfully" });
   } catch (err) {
@@ -35227,16 +35200,15 @@ const Shift_Pattern_MasterUpdate = async (req, res) => {
 };
 
 const Shift_Pattern_MasterDelete = async (req, res) => {
-  const { Shift_Pattern_ID, keyfield, Company_Code } = req.body;
+  const { keyfield, Company_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
-      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Master deleted successfully" });
   } catch (err) {
@@ -35256,7 +35228,6 @@ const Shift_Pattern_MasterLoopInsert = async (req, res) => {
     for (const item of Shift_Pattern_MasterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "I")
-        .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Pattern_Code", sql.NVarChar, item.Pattern_Code)
         .input("Pattern_Name", sql.NVarChar, item.Pattern_Name)
         .input("Rotation_Days", sql.Int, item.Rotation_Days)
@@ -35264,8 +35235,7 @@ const Shift_Pattern_MasterLoopInsert = async (req, res) => {
         .input("Status", sql.NVarChar, item.Status)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .input("Created_date", sql.DateTime, item.Created_date)
-        .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, @Created_date, '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, '', '', ''`);
     }
     res.status(200).json("Shift_Pattern_Master data inserted successfully");
   } catch (err) {
@@ -35285,7 +35255,6 @@ const Shift_Pattern_MasterLoopUpdate = async (req, res) => {
     for (const item of Shift_Pattern_MasterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Pattern_Code", sql.NVarChar, item.Pattern_Code)
         .input("Pattern_Name", sql.NVarChar, item.Pattern_Name)
         .input("Rotation_Days", sql.Int, item.Rotation_Days)
@@ -35296,8 +35265,7 @@ const Shift_Pattern_MasterLoopUpdate = async (req, res) => {
         .input("Created_by", sql.NVarChar, item.Created_by)
         .input("Created_date", sql.DateTime, item.Created_date)
         .input("Modified_by", sql.DateTime, item.Modified_by)
-        .input("Modified_date", sql.NVarChar, item.Modified_date)
-        .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, @Modified_date`);
+        .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift_Pattern_Master data updated successfully");
   } catch (err) {
@@ -35319,7 +35287,7 @@ const Shift_Pattern_MasterLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Pattern_Master @mode, '', '', '', 0, '', '', @Company_Code, @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Master_Test @mode, '', '', 0, '', '', @Company_Code, @keyfield, '', '', '', ''`);
     }
     res.status(200).json("Shift_Pattern_Master data deleted successfully");
   } catch (err) {
@@ -35329,7 +35297,7 @@ const Shift_Pattern_MasterLoopDelete = async (req, res) => {
 };
 
 const Shift_Pattern_DetailInsert = async (req, res) => {
-  const { Pattern_Detail_ID, Shift_Pattern_ID, Day_Sequence, Shift_ID, Is_Off_Day, Company_Code, Created_by, Created_date } = req.body;
+  const { Pattern_Detail_ID, Shift_Pattern_ID, Day_Sequence, Shift_ID, Is_Off_Day, Company_Code, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -35338,12 +35306,11 @@ const Shift_Pattern_DetailInsert = async (req, res) => {
       .input("Pattern_Detail_ID", sql.NVarChar, Pattern_Detail_ID)
       .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Day_Sequence", sql.Int, Day_Sequence)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Is_Off_Day", sql.Bit, Is_Off_Day)
+      .input("Shift_ID", sql.NVarChar, Shift_ID)
+      .input("Is_Off_Day", sql.NVarChar, Is_Off_Day)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .input("Created_date", sql.DateTime, Created_date)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, @Created_date, '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Detail insertd successfully" });
   } catch (err) {
@@ -35368,13 +35335,12 @@ const Shift_Pattern_DetailUpdate = async (req, res) => {
      .input("Pattern_Detail_ID", sql.NVarChar, item.Pattern_Detail_ID)
      .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
      .input("Day_Sequence", sql.Int, item.Day_Sequence)
-     .input("Shift_ID", sql.Int, item.Shift_ID)
-     .input("Is_Off_Day", sql.Bit,item.Is_Off_Day ?? null)
+     .input("Shift_ID", sql.NVarChar, item.Shift_ID)
+     .input("Is_Off_Day", sql.NVarChar,item.Is_Off_Day)
      .input("Company_Code", sql.NVarChar, item.Company_Code)
      .input("keyfield", sql.NVarChar, item.keyfield)
      .input("Modified_by", sql.NVarChar, item.Modified_by)
-     .input("Modified_date", sql.DateTime, item.Modified_date)
-     .query(`EXEC sp_Shift_Pattern_Detail @mode,@Pattern_Detail_ID,@Shift_Pattern_ID,@Day_Sequence,@Shift_ID,@Is_Off_Day,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date `);
+     .query(`EXEC sp_Shift_Pattern_Detail_Test @mode,@Pattern_Detail_ID,@Shift_Pattern_ID,@Day_Sequence,@Shift_ID,@Is_Off_Day,@Company_Code,@keyfield,'','',@Modified_by,'' `);
     }
 
     res.status(200).json("Shift Pattern Detail updated successfully");
@@ -35386,17 +35352,15 @@ const Shift_Pattern_DetailUpdate = async (req, res) => {
 
 
 const Shift_Pattern_DetailDelete = async (req, res) => {
-  const { Pattern_Detail_ID, Shift_Pattern_ID, keyfield, Company_Code } = req.body;
+  const { keyfield, Company_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
-      .input("Pattern_Detail_ID", sql.NVarChar, Pattern_Detail_ID)
-      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, 0, 0, 0, @Company_Code, '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, '', '', 0, '', '', @Company_Code, '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "Shift_Pattern_Detail deleted successfully" });
   } catch (err) {
@@ -35419,12 +35383,11 @@ const Shift_Pattern_DetailLoopInsert = async (req, res) => {
         .input("Pattern_Detail_ID", sql.NVarChar, item.Pattern_Detail_ID)
         .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Day_Sequence", sql.Int, item.Day_Sequence)
-        .input("Shift_ID", sql.Int, item.Shift_ID)
-        .input("Is_Off_Day", sql.Bit, item.Is_Off_Day)
+        .input("Shift_ID", sql.NVarChar, item.Shift_ID)
+        .input("Is_Off_Day", sql.NVarChar, item.Is_Off_Day)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .input("Created_date", sql.DateTime, item.Created_date)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, @Created_date, '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, '', '', ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data inserted successfully");
   } catch (err) {
@@ -35447,13 +35410,12 @@ const Shift_Pattern_DetailLoopUpdate = async (req, res) => {
         .input("Pattern_Detail_ID", sql.NVarChar, item.Pattern_Detail_ID)
         .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Day_Sequence", sql.Int, item.Day_Sequence)
-        .input("Shift_ID", sql.Int, item.Shift_ID)
-        .input("Is_Off_Day", sql.Bit, item.Is_Off_Day)
+        .input("Shift_ID", sql.NVarChar, item.Shift_ID)
+        .input("Is_Off_Day", sql.NVarChar, item.Is_Off_Day)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.DateTime, item.Modified_by)
-        .input("Modified_date", sql.NVarChar, item.Modified_date)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, @keyfield, '', '', @Modified_by, @Modified_date`);
+        .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data updated successfully");
   } catch (err) {
@@ -35475,7 +35437,7 @@ const Shift_Pattern_DetailLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode, '', '', 0, 0, 0, @Company_Code, @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, '', '', 0, '', '', @Company_Code, @keyfield, '', '', '', ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data deleted successfully");
   } catch (err) {
@@ -35485,24 +35447,21 @@ const Shift_Pattern_DetailLoopDelete = async (req, res) => {
 };
 
 const Employee_shift_mappingInsert = async (req, res) => {
-  const { Emp_Shift_ID, Employee_ID, Shift_ID, Shift_Type_ID, Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, Created_by } = req.body;
+  const { Employee_ID, Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Employee_ID", sql.NVarChar, Employee_ID)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Shift_Type_ID", sql.Int, Shift_Type_ID)
       .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Effective_From", sql.Date, Effective_From)
       .input("Effective_To", sql.Date, Effective_To)
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,'',@Created_by,'','',''`);
+      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,'',@Company_Code,@Created_by,'','',''`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping insertd successfully" });
   } catch (err) {
@@ -35512,16 +35471,13 @@ const Employee_shift_mappingInsert = async (req, res) => {
 };
 
 const Employee_shift_mappingUpdate = async (req, res) => {
-  const { Emp_Shift_ID, Employee_ID, Shift_ID, Shift_Type_ID, Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, keyfield, Modified_by, Modified_date } = req.body;
+  const { Employee_ID,  Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, keyfield, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "U")
-      .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Employee_ID", sql.NVarChar, Employee_ID)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Shift_Type_ID", sql.Int, Shift_Type_ID)
       .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Effective_From", sql.Date, Effective_From)
       .input("Effective_To", sql.Date, Effective_To)
@@ -35529,9 +35485,8 @@ const Employee_shift_mappingUpdate = async (req, res) => {
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .input("Modified_date", sql.DateTime, Modified_date)
-      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,@Modified_date`);
+      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,@keyfield,@Company_Code,'','',@Modified_by,''`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping updated successfully" });
   } catch (err) {
@@ -35541,17 +35496,16 @@ const Employee_shift_mappingUpdate = async (req, res) => {
 };
 
 const Employee_shift_mappingDelete = async (req, res) => {
-  const { Emp_Shift_ID, Company_Code, keyfield } = req.body;
+  const { Company_Code, keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
-      .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Company_Code", sql.NVarChar, Company_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,'',0,0,'','','',
-        '',@Company_Code,@keyfield,'','',0,0`);
+      .query(`EXEC sp_Employee_shift_mapping_Test @mode,'','','','',
+        '',@keyfield,@Company_Code,'','','',''`);
 
     res.status(200).json({ success: true, message: "Employee_shift_mapping deleted successfully" });
   } catch (err) {
@@ -35571,19 +35525,15 @@ const Employee_shift_mappingLoopInsert = async (req, res) => {
     for (const item of Employee_shift_mappingData) {
       await pool.request()
         .input("mode", sql.NVarChar, "I")
-        .input("Emp_Shift_ID", sql.Date, item.Emp_Shift_ID)
         .input("Employee_ID", sql.NVarChar, item.Employee_ID)
-        .input("Shift_ID", sql.Int, item.Shift_ID)
-        .input("Shift_Type_ID", sql.Int, item.Shift_Type_ID)
         .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Effective_From", sql.Date, item.Effective_From)
         .input("Effective_To", sql.Date, item.Effective_To)
         .input("Is_Current", sql.NVarChar, item.Is_Current)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .input("Created_date", sql.DateTime, item.Created_date)
-        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,'',@Created_by,@Created_date,'',''`);
+        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,'',@Company_Code,@Created_by,'','',''`);
     }
     res.status(200).json("Employee_shift_mapping data inserted successfully");
   } catch (err) {
@@ -35603,10 +35553,7 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
     for (const item of Employee_shift_mappingData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Emp_Shift_ID", sql.Int, item.Emp_Shift_ID)
         .input("Employee_ID", sql.NVarChar, item.Employee_ID)
-        .input("Shift_ID", sql.Int, item.Shift_ID)
-        .input("Shift_Type_ID", sql.Int, item.Shift_Type_ID)
         .input("Shift_Pattern_ID", sql.NVarChar, item.Shift_Pattern_ID)
         .input("Effective_From", sql.Date, item.Effective_From)
         .input("Effective_To", sql.Date, item.Effective_To)
@@ -35614,8 +35561,8 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,@keyfield,'','',@Modified_by,''`);
+        .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,@keyfield,@Company_Code,'','',@Modified_by,''`);
     }
     res.status(200).json("Employee_shift_mapping data updated successfully");
   } catch (err) {
@@ -35637,7 +35584,7 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Employee_shift_mapping @mode,0,'',0,0,'','','','',@Company_Code,@keyfield,'','','',''`);
+        .query(`EXEC sp_Employee_shift_mapping_Test @mode,'','','','','',@keyfield,@Company_Code,'','','',''`);
     }
     res.status(200).json("Employee_shift_mapping data deleted successfully");
   } catch (err) {
@@ -35752,22 +35699,20 @@ const Shift_TypeMasterDelete = async (req, res) => {
 
 //Code exported by Sakthi on 05-02-26
 const ShiftPattern_Insert = async (req, res) => {
-  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, company_code, created_by,  keyfield } = req.body;
+  const { Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, Company_Code, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "I")
-      .input("Shift_Pattern_ID", sql.VarChar, Shift_Pattern_ID)
       .input("Pattern_Code", sql.VarChar, Pattern_Code)
       .input("Pattern_Name", sql.VarChar, Pattern_Name)
       .input("Rotation_Days", sql.Int, Rotation_Days)
       .input("Description", sql.VarChar, Description)
       .input("Status", sql.VarChar, Status)
-      .input("company_code", sql.NVarChar, company_code)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, @Created_by, '', '', ''`);
+      .input("Company_Code", sql.NVarChar, Company_Code)
+      .input("Created_by", sql.NVarChar, Created_by)
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, '', '', ''`);
 
    res.status(200).json({ success: true, message: "ShiftPattern insertd successfully" });
   } catch (err) {
@@ -35779,7 +35724,7 @@ const ShiftPattern_Insert = async (req, res) => {
 
 //Code exported by Sakthi on 05-02-26
 const ShiftPattern_SC = async (req, res) => {
-  const { Shift_Pattern_ID, Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, company_code,  keyfield} = req.body;
+  const { Pattern_Code, Pattern_Name,Rotation_Days, Description, Status, company_code } = req.body;
 
   try {
     // Connect to the database
@@ -35789,15 +35734,13 @@ const ShiftPattern_SC = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("Shift_Pattern_ID", sql.VarChar, Shift_Pattern_ID)
       .input("Pattern_Code", sql.VarChar, Pattern_Code)
       .input("Pattern_Name", sql.VarChar, Pattern_Name)
       .input("Rotation_Days", sql.Int, Rotation_Days)
       .input("Description", sql.VarChar, Description)
       .input("Status", sql.VarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', '', '', '', ''`);
 
     // Send response
        if (result.recordset.length > 0) {
@@ -35823,16 +35766,15 @@ const ShiftPattern_Update = async (req, res) => {
     for (const item of Shift_MasterData) {
       await pool.request()
         .input("mode", sql.NVarChar, "U")
-        .input("Shift_Pattern_ID", sql.VarChar, item.Shift_Pattern_ID)
         .input("Pattern_Code", sql.VarChar, item.Pattern_Code)
         .input("Pattern_Name", sql.VarChar, item.Pattern_Name)
         .input("Rotation_Days", sql.Int, item.Rotation_Days)
         .input("Description", sql.VarChar, item.Description)
         .input("Status", sql.VarChar, item.Status)
-        .input("company_code", sql.NVarChar, item.company_code)
-        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Pattern_Master @mode, @Shift_Pattern_ID, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @modified_by, ''`);
+        .query(`EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift Pattern data updated successfully");
   } catch (err) {
@@ -35855,7 +35797,7 @@ const ShiftPattern_Delete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_Shift_Pattern_Master @mode, '', '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Master_Test @mode, '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`);
     }
     res.status(200).json("ShiftPattern_Delete data deleted successfully");
   } catch (err) {
@@ -35880,10 +35822,10 @@ const ShiftPatternDetail_SC = async (req, res) => {
       .input("Pattern_Detail_ID", sql.NVarChar, Pattern_Detail_ID)
       .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Day_Sequence", sql.Int, Day_Sequence)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Is_Off_Day", sql.Bit, Is_Off_Day)
+      .input("Shift_ID", sql.NVarChar, Shift_ID)
+      .input("Is_Off_Day", sql.NVarChar, Is_Off_Day)
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Detail_Test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', '', '', '', ''`);
 
     // Send response
        if (result.recordset.length > 0) {
@@ -35932,7 +35874,7 @@ const ShiftMasterDropDown = async (req, res) => {
     const result = await pool.request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Shift_Master_test @mode, 0, '', '', '', '', 0, 0, 0, 0, '', '', @company_code, '', '', '', '', ''`);
+      .query(`EXEC sp_Shift_Master @mode,'', '', '', '', 0, '', 0, 0, '', '', '', @company_code, '', '', '', ''`);
 
    if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -35974,7 +35916,7 @@ const ShiftPatternMasterDropDown = async (req, res) => {
     const result = await pool.request()
       .input("mode", sql.NVarChar, "F")
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Shift_Pattern_Master @mode, '', '', '', 0, '', '', @Company_Code, '', '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Master_Test @mode, '', '', 0, '', '', @Company_Code, '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -35988,23 +35930,20 @@ const ShiftPatternMasterDropDown = async (req, res) => {
 };
 
 const Employee_shift_mappingSc = async (req, res) => {
-  const { Emp_Shift_ID, Employee_ID, Shift_ID, Shift_Type_ID, Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, Created_by } = req.body;
+  const { Employee_ID, Shift_Pattern_ID, Effective_From, Effective_To, Is_Current, Company_Code, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool.request()
       .input("mode", sql.NVarChar, "SC")
-      .input("Emp_Shift_ID", sql.Int, Emp_Shift_ID)
       .input("Employee_ID", sql.NVarChar, Employee_ID)
-      .input("Shift_ID", sql.Int, Shift_ID)
-      .input("Shift_Type_ID", sql.Int, Shift_Type_ID)
       .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
       .input("Effective_From", sql.NVarChar, Effective_From)
       .input("Effective_To", sql.NVarChar, Effective_To)
       .input("Is_Current", sql.NVarChar, Is_Current)
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Employee_shift_mapping @mode,@Emp_Shift_ID,@Employee_ID,@Shift_ID,@Shift_Type_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
-        @Is_Current,@Company_Code,'','','','',''`);
+      .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
+        @Is_Current,'',@Company_Code,'','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -36134,7 +36073,9 @@ const PanelPerformanceSearch = async (req, res) => {
   const {
     schedule_id,
     panel_name,
-    rating
+    rating, 
+    from_date, 
+    to_date
   } = req.body;
 
   try {
@@ -36146,8 +36087,10 @@ const PanelPerformanceSearch = async (req, res) => {
       .input("schedule_id", sql.Int, schedule_id ? schedule_id : 0)
       .input("panel_name", sql.NVarChar, panel_name || "")
       .input("rating", sql.Int, rating ? rating : 0)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
       .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
-         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', '', '', '', '' `);
+         '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date, '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -36852,6 +36795,1044 @@ const loan_paymentsLoopDelete = async (req, res) => {
 }; 
 
 //Code ended by Dinesh Gokul on 07-03-2026
+
+//Code added by pavun on 03-03-26
+const getInterviewDashboardCount = async (req, res) => {
+  const { mode, company_code, fromDate, toDate } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("fromDate", sql.NVarChar, fromDate)
+      .input("toDate", sql.NVarChar, toDate)
+      .query(`EXEC sp_interview_panel_dashboard @mode,@fromDate,@toDate,@company_code`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//Code ended by pavun on 03-03-26
+
+//code added by pavun on 05-03-26
+const generateShiftPDF = (employee, shifts) => {
+  const pdfDir = path.join(__dirname, "pdf");
+  if (!fs.existsSync(pdfDir)) {
+    fs.mkdirSync(pdfDir);
+  }
+
+  const filePath = path.join(pdfDir, `Shift_${employee.Employee_ID}.pdf`);
+  const doc = new PDFDocument({
+    margin: 40,
+    size: "A4",
+  });
+
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // --- CONFIGURATION (Matching Sample Colors) ---
+  const colors = {
+    primary: "#0f4c81",    // Dark Blue (Table Header)
+    secondary: "#f4f6f9",  // Light Gray (Background)
+    text: "#333333",
+    rowAlt: "#f7f7f7",     // Zebra striping
+    border: "#dddddd"
+  };
+
+  /* ---------- HEADER WITH LOGO ---------- */
+  // Note: Ensure your logo exists at this path or use a placeholder
+  const logoPath = path.join(__dirname, "public", "favicon.ico"); 
+  
+  // Header Background Box (The blue bar from your sample)
+  doc.rect(0, 0, 600, 100).fill(colors.primary);
+
+  if (fs.existsSync(logoPath)) {
+    doc.image(logoPath, 40, 25, { height: 50 });
+  }
+
+  doc
+    .fillColor("white")
+    .fontSize(22)
+    .font("Helvetica-Bold")
+    .text("Employee Shift Schedule", 160, 40, { align: "left" });
+
+  doc.moveDown(4);
+
+  /* ---------- SUB-INFO SECTION ---------- */
+  doc.fillColor(colors.text).fontSize(10).font("Helvetica");
+  
+  const currentY = 115;
+  doc.text(`Employee Name: ${employee.First_Name || ""}`, 40, currentY);
+  doc.text(`Employee ID: ${employee.Employee_ID}`, 40, currentY + 15);
+  
+  doc.text(`Total Records: ${shifts.length}`, 400, currentY, { align: "right" });
+  doc.text(`Printed Date: ${moment().format("DD-MM-YYYY")}`, 400, currentY + 15, { align: "right" });
+
+  /* ---------- TABLE DESIGN ---------- */
+  const tableX = 40;
+  const column = {
+    date: tableX + 10,
+    shift: tableX + 130,
+    start: tableX + 270,
+    end: tableX + 390
+  };
+
+  let y = 160;
+
+  const drawHeader = () => {
+    // Header background
+    doc.rect(tableX, y, 520, 30).fill(colors.primary);
+
+    doc
+      .fillColor("white")
+      .font("Helvetica-Bold")
+      .fontSize(11)
+      .text("Date", column.date, y + 10)
+      .text("Shift Name", column.shift, y + 10)
+      .text("Start Time", column.start, y + 10)
+      .text("End Time", column.end, y + 10);
+
+    y += 30;
+  };
+
+  drawHeader();
+
+  /* ---------- TABLE BODY ---------- */
+  shifts.forEach((shift, index) => {
+    // Page breaking logic
+    if (y > 730) {
+      doc.addPage();
+      y = 40;
+      drawHeader();
+    }
+
+    // Zebra Striping
+    const isEven = index % 2 === 0;
+    if (isEven) {
+      doc.rect(tableX, y, 520, 25).fill(colors.rowAlt);
+    }
+
+    // Border Bottom
+    doc.moveTo(tableX, y + 25)
+       .lineTo(tableX + 520, y + 25)
+       .strokeColor(colors.border)
+       .lineWidth(0.5)
+       .stroke();
+
+    doc
+      .fillColor(colors.text)
+      .font("Helvetica")
+      .fontSize(10)
+      .text(moment(shift.Date).format("DD-MM-YYYY"), column.date, y + 8)
+      .text(shift.Shift_Name || shift.Shift_Code || "-", column.shift, y + 8)
+      .text(shift.Start_Time || "-", column.start, y + 8)
+      .text(shift.End_Time || "-", column.end, y + 8);
+
+    y += 25;
+  });
+
+  /* ---------- FOOTER ---------- */
+  const pageCount = doc.bufferedPageRange().count;
+  // doc.fontSize(9).fillColor("gray");
+  // doc.text(
+  //   `© ${new Date().getFullYear()} YJK Technologies | Confidential Report`,
+  //   0,
+  //   doc.page.height - 50,
+  //   { align: "center" }
+  // );
+
+  doc.end();
+  return filePath;
+};
+
+const getGenerateShift = async (req, res) => {
+  const { department_ID, designation_ID, Employee_ID, From_Date, To_Date, company_code, created_by } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "GS")
+      .input("department_ID", sql.NVarChar, department_ID)
+      .input("designation_ID", sql.NVarChar, designation_ID)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_Employee_Shift_Report @mode,@department_ID,@designation_ID,@Employee_ID,
+        @From_Date,@To_Date,@company_code,@created_by,'','',''`);
+
+    const shifts = result.recordset;
+    const grouped = {};
+    shifts.forEach(row => {
+      if (!grouped[row.Employee_ID]) {
+        grouped[row.Employee_ID] = [];
+      }
+      grouped[row.Employee_ID].push(row);
+    });
+
+    for (const empId in grouped) {
+
+      const empShifts = grouped[empId];
+      const employee = empShifts[0];
+
+      const pdfPath = generateShiftPDF(employee, empShifts);
+
+      await transporter.sendMail({
+        from: "alert@yjktechnologies.com",
+        to: employee.email,
+        subject: "Your Shift Schedule",
+        text: "Please find attached your shift schedule",
+        attachments: [
+          {
+            filename: `Shift_${empId}.pdf`,
+            path: pdfPath
+          }
+        ]
+      });
+
+      // ✅ Mail sent success → Delete PDF
+      if (fs.existsSync(pdfPath)) {
+        fs.unlinkSync(pdfPath);
+      }
+    }
+
+    res.status(200).json({
+      message: "Shift Generated & Email Sent Successfully"
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getEmpShiftReport = async (req, res) => {
+  const { Employee_ID, From_Date, To_Date, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'ESR')
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Shift_Report @mode,'','',@Employee_ID,@From_Date,@To_Date,@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//code ended by pavun on 05-03-26
+
+//code added by sakthi on 05-03-26
+const getDepartmentDashboard = async (req, res) => {
+  const { mode, company_code, fromDate, toDate } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, fromDate)
+      .input("to_date", sql.Date, toDate)
+      .query(`EXEC sp_Department_Dashboard @mode, @company_code, @from_date, @to_date `);
+
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error("Error fetching Department Dashboard:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};//code ended by sakthi on 05-03-26
+
+//code added by pavun on 06-03-26
+const getDepartment = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_department 'FD','','',@company_code,'','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getAdEmpShiftReport = async (req, res) => { /*Admin Dashboard Screen Mode */
+  const { From_Date, To_Date, Employee_ID, department_ID, designation_ID, Shift_Pattern_ID, Shift_Code,
+    Day_Sequence, Start_Time, End_Time, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'ESR')
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("department_ID", sql.NVarChar, department_ID)
+      .input("designation_ID", sql.NVarChar, designation_ID)
+      .input("Shift_Pattern_ID", sql.NVarChar, Shift_Pattern_ID)
+      .input("Shift_Code", sql.NVarChar, Shift_Code)
+      .input("Day_Sequence", sql.Int, Day_Sequence)
+      .input("Start_Time", sql.NVarChar, Start_Time)
+      .input("End_Time", sql.NVarChar, End_Time)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Daily_Shift_Report @mode,@From_Date,@To_Date,@Employee_ID,@department_ID,@designation_ID,@Shift_Pattern_ID,@Shift_Code,@Day_Sequence,@Start_Time,@End_Time,@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const shiftPatternChart = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, 'TSPS')
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Employee_Shift_Report @mode,'','','','','',@company_code,'','','',''`);
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+//code ended by pavun on 06-03-26
+
+//Code added dinesh on 07-03-26
+const visa_requestsInsert = async (req, res) => {
+  const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id, purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level, sponsor_name, estimated_cost, Remarks, company_code, Created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("visa_request_id", sql.Int, visa_request_id)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("passport_id", sql.Int, passport_id)
+      .input("destination_country_id", sql.NVarChar, destination_country_id)
+      .input("visa_type_id", sql.NVarChar, visa_type_id)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("sponsor_name", sql.NVarChar, sponsor_name)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Created_by", sql.NVarChar, Created_by)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, '', @Created_by, '', '', ''`);
+
+    res.status(200).json({ success: true, message: "visa_requests insertd successfully" });
+  } catch (err) {
+    console.error("Error during visa_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const visa_requestsUpdate = async (req, res) => {
+  const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id, purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level, sponsor_name, estimated_cost, Remarks, company_code, keyfield,  Modified_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("visa_request_id", sql.Int, visa_request_id)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("passport_id", sql.Int, passport_id)
+      .input("destination_country_id", sql.NVarChar, destination_country_id)
+      .input("visa_type_id", sql.NVarChar, visa_type_id)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("sponsor_name", sql.NVarChar, sponsor_name)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @keyfield, '', '', @Modified_by, ''`);
+
+    res.status(200).json({ success: true, message: "visa_requests updated successfully" });
+  } catch (err) {
+    console.error("Error during visa_requests update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const visa_requestsDelete = async (req, res) => {
+  const { visa_request_id, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("visa_request_id", sql.Int, visa_request_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', ', '', ''`);
+
+    res.status(200).json({ success: true, message: "visa_requests deleted successfully" });
+  } catch (err) {
+    console.error("Error during visa_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated visa_requestsLoopInsert API for sp_visa_requests
+const visa_requestsLoopInsert = async (req, res) => {
+  const visa_requestsData = req.body.visa_requestsData;
+  if (!visa_requestsData || !visa_requestsData.length) {
+    return res.status(400).json("Invalid or empty visa_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of visa_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("visa_request_id", sql.Int, item.visa_request_id)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("passport_id", sql.Int, item.passport_id)
+        .input("destination_country_id", sql.NVarChar, item.destination_country_id)
+        .input("visa_type_id", sql.NVarChar, item.visa_type_id)
+        .input("purpose", sql.NVarChar, item.purpose)
+        .input("travel_start_date", sql.Date, item.travel_start_date)
+        .input("travel_end_date", sql.Date, item.travel_end_date)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("priority_level", sql.NVarChar, item.priority_level)
+        .input("sponsor_name", sql.NVarChar, item.sponsor_name)
+        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Created_by", sql.NVarChar, item.Created_by)
+        .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @keyfield, @Created_by, '', '', ''`);
+    }
+    res.status(200).json("visa_requests data inserted successfully");
+  } catch (err) {
+    console.error("Error in visa_requestsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated visa_requestsLoopUpdate API for sp_visa_requests
+const visa_requestsLoopUpdate = async (req, res) => {
+  const visa_requestsData = req.body.visa_requestsData;
+  if (!visa_requestsData || !visa_requestsData.length) {
+    return res.status(400).json("Invalid or empty visa_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of visa_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("visa_request_id", sql.Int, item.visa_request_id)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("passport_id", sql.Int, item.passport_id)
+        .input("destination_country_id", sql.NVarChar, item.destination_country_id)
+        .input("visa_type_id", sql.NVarChar, item.visa_type_id)
+        .input("purpose", sql.NVarChar, item.purpose)
+        .input("travel_start_date", sql.Date, item.travel_start_date)
+        .input("travel_end_date", sql.Date, item.travel_end_date)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("priority_level", sql.NVarChar, item.priority_level)
+        .input("sponsor_name", sql.NVarChar, item.sponsor_name)
+        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
+        .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @keyfield, '', '', @Modified_by, ''`);
+    }
+    res.status(200).json("visa_requests data updated successfully");
+  } catch (err) {
+    console.error("Error in visa_requestsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated visa_requestsLoopDelete API for sp_visa_requests
+const visa_requestsLoopDelete = async (req, res) => {
+  const visa_requestsData = req.body.visa_requestsData;
+  if (!visa_requestsData || !visa_requestsData.length) {
+    return res.status(400).json("Invalid or empty visa_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of visa_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("visa_request_id", sql.Int, item.visa_request_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', '', '', ''`);
+    }
+    res.status(200).json("visa_requests data deleted successfully");
+  } catch (err) {
+    console.error("Error in visa_requestsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated Node.js CRUD for sp_travel_requests
+const travel_requestsInsert = async (req, res) => {
+  const { travel_request_id, request_number, employee_id, department_id, travel_type, destination_country_id, destination_city, purpose_of_travel, travel_start_date, travel_end_date, transport_mode, accommodation_required, estimated_cost, currency_code, request_status, Remarks, priority_level, manager_id, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("travel_request_id", sql.Int, travel_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("department_id", sql.Int, department_id)
+      .input("travel_type", sql.NVarChar, travel_type)
+      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_city", sql.NVarChar, destination_city)
+      .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("transport_mode", sql.NVarChar, transport_mode)
+      .input("accommodation_required", sql.Bit, accommodation_required)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("manager_id", sql.Int, manager_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "travel_requests insertd successfully" });
+  } catch (err) {
+    console.error("Error during travel_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const travel_requestsUpdate = async (req, res) => {
+  const { travel_request_id, request_number, employee_id, department_id, travel_type, destination_country_id, destination_city, purpose_of_travel, travel_start_date, travel_end_date, transport_mode, accommodation_required, estimated_cost, currency_code, request_status, Remarks, priority_level, manager_id, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("travel_request_id", sql.Int, travel_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("department_id", sql.Int, department_id)
+      .input("travel_type", sql.NVarChar, travel_type)
+      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_city", sql.NVarChar, destination_city)
+      .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("transport_mode", sql.NVarChar, transport_mode)
+      .input("accommodation_required", sql.Bit, accommodation_required)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("manager_id", sql.Int, manager_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "travel_requests updated successfully" });
+  } catch (err) {
+    console.error("Error during travel_requests update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const travel_requestsDelete = async (req, res) => {
+  const { travel_request_id, request_number, employee_id, department_id, travel_type, destination_country_id, destination_city, purpose_of_travel, travel_start_date, travel_end_date, transport_mode, accommodation_required, estimated_cost, currency_code, request_status, Remarks, priority_level, manager_id, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("travel_request_id", sql.Int, travel_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("department_id", sql.Int, department_id)
+      .input("travel_type", sql.NVarChar, travel_type)
+      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_city", sql.NVarChar, destination_city)
+      .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("transport_mode", sql.NVarChar, transport_mode)
+      .input("accommodation_required", sql.Bit, accommodation_required)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("manager_id", sql.Int, manager_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "travel_requests deleted successfully" });
+  } catch (err) {
+    console.error("Error during travel_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated travel_requestsLoopInsert API for sp_travel_requests
+const travel_requestsLoopInsert = async (req, res) => {
+  const travel_requestsData = req.body.travel_requestsData;
+  if (!travel_requestsData || !travel_requestsData.length) {
+    return res.status(400).json("Invalid or empty travel_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of travel_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("travel_request_id", sql.Int, item.travel_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("department_id", sql.Int, item.department_id)
+        .input("travel_type", sql.NVarChar, item.travel_type)
+        .input("destination_country_id", sql.Int, item.destination_country_id)
+        .input("destination_city", sql.NVarChar, item.destination_city)
+        .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
+        .input("travel_start_date", sql.Date, item.travel_start_date)
+        .input("travel_end_date", sql.Date, item.travel_end_date)
+        .input("transport_mode", sql.NVarChar, item.transport_mode)
+        .input("accommodation_required", sql.Bit, item.accommodation_required)
+        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("priority_level", sql.NVarChar, item.priority_level)
+        .input("manager_id", sql.Int, item.manager_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("travel_requests data inserted successfully");
+  } catch (err) {
+    console.error("Error in travel_requestsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated travel_requestsLoopUpdate API for sp_travel_requests
+const travel_requestsLoopUpdate = async (req, res) => {
+  const travel_requestsData = req.body.travel_requestsData;
+  if (!travel_requestsData || !travel_requestsData.length) {
+    return res.status(400).json("Invalid or empty travel_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of travel_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("travel_request_id", sql.Int, item.travel_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("department_id", sql.Int, item.department_id)
+        .input("travel_type", sql.NVarChar, item.travel_type)
+        .input("destination_country_id", sql.Int, item.destination_country_id)
+        .input("destination_city", sql.NVarChar, item.destination_city)
+        .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
+        .input("travel_start_date", sql.Date, item.travel_start_date)
+        .input("travel_end_date", sql.Date, item.travel_end_date)
+        .input("transport_mode", sql.NVarChar, item.transport_mode)
+        .input("accommodation_required", sql.Bit, item.accommodation_required)
+        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("priority_level", sql.NVarChar, item.priority_level)
+        .input("manager_id", sql.Int, item.manager_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("travel_requests data updated successfully");
+  } catch (err) {
+    console.error("Error in travel_requestsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated travel_requestsLoopDelete API for sp_travel_requests
+const travel_requestsLoopDelete = async (req, res) => {
+  const travel_requestsData = req.body.travel_requestsData;
+  if (!travel_requestsData || !travel_requestsData.length) {
+    return res.status(400).json("Invalid or empty travel_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of travel_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("travel_request_id", sql.Int, item.travel_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("department_id", sql.Int, item.department_id)
+        .input("travel_type", sql.NVarChar, item.travel_type)
+        .input("destination_country_id", sql.Int, item.destination_country_id)
+        .input("destination_city", sql.NVarChar, item.destination_city)
+        .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
+        .input("travel_start_date", sql.Date, item.travel_start_date)
+        .input("travel_end_date", sql.Date, item.travel_end_date)
+        .input("transport_mode", sql.NVarChar, item.transport_mode)
+        .input("accommodation_required", sql.Bit, item.accommodation_required)
+        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("priority_level", sql.NVarChar, item.priority_level)
+        .input("manager_id", sql.Int, item.manager_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("travel_requests data deleted successfully");
+  } catch (err) {
+    console.error("Error in travel_requestsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated Node.js CRUD for sp_loan_requests
+const loan_requestsInsert = async (req, res) => {
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("loan_type_id", sql.Int, loan_type_id)
+      .input("loan_amount", sql.Decimal(12, 2), loan_amount)
+      .input("interest_rate", sql.Decimal(5, 2), interest_rate)
+      .input("repayment_months", sql.Int, repayment_months)
+      .input("monthly_installment", sql.Decimal(12, 2), monthly_installment)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "loan_requests insertd successfully" });
+  } catch (err) {
+    console.error("Error during loan_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_requestsUpdate = async (req, res) => {
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("loan_type_id", sql.Int, loan_type_id)
+      .input("loan_amount", sql.Decimal(12, 2), loan_amount)
+      .input("interest_rate", sql.Decimal(5, 2), interest_rate)
+      .input("repayment_months", sql.Int, repayment_months)
+      .input("monthly_installment", sql.Decimal(12, 2), monthly_installment)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "loan_requests updated successfully" });
+  } catch (err) {
+    console.error("Error during loan_requests update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_requestsDelete = async (req, res) => {
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("loan_type_id", sql.Int, loan_type_id)
+      .input("loan_amount", sql.Decimal(12, 2), loan_amount)
+      .input("interest_rate", sql.Decimal(5, 2), interest_rate)
+      .input("repayment_months", sql.Int, repayment_months)
+      .input("monthly_installment", sql.Decimal(12, 2), monthly_installment)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "loan_requests deleted successfully" });
+  } catch (err) {
+    console.error("Error during loan_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_requestsLoopInsert API for sp_loan_requests
+const loan_requestsLoopInsert = async (req, res) => {
+  const loan_requestsData = req.body.loan_requestsData;
+  if (!loan_requestsData || !loan_requestsData.length) {
+    return res.status(400).json("Invalid or empty loan_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("loan_type_id", sql.Int, item.loan_type_id)
+        .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
+        .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
+        .input("repayment_months", sql.Int, item.repayment_months)
+        .input("monthly_installment", sql.Decimal(12, 2), item.monthly_installment)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("purpose", sql.NVarChar, item.purpose)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("loan_requests data inserted successfully");
+  } catch (err) {
+    console.error("Error in loan_requestsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_requestsLoopUpdate API for sp_loan_requests
+const loan_requestsLoopUpdate = async (req, res) => {
+  const loan_requestsData = req.body.loan_requestsData;
+  if (!loan_requestsData || !loan_requestsData.length) {
+    return res.status(400).json("Invalid or empty loan_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("loan_type_id", sql.Int, item.loan_type_id)
+        .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
+        .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
+        .input("repayment_months", sql.Int, item.repayment_months)
+        .input("monthly_installment", sql.Decimal(12, 2), item.monthly_installment)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("purpose", sql.NVarChar, item.purpose)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("loan_requests data updated successfully");
+  } catch (err) {
+    console.error("Error in loan_requestsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_requestsLoopDelete API for sp_loan_requests
+const loan_requestsLoopDelete = async (req, res) => {
+  const loan_requestsData = req.body.loan_requestsData;
+  if (!loan_requestsData || !loan_requestsData.length) {
+    return res.status(400).json("Invalid or empty loan_requestsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_requestsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("request_number", sql.NVarChar, item.request_number)
+        .input("employee_id", sql.NVarChar, item.employee_id)
+        .input("loan_type_id", sql.Int, item.loan_type_id)
+        .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
+        .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
+        .input("repayment_months", sql.Int, item.repayment_months)
+        .input("monthly_installment", sql.Decimal(12, 2), item.monthly_installment)
+        .input("currency_code", sql.NVarChar, item.currency_code)
+        .input("purpose", sql.NVarChar, item.purpose)
+        .input("request_status", sql.NVarChar, item.request_status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("loan_requests data deleted successfully");
+  } catch (err) {
+    console.error("Error in loan_requestsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended dinesh on 07-03-26
+
+//Code added pavun on 07-03-26
+const getVisaType = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Visa Type','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const visaRequestSearch = async (req, res) => {
+  const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id, purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level, sponsor_name, estimated_cost, Remarks, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("visa_request_id", sql.NVarChar, visa_request_id)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("passport_id", sql.NVarChar, passport_id)
+      .input("destination_country_id", sql.NVarChar, destination_country_id)
+      .input("visa_type_id", sql.NVarChar, visa_type_id)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("travel_start_date", sql.NVarChar, travel_start_date)
+      .input("travel_end_date", sql.NVarChar, travel_end_date)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("sponsor_name", sql.NVarChar, sponsor_name)
+      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, '', '', '', '', ''`);
+
+      if (result.recordset.length > 0) {  
+        res.status(200).json(result.recordset);
+      } else {
+        res.status(404).json("Data not found");
+      } 
+  } catch (err) {
+    console.error("Error during visa_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended pavun on 07-03-26
 
 module.exports = {
   login,
@@ -38019,7 +39000,6 @@ module.exports = {
     GetCountry,
     Time_Zone_masterLoopUpdate,
     Time_Zone_masterLoopDelete,
-    Time_Zone_master_sc,
     Shift_MasterInsert,
     getShiftsearchdata,
     sp_Shift_MasterLoopUpdate,
@@ -38074,6 +39054,34 @@ module.exports = {
     getHolidayType,
     TotalInterviewSchedule,
     InterviewCompletionRateSC,
+    getEmployeeTypeDD,
+    getInterviewDashboardCount,
+    getGenerateShift,
+    getEmpShiftReport,
+    getDepartmentDashboard,
+    getDepartment,
+    getAdEmpShiftReport,
+    shiftPatternChart,
+    visa_requestsInsert,
+    visa_requestsUpdate,
+    visa_requestsDelete,
+    visa_requestsLoopInsert,
+    visa_requestsLoopUpdate,
+    visa_requestsLoopDelete,
+    travel_requestsInsert,
+    travel_requestsUpdate,
+    travel_requestsDelete,
+    travel_requestsLoopInsert,
+    travel_requestsLoopUpdate,
+    travel_requestsLoopDelete,
+    loan_requestsInsert,
+    loan_requestsUpdate,
+    loan_requestsDelete,
+    loan_requestsLoopInsert,
+    loan_requestsLoopUpdate,
+    loan_requestsLoopDelete,
+    getVisaType,
+    visaRequestSearch,
     loan_approvalsInsert,
     loan_approvalsUpdate,
     loan_approvalsDelete,

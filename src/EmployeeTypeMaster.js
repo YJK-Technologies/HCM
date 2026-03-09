@@ -62,6 +62,16 @@ function EmployeeTypeMaster() {
         .filter((permission) => permission.screen_type === "Company Mapping")
         .map((permission) => permission.permission_type.toLowerCase());
 
+    const searchClearInputFields = () => {
+        setEmploymentIdSc("");
+        setSelectedEmploymentTypeSc("");
+        setEmploymentTypeSc("");
+        setDescriptionSc("");
+        setSelectedStatusSc("");
+        setStatusSc("");
+    };
+
+
     const handleChangeStatus = (selectedStatus) => {
         setSelectedStatus(selectedStatus);
         setStatus(selectedStatus ? selectedStatus.value : "");
@@ -236,7 +246,8 @@ function EmployeeTypeMaster() {
     };
 
     const reloadGridData = () => {
-        window.location.reload();
+        setRowData([]);
+        searchClearInputFields();
     };
 
     const columnDefs = [
@@ -492,12 +503,12 @@ function EmployeeTypeMaster() {
     };
 
     const handleUpdate = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to update the selected employment type master data?",
             async () => {
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -547,12 +558,12 @@ function EmployeeTypeMaster() {
     };
 
     const handleDelete = async (rowData) => {
-        setLoading(true);
 
         showConfirmationToast(
             "Are you sure you want to delete the selected employment type master data?",
             async () => {
                 try {
+                    setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {

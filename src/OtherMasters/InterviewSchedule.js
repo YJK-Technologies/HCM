@@ -90,14 +90,21 @@ function InterviewSchedule({ }) {
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselectedscheduleidSC("");
+    setscheduleidSC("");
+    setSelectedcandidatenameSC("");
+    set_candidatenameSC("");
+    setselectedPanelIDSC("");
+    setPanelIDSC("");
+    setselectedInterviewModeSC("");
+    setInterviewModeSC("");
+    setlocationSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
-
 
   const handleInterviewMode = (selectedDPT) => {
     setselectedInterviewMode(selectedDPT);
@@ -143,7 +150,7 @@ function InterviewSchedule({ }) {
       .then((data) => {
         const statusOption = data.map((option) => ({
           value: option.panel_id,
-          label: `${option.panel_id}-${option.panel_name}`,
+          label: `${option.panel_id} - ${option.panel_name}`,
         }));
         setPaneldrop(statusOption);
       })
@@ -163,7 +170,7 @@ function InterviewSchedule({ }) {
       .then((data) => {
         const statusOption = data.map((option) => ({
           value: option.candidate_id,
-          label: `${option.candidate_id}-${option.candidate_name}`,
+          label: `${option.candidate_id} - ${option.candidate_name}`,
         }));
         setcandidatedrop(statusOption);
       })
@@ -428,6 +435,16 @@ function InterviewSchedule({ }) {
       editable: true
     },
     {
+      headerName: "Candidate Email",
+      field: "email",
+      editable: false,
+    },
+    {
+      headerName: "Candidate Phone No",
+      field: "phone",
+      editable: false,
+    },
+    {
       headerName: "Panel ID",
       field: "panel_id",
       editable: true,
@@ -574,6 +591,8 @@ function InterviewSchedule({ }) {
           Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
           Interview_Mode: matchedItem.Interview_Mode,
+          email: matchedItem.email,
+          phone: matchedItem.phone,
         }));
         setRowData(newRows);
       } else if (response.status === 404) {
@@ -594,15 +613,16 @@ function InterviewSchedule({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -640,11 +660,11 @@ function InterviewSchedule({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_scheduleData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -754,17 +774,37 @@ function InterviewSchedule({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Schedule ID": row.schedule_id || "",
-      "Candidate ID": row.candidate_id || "",
-      "Panel ID": row.panel_id || "",
-      "Schedule Date": row.scheduled_datetime || "",
-      "Time Zone": row.timezone || "",
-      "Location": row.location || "",
-      "Interview Mode": row.Interview_Mode || "",
-      "Meeting Link": row.meeting_link || "",
-      "Status": row.Status || "",
-    }));
+    return data.map((row) => {
+      const canObj = candidatedrop.find(
+        (d) => d.value === row.candidate_id
+      );
+
+      const canName = canObj
+        ? canObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const panObj = Paneldrop.find(
+        (d) => d.value === row.panel_id
+      );
+
+      const panName = panObj
+        ? panObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Schedule ID": row.schedule_id || "",
+        "Candidate ID": `${row.candidate_id} - ${canName}` || "",
+        "Candidate Email": row.email || "",
+        "Candidate Phone No": row.phone || "",
+        "Panel ID": `${row.panel_id} - ${panName}` || "",
+        "Schedule Date": row.scheduled_datetime || "",
+        "Time Zone": row.timezone || "",
+        "Location": row.location || "",
+        "Interview Mode": row.Interview_Mode || "",
+        "Meeting Link": row.meeting_link || "",
+        "Status": row.Status || "",
+      };
+    });
   };
 
   const handleExportToExcel = () => {

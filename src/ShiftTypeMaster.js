@@ -44,6 +44,12 @@ function ShiftTypeMaster() {
     .filter((permission) => permission.screen_type === "Company Mapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const searchClearInputFields = () => {
+    setShift_Type_IDSC("");
+    setShift_TypeSC("");
+    setDescriptionSC("");
+  };
+
   const handleSearch = async () => {
     setLoading(true);
 
@@ -83,7 +89,8 @@ function ShiftTypeMaster() {
   };
 
   const reloadGridData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
@@ -328,12 +335,12 @@ function ShiftTypeMaster() {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to update the selected shift data?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
@@ -385,12 +392,12 @@ function ShiftTypeMaster() {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
-
+    
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {

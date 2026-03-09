@@ -90,8 +90,7 @@ import InterviewDecision from "./OtherMasters/InterviewDecision.js";
 import CountryMaster from "./NewCountryMasterGrid.js";
 import AddCountryMaster from "./AddCountryMaster.js";
 import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
-import TimeZoneGrid from "./TimeZoneMasterGrid.js";
-import ShiftMaster from "./ShiftMaster.js";
+import TimeZoneGrid from "./TimeZoneMaster.js";
 import ShiftMasterGrid from "./ShiftMasterGrid.js";
 import ShiftTypeMaster from "./ShiftTypeMaster.js";
 import ShiftPatternMaster from "./ShiftPatternMaster.js";
@@ -106,8 +105,12 @@ import HiringDecisionReport from "./HiringDecisionReport.js";
 import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
 import TotalInterviewsScheduled from "./TotalInterviewsScheduled.js";
 import InterviewCompletionRate from "./InterviewCompletionRate.js";
+import InterviewDashboard from "./InterviewDashboard.js";
+import DepartmentDashboard from "./DepartmentDashboard.js";
+import VisaRequest from "./EmpRequests/VisaRequest.js"
 
 import { ToastContainer } from "react-toastify";
+import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -271,7 +274,6 @@ function Main() {
     { path: "/AddCountryMaster", component: <AddCountryMaster /> },
     { path: "/AddTimeZoneMaster", component: <AddTimeZoneMaster /> },
     { path: "/TimeZoneGrid", component: <TimeZoneGrid /> },
-    { path: "/ShiftMaster", component: <ShiftMaster /> },
     { path: "/ShiftMasterGrid", component: <ShiftMasterGrid /> },
     { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
     { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },
@@ -285,7 +287,11 @@ function Main() {
     { path: "/HiringDecisionReport", component: <HiringDecisionReport /> },
     { path: "/TotalCandidatesAppli", component: <TotalCandidatesApplied /> },
     { path: "/TotalInterviewsSched", component: <TotalInterviewsScheduled /> },
-    { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> }
+    { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
+    { path: "/InterviewDashboard", component: <InterviewDashboard /> },
+    { path: "/GenerateShift", component: <GenerateShift /> },
+    { path: "/DepartmentDashboard", component: <DepartmentDashboard /> },
+    { path: "/VisaRequest", component: <VisaRequest /> },
 
   
   ];

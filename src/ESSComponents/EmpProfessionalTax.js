@@ -43,7 +43,9 @@ function Input({ }) {
   const navigate = useNavigate();
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
+  const [Start_YearSC, setStart_YearSC] = useState('');
   const [End_Year, setEnd_Year] = useState(LastDate);
+  const [End_YearSC, setEnd_YearSC] = useState('');
   const [rowData, setRowData] = useState([]);
   const [Empsalaryfrom, setEmpsalaryfrom] = useState(0);
   const [EmpsalaryTo, setEmpsalaryTo] = useState(0);
@@ -52,6 +54,14 @@ function Input({ }) {
   const gridColumnApiRef = useRef(null);
   const [activeTab, setActiveTab] = useState("Professional Tax");
   const [loading, setLoading] = useState(false);
+
+  const searchClearInputFields = () => {
+    setStart_YearSC("");
+    setEnd_YearSC("");
+    setEmpsalaryfrom(0);
+    setEmpsalaryTo(0);
+    setTaxAMt(0);
+  };
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -200,11 +210,11 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -309,14 +319,15 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -358,6 +369,8 @@ function Input({ }) {
         Employee_Salary_From: Empsalaryfrom,
         Employee_Salary_To: EmpsalaryTo,
         Taxable_Amount: TaxAMt,
+        Start_Year: Start_YearSC,
+        End_Year: End_YearSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -628,6 +641,37 @@ function Input({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={Start_YearSC}
+                onChange={(e) => setStart_YearSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>Start Year</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                value={End_YearSC}
+                onChange={(e) => setEnd_YearSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}> End Year</label>
+            </div>
+          </div>
+
 
           <div className="col-md-2">
             <div className="inputGroup">

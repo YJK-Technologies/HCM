@@ -60,6 +60,13 @@ function Input({ }) {
 
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setAnnual_bonus(0);
+    setReferral_bonus(0);
+  };
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getID`, {
       method: "POST",
@@ -313,14 +320,15 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -358,11 +366,11 @@ function Input({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };

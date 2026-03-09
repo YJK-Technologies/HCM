@@ -53,7 +53,23 @@ function CandidateMaster() {
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setSelectedcandidatename("");
+    set_candidatename("");
+    setemailSC("");
+    setphoneSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setEducationSC("");
+    setExperienceSC("");
+    setRelated_experienceSC("");
+    setJobDescriptionSC("");
+  };
 
   const cv = useRef(null)
 
@@ -128,7 +144,7 @@ function CandidateMaster() {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(jobs);
       })
@@ -176,6 +192,8 @@ function CandidateMaster() {
         Experience: ExperienceSC,
         Job_description: JobDescriptionSC,
         Related_experience: Related_experienceSC,
+        fromDate: fromDate,
+        toDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode")
       };
 
@@ -194,6 +212,7 @@ function CandidateMaster() {
           email: matchedItem.email,
           Canditate_CV: matchedItem.Canditate_CV,
           phone: matchedItem.phone,
+          created_date: matchedItem.created_date,
           candidate_name: matchedItem.candidate_name,
           applied_job_id: matchedItem.applied_job_id,
           Education: matchedItem.Education,
@@ -267,11 +286,11 @@ function CandidateMaster() {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -309,11 +328,11 @@ function CandidateMaster() {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -350,6 +369,7 @@ function CandidateMaster() {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const CVLinkRenderer = (props) => {
@@ -414,6 +434,11 @@ function CandidateMaster() {
           </div>
         );
       },
+    },
+    {
+      headerName: "Applied Date",
+      field: "created_date",
+      editable: false,
     },
     {
       headerName: "Candidate ID",
@@ -627,18 +652,28 @@ function CandidateMaster() {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Candidate ID": row.candidate_id || "",
-      "Candidate Name": row.candidate_name || "",
-      "Email": row.email || "",
-      "Phone": row.phone || "",
-      "Applied Job ID": row.applied_job_id || "",
-      "Education": row.Education || "",
-      "Experience": row.Experience || "",
-      "Related Experience": row.Related_experience || "",
-      "Job Description": row.Job_description || "",
-      // "Candidate CV": row.Canditate_CV || "",
-    }));
+    return data.map((row) => {
+      const jobObj = JobDrop.find(
+        (d) => d.value === row.applied_job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Applied Date": row.created_date || "",
+        "Candidate ID": row.candidate_id || "",
+        "Candidate Name": row.candidate_name || "",
+        "Email": row.email || "",
+        "Phone": row.phone || "",
+        "Applied Job ID": `${row.applied_job_id} - ${jobName}` || "",
+        "Education": row.Education || "",
+        "Experience": row.Experience || "",
+        "Related Experience": row.Related_experience || "",
+        "Job Description": row.Job_description || "",
+      };
+    });
   };
 
   const handleExportToExcel = () => {
@@ -1004,6 +1039,46 @@ function CandidateMaster() {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={fromDate}
+                maxLength={100}
+                onChange={(e) => { setFromDate(e.target.value); }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Applied From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={toDate}
+                maxLength={100}
+                onChange={(e) => { setToDate(e.target.value); }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Applied To
+              </label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div

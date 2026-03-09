@@ -1,18 +1,29 @@
+import { useState, useEffect } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
-import bgImage from "./background.png";
 import Logo from "./main.png";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") navigate("/Login");
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
 
   return (
     <div className="hcm-dark-theme">
       {/* Dynamic Background Overlay */}
-      <div className="bg-overlay" style={{ backgroundImage: `url(${bgImage})` }}></div>
+      <div className="bg-overlay"></div>
 
-      <nav className="hcm-navbar">
-        <div className="logo">HCM<span>.</span>PRO</div>
+      <nav className={`hcm-navbar fade-down ${isVisible ? "active" : ""}`}>
+        <div className="logo">HCM</div>
         <div className="nav-group">
           {/* <button className="text-link">Product</button> */}
           {/* <button className="text-link">Pricing</button> */}
@@ -21,21 +32,23 @@ const Home = () => {
       </nav>
 
       <section className="hero-center">
-        <div className="glass-hero-card">
-          <div className="status-pill">● System Live: v1.0.0</div>
-          <h1>Unified Intelligence for <span>Modern Teams.</span></h1>
-          <p>
+        <div className={`glass-hero-card fade-up ${isVisible ? "active" : ""}`}>
+          <div className="status-pill"><span className="static-dot">●</span> System Live: v1.0.0</div>
+
+          <h1 className="reveal-text-1">Unified Intelligence for <span>Modern Teams.</span></h1>
+
+          <p className="reveal-text-2">
             The all-in-one platform to hire, pay, and manage your global workforce
             with total compliance and zero friction.
           </p>
 
-          <div className="search-box-mockup">
+          <div className="search-box-mockup reveal-text-3">
             {/* <input type="text" placeholder="Enter your work email..." /> */}
-            <button onClick={() => navigate("/Login")}>Get Started</button>
+            <button className="btn-solid" onClick={() => navigate("/Login")}>Get Started</button>
           </div>
 
-          <div className="trust-badges">
-            <span>Trusted by:</span>
+          <div className="trust-badges reveal-text-4">
+            <span className="trusted-text">Trusted by:</span>
             <div className="brand-icons">
               <img src={Logo} alt="YJK Logo" className="brand-logo" />
               <strong>YJK TECHNOLOGIES</strong>

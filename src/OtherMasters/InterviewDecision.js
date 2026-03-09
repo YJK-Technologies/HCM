@@ -71,9 +71,6 @@ function InterviewDecision({ }) {
   const [selectedJobIDSC, setselectedJobIDSC] = useState("");
   const [JobIDSC, setJobIDSC] = useState("");
   const [isSelectjobIDSC, setisSelectjobIDSC] = useState(false);
-
-
-
   const [activeTab, setActiveTab] = useState("Interview Decision")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
@@ -83,15 +80,21 @@ function InterviewDecision({ }) {
   const [jobDrop, setJobDrop] = useState([]);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselecteddecision_id("");
+    setdecision_id("");
+    setSelectedcandidatenameSC("");
+    set_candidatenameSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setdecided_bySC("");
+    setremarksSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
 
   const handledecision_id = (selectedDPT) => {
@@ -275,7 +278,7 @@ function InterviewDecision({ }) {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(jobs);
       })
@@ -296,7 +299,7 @@ function InterviewDecision({ }) {
       .then((data) => {
         const jobs = data.map((option) => ({
           value: option.candidate_id,
-          label: `${option.candidate_id}-${option.candidate_name}`,
+          label: `${option.candidate_id} - ${option.candidate_name}`,
         }));
         setConditateDrop(jobs);
       })
@@ -543,15 +546,16 @@ function InterviewDecision({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -589,11 +593,11 @@ function InterviewDecision({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_decisionData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -711,15 +715,33 @@ function InterviewDecision({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Candidate ID": row.candidate_id || "",
+    return data.map((row) => {
+      const conObj = conditateDrop.find(
+        (d) => d.value === row.candidate_id
+      );
+
+      const conName = conObj
+        ? conObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const jobObj = jobDrop.find(
+        (d) => d.value === row.job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+      "Candidate ID": `${row.candidate_id} - ${conName}` || "",
       "Decision ID": row.decision_id || "",
-      "Job ID": row.job_id || "",
+      "Job ID": `${row.job_id} - ${jobName}` || "",
       "Decided By": row.decided_by || "",
       "Decided On": row.decided_on || "",
       "Remarks": row.remarks || "",
       "Final Status": row.Final_Status || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {

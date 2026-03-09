@@ -74,12 +74,14 @@ function InterviewPanel({ }) {
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setpanel_nameSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setselecteddeptSC("");
+    setdptSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
 
 
@@ -144,7 +146,7 @@ function InterviewPanel({ }) {
       .then((data) => {
         const job = data.map((option) => ({
           value: option.job_id,
-          label: `${option.job_id}-${option.job_title}`,
+          label: `${option.job_id} - ${option.job_title}`,
         }));
         setJobDrop(job);
       })
@@ -448,15 +450,16 @@ function InterviewPanel({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -494,11 +497,11 @@ function InterviewPanel({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_panelData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -611,12 +614,30 @@ function InterviewPanel({ }) {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => ({
+    return data.map((row) => {
+      const jobObj = jobDrop.find(
+        (d) => d.value === row.job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const deptObj = Dptdrop.find(
+        (d) => d.value === row.department_id
+      );
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
       "Panel Name": row.panel_name || "",
-      "Job ID": row.job_id || "",
-      "Department ID": row.department_id || "",
+      "Job ID": `${row.job_id} - ${jobName}` || "",
+      "Department ID": `${row.department_id} - ${deptName}` || "",
       "Status": row.Status || "",
-    }));
+      };
+    });
   };
 
   const handleExportToExcel = () => {
