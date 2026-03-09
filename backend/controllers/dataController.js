@@ -37126,6 +37126,35 @@ const shiftPatternChart = async (req, res) => {
 };
 //code ended by pavun on 06-03-26
 
+//code added by sakthi on 07-03-26
+const Shift_Summary_Report = async (req, res) => {
+  const { From_Date, To_Date, Employee_ID, Shift_Name, Company_Code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("From_Date", sql.NVarChar, From_Date)
+      .input("To_Date", sql.NVarChar, To_Date)
+      .input("Employee_ID", sql.NVarChar, Employee_ID)
+      .input("Shift_Name", sql.NVarChar, Shift_Name)
+      .input("company_code", sql.NVarChar, Company_Code)
+      .query(`EXEC sp_Shift_Summary_Report @mode, @From_Date, @To_Date, @Employee_ID, @Shift_Name, @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Shift Summary Report:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};//code ended by sakthi on 07-03-26
+
 //Code added dinesh on 07-03-26
 const visa_requestsInsert = async (req, res) => {
   const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id, purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level, sponsor_name, estimated_cost, Remarks, company_code, Created_by } = req.body;
@@ -37462,12 +37491,9 @@ const travel_requestsLoopInsert = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, '', '', ''`);
     }
-    res.status(200).json("travel_requests data inserted successfully");
+    res.status(200).json("travel_requests data inserted successfully"); 
   } catch (err) {
     console.error("Error in travel_requestsLoopInsert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -37506,11 +37532,8 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("manager_id", sql.Int, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, '', '', @modified_by, ''`);
     }
     res.status(200).json("travel_requests data updated successfully");
   } catch (err) {
@@ -37532,30 +37555,8 @@ const travel_requestsLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("travel_request_id", sql.Int, item.travel_request_id)
-        .input("request_number", sql.NVarChar, item.request_number)
-        .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("department_id", sql.Int, item.department_id)
-        .input("travel_type", sql.NVarChar, item.travel_type)
-        .input("destination_country_id", sql.Int, item.destination_country_id)
-        .input("destination_city", sql.NVarChar, item.destination_city)
-        .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
-        .input("travel_start_date", sql.Date, item.travel_start_date)
-        .input("travel_end_date", sql.Date, item.travel_end_date)
-        .input("transport_mode", sql.NVarChar, item.transport_mode)
-        .input("accommodation_required", sql.Bit, item.accommodation_required)
-        .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
-        .input("currency_code", sql.NVarChar, item.currency_code)
-        .input("request_status", sql.NVarChar, item.request_status)
-        .input("Remarks", sql.NVarChar, item.Remarks)
-        .input("priority_level", sql.NVarChar, item.priority_level)
-        .input("manager_id", sql.Int, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', @company_code, '', '', '', '',''`);
     }
     res.status(200).json("travel_requests data deleted successfully");
   } catch (err) {
@@ -37833,6 +37834,72 @@ const visaRequestSearch = async (req, res) => {
   }
 };
 //Code ended pavun on 07-03-26
+
+//code added Sakthi on 09-03-26
+const travel_requestsSearch = async (req, res) => {
+
+  const {
+    travel_request_id,
+    request_number,
+    employee_id,
+    department_id,
+    travel_type,
+    destination_country_id,
+    destination_city,
+    purpose_of_travel,
+    travel_start_date,
+    travel_end_date,
+    transport_mode,
+    accommodation_required,
+    estimated_cost,
+    currency_code,
+    request_status,
+    Remarks,
+    priority_level,
+    manager_id,
+    company_code
+  } = req.body;
+
+  try {
+
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request()
+
+      .input("mode", sql.NVarChar, "SC")
+      .input("travel_request_id", sql.Int, travel_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("department_id", sql.Int, department_id)
+      .input("travel_type", sql.NVarChar, travel_type)
+      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_city", sql.NVarChar, destination_city)
+      .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
+      .input("travel_start_date", sql.Date, travel_start_date)
+      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("transport_mode", sql.NVarChar, transport_mode)
+      .input("accommodation_required", sql.Bit, accommodation_required)
+      .input("estimated_cost", sql.Decimal(12,2), estimated_cost)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("priority_level", sql.NVarChar, priority_level)
+      .input("manager_id", sql.Int, manager_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, '', '', '', '', ''  `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching travel requests Search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};//code ended Sakthi on 09-03-26
 
 module.exports = {
   login,
@@ -39062,6 +39129,7 @@ module.exports = {
     getDepartment,
     getAdEmpShiftReport,
     shiftPatternChart,
+    Shift_Summary_Report,
     visa_requestsInsert,
     visa_requestsUpdate,
     visa_requestsDelete,
@@ -39081,6 +39149,7 @@ module.exports = {
     loan_requestsLoopUpdate,
     loan_requestsLoopDelete,
     getVisaType,
+    travel_requestsSearch,
     visaRequestSearch,
     loan_approvalsInsert,
     loan_approvalsUpdate,
