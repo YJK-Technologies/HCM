@@ -41,7 +41,8 @@ import {
   BsPersonVcard,
   BsWrenchAdjustable,
   BsPeopleFill,
-  BsArrowRepeat
+  BsArrowRepeat,
+  
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -51,6 +52,7 @@ import {
   MdOutlineGavel,
   MdOutlineGroupAdd,
   MdOutlineEventAvailable,
+  MdOutlineSchedule,
   MdTravelExplore 
 } from "react-icons/md";
 
@@ -152,6 +154,7 @@ export const leafIconMap = {
   "Task Hours & Time Tracking": BsClock,
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
+  "Shift Summary Report": MdOutlineSchedule,
 };
 
 const menuData = [
@@ -198,6 +201,7 @@ const menuData = [
         subMenus: [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
           { label: "Visa Requests", path: "/VisaRequest" },
+          { label: "Travel Request", path: "/TravelRequest" },
         ],
       },
       {
@@ -224,6 +228,13 @@ const menuData = [
           { label: "Country Master", path: "/CountryMaster" },
           { label: "Time Zone Master", path: "/TimeZoneGrid" },
           { label: "Shift Master", path: "/ShiftMasterGrid" },
+        ],
+      },
+      {
+        label: "Shift Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Shift Summary Report", path: "/ShiftSumRep" },
         ],
       },
       {
