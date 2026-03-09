@@ -1,0 +1,2041 @@
+import React, { useState, useEffect } from "react";
+import "../input.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { AgGridReact } from "ag-grid-react";
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
+import Select from "react-select";
+import * as XLSX from "xlsx-js-style";
+const config = require("../Apiconfig");
+
+function TravelRequest({}) {
+  const [rowData, setRowData] = useState([]);
+  const [job_titleSC, setjob_titleSC] = useState("");
+  const [job_title, setjob_title] = useState("");
+  const [Country_Code, setCountry_Code] = useState("");
+  const [Country_CodeSC, setCountry_CodeSC] = useState("");
+  const [locationSC, setlocationSC] = useState("");
+  const [employment_typeSC, setemployment_typeSC] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isSelectDepartment, setIsSelectDepartment] = useState(false);
+  const [selecteddpt, setselecteddept] = useState("");
+  const [DPTdrop, setDPTdrop] = useState([]);
+  const [Countrydrop, setCountrydrop] = useState([]);
+  const [CountrydropGR, setCountrydropGR] = useState([]);
+  const [CountrydropSC, setCountrydropSC] = useState([]);
+  const [employmentdrop, setEmploymentdrop] = useState([]);
+  const [employmentdropGR, setEmploymentdropGR] = useState([]);
+  const [employmentdropSC, setEmploymentdropSC] = useState([]);
+  const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [dpt, setdpt] = useState("");
+  const [showAsterisk, setShowAsterisk] = useState(true);
+  const [selecteddptSC, setselecteddeptSC] = useState("");
+  const [dptSC, setdptSC] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const [travel_request_id, settravel_request_id] = useState("");
+  const [request_number, setrequest_number] = useState("");
+  const [empIdDrop, setEmpIdDrop] = useState([]);
+  const [empId, setEmpId] = useState("");
+  const [selectedEmpId, setSelectedEmpId] = useState("");
+  const [travel_type, settravel_type] = useState("");
+  const [destination_country_id, setdestination_country_id] = useState("");
+  const [destination_city, setdestination_city] = useState("");
+  const [purpose_of_travel, setpurpose_of_travel] = useState("");
+  const [countryIdDrop, setCountyIdDrop] = useState([]);
+  const [visaTypeDrop, setVisaTypeDrop] = useState([]);
+  const [travelStartDate, setTravelStartDate] = useState("");
+  const [travelEndDate, setTravelEndDate] = useState("");
+  const [transport_mode, settransport_mode] = useState("");
+  const [accommodation_required, setaccommodation_required] = useState("");
+  const [estimated_cost, setestimated_cost] = useState("");
+  const [Currency_Code, setCurrency_Code] = useState('');
+  const [reqStatusDrop, setReqStatusDrop] = useState([]);
+  const [reqStatus, setReqStatus] = useState("");
+  const [selectedReqStatus, setSelectedReqStatus] = useState("");
+  const [priorityDrop, setPriorityDrop] = useState([]);
+  const [priority, setPriority] = useState("");
+  const [selectedPriority, setSelectedPriority] = useState("");
+  const [remarks, setRemarks] = useState("");
+
+  const [empIdDropSc, setEmpIdDropSc] = useState([]);
+  const [empIdSc, setEmpIdSc] = useState("");
+  const [selectedEmpIdSc, setSelectedEmpIdSc] = useState("");
+  const [countryIdDropSc, setCountyIdDropSc] = useState([]);
+  const [countryIdSc, setCountryIdSc] = useState("");
+  const [selectedCountryIdSc, setSelectedCountryIdSc] = useState("");
+  const [visaTypeDropSc, setVisaTypeDropSc] = useState([]);
+  const [visaTypeSc, setVisaTypeSc] = useState("");
+  const [selectedVisaTypeSc, setSelectedVisaTypeSc] = useState("");
+  const [purposeSc, setPurposeSc] = useState("");
+  const [travelStartDateSc, setTravelStartDateSc] = useState("");
+  const [travelEndDateSc, setTravelEndDateSc] = useState("");
+  const [reqStatusDropSC, setReqStatusDropSC] = useState([]);
+  const [priorityDropSc, setPriorityDropSc] = useState([]);
+  const [prioritySc, setPrioritySc] = useState("");
+  const [selectedPrioritySc, setSelectedPrioritySc] = useState("");
+  const [estimatedCostSc, setEstimatedCostSc] = useState("");
+  const [remarksSc, setRemarksSc] = useState("");
+  const [dynamicOptions, setDynamicOptions] = useState([]);
+  const [selectedmanager, setselectedmanager] = useState('');
+  const [ProjectManager, setProjectManager] = useState('');
+  const [isSelectManager, setIsSelectManager] = useState(false);
+  const [Managerdrop, setManagerdrop] = useState([]);
+  const [travel_request_idSC, settravel_request_idSC] = useState('');
+  const [request_numberSC, setrequest_numberSC] = useState('');
+  const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
+  const [DPTdropSC, setDPTdropSC] = useState([]);
+  const [travel_typeSC, settravel_typeSC] = useState("");
+  const [destination_country_idSC, setdestination_country_idSC] = useState("");
+  const [purpose_of_travelSC, setpurpose_of_travelSC] = useState("");
+  const [transport_modeSc, settransport_modeSc] = useState("");
+  const [accommodation_requiredSc, setaccommodation_requiredSc] = useState("");
+  const [estimated_costSC, setestimated_costSC] = useState("");
+  const [Currency_CodeSC, setCurrency_CodeSC] = useState('');
+  const [selectedReqStatusSC, setSelectedReqStatusSC] = useState("");
+  const [reqStatusSC, setReqStatusSC] = useState("");
+  const [selectedmanagerSC, setselectedmanagerSC] = useState('');
+  const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
+  const [ManagerdropSC, setManagerdropSC] = useState([]);
+  const [destination_citySC, setdestination_citySC] = useState("");
+  const [ProjectManagerSC, setProjectManagerSC] = useState('');
+
+  const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
+  const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
+  const [isSelectedPriority, setIsSelectedPriority] = useState(false);
+
+  const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
+  const [isSelectedReqStatusSC, setIsSelectedReqStatusSC] = useState(false);
+  const [isSelectedPrioritySc, setIsSelectedPrioritySc] = useState(false);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCountyIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getVisaType`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setVisaTypeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getPriority`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setPriorityDrop(val));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setReqStatusDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+    useEffect(() => {
+      fetch(`${config.apiBaseUrl}/ESSManager`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // user_code: sessionStorage.getItem("selectedUserCode"),
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((response) => response.json())
+        .then(setManagerdrop)
+        .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
+    const fetchProductCodes = async (selectedValue) => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ dept_id: selectedValue, company_code }),
+        });
+  
+        const data = await response.json();
+        const formattedData = data.map((product) => ({
+          value: product.Desgination,
+          label: product.Desgination,
+        }));
+  
+        setDynamicOptions(formattedData);
+        return formattedData;
+      } catch (error) {
+        console.error('Error fetching product codes:', error);
+        return [];
+      }
+    };
+    const fetchProductCodesSC = async (selectedValue) => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ dept_id: selectedValue, company_code }),
+        });
+  
+        const data = await response.json();
+        const formattedData = data.map((product) => ({
+          value: product.Desgination,
+          label: product.Desgination,
+        }));
+  
+        setDynamicOptions(formattedData);
+        return formattedData;
+      } catch (error) {
+        console.error('Error fetching product codes:', error);
+        return [];
+      }
+    };
+  
+  
+
+  const filteredOptionEmpId = empIdDrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.First_Name}`,
+  }));
+
+  const filteredOptionPriority = priorityDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+    const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
+ 
+  const filteredOptionManagerSC = ManagerdropSC.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
+
+
+  const handleChangeEmpId = (selectedEmpId) => {
+    setSelectedEmpId(selectedEmpId);
+    setEmpId(selectedEmpId ? selectedEmpId.value : "");
+  };
+
+  const handleChangePriority = (selectedPriority) => {
+    setSelectedPriority(selectedPriority);
+    setPriority(selectedPriority ? selectedPriority.value : "");
+  };
+
+  const handleChangeReqStatus = (selectedReqStatus) => {
+    setSelectedReqStatus(selectedReqStatus);
+    setReqStatus(selectedReqStatus ? selectedReqStatus.value : "");
+  };
+
+  const handleChangeReqStatusSC = (selectedReqStatusSC) => {
+    setSelectedReqStatusSC(selectedReqStatusSC);
+    setReqStatusSC(selectedReqStatusSC ? selectedReqStatusSC.value : "");
+  };
+
+    const handleChangemanager = (selectedOption) => {
+    setselectedmanager(selectedOption);
+    setProjectManager(selectedOption ? selectedOption.value : '');
+    setError(false);
+  };
+    const handleChangemanagerSC = (selectedOption) => {
+    setselectedmanagerSC(selectedOption);
+    setProjectManagerSC(selectedOption ? selectedOption.value : '');
+    setError(false);
+  };
+
+
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCountyIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getVisaType`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setVisaTypeDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getPriority`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setPriorityDropSc(val));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setReqStatusDropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+      useEffect(() => {
+      fetch(`${config.apiBaseUrl}/ESSManager`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // user_code: sessionStorage.getItem("selectedUserCode"),
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((response) => response.json())
+        .then(setManagerdropSC)
+        .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
+
+  const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.First_Name}`,
+  }));
+
+  const filteredOptionCountryIdSc = countryIdDropSc.map((option) => ({
+    value: option.Country_Code,
+    label: `${option.Country_Code} - ${option.Country_Name}`,
+  }));
+
+  const filteredOptionVisaTypeSc = visaTypeDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionPrioritySc = priorityDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionReqStatusSC = reqStatusDropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangeEmpIdSc = (selectedEmpIdSc) => {
+    setSelectedEmpIdSc(selectedEmpIdSc);
+    setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
+  };
+
+  const handleChangePrioritySc = (selectedPrioritySc) => {
+    setSelectedPrioritySc(selectedPrioritySc);
+    setPrioritySc(selectedPrioritySc ? selectedPrioritySc.value : "");
+  };
+
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setjob_titleSC("");
+    setselecteddeptSC("");
+    setdptSC("");
+    setCountry_CodeSC("");
+    setlocationSC("");
+    setemployment_typeSC("");
+  };
+
+  const handleDPT = (selectedDPT) => {
+    setselecteddept(selectedDPT);
+    setdpt(selectedDPT ? selectedDPT.value : '');
+    fetchProductCodes(selectedDPT ? selectedDPT.value : '');
+  };
+
+    const handleDPTSC = (selectedDPTSC) => {
+    setselecteddeptSC(selectedDPTSC);
+    setdptSC(selectedDPTSC ? selectedDPTSC.value : '');
+    fetchProductCodesSC(selectedDPTSC ? selectedDPTSC.value : '');
+  };
+
+
+  const filteredOptionDPt = DPTdrop.map((option) => ({
+    value: option.dept_id,
+    label: `${option.dept_id} - ${option.dept_name}`,
+  }));
+
+  const filteredOptionDPtSC = DPTdropSC.map((option) => ({
+    value: option.dept_id,
+    label: `${option.dept_id} - ${option.dept_name}`,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmploymentdrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const val = await response.json();
+        setDPTdrop(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const val = await response.json();
+        setDPTdropSC(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+  
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/DeptID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setDepartmentDrop(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error),
+      );
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const Countryptions = data.map((option) => ({
+          value: option.Country_Code,
+          label: `${option.Country_Code} - ${option.Country_Name}`,
+        }));
+        setCountrydropGR(Countryptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) => console.error("Error fetching country data:", error));
+  }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const Countryptions = data.map((option) => ({
+          value: option.Country_Code,
+          label: `${option.Country_Code} - ${option.Country_Name}`,
+        }));
+        setCountrydropGR(Countryptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) => console.error("Error fetching country data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employmentptions = data.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setEmploymentdropGR(employmentptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching employee type data:", error),
+      );
+  }, []);
+
+  const columnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      cellRenderer: (params) => {
+        const cellWidth = params.column.getActualWidth();
+        const isWideEnough = cellWidth > 20;
+        const showIcons = isWideEnough;
+
+        return (
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
+            {showIcons && (
+              <>
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleUpdate(params.data, params.node.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-regular fa-floppy-disk"></i>
+                </span>
+
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleDelete(params.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </span>
+              </>
+            )}
+          </div>
+        );
+      },
+    },
+
+    {
+      headerName: "travel_request ID",
+      field: "travel_request_id",
+      editable: true,
+    },
+    {
+      headerName: "Job Title",
+      field: "job_title",
+      editable: true,
+    },
+    {
+      headerName: "Department",
+      field: "department_id",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: departmentDrop.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = departmentDrop.find((d) => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Country Code",
+      field: "Country_Code",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: CountrydropGR.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const country = CountrydropGR.find((d) => d.value === params.value);
+        return country ? country.label : params.value;
+      },
+    },
+    {
+      headerName: "Location",
+      field: "location",
+      editable: true,
+    },
+    {
+      headerName: "Employment Type",
+      field: "employment_type",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employmentdropGR.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const employment = employmentdropGR.find(
+          (d) => d.value === params.value,
+        );
+        return employment ? employment.label : params.value;
+      },
+    },
+    {
+      headerName: "Updated On",
+      field: "updated_on",
+      editable: true,
+    },
+    {
+      headerName: "Keyfield",
+      field: "keyfield",
+      editable: true,
+      hide: true,
+    },
+  ];
+
+  const gridOptions = {
+    pagination: true,
+    paginationPageSize: 10,
+  };
+
+  const handleSave = async () => {
+      // if (!dpt ||
+      //     !job_title ||
+      //     !Country_Code ||
+      //     !location ||
+      //     !employment_type ||
+      //     !updated_on
+      // ) {
+      //     setError(" ");
+      //     toast.warning("Error: Missing required fields");
+      //     return;
+      // }
+      if (new Date(travelStartDate) > new Date(travelEndDate)) {
+          toast.warning("Start Date cannot be greater than End Date");
+          return;
+      }
+
+      setLoading(true);
+
+      try {
+           const Header = {
+            travel_request_id: 0,
+            request_number: request_number,
+            employee_id: empId,
+            department_id: dpt,
+            travel_type: travel_type,
+            destination_country_id: destination_country_id,
+            destination_city: destination_city,
+            purpose_of_travel: purpose_of_travel,
+            travel_start_date: travelStartDate,
+            travel_end_date: travelEndDate,
+            transport_mode: transport_mode,
+            accommodation_required: accommodation_required,
+            estimated_cost: estimated_cost,
+            currency_code: Currency_Code,
+            request_status: reqStatus,
+            Remarks: remarks,
+            priority_level: priority,
+            manager_id: ProjectManager,
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            keyfield: "",
+            created_by: sessionStorage.getItem("selectedUserCode"),
+            created_date: new Date(),
+            modified_by: "",
+            modified_date: null
+        };
+
+          const response = await fetch(`${config.apiBaseUrl}/travel_requestsInsert`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Header),
+          });
+          if (response.ok) {
+              console.log("Data inserted successfully");
+              toast.success("Data inserted successfully!", {
+                  onClose: () => window.location.reload(),
+              });
+          } else {
+              const errorResponse = await response.json();
+              toast.warning(errorResponse.message || "Failed to insert sales data");
+              console.error(errorResponse.details || errorResponse.message);
+          }
+      } catch (error) {
+          console.error("Error inserting data:", error);
+          toast.error('Error inserting data: ' + error.message);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const body = {
+        job_title: job_titleSC,
+        department_id: dptSC,
+        Country_Code: Country_CodeSC,
+        location: locationSC,
+        employment_type: employment_typeSC,
+        fromDate: fromDate,
+        toDate: toDate,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(`${config.apiBaseUrl}/travel_requestsSearch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+        const newRows = fetchedData.map((matchedItem) => ({
+          job_title: matchedItem.job_title,
+          job_id: matchedItem.job_id,
+          department_id: matchedItem.department_id,
+          dept_name: matchedItem.dept_name,
+          Country_Code: matchedItem.Country_Code,
+          employment_type: matchedItem.employment_type,
+          location: matchedItem.location,
+          updated_on: matchedItem.updated_on,
+          keyfield: matchedItem.keyfield,
+        }));
+        setRowData(newRows);
+      } else if (response.status === 404) {
+        console.log("Data Not found");
+        toast.warning("Data Not found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to insert sales data");
+        console.error(errorResponse.details || errorResponse.message);
+        setRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data:", error);
+      setRowData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reloadGridData = () => {
+    setRowData([]);
+    searchClearInputFields();
+  };
+
+  const handleUpdate = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to update the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+          const payload = {
+            job_masterData: (Array.isArray(rowData) ? rowData : [rowData]).map(
+              (r) => ({
+                ...r,
+                company_code,
+                modified_by,
+              }),
+            ),
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/travel_requestsLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            },
+          );
+
+          const result = await response.json();
+
+          if (response.ok) {
+            toast.success("Data updated successfully");
+
+            setRowData((prev) =>
+              prev.map((row) => {
+                const updated = result.data.find(
+                  (u) => u.job_id === row.job_id,
+                );
+                return updated ? { ...row, keyfield: updated.keyfield } : row;
+              }),
+            );
+
+            handleSearch();
+          } else {
+            toast.warning(result.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Update failed: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Update cancelled"),
+    );
+  };
+
+  const handleDelete = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to Delete the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+          const dataToSend = {
+            job_masterData: Array.isArray(rowData) ? rowData : [rowData],
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/travel_requestsLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                company_code: company_code,
+              },
+              body: JSON.stringify(dataToSend),
+            },
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
+          }
+        } catch (error) {
+          console.error("Error deleting rows:", error);
+          toast.error("Error Deleting Data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data Delete cancelled.");
+      },
+    );
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const deptObj = departmentDrop.find((d) => d.value === row.department_id);
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Job ID": row.job_id || "",
+        "Job Title": row.job_title || "",
+        Department: `${row.department_id} - ${deptName}` || "",
+        "Country Code": row.Country_Code || "",
+        Location: row.location || "",
+        "Employment Type": row.employment_type || "",
+        "Updated On": row.updated_on || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Job Master Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Job Master");
+
+    XLSX.writeFile(workbook, "Job_Master_Search_Report.xlsx");
+  };
+
+  return (
+    <div class="container-fluid Topnav-screen ">
+      {loading && <LoadingScreen />}
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Travel Request</h1>
+          <div className="action-wrapper">
+            <div onClick={handleSave} className="action-icon add">
+                            <span className="tooltip">Save</span>
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </div>
+          </div>
+        </div>
+      </div>
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <div className="row g-3">
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travel_request_id}
+                onChange={(e) => settravel_request_id(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travel_request_id ? "text-danger" : ""}`}
+              >
+                Travel Request ID<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={request_number}
+                onChange={(e) => setrequest_number(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travel_request_id ? "text-danger" : ""}`}
+              >
+                Request Number<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+                            ${selectedEmpId ? "has-value" : ""} 
+                            ${isSelectedEmpId ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectedEmpId(true)}
+                onBlur={() => setIsSelectedEmpId(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedEmpId}
+                onChange={handleChangeEmpId}
+                options={filteredOptionEmpId}
+              />
+              <label
+                htmlFor="selecteddpt"
+                className={`floating-label ${error && !dpt ? "text-danger" : ""}`}
+              >
+                Employee ID<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selecteddpt ? "has-value" : ""} 
+              ${isSelectDepartment ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectDepartment(true)}
+                onBlur={() => setIsSelectDepartment(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selecteddpt}
+                onChange={handleDPT}
+                options={filteredOptionDPt}
+              />
+              <label
+                htmlFor="selecteddpt"
+                className={`floating-label ${error && !dpt ? "text-danger" : ""}`}
+              >
+                Department
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${Designation ? "has-value" : ""} 
+              ${isSelectDesignation ? "is-focused" : ""}`}
+            >
+              <Select
+                id="designation"
+                placeholder=" "
+                onFocus={() => setIsSelectDesignation(true)}
+                onBlur={() => setIsSelectDesignation(false)}
+                classNamePrefix="react-select"
+                isClearable
+                name="designation_ID"
+                value={Designation}
+                options={dynamicOptions}
+                onChange={handleChangedesgination}
+              />
+              <label
+                htmlFor="selecteddpt"
+                className={`floating-label ${error && !selecteddesg ? "text-danger" : ""}`}
+              >
+                Designation
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travel_type}
+                onChange={(e) => settravel_type(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travel_type ? "text-danger" : ""}`}
+              >
+                Travel Type<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={destination_country_id}
+                onChange={(e) => setdestination_country_id(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !destination_country_id ? "text-danger" : ""}`}
+              >
+                Destination Country ID<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={destination_city}
+                onChange={(e) => setdestination_city(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !destination_city ? "text-danger" : ""}`}
+              >
+                Destination City<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={purpose_of_travel}
+                onChange={(e) => setpurpose_of_travel(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !purpose_of_travel ? "text-danger" : ""}`}
+              >
+                purpose of travel<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travelStartDate}
+                onChange={(e) => setTravelStartDate(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travelStartDate ? "text-danger" : ""}`}
+              >
+                Travel Start Date<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travelEndDate}
+                onChange={(e) => setTravelEndDate(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travelEndDate ? "text-danger" : ""}`}
+              >
+                Travel End Date<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={transport_mode}
+                onChange={(e) => settransport_mode(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !transport_mode ? "text-danger" : ""}`}
+              >
+                Transport Mode<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={accommodation_required}
+                onChange={(e) => setaccommodation_required(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
+              >
+                Accommodation Required<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={estimated_cost}
+                onChange={(e) => setestimated_cost(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !estimated_cost ? "text-danger" : ""}`}
+              >
+                Estimated Cost<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                maxLength={10}
+                required title="Please Enter the  Company PF Contribution"
+                value={Currency_Code}
+                onChange={(e) => setCurrency_Code(e.target.value)}
+              />
+              <label className="exp-form-labels">Currency Code</label>
+            </div>
+          </div>
+
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+                ${selectedReqStatus ? "has-value" : ""} 
+                ${isSelectedReqStatus ? "is-focused" : ""}`}
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedReqStatus(true)}
+                onBlur={() => setIsSelectedReqStatus(false)}
+                isClearable
+                value={selectedReqStatus}
+                onChange={handleChangeReqStatus}
+                options={filteredOptionReqStatus}
+              />
+              <label
+                for="sname"
+                className={`floating-label ${error && !Country_Code ? "text-danger" : ""}`}
+              >
+                Request Status<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !job_title ? "text-danger" : ""}`}
+              >
+                Remarks<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+               ${selectedPriority ? "has-value" : ""} 
+               ${isSelectedPriority ? "is-focused" : ""}`}
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedPriority(true)}
+                onBlur={() => setIsSelectedPriority(false)}
+                isClearable
+                value={selectedPriority}
+                onChange={handleChangePriority}
+                options={filteredOptionPriority}
+              />
+              <label
+                for="sname"
+                className={`floating-label ${error && !Country_Code ? "text-danger" : ""}`}
+              >
+                Priority Level<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedmanager ? "has-value" : ""} 
+              ${isSelectManager ? "is-focused" : ""}`}
+            >
+              <Select
+                id="LoanEligibleAmount"
+                type="text"
+                placeholder=" "
+                onFocus={() => setIsSelectManager(true)}
+                onBlur={() => setIsSelectManager(false)}
+                classNamePrefix="react-select"
+                isClearable
+                value={selectedmanager}
+                options={filteredOptionManager}
+                onChange={handleChangemanager}
+                maxLength={18}
+              />
+              <label for="add1" className={`floating-label ${error && !ProjectManager ? 'text-danger' : ''}`}>
+                Project Manager<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <div className="header-flex">
+          <h6 className="">Search Criteria:</h6>
+        </div>
+        <div className="row g-3">
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travel_request_idSC}
+                onChange={(e) => settravel_request_idSC(e.target.value)}
+              />
+              <label for="sname"className={`exp-form-labels`}>
+                Travel Request ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={request_numberSC}
+                onChange={(e) => setrequest_numberSC(e.target.value)}
+              />
+              <label for="sname"className={`exp-form-labels`}>
+                 Request Number
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+                ${selectedEmpIdSc ? "has-value" : ""} 
+                ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectedEmpIdSc(true)}
+                onBlur={() => setIsSelectedEmpIdSc(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedEmpIdSc}
+                onChange={handleChangeEmpIdSc}
+                options={filteredOptionEmpIdSc}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Employee ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selecteddptSC ? "has-value" : ""} 
+              ${isSelectDepartmentSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectDepartmentSC(true)}
+                onBlur={() => setIsSelectDepartmentSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selecteddptSC}
+                onChange={handleDPTSC}
+                options={filteredOptionDPtSC}
+              />
+              <label
+                htmlFor="selecteddpt"
+                className={`floating-label`}
+              >
+                Department
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travel_typeSC}
+                onChange={(e) => settravel_typeSC(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Travel Type
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={destination_country_idSC}
+                onChange={(e) => setdestination_country_idSC(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Destination Country ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={purpose_of_travelSC}
+                onChange={(e) => setpurpose_of_travelSC(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                purpose of travel
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travelStartDateSc}
+                onChange={(e) => setTravelStartDateSc(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Travel Start Date
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travelEndDateSc}
+                onChange={(e) => setTravelEndDateSc(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Travel End Date
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={transport_modeSc}
+                onChange={(e) => settransport_modeSc(e.target.value)}
+              />
+              <label for="sname"className={`exp-form-labels`}>
+                Transport Mode
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={accommodation_requiredSc}
+                onChange={(e) => setaccommodation_requiredSc(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Accommodation Required
+              </label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={estimated_costSC}
+                onChange={(e) => setestimated_costSC(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels `}
+              >
+                Estimated Cost
+              </label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                maxLength={10}
+                required title="Please Enter the  Company PF Contribution"
+                value={Currency_CodeSC}
+                onChange={(e) => setCurrency_CodeSC(e.target.value)}
+              />
+              <label className="exp-form-labels">Currency Code</label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+                ${selectedReqStatusSC ? "has-value" : ""} 
+                ${isSelectedReqStatusSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedReqStatusSC(true)}
+                onBlur={() => setIsSelectedReqStatusSC(false)}
+                isClearable
+                value={selectedReqStatusSC}
+                onChange={handleChangeReqStatusSC}
+                options={filteredOptionReqStatusSC}
+              />
+              <label
+                for="sname"
+                className={`floating-label`}
+              >
+                Request Status
+              </label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={remarksSc}
+                onChange={(e) => setRemarksSc(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels`}
+              >
+                Remarks
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+                ${selectedPrioritySc ? "has-value" : ""} 
+                ${isSelectedPrioritySc ? "is-focused" : ""}`}
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedPrioritySc(true)}
+                onBlur={() => setIsSelectedPrioritySc(false)}
+                isClearable
+                value={selectedPrioritySc}
+                onChange={handleChangePrioritySc}
+                options={filteredOptionPrioritySc}
+              />
+              <label
+                for="sname"
+                className={`floating-label`}
+              >
+                Priority Level
+              </label>
+            </div>
+          </div>
+
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedmanagerSC ? "has-value" : ""} 
+              ${isSelectManagerSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="LoanEligibleAmount"
+                type="text"
+                placeholder=" "
+                onFocus={() => setIsSelectManagerSC(true)}
+                onBlur={() => setIsSelectManagerSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                value={selectedmanagerSC}
+                options={filteredOptionManagerSC}
+                onChange={handleChangemanagerSC}
+                maxLength={18}
+              />
+              <label for="add1" className={`floating-label `}>
+                Project Manager
+              </label>
+            </div>
+          </div>
+
+
+          {/* Search + Reload Buttons */}
+          <div className="col-12">
+            <div className="search-btn-wrapper">
+              <div className="icon-btn search" onClick={handleSearch}>
+                <span className="tooltip">Search</span>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <div className="icon-btn reload" onClick={reloadGridData}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            columnDefs={columnDefs}
+            rowData={rowData}
+            pagination={true}
+            paginationAutoPageSize={true}
+            gridOptions={gridOptions}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+export default TravelRequest;
