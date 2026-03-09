@@ -1296,6 +1296,12 @@ router.post("/loan_requestsLoopUpdate",dataController.loan_requestsLoopUpdate)
 router.post("/loan_requestsLoopDelete",dataController.loan_requestsLoopDelete)
 router.post("/getVisaType",dataController.getVisaType)
 router.post("/visaRequestSearch",dataController.visaRequestSearch)
+router.post("/loan_documentsInsert",dataController.loan_documentsInsert)
+router.post("/loan_documentsUpdate",dataController.loan_documentsUpdate)
+router.post("/loan_documentsDelete",dataController.loan_documentsDelete)
+router.post("/loan_documentsLoopInsert",dataController.loan_documentsLoopInsert)
+router.post("/loan_documentsLoopUpdate",dataController.loan_documentsLoopUpdate)
+router.post("/loan_documentsLoopDelete",dataController.loan_documentsLoopDelete)
 
 
 

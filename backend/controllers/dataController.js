@@ -37834,6 +37834,167 @@ const visaRequestSearch = async (req, res) => {
 };
 //Code ended pavun on 07-03-26
 
+//Code Added Dinesh Gokul on 09-03-26
+// Auto-generated Node.js CRUD for sp_loan_documents
+
+const loan_documentsInsert = async (req, res) => {
+  const { document_id, loan_request_id, document_type, file_path, uploaded_by, uploaded_at, company_code, keyfield, created_by} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("document_id", sql.Int, document_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("document_type", sql.NVarChar, document_type)
+      .input("file_path", sql.NVarChar, file_path)
+      .input("uploaded_by", sql.NVarChar, uploaded_by)
+      .input("uploaded_at", sql.DateTime, uploaded_at)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, @created_by, '', '', ''`);
+
+    res.status(200).json({ success: true, message: "loan_documents insertd successfully" });
+  } catch (err) {
+    console.error("Error during loan_documents insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_documentsUpdate = async (req, res) => {
+  const { document_id, loan_request_id, document_type, file_path, uploaded_by, uploaded_at, company_code, keyfield, modified_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("document_id", sql.Int, document_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("document_type", sql.NVarChar, document_type)
+      .input("file_path", sql.NVarChar, file_path)
+      .input("uploaded_by", sql.NVarChar, uploaded_by)
+      .input("uploaded_at", sql.DateTime, uploaded_at)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, '', '', @modified_by, ''`);
+
+    res.status(200).json({ success: true, message: "loan_documents updated successfully" });
+  } catch (err) {
+    console.error("Error during loan_documents update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_documentsDelete = async (req, res) => {
+  const { document_id, company_code, keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("document_id", sql.Int, document_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', @company_code, @keyfield, '', '', '', ''`);
+
+    res.status(200).json({ success: true, message: "loan_documents deleted successfully" });
+  } catch (err) {
+    console.error("Error during loan_documents delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//Code Ended Dinesh Gokul on 09-03-26
+
+//Code Added Dinesh Gokul on 09-03-26
+// Auto-generated loan_documentsLoopInsert API for sp_loan_documents
+const loan_documentsLoopInsert = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("document_id", sql.Int, item.document_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("document_type", sql.NVarChar, item.document_type)
+        .input("file_path", sql.NVarChar, item.file_path)
+        .input("uploaded_by", sql.NVarChar, item.uploaded_by)
+        .input("uploaded_at", sql.DateTime, item.uploaded_at)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .query(`EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, @created_by, '', '', ''`);
+    }
+    res.status(200).json("loan_documents data inserted successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_documentsLoopUpdate API for sp_loan_documents
+const loan_documentsLoopUpdate = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("document_id", sql.Int, item.document_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("document_type", sql.NVarChar, item.document_type)
+        .input("file_path", sql.NVarChar, item.file_path)
+        .input("uploaded_by", sql.NVarChar, item.uploaded_by)
+        .input("uploaded_at", sql.DateTime, item.uploaded_at)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .query(`EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, '', '', @modified_by, ''`);
+    }
+    res.status(200).json("loan_documents data updated successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_documentsLoopDelete API for sp_loan_documents
+const loan_documentsLoopDelete = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("document_id", sql.Int, item.document_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .query(`EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', @company_code, @keyfield, '', '', '', ''`);
+    }
+    res.status(200).json("loan_documents data deleted successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//Code Ended Dinesh Gokul on 09-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -39099,7 +39260,13 @@ module.exports = {
     loan_paymentsDelete,
     loan_paymentsLoopInsert,
     loan_paymentsLoopUpdate,
-    loan_paymentsLoopDelete
+    loan_paymentsLoopDelete,
+    loan_documentsInsert,
+    loan_documentsUpdate,
+    loan_documentsDelete,
+    loan_documentsLoopInsert,
+    loan_documentsLoopUpdate,
+    loan_documentsLoopDelete
 
 
 };
