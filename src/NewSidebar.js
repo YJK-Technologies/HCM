@@ -41,7 +41,8 @@ import {
   BsPersonVcard,
   BsWrenchAdjustable,
   BsPeopleFill,
-  BsArrowRepeat
+  BsArrowRepeat,
+  
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -51,6 +52,8 @@ import {
   MdOutlineGavel,
   MdOutlineGroupAdd,
   MdOutlineEventAvailable,
+  MdOutlineSchedule,
+  MdTravelExplore 
 } from "react-icons/md";
 
 import {
@@ -58,39 +61,30 @@ import {
   AiOutlineFileDone,
 } from "react-icons/ai";
 
-// Helper function to normalize paths (ensure leading slash is present and no trailing slash)
 const cleanPath = (path) => {
   if (!path) return '';
-  // Ensure path starts with /
   let cleaned = path.startsWith('/') ? path : '/' + path;
-  // Remove trailing slash if present
   return cleaned.endsWith('/') ? cleaned.slice(0, -1) : cleaned;
 };
 
-// Recursive function to filter the menu structure based on permissions
 const filterMenuByPermission = (menuItems, allowedPaths) => {
   return menuItems.reduce((acc, item) => {
     let newItem = { ...item };
 
     if (item.subMenus) {
-      // 1. If it's a dropdown, recursively filter its submenus
       const filteredSubMenus = filterMenuByPermission(item.subMenus, allowedPaths);
 
       if (filteredSubMenus.length > 0) {
-        // Only keep the parent dropdown if it still has active children
         newItem.subMenus = filteredSubMenus;
         acc.push(newItem);
       }
     } else if (item.path) {
-      // 2. If it's a link (leaf node), check permission based on its path
       const itemPath = cleanPath(item.path);
 
-      // Check if the normalized path is in the list of allowed paths
       if (allowedPaths.includes(itemPath)) {
         acc.push(newItem);
       }
     }
-    // Ignore items that are just structural labels without a path/submenus (if not filtered by the recursive call).
 
     return acc;
   }, []);
@@ -136,6 +130,7 @@ export const leafIconMap = {
   "Employee Holiday": BsSun,
   "Setting": BsGear,
   "Generate Shift": BsArrowRepeat,
+  "Visa Requests": MdTravelExplore,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -159,6 +154,7 @@ export const leafIconMap = {
   "Task Hours & Time Tracking": BsClock,
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
+  "Shift Summary Report": MdOutlineSchedule,
 };
 
 const menuData = [
@@ -204,6 +200,8 @@ const menuData = [
         isDropdown: true,
         subMenus: [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
+          { label: "Visa Requests", path: "/VisaRequest" },
+          { label: "Travel Request", path: "/TravelRequest" },
         ],
       },
       {
@@ -230,6 +228,13 @@ const menuData = [
           { label: "Country Master", path: "/CountryMaster" },
           { label: "Time Zone Master", path: "/TimeZoneGrid" },
           { label: "Shift Master", path: "/ShiftMasterGrid" },
+        ],
+      },
+      {
+        label: "Shift Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Shift Summary Report", path: "/ShiftSumRep" },
         ],
       },
       {
