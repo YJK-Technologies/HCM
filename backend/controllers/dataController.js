@@ -36438,7 +36438,7 @@ const loan_approvalsLoopDelete = async (req, res) => {
 // Auto-generated Node.js CRUD for sp_loan_repayment_schedule
 
 const loan_repayment_scheduleInsert = async (req, res) => {
-  const { schedule_id, loan_request_id, installment_number, installment_date, principal_amount, interest_amount, total_installment, payment_status, company_code, keyfield, created_by } = req.body;
+  const { schedule_id, loan_request_id, installment_number, installment_date, principal_amount, interest_amount, total_installment, payment_status, company_code, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36453,9 +36453,8 @@ const loan_repayment_scheduleInsert = async (req, res) => {
       .input("total_installment", sql.Decimal(12, 2), total_installment)
       .input("payment_status", sql.NVarChar, payment_status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`);
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', '', '', @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_repayment_schedule insertd successfully" });
   } catch (err) {
@@ -36482,7 +36481,7 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`);
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
 
     res.status(200).json({ success: true, message: "loan_repayment_schedule updated successfully" });
   } catch (err) {
@@ -36492,7 +36491,7 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
 };
 
 const loan_repayment_scheduleDelete = async (req, res) => {
-  const { schedule_id,company_code, keyfield } = req.body;
+  const { schedule_id,company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36500,8 +36499,7 @@ const loan_repayment_scheduleDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("schedule_id", sql.Int, schedule_id)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`);
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_repayment_schedule deleted successfully" });
   } catch (err) {
@@ -36534,9 +36532,8 @@ const loan_repayment_scheduleLoopInsert = async (req, res) => {
         .input("total_installment", sql.Decimal(12, 2), item.total_installment)
         .input("payment_status", sql.NVarChar, item.payment_status)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`);
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', @created_by, '', '', '', '', ''`);
     }
     res.status(200).json("loan_repayment_schedule data inserted successfully");
   } catch (err) {
@@ -36568,7 +36565,7 @@ const loan_repayment_scheduleLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`);
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_repayment_schedule data updated successfully");
   } catch (err) {
@@ -36591,8 +36588,7 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("schedule_id", sql.Int, item.schedule_id)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`);
     }
     res.status(200).json("loan_repayment_schedule data deleted successfully");
   } catch (err) {
@@ -36605,9 +36601,8 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
 
 //Code added by Dinesh Gokul on 07-03-2026
 // Auto-generated Node.js CRUD for sp_loan_payments
-
 const loan_paymentsInsert = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36620,12 +36615,8 @@ const loan_paymentsInsert = async (req, res) => {
       .input("payment_method", sql.NVarChar, payment_method)
       .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_payments insertd successfully" });
   } catch (err) {
@@ -36635,7 +36626,7 @@ const loan_paymentsInsert = async (req, res) => {
 };
 
 const loan_paymentsUpdate = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -36649,11 +36640,8 @@ const loan_paymentsUpdate = async (req, res) => {
       .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
 
     res.status(200).json({ success: true, message: "loan_payments updated successfully" });
   } catch (err) {
@@ -36663,25 +36651,15 @@ const loan_paymentsUpdate = async (req, res) => {
 };
 
 const loan_paymentsDelete = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { payment_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
       .input("payment_id", sql.Int, payment_id)
-      .input("loan_request_id", sql.Int, loan_request_id)
-      .input("payment_date", sql.Date, payment_date)
-      .input("paid_amount", sql.Decimal(12, 2), paid_amount)
-      .input("payment_method", sql.NVarChar, payment_method)
-      .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_payments @mode, @payment_id, 0, '', '', '', '', @company_code, '', '', '', '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_payments deleted successfully" });
   } catch (err) {
@@ -36714,12 +36692,8 @@ const loan_paymentsLoopInsert = async (req, res) => {
         .input("payment_method", sql.NVarChar, item.payment_method)
         .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`);
     }
     res.status(200).json("loan_payments data inserted successfully");
   } catch (err) {
@@ -36748,11 +36722,8 @@ const loan_paymentsLoopUpdate = async (req, res) => {
         .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_payments data updated successfully");
   } catch (err) {
@@ -36774,18 +36745,8 @@ const loan_paymentsLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("payment_id", sql.Int, item.payment_id)
-        .input("loan_request_id", sql.Int, item.loan_request_id)
-        .input("payment_date", sql.Date, item.payment_date)
-        .input("paid_amount", sql.Decimal(12, 2), item.paid_amount)
-        .input("payment_method", sql.NVarChar, item.payment_method)
-        .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`);
     }
     res.status(200).json("loan_payments data deleted successfully");
   } catch (err) {
@@ -37567,7 +37528,7 @@ const travel_requestsLoopDelete = async (req, res) => {
 
 // Auto-generated Node.js CRUD for sp_loan_requests
 const loan_requestsInsert = async (req, res) => {
-  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -37576,7 +37537,7 @@ const loan_requestsInsert = async (req, res) => {
       .input("loan_request_id", sql.Int, loan_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("loan_type_id", sql.Int, loan_type_id)
+      .input("loan_type_id", sql.VarChar, loan_type_id)
       .input("loan_amount", sql.Decimal(12, 2), loan_amount)
       .input("interest_rate", sql.Decimal(5, 2), interest_rate)
       .input("repayment_months", sql.Int, repayment_months)
@@ -37587,10 +37548,7 @@ const loan_requestsInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_requests insertd successfully" });
   } catch (err) {
@@ -37600,7 +37558,7 @@ const loan_requestsInsert = async (req, res) => {
 };
 
 const loan_requestsUpdate = async (req, res) => {
-  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -37609,7 +37567,7 @@ const loan_requestsUpdate = async (req, res) => {
       .input("loan_request_id", sql.Int, loan_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("loan_type_id", sql.Int, loan_type_id)
+      .input("loan_type_id", sql.VarChar, loan_type_id)
       .input("loan_amount", sql.Decimal(12, 2), loan_amount)
       .input("interest_rate", sql.Decimal(5, 2), interest_rate)
       .input("repayment_months", sql.Int, repayment_months)
@@ -37619,11 +37577,8 @@ const loan_requestsUpdate = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, '', '', @modified_by, ''`);
 
     res.status(200).json({ success: true, message: "loan_requests updated successfully" });
   } catch (err) {
@@ -37633,30 +37588,15 @@ const loan_requestsUpdate = async (req, res) => {
 };
 
 const loan_requestsDelete = async (req, res) => {
-  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code, keyfield, created_by, created_date, modified_by, modified_date } = req.body;
+  const { loan_request_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     await pool.request()
       .input("mode", sql.NVarChar, "D")
       .input("loan_request_id", sql.Int, loan_request_id)
-      .input("request_number", sql.NVarChar, request_number)
-      .input("employee_id", sql.NVarChar, employee_id)
-      .input("loan_type_id", sql.Int, loan_type_id)
-      .input("loan_amount", sql.Decimal(12, 2), loan_amount)
-      .input("interest_rate", sql.Decimal(5, 2), interest_rate)
-      .input("repayment_months", sql.Int, repayment_months)
-      .input("monthly_installment", sql.Decimal(12, 2), monthly_installment)
-      .input("currency_code", sql.NVarChar, currency_code)
-      .input("purpose", sql.NVarChar, purpose)
-      .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "loan_requests deleted successfully" });
   } catch (err) {
@@ -37680,7 +37620,7 @@ const loan_requestsLoopInsert = async (req, res) => {
         .input("loan_request_id", sql.Int, item.loan_request_id)
         .input("request_number", sql.NVarChar, item.request_number)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("loan_type_id", sql.Int, item.loan_type_id)
+        .input("loan_type_id", sql.VarChar, item.loan_type_id)
         .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
         .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
         .input("repayment_months", sql.Int, item.repayment_months)
@@ -37689,12 +37629,8 @@ const loan_requestsLoopInsert = async (req, res) => {
         .input("purpose", sql.NVarChar, item.purpose)
         .input("request_status", sql.NVarChar, item.request_status)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, '', @created_by, '', '', ''`);
     }
     res.status(200).json("loan_requests data inserted successfully");
   } catch (err) {
@@ -37718,7 +37654,7 @@ const loan_requestsLoopUpdate = async (req, res) => {
         .input("loan_request_id", sql.Int, item.loan_request_id)
         .input("request_number", sql.NVarChar, item.request_number)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("loan_type_id", sql.Int, item.loan_type_id)
+        .input("loan_type_id", sql.VarChar, item.loan_type_id)
         .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
         .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
         .input("repayment_months", sql.Int, item.repayment_months)
@@ -37728,11 +37664,8 @@ const loan_requestsLoopUpdate = async (req, res) => {
         .input("request_status", sql.NVarChar, item.request_status)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_requests data updated successfully");
   } catch (err) {
@@ -37754,23 +37687,8 @@ const loan_requestsLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("loan_request_id", sql.Int, item.loan_request_id)
-        .input("request_number", sql.NVarChar, item.request_number)
-        .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("loan_type_id", sql.Int, item.loan_type_id)
-        .input("loan_amount", sql.Decimal(12, 2), item.loan_amount)
-        .input("interest_rate", sql.Decimal(5, 2), item.interest_rate)
-        .input("repayment_months", sql.Int, item.repayment_months)
-        .input("monthly_installment", sql.Decimal(12, 2), item.monthly_installment)
-        .input("currency_code", sql.NVarChar, item.currency_code)
-        .input("purpose", sql.NVarChar, item.purpose)
-        .input("request_status", sql.NVarChar, item.request_status)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_requests @mode, @loan_request_id, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`);
     }
     res.status(200).json("loan_requests data deleted successfully");
   } catch (err) {
@@ -37900,6 +37818,179 @@ const travel_requestsSearch = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };//code ended Sakthi on 09-03-26
+
+//Code added by pavun on 09-03-26
+const getLoanTypes = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Loan Type','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const loanRequestSearch = async (req, res) => {
+  const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months, monthly_installment, currency_code, purpose, request_status, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+    .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("request_number", sql.NVarChar, request_number)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("loan_type_id", sql.VarChar, loan_type_id)
+      .input("loan_amount", sql.Decimal(12, 2), loan_amount)
+      .input("interest_rate", sql.Decimal(5, 2), interest_rate)
+      .input("repayment_months", sql.NVarChar, repayment_months)
+      .input("monthly_installment", sql.Decimal(12, 2), monthly_installment)
+      .input("currency_code", sql.NVarChar, currency_code)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getPaymentMethod = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'PaymentMode','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const getLoanRequest = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "F")
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loanPaymentSearch = async (req, res) => {
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, FromDate, ToDate } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("payment_id", sql.NVarChar, payment_id)
+      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("payment_date", sql.NVarChar, payment_date)
+      .input("paid_amount", sql.Decimal(12, 2), paid_amount)
+      .input("payment_method", sql.NVarChar, payment_method)
+      .input("payroll_reference", sql.NVarChar, payroll_reference)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, '', @paid_amount, @payment_method, @payroll_reference, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_payments insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getPaymentStatus = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Payment Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const loanScheduleSearch = async (req, res) => {
+  const { schedule_id, loan_request_id, installment_number, FromDate, ToDate, principal_amount, interest_amount, total_installment, payment_status, company_code, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result =  await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("schedule_id", sql.NVarChar, schedule_id)
+      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("installment_number", sql.NVarChar, installment_number)
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("principal_amount", sql.Decimal(12, 2), principal_amount)
+      .input("interest_amount", sql.Decimal(12, 2), interest_amount)
+      .input("total_installment", sql.Decimal(12, 2), total_installment)
+      .input("payment_status", sql.NVarChar, payment_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, '', @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_repayment_schedule insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 09-03-26
 
 module.exports = {
   login,
@@ -39168,7 +39259,14 @@ module.exports = {
     loan_paymentsDelete,
     loan_paymentsLoopInsert,
     loan_paymentsLoopUpdate,
-    loan_paymentsLoopDelete
+    loan_paymentsLoopDelete,
+    getLoanTypes,
+    loanRequestSearch,
+    getPaymentMethod,
+    getLoanRequest,
+    loanPaymentSearch,
+    getPaymentStatus,
+    loanScheduleSearch
 
 
 };
