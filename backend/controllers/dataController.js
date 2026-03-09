@@ -37348,9 +37348,9 @@ const travel_requestsInsert = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("department_id", sql.Int, department_id)
+      .input("department_id", sql.NVarChar, department_id)
       .input("travel_type", sql.NVarChar, travel_type)
-      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_country_id", sql.VarChar, destination_country_id)
       .input("destination_city", sql.NVarChar, destination_city)
       .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
       .input("travel_start_date", sql.Date, travel_start_date)
@@ -37362,7 +37362,7 @@ const travel_requestsInsert = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("priority_level", sql.NVarChar, priority_level)
-      .input("manager_id", sql.Int, manager_id)
+      .input("manager_id", sql.VarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
@@ -37870,13 +37870,13 @@ const travel_requestsSearch = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("department_id", sql.Int, department_id)
+      .input("department_id", sql.NVarChar, department_id)
       .input("travel_type", sql.NVarChar, travel_type)
       .input("destination_country_id", sql.Int, destination_country_id)
       .input("destination_city", sql.NVarChar, destination_city)
       .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
-      .input("travel_start_date", sql.Date, travel_start_date)
-      .input("travel_end_date", sql.Date, travel_end_date)
+      .input("travel_start_date", sql.VarChar, travel_start_date)
+      .input("travel_end_date", sql.VarChar, travel_end_date)
       .input("transport_mode", sql.NVarChar, transport_mode)
       .input("accommodation_required", sql.Bit, accommodation_required)
       .input("estimated_cost", sql.Decimal(12,2), estimated_cost)
@@ -37884,7 +37884,7 @@ const travel_requestsSearch = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("priority_level", sql.NVarChar, priority_level)
-      .input("manager_id", sql.Int, manager_id)
+      .input("manager_id", sql.VarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
       .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, '', '', '', '', ''  `);
 
@@ -37899,7 +37899,8 @@ const travel_requestsSearch = async (req, res) => {
     console.error("Error fetching travel requests Search:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
-};//code ended Sakthi on 09-03-26
+};
+//code ended Sakthi on 09-03-26
 
 module.exports = {
   login,
