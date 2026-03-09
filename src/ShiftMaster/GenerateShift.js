@@ -106,8 +106,8 @@ function GenerateShift({ }) {
     };
 
     const handleChangedesgination = (selecteddesg) => {
-        setSelectedDsg(selecteddesg ? selecteddesg.value : '');
-        setDesignation(selecteddesg);
+        setSelectedDsg(selecteddesg);
+        setDesignation(selecteddesg ? selecteddesg.value : '');
     };
 
     const fetchDesignation = async (selectedValue) => {

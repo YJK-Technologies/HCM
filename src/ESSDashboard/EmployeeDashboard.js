@@ -55,6 +55,55 @@ const Dashboard = (payslip) => {
   const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
   const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
 
+  const [isShiftCalendarVisible, setIsShiftCalendarVisible] = useState(true);
+  const [currentShiftDate, setCurrentShiftDate] = useState(new Date());
+
+  // Filter shifts from existing Ag-Grid rowData for the calendar cells
+  const getShiftDetailsForDay = (day) => {
+    if (!day) return null;
+
+    // Format the date to match your API response format (YYYY-MM-DD)
+    const formattedDate = `${currentShiftDate.getFullYear()}-${String(currentShiftDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    // rempShiftRowData-la irunthu antha date-kku mela shift irukkannu check pannum
+    return rempShiftRowData && Array.isArray(rempShiftRowData)
+      ? rempShiftRowData.find(s => s.Date === formattedDate)
+      : null;
+  };
+
+  const shiftConfig = {
+    S1: {
+      label: "Morning Shift",
+      icon: "fa-sun",
+      color: "#f59e0b"
+    },
+    S2: {
+      label: "General Shift",
+      icon: "fa-briefcase",
+      color: "#3b82f6"
+    },
+    S3: {
+      label: "Evening Shift",
+      icon: "fa-cloud-sun",
+      color: "#8b5cf6"
+    },
+    S4: {
+      label: "Night Shift",
+      icon: "fa-moon",
+      color: "#1e293b"
+    },
+    S5: {
+      label: "Split Shift",
+      icon: "fa-clock",
+      color: "#10b981"
+    },
+    S6: {
+      label: "Week Off",
+      icon: "fa-couch",
+      color: "#ef4444"
+    }
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getEmployeeId`, {
@@ -161,7 +210,7 @@ const Dashboard = (payslip) => {
 
   useEffect(() => {
     handleEmpShiftReportSearch();
-  },[])
+  }, [])
 
   const {
     Location_name,
@@ -295,45 +344,15 @@ const Dashboard = (payslip) => {
   }, []);
 
   const reloadGridData = async () => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          start_date: startdate,
-          end_date: enddate,
-          userid: sessionStorage.getItem("selectedUserCode"),
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        const newRows = data.map((item) => ({
-          work_date: formatDates(item.work_date),
-          First_CheckIn: item.First_CheckIn,
-          Last_CheckOut: item.Last_CheckOut,
-          total_worked_hours: item.total_worked_hours,
-          Total_login_Hours: item.Total_login_Hours,
-        }));
-
-        setRowData(newRows);
-        toast.success("Grid refreshed successfully");
-      } else {
-        setRowData([]);
-        toast.warning("No data found");
-      }
-    } catch (error) {
-      console.error("Error reloading grid:", error);
-      toast.error("Failed to reload grid");
-    }
+    setRowData([]);
   };
 
-
   const handleSearch = async () => {
+    if (new Date(startdate) > new Date(enddate)) {
+      toast.warning("Start Date cannot be greater than End Date");
+      return;
+    }
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
         method: "POST",
@@ -1073,79 +1092,147 @@ const Dashboard = (payslip) => {
 
         <div className="leave-balance-container mt-2">
           <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
-            {/* Header Section */}
-            <div className="d-flex justify-content-between align-items-center flex-wrap spacing-mb-2">
+
+            {/* Header Section: Title & Toggle */}
+            <div className="d-flex justify-content-between align-items-center spacing-mb-2">
               <h6 className="card-title-heading mb-0">Shift Routine</h6>
-
-              <div className="d-flex flex-row align-items-center gap-3">
-                <div className="d-flex align-items-center gap-2">
-                  {/* <label className="font-size-small font-weight-bold text-muted-color mb-0">From:</label>
-                  <input
-                    type="date"
-                    className="form-control form-control-sm border-custom"
-                    style={{ width: "135px", height: "32px", fontSize: "12px" }}
-                    value={startdate}
-                    onChange={(e) => setstartdate(e.target.value)}
-                  /> */}
-                  <div className="inputGroup">
-                    <input
-                      id="startdate"
-                      className="exp-input-field form-control"
-                      type="date"
-                      placeholder=" "
-                      autoComplete="off"
-                      value={shiftFromDate}
-                      onChange={(e) => setShiftFromDate(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleEmpShiftReportSearch()}
-                    />
-                    <label className="exp-form-labels">From Date</label>
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center gap-2">
-                  {/* <label className="font-size-small font-weight-bold text-muted-color mb-0">To:</label>
-                  <input
-                    type="date"
-                    className="form-control form-control-sm border-custom"
-                    style={{ width: "135px", height: "32px", fontSize: "12px" }}
-                    value={enddate}
-                    onChange={(e) => setenddate(e.target.value)}
-                  /> */}
-                  <div className="inputGroup">
-                    <input
-                      id="enddate"
-                      className="exp-input-field form-control"
-                      type="date"
-                      autoComplete="off"
-                      placeholder=" "
-                      value={shiftToDate}
-                      onChange={(e) => setShiftToDate(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleEmpShiftReportSearch()}
-                    />
-                    <label className="exp-form-labels">To Date</label>
-                  </div>
-                </div>
-
-                {/* Search Button */}
-                <button
-                  className="btn btn-sm btn-primary d-flex align-items-center justify-content-center"
-                  onClick={handleEmpShiftReportSearch}
-                  style={{ height: "32px", width: "35px" }}
-                >
-                  <i className="fa-solid fa-magnifying-glass"></i>
-                </button>
-              </div>
+              <button
+                className="btn btn-sm btn-outline-primary border-none"
+                onClick={() => setIsShiftCalendarVisible(!isShiftCalendarVisible)}
+                title={isShiftCalendarVisible ? "Switch to Table View" : "Switch to Calendar View"}
+              >
+                {isShiftCalendarVisible ? <i className="fa-solid fa-table"></i> : <i className="fa-solid fa-calendar-days"></i>}
+              </button>
             </div>
 
-            {/* AG Grid Section */}
-            <div className="ag-theme-alpine" style={{ height: "315px", width: "100%" }}>
-              <AgGridReact
-                columnDefs={empShiftCols}
-                rowData={rempShiftRowData}
-                rowHeight={30}
-                pagination={true}
-                paginationAutoPageSize={true}
-              />
+            {/* Search Filters Section (DO NOT REMOVE) */}
+            <div className="d-flex flex-row align-items-center gap-2 spacing-mb-3">
+              <div className="inputGroup flex-grow-1">
+                <input
+                  id="shiftStart"
+                  className="exp-input-field form-control"
+                  type="date"
+                  value={shiftFromDate}
+                  onChange={(e) => setShiftFromDate(e.target.value)}
+                />
+                <label className="exp-form-labels">From Date</label>
+              </div>
+
+              <div className="inputGroup flex-grow-1">
+                <input
+                  id="shiftEnd"
+                  className="exp-input-field form-control"
+                  type="date"
+                  value={shiftToDate}
+                  onChange={(e) => setShiftToDate(e.target.value)}
+                />
+                <label className="exp-form-labels">To Date</label>
+              </div>
+
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleEmpShiftReportSearch}
+                style={{ height: "35px", width: "40px" }}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+
+            {/* Conditional Rendering: Calendar vs Ag-Grid */}
+            <div className="shift-content-area" style={{ height: "320px" }}>
+              {isShiftCalendarVisible ? (
+                <div className="calendar-container">
+                  <div className="calendar-nav">
+                    <button
+                      className="cal-nav-btn"
+                      onClick={() =>
+                        setCurrentShiftDate(
+                          new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() - 1, 1)
+                        )
+                      }
+                    >
+                      &lt;
+                    </button>
+
+                    <span className="calendar-title">
+                      {currentShiftDate.toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+
+                    <button
+                      className="cal-nav-btn"
+                      onClick={() =>
+                        setCurrentShiftDate(
+                          new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() + 1, 1)
+                        )
+                      }
+                    >
+                      &gt;
+                    </button>
+                  </div>
+
+                  <div className="calendar-grid-header">
+                    {["S", "M", "T", "W", "T", "F", "S"].map(day => <div key={day} className="grid-head-cell">{day}</div>)}
+                  </div>
+
+                  <div className="calendar-grid-body">
+
+                    {Array.from(
+                      { length: new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth(), 1).getDay() },
+                      () => ""
+                    )
+                      .concat(
+                        Array.from(
+                          { length: new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() + 1, 0).getDate() },
+                          (_, i) => i + 1
+                        )
+                      )
+                      .map((day, index) => {
+
+                        const shiftInfo = getShiftDetailsForDay(day);
+                        const shift = shiftInfo ? shiftConfig[shiftInfo.Shift_Code] : null;
+
+                        return (
+                          <div
+                            key={index}
+                            className={`cal-day-cell ${day ? "active-day" : ""}`}
+                            style={{
+                              backgroundColor: shift ? `${shift.color}15` : ""
+                            }}
+                          >
+
+                            <span className="day-num">{day}</span>
+
+                            {shift && (
+                              <div
+                                className="shift-icon"
+                                title={shift.label}
+                                style={{ color: shift.color }}
+                              >
+                                <i className={`fa-solid ${shift.icon}`}></i>
+                              </div>
+                            )}
+
+                          </div>
+                        );
+
+                      })}
+
+                  </div>
+                </div>
+              ) : (
+                <div className="ag-theme-alpine" style={{ height: "100%", width: "100%" }}>
+                  <AgGridReact
+                    columnDefs={empShiftCols}
+                    rowData={rempShiftRowData}
+                    rowHeight={30}
+                    pagination={true}
+                    paginationAutoPageSize={true}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
