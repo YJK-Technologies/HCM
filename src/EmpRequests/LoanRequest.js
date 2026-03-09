@@ -3,8 +3,6 @@ import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from "react-router-dom";
-import TabButtons from '../ESSComponents/Tabs';
 import { AgGridReact } from "ag-grid-react";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
@@ -12,16 +10,16 @@ import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
-function VisaRequest({ }) {
+function LoanRequest({ }) {
 
     const [rowData, setRowData] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const [visaRequestId, setVisaRequestId] = useState('');
-    const [empIdDrop, setEmpIdDrop] = useState([]);
-    const [empId, setEmpId] = useState('');
-    const [selectedEmpId, setSelectedEmpId] = useState('');
+    // const [empIdDrop, setEmpIdDrop] = useState([]);
+    // const [empId, setEmpId] = useState('');
+    // const [selectedEmpId, setSelectedEmpId] = useState('');
     const [passportId, setPassportId] = useState('');
     const [countryIdDrop, setCountyIdDrop] = useState([]);
     const [countryId, setCountryId] = useState('');
@@ -29,13 +27,13 @@ function VisaRequest({ }) {
     const [visaTypeDrop, setVisaTypeDrop] = useState([]);
     const [visaType, setVisaType] = useState('');
     const [selectedVisaType, setSelectedVisaType] = useState('');
-    const [purpose, setPurpose] = useState('');
+    // const [purpose, setPurpose] = useState('');
     const [travelStartDate, setTravelStartDate] = useState('');
     const [travelEndDate, setTravelEndDate] = useState('');
-    const [reqStatusDrop, setReqStatusDrop] = useState([]);
-    const [reqStatus, setReqStatus] = useState('');
-    const [selectedReqStatus, setSelectedReqStatus] = useState('');
-    const [reqNumber, setReqNumber] = useState('');
+    // const [reqStatusDrop, setReqStatusDrop] = useState([]);
+    // const [reqStatus, setReqStatus] = useState('');
+    // const [selectedReqStatus, setSelectedReqStatus] = useState('');
+    // const [reqNumber, setReqNumber] = useState('');
     const [priorityDrop, setPriorityDrop] = useState([]);
     const [priority, setPriority] = useState('');
     const [selectedPriority, setSelectedPriority] = useState('');
@@ -44,9 +42,9 @@ function VisaRequest({ }) {
     const [remarks, setRemarks] = useState('');
 
     const [visaRequestIdSc, setVisaRequestIdSc] = useState('');
-    const [empIdDropSc, setEmpIdDropSc] = useState([]);
-    const [empIdSc, setEmpIdSc] = useState('');
-    const [selectedEmpIdSc, setSelectedEmpIdSc] = useState('');
+    // const [empIdDropSc, setEmpIdDropSc] = useState([]);
+    // const [empIdSc, setEmpIdSc] = useState('');
+    // const [selectedEmpIdSc, setSelectedEmpIdSc] = useState('');
     const [passportIdSc, setPassportIdSc] = useState('');
     const [countryIdDropSc, setCountyIdDropSc] = useState([]);
     const [countryIdSc, setCountryIdSc] = useState('');
@@ -54,13 +52,13 @@ function VisaRequest({ }) {
     const [visaTypeDropSc, setVisaTypeDropSc] = useState([]);
     const [visaTypeSc, setVisaTypeSc] = useState('');
     const [selectedVisaTypeSc, setSelectedVisaTypeSc] = useState('');
-    const [purposeSc, setPurposeSc] = useState('');
+    // const [purposeSc, setPurposeSc] = useState('');
     const [travelStartDateSc, setTravelStartDateSc] = useState('');
     const [travelEndDateSc, setTravelEndDateSc] = useState('');
-    const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
-    const [reqStatusSc, setReqStatusSc] = useState('');
-    const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
-    const [reqNumberSc, setReqNumberSc] = useState('');
+    // const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
+    // const [reqStatusSc, setReqStatusSc] = useState('');
+    // const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
+    // const [reqNumberSc, setReqNumberSc] = useState('');
     const [priorityDropSc, setPriorityDropSc] = useState([]);
     const [prioritySc, setPrioritySc] = useState('');
     const [selectedPrioritySc, setSelectedPrioritySc] = useState('');
@@ -68,23 +66,71 @@ function VisaRequest({ }) {
     const [estimatedCostSc, setEstimatedCostSc] = useState('');
     const [remarksSc, setRemarksSc] = useState('');
 
-    const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
+    // const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
     const [isSelectedCountryId, setIsSelectedCountryId] = useState(false);
     const [isSelectedVisaType, setIsSelectedVisaType] = useState(false);
-    const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
+    // const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
     const [isSelectedPriority, setIsSelectedPriority] = useState(false);
 
-    const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
+    // const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
     const [isSelectedCountryIdSc, setIsSelectedCountryIdSc] = useState(false);
     const [isSelectedVisaTypeSc, setIsSelectedVisaTypeSc] = useState(false);
-    const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
+    // const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
     const [isSelectedPrioritySc, setIsSelectedPrioritySc] = useState(false);
 
     const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
     const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
     const [visaTypeDropGrid, setVisaTypeDropGrid] = useState([]);
-    const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+    // const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
     const [priorityDropGrid, setPriorityDropGrid] = useState([]);
+
+    const [loanReqId, setLoanReqId] = useState('');
+    const [reqNumber, setReqNumber] = useState('');
+    const [empIdDrop, setEmpIdDrop] = useState([]);
+    const [empId, setEmpId] = useState('');
+    const [selectedEmpId, setSelectedEmpId] = useState('');
+    const [loanTypeIdDrop, setLoanTypeIdDrop] = useState([]);
+    const [loanTypeId, setLoanTypeId] = useState('');
+    const [selectedLoanTypeId, setSelectedLoanIypeId] = useState('');
+    const [loanAmount, setLoanAmount] = useState('');
+    const [interestRate, setInterestRate] = useState('');
+    const [repayMonth, setRepayMonth] = useState('');
+    const [monthlyInstallment, setMonthlyInstallment] = useState('');
+    const [currencyCode, setCurrencyCode] = useState('');
+    const [purpose, setPurpose] = useState("");
+    const [reqStatusDrop, setReqStatusDrop] = useState([]);
+    const [reqStatus, setReqStatus] = useState('');
+    const [selectedReqStatus, setSelectedReqStatus] = useState('');
+
+    const [loanReqIdSc, setLoanReqIdSc] = useState('');
+    const [reqNumberSc, setReqNumberSc] = useState('');
+    const [empIdDropSc, setEmpIdDropSc] = useState([]);
+    const [empIdSc, setEmpIdSc] = useState('');
+    const [selectedEmpIdSc, setSelectedEmpIdSc] = useState('');
+    const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
+    const [loanTypeIdSc, setLoanTypeIdSc] = useState('');
+    const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState('');
+    const [loanAmountSc, setLoanAmountSc] = useState('');
+    const [interestRateSc, setInterestRateSc] = useState('');
+    const [repayMonthSc, setRepayMonthSc] = useState('');
+    const [monthlyInstallmentSc, setMonthlyInstallmentSc] = useState('');
+    const [currencyCodeSc, setCurrencyCodeSc] = useState('');
+    const [purposeSc, setPurposeSc] = useState("");
+    const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
+    const [reqStatusSc, setReqStatusSc] = useState('');
+    const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
+
+    const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
+    const [isSelectedLoanType, setIsSelectedLoanType] = useState(false);
+    const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
+
+    const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
+    const [isSelectedLoanTypeSc, setIsSelectedLoanTypeSc] = useState(false);
+    const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
+
+    const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
+    const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -103,7 +149,7 @@ function VisaRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,35 +157,8 @@ function VisaRequest({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setCountyIdDrop(val))
+            .then((val) => setLoanTypeIdDrop(val))
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getVisaType`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setVisaTypeDrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setPriorityDrop(val));
     }, []);
 
     useEffect(() => {
@@ -171,6 +190,11 @@ function VisaRequest({ }) {
         label: option.attributedetails_name,
     }));
 
+    const filteredOptionLoanType = loanTypeIdDrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
     const filteredOptionPriority = priorityDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
@@ -194,6 +218,11 @@ function VisaRequest({ }) {
     const handleChangeVisaType = (selectedVisaType) => {
         setSelectedVisaType(selectedVisaType);
         setVisaType(selectedVisaType ? selectedVisaType.value : "");
+    };
+
+    const handleChangeLoanType = (selectedLoanTypeId) => {
+        setSelectedLoanIypeId(selectedLoanTypeId);
+        setLoanTypeId(selectedLoanTypeId ? selectedLoanTypeId.value : "");
     };
 
     const handleChangePriority = (selectedPriority) => {
@@ -223,7 +252,7 @@ function VisaRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -231,35 +260,8 @@ function VisaRequest({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setCountyIdDropSc(val))
+            .then((val) => setLoanTypeIdDropSc(val))
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getVisaType`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setVisaTypeDropSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setPriorityDropSc(val));
     }, []);
 
     useEffect(() => {
@@ -279,6 +281,11 @@ function VisaRequest({ }) {
     const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
         value: option.EmployeeId,
         label: `${option.EmployeeId}-${option.First_Name}`,
+    }));
+
+    const filteredOptionLoanTypeSc = loanTypeIdDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
     }));
 
     const filteredOptionCountryIdSc = countryIdDropSc.map(option => ({
@@ -304,6 +311,11 @@ function VisaRequest({ }) {
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
         setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
+    };
+
+    const handleChangeLoanTypeSc = (selectedLoanTypeIdSc) => {
+        setSelectedLoanIypeIdSc(selectedLoanTypeIdSc);
+        setLoanTypeIdSc(selectedLoanTypeIdSc ? selectedLoanTypeIdSc.value : "");
     };
 
     const handleChangeCountryIdSc = (selectedCountryIdSc) => {
@@ -349,27 +361,7 @@ function VisaRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const country = val.map((option) => ({
-                    value: option.Country_Code,
-                    label: `${option.Country_Code} - ${option.Country_Name}`,
-                }));
-                setCountyIdDropGrid(country);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getVisaType`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -379,24 +371,7 @@ function VisaRequest({ }) {
             .then((data) => data.json())
             .then((val) => {
                 const visaType = val.map(option => option.attributedetails_name);
-                setVisaTypeDropGrid(visaType);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const priority = val.map(option => option.attributedetails_name);
-                setPriorityDropGrid(priority);
+                setLoanTypeIdDropGrid(visaType);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
@@ -476,8 +451,8 @@ function VisaRequest({ }) {
         },
 
         {
-            headerName: "Visa Request ID",
-            field: "visa_request_id",
+            headerName: "Loan Request ID",
+            field: "loan_request_id",
             editable: false
         },
         {
@@ -494,47 +469,48 @@ function VisaRequest({ }) {
             },
         },
         {
-            headerName: "Passport ID",
-            field: "passport_id",
+            headerName: "Request Number",
+            field: "request_number",
             editable: true
         },
         {
-            headerName: "Country ID",
-            field: "destination_country_id",
+            headerName: "Loan Type ID",
+            field: "loan_type_id",
             editable: true,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: countryIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = countryIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
+                values: loanTypeIdDropGrid,
             },
         },
         {
-            headerName: "Visa Type",
-            field: "visa_type_id",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: visaTypeDropGrid,
-            },
+            headerName: "Loan Amount",
+            field: "loan_amount",
+            editable: true
+        },
+        {
+            headerName: "Interest Rate",
+            field: "interest_rate",
+            editable: true
+        },
+        {
+            headerName: "Repayment Months",
+            field: "repayment_months",
+            editable: true
+        },
+        {
+            headerName: "Monthly Installment",
+            field: "monthly_installment",
+            editable: true
+        },
+        {
+            headerName: "Currency Code",
+            field: "currency_code",
+            editable: true
         },
         {
             headerName: "Purpose",
             field: "purpose",
-            editable: true
-        },
-        {
-            headerName: "Travel Start Date",
-            field: "travel_start_date",
-            editable: true
-        },
-        {
-            headerName: "Travel End Date",
-            field: "travel_end_date",
             editable: true
         },
         {
@@ -546,36 +522,6 @@ function VisaRequest({ }) {
             cellEditorParams: {
                 values: reqStatusDropGrid,
             },
-        },
-        {
-            headerName: "Request Number",
-            field: "request_number",
-            editable: true
-        },
-        {
-            headerName: "Priority Level",
-            field: "priority_level",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: priorityDropGrid,
-            },
-        },
-        {
-            headerName: "Sponsor Name",
-            field: "sponsor_name",
-            editable: true
-        },
-        {
-            headerName: "Estimated Cost",
-            field: "estimated_cost",
-            editable: true
-        },
-        {
-            headerName: "Remarks",
-            field: "Remarks",
-            editable: true
         },
         {
             headerName: "Keyfield",
@@ -591,48 +537,40 @@ function VisaRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!visaRequestId ||
-            !empId ||
-            !passportId ||
-            !visaType ||
-            !travelStartDate ||
-            !travelEndDate ||
-            !reqStatus ||
-            !priority ||
-            !estimatedCost
-        ) {
-            setError(" ");
-            toast.warning("Error: Missing required fields");
-            return;
-        }
-
-        if (new Date(travelStartDate) > new Date(travelEndDate)) {
-            toast.warning("Start Date cannot be greater than End Date");
-            return;
-        }
+        // if (!visaRequestId ||
+        //     !empId ||
+        //     !passportId ||
+        //     !visaType ||
+        //     !travelStartDate ||
+        //     !travelEndDate ||
+        //     !reqStatus ||
+        //     !priority ||
+        //     !estimatedCost
+        // ) {
+        //     setError(" ");
+        //     toast.warning("Error: Missing required fields");
+        //     return;
+        // }
 
         setLoading(true);
 
         try {
             const Header = {
-                visa_request_id: visaRequestId,
-                employee_id: empId,
-                passport_id: passportId,
-                destination_country_id: countryId,
-                visa_type_id: visaType,
-                purpose: purpose,
-                travel_start_date: travelStartDate,
-                travel_end_date: travelEndDate,
-                request_status: reqStatus,
+                loan_request_id: loanReqId,
                 request_number: reqNumber,
-                priority_level: priority,
-                sponsor_name: sponsorName,
-                estimated_cost: estimatedCost,
-                Remarks: remarks,
+                employee_id: empId,
+                loan_type_id: loanTypeId,
+                loan_amount: loanAmount,
+                interest_rate: interestRate,
+                repayment_months: repayMonth,
+                monthly_installment: monthlyInstallment,
+                currency_code: currencyCode,
+                purpose: purpose,
+                request_status: reqStatus,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
-                Created_by: sessionStorage.getItem('selectedUserCode')
+                created_by: sessionStorage.getItem('selectedUserCode')
             };
-            const response = await fetch(`${config.apiBaseUrl}/visa_requestsInsert`, {
+            const response = await fetch(`${config.apiBaseUrl}/loan_requestsInsert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -661,24 +599,21 @@ function VisaRequest({ }) {
         setLoading(true);
         try {
             const body = {
-                visa_request_id: visaRequestIdSc,
-                employee_id: empIdSc,
-                passport_id: passportIdSc,
-                destination_country_id: countryIdSc,
-                visa_type_id: visaTypeSc,
-                purpose: purposeSc,
-                travel_start_date: travelStartDateSc,
-                travel_end_date: travelEndDateSc,
-                request_status: reqStatusSc,
+                loan_request_id: loanReqIdSc,
                 request_number: reqNumberSc,
-                priority_level: prioritySc,
-                sponsor_name: sponsorNameSc,
-                estimated_cost: estimatedCostSc ? estimatedCostSc : 0,
-                Remarks: remarksSc,
+                employee_id: empIdSc,
+                loan_type_id: loanTypeIdSc,
+                loan_amount: loanAmountSc ? loanAmountSc : 0,
+                interest_rate: interestRateSc ? interestRateSc : 0,
+                repayment_months: repayMonthSc,
+                monthly_installment: monthlyInstallmentSc ? monthlyInstallmentSc : 0,
+                currency_code: currencyCodeSc,
+                purpose: purposeSc,
+                request_status: reqStatusSc,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
-            const response = await fetch(`${config.apiBaseUrl}/visaRequestSearch`, {
+            const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -716,30 +651,30 @@ function VisaRequest({ }) {
     const handleUpdate = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to update the selected visa request data?",
+            "Are you sure you want to update the selected loan request data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        visa_requestsData: Array.isArray(rowData)
+                        loan_requestsData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
-                                Modified_by,
+                                modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
-                                    Modified_by,
+                                    modified_by,
                                 },
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/visa_requestsLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopUpdate`,
                         {
                             method: "POST",
                             headers: {
@@ -750,7 +685,7 @@ function VisaRequest({ }) {
                     );
 
                     if (response.ok) {
-                        toast.success("Visa request updated successfully", {
+                        toast.success("loan request updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -771,14 +706,14 @@ function VisaRequest({ }) {
     const handleDelete = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to delete the selected visa request data?",
+            "Are you sure you want to delete the selected loan request data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        visa_requestsData: Array.isArray(rowData)
+                        loan_requestsData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
@@ -791,7 +726,7 @@ function VisaRequest({ }) {
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/visa_requestsLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopDelete`,
                         {
                             method: "POST",
                             headers: {
@@ -979,7 +914,7 @@ function VisaRequest({ }) {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Visa Request</h1>
+                    <h1 className="page-title">Loan Request</h1>
                     <div className="action-wrapper">
                         <div onClick={handleSave} className="action-icon add">
                             <span className="tooltip">Save</span>
@@ -1000,10 +935,10 @@ function VisaRequest({ }) {
                                 placeholder=""
                                 required
                                 autoComplete="off"
-                                value={visaRequestId}
-                                onChange={(e) => setVisaRequestId((e.target.value))}
+                                value={loanReqId}
+                                onChange={(e) => setLoanReqId((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !visaRequestId ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !loanReqId ? 'text-danger' : ''}`}>Loan Request ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1036,58 +971,116 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={reqNumber}
+                                onChange={(e) => setReqNumber((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedLoanTypeId ? "has-value" : ""} 
+                            ${isSelectedLoanType ? "is-focused" : ""}`}
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedLoanType(true)}
+                                onBlur={() => setIsSelectedLoanType(false)}
+                                isClearable
+                                value={selectedLoanTypeId}
+                                onChange={handleChangeLoanType}
+                                options={filteredOptionLoanType}
+                            />
+                            <label for="sname" className={`floating-label ${error && !countryId ? 'text-danger' : ''}`}>Loan Type ID<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
                                 type="number"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
-                                value={passportId}
-                                onChange={(e) => setPassportId((e.target.value))}
+                                value={loanAmount}
+                                onChange={(e) => setLoanAmount((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !passportId ? 'text-danger' : ''}`}>Passport ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !loanAmount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedCountryId ? "has-value" : ""} 
-                            ${isSelectedCountryId ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
                                 placeholder=""
-                                onFocus={() => setIsSelectedCountryId(true)}
-                                onBlur={() => setIsSelectedCountryId(false)}
-                                isClearable
-                                value={selectedCountryId}
-                                onChange={handleChangeCountryId}
-                                options={filteredOptionCountryId}
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={interestRate}
+                                onChange={(e) => setInterestRate((e.target.value))}
                             />
-                            <label for="sname" className={`floating-label ${error && !countryId ? 'text-danger' : ''}`}>Country ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !interestRate ? 'text-danger' : ''}`}>Interest Rate<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedVisaType ? "has-value" : ""} 
-                            ${isSelectedVisaType ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
                                 placeholder=""
-                                onFocus={() => setIsSelectedVisaType(true)}
-                                onBlur={() => setIsSelectedVisaType(false)}
-                                isClearable
-                                value={selectedVisaType}
-                                onChange={handleChangeVisaType}
-                                options={filteredOptionVisaType}
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={repayMonth}
+                                onChange={(e) => setRepayMonth((e.target.value))}
                             />
-                            <label for="sname" className={`floating-label ${error && !visaType ? 'text-danger' : ''}`}>Visa Type ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !repayMonth ? 'text-danger' : ''}`}>Repayment Months<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={monthlyInstallment}
+                                onChange={(e) => setMonthlyInstallment((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !monthlyInstallment ? 'text-danger' : ''}`}>Monthly Installment<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={currencyCode}
+                                onChange={(e) => setCurrencyCode((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !currencyCode ? 'text-danger' : ''}`}>Current Code<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1104,38 +1097,6 @@ function VisaRequest({ }) {
                                 onChange={(e) => setPurpose((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={travelStartDate}
-                                onChange={(e) => setTravelStartDate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !travelStartDate ? 'text-danger' : ''}`}>Travel Start Date<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={travelEndDate}
-                                onChange={(e) => setTravelEndDate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !travelEndDate ? 'text-danger' : ''}`}>Travel End Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1161,92 +1122,6 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={reqNumber}
-                                onChange={(e) => setReqNumber((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedPriority ? "has-value" : ""} 
-                            ${isSelectedPriority ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedPriority(true)}
-                                onBlur={() => setIsSelectedPriority(false)}
-                                isClearable
-                                value={selectedPriority}
-                                onChange={handleChangePriority}
-                                options={filteredOptionPriority}
-                            />
-                            <label for="sname" className={`floating-label ${error && !priority ? 'text-danger' : ''}`}>Priority Level<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={sponsorName}
-                                onChange={(e) => setSponsorName((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={estimatedCost}
-                                onChange={(e) => setEstimatedCost((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !estimatedCost ? 'text-danger' : ''}`}>Estimated Cost<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={remarks}
-                                onChange={(e) => setRemarks((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -1263,12 +1138,12 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="number"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required
                                 autoComplete="off"
-                                value={visaRequestIdSc}
-                                onChange={(e) => setVisaRequestIdSc((e.target.value))}
+                                value={loanReqIdSc}
+                                onChange={(e) => setLoanReqIdSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Visa Request ID</label>
+                            <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
                         </div>
                     </div>
 
@@ -1305,54 +1180,112 @@ function VisaRequest({ }) {
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
-                                value={passportIdSc}
-                                onChange={(e) => setPassportIdSc((e.target.value))}
+                                value={reqNumberSc}
+                                onChange={(e) => setReqNumberSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Passport ID</label>
+                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedCountryIdSc ? "has-value" : ""} 
-                            ${isSelectedCountryIdSc ? "is-focused" : ""}`}
+                            ${selectedLoanTypeIdSc ? "has-value" : ""} 
+                            ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="country"
                                 type="text"
                                 classNamePrefix="react-select"
                                 placeholder=""
-                                onFocus={() => setIsSelectedCountryIdSc(true)}
-                                onBlur={() => setIsSelectedCountryIdSc(false)}
+                                onFocus={() => setIsSelectedLoanTypeSc(true)}
+                                onBlur={() => setIsSelectedLoanTypeSc(false)}
                                 isClearable
-                                value={selectedCountryIdSc}
-                                onChange={handleChangeCountryIdSc}
-                                options={filteredOptionCountryIdSc}
+                                value={selectedLoanTypeIdSc}
+                                onChange={handleChangeLoanTypeSc}
+                                options={filteredOptionLoanTypeSc}
                             />
-                            <label for="sname" className={`floating-label`}>Country ID</label>
+                            <label for="sname" className={`floating-label`}>Loan Type ID</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedVisaTypeSc ? "has-value" : ""} 
-                            ${isSelectedVisaTypeSc ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
                                 placeholder=""
-                                onFocus={() => setIsSelectedVisaTypeSc(true)}
-                                onBlur={() => setIsSelectedVisaTypeSc(false)}
-                                isClearable
-                                value={selectedVisaTypeSc}
-                                onChange={handleChangeVisaTypeSc}
-                                options={filteredOptionVisaTypeSc}
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={loanAmountSc}
+                                onChange={(e) => setLoanAmountSc((e.target.value))}
                             />
-                            <label for="sname" className={`floating-label`}>Visa Type ID</label>
+                            <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={interestRateSc}
+                                onChange={(e) => setInterestRateSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={repayMonthSc}
+                                onChange={(e) => setRepayMonthSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={monthlyInstallmentSc}
+                                onChange={(e) => setMonthlyInstallmentSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={currencyCodeSc}
+                                onChange={(e) => setCurrencyCodeSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Current Code</label>
                         </div>
                     </div>
 
@@ -1369,38 +1302,6 @@ function VisaRequest({ }) {
                                 onChange={(e) => setPurposeSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={travelStartDateSc}
-                                onChange={(e) => setTravelStartDateSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Travel Start Date</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={travelEndDateSc}
-                                onChange={(e) => setTravelEndDateSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Travel End Date</label>
                         </div>
                     </div>
 
@@ -1423,92 +1324,6 @@ function VisaRequest({ }) {
                                 options={filteredOptionReqStatusSc}
                             />
                             <label for="sname" className={`floating-label`}>Request Status</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={reqNumberSc}
-                                onChange={(e) => setReqNumberSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedPrioritySc ? "has-value" : ""} 
-                            ${isSelectedPrioritySc ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedPrioritySc(true)}
-                                onBlur={() => setIsSelectedPrioritySc(false)}
-                                isClearable
-                                value={selectedPrioritySc}
-                                onChange={handleChangePrioritySc}
-                                options={filteredOptionPrioritySc}
-                            />
-                            <label for="sname" className={`floating-label`}>Priority Level</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={sponsorNameSc}
-                                onChange={(e) => setSponsorNameSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={estimatedCostSc}
-                                onChange={(e) => setEstimatedCostSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Estimated Cost</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={remarksSc}
-                                onChange={(e) => setRemarksSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
                         </div>
                     </div>
 
@@ -1550,4 +1365,4 @@ function VisaRequest({ }) {
         </div>
     );
 }
-export default VisaRequest;
+export default LoanRequest;

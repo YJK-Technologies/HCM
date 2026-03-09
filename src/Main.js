@@ -110,6 +110,7 @@ import DepartmentDashboard from "./DepartmentDashboard.js";
 import ShiftSumRep from "./ShiftSumRep.js";
 import VisaRequest from "./EmpRequests/VisaRequest.js"
 import TravelRequest from "./EmpRequests/TravelRequest.js"
+import LoanRequest from "./EmpRequests/LoanRequest.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -296,6 +297,7 @@ function Main() {
     { path: "/ShiftSumRep", component: <ShiftSumRep /> },
     { path: "/VisaRequest", component: <VisaRequest /> },
     { path: "/TravelRequest", component: <TravelRequest /> },
+    { path: "/LoanRequest", component: <LoanRequest /> },
 
   
   ];
