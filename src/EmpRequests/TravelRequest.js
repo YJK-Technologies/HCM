@@ -53,7 +53,7 @@ function TravelRequest({}) {
   const [transport_mode, settransport_mode] = useState("");
   const [accommodation_required, setaccommodation_required] = useState("");
   const [estimated_cost, setestimated_cost] = useState("");
-  const [Currency_Code, setCurrency_Code] = useState('');
+  const [Currency_Code, setCurrency_Code] = useState("");
   const [reqStatusDrop, setReqStatusDrop] = useState([]);
   const [reqStatus, setReqStatus] = useState("");
   const [selectedReqStatus, setSelectedReqStatus] = useState("");
@@ -81,12 +81,12 @@ function TravelRequest({}) {
   const [estimatedCostSc, setEstimatedCostSc] = useState("");
   const [remarksSc, setRemarksSc] = useState("");
   const [dynamicOptions, setDynamicOptions] = useState([]);
-  const [selectedmanager, setselectedmanager] = useState('');
-  const [ProjectManager, setProjectManager] = useState('');
+  const [selectedmanager, setselectedmanager] = useState("");
+  const [ProjectManager, setProjectManager] = useState("");
   const [isSelectManager, setIsSelectManager] = useState(false);
   const [Managerdrop, setManagerdrop] = useState([]);
-  const [travel_request_idSC, settravel_request_idSC] = useState('');
-  const [request_numberSC, setrequest_numberSC] = useState('');
+  const [travel_request_idSC, settravel_request_idSC] = useState("");
+  const [request_numberSC, setrequest_numberSC] = useState("");
   const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
   const [DPTdropSC, setDPTdropSC] = useState([]);
   const [travel_typeSC, settravel_typeSC] = useState("");
@@ -95,14 +95,14 @@ function TravelRequest({}) {
   const [transport_modeSc, settransport_modeSc] = useState("");
   const [accommodation_requiredSc, setaccommodation_requiredSc] = useState("");
   const [estimated_costSC, setestimated_costSC] = useState("");
-  const [Currency_CodeSC, setCurrency_CodeSC] = useState('');
+  const [Currency_CodeSC, setCurrency_CodeSC] = useState("");
   const [selectedReqStatusSC, setSelectedReqStatusSC] = useState("");
   const [reqStatusSC, setReqStatusSC] = useState("");
-  const [selectedmanagerSC, setselectedmanagerSC] = useState('');
+  const [selectedmanagerSC, setselectedmanagerSC] = useState("");
   const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
   const [ManagerdropSC, setManagerdropSC] = useState([]);
   const [destination_citySC, setdestination_citySC] = useState("");
-  const [ProjectManagerSC, setProjectManagerSC] = useState('');
+  const [ProjectManagerSC, setProjectManagerSC] = useState("");
 
   const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
   const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
@@ -182,74 +182,72 @@ function TravelRequest({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-    useEffect(() => {
-      fetch(`${config.apiBaseUrl}/ESSManager`, {
-        method: 'POST',
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // user_code: sessionStorage.getItem("selectedUserCode"),
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
+  const fetchProductCodes = async (selectedValue) => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          // user_code: sessionStorage.getItem("selectedUserCode"),
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      })
-        .then((response) => response.json())
-        .then(setManagerdrop)
-        .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
+        body: JSON.stringify({ dept_id: selectedValue, company_code }),
+      });
 
-    const fetchProductCodes = async (selectedValue) => {
+      const data = await response.json();
+      const formattedData = data.map((product) => ({
+        value: product.Desgination,
+        label: product.Desgination,
+      }));
+
+      setDynamicOptions(formattedData);
+      return formattedData;
+    } catch (error) {
+      console.error("Error fetching product codes:", error);
+      return [];
+    }
+  };
+  const fetchProductCodesSC = async (selectedValue) => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      try {
-        const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ dept_id: selectedValue, company_code }),
-        });
-  
-        const data = await response.json();
-        const formattedData = data.map((product) => ({
-          value: product.Desgination,
-          label: product.Desgination,
-        }));
-  
-        setDynamicOptions(formattedData);
-        return formattedData;
-      } catch (error) {
-        console.error('Error fetching product codes:', error);
-        return [];
-      }
-    };
-    const fetchProductCodesSC = async (selectedValue) => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dept_id: selectedValue, company_code }),
+      });
 
-      try {
-        const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ dept_id: selectedValue, company_code }),
-        });
-  
-        const data = await response.json();
-        const formattedData = data.map((product) => ({
-          value: product.Desgination,
-          label: product.Desgination,
-        }));
-  
-        setDynamicOptions(formattedData);
-        return formattedData;
-      } catch (error) {
-        console.error('Error fetching product codes:', error);
-        return [];
-      }
-    };
-  
-  
+      const data = await response.json();
+      const formattedData = data.map((product) => ({
+        value: product.Desgination,
+        label: product.Desgination,
+      }));
+
+      setDynamicOptions(formattedData);
+      return formattedData;
+    } catch (error) {
+      console.error("Error fetching product codes:", error);
+      return [];
+    }
+  };
 
   const filteredOptionEmpId = empIdDrop.map((option) => ({
     value: option.EmployeeId,
@@ -266,16 +264,15 @@ function TravelRequest({}) {
     label: option.attributedetails_name,
   }));
 
-    const filteredOptionManager = Managerdrop.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-  }));
- 
-  const filteredOptionManagerSC = ManagerdropSC.map((option) => ({
+  const filteredOptionManager = Managerdrop.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId}-${option.full_name}`,
   }));
 
+  const filteredOptionManagerSC = ManagerdropSC.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
 
   const handleChangeEmpId = (selectedEmpId) => {
     setSelectedEmpId(selectedEmpId);
@@ -297,18 +294,16 @@ function TravelRequest({}) {
     setReqStatusSC(selectedReqStatusSC ? selectedReqStatusSC.value : "");
   };
 
-    const handleChangemanager = (selectedOption) => {
+  const handleChangemanager = (selectedOption) => {
     setselectedmanager(selectedOption);
-    setProjectManager(selectedOption ? selectedOption.value : '');
+    setProjectManager(selectedOption ? selectedOption.value : "");
     setError(false);
   };
-    const handleChangemanagerSC = (selectedOption) => {
+  const handleChangemanagerSC = (selectedOption) => {
     setselectedmanagerSC(selectedOption);
-    setProjectManagerSC(selectedOption ? selectedOption.value : '');
+    setProjectManagerSC(selectedOption ? selectedOption.value : "");
     setError(false);
   };
-
-
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -380,22 +375,21 @@ function TravelRequest({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-      useEffect(() => {
-      fetch(`${config.apiBaseUrl}/ESSManager`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          // user_code: sessionStorage.getItem("selectedUserCode"),
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      })
-        .then((response) => response.json())
-        .then(setManagerdropSC)
-        .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
-
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // user_code: sessionStorage.getItem("selectedUserCode"),
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdropSC)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
 
   const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
     value: option.EmployeeId,
@@ -433,28 +427,42 @@ function TravelRequest({}) {
   };
 
   const searchClearInputFields = () => {
-    setFromDate("");
-    setToDate("");
-    setjob_titleSC("");
+    settravel_request_idSC("");
+    setrequest_numberSC("");
+    setSelectedEmpIdSc("");
+    setEmpIdSc("");
     setselecteddeptSC("");
     setdptSC("");
-    setCountry_CodeSC("");
-    setlocationSC("");
-    setemployment_typeSC("");
+    settravel_typeSC("");
+    setdestination_country_idSC("");
+    setdestination_citySC("");
+    setpurpose_of_travelSC("");
+    setTravelStartDateSc("");
+    setTravelEndDateSc("");
+    settransport_modeSc("");
+    setaccommodation_requiredSc("");
+    setestimated_costSC("");
+    setCurrency_CodeSC("");
+    setSelectedReqStatusSC("");
+    setReqStatusSC("");
+    setselectedmanagerSC("");
+    setProjectManagerSC("");
+    setRemarks("");
+    setSelectedPrioritySc("");
+    setPrioritySc("");
   };
 
   const handleDPT = (selectedDPT) => {
     setselecteddept(selectedDPT);
-    setdpt(selectedDPT ? selectedDPT.value : '');
-    fetchProductCodes(selectedDPT ? selectedDPT.value : '');
+    setdpt(selectedDPT ? selectedDPT.value : "");
+    fetchProductCodes(selectedDPT ? selectedDPT.value : "");
   };
 
-    const handleDPTSC = (selectedDPTSC) => {
+  const handleDPTSC = (selectedDPTSC) => {
     setselecteddeptSC(selectedDPTSC);
-    setdptSC(selectedDPTSC ? selectedDPTSC.value : '');
-    fetchProductCodesSC(selectedDPTSC ? selectedDPTSC.value : '');
+    setdptSC(selectedDPTSC ? selectedDPTSC.value : "");
+    fetchProductCodesSC(selectedDPTSC ? selectedDPTSC.value : "");
   };
-
 
   const filteredOptionDPt = DPTdrop.map((option) => ({
     value: option.dept_id,
@@ -507,7 +515,6 @@ function TravelRequest({}) {
       .then((val) => setEmploymentdrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -566,7 +573,7 @@ function TravelRequest({}) {
       fetchDept();
     }
   }, []);
-  
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -663,237 +670,300 @@ function TravelRequest({}) {
       headerName: "Actions",
       field: "actions",
       cellRenderer: (params) => {
-        const cellWidth = params.column.getActualWidth();
-        const isWideEnough = cellWidth > 20;
-        const showIcons = isWideEnough;
-
         return (
-          <div
-            className="position-relative d-flex align-items-center"
-            style={{ minHeight: "100%", justifyContent: "center" }}
-          >
-            {showIcons && (
-              <>
-                <span
-                  className="icon mx-2"
-                  onClick={() => handleUpdate(params.data, params.node.data)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="fa-regular fa-floppy-disk"></i>
-                </span>
+          <div className="d-flex justify-content-center">
+            <span
+              className="icon mx-2"
+              onClick={() => handleUpdate(params.data)}
+              style={{ cursor: "pointer" }}
+            >
+              <i className="fa-regular fa-floppy-disk"></i>
+            </span>
 
-                <span
-                  className="icon mx-2"
-                  onClick={() => handleDelete(params.data)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </>
-            )}
+            <span
+              className="icon mx-2"
+              onClick={() => handleDelete(params.data)}
+              style={{ cursor: "pointer" }}
+            >
+              <i className="fa-solid fa-trash"></i>
+            </span>
           </div>
         );
       },
     },
 
     {
-      headerName: "travel_request ID",
+      headerName: "Travel Request ID",
       field: "travel_request_id",
       editable: true,
     },
+
     {
-      headerName: "Job Title",
-      field: "job_title",
+      headerName: "Request Number",
+      field: "request_number",
       editable: true,
     },
+
+    {
+      headerName: "Employee ID",
+      field: "employee_id",
+      editable: true,
+    },
+
     {
       headerName: "Department",
       field: "department_id",
       editable: true,
-      cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: departmentDrop.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = departmentDrop.find((d) => d.value === params.value);
+        const dept = departmentDrop.find((d) => d.value == params.value);
         return dept ? dept.label : params.value;
       },
     },
+
     {
-      headerName: "Country Code",
-      field: "Country_Code",
+      headerName: "Travel Type",
+      field: "travel_type",
       editable: true,
-      cellStyle: { textAlign: "left" },
+    },
+
+    {
+      headerName: "Destination Country",
+      field: "destination_country_id",
+      editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: CountrydropGR.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const country = CountrydropGR.find((d) => d.value === params.value);
+        const country = CountrydropGR.find((d) => d.value == params.value);
         return country ? country.label : params.value;
       },
     },
+
     {
-      headerName: "Location",
-      field: "location",
+      headerName: "Destination City",
+      field: "destination_city",
       editable: true,
     },
+
     {
-      headerName: "Employment Type",
-      field: "employment_type",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: employmentdropGR.map((d) => d.value),
-      },
-      valueFormatter: (params) => {
-        const employment = employmentdropGR.find(
-          (d) => d.value === params.value,
-        );
-        return employment ? employment.label : params.value;
-      },
-    },
-    {
-      headerName: "Updated On",
-      field: "updated_on",
+      headerName: "Start Date",
+      field: "travel_start_date",
       editable: true,
     },
+
+    {
+      headerName: "End Date",
+      field: "travel_end_date",
+      editable: true,
+    },
+
+    {
+      headerName: "Transport Mode",
+      field: "transport_mode",
+      editable: true,
+    },
+
+    {
+      headerName: "Estimated Cost",
+      field: "estimated_cost",
+      editable: true,
+    },
+
+    {
+      headerName: "Currency Code",
+      field: "currency_code",
+      editable: true,
+    },
+
+    {
+      headerName: "Request Status",
+      field: "request_status",
+      editable: true,
+    },
+
+    {
+      headerName: "Remarks",
+      field: "Remarks",
+      editable: true,
+    },
+
+    {
+      headerName: "Priority",
+      field: "priority_level",
+      editable: true,
+    },
+
+    {
+      headerName: "Manager",
+      field: "manager_id",
+      editable: true,
+    },
+
     {
       headerName: "Keyfield",
       field: "keyfield",
-      editable: true,
       hide: true,
     },
   ];
-
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
   };
 
   const handleSave = async () => {
-      // if (!dpt ||
-      //     !job_title ||
-      //     !Country_Code ||
-      //     !location ||
-      //     !employment_type ||
-      //     !updated_on
-      // ) {
-      //     setError(" ");
-      //     toast.warning("Error: Missing required fields");
-      //     return;
-      // }
-      if (new Date(travelStartDate) > new Date(travelEndDate)) {
-          toast.warning("Start Date cannot be greater than End Date");
-          return;
-      }
+    // if (!dpt ||
+    //     !job_title ||
+    //     !Country_Code ||
+    //     !location ||
+    //     !employment_type ||
+    //     !updated_on
+    // ) {
+    //     setError(" ");
+    //     toast.warning("Error: Missing required fields");
+    //     return;
+    // }
+    if (new Date(travelStartDate) > new Date(travelEndDate)) {
+      toast.warning("Start Date cannot be greater than End Date");
+      return;
+    }
 
-      setLoading(true);
-
-      try {
-           const Header = {
-            travel_request_id: 0,
-            request_number: request_number,
-            employee_id: empId,
-            department_id: dpt,
-            travel_type: travel_type,
-            destination_country_id: destination_country_id,
-            destination_city: destination_city,
-            purpose_of_travel: purpose_of_travel,
-            travel_start_date: travelStartDate,
-            travel_end_date: travelEndDate,
-            transport_mode: transport_mode,
-            accommodation_required: accommodation_required,
-            estimated_cost: estimated_cost,
-            currency_code: Currency_Code,
-            request_status: reqStatus,
-            Remarks: remarks,
-            priority_level: priority,
-            manager_id: ProjectManager,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-            keyfield: "",
-            created_by: sessionStorage.getItem("selectedUserCode"),
-            created_date: new Date(),
-            modified_by: "",
-            modified_date: null
-        };
-
-          const response = await fetch(`${config.apiBaseUrl}/travel_requestsInsert`, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(Header),
-          });
-          if (response.ok) {
-              console.log("Data inserted successfully");
-              toast.success("Data inserted successfully!", {
-                  onClose: () => window.location.reload(),
-              });
-          } else {
-              const errorResponse = await response.json();
-              toast.warning(errorResponse.message || "Failed to insert sales data");
-              console.error(errorResponse.details || errorResponse.message);
-          }
-      } catch (error) {
-          console.error("Error inserting data:", error);
-          toast.error('Error inserting data: ' + error.message);
-      } finally {
-          setLoading(false);
-      }
-  };
-
-  const handleSearch = async () => {
     setLoading(true);
+
     try {
-      const body = {
-        job_title: job_titleSC,
-        department_id: dptSC,
-        Country_Code: Country_CodeSC,
-        location: locationSC,
-        employment_type: employment_typeSC,
-        fromDate: fromDate,
-        toDate: toDate,
+      const Header = {
+        travel_request_id: 0,
+        request_number: request_number,
+        employee_id: empId,
+        department_id: dpt,
+        travel_type: travel_type,
+        destination_country_id: destination_country_id,
+        destination_city: destination_city,
+        purpose_of_travel: purpose_of_travel,
+        travel_start_date: travelStartDate,
+        travel_end_date: travelEndDate,
+        transport_mode: transport_mode,
+        accommodation_required: accommodation_required,
+        estimated_cost: estimated_cost,
+        currency_code: Currency_Code,
+        request_status: reqStatus,
+        Remarks: remarks,
+        priority_level: priority,
+        manager_id: ProjectManager,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        keyfield: "",
+        created_by: sessionStorage.getItem("selectedUserCode"),
+        created_date: new Date(),
+        modified_by: "",
+        modified_date: null,
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/travel_requestsSearch`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.apiBaseUrl}/travel_requestsInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Header),
         },
-        body: JSON.stringify(body),
-      });
-
+      );
       if (response.ok) {
-        const fetchedData = await response.json();
-        const newRows = fetchedData.map((matchedItem) => ({
-          job_title: matchedItem.job_title,
-          job_id: matchedItem.job_id,
-          department_id: matchedItem.department_id,
-          dept_name: matchedItem.dept_name,
-          Country_Code: matchedItem.Country_Code,
-          employment_type: matchedItem.employment_type,
-          location: matchedItem.location,
-          updated_on: matchedItem.updated_on,
-          keyfield: matchedItem.keyfield,
-        }));
-        setRowData(newRows);
-      } else if (response.status === 404) {
-        console.log("Data Not found");
-        toast.warning("Data Not found");
-        setRowData([]);
+        console.log("Data inserted successfully");
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
         console.error(errorResponse.details || errorResponse.message);
+      }
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error("Error inserting data: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+
+    try {
+      const body = {
+        travel_request_id: travel_request_idSC || null,
+        request_number: request_numberSC || "",
+        employee_id: empIdSc || "",
+        department_id: dptSC || null,
+        travel_type: travel_typeSC || "",
+        destination_country_id: destination_country_idSC || null,
+        destination_city: destination_citySC || "",
+        purpose_of_travel: purpose_of_travelSC || "",
+        travel_start_date: travelStartDateSc || null,
+        travel_end_date: travelEndDateSc || null,
+        transport_mode: transport_modeSc || "",
+        accommodation_required: accommodation_requiredSc || null,
+        estimated_cost: estimated_costSC || null,
+        currency_code: Currency_CodeSC || "",
+        request_status: reqStatusSC || "",
+        Remarks: remarksSc || "",
+        priority_level: prioritySc || "",
+        manager_id: ProjectManagerSC || null,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/travel_requestsSearch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+
+        const newRows = fetchedData.map((item) => ({
+          travel_request_id: item.travel_request_id,
+          request_number: item.request_number,
+          employee_id: item.employee_id,
+          department_id: item.department_id,
+          travel_type: item.travel_type,
+          destination_country_id: item.destination_country_id,
+          destination_city: item.destination_city,
+          purpose_of_travel: item.purpose_of_travel,
+          travel_start_date: item.travel_start_date,
+          travel_end_date: item.travel_end_date,
+          transport_mode: item.transport_mode,
+          accommodation_required: item.accommodation_required,
+          estimated_cost: item.estimated_cost,
+          currency_code: item.currency_code,
+          request_status: item.request_status,
+          Remarks: item.Remarks,
+          priority_level: item.priority_level,
+          manager_id: item.manager_id,
+          keyfield: item.keyfield,
+        }));
+
+        setRowData(newRows);
+      } else if (response.status === 404) {
+        toast.warning("Data Not found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Search failed");
         setRowData([]);
       }
     } catch (error) {
       console.error("Error fetching search data:", error);
-      toast.error("Error fetching search data:", error);
+      toast.error("Error fetching search data: " + error.message);
       setRowData([]);
     } finally {
       setLoading(false);
@@ -911,18 +981,17 @@ function TravelRequest({}) {
       async () => {
         try {
           setLoading(true);
+
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const payload = {
-            job_masterData: (Array.isArray(rowData) ? rowData : [rowData]).map(
-              (r) => ({
-                ...r,
-                company_code,
-                modified_by,
-              }),
-            ),
-          };
+          const payload = (Array.isArray(rowData) ? rowData : [rowData]).map(
+            (r) => ({
+              ...r,
+              company_code,
+              modified_by,
+            }),
+          );
 
           const response = await fetch(
             `${config.apiBaseUrl}/travel_requestsLoopUpdate`,
@@ -939,23 +1008,13 @@ function TravelRequest({}) {
 
           if (response.ok) {
             toast.success("Data updated successfully");
-
-            setRowData((prev) =>
-              prev.map((row) => {
-                const updated = result.data.find(
-                  (u) => u.job_id === row.job_id,
-                );
-                return updated ? { ...row, keyfield: updated.keyfield } : row;
-              }),
-            );
-
             handleSearch();
           } else {
             toast.warning(result.message || "Update failed");
           }
         } catch (error) {
-          console.error("Update error:", error);
-          toast.error("Update failed: " + error.message);
+          console.error(error);
+          toast.error("Update failed");
         } finally {
           setLoading(false);
         }
@@ -1019,20 +1078,31 @@ function TravelRequest({}) {
 
   const transformRowData = (data) => {
     return data.map((row) => {
-      const deptObj = departmentDrop.find((d) => d.value === row.department_id);
+      const deptObj = departmentDrop.find((d) => d.value == row.department_id);
+      const deptName = deptObj ? deptObj.label : "";
 
-      const deptName = deptObj
-        ? deptObj.label.split(" - ").slice(1).join(" - ")
-        : "";
+      const countryObj = CountrydropGR.find(
+        (c) => c.value == row.destination_country_id,
+      );
+      const countryName = countryObj ? countryObj.label : "";
 
       return {
-        "Job ID": row.job_id || "",
-        "Job Title": row.job_title || "",
-        Department: `${row.department_id} - ${deptName}` || "",
-        "Country Code": row.Country_Code || "",
-        Location: row.location || "",
-        "Employment Type": row.employment_type || "",
-        "Updated On": row.updated_on || "",
+        "Travel Request ID": row.travel_request_id || "",
+        "Request Number": row.request_number || "",
+        "Employee ID": row.employee_id || "",
+        Department: deptName,
+        "Travel Type": row.travel_type || "",
+        "Destination Country": countryName,
+        "Destination City": row.destination_city || "",
+        "Start Date": row.travel_start_date || "",
+        "End Date": row.travel_end_date || "",
+        "Transport Mode": row.transport_mode || "",
+        "Estimated Cost": row.estimated_cost || "",
+        Currency: row.currency_code || "",
+        Status: row.request_status || "",
+        Remarks: row.Remarks || "",
+        Priority: row.priority_level || "",
+        Manager: row.manager_id || "",
       };
     });
   };
@@ -1043,17 +1113,13 @@ function TravelRequest({}) {
       return;
     }
 
-    const screenName = "Job Master Search Report";
+    const screenName = "Travel Requests Search Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
-
-    /* ================= THEME COLORS ================= */
 
     const titleBg = getCSSVariable("--but").replace("#", "");
     const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
     const fontColor = getCSSVariable("--font-color").replace("#", "");
     const altRowBg = getCSSVariable("--ag-row").replace("#", "");
-
-    /* ================= HEADER ================= */
 
     const headerData = [
       [screenName],
@@ -1063,8 +1129,6 @@ function TravelRequest({}) {
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    /* ================= TABLE DATA ================= */
-
     const transformedData = transformRowData(rowData);
 
     XLSX.utils.sheet_add_json(worksheet, transformedData, {
@@ -1073,8 +1137,6 @@ function TravelRequest({}) {
 
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
     const headerRowIndex = headerData.length;
-
-    /* ================= TITLE STYLE ================= */
 
     worksheet["A1"].s = {
       font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
@@ -1088,8 +1150,6 @@ function TravelRequest({}) {
         e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
       },
     ];
-
-    /* ================= TABLE HEADER STYLE ================= */
 
     const totalColumns = Object.keys(transformedData[0]).length;
 
@@ -1112,8 +1172,6 @@ function TravelRequest({}) {
       };
     }
 
-    /* ================= TABLE BODY STYLE ================= */
-
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
         const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
@@ -1133,18 +1191,14 @@ function TravelRequest({}) {
       }
     }
 
-    /* ================= COLUMN WIDTH ================= */
-
     worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
-    /* ================= EXPORT ================= */
-
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Job Master");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Travel Requests");
 
-    XLSX.writeFile(workbook, "Job_Master_Search_Report.xlsx");
+    XLSX.writeFile(workbook, "Travel_Requests_Search_Report.xlsx");
   };
-
+  
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -1158,9 +1212,9 @@ function TravelRequest({}) {
           <h1 className="page-title">Travel Request</h1>
           <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
-                        </div>
+              <span className="tooltip">Save</span>
+              <i class="fa-solid fa-floppy-disk"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -1193,7 +1247,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1230,7 +1284,7 @@ function TravelRequest({}) {
               />
               <label
                 htmlFor="selecteddpt"
-                className={`floating-label ${error && !dpt ? "text-danger" : ""}`}
+                className={`floating-label ${error && !empId ? "text-danger" : ""}`}
               >
                 Employee ID<span className="text-danger">*</span>
               </label>
@@ -1298,7 +1352,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1320,7 +1374,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="Text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1342,7 +1396,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="Text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1491,7 +1545,7 @@ function TravelRequest({}) {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -1499,14 +1553,14 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the  Company PF Contribution"
+                required
+                title="Please Enter the  Company PF Contribution"
                 value={Currency_Code}
                 onChange={(e) => setCurrency_Code(e.target.value)}
               />
               <label className="exp-form-labels">Currency Code</label>
             </div>
           </div>
-
 
           <div className="col-md-2">
             <div
@@ -1535,7 +1589,7 @@ function TravelRequest({}) {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1603,13 +1657,14 @@ function TravelRequest({}) {
                 onChange={handleChangemanager}
                 maxLength={18}
               />
-              <label for="add1" className={`floating-label ${error && !ProjectManager ? 'text-danger' : ''}`}>
-                Project Manager<span className="text-danger">*</span>
+              <label
+                for="add1"
+                className={`floating-label ${error && !ProjectManager ? "text-danger" : ""}`}
+              >
+                Manager<span className="text-danger">*</span>
               </label>
             </div>
           </div>
-
-
         </div>
       </div>
 
@@ -1631,7 +1686,7 @@ function TravelRequest({}) {
                 value={travel_request_idSC}
                 onChange={(e) => settravel_request_idSC(e.target.value)}
               />
-              <label for="sname"className={`exp-form-labels`}>
+              <label for="sname" className={`exp-form-labels`}>
                 Travel Request ID
               </label>
             </div>
@@ -1642,7 +1697,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1650,8 +1705,8 @@ function TravelRequest({}) {
                 value={request_numberSC}
                 onChange={(e) => setrequest_numberSC(e.target.value)}
               />
-              <label for="sname"className={`exp-form-labels`}>
-                 Request Number
+              <label for="sname" className={`exp-form-labels`}>
+                Request Number
               </label>
             </div>
           </div>
@@ -1698,10 +1753,7 @@ function TravelRequest({}) {
                 onChange={handleDPTSC}
                 options={filteredOptionDPtSC}
               />
-              <label
-                htmlFor="selecteddpt"
-                className={`floating-label`}
-              >
+              <label htmlFor="selecteddpt" className={`floating-label`}>
                 Department
               </label>
             </div>
@@ -1712,7 +1764,7 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 required
                 title="Please Enter the Annual Bonus"
@@ -1720,10 +1772,7 @@ function TravelRequest({}) {
                 value={travel_typeSC}
                 onChange={(e) => settravel_typeSC(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Travel Type
               </label>
             </div>
@@ -1742,11 +1791,27 @@ function TravelRequest({}) {
                 value={destination_country_idSC}
                 onChange={(e) => setdestination_country_idSC(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Destination Country ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="Text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={destination_citySC}
+                onChange={(e) => setdestination_citySC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Destination City
               </label>
             </div>
           </div>
@@ -1764,10 +1829,7 @@ function TravelRequest({}) {
                 value={purpose_of_travelSC}
                 onChange={(e) => setpurpose_of_travelSC(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 purpose of travel
               </label>
             </div>
@@ -1786,10 +1848,7 @@ function TravelRequest({}) {
                 value={travelStartDateSc}
                 onChange={(e) => setTravelStartDateSc(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Travel Start Date
               </label>
             </div>
@@ -1808,10 +1867,7 @@ function TravelRequest({}) {
                 value={travelEndDateSc}
                 onChange={(e) => setTravelEndDateSc(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Travel End Date
               </label>
             </div>
@@ -1830,7 +1886,7 @@ function TravelRequest({}) {
                 value={transport_modeSc}
                 onChange={(e) => settransport_modeSc(e.target.value)}
               />
-              <label for="sname"className={`exp-form-labels`}>
+              <label for="sname" className={`exp-form-labels`}>
                 Transport Mode
               </label>
             </div>
@@ -1849,16 +1905,13 @@ function TravelRequest({}) {
                 value={accommodation_requiredSc}
                 onChange={(e) => setaccommodation_requiredSc(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Accommodation Required
               </label>
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1871,16 +1924,13 @@ function TravelRequest({}) {
                 value={estimated_costSC}
                 onChange={(e) => setestimated_costSC(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels `}
-              >
+              <label for="sname" className={`exp-form-labels `}>
                 Estimated Cost
               </label>
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -1888,7 +1938,8 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the  Company PF Contribution"
+                required
+                title="Please Enter the  Company PF Contribution"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
               />
@@ -1896,7 +1947,7 @@ function TravelRequest({}) {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedReqStatusSC ? "has-value" : ""} 
@@ -1914,16 +1965,13 @@ function TravelRequest({}) {
                 onChange={handleChangeReqStatusSC}
                 options={filteredOptionReqStatusSC}
               />
-              <label
-                for="sname"
-                className={`floating-label`}
-              >
+              <label for="sname" className={`floating-label`}>
                 Request Status
               </label>
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1936,10 +1984,7 @@ function TravelRequest({}) {
                 value={remarksSc}
                 onChange={(e) => setRemarksSc(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels`}
-              >
+              <label for="sname" className={`exp-form-labels`}>
                 Remarks
               </label>
             </div>
@@ -1963,15 +2008,11 @@ function TravelRequest({}) {
                 onChange={handleChangePrioritySc}
                 options={filteredOptionPrioritySc}
               />
-              <label
-                for="sname"
-                className={`floating-label`}
-              >
+              <label for="sname" className={`floating-label`}>
                 Priority Level
               </label>
             </div>
           </div>
-
 
           <div className="col-md-2">
             <div
@@ -1993,11 +2034,10 @@ function TravelRequest({}) {
                 maxLength={18}
               />
               <label for="add1" className={`floating-label `}>
-                Project Manager
+                Manager
               </label>
             </div>
           </div>
-
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
