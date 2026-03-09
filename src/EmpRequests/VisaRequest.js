@@ -15,48 +15,13 @@ const config = require('../Apiconfig');
 function VisaRequest({ }) {
 
     const [rowData, setRowData] = useState([]);
-    const [job_titleSC, setjob_titleSC] = useState("");
     const [job_title, setjob_title] = useState("");
     const [Country_Code, setCountry_Code] = useState("");
-    const [location, setlocation] = useState("");
-    const [employment_type, setemployment_type] = useState("");
-    const [updated_on, setupdated_on] = useState("");
-    const [Country_CodeSC, setCountry_CodeSC] = useState("");
-    const [locationSC, setlocationSC] = useState("");
-    const [employment_typeSC, setemployment_typeSC] = useState("");
-    const [updated_onSC, setupdated_onSC] = useState("");
-    const [department_idSC, setdepartment_idSC] = useState("");
     const [error, setError] = useState("");
-    const [activeTab, setActiveTab] = useState("Visa Request")
     const [loading, setLoading] = useState(false);
-    const [isSelectDepartment, setIsSelectDepartment] = useState(false);
-    const [isSelectCountry, setIsSelectCountry] = useState(false);
-    const [isSelectemployment, setIsSelectemployment] = useState(false);
-    const [isSelectemploymentSC, setIsSelectemploymentSC] = useState(false);
-    const [isSelectCountrySC, setIsSelectCountrySC] = useState(false);
-    const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
-    const [departmentList, setDepartmentList] = useState([]);
-    const [departmentGridDrop, setDepartmentGridDrop] = useState([]);
-    const [selecteddpt, setselecteddept] = useState("");
-    const [selectedCountry, setselectedCountry] = useState("");
-    const [selectedemployment, setselectedemployment] = useState("");
-    const [selectedemploymentSC, setselectedemploymentSC] = useState("");
-    const [selectedCountrySC, setselectedCountrySC] = useState("");
-    const [DPTdrop, setDPTdrop] = useState([]);
-    const [Countrydrop, setCountrydrop] = useState([]);
     const [CountrydropGR, setCountrydropGR] = useState([]);
-    const [CountrydropSC, setCountrydropSC] = useState([]);
-    const [employmentdrop, setEmploymentdrop] = useState([]);
-    const [employmentdropGR, setEmploymentdropGR] = useState([]);
-    const [employmentdropSC, setEmploymentdropSC] = useState([]);
     const [departmentDrop, setDepartmentDrop] = useState([]);
     const [dpt, setdpt] = useState("");
-    const [showAsterisk, setShowAsterisk] = useState(true);
-    const [selecteddptSC, setselecteddeptSC] = useState("");
-    const [dptSC, setdptSC] = useState("");
-    const navigate = useNavigate();
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
 
     const [visaRequestId, setVisaRequestId] = useState('');
     const [empIdDrop, setEmpIdDrop] = useState([]);
@@ -119,6 +84,12 @@ function VisaRequest({ }) {
     const [isSelectedVisaTypeSc, setIsSelectedVisaTypeSc] = useState(false);
     const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
     const [isSelectedPrioritySc, setIsSelectedPrioritySc] = useState(false);
+
+    const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
+    const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
+    const [visaTypeDropGrid, setVisaTypeDropGrid] = useState([]);
+    const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+    const [priorityDropGrid, setPriorityDropGrid] = useState([]);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -360,258 +331,119 @@ function VisaRequest({ }) {
         setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
     };
 
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const emp = val.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId} - ${option.First_Name}`,
+                }));
+                setEmpIdDropGrid(emp);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetCountry`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const country = val.map((option) => ({
+                    value: option.Country_Code,
+                    label: `${option.Country_Code} - ${option.Country_Name}`,
+                }));
+                setCountyIdDropGrid(country);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/getVisaType`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const visaType = val.map(option => option.attributedetails_name);
+                setVisaTypeDropGrid(visaType);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/getPriority`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const priority = val.map(option => option.attributedetails_name);
+                setPriorityDropGrid(priority);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const reqStatus = val.map(option => option.attributedetails_name);
+                setReqStatusDropGrid(reqStatus);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
     const searchClearInputFields = () => {
-        setFromDate("");
-        setToDate("");
-        setjob_titleSC("");
-        setselecteddeptSC("");
-        setdptSC("");
-        setselectedCountrySC("");
-        setCountry_CodeSC("");
-        setlocationSC("");
-        setselectedemploymentSC("");
-        setemployment_typeSC("");
+        setVisaRequestIdSc("");
+        setEmpIdSc("");
+        setSelectedEmpIdSc("");
+        setPassportIdSc("");
+        setCountryIdSc("");
+        setSelectedCountryIdSc("");
+        setVisaTypeSc("");
+        setSelectedVisaTypeSc("");
+        setPurposeSc("");
+        setTravelStartDateSc("");
+        setTravelEndDateSc("");
+        setReqStatusSc("");
+        setSelectedReqStatusSc("");
+        setReqNumberSc("");
+        setPrioritySc("");
+        setSelectedPrioritySc("");
+        setSponsorNameSc("");
+        setEstimatedCostSc("");
+        setRemarksSc("");
     };
-
-    const handleDPT = (selectedDPT) => {
-        setselecteddept(selectedDPT);
-        setdpt(selectedDPT ? selectedDPT.value : '');
-    };
-    const handleDPTSC = (selectedDPT) => {
-        setselecteddeptSC(selectedDPT);
-        setdptSC(selectedDPT ? selectedDPT.value : '');
-    };
-
-    const handleCountryChange = (selectedCountry) => {
-        setselectedCountry(selectedCountry);
-        setCountry_Code(selectedCountry ? selectedCountry.value : '');
-    };
-    const handleEmploymentChange = (selectedEmployment) => {
-        setselectedemployment(selectedEmployment);
-        setemployment_type(selectedEmployment ? selectedEmployment.value : '');
-    };
-
-    const handleEmploymentChangeSC = (selectedEmploymentSC) => {
-        setselectedemploymentSC(selectedEmploymentSC);
-        setemployment_typeSC(selectedEmploymentSC ? selectedEmploymentSC.value : '');
-    };
-
-    const handleCountryChangeSC = (selectedCountrySC) => {
-        setselectedCountrySC(selectedCountrySC);
-        setCountry_CodeSC(selectedCountrySC ? selectedCountrySC.value : '');
-    };
-
-    const filteredOptionDPt = DPTdrop.map(option => ({
-        value: option.dept_id,
-        label: `${option.dept_id} - ${option.dept_name}`
-    }));
-
-    const filteredOptionDPtSC = DPTdrop.map(option => ({
-        value: option.dept_id,
-        label: `${option.dept_id} - ${option.dept_name}`
-    }));
-
-    const filteredOptionCountry = Countrydrop.map(option => ({
-        value: option.Country_Code,
-        label: `${option.Country_Code} - ${option.Country_Name}`
-    }));
-
-    const filteredOptionEmployment = employmentdrop.map(option => ({
-        value: option.attributedetails_name,
-        label: `${option.attributedetails_name}`
-    }));
-    const filteredOptionEmploymentSC = employmentdropSC.map(option => ({
-        value: option.attributedetails_name,
-        label: `${option.attributedetails_name}`
-    }));
-
-    const filteredOptionCountrySC = CountrydropSC.map(option => ({
-        value: option.Country_Code,
-        label: `${option.Country_Code} - ${option.Country_Name}`
-    }));
-
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setCountrydrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setCountrydropSC(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setEmploymentdrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setEmploymentdropSC(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-        const fetchDept = async () => {
-            try {
-                const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ company_code }),
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const val = await response.json();
-                setDPTdrop(val);
-            } catch (error) {
-                console.error('Error fetching departments:', error);
-            }
-        };
-
-        if (company_code) {
-            fetchDept();
-        }
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/DeptID`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const deptOptions = data.map((option) => ({
-                    value: option.dept_id,
-                    label: `${option.dept_id} - ${option.dept_name}`,
-                }));
-                setDepartmentDrop(deptOptions);
-            })
-            // .then((val) => setDPTdrop(val))
-            .catch((error) =>
-                console.error("Error fetching department data:", error)
-            );
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const Countryptions = data.map((option) => ({
-                    value: option.Country_Code,
-                    label: `${option.Country_Code} - ${option.Country_Name}`,
-                }));
-                setCountrydropGR(Countryptions);
-            })
-            // .then((val) => setDPTdrop(val))
-            .catch((error) =>
-                console.error("Error fetching country data:", error)
-            );
-    }, []);
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const Countryptions = data.map((option) => ({
-                    value: option.Country_Code,
-                    label: `${option.Country_Code} - ${option.Country_Name}`,
-                }));
-                setCountrydropGR(Countryptions);
-            })
-            // .then((val) => setDPTdrop(val))
-            .catch((error) =>
-                console.error("Error fetching country data:", error)
-            );
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const employmentptions = data.map((option) => ({
-                    value: option.attributedetails_name,
-                    label: `${option.attributedetails_name}`,
-                }));
-                setEmploymentdropGR(employmentptions);
-            })
-            // .then((val) => setDPTdrop(val))
-            .catch((error) =>
-                console.error("Error fetching employee type data:", error)
-            );
-    }, []);
-
 
     const columnDefs = [
         {
@@ -649,63 +481,105 @@ function VisaRequest({ }) {
         },
 
         {
-            headerName: "Job ID",
-            field: "job_id",
-            editable: true
+            headerName: "Visa Request ID",
+            field: "visa_request_id",
+            editable: false
         },
         {
-            headerName: "Job Title",
-            field: "job_title",
-            editable: true
-        },
-        {
-            headerName: "Department",
-            field: "department_id",
+            headerName: "Employee ID",
+            field: "employee_id",
             editable: true,
-            cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: departmentDrop.map(d => d.value),
+                values: empIdDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const dept = departmentDrop.find(d => d.value === params.value);
+                const dept = empIdDropGrid.find(d => d.value === params.value);
                 return dept ? dept.label : params.value;
             },
         },
         {
-            headerName: "Country Code",
-            field: "Country_Code",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: CountrydropGR.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const country = CountrydropGR.find(d => d.value === params.value);
-                return country ? country.label : params.value;
-            },
-
-        }, {
-            headerName: "Location",
-            field: "location",
+            headerName: "Passport ID",
+            field: "passport_id",
             editable: true
-        }, {
-            headerName: "Employment Type",
-            field: "employment_type",
+        },
+        {
+            headerName: "Country ID",
+            field: "destination_country_id",
             editable: true,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: employmentdropGR.map(d => d.value),
+                values: countryIdDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const employment = employmentdropGR.find(d => d.value === params.value);
-                return employment ? employment.label : params.value;
+                const dept = countryIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
             },
-        }, {
-            headerName: "Updated On",
-            field: "updated_on",
+        },
+        {
+            headerName: "Visa Type",
+            field: "visa_type_id",
+            editable: true,
+            cellStyle: { textAlign: "left" },
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: visaTypeDropGrid,
+            },
+        },
+        {
+            headerName: "Purpose",
+            field: "purpose",
+            editable: true
+        },
+        {
+            headerName: "Travel Start Date",
+            field: "travel_start_date",
+            editable: true
+        },
+        {
+            headerName: "Travel End Date",
+            field: "travel_end_date",
+            editable: true
+        },
+        {
+            headerName: "Request Status",
+            field: "request_status",
+            editable: true,
+            cellStyle: { textAlign: "left" },
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: reqStatusDropGrid,
+            },
+        },
+        {
+            headerName: "Request Number",
+            field: "request_number",
+            editable: true
+        },
+        {
+            headerName: "Priority Level",
+            field: "priority_level",
+            editable: true,
+            cellStyle: { textAlign: "left" },
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: priorityDropGrid,
+            },
+        },
+        {
+            headerName: "Sponsor Name",
+            field: "sponsor_name",
+            editable: true
+        },
+        {
+            headerName: "Estimated Cost",
+            field: "estimated_cost",
+            editable: true
+        },
+        {
+            headerName: "Remarks",
+            field: "Remarks",
             editable: true
         },
         {
@@ -714,7 +588,6 @@ function VisaRequest({ }) {
             editable: true,
             hide: true
         }
-
     ]
 
     const gridOptions = {
@@ -723,17 +596,21 @@ function VisaRequest({ }) {
     };
 
     const handleSave = async () => {
-        // if (!dpt ||
-        //     !job_title ||
-        //     !Country_Code ||
-        //     !location ||
-        //     !employment_type ||
-        //     !updated_on
-        // ) {
-        //     setError(" ");
-        //     toast.warning("Error: Missing required fields");
-        //     return;
-        // }
+        if (!visaRequestId ||
+            !empId ||
+            !passportId ||
+            !visaType ||
+            !travelStartDate ||
+            !travelEndDate ||
+            !reqStatus ||
+            !priority ||
+            !estimatedCost
+        ) {
+            setError(" ");
+            toast.warning("Error: Missing required fields");
+            return;
+        }
+
         if (new Date(travelStartDate) > new Date(travelEndDate)) {
             toast.warning("Start Date cannot be greater than End Date");
             return;
@@ -789,17 +666,24 @@ function VisaRequest({ }) {
         setLoading(true);
         try {
             const body = {
-                job_title: job_titleSC,
-                department_id: dptSC,
-                Country_Code: Country_CodeSC,
-                location: locationSC,
-                employment_type: employment_typeSC,
-                fromDate: fromDate,
-                toDate: toDate,
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                visa_request_id: visaRequestIdSc,
+                employee_id: empIdSc,
+                passport_id: passportIdSc,
+                destination_country_id: countryIdSc,
+                visa_type_id: visaTypeSc,
+                purpose: purposeSc,
+                travel_start_date: travelStartDateSc,
+                travel_end_date: travelEndDateSc,
+                request_status: reqStatusSc,
+                request_number: reqNumberSc,
+                priority_level: prioritySc,
+                sponsor_name: sponsorNameSc,
+                estimated_cost: estimatedCostSc ? estimatedCostSc : 0,
+                Remarks: remarksSc,
+                company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
-            const response = await fetch(`${config.apiBaseUrl}/JobmasterSearch`, {
+            const response = await fetch(`${config.apiBaseUrl}/visaRequestSearch`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -809,18 +693,7 @@ function VisaRequest({ }) {
 
             if (response.ok) {
                 const fetchedData = await response.json();
-                const newRows = fetchedData.map((matchedItem) => ({
-                    job_title: matchedItem.job_title,
-                    job_id: matchedItem.job_id,
-                    department_id: matchedItem.department_id,
-                    dept_name: matchedItem.dept_name,
-                    Country_Code: matchedItem.Country_Code,
-                    employment_type: matchedItem.employment_type,
-                    location: matchedItem.location,
-                    updated_on: matchedItem.updated_on,
-                    keyfield: matchedItem.keyfield,
-                }));
-                setRowData(newRows);
+                setRowData(fetchedData);
             } else if (response.status === 404) {
                 console.log("Data Not found");
                 toast.warning("Data Not found");
@@ -848,119 +721,109 @@ function VisaRequest({ }) {
     const handleUpdate = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to update the data in the selected rows?",
+            "Are you sure you want to update the selected employee shift mapping data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
 
-                    const payload = {
-                        job_masterData: (Array.isArray(rowData) ? rowData : [rowData]).map(r => ({
-                            ...r,
-                            company_code,
-                            modified_by
-                        }))
+                    const dataToSend = {
+                        visa_requestsData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                Modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    Modified_by,
+                                },
+                            ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/job_masterLoopUpdate`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
+                    const response = await fetch(`${config.apiBaseUrl}/visa_requestsLoopUpdate`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(dataToSend),
                         },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
+                    );
 
                     if (response.ok) {
-                        toast.success("Data updated successfully");
-
-
-                        setRowData(prev =>
-                            prev.map(row => {
-                                const updated = result.data.find(u => u.job_id === row.job_id);
-                                return updated ? { ...row, keyfield: updated.keyfield } : row;
-                            })
-                        );
-
-                        handleSearch();
-                    } else {
-                        toast.warning(result.message || "Update failed");
-                    }
-
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Update failed: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Update cancelled")
-        );
-    };
-
-
-    const handleDelete = async (rowData) => {
-        showConfirmationToast(
-            "Are you sure you want to Delete the data in the selected rows?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-                    const dataToSend = { job_masterData: Array.isArray(rowData) ? rowData : [rowData] };
-
-                    const response = await fetch(`${config.apiBaseUrl}/job_masterLoopDelete`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "company_code": company_code
-                        },
-                        body: JSON.stringify(dataToSend)
-                    });
-
-                    if (response.ok) {
-                        toast.success("Data deleted successfully", {
+                        toast.success("Visa request updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
                         const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Failed to insert sales data");
+                        toast.warning(errorResponse.message || "Update failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting rows:", error);
-                    toast.error('Error Deleting Data: ' + error.message);
+                    console.error("Update error:", error);
+                    toast.error("Error updating data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
             },
-            () => {
-                toast.info("Data Delete cancelled.");
-            }
+            () => toast.info("Update cancelled"),
         );
     };
 
-    const tabs = [
-        { label: 'Visa Request' },
-    ];
+    const handleDelete = async (rowData) => {
 
+        showConfirmationToast(
+            "Are you sure you want to delete the selected employee shift mapping data?",
+            async () => {
+                try {
+                    setLoading(true);
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    const handleTabClick = (tabLabel) => {
-        setActiveTab(tabLabel);
-        switch (tabLabel) {
+                    const dataToSend = {
+                        visa_requestsData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                },
+                            ],
+                    };
 
-            case 'Visa Request':
-                VisaRequest();
-                break;
+                    const response = await fetch(`${config.apiBaseUrl}/visa_requestsLoopDelete`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "company_code": company_code
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
 
-            default:
-                break;
-        }
-    };
-
-    const VisaRequest = () => {
-        navigate("/VisaRequest");
+                    if (response.ok) {
+                        toast.success("Visa request deleted successfully", {
+                            onClose: () => handleSearch(), // refresh data
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Delete failed");
+                    }
+                } catch (error) {
+                    console.error("Error deleting visa request rows:", error);
+                    toast.error("Error deleting visa request data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            },
+            () => toast.info("Delete cancelled"),
+        );
     };
 
     const getCSSVariable = (variableName) => {
@@ -971,22 +834,37 @@ function VisaRequest({ }) {
 
     const transformRowData = (data) => {
         return data.map((row) => {
-            const deptObj = departmentDrop.find(
-                (d) => d.value === row.department_id
+            const empObj = empIdDropGrid.find(
+                (d) => d.value === row.employee_id
             );
 
-            const deptName = deptObj
-                ? deptObj.label.split(" - ").slice(1).join(" - ")
+            const empName = empObj
+                ? empObj.label.split(" - ").slice(1).join(" - ")
+                : "";
+
+            const countryObj = countryIdDropGrid.find(
+                (d) => d.value === row.destination_country_id
+            );
+
+            const countryName = countryObj
+                ? countryObj.label.split(" - ").slice(1).join(" - ")
                 : "";
 
             return {
-                "Job ID": row.job_id || "",
-                "Job Title": row.job_title || "",
-                "Department": `${row.department_id} - ${deptName}` || "",
-                "Country Code": row.Country_Code || "",
-                "Location": row.location || "",
-                "Employment Type": row.employment_type || "",
-                "Updated On": row.updated_on || "",
+                "Visa Request ID": row.visa_request_id || "",
+                "Employee ID": `${row.employee_id} - ${empName}` || "",
+                "Passport ID": row.passport_id || "",
+                "Country ID": `${row.destination_country_id} - ${countryName}` || "",
+                "Visa Type": row.visa_type_id || "",
+                "Purpose": row.purpose || "",
+                "Travel Start Date": row.travel_start_date || "",
+                "Travel End Date": row.travel_end_date || "",
+                "Request Status": row.request_status || "",
+                "Request Number": row.request_number || "",
+                "Priority Level": row.priority_level || "",
+                "Sponsor Name": row.sponsor_name || "",
+                "Estimated Cost": row.estimated_cost || "",
+                "Remarks": row.Remarks || "",
             };
         });
     };
@@ -997,7 +875,7 @@ function VisaRequest({ }) {
             return;
         }
 
-        const screenName = "Job Master Search Report";
+        const screenName = "Visa Request Search Report";
         const company = sessionStorage.getItem("selectedCompanyName") || "";
 
         /* ================= THEME COLORS ================= */
@@ -1095,9 +973,9 @@ function VisaRequest({ }) {
         /* ================= EXPORT ================= */
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Job Master");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Visa Request");
 
-        XLSX.writeFile(workbook, "Job_Master_Search_Report.xlsx");
+        XLSX.writeFile(workbook, "Visa_Request_Search_Report.xlsx");
     };
 
     return (
@@ -1106,7 +984,7 @@ function VisaRequest({ }) {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Employee Visa Request</h1>
+                    <h1 className="page-title">Visa Request</h1>
                     <div className="action-wrapper">
                         <div onClick={handleSave} className="action-icon add">
                             <span className="tooltip">Save</span>
@@ -1115,7 +993,6 @@ function VisaRequest({ }) {
                     </div>
                 </div>
             </div>
-            <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
 
@@ -1126,12 +1003,12 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="number"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required
                                 autoComplete="off"
                                 value={visaRequestId}
                                 onChange={(e) => setVisaRequestId((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !visaRequestId ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1153,7 +1030,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeEmpId}
                                 options={filteredOptionEmpId}
                             />
-                            <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
+                            <label htmlFor="selecteddpt" className={`floating-label ${error && !empId ? 'text-danger' : ''}`}>
                                 Employee ID<span className="text-danger">*</span>
                             </label>
                         </div>
@@ -1171,7 +1048,7 @@ function VisaRequest({ }) {
                                 value={passportId}
                                 onChange={(e) => setPassportId((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Passport ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !passportId ? 'text-danger' : ''}`}>Passport ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1193,7 +1070,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeCountryId}
                                 options={filteredOptionCountryId}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Country ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label ${error && !countryId ? 'text-danger' : ''}`}>Country ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1215,7 +1092,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeVisaType}
                                 options={filteredOptionVisaType}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Visa Type ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label ${error && !visaType ? 'text-danger' : ''}`}>Visa Type ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1231,7 +1108,7 @@ function VisaRequest({ }) {
                                 value={purpose}
                                 onChange={(e) => setPurpose((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Purpose<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
                         </div>
                     </div>
 
@@ -1247,7 +1124,7 @@ function VisaRequest({ }) {
                                 value={travelStartDate}
                                 onChange={(e) => setTravelStartDate((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Travel Start Date<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !travelStartDate ? 'text-danger' : ''}`}>Travel Start Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1263,7 +1140,7 @@ function VisaRequest({ }) {
                                 value={travelEndDate}
                                 onChange={(e) => setTravelEndDate((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Travel End Date<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !travelEndDate ? 'text-danger' : ''}`}>Travel End Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1285,7 +1162,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeReqStatus}
                                 options={filteredOptionReqStatus}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Request Status<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label ${error && !reqStatus ? 'text-danger' : ''}`}>Request Status<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1301,7 +1178,7 @@ function VisaRequest({ }) {
                                 value={reqNumber}
                                 onChange={(e) => setReqNumber((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Request Number<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
                     </div>
 
@@ -1323,7 +1200,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangePriority}
                                 options={filteredOptionPriority}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Priority Level<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label ${error && !priority ? 'text-danger' : ''}`}>Priority Level<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1339,7 +1216,7 @@ function VisaRequest({ }) {
                                 value={sponsorName}
                                 onChange={(e) => setSponsorName((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Sponsor Name<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
                         </div>
                     </div>
 
@@ -1355,7 +1232,7 @@ function VisaRequest({ }) {
                                 value={estimatedCost}
                                 onChange={(e) => setEstimatedCost((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Estimated Cost<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !estimatedCost ? 'text-danger' : ''}`}>Estimated Cost<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1371,7 +1248,7 @@ function VisaRequest({ }) {
                                 value={remarks}
                                 onChange={(e) => setRemarks((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Remarks<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
                         </div>
                     </div>
 
@@ -1396,7 +1273,7 @@ function VisaRequest({ }) {
                                 value={visaRequestIdSc}
                                 onChange={(e) => setVisaRequestIdSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Visa Request ID</label>
                         </div>
                     </div>
 
@@ -1418,8 +1295,8 @@ function VisaRequest({ }) {
                                 onChange={handleChangeEmpIdSc}
                                 options={filteredOptionEmpIdSc}
                             />
-                            <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                                Employee ID<span className="text-danger">*</span>
+                            <label htmlFor="selecteddpt" className={`floating-label`}>
+                                Employee ID
                             </label>
                         </div>
                     </div>
@@ -1436,7 +1313,7 @@ function VisaRequest({ }) {
                                 value={passportIdSc}
                                 onChange={(e) => setPassportIdSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Passport ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Passport ID</label>
                         </div>
                     </div>
 
@@ -1458,7 +1335,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeCountryIdSc}
                                 options={filteredOptionCountryIdSc}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Country ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label`}>Country ID</label>
                         </div>
                     </div>
 
@@ -1480,7 +1357,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeVisaTypeSc}
                                 options={filteredOptionVisaTypeSc}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Visa Type ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label`}>Visa Type ID</label>
                         </div>
                     </div>
 
@@ -1496,7 +1373,7 @@ function VisaRequest({ }) {
                                 value={purposeSc}
                                 onChange={(e) => setPurposeSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Purpose<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
                         </div>
                     </div>
 
@@ -1512,7 +1389,7 @@ function VisaRequest({ }) {
                                 value={travelStartDateSc}
                                 onChange={(e) => setTravelStartDateSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Travel Start Date<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Travel Start Date</label>
                         </div>
                     </div>
 
@@ -1528,7 +1405,7 @@ function VisaRequest({ }) {
                                 value={travelEndDateSc}
                                 onChange={(e) => setTravelEndDateSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Travel End Date<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Travel End Date</label>
                         </div>
                     </div>
 
@@ -1550,7 +1427,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangeReqStatusSc}
                                 options={filteredOptionReqStatusSc}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Country ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label`}>Request Status</label>
                         </div>
                     </div>
 
@@ -1566,7 +1443,7 @@ function VisaRequest({ }) {
                                 value={reqNumberSc}
                                 onChange={(e) => setReqNumberSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Request Number<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
                     </div>
 
@@ -1588,7 +1465,7 @@ function VisaRequest({ }) {
                                 onChange={handleChangePrioritySc}
                                 options={filteredOptionPrioritySc}
                             />
-                            <label for="sname" className={`floating-label ${error && !Country_Code ? 'text-danger' : ''}`}>Priority Level<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label`}>Priority Level</label>
                         </div>
                     </div>
 
@@ -1604,7 +1481,7 @@ function VisaRequest({ }) {
                                 value={sponsorNameSc}
                                 onChange={(e) => setSponsorNameSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Sponsor Name<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
                         </div>
                     </div>
 
@@ -1620,7 +1497,7 @@ function VisaRequest({ }) {
                                 value={estimatedCostSc}
                                 onChange={(e) => setEstimatedCostSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Estimated Cost<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Estimated Cost</label>
                         </div>
                     </div>
 
@@ -1636,7 +1513,7 @@ function VisaRequest({ }) {
                                 value={remarksSc}
                                 onChange={(e) => setRemarksSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Remarks<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
                         </div>
                     </div>
 
