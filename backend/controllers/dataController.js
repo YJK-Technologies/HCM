@@ -42364,19 +42364,7 @@ const loan_approvalsLoopDelete = async (req, res) => {
 // Auto-generated Node.js CRUD for sp_loan_repayment_schedule
 
 const loan_repayment_scheduleInsert = async (req, res) => {
-  const {
-    schedule_id,
-    loan_request_id,
-    installment_number,
-    installment_date,
-    principal_amount,
-    interest_amount,
-    total_installment,
-    payment_status,
-    company_code,
-    keyfield,
-    created_by,
-  } = req.body;
+  const { schedule_id, loan_request_id, installment_number, installment_date, principal_amount, interest_amount, total_installment, payment_status, company_code, keyfield, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42392,11 +42380,8 @@ const loan_repayment_scheduleInsert = async (req, res) => {
       .input("total_installment", sql.Decimal(12, 2), total_installment)
       .input("payment_status", sql.NVarChar, payment_status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .query(
-        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`,
-      );
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`);
 
     res
       .status(200)
@@ -42441,9 +42426,7 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(
-        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`,
-      );
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`);
 
     res
       .status(200)
@@ -42458,7 +42441,7 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
 };
 
 const loan_repayment_scheduleDelete = async (req, res) => {
-  const { schedule_id, company_code, keyfield } = req.body;
+  const { schedule_id,company_code, keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42468,9 +42451,7 @@ const loan_repayment_scheduleDelete = async (req, res) => {
       .input("schedule_id", sql.Int, schedule_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(
-        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`,
-      );
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`);
 
     res
       .status(200)
@@ -42511,11 +42492,8 @@ const loan_repayment_scheduleLoopInsert = async (req, res) => {
         .input("total_installment", sql.Decimal(12, 2), item.total_installment)
         .input("payment_status", sql.NVarChar, item.payment_status)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(
-          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`,
-        );
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, @created_by, '', '', ''`);
     }
     res.status(200).json("loan_repayment_schedule data inserted successfully");
   } catch (err) {
@@ -42550,9 +42528,7 @@ const loan_repayment_scheduleLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(
-          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`,
-        );
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_repayment_schedule data updated successfully");
   } catch (err) {
@@ -42579,9 +42555,7 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
         .input("schedule_id", sql.Int, item.schedule_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(
-          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`,
-        );
+        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', ''`);
     }
     res.status(200).json("loan_repayment_schedule data deleted successfully");
   } catch (err) {
@@ -42594,22 +42568,8 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
 
 //Code added by Dinesh Gokul on 07-03-2026
 // Auto-generated Node.js CRUD for sp_loan_payments
-
 const loan_paymentsInsert = async (req, res) => {
-  const {
-    payment_id,
-    loan_request_id,
-    payment_date,
-    paid_amount,
-    payment_method,
-    payroll_reference,
-    company_code,
-    keyfield,
-    created_by,
-    created_date,
-    modified_by,
-    modified_date,
-  } = req.body;
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42623,14 +42583,8 @@ const loan_paymentsInsert = async (req, res) => {
       .input("payment_method", sql.NVarChar, payment_method)
       .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(
-        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-      );
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`);
 
     res
       .status(200)
@@ -42642,20 +42596,7 @@ const loan_paymentsInsert = async (req, res) => {
 };
 
 const loan_paymentsUpdate = async (req, res) => {
-  const {
-    payment_id,
-    loan_request_id,
-    payment_date,
-    paid_amount,
-    payment_method,
-    payroll_reference,
-    company_code,
-    keyfield,
-    created_by,
-    created_date,
-    modified_by,
-    modified_date,
-  } = req.body;
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42670,13 +42611,8 @@ const loan_paymentsUpdate = async (req, res) => {
       .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(
-        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-      );
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
 
     res
       .status(200)
@@ -42688,20 +42624,7 @@ const loan_paymentsUpdate = async (req, res) => {
 };
 
 const loan_paymentsDelete = async (req, res) => {
-  const {
-    payment_id,
-    loan_request_id,
-    payment_date,
-    paid_amount,
-    payment_method,
-    payroll_reference,
-    company_code,
-    keyfield,
-    created_by,
-    created_date,
-    modified_by,
-    modified_date,
-  } = req.body;
+  const { payment_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42709,20 +42632,8 @@ const loan_paymentsDelete = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "D")
       .input("payment_id", sql.Int, payment_id)
-      .input("loan_request_id", sql.Int, loan_request_id)
-      .input("payment_date", sql.Date, payment_date)
-      .input("paid_amount", sql.Decimal(12, 2), paid_amount)
-      .input("payment_method", sql.NVarChar, payment_method)
-      .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(
-        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-      );
+      .query(`EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`);
 
     res
       .status(200)
@@ -42757,14 +42668,8 @@ const loan_paymentsLoopInsert = async (req, res) => {
         .input("payment_method", sql.NVarChar, item.payment_method)
         .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
-        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
-        .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(
-          `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-        );
+        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
     }
     res.status(200).json("loan_payments data inserted successfully");
   } catch (err) {
@@ -42794,13 +42699,9 @@ const loan_paymentsLoopUpdate = async (req, res) => {
         .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("modified_date", sql.DateTime, item.modified_date)
-        .query(
-          `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-        );
+        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
     }
     res.status(200).json("loan_payments data updated successfully");
   } catch (err) {
@@ -42823,20 +42724,13 @@ const loan_paymentsLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("payment_id", sql.Int, item.payment_id)
-        .input("loan_request_id", sql.Int, item.loan_request_id)
-        .input("payment_date", sql.Date, item.payment_date)
-        .input("paid_amount", sql.Decimal(12, 2), item.paid_amount)
-        .input("payment_method", sql.NVarChar, item.payment_method)
-        .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
         .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .input("modified_date", sql.DateTime, item.modified_date)
-        .query(
-          `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-        );
+        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`);
     }
     res.status(200).json("loan_payments data deleted successfully");
   } catch (err) {
@@ -44260,9 +44154,23 @@ const loanRequestSearch = async (req, res) => {
   }
 };
 
-//Code ended by pavun on 09-03-26
+const getPaymentMethod = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'PaymentMode','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
 
-//code added by Sakthi on 09-03-26
 const getLoanRequest = async (req, res) => {
   const { company_code } = req.body;
 
@@ -44272,13 +44180,12 @@ const getLoanRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`,
-      );
+      .query(`EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
-    } else {
+    } 
+    else {
       res.status(404).json("Data not found");
     }
   } catch (err) {
@@ -44286,7 +44193,87 @@ const getLoanRequest = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-//code ended by Sakthi on 09-03-26
+
+const loanPaymentSearch = async (req, res) => {
+  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, FromDate, ToDate } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("payment_id", sql.NVarChar, payment_id)
+      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("payment_date", sql.NVarChar, payment_date)
+      .input("paid_amount", sql.Decimal(12, 2), paid_amount)
+      .input("payment_method", sql.NVarChar, payment_method)
+      .input("payroll_reference", sql.NVarChar, payroll_reference)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, '', @paid_amount, @payment_method, @payroll_reference, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_payments insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getPaymentStatus = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Payment Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
+};
+
+const loanScheduleSearch = async (req, res) => {
+  const { schedule_id, loan_request_id, installment_number, FromDate, ToDate, principal_amount, interest_amount, total_installment, payment_status, company_code, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result =  await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("schedule_id", sql.NVarChar, schedule_id)
+      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("installment_number", sql.NVarChar, installment_number)
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("principal_amount", sql.Decimal(12, 2), principal_amount)
+      .input("interest_amount", sql.Decimal(12, 2), interest_amount)
+      .input("total_installment", sql.Decimal(12, 2), total_installment)
+      .input("payment_status", sql.NVarChar, payment_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, '', @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } 
+    else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_repayment_schedule insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 09-03-26
 
 //code added by Sakthi on 09-03-26
 const loan_approvalsSearch = async (req, res) => {
@@ -44312,6 +44299,7 @@ const loan_approvalsSearch = async (req, res) => {
       res.status(200).json(result.recordset);
     } else {
       res.status(404).json("Data not found");
+      
     }
   } catch (err) {
     console.error("Error fetching loan approvals search:", err);
@@ -45429,169 +45417,174 @@ module.exports = {
   CRM_PV,
   GetCalendarEvent,
   PrintTemplateUpdate,
-  candidate_masterLoopUpdate,
-  candidate_masterLoopDelete,
-  candidate_masterInsert,
-  interview_panelInsert,
-  interview_panelLoopUpdate,
-  interview_panelLoopDelete,
-  job_masterInsert,
-  job_masterLoopInsert,
-  job_masterLoopUpdate,
-  job_masterLoopDelete,
-  interview_panel_membersInsert,
-  interview_panel_membersLoopInsert,
-  interview_panel_membersLoopUpdate,
-  interview_panel_membersLoopDelete,
-  interview_scheduleInsert,
-  interview_scheduleLoopUpdate,
-  interview_scheduleLoopDelete,
-  interview_feedbackInsert,
-  interview_feedbackLoopUpdate,
-  interview_feedbackLoopDelete,
-  interview_decisionInsert,
-  interview_decisionLoopUpdate,
-  interview_decisionLoopDelete,
-  CandidateSearch,
-  JobmasterSearch,
-  InterviewPanel,
-  InterviewPanelMembers,
-  InterviewSchedule,
-  InterviewFeedbackSC,
-  InterviewDecisionSC,
-  DeptID,
-  JobMaster,
-  InterviewPanelData,
-  ScheduleID,
-  CanditateID,
-  Feedback_ID,
-  Decision_ID,
-  Employee_ID,
-  InterviewMode,
-  InterviewStatus,
-  Recommendation,
-  TimeZonemasterInsert,
-  TimeZonemasterUpdate,
-  TimeZonemasterDelete,
-  getTimeZoneData,
-  getTimeZonesearchdata,
-  getTitle,
-  getReligion,
-  getNationality,
-  CountryMasterInsert,
-  CountryMasterUpdate,
-  deleteCountryMaster,
-  getCountrySearchData,
-  Country_MasterLoopUpdate,
-  Country_MasterLoopDelete,
-  GetCountry,
-  Time_Zone_masterLoopUpdate,
-  Time_Zone_masterLoopDelete,
-  Shift_MasterInsert,
-  getShiftsearchdata,
-  sp_Shift_MasterLoopUpdate,
-  getSex,
-  getAccountType,
-  getBoolean,
-  getEmployeeType,
-  Employment_Type_MasterInsert,
-  Employment_Type_MasterUpdate,
-  Employment_Type_MasterDelete,
-  Employment_Type_MasterLoopUpdate,
-  Employment_Type_MasterLoopDelete,
-  Shift_Pattern_MasterInsert,
-  Shift_Pattern_MasterUpdate,
-  Shift_Pattern_MasterDelete,
-  Shift_Pattern_MasterLoopInsert,
-  Shift_Pattern_MasterLoopUpdate,
-  Shift_Pattern_MasterLoopDelete,
-  Shift_Pattern_DetailInsert,
-  Shift_Pattern_DetailUpdate,
-  Shift_Pattern_DetailDelete,
-  Shift_Pattern_DetailLoopInsert,
-  Shift_Pattern_DetailLoopUpdate,
-  Shift_Pattern_DetailLoopDelete,
-  Employee_shift_mappingInsert,
-  Employee_shift_mappingUpdate,
-  Employee_shift_mappingDelete,
-  Employee_shift_mappingLoopInsert,
-  Employee_shift_mappingLoopUpdate,
-  Employee_shift_mappingLoopDelete,
-  sp_Shift_MasterLoopDelete,
-  Shift_Type_MasterInsert,
-  getShift_TypeSC,
-  Shift_TypeMasterUpdate,
-  Shift_TypeMasterDelete,
-  ShiftPattern_Insert,
-  ShiftPattern_SC,
-  ShiftPattern_Update,
-  ShiftPattern_Delete,
-  ShiftPatternDetail_SC,
-  Employment_Type_MasterSc,
-  ShiftMasterDropDown,
-  ShiftTypeDropDown,
-  ShiftPatternMasterDropDown,
-  Employee_shift_mappingSc,
-  InterviewScheduleSearch,
-  InterviewFeedbackSearch,
-  InterviewProgressSearch,
-  PanelPerformanceSearch,
-  HiringDecisionSearch,
-  CandidateAppliedSearch,
-  getHolidayType,
-  TotalInterviewSchedule,
-  InterviewCompletionRateSC,
-  getEmployeeTypeDD,
-  getInterviewDashboardCount,
-  getGenerateShift,
-  getEmpShiftReport,
-  getDepartmentDashboard,
-  getDepartment,
-  getAdEmpShiftReport,
-  shiftPatternChart,
-  Shift_Summary_Report,
-  visa_requestsInsert,
-  visa_requestsUpdate,
-  visa_requestsDelete,
-  visa_requestsLoopInsert,
-  visa_requestsLoopUpdate,
-  visa_requestsLoopDelete,
-  travel_requestsInsert,
-  travel_requestsUpdate,
-  travel_requestsDelete,
-  travel_requestsLoopInsert,
-  travel_requestsLoopUpdate,
-  travel_requestsLoopDelete,
-  loan_requestsInsert,
-  loan_requestsUpdate,
-  loan_requestsDelete,
-  loan_requestsLoopInsert,
-  loan_requestsLoopUpdate,
-  loan_requestsLoopDelete,
-  getVisaType,
-  travel_requestsSearch,
-  visaRequestSearch,
-  loan_approvalsInsert,
-  loan_approvalsUpdate,
-  loan_approvalsDelete,
-  loan_approvalsLoopInsert,
-  loan_approvalsLoopUpdate,
-  loan_approvalsLoopDelete,
-  loan_repayment_scheduleInsert,
-  loan_repayment_scheduleUpdate,
-  loan_repayment_scheduleDelete,
-  loan_repayment_scheduleLoopInsert,
-  loan_repayment_scheduleLoopUpdate,
-  loan_repayment_scheduleLoopDelete,
-  loan_paymentsInsert,
-  loan_paymentsUpdate,
-  loan_paymentsDelete,
-  loan_paymentsLoopInsert,
-  loan_paymentsLoopUpdate,
-  loan_paymentsLoopDelete,
-  getLoanTypes,
-  loanRequestSearch,
-  getLoanRequest,
-  loan_approvalsSearch
+    candidate_masterLoopUpdate,
+    candidate_masterLoopDelete,
+    candidate_masterInsert,
+    interview_panelInsert,
+    interview_panelLoopUpdate,
+    interview_panelLoopDelete,
+    job_masterInsert,
+    job_masterLoopInsert,
+    job_masterLoopUpdate,
+    job_masterLoopDelete,
+    interview_panel_membersInsert,
+    interview_panel_membersLoopInsert,
+    interview_panel_membersLoopUpdate,
+    interview_panel_membersLoopDelete,
+    interview_scheduleInsert,
+    interview_scheduleLoopUpdate,
+    interview_scheduleLoopDelete,
+    interview_feedbackInsert,
+    interview_feedbackLoopUpdate,
+    interview_feedbackLoopDelete,
+    interview_decisionInsert,
+    interview_decisionLoopUpdate,
+    interview_decisionLoopDelete,
+    CandidateSearch,
+    JobmasterSearch,
+    InterviewPanel,
+    InterviewPanelMembers,
+    InterviewSchedule,
+    InterviewFeedbackSC,
+    InterviewDecisionSC,
+    DeptID,
+    JobMaster,
+    InterviewPanelData,
+    ScheduleID,
+    CanditateID,
+    Feedback_ID,
+    Decision_ID,
+    Employee_ID,
+    InterviewMode,
+    InterviewStatus,
+    Recommendation,
+    TimeZonemasterInsert,
+    TimeZonemasterUpdate,
+    TimeZonemasterDelete,
+    getTimeZoneData,
+    getTimeZonesearchdata,
+    getTitle,
+    getReligion,
+    getNationality,
+    CountryMasterInsert,
+    CountryMasterUpdate,
+    deleteCountryMaster,
+    getCountrySearchData,
+    Country_MasterLoopUpdate,
+    Country_MasterLoopDelete,
+    GetCountry,
+    Time_Zone_masterLoopUpdate,
+    Time_Zone_masterLoopDelete,
+    Shift_MasterInsert,
+    getShiftsearchdata,
+    sp_Shift_MasterLoopUpdate,
+    getSex,
+    getAccountType,
+    getBoolean,
+    getEmployeeType,
+    Employment_Type_MasterInsert, 
+    Employment_Type_MasterUpdate, 
+    Employment_Type_MasterDelete,
+    Employment_Type_MasterLoopUpdate, 
+    Employment_Type_MasterLoopDelete,
+    Shift_Pattern_MasterInsert, 
+    Shift_Pattern_MasterUpdate, 
+    Shift_Pattern_MasterDelete,
+    Shift_Pattern_MasterLoopInsert, 
+    Shift_Pattern_MasterLoopUpdate, 
+    Shift_Pattern_MasterLoopDelete,
+    Shift_Pattern_DetailInsert, 
+    Shift_Pattern_DetailUpdate, 
+    Shift_Pattern_DetailDelete,
+    Shift_Pattern_DetailLoopInsert, 
+    Shift_Pattern_DetailLoopUpdate, 
+    Shift_Pattern_DetailLoopDelete,
+    Employee_shift_mappingInsert,
+    Employee_shift_mappingUpdate,
+    Employee_shift_mappingDelete,
+    Employee_shift_mappingLoopInsert,
+    Employee_shift_mappingLoopUpdate,
+    Employee_shift_mappingLoopDelete,
+    sp_Shift_MasterLoopDelete,
+    Shift_Type_MasterInsert,
+    getShift_TypeSC,
+    Shift_TypeMasterUpdate,
+    Shift_TypeMasterDelete,
+    ShiftPattern_Insert,
+    ShiftPattern_SC,
+    ShiftPattern_Update,
+    ShiftPattern_Delete,
+    ShiftPatternDetail_SC,
+    Employment_Type_MasterSc,
+    ShiftMasterDropDown,
+    ShiftTypeDropDown,
+    ShiftPatternMasterDropDown,
+    Employee_shift_mappingSc,
+    InterviewScheduleSearch,
+    InterviewFeedbackSearch,
+    InterviewProgressSearch,
+    PanelPerformanceSearch,
+    HiringDecisionSearch,
+    CandidateAppliedSearch,
+    getHolidayType,
+    TotalInterviewSchedule,
+    InterviewCompletionRateSC,
+    getEmployeeTypeDD,
+    getInterviewDashboardCount,
+    getGenerateShift,
+    getEmpShiftReport,
+    getDepartmentDashboard,
+    getDepartment,
+    getAdEmpShiftReport,
+    shiftPatternChart,
+    Shift_Summary_Report,
+    visa_requestsInsert,
+    visa_requestsUpdate,
+    visa_requestsDelete,
+    visa_requestsLoopInsert,
+    visa_requestsLoopUpdate,
+    visa_requestsLoopDelete,
+    travel_requestsInsert,
+    travel_requestsUpdate,
+    travel_requestsDelete,
+    travel_requestsLoopInsert,
+    travel_requestsLoopUpdate,
+    travel_requestsLoopDelete,
+    loan_requestsInsert,
+    loan_requestsUpdate,
+    loan_requestsDelete,
+    loan_requestsLoopInsert,
+    loan_requestsLoopUpdate,
+    loan_requestsLoopDelete,
+    getVisaType,
+    travel_requestsSearch,
+    visaRequestSearch,
+    loan_approvalsInsert,
+    loan_approvalsUpdate,
+    loan_approvalsDelete,
+    loan_approvalsLoopInsert,
+    loan_approvalsLoopUpdate,
+    loan_approvalsLoopDelete,
+    loan_repayment_scheduleInsert,
+    loan_repayment_scheduleUpdate,
+    loan_repayment_scheduleDelete,
+    loan_repayment_scheduleLoopInsert,
+    loan_repayment_scheduleLoopUpdate,
+    loan_repayment_scheduleLoopDelete,
+    loan_paymentsInsert,
+    loan_paymentsUpdate,
+    loan_paymentsDelete,
+    loan_paymentsLoopInsert,
+    loan_paymentsLoopUpdate,
+    loan_paymentsLoopDelete,
+    getLoanTypes,
+    loanRequestSearch,
+    getPaymentMethod,
+    getLoanRequest,
+    loanPaymentSearch,
+    getPaymentStatus,
+    loanScheduleSearch,
+    loan_approvalsSearch
+
 
 };

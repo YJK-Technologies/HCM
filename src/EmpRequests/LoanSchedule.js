@@ -10,73 +10,53 @@ import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
-function LoanRequest({ }) {
+function LoanSchedule({ }) {
 
     const [rowData, setRowData] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const [visaRequestId, setVisaRequestId] = useState('');
-    // const [empIdDrop, setEmpIdDrop] = useState([]);
-    // const [empId, setEmpId] = useState('');
-    // const [selectedEmpId, setSelectedEmpId] = useState('');
-    const [passportId, setPassportId] = useState('');
-    const [countryIdDrop, setCountyIdDrop] = useState([]);
-    const [countryId, setCountryId] = useState('');
-
+    const [scheduleId, setScheduleId] = useState('');
+    const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
     const [loanReqId, setLoanReqId] = useState('');
-    const [reqNumber, setReqNumber] = useState('');
-    const [empIdDrop, setEmpIdDrop] = useState([]);
-    const [empId, setEmpId] = useState('');
-    const [selectedEmpId, setSelectedEmpId] = useState('');
-    const [loanTypeIdDrop, setLoanTypeIdDrop] = useState([]);
-    const [loanTypeId, setLoanTypeId] = useState('');
-    const [selectedLoanTypeId, setSelectedLoanIypeId] = useState('');
-    const [loanAmount, setLoanAmount] = useState('');
-    const [interestRate, setInterestRate] = useState('');
-    const [repayMonth, setRepayMonth] = useState('');
-    const [monthlyInstallment, setMonthlyInstallment] = useState('');
-    const [currencyCode, setCurrencyCode] = useState('');
-    const [purpose, setPurpose] = useState("");
-    const [reqStatusDrop, setReqStatusDrop] = useState([]);
-    const [reqStatus, setReqStatus] = useState('');
-    const [selectedReqStatus, setSelectedReqStatus] = useState('');
+    const [selectedLoanReqId, setSelectedLoanReqId] = useState('');
+    const [installmentNo, setIntallmentNo] = useState('');
+    const [installmentDate, setIntallmentDate] = useState('');
+    const [principleAmount, setPrincipleAmount] = useState('');
+    const [interestAmount, setInterestAmount] = useState('');
+    const [totalInstallment, setTotalInstallment] = useState('');
+    const [paymentStatusDrop, setPaymentStatusDrop] = useState([]);
+    const [paymentStatus, setPaymentStatus] = useState('');
+    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
 
+    const [scheduleIdSc, setScheduleIdSc] = useState('');
+    const [loanReqIdDropSc, setLoanReqIdDropSc] = useState([]);
     const [loanReqIdSc, setLoanReqIdSc] = useState('');
-    const [reqNumberSc, setReqNumberSc] = useState('');
-    const [empIdDropSc, setEmpIdDropSc] = useState([]);
-    const [empIdSc, setEmpIdSc] = useState('');
-    const [selectedEmpIdSc, setSelectedEmpIdSc] = useState('');
-    const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
-    const [loanTypeIdSc, setLoanTypeIdSc] = useState('');
-    const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState('');
-    const [loanAmountSc, setLoanAmountSc] = useState('');
-    const [interestRateSc, setInterestRateSc] = useState('');
-    const [repayMonthSc, setRepayMonthSc] = useState('');
-    const [monthlyInstallmentSc, setMonthlyInstallmentSc] = useState('');
-    const [currencyCodeSc, setCurrencyCodeSc] = useState('');
-    const [purposeSc, setPurposeSc] = useState("");
-    const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
-    const [reqStatusSc, setReqStatusSc] = useState('');
-    const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
+    const [selectedLoanReqIdSc, setSelectedLoanReqIdSc] = useState('');
+    const [installmentNoSc, setIntallmentNoSc] = useState('');
+    const [principleAmountSc, setPrincipleAmountSc] = useState('');
+    const [interestAmountSc, setInterestAmountSc] = useState('');
+    const [totalInstallmentSc, setTotalInstallmentSc] = useState('');
+    const [paymentStatusDropSc, setPaymentStatusDropSc] = useState([]);
+    const [paymentStatusSc, setPaymentStatusSc] = useState('');
+    const [selectedPaymentStatusSc, setSelectedPaymentStatusSc] = useState('');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
 
-    const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
-    const [isSelectedLoanType, setIsSelectedLoanType] = useState(false);
-    const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
+    const [loanReqIdDropGrid, setLoanReqIdDropGrid] = useState([]);
+    const [paymentStatusDropGrid, setPaymentStatusDropGrid] = useState([]);
 
-    const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
-    const [isSelectedLoanTypeSc, setIsSelectedLoanTypeSc] = useState(false);
-    const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
+    const [isSelectedLoanReqId, setIsSelectedLoanReqId] = useState('');
+    const [isSelectedPaymentStatus, setIsSelectedPaymentStatus] = useState('');
 
-    const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
-    const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
-    const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+    const [isSelectedLoanReqIdSc, setIsSelectedLoanReqIdSc] = useState('');
+    const [isSelectedPaymentStatusSc, setIsSelectedPaymentStatusSc] = useState('');
 
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -84,13 +64,13 @@ function LoanRequest({ }) {
             body: JSON.stringify({ company_code }),
         })
             .then((data) => data.json())
-            .then((val) => setEmpIdDrop(val))
+            .then((val) => setLoanReqIdDrop(val))
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -98,58 +78,36 @@ function LoanRequest({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setLoanTypeIdDrop(val))
+            .then((val) => setPaymentStatusDrop(val))
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
 
-    const filteredOptionEmpId = empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
+    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
     }));
 
-    const filteredOptionLoanType = loanTypeIdDrop.map((option) => ({
+    const filteredOptionPaymentStatus = paymentStatusDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
 
-    const handleChangeEmpId = (selectedEmpId) => {
-        setSelectedEmpId(selectedEmpId);
-        setEmpId(selectedEmpId ? selectedEmpId.value : "");
+    const handleChangeLoanReqId = (selectedLoanReqId) => {
+        setSelectedLoanReqId(selectedLoanReqId);
+        setLoanReqId(selectedLoanReqId ? selectedLoanReqId.value : "");
     };
 
-    const handleChangeLoanType = (selectedLoanTypeId) => {
-        setSelectedLoanIypeId(selectedLoanTypeId);
-        setLoanTypeId(selectedLoanTypeId ? selectedLoanTypeId.value : "");
-    };
-
-    const handleChangeReqStatus = (selectedReqStatus) => {
-        setSelectedReqStatus(selectedReqStatus);
-        setReqStatus(selectedReqStatus ? selectedReqStatus.value : "");
+    const handleChangePaymentStatus = (selectedPaymentStatus) => {
+        setSelectedPaymentStatus(selectedPaymentStatus);
+        setPaymentStatus(selectedPaymentStatus ? selectedPaymentStatus.value : "");
     };
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -157,13 +115,13 @@ function LoanRequest({ }) {
             body: JSON.stringify({ company_code }),
         })
             .then((data) => data.json())
-            .then((val) => setEmpIdDropSc(val))
+            .then((val) => setLoanReqIdDropSc(val))
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -171,78 +129,33 @@ function LoanRequest({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setLoanTypeIdDropSc(val))
+            .then((val) => setPaymentStatusDropSc(val))
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDropSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
+    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
     }));
 
-    const filteredOptionLoanTypeSc = loanTypeIdDropSc.map((option) => ({
+    const filteredOptionPaymentStatusSc = paymentStatusDropSc.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const filteredOptionReqStatusSc = reqStatusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    const handleChangeEmpIdSc = (selectedEmpIdSc) => {
-        setSelectedEmpIdSc(selectedEmpIdSc);
-        setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
+    const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
+        setSelectedLoanReqIdSc(selectedLoanReqIdSc);
+        setLoanReqIdSc(selectedLoanReqIdSc ? selectedLoanReqIdSc.value : "");
     };
 
-    const handleChangeLoanTypeSc = (selectedLoanTypeIdSc) => {
-        setSelectedLoanIypeIdSc(selectedLoanTypeIdSc);
-        setLoanTypeIdSc(selectedLoanTypeIdSc ? selectedLoanTypeIdSc.value : "");
+    const handleChangePaymentStatusSc = (selectedPaymentStatusSc) => {
+        setSelectedPaymentStatusSc(selectedPaymentStatusSc);
+        setPaymentStatusSc(selectedPaymentStatusSc ? selectedPaymentStatusSc.value : "");
     };
-
-    const handleChangeReqStatusSc = (selectedReqStatusSc) => {
-        setSelectedReqStatusSc(selectedReqStatusSc);
-        setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
-    };
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const emp = val.map((option) => ({
-                    value: option.EmployeeId,
-                    label: `${option.EmployeeId} - ${option.First_Name}`,
-                }));
-                setEmpIdDropGrid(emp);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -251,15 +164,15 @@ function LoanRequest({ }) {
         })
             .then((data) => data.json())
             .then((val) => {
-                const visaType = val.map(option => option.attributedetails_name);
-                setLoanTypeIdDropGrid(visaType);
+                const payment = val.map(option => option.loan_request_id);
+                setLoanReqIdDropGrid(payment);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
+        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -268,27 +181,24 @@ function LoanRequest({ }) {
         })
             .then((data) => data.json())
             .then((val) => {
-                const reqStatus = val.map(option => option.attributedetails_name);
-                setReqStatusDropGrid(reqStatus);
+                const payment = val.map(option => option.attributedetails_name);
+                setPaymentStatusDropGrid(payment);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     const searchClearInputFields = () => {
+        setScheduleIdSc("");
         setLoanReqIdSc("");
-        setReqNumberSc("");
-        setEmpIdSc("");
-        setSelectedEmpIdSc("");
-        setLoanTypeIdSc("");
-        setSelectedLoanIypeIdSc("");
-        setLoanAmountSc("");
-        setInterestRateSc("");
-        setRepayMonthSc("");
-        setMonthlyInstallmentSc("");
-        setCurrencyCodeSc("");
-        setPurposeSc("");
-        setReqStatusSc("");
-        setSelectedReqStatusSc("");
+        setSelectedLoanReqIdSc("");
+        setIntallmentNoSc("");
+        setPrincipleAmountSc("");
+        setInterestAmountSc("");
+        setTotalInstallmentSc("");
+        setPaymentStatusSc("");
+        setSelectedPaymentStatusSc("");
+        setFromDate("");
+        setToDate("");
     };
 
     const columnDefs = [
@@ -325,78 +235,52 @@ function LoanRequest({ }) {
                 );
             },
         },
-
         {
-            headerName: "Loan Request ID",
-            field: "loan_request_id",
+            headerName: "Schedule ID",
+            field: "schedule_id",
             editable: false
         },
         {
-            headerName: "Employee ID",
-            field: "employee_id",
+            headerName: "Loan Request ID",
+            field: "loan_request_id",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: empIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = empIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
+                values: loanReqIdDropGrid,
             },
         },
         {
-            headerName: "Request Number",
-            field: "request_number",
+            headerName: "Installment No",
+            field: "installment_number",
             editable: true
         },
         {
-            headerName: "Loan Type ID",
-            field: "loan_type_id",
+            headerName: "Installment Date",
+            field: "installment_date",
+            editable: true
+        },
+        {
+            headerName: "Principle Amount",
+            field: "principal_amount",
+            editable: true
+        },
+        {
+            headerName: "Interest Amount",
+            field: "interest_amount",
+            editable: true
+        },
+        {
+            headerName: "Total Installment",
+            field: "total_installment",
+            editable: true
+        },
+        {
+            headerName: "Payment Status",
+            field: "payment_status",
             editable: true,
-            cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: loanTypeIdDropGrid,
-            },
-        },
-        {
-            headerName: "Loan Amount",
-            field: "loan_amount",
-            editable: true
-        },
-        {
-            headerName: "Interest Rate",
-            field: "interest_rate",
-            editable: true
-        },
-        {
-            headerName: "Repayment Months",
-            field: "repayment_months",
-            editable: true
-        },
-        {
-            headerName: "Monthly Installment",
-            field: "monthly_installment",
-            editable: true
-        },
-        {
-            headerName: "Currency Code",
-            field: "currency_code",
-            editable: true
-        },
-        {
-            headerName: "Purpose",
-            field: "purpose",
-            editable: true
-        },
-        {
-            headerName: "Request Status",
-            field: "request_status",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: reqStatusDropGrid,
+                values: paymentStatusDropGrid,
             },
         },
         {
@@ -413,15 +297,14 @@ function LoanRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!visaRequestId ||
-            !empId ||
-            !loanTypeId ||
-            !loanAmount ||
-            !interestRate ||
-            !repayMonth ||
-            !monthlyInstallment ||
-            !currencyCode ||
-            !reqStatus
+        if (!scheduleId ||
+            !loanReqId ||
+            !installmentNo ||
+            !installmentDate ||
+            !principleAmount ||
+            !interestAmount ||
+            !totalInstallment ||
+            !paymentStatus
         ) {
             setError(" ");
             toast.warning("Error: Missing required fields");
@@ -432,21 +315,18 @@ function LoanRequest({ }) {
 
         try {
             const Header = {
+                schedule_id: scheduleId,
                 loan_request_id: loanReqId,
-                request_number: reqNumber,
-                employee_id: empId,
-                loan_type_id: loanTypeId,
-                loan_amount: loanAmount,
-                interest_rate: interestRate,
-                repayment_months: repayMonth,
-                monthly_installment: monthlyInstallment,
-                currency_code: currencyCode,
-                purpose: purpose,
-                request_status: reqStatus,
+                installment_number: installmentNo,
+                installment_date: installmentDate,
+                principal_amount: principleAmount,
+                interest_amount: interestAmount,
+                total_installment: totalInstallment,
+                payment_status: paymentStatus,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
                 created_by: sessionStorage.getItem('selectedUserCode')
             };
-            const response = await fetch(`${config.apiBaseUrl}/loan_requestsInsert`, {
+            const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleInsert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -475,21 +355,19 @@ function LoanRequest({ }) {
         setLoading(true);
         try {
             const body = {
+                schedule_id: scheduleIdSc,
                 loan_request_id: loanReqIdSc,
-                request_number: reqNumberSc,
-                employee_id: empIdSc,
-                loan_type_id: loanTypeIdSc,
-                loan_amount: loanAmountSc ? loanAmountSc : 0,
-                interest_rate: interestRateSc ? interestRateSc : 0,
-                repayment_months: repayMonthSc,
-                monthly_installment: monthlyInstallmentSc ? monthlyInstallmentSc : 0,
-                currency_code: currencyCodeSc,
-                purpose: purposeSc,
-                request_status: reqStatusSc,
+                installment_number: installmentNoSc,
+                principal_amount: principleAmountSc ? principleAmountSc : 0,
+                interest_amount: interestAmountSc ? interestAmountSc : 0,
+                total_installment: totalInstallmentSc ? totalInstallmentSc : 0,
+                FromDate: fromDate,
+                ToDate: toDate,
+                payment_status: paymentStatusSc,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
-            const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
+            const response = await fetch(`${config.apiBaseUrl}/loanScheduleSearch`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -527,7 +405,7 @@ function LoanRequest({ }) {
     const handleUpdate = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to update the selected loan request data?",
+            "Are you sure you want to update the selected loan schedule data?",
             async () => {
                 try {
                     setLoading(true);
@@ -535,7 +413,7 @@ function LoanRequest({ }) {
                     const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        loan_requestsData: Array.isArray(rowData)
+                        loan_repayment_scheduleData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
@@ -550,7 +428,7 @@ function LoanRequest({ }) {
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleLoopUpdate`,
                         {
                             method: "POST",
                             headers: {
@@ -561,7 +439,7 @@ function LoanRequest({ }) {
                     );
 
                     if (response.ok) {
-                        toast.success("loan request updated successfully", {
+                        toast.success("loan schedule updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -582,14 +460,14 @@ function LoanRequest({ }) {
     const handleDelete = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to delete the selected loan request data?",
+            "Are you sure you want to delete the selected loan schedule data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        loan_requestsData: Array.isArray(rowData)
+                        loan_repayment_scheduleData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
@@ -602,7 +480,7 @@ function LoanRequest({ }) {
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleLoopDelete`,
                         {
                             method: "POST",
                             headers: {
@@ -614,7 +492,7 @@ function LoanRequest({ }) {
                     );
 
                     if (response.ok) {
-                        toast.success("loan request deleted successfully", {
+                        toast.success("loan schedule deleted successfully", {
                             onClose: () => handleSearch(), // refresh data
                         });
                     } else {
@@ -622,8 +500,8 @@ function LoanRequest({ }) {
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting loan request rows:", error);
-                    toast.error("Error deleting loan request data: " + error.message);
+                    console.error("Error deleting loan schedule rows:", error);
+                    toast.error("Error deleting loan schedule data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -640,26 +518,15 @@ function LoanRequest({ }) {
 
     const transformRowData = (data) => {
         return data.map((row) => {
-            const empObj = empIdDropGrid.find(
-                (d) => d.value === row.employee_id
-            );
-
-            const empName = empObj
-                ? empObj.label.split(" - ").slice(1).join(" - ")
-                : "";
-
             return {
+                "Schedule ID": row.schedule_id || "",
                 "Loan Request ID": row.loan_request_id || "",
-                "Employee ID": `${row.employee_id} - ${empName}` || "",
-                "Request Number": row.request_number || "",
-                "Loan Type ID": row.loan_type_id || "",
-                "Loan Amount": row.loan_amount || "",
-                "Interest Rate": row.interest_rate || "",
-                "Repayment Months": row.repayment_months || "",
-                "Monthly Installment": row.monthly_installment || "",
-                "Currency Code": row.currency_code || "",
-                "Purpose": row.purpose || "",
-                "Request Status": row.request_status || "",
+                "Installment No": row.installment_number || "",
+                "Installment Date": row.installment_date || "",
+                "Principle Amount": row.principal_amount || "",
+                "Interest Amount": row.interest_amount || "",
+                "Total Installment": row.total_installment || "",
+                "Payment Status": row.payment_status || "",
             };
         });
     };
@@ -670,7 +537,7 @@ function LoanRequest({ }) {
             return;
         }
 
-        const screenName = "Loan Request Search Report";
+        const screenName = "Loan Repayment Schedule Search Report";
         const company = sessionStorage.getItem("selectedCompanyName") || "";
 
         /* ================= THEME COLORS ================= */
@@ -768,9 +635,9 @@ function LoanRequest({ }) {
         /* ================= EXPORT ================= */
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Request");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Repayment Schedule");
 
-        XLSX.writeFile(workbook, "Loan_Request_Search_Report.xlsx");
+        XLSX.writeFile(workbook, "Loan_Repayment_Schedule_Search_Report.xlsx");
     };
 
     return (
@@ -779,7 +646,8 @@ function LoanRequest({ }) {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Loan Request</h1>
+                    {/* <h1 className="page-title">Loan Repayment Schedule</h1> */}
+                    <h1 className="page-title">Loan Repayment Schedule</h1>
                     <div className="action-wrapper">
                         <div onClick={handleSave} className="action-icon add">
                             <span className="tooltip">Save</span>
@@ -800,33 +668,33 @@ function LoanRequest({ }) {
                                 placeholder=""
                                 required
                                 autoComplete="off"
-                                value={loanReqId}
-                                onChange={(e) => setLoanReqId((e.target.value))}
+                                value={scheduleId}
+                                onChange={(e) => setScheduleId((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !loanReqId ? 'text-danger' : ''}`}>Loan Request ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !scheduleId ? 'text-danger' : ''}`}>Schedule ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedEmpId ? "has-value" : ""} 
-                            ${isSelectedEmpId ? "is-focused" : ""}`}
+                            ${selectedLoanReqId ? "has-value" : ""} 
+                            ${isSelectedLoanReqId ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="department"
                                 placeholder=" "
-                                onFocus={() => setIsSelectedEmpId(true)}
-                                onBlur={() => setIsSelectedEmpId(false)}
+                                onFocus={() => setIsSelectedLoanReqId(true)}
+                                onBlur={() => setIsSelectedLoanReqId(false)}
                                 classNamePrefix="react-select"
                                 isClearable
                                 type="text"
-                                value={selectedEmpId}
-                                onChange={handleChangeEmpId}
-                                options={filteredOptionEmpId}
+                                value={selectedLoanReqId}
+                                onChange={handleChangeLoanReqId}
+                                options={filteredOptionLoanReqId}
                             />
-                            <label htmlFor="selecteddpt" className={`floating-label ${error && !empId ? 'text-danger' : ''}`}>
-                                Employee ID<span className="text-danger">*</span>
+                            <label htmlFor="selecteddpt" className={`floating-label ${error && !loanReqId ? 'text-danger' : ''}`}>
+                                Loan Request ID<span className="text-danger">*</span>
                             </label>
                         </div>
                     </div>
@@ -836,154 +704,100 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="text"
+                                type="number"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
-                                value={reqNumber}
-                                onChange={(e) => setReqNumber((e.target.value))}
+                                value={installmentNo}
+                                onChange={(e) => setIntallmentNo((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
+                            <label for="sname" className={`exp-form-labels ${error && !installmentNo ? 'text-danger' : ''}`}>Installment No<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="date"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={installmentDate}
+                                onChange={(e) => setIntallmentDate((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !installmentDate ? 'text-danger' : ''}`}>Payment Date<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={principleAmount}
+                                onChange={(e) => setPrincipleAmount((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !principleAmount ? 'text-danger' : ''}`}>Principle Amount<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={interestAmount}
+                                onChange={(e) => setInterestAmount((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !interestAmount ? 'text-danger' : ''}`}>Interest Amount<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={totalInstallment}
+                                onChange={(e) => setTotalInstallment((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !totalInstallment ? 'text-danger' : ''}`}>Total Installment<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedLoanTypeId ? "has-value" : ""} 
-                            ${isSelectedLoanType ? "is-focused" : ""}`}
+                            ${selectedPaymentStatus ? "has-value" : ""} 
+                            ${isSelectedPaymentStatus ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="country"
                                 type="text"
                                 classNamePrefix="react-select"
                                 placeholder=""
-                                onFocus={() => setIsSelectedLoanType(true)}
-                                onBlur={() => setIsSelectedLoanType(false)}
+                                onFocus={() => setIsSelectedPaymentStatus(true)}
+                                onBlur={() => setIsSelectedPaymentStatus(false)}
                                 isClearable
-                                value={selectedLoanTypeId}
-                                onChange={handleChangeLoanType}
-                                options={filteredOptionLoanType}
+                                value={selectedPaymentStatus}
+                                onChange={handleChangePaymentStatus}
+                                options={filteredOptionPaymentStatus}
                             />
-                            <label for="sname" className={`floating-label ${error && !loanTypeId ? 'text-danger' : ''}`}>Loan Type ID<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={loanAmount}
-                                onChange={(e) => setLoanAmount((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !loanAmount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={interestRate}
-                                onChange={(e) => setInterestRate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !interestRate ? 'text-danger' : ''}`}>Interest Rate<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={repayMonth}
-                                onChange={(e) => setRepayMonth((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !repayMonth ? 'text-danger' : ''}`}>Repayment Months<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={monthlyInstallment}
-                                onChange={(e) => setMonthlyInstallment((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !monthlyInstallment ? 'text-danger' : ''}`}>Monthly Installment<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={currencyCode}
-                                onChange={(e) => setCurrencyCode((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !currencyCode ? 'text-danger' : ''}`}>Current Code<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={purpose}
-                                onChange={(e) => setPurpose((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedReqStatus ? "has-value" : ""} 
-                            ${isSelectedReqStatus ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedReqStatus(true)}
-                                onBlur={() => setIsSelectedReqStatus(false)}
-                                isClearable
-                                value={selectedReqStatus}
-                                onChange={handleChangeReqStatus}
-                                options={filteredOptionReqStatus}
-                            />
-                            <label for="sname" className={`floating-label ${error && !reqStatus ? 'text-danger' : ''}`}>Request Status<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label  ${error && !paymentStatus ? 'text-danger' : ''}`}>Payment Status<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1005,33 +819,33 @@ function LoanRequest({ }) {
                                 placeholder=""
                                 required
                                 autoComplete="off"
-                                value={loanReqIdSc}
-                                onChange={(e) => setLoanReqIdSc((e.target.value))}
+                                value={scheduleIdSc}
+                                onChange={(e) => setScheduleIdSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
+                            <label for="sname" className={`exp-form-labels`}>Schedule ID</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedEmpIdSc ? "has-value" : ""} 
-                            ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+                            ${selectedLoanReqIdSc ? "has-value" : ""} 
+                            ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="department"
                                 placeholder=" "
-                                onFocus={() => setIsSelectedEmpIdSc(true)}
-                                onBlur={() => setIsSelectedEmpIdSc(false)}
+                                onFocus={() => setIsSelectedLoanReqIdSc(true)}
+                                onBlur={() => setIsSelectedLoanReqIdSc(false)}
                                 classNamePrefix="react-select"
                                 isClearable
                                 type="text"
-                                value={selectedEmpIdSc}
-                                onChange={handleChangeEmpIdSc}
-                                options={filteredOptionEmpIdSc}
+                                value={selectedLoanReqIdSc}
+                                onChange={handleChangeLoanReqIdSc}
+                                options={filteredOptionLoanReqIdSc}
                             />
                             <label htmlFor="selecteddpt" className={`floating-label`}>
-                                Employee ID
+                                Loan Request ID
                             </label>
                         </div>
                     </div>
@@ -1041,154 +855,116 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="text"
+                                type="number"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
-                                value={reqNumberSc}
-                                onChange={(e) => setReqNumberSc((e.target.value))}
+                                value={installmentNoSc}
+                                onChange={(e) => setIntallmentNoSc((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
+                            <label for="sname" className={`exp-form-labels`}>Installment No</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="date"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={fromDate}
+                                onChange={(e) => setFromDate((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Installment From</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="date"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={toDate}
+                                onChange={(e) => setToDate((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Installment To</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={principleAmountSc}
+                                onChange={(e) => setPrincipleAmountSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Principle Amount</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={interestAmountSc}
+                                onChange={(e) => setInterestAmountSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Interest Amount</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="number"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={totalInstallmentSc}
+                                onChange={(e) => setTotalInstallmentSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Total Installment</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedLoanTypeIdSc ? "has-value" : ""} 
-                            ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
+                            ${selectedPaymentStatusSc ? "has-value" : ""} 
+                            ${isSelectedPaymentStatusSc ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="country"
                                 type="text"
                                 classNamePrefix="react-select"
                                 placeholder=""
-                                onFocus={() => setIsSelectedLoanTypeSc(true)}
-                                onBlur={() => setIsSelectedLoanTypeSc(false)}
+                                onFocus={() => setIsSelectedPaymentStatusSc(true)}
+                                onBlur={() => setIsSelectedPaymentStatusSc(false)}
                                 isClearable
-                                value={selectedLoanTypeIdSc}
-                                onChange={handleChangeLoanTypeSc}
-                                options={filteredOptionLoanTypeSc}
+                                value={selectedPaymentStatusSc}
+                                onChange={handleChangePaymentStatusSc}
+                                options={filteredOptionPaymentStatusSc}
                             />
-                            <label for="sname" className={`floating-label`}>Loan Type ID</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={loanAmountSc}
-                                onChange={(e) => setLoanAmountSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={interestRateSc}
-                                onChange={(e) => setInterestRateSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={repayMonthSc}
-                                onChange={(e) => setRepayMonthSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="number"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={monthlyInstallmentSc}
-                                onChange={(e) => setMonthlyInstallmentSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={currencyCodeSc}
-                                onChange={(e) => setCurrencyCodeSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Current Code</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={purposeSc}
-                                onChange={(e) => setPurposeSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedReqStatusSc ? "has-value" : ""} 
-                            ${isSelectedReqStatusSc ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedReqStatusSc(true)}
-                                onBlur={() => setIsSelectedReqStatusSc(false)}
-                                isClearable
-                                value={selectedReqStatusSc}
-                                onChange={handleChangeReqStatusSc}
-                                options={filteredOptionReqStatusSc}
-                            />
-                            <label for="sname" className={`floating-label`}>Request Status</label>
+                            <label for="sname" className={`floating-label`}>Payment Status</label>
                         </div>
                     </div>
 
@@ -1230,4 +1006,4 @@ function LoanRequest({ }) {
         </div>
     );
 }
-export default LoanRequest;
+export default LoanSchedule;

@@ -42,8 +42,8 @@ import {
   BsWrenchAdjustable,
   BsPeopleFill,
   BsArrowRepeat,
-  
 } from "react-icons/bs";
+
 import {
   MdOutlineEventNote,
   MdOutlineRateReview,
@@ -53,8 +53,13 @@ import {
   MdOutlineGroupAdd,
   MdOutlineEventAvailable,
   MdOutlineSchedule,
-  MdTravelExplore 
+  MdTravelExplore,
+  MdFlightTakeoff,
+  MdPayments,
+  MdCalendarMonth
 } from "react-icons/md";
+
+import { FaHandHoldingUsd } from "react-icons/fa";
 
 import {
   AiOutlinePercentage,
@@ -131,6 +136,10 @@ export const leafIconMap = {
   "Setting": BsGear,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
+  "Travel Request": MdFlightTakeoff,
+  "Loan Request": FaHandHoldingUsd,
+  "Loan Payment": MdPayments,
+  "Loan Repayment Schedule": MdCalendarMonth,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -205,6 +214,8 @@ const menuData = [
           { label: "Loan Request", path: "/LoanRequest" },
           { label: "Loan Approvals", path: "/LoanApprovals" },
           { label: "Loan Documents", path: "/LoanDocuments" },
+          { label: "Loan Payment", path: "/LoanPayment" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
         ],
       },
       {
