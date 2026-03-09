@@ -111,6 +111,7 @@ import ShiftSumRep from "./ShiftSumRep.js";
 import VisaRequest from "./EmpRequests/VisaRequest.js"
 import TravelRequest from "./EmpRequests/TravelRequest.js"
 import LoanRequest from "./EmpRequests/LoanRequest.js"
+import LoanStatusHistory from "./EmpRequests/LoanStatusHistory.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -298,6 +299,7 @@ function Main() {
     { path: "/VisaRequest", component: <VisaRequest /> },
     { path: "/TravelRequest", component: <TravelRequest /> },
     { path: "/LoanRequest", component: <LoanRequest /> },
+    { path: "/LoanStatusHistory", component: <LoanStatusHistory /> },
 
   
   ];

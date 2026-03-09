@@ -203,6 +203,7 @@ const menuData = [
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
           { label: "Loan Request", path: "/LoanRequest" },
+          { label: "Loan Status History", path: "/LoanStatusHistory" },
         ],
       },
       {
