@@ -53,13 +53,18 @@ import {
   MdOutlineGroupAdd,
   MdOutlineEventAvailable,
   MdOutlineSchedule,
-  MdTravelExplore 
+  MdTravelExplore ,
+  MdFlightTakeoff,
+  MdPayments,
+  MdCalendarMonth
 } from "react-icons/md";
 
 import {
   AiOutlinePercentage,
   AiOutlineFileDone,
 } from "react-icons/ai";
+
+import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt } from "react-icons/fa";
 
 const cleanPath = (path) => {
   if (!path) return '';
@@ -131,6 +136,12 @@ export const leafIconMap = {
   "Setting": BsGear,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
+  "Loan Request": FaHandHoldingUsd,
+  "Loan Approvals": FaCheckCircle,
+  "Loan Documents": FaFileAlt,
+  "Travel Request": MdFlightTakeoff,
+  "Loan Repayment Schedule": MdCalendarMonth,
+  "Loan Payment": MdPayments,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -202,6 +213,11 @@ const menuData = [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
+          { label: "Loan Request", path: "/LoanRequest" },
+          { label: "Loan Payment", path: "/LoanPayment" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+          { label: "Loan Approvals", path: "/LoanApprovals" },
+          { label: "Loan Documents", path: "/LoanDocuments" },
         ],
       },
       {

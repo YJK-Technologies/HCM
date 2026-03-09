@@ -110,6 +110,11 @@ import DepartmentDashboard from "./DepartmentDashboard.js";
 import ShiftSumRep from "./ShiftSumRep.js";
 import VisaRequest from "./EmpRequests/VisaRequest.js"
 import TravelRequest from "./EmpRequests/TravelRequest.js"
+import LoanRequest from "./EmpRequests/LoanRequest.js"
+import LoanApprovals from "./EmpRequests/LoanApprovals.js"
+import LoanDocuments from "./EmpRequests/LoanDocuments.js"
+import LoanPayment from "./EmpRequests/LoanPayment.js"
+import LoanSchedule from "./EmpRequests/LoanSchedule.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -296,6 +301,11 @@ function Main() {
     { path: "/ShiftSumRep", component: <ShiftSumRep /> },
     { path: "/VisaRequest", component: <VisaRequest /> },
     { path: "/TravelRequest", component: <TravelRequest /> },
+    { path: "/LoanRequest", component: <LoanRequest /> },
+    { path: "/LoanApprovals", component: <LoanApprovals /> },
+    { path: "/LoanDocuments", component: <LoanDocuments /> },
+    { path: "/LoanPayment", component: <LoanPayment /> },
+    { path: "/LoanSchedule", component: <LoanSchedule /> },
 
   
   ];
