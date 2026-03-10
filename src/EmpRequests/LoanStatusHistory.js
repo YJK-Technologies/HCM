@@ -48,6 +48,10 @@ function LoanStatusHistory() {
     const [isSelectedStatusSc, setIsSelectedStatusSc] = useState('');
     const [isSelectedDstApplicableSc, setIsSelectedDstApplicableSc] = useState('');
 
+
+    //Temp
+    const [travelEndDate, setTravelEndDate] = useState("");
+
     //code added by Harish purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
     const LoanStatusHistoryPermission = permissions
@@ -708,47 +712,8 @@ function LoanStatusHistory() {
                                     onChange={(e) => setTimeZoneName(e.target.value)}
                                 />
                                 <label for="state" className={`exp-form-labels ${error && !timeZoneName ? "text-danger" : ""}`}>
-                                    Time Zone Name<span className="text-danger">*</span>
+                                    History ID<span className="text-danger">*</span>
                                 </label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={utcOffset}
-                                    onChange={(e) => setUtcOffset(e.target.value)}
-                                />
-                                <label for="state" className={`exp-form-labels ${error && !utcOffset ? "text-danger" : ""}`}>
-                                    UTC Offset<span className="text-danger">*</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                                    ${selectedDstApplicable ? "has-value" : ""} 
-                                    ${isSelectedDstApplicable ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="status"
-                                    isClearable
-                                    value={selectedDstApplicable}
-                                    onChange={handleChangeDstApplicable}
-                                    options={filteredOptionDstApplicable}
-                                    classNamePrefix="react-select"
-                                    placeholder=" "
-                                    onFocus={() => setIsSelectedDstApplicable(true)}
-                                    onBlur={() => setIsSelectedDstApplicable(false)}
-                                />
-                                <label className={`floating-label`}>DST Applicable</label>
                             </div>
                         </div>
 
@@ -769,7 +734,110 @@ function LoanStatusHistory() {
                                     onFocus={() => setIsSelectedStatus(true)}
                                     onBlur={() => setIsSelectedStatus(false)}
                                 />
-                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
+                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedDstApplicable ? "has-value" : ""} 
+                                    ${isSelectedDstApplicable ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedDstApplicable}
+                                    onChange={handleChangeDstApplicable}
+                                    options={filteredOptionDstApplicable}
+                                    classNamePrefix="react-select"
+                                    placeholder=" "
+                                    onFocus={() => setIsSelectedDstApplicable(true)}
+                                    onBlur={() => setIsSelectedDstApplicable(false)}
+                                />
+                                <label className={`floating-label`}>Old Status</label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedStatus ? "has-value" : ""} 
+                                    ${isSelectedStatus ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedStatus}
+                                    onChange={handleChangeStatus}
+                                    options={filteredOptionStatus}
+                                    classNamePrefix="react-select"
+                                    placeholder=" "
+                                    onFocus={() => setIsSelectedStatus(true)}
+                                    onBlur={() => setIsSelectedStatus(false)}
+                                />
+                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>New Status<span className="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedStatus ? "has-value" : ""} 
+                                    ${isSelectedStatus ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedStatus}
+                                    onChange={handleChangeStatus}
+                                    options={filteredOptionStatus}
+                                    classNamePrefix="react-select"
+                                    placeholder=" "
+                                    onFocus={() => setIsSelectedStatus(true)}
+                                    onBlur={() => setIsSelectedStatus(false)}
+                                />
+                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Changed By<span className="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={travelEndDate}
+                onChange={(e) => setTravelEndDate(e.target.value)}
+              />
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !travelEndDate ? "text-danger" : ""}`}
+              >
+                Travel End Date<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+                        <div className="col-md-2">
+                            <div className="inputGroup">
+                                <input
+                                    class="exp-input-field form-control"
+                                    type="text"
+                                    placeholder=" "
+                                    autoComplete="off"
+                                    required
+                                    maxLength={50}
+                                    value={timeZoneName}
+                                    onChange={(e) => setTimeZoneName(e.target.value)}
+                                />
+                                <label for="state" className={`exp-form-labels ${error && !timeZoneName ? "text-danger" : ""}`}>
+                                    Remarks<span className="text-danger">*</span>
+                                </label>
                             </div>
                         </div>
 
@@ -794,23 +862,28 @@ function LoanStatusHistory() {
                                     value={timeZoneIdSc}
                                     onChange={(e) => setTimeZoneIdSc(e.target.value)}
                                 />
-                                <label for="state" className={`exp-form-labels`}>Time Zone ID</label>
+                                <label for="state" className={`exp-form-labels`}>History ID</label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    class="exp-input-field form-control"
-                                    type="text"
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedDstApplicableSc ? "has-value" : ""} 
+                                    ${isSelectedDstApplicableSc ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedDstApplicableSc}
+                                    onChange={handleChangeDstApplicableSc}
+                                    options={filteredOptionDstApplicableSc}
+                                    classNamePrefix="react-select"
                                     placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={timeZoneNameSc}
-                                    onChange={(e) => setTimeZoneNameSc(e.target.value)}
+                                    onFocus={() => setIsSelectedDstApplicableSc(true)}
+                                    onBlur={() => setIsSelectedDstApplicableSc(false)}
                                 />
-                                <label for="state" className={`exp-form-labels`}>Time Zone Name</label>
+                                <label className={`floating-label`}>Loan Request ID</label>
                             </div>
                         </div>
 
@@ -826,7 +899,7 @@ function LoanStatusHistory() {
                                     value={utcOffsetSc}
                                     onChange={(e) => setUtcOffsetSc(e.target.value)}
                                 />
-                                <label for="state" className={`exp-form-labels`}>UTC Offset</label>
+                                <label for="state" className={`exp-form-labels`}>Old Status</label>
                             </div>
                         </div>
 
