@@ -115,6 +115,7 @@ import LoanApprovals from "./EmpRequests/LoanApprovals.js"
 import LoanDocuments from "./EmpRequests/LoanDocuments.js"
 import LoanPayment from "./EmpRequests/LoanPayment.js"
 import LoanSchedule from "./EmpRequests/LoanSchedule.js"
+import LoanType from "./EmpRequests/LoanType.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -306,6 +307,7 @@ function Main() {
     { path: "/LoanDocuments", component: <LoanDocuments /> },
     { path: "/LoanPayment", component: <LoanPayment /> },
     { path: "/LoanSchedule", component: <LoanSchedule /> },
+    { path: "/LoanType", component: <LoanType /> },
 
   
   ];

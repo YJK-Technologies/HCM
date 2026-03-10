@@ -16,14 +16,6 @@ function LoanRequest({ }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const [visaRequestId, setVisaRequestId] = useState('');
-    // const [empIdDrop, setEmpIdDrop] = useState([]);
-    // const [empId, setEmpId] = useState('');
-    // const [selectedEmpId, setSelectedEmpId] = useState('');
-    const [passportId, setPassportId] = useState('');
-    const [countryIdDrop, setCountyIdDrop] = useState([]);
-    const [countryId, setCountryId] = useState('');
-
     const [loanReqId, setLoanReqId] = useState('');
     const [reqNumber, setReqNumber] = useState('');
     const [empIdDrop, setEmpIdDrop] = useState([]);
@@ -413,7 +405,7 @@ function LoanRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!visaRequestId ||
+        if (!loanReqId ||
             !empId ||
             !loanTypeId ||
             !loanAmount ||
@@ -796,12 +788,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required
                                 autoComplete="off"
                                 value={loanReqId}
-                                onChange={(e) => setLoanReqId((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setLoanReqId(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !loanReqId ? 'text-danger' : ''}`}>Loan Request ID<span className="text-danger">*</span></label>
                         </div>
@@ -838,10 +836,16 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={reqNumber}
-                                onChange={(e) => setReqNumber((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setReqNumber(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
@@ -874,12 +878,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={loanAmount}
-                                onChange={(e) => setLoanAmount((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setLoanAmount(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !loanAmount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
                         </div>
@@ -890,12 +900,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
                                 autoComplete="off"
                                 value={interestRate}
-                                onChange={(e) => setInterestRate((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    setInterestRate(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !interestRate ? 'text-danger' : ''}`}>Interest Rate<span className="text-danger">*</span></label>
                         </div>
@@ -906,12 +922,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
                                 autoComplete="off"
                                 value={repayMonth}
-                                onChange={(e) => setRepayMonth((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setRepayMonth(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !repayMonth ? 'text-danger' : ''}`}>Repayment Months<span className="text-danger">*</span></label>
                         </div>
@@ -922,12 +944,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={monthlyInstallment}
-                                onChange={(e) => setMonthlyInstallment((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMonthlyInstallment(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !monthlyInstallment ? 'text-danger' : ''}`}>Monthly Installment<span className="text-danger">*</span></label>
                         </div>
@@ -942,10 +970,14 @@ function LoanRequest({ }) {
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
+                                maxLength={3}
                                 value={currencyCode}
-                                onChange={(e) => setCurrencyCode((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+                                    setCurrencyCode(value);
+                                }}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !currencyCode ? 'text-danger' : ''}`}>Current Code<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !currencyCode ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -959,6 +991,7 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={purpose}
+                                maxLength={100}
                                 onChange={(e) => setPurpose((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
@@ -1001,12 +1034,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required
                                 autoComplete="off"
                                 value={loanReqIdSc}
-                                onChange={(e) => setLoanReqIdSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setLoanReqIdSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
                         </div>
@@ -1043,10 +1082,16 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={reqNumberSc}
-                                onChange={(e) => setReqNumberSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setReqNumberSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
@@ -1079,12 +1124,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={loanAmountSc}
-                                onChange={(e) => setLoanAmountSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setLoanAmountSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
                         </div>
@@ -1095,12 +1146,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={interestRateSc}
-                                onChange={(e) => setInterestRateSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    setInterestRateSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
                         </div>
@@ -1111,12 +1168,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={repayMonthSc}
-                                onChange={(e) => setRepayMonthSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setRepayMonthSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
                         </div>
@@ -1127,12 +1190,18 @@ function LoanRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={monthlyInstallmentSc}
-                                onChange={(e) => setMonthlyInstallmentSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMonthlyInstallmentSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
                         </div>
@@ -1147,10 +1216,14 @@ function LoanRequest({ }) {
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
+                                maxLength={3}
                                 value={currencyCodeSc}
-                                onChange={(e) => setCurrencyCodeSc((e.target.value))}
+                                 onChange={(e) => {
+                                    const value = e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+                                    setCurrencyCodeSc(value);
+                                }}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Current Code</label>
+                            <label for="sname" className={`exp-form-labels`}>Currency Code</label>
                         </div>
                     </div>
 
@@ -1164,6 +1237,7 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={purposeSc}
+                                maxLength={100}
                                 onChange={(e) => setPurposeSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
