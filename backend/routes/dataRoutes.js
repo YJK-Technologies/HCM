@@ -1298,8 +1298,7 @@ router.post("/loan_requestsLoopDelete",dataController.loan_requestsLoopDelete)
 router.post("/getVisaType",dataController.getVisaType)
 router.post("/travel_requestsSearch",dataController.travel_requestsSearch)
 router.post("/visaRequestSearch",dataController.visaRequestSearch)
-router.post("/loan_documentsInsert",dataController.loan_documentsInsert)
-router.post("/loan_documentsUpdate",dataController.loan_documentsUpdate)
+router.post("/loan_documentsInsert",upload.single('document'),dataController.loan_documentsInsert);
 router.post("/loan_documentsDelete",dataController.loan_documentsDelete)
 router.post("/loan_documentsLoopInsert",dataController.loan_documentsLoopInsert)
 router.post("/loan_documentsLoopUpdate",dataController.loan_documentsLoopUpdate)
@@ -1311,7 +1310,7 @@ router.post("/loan_approvalsSearch",dataController.loan_approvalsSearch)
 router.post("/getPaymentMethod",dataController.getPaymentMethod)
 router.post("/getLoanRequest",dataController.getLoanRequest)
 router.post("/loanPaymentSearch",dataController.loanPaymentSearch)
-router.post("/getPaymentStatus",dataController.getPaymentStatus)
+router.post("/getPaymentStatus",dataController.getPaymentStatus) 
 router.post("/loanScheduleSearch",dataController.loanScheduleSearch)
 router.post("/loan_status_historyInsert", dataController.loan_status_historyInsert)
 router.post("/loan_status_historyUpdate", dataController.loan_status_historyUpdate)
@@ -1320,6 +1319,8 @@ router.post("/loan_status_historyLoopInsert", dataController.loan_status_history
 router.post("/loan_status_historyLoopUpdate", dataController.loan_status_historyLoopUpdate)
 router.post("/loan_status_historyLoopDelete", dataController.loan_status_historyLoopDelete)
 router.post("/GetLoanStatus", dataController.GetLoanStatus)
+router.post("/loan_documentsSearch",dataController.loan_documentsSearch)
+
 
 
 module.exports = router;

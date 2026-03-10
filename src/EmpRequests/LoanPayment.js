@@ -20,7 +20,9 @@ function LoanPayment({ }) {
     const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
     const [loanReqId, setLoanReqId] = useState('');
     const [selectedLoanReqId, setSelectedLoanReqId] = useState('');
-    const [paymentDate, setPaymentDate] = useState('');
+    const [paymentDate, setPaymentDate] = useState(
+        new Date().toISOString().split("T")[0]
+    );
     const [paymentAmount, setPaymentAmount] = useState('');
     const [paymentDrop, setPaymentDrop] = useState([]);
     const [payment, setPayment] = useState('');
@@ -344,7 +346,6 @@ function LoanPayment({ }) {
                 ToDate: toDate,
                 paid_amount: paymentAmountSc ? paymentAmountSc : 0,
                 payment_method: paymentSc,
-
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
@@ -642,12 +643,18 @@ function LoanPayment({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required
                                 autoComplete="off"
                                 value={paymentId}
-                                onChange={(e) => setPaymentId((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setPaymentId(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !paymentId ? 'text-danger' : ''}`}>Payment ID<span className="text-danger">*</span></label>
                         </div>
@@ -698,12 +705,18 @@ function LoanPayment({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required 
                                 autoComplete="off"
                                 value={paymentAmount}
-                                onChange={(e) => setPaymentAmount((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setPaymentAmount(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !paymentAmount ? 'text-danger' : ''}`}>Paid Amount<span className="text-danger">*</span></label>
                         </div>
@@ -745,12 +758,18 @@ function LoanPayment({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required
                                 autoComplete="off"
                                 value={paymentIdSc}
-                                onChange={(e) => setPaymentIdSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setPaymentIdSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Payment ID</label>
                         </div>
@@ -817,12 +836,18 @@ function LoanPayment({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
                                 autoComplete="off"
                                 value={paymentAmountSc}
-                                onChange={(e) => setPaymentAmountSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setPaymentAmountSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Paid Amount</label>
                         </div>

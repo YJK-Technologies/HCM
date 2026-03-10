@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,31 +22,26 @@ function LoanDocuments({}) {
   const [selectedLoanReq, setSelectedLoanReq] = useState(null);
   const [selectedLoanReqSC, setSelectedLoanReqSC] = useState(null);
   const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
+  const [loanReqIdDropAG, setLoanReqIdDropAG] = useState([]);
+  const [loanReqIdDropSC, setLoanReqIdDropSC] = useState([]);
   const [isLoanReqFocus, setIsLoanReqFocus] = useState(false);
   const [isLoanReqFocusSC, setIsLoanReqFocusSC] = useState(false);
   const [document_id, setdocument_id] = useState("");
+  const [document_idSC, setdocument_idSC] = useState("");
   const [document_type, setdocument_type] = useState("");
+  const [document_typeSC, setdocument_typeSC] = useState("");
   const [file_path, setfile_path] = useState("");
-  const [uploaded_by, setuploaded_by] = useState([]);
-  const [selectedStatus, setselectedStatus] = useState("");
-  const [selectedStatusSC, setselectedStatusSC] = useState("");
-  const [ApprovalStatus, setApprovalStatus] = useState("");
-  const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
+  const [file_pathSC, setfile_pathSC] = useState("");
+  const [uploaded_by, setuploaded_by] = useState("");
+  const [uploaded_bySC, setuploaded_bySC] = useState("");
   const [uploaded_at, setuploaded_at] = useState("");
-  const [approval_dateSC, setapproval_dateSC] = useState("");
-  const [remarks, setRemarks] = useState("");
-  const [remarksSC, setRemarksSC] = useState("");
+  const [uploaded_atSC, setuploaded_atSC] = useState("");
   const [statusDrop, setstatusDrop] = useState([]);
-  const [statusDropSC, setstatusDropSC] = useState([]);
-  const [isSearchStatus, setIsSearchStatus] = useState(false);
-  const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
-
-  const [approval_idSC, setapproval_idSC] = useState("");
-  const [approver_idSC, setapprover_idSC] = useState("");
-  const [approval_levelSC, setapproval_levelSC] = useState("");
-  const [empIdDropSc, setEmpIdDropSc] = useState([]);
-
-
+  const [documentFile, setDocumentFile] = useState([]);
+  const [documentUrl, setDocumentUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState([]);
+  const gridApiRef = useRef(null);
+  const [gridApi, setGridApi] = useState(null);
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
@@ -63,20 +58,6 @@ function LoanDocuments({}) {
   }, []);
 
   useEffect(() => {
-    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    })
-      .then((data) => data.json())
-      .then((val) => setstatusDropSC(val));
-  }, []);
-
-  useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLoanRequest`, {
       method: "POST",
       headers: {
@@ -90,75 +71,80 @@ function LoanDocuments({}) {
       .then((val) => setLoanReqIdDrop(val));
   }, []);
 
-    useEffect(() => {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-          fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ company_code }),
-          })
-              .then((data) => data.json())
-              .then((val) => {
-                  const emp = val.map((option) => ({
-                      value: option.attributedetails_name,
-                      label: `${option.attributedetails_name}`,
-                  }));
-                  setstatusDrop(emp);
-              })
-              .catch((error) => console.error("Error fetching data:", error));
-      }, []);
-
-      useEffect(() => {
-  fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-    }),
-  })
-    .then((data) => data.json())
-    .then((val) => {
-      const loan = val.map((option) => ({
-        value: option.loan_request_id,
-        label: `${option.loan_request_id}`,
-      }));
-
-      setLoanReqIdDrop(loan);
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
     })
-    .catch((error) => console.error("Error fetching loan request:", error));
-}, []);
+      .then((data) => data.json())
+      .then((val) => setLoanReqIdDropSC(val));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const emp = val.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setstatusDrop(emp);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const loan = val.map((option) => ({
+          value: option.loan_request_id,
+          label: `${option.loan_request_id}`,
+        }));
+
+        setLoanReqIdDropAG(loan);
+      })
+      .catch((error) => console.error("Error fetching loan request:", error));
+  }, []);
 
 
-  const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+
+  const filteredOptionLoanReqIdSC = loanReqIdDropSC.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
   }));
 
-  const filterOptionStatus = statusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+  value: option.loan_request_id,
+  label: option.loan_request_id,
+}));
 
-  const filterOptionStatusSC = statusDropSC.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const handleStatus = (SelectedStatus) => {
-    setselectedStatus(SelectedStatus);
-    setApprovalStatus(SelectedStatus ? SelectedStatus.value : "");
-  };
-
-  const handleStatusSC = (SelectedStatus) => {
-    setselectedStatusSC(SelectedStatus);
-    setApprovalStatusSC(SelectedStatus ? SelectedStatus.value : "");
-  };
-
+  const filteredOptionLoanReqIdAG = loanReqIdDropAG.map((option) => ({
+  value: option.loan_request_id,
+  label: option.loan_request_id,
+}));
+  
   const handleLoanReq = (SelectedLoanReq) => {
     setSelectedLoanReq(SelectedLoanReq);
     setLoanReqId(SelectedLoanReq ? SelectedLoanReq.value : "");
@@ -170,20 +156,14 @@ function LoanDocuments({}) {
   };
 
   const searchClearInputFields = () => {
-    setRemarksSc("");
-    setapproval_idSC("");
     setLoanReqIdSC("");
     setSelectedLoanReqSC("");
-    setapprover_idSC("");
-    setapproval_levelSC("");
-    setselectedStatusSC("");
-    setApprovalStatusSC("");
-    setapproval_dateSC("");
   };
-
 
 const columnDefs = [
   {
+    headerCheckboxSelection: true,
+    checkboxSelection: true,
     headerName: "Actions",
     field: "actions",
     cellRenderer: (params) => {
@@ -220,61 +200,77 @@ const columnDefs = [
   },
 
   {
-    headerName: "Approval ID",
-    field: "approval_id",
+    headerName: "Document ID",
+    field: "document_id",
     editable: false,
   },
 
   {
-  headerName: "Loan Request ID",
-  field: "loan_request_id",
-  editable: true,
-  cellEditor: "agSelectCellEditor",
-  cellEditorParams: {
-    values: loanReqIdDrop.map((d) => d.value),
+    headerName: "Loan Request ID",
+    field: "loan_request_id",
+    editable: true,
+    cellEditor: "agSelectCellEditor",
+    cellEditorParams: {
+      values: loanReqIdDropAG.map((d) => d.value),
+    },
+    valueFormatter: (params) => {
+      const loan = loanReqIdDropAG.find((d) => d.value === params.value);
+      return loan ? loan.label : params.value;
+    },
   },
-  valueFormatter: (params) => {
-    const loan = loanReqIdDrop.find((d) => d.value === params.value);
-    return loan ? loan.label : params.value;
-  },
-},
 
   {
-    headerName: "Approver ID",
-    field: "approver_id",
+    headerName: "Document Type",
+    field: "document_type",
     editable: true,
   },
 
   {
-    headerName: "Approval Level",
-    field: "approval_level",
+    headerName: "File Path",
+    field: "file_path",
     editable: true,
   },
 
   {
-  headerName: "Approval Status",
-  field: "approval_status",
-  editable: true,
-  cellEditor: "agSelectCellEditor",
-  cellEditorParams: {
-    values: statusDrop.map((d) => d.value),
-  },
-  valueFormatter: (params) => {
-    const status = statusDrop.find((d) => d.value === params.value);
-    return status ? status.label : params.value;
-  },
-},
-
-  {
-    headerName: "Approval Date",
-    field: "approval_date",
+    headerName: "Uploaded By",
+    field: "uploaded_by",
     editable: true,
   },
 
   {
-    headerName: "Remarks",
-    field: "remarks",
+    headerName: "Uploaded Date",
+    field: "uploaded_at",
     editable: true,
+  },
+
+  // ⭐ PDF PREVIEW COLUMN
+  {
+    headerName: "Preview",
+    field: "document",
+    width: 120,
+    editable: false,
+    cellRenderer: (params) => {
+      if (!params.value) return null;
+
+      const base64 = params.value;
+
+      return (
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => {
+
+            const pdfWindow = window.open("");
+
+            pdfWindow.document.write(
+              `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64}"></iframe>`
+            );
+
+          }}
+        >
+          Preview
+        </button>
+      );
+    },
   },
 
   {
@@ -285,120 +281,120 @@ const columnDefs = [
   },
 
   {
-    headerName: "Created By",
-    field: "created_by",
-    editable: false,
-    hide: true,
-  },
-
-  {
-    headerName: "Created Date",
-    field: "created_date",
-    editable: false,
-    hide: true,
-  },
-
-  {
     headerName: "Keyfield",
     field: "keyfield",
     hide: true,
   },
 ];
-
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
   };
 
-const handleSave = async () => {
-  setLoading(true);
+  const handleRemove = (index) => {
 
-  try {
-    const Header = {
-    //   approval_id: approval_id,
-    //   loan_request_id: loanReqId,
-    //   approver_id: approver_id,
-    //   approval_level: approval_level,
-    //   approval_status: ApprovalStatus,
-    //   approval_date: approval_date,
-    //   remarks: remarks,
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      keyfield: '',
-      created_by: sessionStorage.getItem("selectedUserCode"),
-    };
+    setSelectedFile((prev) => prev.filter((_, i) => i !== index));
+  };
 
-    const response = await fetch(`${config.apiBaseUrl}/loan_approvalsInsert`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(Header),
-    });
+  const handleSave = async (e) => {
+        if (
+          !document_id ||
+          !loanReqId ||
+          !file_path ||
+          !uploaded_by ||
+          !uploaded_at
+        ) {
+          setError(" ");
+          toast.warning("Error: Missing required fields");
+          return;
+        }
+    
+    e.preventDefault();
 
-    if (response.ok) {
-      console.log("Loan approval inserted successfully");
-      toast.success("Loan Approval Saved Successfully!", {
-        onClose: () => window.location.reload(),
-      });
-    } else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Failed to insert loan approval");
-      console.error(errorResponse.details || errorResponse.message);
-    }
-  } catch (error) {
-    console.error("Error inserting loan approval:", error);
-    toast.error("Error inserting data: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    const formData = new FormData();
 
-const handleSearch = async () => {
-  setLoading(true);
+    formData.append("document_id", document_id);
+    formData.append("loan_request_id", loanReqId);
+    formData.append("document_type", document_type);
+    formData.append("file_path", file_path);
+    formData.append("uploaded_by", uploaded_by);
+    formData.append("uploaded_at", uploaded_at);
+    formData.append(
+      "company_code",
+      sessionStorage.getItem("selectedCompanyCode"),
+    );
+    formData.append("keyfield", "");
+    formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
-  try {
-    const body = {
-    //   approval_id: approval_idSC ? approval_idSC : 0,
-    //   loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
-    //   approver_id: approver_idSC ? approver_idSC : 0,
-    //   approval_level: approval_levelSC ? approval_levelSC : 0,
-    //   approval_status: ApprovalStatusSC || "",
-    //   approval_date: approval_dateSC || "",
-    //   remarks: remarksSc || "",
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-    };
-
-    const response = await fetch(`${config.apiBaseUrl}/loan_approvalsSearch`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (response.ok) {
-      const fetchedData = await response.json();
-      setRowData(fetchedData);
-    } 
-    else if (response.status === 404) {
-      toast.warning("Data Not Found");
-      setRowData([]);
-    } 
-    else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Search failed");
-      console.error(errorResponse.details || errorResponse.message);
-      setRowData([]);
+    if (documentFile) {
+      formData.append("document", documentFile);
     }
 
-  } catch (error) {
-    console.error("Error fetching search data:", error);
-    toast.error("Error fetching search data");
-    setRowData([]);
-  } finally {
-    setLoading(false);
-  }
- };
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/loan_documentsInsert`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      if (response.ok) {
+        toast.success("Loan Document Saved Successfully!");
+      } else {
+        const err = await response.json();
+        toast.warning(err.message);
+      }
+    } catch (error) {
+      toast.error("Upload Failed: " + error.message);
+    }
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const body = {
+        document_id: document_idSC ? document_idSC : 0,
+        loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
+        document_type: document_typeSC || "",
+        file_path: file_pathSC || "",
+        uploaded_by: uploaded_bySC || "",
+        uploaded_at: uploaded_atSC || "",
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/loan_documentsSearch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+
+        setRowData(fetchedData);
+      } else if (response.status === 404) {
+        toast.warning("Data Not Found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Search failed");
+        console.error(errorResponse.details || errorResponse.message);
+        setRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data");
+      setRowData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const reloadGridData = () => {
     setRowData([]);
@@ -415,7 +411,7 @@ const handleSearch = async () => {
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            loan_approvalsData: Array.isArray(rowData)
+            loan_documentsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                   ...row,
                   company_code,
@@ -431,7 +427,7 @@ const handleSearch = async () => {
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/loan_approvalsLoopUpdate`,
+            `${config.apiBaseUrl}/loan_documentsLoopUpdate`,
             {
               method: "POST",
               headers: {
@@ -469,7 +465,7 @@ const handleSearch = async () => {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
 
           const dataToSend = {
-            loan_approvalsData: Array.isArray(rowData)
+            loan_documentsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                   ...row,
                   company_code,
@@ -483,7 +479,7 @@ const handleSearch = async () => {
           };
 
           const response = await fetch(
-            `${config.apiBaseUrl}/loan_approvalsLoopDelete`,
+            `${config.apiBaseUrl}/loan_documentsLoopDelete`,
             {
               method: "POST",
               headers: {
@@ -513,6 +509,32 @@ const handleSearch = async () => {
     );
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "application/pdf") {
+      const fileUrl = URL.createObjectURL(file);
+      setDocumentFile(file);
+      setDocumentUrl(fileUrl);
+    } else {
+      toast.warning("Please upload a valid PDF file.");
+      event.target.value = "";
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+    const onGridReady = (params) => {
+    setGridApi(params.api);
+    gridApiRef.current = params.api;
+  };
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -522,13 +544,12 @@ const handleSearch = async () => {
   const transformRowData = (data) => {
     return data.map((row) => {
       return {
-        "Approval ID": row.approval_id || "",
+        "Document ID": row.document_id || "",
         "Loan Request ID": row.loan_request_id || "",
-        "Approver ID": row.approver_id || "",
-        "Approval Level": row.approval_level || "",
-        "Approval Status": row.approval_status || "",
-        "Approval Date": row.approval_date || "",
-        "Remarks": row.remarks || "",
+        "Document Type": row.document_type || "",
+        "File Path": row.file_path || "",
+        "Uploaded By": row.uploaded_by || "",
+        "Upload Date": row.uploaded_at || "",
       };
     });
   };
@@ -539,7 +560,7 @@ const handleSearch = async () => {
       return;
     }
 
-    const screenName = "Loan Approval Search Report";
+    const screenName = "Loan Documents Search Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
 
     /* ================= THEME COLORS ================= */
@@ -636,9 +657,9 @@ const handleSearch = async () => {
     /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Approvals");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Documents");
 
-    XLSX.writeFile(workbook, "Loan_Approval.xlsx");
+    XLSX.writeFile(workbook, "Loan_Documents.xlsx");
   };
 
   return (
@@ -653,10 +674,10 @@ const handleSearch = async () => {
         <div className="header-flex">
           <h1 className="page-title">Loan Documents</h1>
           <div className="action-wrapper">
-            {/* <div onClick={handleSave} className="action-icon add">
+            <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
@@ -700,7 +721,7 @@ const handleSearch = async () => {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label className="floating-label">Loan Request ID</label>
+              <label className={`exp-form-labels ${error && !loanReqId ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -767,7 +788,6 @@ const handleSearch = async () => {
             </div>
           </div>
 
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -792,20 +812,72 @@ const handleSearch = async () => {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
-              <label htmlFor="sname" className={`exp-form-labels`}>
-                Remarks
-              </label>
+              <div className="image-upload-container">
+                {documentUrl ? (
+                  <div className="image-preview-box">
+                    <iframe
+                      src={documentUrl}
+                      title="PDF Preview"
+                      className="pdf-inline-preview"
+                    ></iframe>
+
+                    <button
+                      type="button"
+                      className="delete-image-btn"
+                      onClick={() => {
+                        setDocumentFile(null);
+                        setDocumentUrl("");
+                      }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="upload-placeholder-box"
+                    onClick={() =>
+                      document.getElementById("documentUpload").click()
+                    }
+                  >
+                    <div className="upload-icon-text">
+                      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+                      <span>Upload Document</span>
+                    </div>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  className="hidden-file-input"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                  id="documentUpload"
+                />
+                {selectedFile.length > 0 && (
+                  <div className="col-md-12 d-flex flex-wrap preview-container mt-2">
+                    {selectedFile.map((file, index) => {
+                      const fileURL = URL.createObjectURL(file);
+
+                      return (
+                        <div key={index} className="file-preview-box">
+                          <span
+                            className="delete-file-btn"
+                            onClick={() => handleRemove(index)}
+                          >
+                            &times;
+                          </span>
+
+                          <iframe
+                            src={fileURL}
+                            title={file.name}
+                            className="uploaded-file"
+                          ></iframe>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -825,11 +897,11 @@ const handleSearch = async () => {
                 placeholder=""
                 required
                 autoComplete="off"
-                value={approval_idSC}
-                onChange={(e) => setapproval_idSC(e.target.value)}
+                value={document_idSC}
+                onChange={(e) => setdocument_idSC(e.target.value)}
               />
-              <label for="sname" className={`exp-form-labels `}>
-                Approval ID
+              <label for="sname" className={`exp-form-labels`}>
+                Document ID
               </label>
             </div>
           </div>
@@ -844,7 +916,7 @@ const handleSearch = async () => {
                 id="loanReq"
                 value={selectedLoanReqSC}
                 onChange={handleLoanReqSC}
-                options={filteredOptionLoanReqId}
+                options={filteredOptionLoanReqIdSC}
                 placeholder=" "
                 onFocus={() => setIsLoanReqFocusSC(true)}
                 onBlur={() => setIsLoanReqFocusSC(false)}
@@ -865,70 +937,11 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approver_idSC}
-                onChange={(e) => setapprover_idSC(e.target.value)}
+                value={document_typeSC}
+                onChange={(e) => setdocument_typeSC(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                Approver ID
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={approval_levelSC}
-                onChange={(e) => setapproval_levelSC(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Approval Level
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-                ${selectedStatusSC ? "has-value" : ""} 
-                ${isSearchStatusSC ? "is-focused" : ""}`}
-            >
-              <Select
-                id="Select_slots"
-                value={selectedStatusSC}
-                onChange={handleStatusSC}
-                options={filterOptionStatusSC}
-                placeholder=" "
-                onFocus={() => setIsSearchStatusSC(true)}
-                onBlur={() => setIsSearchStatusSC(false)}
-                classNamePrefix="react-select"
-                isClearable
-              />
-              <label className="floating-label">Approval Status</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={approval_dateSC}
-                onChange={(e) => setapproval_dateSC(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Approval Date
+                Document Type
               </label>
             </div>
           </div>
@@ -943,11 +956,49 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={remarksSC}
-                onChange={(e) => setRemarksSC(e.target.value)}
+                value={file_pathSC}
+                onChange={(e) => setfile_pathSC(e.target.value)}
               />
-              <label htmlFor="sname" className={`exp-form-labels`}>
-                Remarks
+              <label for="sname" className={`exp-form-labels`}>
+                File Path
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={uploaded_bySC}
+                onChange={(e) => setuploaded_bySC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels `}>
+                Uploaded By
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={uploaded_atSC}
+                onChange={(e) => setuploaded_atSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Uploaded Date
               </label>
             </div>
           </div>
@@ -983,6 +1034,8 @@ const handleSearch = async () => {
             columnDefs={columnDefs}
             rowData={rowData}
             pagination={true}
+            onGridReady={onGridReady}
+            rowSelection="multiple"
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
           />

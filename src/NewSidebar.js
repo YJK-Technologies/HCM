@@ -56,7 +56,8 @@ import {
   MdTravelExplore ,
   MdFlightTakeoff,
   MdPayments,
-  MdCalendarMonth
+  MdCalendarMonth,
+  MdOutlineAccountBalance 
 } from "react-icons/md";
 
 import {
@@ -142,6 +143,7 @@ export const leafIconMap = {
   "Travel Request": MdFlightTakeoff,
   "Loan Repayment Schedule": MdCalendarMonth,
   "Loan Payment": MdPayments,
+  "Loan Type": MdOutlineAccountBalance,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -213,12 +215,13 @@ const menuData = [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
-          { label: "Loan Request", path: "/LoanRequest" },
-          { label: "Loan Status History", path: "/LoanStatusHistory" },
-          { label: "Loan Payment", path: "/LoanPayment" },
-          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
-          { label: "Loan Approvals", path: "/LoanApprovals" },
+          { label: "Loan Type", path: "/LoanType" },
           { label: "Loan Documents", path: "/LoanDocuments" },
+          { label: "Loan Request", path: "/LoanRequest" },
+          { label: "Loan Approvals", path: "/LoanApprovals" },
+          { label: "Loan Payment", path: "/LoanPayment" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+          { label: "Loan Status History", path: "/LoanStatusHistory" },
         ],
       },
       {
