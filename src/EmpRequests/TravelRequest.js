@@ -66,19 +66,13 @@ function TravelRequest({}) {
   const [empIdSc, setEmpIdSc] = useState("");
   const [selectedEmpIdSc, setSelectedEmpIdSc] = useState("");
   const [countryIdDropSc, setCountyIdDropSc] = useState([]);
-  const [countryIdSc, setCountryIdSc] = useState("");
-  const [selectedCountryIdSc, setSelectedCountryIdSc] = useState("");
   const [visaTypeDropSc, setVisaTypeDropSc] = useState([]);
-  const [visaTypeSc, setVisaTypeSc] = useState("");
-  const [selectedVisaTypeSc, setSelectedVisaTypeSc] = useState("");
-  const [purposeSc, setPurposeSc] = useState("");
   const [travelStartDateSc, setTravelStartDateSc] = useState("");
   const [travelEndDateSc, setTravelEndDateSc] = useState("");
   const [reqStatusDropSC, setReqStatusDropSC] = useState([]);
   const [priorityDropSc, setPriorityDropSc] = useState([]);
   const [prioritySc, setPrioritySc] = useState("");
   const [selectedPrioritySc, setSelectedPrioritySc] = useState("");
-  const [estimatedCostSc, setEstimatedCostSc] = useState("");
   const [remarksSc, setRemarksSc] = useState("");
   const [dynamicOptions, setDynamicOptions] = useState([]);
   const [selectedmanager, setselectedmanager] = useState("");
@@ -707,7 +701,7 @@ function TravelRequest({}) {
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: true,
+      editable: false,
     },
 
     {
@@ -734,14 +728,14 @@ function TravelRequest({}) {
       headerName: "Destination Country",
       field: "destination_country_id",
       editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: CountrydropGR.map((d) => d.value),
-      },
-      valueFormatter: (params) => {
-        const country = CountrydropGR.find((d) => d.value == params.value);
-        return country ? country.label : params.value;
-      },
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   values: CountrydropGR.map((d) => d.value),
+      // },
+      // valueFormatter: (params) => {
+      //   const country = CountrydropGR.find((d) => d.value == params.value);
+      //   return country ? country.label : params.value;
+      // },
     },
 
     {
@@ -816,17 +810,27 @@ function TravelRequest({}) {
   };
 
   const handleSave = async () => {
-    // if (!dpt ||
-    //     !job_title ||
-    //     !Country_Code ||
-    //     !location ||
-    //     !employment_type ||
-    //     !updated_on
-    // ) {
-    //     setError(" ");
-    //     toast.warning("Error: Missing required fields");
-    //     return;
-    // }
+    if (
+      !travel_request_id ||
+      !empId ||
+      !dpt ||
+      !travel_type ||
+      !destination_country_id ||
+      !destination_city ||
+      !purpose_of_travel ||
+      !travelStartDate ||
+      !travelEndDate ||
+      !transport_mode ||
+      !accommodation_required ||
+      !estimated_cost ||
+      !priority ||
+      !ProjectManager ||
+      !reqStatus
+    ) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
+    }
     if (new Date(travelStartDate) > new Date(travelEndDate)) {
       toast.warning("Start Date cannot be greater than End Date");
       return;
@@ -836,7 +840,7 @@ function TravelRequest({}) {
 
     try {
       const Header = {
-        travel_request_id: 0,
+        travel_request_id: travel_request_id,
         request_number: request_number,
         employee_id: empId,
         department_id: dpt,
@@ -891,6 +895,7 @@ function TravelRequest({}) {
   };
 
   const handleSearch = async () => {
+
     setLoading(true);
 
     try {
@@ -898,7 +903,7 @@ function TravelRequest({}) {
         travel_request_id: travel_request_idSC || null,
         request_number: request_numberSC || "",
         employee_id: empIdSc || "",
-        department_id: dptSC || null,
+        department_id: dptSC || "",
         travel_type: travel_typeSC || "",
         destination_country_id: destination_country_idSC || null,
         destination_city: destination_citySC || "",
@@ -977,21 +982,28 @@ function TravelRequest({}) {
 
   const handleUpdate = async (rowData) => {
     showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
+      "Are you sure you want to update the selected loan request data?",
       async () => {
         try {
           setLoading(true);
-
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const payload = (Array.isArray(rowData) ? rowData : [rowData]).map(
-            (r) => ({
-              ...r,
-              company_code,
-              modified_by,
-            }),
-          );
+          const dataToSend = {
+            travel_requestsData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                  ...row,
+                  company_code,
+                  modified_by,
+                }))
+              : [
+                  {
+                    ...rowData,
+                    company_code,
+                    modified_by,
+                  },
+                ],
+          };
 
           const response = await fetch(
             `${config.apiBaseUrl}/travel_requestsLoopUpdate`,
@@ -1000,21 +1012,21 @@ function TravelRequest({}) {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(payload),
+              body: JSON.stringify(dataToSend),
             },
           );
 
-          const result = await response.json();
-
           if (response.ok) {
-            toast.success("Data updated successfully");
-            handleSearch();
+            toast.success("loan approval updated successfully", {
+              onClose: () => handleSearch(),
+            });
           } else {
-            toast.warning(result.message || "Update failed");
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
           }
         } catch (error) {
-          console.error(error);
-          toast.error("Update failed");
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
         } finally {
           setLoading(false);
         }
@@ -1023,52 +1035,59 @@ function TravelRequest({}) {
     );
   };
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-          const dataToSend = {
-            job_masterData: Array.isArray(rowData) ? rowData : [rowData],
-          };
-
-          const response = await fetch(
-            `${config.apiBaseUrl}/travel_requestsLoopDelete`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
+    const handleDelete = async (rowData) => {
+      showConfirmationToast(
+        "Are you sure you want to delete the selected loan request data?",
+        async () => {
+          try {
+            setLoading(true);
+            const company_code = sessionStorage.getItem("selectedCompanyCode");
+  
+            const dataToSend = {
+              travel_requestsData: Array.isArray(rowData)
+                ? rowData.map((row) => ({
+                    ...row,
+                    company_code,
+                  }))
+                : [
+                    {
+                      ...rowData,
+                      company_code,
+                    },
+                  ],
+            };
+  
+            const response = await fetch(
+              `${config.apiBaseUrl}/travel_requestsLoopDelete`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  company_code: company_code,
+                },
+                body: JSON.stringify(dataToSend),
               },
-              body: JSON.stringify(dataToSend),
-            },
-          );
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(
-              errorResponse.message || "Failed to insert sales data",
             );
+  
+            if (response.ok) {
+              toast.success("Loan approval deleted successfully", {
+                onClose: () => handleSearch(), // refresh data
+              });
+            } else {
+              const errorResponse = await response.json();
+              toast.warning(errorResponse.message || "Delete failed");
+            }
+          } catch (error) {
+            console.error("Error deleting loan approval rows:", error);
+            toast.error("Error deleting loan approval data: " + error.message);
+          } finally {
+            setLoading(false);
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error("Error Deleting Data: " + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
-      },
-    );
-  };
+        },
+        () => toast.info("Delete cancelled"),
+      );
+    };
+  
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
@@ -1198,7 +1217,7 @@ function TravelRequest({}) {
 
     XLSX.writeFile(workbook, "Travel_Requests_Search_Report.xlsx");
   };
-  
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}

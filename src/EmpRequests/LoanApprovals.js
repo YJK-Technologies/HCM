@@ -37,6 +37,7 @@ function LoanApprovals({}) {
   const [remarks, setRemarks] = useState("");
   const [remarksSC, setRemarksSC] = useState("");
   const [statusDrop, setstatusDrop] = useState([]);
+  const [statusDropAG, setstatusDropAG] = useState([]);
   const [statusDropSC, setstatusDropSC] = useState([]);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
   const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
@@ -44,7 +45,8 @@ function LoanApprovals({}) {
   const [approval_idSC, setapproval_idSC] = useState("");
   const [approver_idSC, setapprover_idSC] = useState("");
   const [approval_levelSC, setapproval_levelSC] = useState("");
-  const [empIdDropSc, setEmpIdDropSc] = useState([]);
+  const [loanReqIdDropAG, setLoanReqIdDropAG] = useState([]);
+  const [loanReqIdDropSC, setLoanReqIdDropSC] = useState([]);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -90,6 +92,20 @@ function LoanApprovals({}) {
   }, []);
 
   useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setstatusDropSC(val));
+  }, []);
+
+  useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLoanRequest`, {
       method: "POST",
       headers: {
@@ -103,51 +119,69 @@ function LoanApprovals({}) {
       .then((val) => setLoanReqIdDrop(val));
   }, []);
 
-    useEffect(() => {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-          fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ company_code }),
-          })
-              .then((data) => data.json())
-              .then((val) => {
-                  const emp = val.map((option) => ({
-                      value: option.attributedetails_name,
-                      label: `${option.attributedetails_name}`,
-                  }));
-                  setstatusDrop(emp);
-              })
-              .catch((error) => console.error("Error fetching data:", error));
-      }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      useEffect(() => {
-  fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-    }),
-  })
-    .then((data) => data.json())
-    .then((val) => {
-      const loan = val.map((option) => ({
-        value: option.loan_request_id,
-        label: `${option.loan_request_id}`,
-      }));
-
-      setLoanReqIdDrop(loan);
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
     })
-    .catch((error) => console.error("Error fetching loan request:", error));
-}, []);
+      .then((data) => data.json())
+      .then((val) => {
+        const emp = val.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setstatusDropAG(emp);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setLoanReqIdDropSC(val));
+  }, []);
+
+    useEffect(() => {
+      fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((data) => data.json())
+        .then((val) => {
+          const loan = val.map((option) => ({
+            value: option.loan_request_id,
+            label: `${option.loan_request_id}`,
+          }));
+  
+          setLoanReqIdDropAG(loan);
+        })
+        .catch((error) => console.error("Error fetching loan request:", error));
+    }, []);
 
   const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+    value: option.loan_request_id,
+    label: option.loan_request_id,
+  }));
+
+    const filteredOptionLoanReqIdSC = loanReqIdDropSC.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
   }));
@@ -157,9 +191,19 @@ function LoanApprovals({}) {
     label: option.attributedetails_name,
   }));
 
+  const filterOptionStatusAG = statusDropAG.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
   const filterOptionStatusSC = statusDropSC.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
+  }));
+
+  const filteredOptionLoanReqIdAG = loanReqIdDropAG.map((option) => ({
+    value: option.loan_request_id,
+    label: option.loan_request_id,
   }));
 
   const handleStatus = (SelectedStatus) => {
@@ -194,224 +238,238 @@ function LoanApprovals({}) {
     setapproval_dateSC("");
   };
 
+  const columnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      cellRenderer: (params) => {
+        const cellWidth = params.column.getActualWidth();
+        const showIcons = cellWidth > 20;
 
-const columnDefs = [
-  {
-    headerName: "Actions",
-    field: "actions",
-    cellRenderer: (params) => {
-      const cellWidth = params.column.getActualWidth();
-      const showIcons = cellWidth > 20;
+        return (
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
+            {showIcons && (
+              <>
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleUpdate(params.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-regular fa-floppy-disk"></i>
+                </span>
 
-      return (
-        <div
-          className="position-relative d-flex align-items-center"
-          style={{ minHeight: "100%", justifyContent: "center" }}
-        >
-          {showIcons && (
-            <>
-              <span
-                className="icon mx-2"
-                onClick={() => handleUpdate(params.data)}
-                style={{ cursor: "pointer" }}
-              >
-                <i className="fa-regular fa-floppy-disk"></i>
-              </span>
-
-              <span
-                className="icon mx-2"
-                onClick={() => handleDelete(params.data)}
-                style={{ cursor: "pointer" }}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </span>
-            </>
-          )}
-        </div>
-      );
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleDelete(params.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </span>
+              </>
+            )}
+          </div>
+        );
+      },
     },
-  },
 
-  {
-    headerName: "Approval ID",
-    field: "approval_id",
-    editable: false,
-  },
+    {
+      headerName: "Approval ID",
+      field: "approval_id",
+      editable: false,
+    },
 
-  {
-  headerName: "Loan Request ID",
-  field: "loan_request_id",
-  editable: true,
-  cellEditor: "agSelectCellEditor",
-  cellEditorParams: {
-    values: loanReqIdDrop.map((d) => d.value),
-  },
-  valueFormatter: (params) => {
-    const loan = loanReqIdDrop.find((d) => d.value === params.value);
-    return loan ? loan.label : params.value;
-  },
-},
+    {
+      headerName: "Loan Request ID",
+      field: "loan_request_id",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: loanReqIdDropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const loan = loanReqIdDropAG.find((d) => d.value === params.value);
+        return loan ? loan.label : params.value;
+      },
+    },
 
-  {
-    headerName: "Approver ID",
-    field: "approver_id",
-    editable: true,
-  },
+    {
+      headerName: "Approver ID",
+      field: "approver_id",
+      editable: true,
+    },
 
-  {
-    headerName: "Approval Level",
-    field: "approval_level",
-    editable: true,
-  },
+    {
+      headerName: "Approval Level",
+      field: "approval_level",
+      editable: true,
+    },
 
-  {
-  headerName: "Approval Status",
-  field: "approval_status",
-  editable: true,
-  cellEditor: "agSelectCellEditor",
-  cellEditorParams: {
-    values: statusDrop.map((d) => d.value),
-  },
-  valueFormatter: (params) => {
-    const status = statusDrop.find((d) => d.value === params.value);
-    return status ? status.label : params.value;
-  },
-},
+    {
+      headerName: "Approval Status",
+      field: "approval_status",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusDropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const status = statusDropAG.find((d) => d.value === params.value);
+        return status ? status.label : params.value;
+      },
+    },
 
-  {
-    headerName: "Approval Date",
-    field: "approval_date",
-    editable: true,
-  },
+    {
+      headerName: "Approval Date",
+      field: "approval_date",
+      editable: true,
+    },
 
-  {
-    headerName: "Remarks",
-    field: "remarks",
-    editable: true,
-  },
+    {
+      headerName: "Remarks",
+      field: "remarks",
+      editable: true,
+    },
 
-  {
-    headerName: "Company Code",
-    field: "company_code",
-    editable: false,
-    hide: true,
-  },
+    {
+      headerName: "Company Code",
+      field: "company_code",
+      editable: false,
+      hide: true,
+    },
 
-  {
-    headerName: "Created By",
-    field: "created_by",
-    editable: false,
-    hide: true,
-  },
+    {
+      headerName: "Created By",
+      field: "created_by",
+      editable: false,
+      hide: true,
+    },
 
-  {
-    headerName: "Created Date",
-    field: "created_date",
-    editable: false,
-    hide: true,
-  },
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      editable: false,
+      hide: true,
+    },
 
-  {
-    headerName: "Keyfield",
-    field: "keyfield",
-    hide: true,
-  },
-];
+    {
+      headerName: "Keyfield",
+      field: "keyfield",
+      hide: true,
+    },
+  ];
 
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
   };
 
-const handleSave = async () => {
-  setLoading(true);
-
-  try {
-    const Header = {
-      approval_id: approval_id,
-      loan_request_id: loanReqId,
-      approver_id: approver_id,
-      approval_level: approval_level,
-      approval_status: ApprovalStatus,
-      approval_date: approval_date,
-      remarks: remarks,
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      keyfield: '',
-      created_by: sessionStorage.getItem("selectedUserCode"),
-    };
-
-    const response = await fetch(`${config.apiBaseUrl}/loan_approvalsInsert`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(Header),
-    });
-
-    if (response.ok) {
-      console.log("Loan approval inserted successfully");
-      toast.success("Loan Approval Saved Successfully!", {
-        onClose: () => window.location.reload(),
-      });
-    } else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Failed to insert loan approval");
-      console.error(errorResponse.details || errorResponse.message);
+  const handleSave = async () => {
+    if (
+      !approval_id ||
+      !loanReqId ||
+      !approval_level ||
+      !ApprovalStatus ||
+      !approval_date
+    ) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  } catch (error) {
-    console.error("Error inserting loan approval:", error);
-    toast.error("Error inserting data: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
 
-const handleSearch = async () => {
-  setLoading(true);
+    try {
+      const Header = {
+        approval_id: approval_id,
+        loan_request_id: loanReqId,
+        approver_id: approver_id,
+        approval_level: approval_level,
+        approval_status: ApprovalStatus,
+        approval_date: approval_date,
+        remarks: remarks,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        created_by: sessionStorage.getItem("selectedUserCode"),
+      };
 
-  try {
-    const body = {
-      approval_id: approval_idSC ? approval_idSC : 0,
-      loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
-      approver_id: approver_idSC ? approver_idSC : 0,
-      approval_level: approval_levelSC ? approval_levelSC : 0,
-      approval_status: ApprovalStatusSC || "",
-      approval_date: approval_dateSC || "",
-      remarks: remarksSc || "",
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-    };
+      const response = await fetch(
+        `${config.apiBaseUrl}/loan_approvalsInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Header),
+        },
+      );
 
-    const response = await fetch(`${config.apiBaseUrl}/loan_approvalsSearch`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (response.ok) {
-      const fetchedData = await response.json();
-      setRowData(fetchedData);
-    } 
-    else if (response.status === 404) {
-      toast.warning("Data Not Found");
-      setRowData([]);
-    } 
-    else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message || "Search failed");
-      console.error(errorResponse.details || errorResponse.message);
-      setRowData([]);
+      if (response.ok) {
+        console.log("Loan approval inserted successfully");
+        toast.success("Loan Approval Saved Successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(
+          errorResponse.message || "Failed to insert loan approval",
+        );
+        console.error(errorResponse.details || errorResponse.message);
+      }
+    } catch (error) {
+      console.error("Error inserting loan approval:", error);
+      toast.error("Error inserting data: " + error.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-  } catch (error) {
-    console.error("Error fetching search data:", error);
-    toast.error("Error fetching search data");
-    setRowData([]);
-  } finally {
-    setLoading(false);
-  }
- };
+  const handleSearch = async () => {
+    setLoading(true);
+
+    try {
+      const body = {
+        approval_id: approval_idSC ? approval_idSC : 0,
+        loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
+        approver_id: approver_idSC ? approver_idSC : 0,
+        approval_level: approval_levelSC ? approval_levelSC : 0,
+        approval_status: ApprovalStatusSC || "",
+        approval_date: approval_dateSC || "",
+        remarks: remarksSc || "",
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/loan_approvalsSearch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+        setRowData(fetchedData);
+      } else if (response.status === 404) {
+        toast.warning("Data Not Found");
+        setRowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Search failed");
+        console.error(errorResponse.details || errorResponse.message);
+        setRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data");
+      setRowData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const reloadGridData = () => {
     setRowData([]);
@@ -541,7 +599,7 @@ const handleSearch = async () => {
         "Approval Level": row.approval_level || "",
         "Approval Status": row.approval_status || "",
         "Approval Date": row.approval_date || "",
-        "Remarks": row.remarks || "",
+        Remarks: row.remarks || "",
       };
     });
   };
@@ -713,7 +771,7 @@ const handleSearch = async () => {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label className="floating-label">Loan Request ID</label>
+              <label className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -775,7 +833,11 @@ const handleSearch = async () => {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label className="floating-label">Approval Status</label>
+              <label
+                className={`floating-label ${error && !ApprovalStatus ? "text-danger" : ""}`}
+              >
+                Approval Status<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -855,7 +917,7 @@ const handleSearch = async () => {
                 id="loanReq"
                 value={selectedLoanReqSC}
                 onChange={handleLoanReqSC}
-                options={filteredOptionLoanReqId}
+                options={filteredOptionLoanReqIdSC}
                 placeholder=" "
                 onFocus={() => setIsLoanReqFocusSC(true)}
                 onBlur={() => setIsLoanReqFocusSC(false)}

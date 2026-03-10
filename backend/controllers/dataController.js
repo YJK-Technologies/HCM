@@ -8653,12 +8653,10 @@ const addstocktransferdetail = async (req, res) => {
   } catch (err) {
     // Check if the error is a primary key violation
     if (err.code === "EREQUEST" && err.number === 2627) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This transation no stock already transfer or assigned",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "This transation no stock already transfer or assigned",
+      });
     } else {
       console.error("Error adding company  data:", err);
       return res
@@ -8812,12 +8810,10 @@ const addstocktransferhdr = async (req, res) => {
   } catch (err) {
     // Check if the error is a primary key violation
     if (err.code === "EREQUEST" && err.number === 2627) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This transation no stock already transfer or assigned",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "This transation no stock already transfer or assigned",
+      });
     } else {
       console.error("Error adding company  data:", err);
       return res
@@ -21908,12 +21904,10 @@ const addEmployeedoc = async (req, res) => {
         `EXEC sp_employee_documents @mode,@EmployeeId,@ResumeFile,@OfferLetter,@JoiningLetter,@ContractAndAgreement,@dropboxURL,@GoogleDriveURL,@aadhar_and_pan,@company_code,@Created_by, @Modified_by, @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`,
       );
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Employee documents inserted successfully",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Employee documents inserted successfully",
+      });
     }
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -22151,12 +22145,10 @@ const UpdateEmployeeImage = async (req, res) => {
         .status(200)
         .json({ success: true, message: "Image updated successfully" });
     } else {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "No changes made to the employee image.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "No changes made to the employee image.",
+      });
     }
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -35359,12 +35351,10 @@ const CRM_SalesPersonMasterInsert = async (req, res) => {
         `EXEC sp_CRM_SalesPersonMaster @mode, @SalesCode, @SalesPersonName, @EmailID, @Language, @Role, @status,@SalesTeam, @company_code, @keyfield, @BussinessDomain, @RefferedBy, '', '', @Created_by,''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPersonMaster insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPersonMaster insertd successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPersonMaster insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35410,12 +35400,10 @@ const CRM_SalesPersonMasterUpdate = async (req, res) => {
         `EXEC sp_CRM_SalesPersonMaster @mode, @SalesCode, @SalesPersonName, @EmailID, @Language, @Role, @status, @SalesTeam, @company_code, @keyfield, @BussinessDomain, @RefferedBy, '', @modified_date, '', @modified_by`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPersonMaster updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPersonMaster updated successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPersonMaster update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35436,12 +35424,10 @@ const CRM_SalesPersonMasterDelete = async (req, res) => {
         `EXEC sp_CRM_SalesPersonMaster @mode, @SalesCode, '', '', '', '', '', '', @company_code,'','','','','','',''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPersonMaster deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPersonMaster deleted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPersonMaster delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35635,12 +35621,10 @@ const CRM_MeetingSubjectInsert = async (req, res) => {
         `EXEC sp_CRM_MeetingSubject @mode, @MeetingID, @MeetingSubject, @Start, @End, @Duration, @Timezone, @Location, @VideoCallURL, @Tags, @Privacy, @Organizer, @Description, @Reminder, @Recurrent, @Repeat, @RepeatOn, @Unit, @status, @company_code, @keyfield, @Created_Date, '', @Created_by,''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_MeetingSubject insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_MeetingSubject insertd successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_MeetingSubject insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35704,12 +35688,10 @@ const CRM_MeetingSubjectUpdate = async (req, res) => {
         `EXEC sp_CRM_MeetingSubject @mode, @MeetingID, @MeetingSubject, @Start, @End, @Duration, @Timezone, @Location, @VideoCallURL, @Tags, @Privacy, @Organizer, @Description, @Reminder, @Recurrent, @Repeat, @RepeatOn, @Unit, @status, @company_code, @keyfield, '', @modified_date, '', @modified_by`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_MeetingSubject updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_MeetingSubject updated successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_MeetingSubject update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -35731,12 +35713,10 @@ const CRM_MeetingSubjectDelete = async (req, res) => {
         `EXEC sp_CRM_MeetingSubject @mode, @MeetingID, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', @company_code, '', '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_MeetingSubject deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_MeetingSubject deleted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_MeetingSubject delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36054,12 +36034,10 @@ const CRM_SalesPurchaseInsert = async (req, res) => {
         `EXEC sp_CRM_SalesPurchase @mode, @SalesPurchaseID, @ContactID, @Type, @SalesPerson, @Mist, @CompanyID, @Reference, @Industry, @status, @Created_by, @modified_by, @Created_Date, @modified_date, @company_code`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPurchase insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPurchase insertd successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPurchase insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36103,12 +36081,10 @@ const CRM_SalesPurchaseUpdate = async (req, res) => {
         `EXEC sp_CRM_SalesPurchase @mode, @SalesPurchaseID, @ContactID, @Type, @SalesPerson, @Mist, @CompanyID, @Reference, @Industry, @status, '', @modified_by, '', @modified_date, @company_code`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPurchase updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPurchase updated successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPurchase update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36129,12 +36105,10 @@ const CRM_SalesPurchaseDelete = async (req, res) => {
         `EXEC sp_CRM_SalesPurchase @mode, @SalesPurchaseID, '', '', '', '', '', '', '','', @company_code '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesPurchase deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesPurchase deleted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesPurchase delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36398,12 +36372,10 @@ const updateNewCompanyStage = async (req, res) => {
       .query(
         "EXEC sp_CRM_NewCompany 'UC',0,'','', @Opportunity_ID, '', '','', 0,0,'', '', '', '', '', '', '', '', '',  '', '', '', '', '', '', '', '', '','', @Stage,'','',@company_code, '', '', '', '', 0, '','', '', '', '', '' ",
       );
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Opportunity ID stage updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Opportunity ID stage updated successfully",
+    });
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36502,12 +36474,10 @@ const CRM_SalesTeam_HDRUpdate = async (req, res) => {
         `EXEC sp_CRM_SalesTeam_HDR @mode, @Sales_ID, @Sales_Team, @Team_Leader, @Email_alias, @Emails_From,'', @Company_code,'', @modified_by,'',''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesTeam_HDR updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesTeam_HDR updated successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesTeam_HDR update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36529,12 +36499,10 @@ const CRM_SalesTeam_HDRDelete = async (req, res) => {
         `EXEC sp_CRM_SalesTeam_HDR @mode, @Sales_ID,'','','', '', '',@Company_code, '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesTeam_HDR deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesTeam_HDR deleted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesTeam_HDR delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36559,12 +36527,10 @@ const CRM_SalesTeam_DetailsInsert = async (req, res) => {
         `EXEC sp_CRM_SalesTeam_Details @mode, @Sales_ID, @Sales_Person, @Company_code, @Created_by,'', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesTeam_Details insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesTeam_Details insertd successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesTeam_Details insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36589,12 +36555,10 @@ const CRM_SalesTeam_DetailsUpdate = async (req, res) => {
         `EXEC sp_CRM_SalesTeam_Details @mode, @Sales_ID, @Sales_Person, @Company_code, '', @modified_by,'',''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesTeam_Details updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesTeam_Details updated successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesTeam_Details update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36615,12 +36579,10 @@ const CRM_SalesTeam_DetailsDelete = async (req, res) => {
         `EXEC sp_CRM_SalesTeam_Details @mode, @Sales_ID,'', @Company_code,'','','',''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_SalesTeam_Details deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_SalesTeam_Details deleted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_SalesTeam_Details delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -36779,12 +36741,10 @@ const updateNewCompanyPeriority = async (req, res) => {
         "EXEC sp_CRM_NewCompany @mode,0,'','',@Opportunity_ID,'','','',0,0,'','','',@Priority,'','','','','','','','','','','','','','','','','','',@company_code,'','','','',0,'','','','','','' ",
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Opportunity ID stage updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Opportunity ID stage updated successfully",
+    });
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -38099,12 +38059,10 @@ const CRM_Lose_Insert = async (req, res) => {
         `EXEC sp_CRM_Lose @mode, @OpportunityID,@Reason_for_Lose,@Description,@company_code,@SalesTeam,@Sales_man_code, '', '',@Created_by, ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "CRM_Lose_Insert inserted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "CRM_Lose_Insert inserted successfully",
+    });
   } catch (err) {
     console.error("Error during CRM_Lose_Insert insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -38591,12 +38549,10 @@ const candidate_masterInsert = async (req, res) => {
         `EXEC sp_candidate_master_Test @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, '', '', @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "candidate_master insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "candidate_master insertd successfully",
+    });
   } catch (err) {
     console.error("Error during candidate_master insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -38856,12 +38812,10 @@ const interview_panel_membersInsert = async (req, res) => {
         `EXEC sp_interview_panel_members @mode, 0, @panel_id, @employee_id,@Role, @company_code, '', @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_panel_members insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_panel_members insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_panel_members insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -38996,12 +38950,10 @@ const interview_scheduleInsert = async (req, res) => {
         `EXEC sp_interview_schedule_Test @mode, 0, @candidate_id, @panel_id, @scheduled_datetime, @location, @meeting_link, @timezone,@Interview_Mode,@Status, @company_code, '', '', '', @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_schedule insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_schedule insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -39105,12 +39057,10 @@ const interview_feedbackInsert = async (req, res) => {
         `EXEC sp_interview_feedback @mode,0, @schedule_id, @employee_id, @rating, @comments, @submitted_on,@Recommendation, @company_code, @keyfield, '', '', @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_feedback insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_feedback insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_feedback insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -39212,12 +39162,10 @@ const interview_decisionInsert = async (req, res) => {
         `EXEC sp_interview_decision_Test @mode, @decision_id, @candidate_id, @job_id, @decided_by, @decided_on, @remarks,@Final_Status, @company_code, @keyfield, '', '', @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_decision insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_decision insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_decision insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -39852,12 +39800,10 @@ const TimeZonemasterDelete = async (req, res) => {
       .query(
         `EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', '', @company_code, '', '', @modified_by, ''`,
       );
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Sp_Time_Zone_master deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Sp_Time_Zone_master deleted successfully",
+    });
   } catch (err) {
     console.error("Error during dbo.Sp_Time _Zone_master delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40250,12 +40196,10 @@ const TimeZonemasterInsert = async (req, res) => {
       .query(
         `EXEC Sp_Time_Zone_master @mode, 0, @TimeZone_Name, @UTC_Offset, @DST_Applicable, @Status, '', @company_code, @created_by, '', '', ''`,
       );
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_schedule insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_schedule insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40360,12 +40304,10 @@ const Shift_MasterInsert = async (req, res) => {
         `EXEC sp_Shift_Master @mode, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Cross_Midnight, @Status, '', @company_code, @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_schedule insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_schedule insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40601,12 +40543,10 @@ const Employment_Type_MasterInsert = async (req, res) => {
         `EXEC sp_Employment_Type_Master @mode, @Employment_Type_ID, @Employment_Type, @Description, @Status, @Company_Code, '', @Created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employment_Type_Master insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employment_Type_Master insertd successfully",
+    });
   } catch (err) {
     console.error("Error during Employment_Type_Master insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40641,12 +40581,10 @@ const Employment_Type_MasterUpdate = async (req, res) => {
       .query(`EXEC sp_Employment_Type_Master @mode, @Employment_Type_ID, @Employment_Type, @Description, @Status, @Company_Code, @keyfield, 
         '', '', @Modified_by, @Modified_date`);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employment_Type_Master updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employment_Type_Master updated successfully",
+    });
   } catch (err) {
     console.error("Error during Employment_Type_Master update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40668,12 +40606,10 @@ const Employment_Type_MasterDelete = async (req, res) => {
         `EXEC sp_Employment_Type_Master @mode, @Employment_Type_ID, '', '', '', @Company_Code, @keyfield, '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employment_Type_Master deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employment_Type_Master deleted successfully",
+    });
   } catch (err) {
     console.error("Error during Employment_Type_Master delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40766,12 +40702,10 @@ const Shift_Pattern_MasterInsert = async (req, res) => {
         `EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, '', @Created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Shift_Pattern_Master insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Shift_Pattern_Master insertd successfully",
+    });
   } catch (err) {
     console.error("Error during Shift_Pattern_Master insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40807,12 +40741,10 @@ const Shift_Pattern_MasterUpdate = async (req, res) => {
         `EXEC sp_Shift_Pattern_Master_Test @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Shift_Pattern_Master updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Shift_Pattern_Master updated successfully",
+    });
   } catch (err) {
     console.error("Error during Shift_Pattern_Master update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40833,12 +40765,10 @@ const Shift_Pattern_MasterDelete = async (req, res) => {
         `EXEC sp_Shift_Pattern_Master_Test @mode, '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Shift_Pattern_Master deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Shift_Pattern_Master deleted successfully",
+    });
   } catch (err) {
     console.error("Error during Shift_Pattern_Master delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -40966,12 +40896,10 @@ const Shift_Pattern_DetailInsert = async (req, res) => {
         `EXEC sp_Shift_Pattern_Detail_Test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Shift_Pattern_Detail insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Shift_Pattern_Detail insertd successfully",
+    });
   } catch (err) {
     console.error("Error during Shift_Pattern_Detail insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41026,12 +40954,10 @@ const Shift_Pattern_DetailDelete = async (req, res) => {
         `EXEC sp_Shift_Pattern_Detail_Test @mode, '', '', 0, '', '', @Company_Code, '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Shift_Pattern_Detail deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Shift_Pattern_Detail deleted successfully",
+    });
   } catch (err) {
     console.error("Error during Shift_Pattern_Detail delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41156,12 +41082,10 @@ const Employee_shift_mappingInsert = async (req, res) => {
       .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,'',@Company_Code,@Created_by,'','',''`);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employee_shift_mapping insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employee_shift_mapping insertd successfully",
+    });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41196,12 +41120,10 @@ const Employee_shift_mappingUpdate = async (req, res) => {
       .query(`EXEC sp_Employee_shift_mapping_Test @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@keyfield,@Company_Code,'','',@Modified_by,''`);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employee_shift_mapping updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employee_shift_mapping updated successfully",
+    });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41221,12 +41143,10 @@ const Employee_shift_mappingDelete = async (req, res) => {
       .query(`EXEC sp_Employee_shift_mapping_Test @mode,'','','','',
         '',@keyfield,@Company_Code,'','','',''`);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Employee_shift_mapping deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Employee_shift_mapping deleted successfully",
+    });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41350,12 +41270,10 @@ const Shift_Type_MasterInsert = async (req, res) => {
         `EXEC sp_Shift_Type_Master_test @mode, @Shift_Type_ID, @Shift_Type, @Description, @company_code, @created_by, '', '', '', @keyfield`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "interview_schedule insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "interview_schedule insertd successfully",
+    });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42160,7 +42078,6 @@ const loan_approvalsInsert = async (req, res) => {
     approval_date,
     remarks,
     company_code,
-    keyfield,
     created_by,
   } = req.body;
 
@@ -42177,10 +42094,9 @@ const loan_approvalsInsert = async (req, res) => {
       .input("approval_date", sql.Date, approval_date)
       .input("remarks", sql.NVarChar, remarks)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, @company_code, @keyfield, @created_by, '', '', ''`,
+        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, @company_code, '', @created_by, '', '',''`,
       );
 
     res
@@ -42364,7 +42280,18 @@ const loan_approvalsLoopDelete = async (req, res) => {
 // Auto-generated Node.js CRUD for sp_loan_repayment_schedule
 
 const loan_repayment_scheduleInsert = async (req, res) => {
-  const { schedule_id, loan_request_id, installment_number, installment_date, principal_amount, interest_amount, total_installment, payment_status, company_code, created_by } = req.body;
+  const {
+    schedule_id,
+    loan_request_id,
+    installment_number,
+    installment_date,
+    principal_amount,
+    interest_amount,
+    total_installment,
+    payment_status,
+    company_code,
+    created_by,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42381,14 +42308,14 @@ const loan_repayment_scheduleInsert = async (req, res) => {
       .input("payment_status", sql.NVarChar, payment_status)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', '', '', @created_by, '', '', ''`);
+      .query(
+        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', '', '', @created_by, '', '', ''`,
+      );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "loan_repayment_schedule insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "loan_repayment_schedule insertd successfully",
+    });
   } catch (err) {
     console.error("Error during loan_repayment_schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42426,14 +42353,14 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
+      .query(
+        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
+      );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "loan_repayment_schedule updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "loan_repayment_schedule updated successfully",
+    });
   } catch (err) {
     console.error("Error during loan_repayment_schedule update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42441,7 +42368,7 @@ const loan_repayment_scheduleUpdate = async (req, res) => {
 };
 
 const loan_repayment_scheduleDelete = async (req, res) => {
-  const { schedule_id,company_code } = req.body;
+  const { schedule_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42450,14 +42377,14 @@ const loan_repayment_scheduleDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("schedule_id", sql.Int, schedule_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`,
+      );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "loan_repayment_schedule deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "loan_repayment_schedule deleted successfully",
+    });
   } catch (err) {
     console.error("Error during loan_repayment_schedule delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42492,7 +42419,9 @@ const loan_repayment_scheduleLoopInsert = async (req, res) => {
         .input("payment_status", sql.NVarChar, item.payment_status)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', '', '', @created_by, '', '', ''`);
+        .query(
+          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', '', '', @created_by, '', '', ''`,
+        );
     }
     res.status(200).json("loan_repayment_schedule data inserted successfully");
   } catch (err) {
@@ -42527,7 +42456,9 @@ const loan_repayment_scheduleLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
+        .query(
+          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, @installment_date, @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
+        );
     }
     res.status(200).json("loan_repayment_schedule data updated successfully");
   } catch (err) {
@@ -42553,7 +42484,9 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("schedule_id", sql.Int, item.schedule_id)
         .input("company_code", sql.NVarChar, item.company_code)
-        .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`);
+        .query(
+          `EXEC sp_loan_repayment_schedule @mode, @schedule_id, 0, '', '', 0, 0, 0, '', @company_code, '', '', '', '', '', '', ''`,
+        );
     }
     res.status(200).json("loan_repayment_schedule data deleted successfully");
   } catch (err) {
@@ -42567,7 +42500,16 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
 //Code added by Dinesh Gokul on 07-03-2026
 // Auto-generated Node.js CRUD for sp_loan_payments
 const loan_paymentsInsert = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, created_by } = req.body;
+  const {
+    payment_id,
+    loan_request_id,
+    payment_date,
+    paid_amount,
+    payment_method,
+    payroll_reference,
+    company_code,
+    created_by,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42582,7 +42524,9 @@ const loan_paymentsInsert = async (req, res) => {
       .input("payroll_reference", sql.NVarChar, payroll_reference)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`);
+      .query(
+        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`,
+      );
 
     res
       .status(200)
@@ -42594,7 +42538,17 @@ const loan_paymentsInsert = async (req, res) => {
 };
 
 const loan_paymentsUpdate = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, keyfield, modified_by } = req.body;
+  const {
+    payment_id,
+    loan_request_id,
+    payment_date,
+    paid_amount,
+    payment_method,
+    payroll_reference,
+    company_code,
+    keyfield,
+    modified_by,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42610,7 +42564,9 @@ const loan_paymentsUpdate = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
+      .query(
+        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
+      );
 
     res
       .status(200)
@@ -42631,7 +42587,9 @@ const loan_paymentsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("payment_id", sql.Int, payment_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`,
+      );
 
     res
       .status(200)
@@ -42667,7 +42625,9 @@ const loan_paymentsLoopInsert = async (req, res) => {
         .input("payroll_reference", sql.NVarChar, item.payroll_reference)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`);
+        .query(
+          `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, '', '', '', @created_by, '', '', ''`,
+        );
     }
     res.status(200).json("loan_payments data inserted successfully");
   } catch (err) {
@@ -42698,7 +42658,9 @@ const loan_paymentsLoopUpdate = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`);
+        .query(
+          `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, @payment_date, @paid_amount, @payment_method, @payroll_reference, @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
+        );
     }
     res.status(200).json("loan_payments data updated successfully");
   } catch (err) {
@@ -42722,7 +42684,9 @@ const loan_paymentsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("payment_id", sql.Int, item.payment_id)
         .input("company_code", sql.NVarChar, item.company_code)
-        .query(`EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`);
+        .query(
+          `EXEC sp_loan_payments @mode, @payment_id, 0, '', 0, '', '', @company_code, '', '', '', '', '', '', ''`,
+        );
     }
     res.status(200).json("loan_payments data deleted successfully");
   } catch (err) {
@@ -44014,6 +43978,226 @@ const visaRequestSearch = async (req, res) => {
 };
 //Code ended pavun on 07-03-26
 
+//Code Added Dinesh Gokul on 09-03-26
+// Auto-generated Node.js CRUD for sp_loan_documents
+
+const loan_documentsInsert = async (req, res) => {
+  try {
+    const {
+      document_id,
+      loan_request_id,
+      document_type,
+      file_path,
+      uploaded_by,
+      uploaded_at,
+      company_code,
+      keyfield,
+      created_by,
+    } = req.body;
+
+      let document = null;
+  if (req.file) {
+    document = req.file.buffer; // Buffer containing the uploaded IMG
+  }
+
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "I")
+      .input("document_id", sql.Int, document_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("document_type", sql.NVarChar, document_type)
+      .input("file_path", sql.NVarChar, file_path)
+      .input("uploaded_by", sql.NVarChar, uploaded_by)
+      .input("uploaded_at", sql.DateTime, uploaded_at)
+      .input("document", sql.VarBinary(sql.MAX), document)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(
+        `EXEC sp_loan_documents 
+        @mode,@document_id,@loan_request_id,@document_type,@file_path,
+        @uploaded_by,@uploaded_at,@document,@company_code,@keyfield,
+        @created_by,'','',''`,
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Loan document inserted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const loan_documentsUpdate = async (req, res) => {
+  const {
+    document_id,
+    loan_request_id,
+    document_type,
+    file_path,
+    uploaded_by,
+    uploaded_at,
+    company_code,
+    keyfield,
+    modified_by,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "U")
+      .input("document_id", sql.Int, document_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("document_type", sql.NVarChar, document_type)
+      .input("file_path", sql.NVarChar, file_path)
+      .input("uploaded_by", sql.NVarChar, uploaded_by)
+      .input("uploaded_at", sql.DateTime, uploaded_at)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(
+        `EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, '', '', @modified_by, ''`,
+      );
+
+    res
+      .status(200)
+      .json({ success: true, message: "loan_documents updated successfully" });
+  } catch (err) {
+    console.error("Error during loan_documents update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_documentsDelete = async (req, res) => {
+  const { document_id, company_code, keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "D")
+      .input("document_id", sql.Int, document_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(
+        `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', @company_code, @keyfield, '', '', '', ''`,
+      );
+
+    res
+      .status(200)
+      .json({ success: true, message: "loan_documents deleted successfully" });
+  } catch (err) {
+    console.error("Error during loan_documents delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//Code Ended Dinesh Gokul on 09-03-26
+
+//Code Added Dinesh Gokul on 09-03-26
+// Auto-generated loan_documentsLoopInsert API for sp_loan_documents
+const loan_documentsLoopInsert = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("document_id", sql.Int, item.document_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("document_type", sql.NVarChar, item.document_type)
+        .input("file_path", sql.NVarChar, item.file_path)
+        .input("uploaded_by", sql.NVarChar, item.uploaded_by)
+        .input("uploaded_at", sql.DateTime, item.uploaded_at)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .query(
+          `EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, @company_code, @keyfield, @created_by, '', '', ''`,
+        );
+    }
+    res.status(200).json("loan_documents data inserted successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_documentsLoopUpdate API for sp_loan_documents
+const loan_documentsLoopUpdate = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      let document = null;
+      if (item.file) {
+        document = item.file.buffer; // uploaded file buffer
+      }
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "U")
+        .input("document_id", sql.Int, item.document_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("document_type", sql.NVarChar, item.document_type)
+        .input("file_path", sql.NVarChar, item.file_path)
+        .input("uploaded_by", sql.NVarChar, item.uploaded_by)
+        .input("uploaded_at", sql.DateTime, item.uploaded_at)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .query(
+          `EXEC sp_loan_documents @mode, @document_id, @loan_request_id, @document_type, @file_path, @uploaded_by, @uploaded_at, '', @company_code, @keyfield, '', '', @modified_by, ''`,
+        );
+    }
+    res.status(200).json("loan_documents data updated successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated loan_documentsLoopDelete API for sp_loan_documents
+const loan_documentsLoopDelete = async (req, res) => {
+  const loan_documentsData = req.body.loan_documentsData;
+  if (!loan_documentsData || !loan_documentsData.length) {
+    return res.status(400).json("Invalid or empty loan_documentsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of loan_documentsData) {
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "D")
+        .input("document_id", sql.Int, item.document_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .query(
+          `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`,
+        );
+    }
+    res.status(200).json("loan_documents data deleted successfully");
+  } catch (err) {
+    console.error("Error in loan_documentsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//Code Ended Dinesh Gokul on 09-03-26
+
 //code added Sakthi on 09-03-26
 const travel_requestsSearch = async (req, res) => {
   const {
@@ -44154,12 +44338,12 @@ const getPaymentMethod = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        "EXEC sp_attribute_Info 'F',@company_code,'PaymentMode','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+        "EXEC sp_attribute_Info 'F',@company_code,'PaymentMode','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
       );
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
+    res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
 
@@ -44172,12 +44356,13 @@ const getLoanRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', @company_code, '', '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
-    } 
-    else {
+    } else {
       res.status(404).json("Data not found");
     }
   } catch (err) {
@@ -44187,7 +44372,17 @@ const getLoanRequest = async (req, res) => {
 };
 
 const loanPaymentSearch = async (req, res) => {
-  const { payment_id, loan_request_id, payment_date, paid_amount, payment_method, payroll_reference, company_code, FromDate, ToDate } = req.body;
+  const {
+    payment_id,
+    loan_request_id,
+    payment_date,
+    paid_amount,
+    payment_method,
+    payroll_reference,
+    company_code,
+    FromDate,
+    ToDate,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44203,12 +44398,13 @@ const loanPaymentSearch = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("FromDate", sql.NVarChar, FromDate)
       .input("ToDate", sql.NVarChar, ToDate)
-      .query(`EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, '', @paid_amount, @payment_method, @payroll_reference, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_payments @mode, @payment_id, @loan_request_id, '', @paid_amount, @payment_method, @payroll_reference, @company_code, '', @FromDate, @ToDate, '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
-    } 
-    else {
+    } else {
       res.status(404).json("Data not found");
     }
   } catch (err) {
@@ -44225,21 +44421,33 @@ const getPaymentStatus = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        "EXEC sp_attribute_Info 'F',@company_code,'Payment Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+        "EXEC sp_attribute_Info 'F',@company_code,'Payment Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
       );
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
+    res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
 
 const loanScheduleSearch = async (req, res) => {
-  const { schedule_id, loan_request_id, installment_number, FromDate, ToDate, principal_amount, interest_amount, total_installment, payment_status, company_code, created_by } = req.body;
+  const {
+    schedule_id,
+    loan_request_id,
+    installment_number,
+    FromDate,
+    ToDate,
+    principal_amount,
+    interest_amount,
+    total_installment,
+    payment_status,
+    company_code,
+    created_by,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
-    const result =  await pool
+    const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
       .input("schedule_id", sql.NVarChar, schedule_id)
@@ -44252,12 +44460,13 @@ const loanScheduleSearch = async (req, res) => {
       .input("total_installment", sql.Decimal(12, 2), total_installment)
       .input("payment_status", sql.NVarChar, payment_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, '', @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', @FromDate, @ToDate, '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_repayment_schedule @mode, @schedule_id, @loan_request_id, @installment_number, '', @principal_amount, @interest_amount, @total_installment, @payment_status, @company_code, '', @FromDate, @ToDate, '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
-    } 
-    else {
+    } else {
       res.status(404).json("Data not found");
     }
   } catch (err) {
@@ -44269,7 +44478,16 @@ const loanScheduleSearch = async (req, res) => {
 
 //code added by Sakthi on 09-03-26
 const loan_approvalsSearch = async (req, res) => {
-  const { approval_id,loan_request_id,approver_id,approval_level,approval_status,approval_date,remarks,company_code, } = req.body;
+  const {
+    approval_id,
+    loan_request_id,
+    approver_id,
+    approval_level,
+    approval_status,
+    approval_date,
+    remarks,
+    company_code,
+  } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44285,13 +44503,14 @@ const loan_approvalsSearch = async (req, res) => {
       .input("approval_date", sql.VarChar, approval_date)
       .input("remarks", sql.NVarChar, remarks)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_approvals @mode,@approval_id,@loan_request_id,@approver_id,@approval_level,@approval_status,@approval_date,@remarks,@company_code,'','','','',''`);
+      .query(
+        `EXEC sp_loan_approvals @mode,@approval_id,@loan_request_id,@approver_id,@approval_level,@approval_status,@approval_date,@remarks,@company_code,'','','','',''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
       res.status(404).json("Data not found");
-      
     }
   } catch (err) {
     console.error("Error fetching loan approvals search:", err);
@@ -44300,6 +44519,56 @@ const loan_approvalsSearch = async (req, res) => {
 };
 //code ended by Sakthi on 09-03-26
 
+//code added by sakthi on 10-03-26
+const loan_documentsSearch = async (req, res) => {
+  const {
+    document_id,
+    loan_request_id,
+    document_type,
+    file_path,
+    uploaded_by,
+    uploaded_at,
+    document,
+    company_code,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("document_id", sql.Int, document_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("document_type", sql.NVarChar, document_type)
+      .input("file_path", sql.NVarChar, file_path)
+      .input("uploaded_by", sql.NVarChar, uploaded_by)
+      .input("uploaded_at", sql.VarChar, uploaded_at)
+      .input("document", sql.NVarChar, document)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_loan_documents @mode,@document_id,@loan_request_id,@document_type,@file_path,@uploaded_by,@uploaded_at,@document,@company_code,'','','','',''`,
+      );
+
+    if (result.recordset.length > 0) {
+      const data = result.recordset.map((row) => {
+        if (row.document) {
+          row.document = row.document.toString("base64");
+        }
+        return row;
+      });
+      res.status(200).json(data);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error fetching loan documents search:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by sakthi on 10-03-26
 
 module.exports = {
   login,
@@ -45409,174 +45678,179 @@ module.exports = {
   CRM_PV,
   GetCalendarEvent,
   PrintTemplateUpdate,
-    candidate_masterLoopUpdate,
-    candidate_masterLoopDelete,
-    candidate_masterInsert,
-    interview_panelInsert,
-    interview_panelLoopUpdate,
-    interview_panelLoopDelete,
-    job_masterInsert,
-    job_masterLoopInsert,
-    job_masterLoopUpdate,
-    job_masterLoopDelete,
-    interview_panel_membersInsert,
-    interview_panel_membersLoopInsert,
-    interview_panel_membersLoopUpdate,
-    interview_panel_membersLoopDelete,
-    interview_scheduleInsert,
-    interview_scheduleLoopUpdate,
-    interview_scheduleLoopDelete,
-    interview_feedbackInsert,
-    interview_feedbackLoopUpdate,
-    interview_feedbackLoopDelete,
-    interview_decisionInsert,
-    interview_decisionLoopUpdate,
-    interview_decisionLoopDelete,
-    CandidateSearch,
-    JobmasterSearch,
-    InterviewPanel,
-    InterviewPanelMembers,
-    InterviewSchedule,
-    InterviewFeedbackSC,
-    InterviewDecisionSC,
-    DeptID,
-    JobMaster,
-    InterviewPanelData,
-    ScheduleID,
-    CanditateID,
-    Feedback_ID,
-    Decision_ID,
-    Employee_ID,
-    InterviewMode,
-    InterviewStatus,
-    Recommendation,
-    TimeZonemasterInsert,
-    TimeZonemasterUpdate,
-    TimeZonemasterDelete,
-    getTimeZoneData,
-    getTimeZonesearchdata,
-    getTitle,
-    getReligion,
-    getNationality,
-    CountryMasterInsert,
-    CountryMasterUpdate,
-    deleteCountryMaster,
-    getCountrySearchData,
-    Country_MasterLoopUpdate,
-    Country_MasterLoopDelete,
-    GetCountry,
-    Time_Zone_masterLoopUpdate,
-    Time_Zone_masterLoopDelete,
-    Shift_MasterInsert,
-    getShiftsearchdata,
-    sp_Shift_MasterLoopUpdate,
-    getSex,
-    getAccountType,
-    getBoolean,
-    getEmployeeType,
-    Employment_Type_MasterInsert, 
-    Employment_Type_MasterUpdate, 
-    Employment_Type_MasterDelete,
-    Employment_Type_MasterLoopUpdate, 
-    Employment_Type_MasterLoopDelete,
-    Shift_Pattern_MasterInsert, 
-    Shift_Pattern_MasterUpdate, 
-    Shift_Pattern_MasterDelete,
-    Shift_Pattern_MasterLoopInsert, 
-    Shift_Pattern_MasterLoopUpdate, 
-    Shift_Pattern_MasterLoopDelete,
-    Shift_Pattern_DetailInsert, 
-    Shift_Pattern_DetailUpdate, 
-    Shift_Pattern_DetailDelete,
-    Shift_Pattern_DetailLoopInsert, 
-    Shift_Pattern_DetailLoopUpdate, 
-    Shift_Pattern_DetailLoopDelete,
-    Employee_shift_mappingInsert,
-    Employee_shift_mappingUpdate,
-    Employee_shift_mappingDelete,
-    Employee_shift_mappingLoopInsert,
-    Employee_shift_mappingLoopUpdate,
-    Employee_shift_mappingLoopDelete,
-    sp_Shift_MasterLoopDelete,
-    Shift_Type_MasterInsert,
-    getShift_TypeSC,
-    Shift_TypeMasterUpdate,
-    Shift_TypeMasterDelete,
-    ShiftPattern_Insert,
-    ShiftPattern_SC,
-    ShiftPattern_Update,
-    ShiftPattern_Delete,
-    ShiftPatternDetail_SC,
-    Employment_Type_MasterSc,
-    ShiftMasterDropDown,
-    ShiftTypeDropDown,
-    ShiftPatternMasterDropDown,
-    Employee_shift_mappingSc,
-    InterviewScheduleSearch,
-    InterviewFeedbackSearch,
-    InterviewProgressSearch,
-    PanelPerformanceSearch,
-    HiringDecisionSearch,
-    CandidateAppliedSearch,
-    getHolidayType,
-    TotalInterviewSchedule,
-    InterviewCompletionRateSC,
-    getEmployeeTypeDD,
-    getInterviewDashboardCount,
-    getGenerateShift,
-    getEmpShiftReport,
-    getDepartmentDashboard,
-    getDepartment,
-    getAdEmpShiftReport,
-    shiftPatternChart,
-    Shift_Summary_Report,
-    visa_requestsInsert,
-    visa_requestsUpdate,
-    visa_requestsDelete,
-    visa_requestsLoopInsert,
-    visa_requestsLoopUpdate,
-    visa_requestsLoopDelete,
-    travel_requestsInsert,
-    travel_requestsUpdate,
-    travel_requestsDelete,
-    travel_requestsLoopInsert,
-    travel_requestsLoopUpdate,
-    travel_requestsLoopDelete,
-    loan_requestsInsert,
-    loan_requestsUpdate,
-    loan_requestsDelete,
-    loan_requestsLoopInsert,
-    loan_requestsLoopUpdate,
-    loan_requestsLoopDelete,
-    getVisaType,
-    travel_requestsSearch,
-    visaRequestSearch,
-    loan_approvalsInsert,
-    loan_approvalsUpdate,
-    loan_approvalsDelete,
-    loan_approvalsLoopInsert,
-    loan_approvalsLoopUpdate,
-    loan_approvalsLoopDelete,
-    loan_repayment_scheduleInsert,
-    loan_repayment_scheduleUpdate,
-    loan_repayment_scheduleDelete,
-    loan_repayment_scheduleLoopInsert,
-    loan_repayment_scheduleLoopUpdate,
-    loan_repayment_scheduleLoopDelete,
-    loan_paymentsInsert,
-    loan_paymentsUpdate,
-    loan_paymentsDelete,
-    loan_paymentsLoopInsert,
-    loan_paymentsLoopUpdate,
-    loan_paymentsLoopDelete,
-    getLoanTypes,
-    loanRequestSearch,
-    getPaymentMethod,
-    getLoanRequest,
-    loanPaymentSearch,
-    getPaymentStatus,
-    loanScheduleSearch,
-    loan_approvalsSearch
-
-
+  candidate_masterLoopUpdate,
+  candidate_masterLoopDelete,
+  candidate_masterInsert,
+  interview_panelInsert,
+  interview_panelLoopUpdate,
+  interview_panelLoopDelete,
+  job_masterInsert,
+  job_masterLoopInsert,
+  job_masterLoopUpdate,
+  job_masterLoopDelete,
+  interview_panel_membersInsert,
+  interview_panel_membersLoopInsert,
+  interview_panel_membersLoopUpdate,
+  interview_panel_membersLoopDelete,
+  interview_scheduleInsert,
+  interview_scheduleLoopUpdate,
+  interview_scheduleLoopDelete,
+  interview_feedbackInsert,
+  interview_feedbackLoopUpdate,
+  interview_feedbackLoopDelete,
+  interview_decisionInsert,
+  interview_decisionLoopUpdate,
+  interview_decisionLoopDelete,
+  CandidateSearch,
+  JobmasterSearch,
+  InterviewPanel,
+  InterviewPanelMembers,
+  InterviewSchedule,
+  InterviewFeedbackSC,
+  InterviewDecisionSC,
+  DeptID,
+  JobMaster,
+  InterviewPanelData,
+  ScheduleID,
+  CanditateID,
+  Feedback_ID,
+  Decision_ID,
+  Employee_ID,
+  InterviewMode,
+  InterviewStatus,
+  Recommendation,
+  TimeZonemasterInsert,
+  TimeZonemasterUpdate,
+  TimeZonemasterDelete,
+  getTimeZoneData,
+  getTimeZonesearchdata,
+  getTitle,
+  getReligion,
+  getNationality,
+  CountryMasterInsert,
+  CountryMasterUpdate,
+  deleteCountryMaster,
+  getCountrySearchData,
+  Country_MasterLoopUpdate,
+  Country_MasterLoopDelete,
+  GetCountry,
+  Time_Zone_masterLoopUpdate,
+  Time_Zone_masterLoopDelete,
+  Shift_MasterInsert,
+  getShiftsearchdata,
+  sp_Shift_MasterLoopUpdate,
+  getSex,
+  getAccountType,
+  getBoolean,
+  getEmployeeType,
+  Employment_Type_MasterInsert,
+  Employment_Type_MasterUpdate,
+  Employment_Type_MasterDelete,
+  Employment_Type_MasterLoopUpdate,
+  Employment_Type_MasterLoopDelete,
+  Shift_Pattern_MasterInsert,
+  Shift_Pattern_MasterUpdate,
+  Shift_Pattern_MasterDelete,
+  Shift_Pattern_MasterLoopInsert,
+  Shift_Pattern_MasterLoopUpdate,
+  Shift_Pattern_MasterLoopDelete,
+  Shift_Pattern_DetailInsert,
+  Shift_Pattern_DetailUpdate,
+  Shift_Pattern_DetailDelete,
+  Shift_Pattern_DetailLoopInsert,
+  Shift_Pattern_DetailLoopUpdate,
+  Shift_Pattern_DetailLoopDelete,
+  Employee_shift_mappingInsert,
+  Employee_shift_mappingUpdate,
+  Employee_shift_mappingDelete,
+  Employee_shift_mappingLoopInsert,
+  Employee_shift_mappingLoopUpdate,
+  Employee_shift_mappingLoopDelete,
+  sp_Shift_MasterLoopDelete,
+  Shift_Type_MasterInsert,
+  getShift_TypeSC,
+  Shift_TypeMasterUpdate,
+  Shift_TypeMasterDelete,
+  ShiftPattern_Insert,
+  ShiftPattern_SC,
+  ShiftPattern_Update,
+  ShiftPattern_Delete,
+  ShiftPatternDetail_SC,
+  Employment_Type_MasterSc,
+  ShiftMasterDropDown,
+  ShiftTypeDropDown,
+  ShiftPatternMasterDropDown,
+  Employee_shift_mappingSc,
+  InterviewScheduleSearch,
+  InterviewFeedbackSearch,
+  InterviewProgressSearch,
+  PanelPerformanceSearch,
+  HiringDecisionSearch,
+  CandidateAppliedSearch,
+  getHolidayType,
+  TotalInterviewSchedule,
+  InterviewCompletionRateSC,
+  getEmployeeTypeDD,
+  getInterviewDashboardCount,
+  getGenerateShift,
+  getEmpShiftReport,
+  getDepartmentDashboard,
+  getDepartment,
+  getAdEmpShiftReport,
+  shiftPatternChart,
+  Shift_Summary_Report,
+  visa_requestsInsert,
+  visa_requestsUpdate,
+  visa_requestsDelete,
+  visa_requestsLoopInsert,
+  visa_requestsLoopUpdate,
+  visa_requestsLoopDelete,
+  travel_requestsInsert,
+  travel_requestsUpdate,
+  travel_requestsDelete,
+  travel_requestsLoopInsert,
+  travel_requestsLoopUpdate,
+  travel_requestsLoopDelete,
+  loan_requestsInsert,
+  loan_requestsUpdate,
+  loan_requestsDelete,
+  loan_requestsLoopInsert,
+  loan_requestsLoopUpdate,
+  loan_requestsLoopDelete,
+  getVisaType,
+  travel_requestsSearch,
+  visaRequestSearch,
+  loan_approvalsInsert,
+  loan_approvalsUpdate,
+  loan_approvalsDelete,
+  loan_approvalsLoopInsert,
+  loan_approvalsLoopUpdate,
+  loan_approvalsLoopDelete,
+  loan_repayment_scheduleInsert,
+  loan_repayment_scheduleUpdate,
+  loan_repayment_scheduleDelete,
+  loan_repayment_scheduleLoopInsert,
+  loan_repayment_scheduleLoopUpdate,
+  loan_repayment_scheduleLoopDelete,
+  loan_paymentsInsert,
+  loan_paymentsUpdate,
+  loan_paymentsDelete,
+  loan_paymentsLoopInsert,
+  loan_paymentsLoopUpdate,
+  loan_paymentsLoopDelete,
+  getLoanTypes,
+  loanRequestSearch,
+  loan_documentsInsert,
+  loan_documentsUpdate,
+  loan_documentsDelete,
+  loan_documentsLoopInsert,
+  loan_documentsLoopUpdate,
+  loan_documentsLoopDelete,
+  getPaymentMethod,
+  getLoanRequest,
+  loanPaymentSearch,
+  getPaymentStatus,
+  loanScheduleSearch,
+  loan_approvalsSearch,
+  loan_documentsSearch,
 };
