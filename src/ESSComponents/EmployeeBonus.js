@@ -410,7 +410,7 @@ function Input({ }) {
     { label: 'Bonus' },
     { label: 'PF Contribution' },
     { label: 'Professional Tax' },
-    { label: 'Loan Type' },
+    // { label: 'Loan Type' },
     { label: 'TDS' },
   ];
 
@@ -433,9 +433,9 @@ function Input({ }) {
       case 'Professional Tax':
         EmpProfessionalTax();
         break;
-      case 'Loan Type':
-        EmpLoanType();
-        break;
+      // case 'Loan Type':
+      //   EmpLoanType();
+      //   break;
       case 'TDS':
         EmpTDS();
         break;
@@ -464,9 +464,9 @@ function Input({ }) {
     navigate("/PayslipEmpProTax");
   };
 
-  const EmpLoanType = () => {
-    navigate("/PayslipEmpLoanType");
-  };
+  // const EmpLoanType = () => {
+  //   navigate("/PayslipEmpLoanType");
+  // };
 
   const EmpTDS = () => {
     navigate("/PayslipEmpTDS");

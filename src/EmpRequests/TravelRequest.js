@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function TravelRequest({}) {
+function TravelRequest({ }) {
   const [rowData, setRowData] = useState([]);
   const [job_titleSC, setjob_titleSC] = useState("");
   const [job_title, setjob_title] = useState("");
@@ -981,8 +981,9 @@ function TravelRequest({}) {
   };
 
   const handleUpdate = async (rowData) => {
+
     showConfirmationToast(
-      "Are you sure you want to update the selected loan request data?",
+      "Are you sure you want to update the selected travel request data?",
       async () => {
         try {
           setLoading(true);
@@ -992,21 +993,20 @@ function TravelRequest({}) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/travel_requestsLoopUpdate`,
+          const response = await fetch(`${config.apiBaseUrl}/travel_requestsLoopUpdate`,
             {
               method: "POST",
               headers: {
@@ -1017,7 +1017,7 @@ function TravelRequest({}) {
           );
 
           if (response.ok) {
-            toast.success("loan approval updated successfully", {
+            toast.success("travel request updated successfully", {
               onClose: () => handleSearch(),
             });
           } else {
@@ -1035,59 +1035,58 @@ function TravelRequest({}) {
     );
   };
 
-    const handleDelete = async (rowData) => {
-      showConfirmationToast(
-        "Are you sure you want to delete the selected loan request data?",
-        async () => {
-          try {
-            setLoading(true);
-            const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-            const dataToSend = {
-              travel_requestsData: Array.isArray(rowData)
-                ? rowData.map((row) => ({
-                    ...row,
-                    company_code,
-                  }))
-                : [
-                    {
-                      ...rowData,
-                      company_code,
-                    },
-                  ],
-            };
-  
-            const response = await fetch(
-              `${config.apiBaseUrl}/travel_requestsLoopDelete`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  company_code: company_code,
+  const handleDelete = async (rowData) => {
+
+    showConfirmationToast(
+      "Are you sure you want to delete the selected travel request data?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+          const dataToSend = {
+            travel_requestsData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
                 },
-                body: JSON.stringify(dataToSend),
+              ],
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/travel_requestsLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "company_code": company_code
               },
-            );
-  
-            if (response.ok) {
-              toast.success("Loan approval deleted successfully", {
-                onClose: () => handleSearch(), // refresh data
-              });
-            } else {
-              const errorResponse = await response.json();
-              toast.warning(errorResponse.message || "Delete failed");
-            }
-          } catch (error) {
-            console.error("Error deleting loan approval rows:", error);
-            toast.error("Error deleting loan approval data: " + error.message);
-          } finally {
-            setLoading(false);
+              body: JSON.stringify(dataToSend),
+            },
+          );
+
+          if (response.ok) {
+            toast.success("travel request deleted successfully", {
+              onClose: () => handleSearch(), // refresh data
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
           }
-        },
-        () => toast.info("Delete cancelled"),
-      );
-    };
-  
+        } catch (error) {
+          console.error("Error deleting travel request rows:", error);
+          toast.error("Error deleting travel request data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Delete cancelled"),
+    );
+  };
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)

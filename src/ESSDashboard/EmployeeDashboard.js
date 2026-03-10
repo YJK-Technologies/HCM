@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
-import { Line } from "react-chartjs-2";
+import * as XLSX from "xlsx-js-style";
 import config from '../Apiconfig';
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
@@ -188,24 +188,44 @@ const Dashboard = (payslip) => {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  // useEffect(() => {
+  //   const today = new Date();
+
+  //   // Get current day (0 = Sunday, 1 = Monday ...)
+  //   const day = today.getDay();
+
+  //   // Calculate Monday
+  //   const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
+  //   const monday = new Date(today.setDate(diffToMonday));
+
+  //   // Calculate Sunday
+  //   const sunday = new Date(monday);
+  //   sunday.setDate(monday.getDate() + 6);
+
+  //   const formatDate = (date) => date.toISOString().split("T")[0];
+
+  //   setShiftFromDate(formatDate(monday));
+  //   setShiftToDate(formatDate(sunday));
+  // }, []);
+
   useEffect(() => {
     const today = new Date();
 
-    // Get current day (0 = Sunday, 1 = Monday ...)
-    const day = today.getDay();
+    // First day of current month
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // Calculate Monday
-    const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(today.setDate(diffToMonday));
+    // Last day of current month
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Calculate Sunday
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
 
-    const formatDate = (date) => date.toISOString().split("T")[0];
-
-    setShiftFromDate(formatDate(monday));
-    setShiftToDate(formatDate(sunday));
+    setShiftFromDate(formatDate(firstDay));
+    setShiftToDate(formatDate(lastDay));
   }, []);
 
   useEffect(() => {
@@ -409,11 +429,12 @@ const Dashboard = (payslip) => {
         const searchData = await response.json();
         setEmpShiftRowData(searchData);
       } else if (response.status === 404) {
-        setRowData([]);
+        setEmpShiftRowData([]);
         toast.warning("Data not found");
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to fetch data");
+        setEmpShiftRowData([]);
       }
     } catch (error) {
       console.error("Error fetching search data:", error);
@@ -505,7 +526,7 @@ const Dashboard = (payslip) => {
       },
     },
     {
-      headerName: "Employee Id",
+      headerName: "Employee ID",
       field: "Employee_ID",
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
@@ -1048,6 +1069,174 @@ const Dashboard = (payslip) => {
     newWindow.close();
   };
 
+  const handleEmpShiftReload = () => {
+    setEmpShiftRowData([]);
+    setShiftFromDate("");
+    setShiftToDate("");
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const shiftObj = shiftIdDropGrid.find(
+        (d) => d.value === row.Shift_Code
+      );
+
+      const shiftName = shiftObj
+        ? shiftObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const empObj = employeeIdDropGrid.find(
+        (d) => d.value === row.Employee_ID
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const depObj = departmentDrop.find(
+        (d) => d.value === row.dept_id
+      );
+
+      const depName = depObj
+        ? depObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const spObj = shiftPatternIdDropGrid.find(
+        (d) => d.value === row.Shift_Pattern_ID
+      );
+
+      const spName = spObj
+        ? spObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Date": row.Date || "",
+        "Shift": `${row.Shift_Code} - ${shiftName}` || "",
+        "Employee ID": `${row.Employee_ID} - ${empName}` || "",
+        "Department": `${row.dept_id} -${depName}` || "",
+        "Designation": row.desgination_id || "",
+        "Shift Pattern": `${row.Shift_Pattern_ID} - ${spName}` || "",
+        "Start Time": row.Start_Time || "",
+        "End Time": row.End_Time || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rempShiftRowData || rempShiftRowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Shift Routine Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rempShiftRowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shift Routine");
+
+    XLSX.writeFile(workbook, "Shift_Routine_Search_Report.xlsx");
+  };
+
   return (
     <div className="container-fluid  Topnav-screen pb-2">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
@@ -1099,7 +1288,7 @@ const Dashboard = (payslip) => {
               <button
                 className="btn btn-sm btn-outline-primary border-none"
                 onClick={() => setIsShiftCalendarVisible(!isShiftCalendarVisible)}
-                title={isShiftCalendarVisible ? "Switch to Table View" : "Switch to Calendar View"}
+                title={isShiftCalendarVisible ? "Switch to Grid View" : "Switch to Calendar View"}
               >
                 {isShiftCalendarVisible ? <i className="fa-solid fa-table"></i> : <i className="fa-solid fa-calendar-days"></i>}
               </button>
@@ -1133,8 +1322,25 @@ const Dashboard = (payslip) => {
                 className="btn btn-sm btn-primary"
                 onClick={handleEmpShiftReportSearch}
                 style={{ height: "35px", width: "40px" }}
+                title="Search"
               >
                 <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleEmpShiftReload}
+                style={{ height: "35px", width: "40px" }}
+                title="Grid Reload"
+              >
+                <i className="fa-solid fa-rotate-right"></i>
+              </button>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleExportToExcel}
+                style={{ height: "35px", width: "40px" }}
+                title="Export Excel"
+              >
+                <i className="fa-solid fa-file-excel"></i>
               </button>
             </div>
 
@@ -1195,12 +1401,25 @@ const Dashboard = (payslip) => {
                         const shift = shiftInfo ? shiftConfig[shiftInfo.Shift_Code] : null;
 
                         return (
+                          // <div
+                          //   key={index}
+                          //   className={`cal-day-cell ${day ? "active-day" : ""}`}
+                          //   style={{
+                          //     backgroundColor: shift ? `${shift.color}15` : ""
+                          //   }}
+                          // >
+
                           <div
                             key={index}
                             className={`cal-day-cell ${day ? "active-day" : ""}`}
                             style={{
                               backgroundColor: shift ? `${shift.color}15` : ""
                             }}
+                            title={
+                              shiftInfo
+                                ? `${shift.label}\n${shiftInfo.Start_Time} - ${shiftInfo.End_Time}`
+                                : ""
+                            }
                           >
 
                             <span className="day-num">{day}</span>
@@ -1284,6 +1503,7 @@ const Dashboard = (payslip) => {
                   <button
                     className="calendar-toggle-btn"
                     onClick={() => setIsCalendarVisible(!isCalendarVisible)}
+                    title={isCalendarVisible ? "Switch to Grid View" : "Switch to Calendar View"}
                   >
                     {isCalendarVisible ? <i className="fa-solid fa-calendar"></i> : <i className="fa-solid fa-table"></i>}
                   </button>
