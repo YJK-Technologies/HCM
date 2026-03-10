@@ -996,12 +996,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required
                                 autoComplete="off"
                                 value={visaRequestId}
-                                onChange={(e) => setVisaRequestId((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setVisaRequestId(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !visaRequestId ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
                         </div>
@@ -1036,12 +1042,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={passportId}
-                                onChange={(e) => setPassportId((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setPassportId(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !passportId ? 'text-danger' : ''}`}>Passport ID<span className="text-danger">*</span></label>
                         </div>
@@ -1101,6 +1113,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={purpose}
+                                maxLength={100}
                                 onChange={(e) => setPurpose((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
@@ -1167,11 +1180,17 @@ function VisaRequest({ }) {
                                 id="fdate"
                                 class="exp-input-field form-control"
                                 type="text"
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={reqNumber}
-                                onChange={(e) => setReqNumber((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setReqNumber(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
@@ -1209,6 +1228,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={sponsorName}
+                                maxLength={150}
                                 onChange={(e) => setSponsorName((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
@@ -1220,12 +1240,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
+                                maxLength={6}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 value={estimatedCost}
-                                onChange={(e) => setEstimatedCost((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setEstimatedCost(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !estimatedCost ? 'text-danger' : ''}`}>Estimated Cost<span className="text-danger">*</span></label>
                         </div>
@@ -1241,6 +1267,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={remarks}
+                                maxLength={255}
                                 onChange={(e) => setRemarks((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Remarks</label>
@@ -1261,12 +1288,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={visaRequestIdSc}
-                                onChange={(e) => setVisaRequestIdSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setVisaRequestIdSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Visa Request ID</label>
                         </div>
@@ -1301,12 +1334,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={passportIdSc}
-                                onChange={(e) => setPassportIdSc((e.target.value))}
+                                 onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setPassportIdSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Passport ID</label>
                         </div>
@@ -1366,6 +1405,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={purposeSc}
+                                maxLength={100}
                                 onChange={(e) => setPurposeSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Purpose</label>
@@ -1431,12 +1471,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={15}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={reqNumberSc}
-                                onChange={(e) => setReqNumberSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setReqNumberSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
@@ -1474,6 +1520,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={sponsorNameSc}
+                                maxLength={150}
                                 onChange={(e) => setSponsorNameSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
@@ -1485,12 +1532,18 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="number"
+                                type="text"
                                 placeholder=""
+                                maxLength={6}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={estimatedCostSc}
-                                onChange={(e) => setEstimatedCostSc((e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    setEstimatedCostSc(value);
+                                }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Estimated Cost</label>
                         </div>
@@ -1506,6 +1559,7 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={remarksSc}
+                                maxLength={255}
                                 onChange={(e) => setRemarksSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Remarks</label>

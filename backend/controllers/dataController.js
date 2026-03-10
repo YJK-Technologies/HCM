@@ -27791,49 +27791,27 @@ const deleteProfessionalTax = async (req, res) => {
 };
 
 const addLoanType = async (req, res) => {
-  const {
-    company_code,
-    Loan_ID,
-    Loan_Eligible_Amount,
-    Start_Year,
-    End_Year,
-    keyfield,
-    Created_by,
-    Modified_by,
-    tempstr1,
-    tempstr2,
-    tempstr3,
-    tempstr4,
-    datetime1,
-    datetime2,
-    datetime3,
-    datetime4,
-  } = req.body;
+  const { company_code, Loan_Type_ID, Loan_Type_Name, Max_amount, Max_repayment_months, Default_interest_rate, Start_Year, End_Year, Description, Status, Created_by } = req.body;
   let pool;
   try {
     pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
-      .input("mode", sql.NVarChar, "I") // Insert mode
+      .input("mode", sql.NVarChar, "I") 
       .input("company_code", sql.NVarChar, company_code)
-      .input("Loan_ID", sql.VarChar, Loan_ID)
-      .input("Loan_Eligible_Amount", sql.Decimal(10, 2), Loan_Eligible_Amount)
+      .input("Loan_Type_ID", sql.Int, Loan_Type_ID)
+      .input("Loan_Type_Name", sql.VarChar, Loan_Type_Name)
+      .input("Max_amount", sql.Decimal(12, 2), Max_amount)
+      .input("Max_repayment_months", sql.Int, Max_repayment_months)
+      .input("Default_interest_rate", sql.Decimal(12, 2), Default_interest_rate)
+      .input("Description", sql.NVarChar, Description)
+      .input("Status", sql.NVarChar, Status)
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
-      .input("keyfield", sql.VarChar, keyfield)
       .input("Created_by", sql.NVarChar, Created_by)
-      .input("Modified_by", sql.NVarChar, Modified_by)
-      .input("tempstr1", sql.NVarChar, tempstr1)
-      .input("tempstr2", sql.NVarChar, tempstr2)
-      .input("tempstr3", sql.NVarChar, tempstr3)
-      .input("tempstr4", sql.NVarChar, tempstr4)
-      .input("datetime1", sql.NVarChar, datetime1)
-      .input("datetime2", sql.NVarChar, datetime2)
-      .input("datetime3", sql.NVarChar, datetime3)
-      .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_Loan_Type @mode,@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'',@Created_by,@Modified_by,
-            @tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
-    res.status(200).json("Employee Loan details data inserted successfully");
+      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
+            '', '', '', '', '', '', '', ''`);
+    res.status(200).json("Loan type data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
     res.status(500).json({
@@ -27850,35 +27828,24 @@ const updateLoanType = async (req, res) => {
   }
 
   try {
-    const pool = await connection.connectToDatabase();
-
+    const pool = await sql.connect(dbConfig);
     for (const updatedRow of editedData) {
       await pool
         .request()
         .input("mode", sql.NVarChar, "U")
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
-        .input("Loan_ID", sql.VarChar, updatedRow.Loan_ID)
-        .input(
-          "Loan_Eligible_Amount",
-          sql.Decimal(10, 2),
-          updatedRow.Loan_Eligible_Amount,
-        )
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("Loan_Type_ID", sql.Int, updatedRow.Loan_Type_ID)
+        .input("Loan_Type_Name", sql.VarChar, updatedRow.Loan_Type_Name)
+        .input("Max_amount", sql.Decimal(12, 2), updatedRow.Max_amount)
+        .input("Max_repayment_months", sql.Int, updatedRow.Max_repayment_months)
+        .input("Default_interest_rate", sql.Decimal(12, 2), updatedRow.Default_interest_rate)
+        .input("Description", sql.NVarChar, updatedRow.Description)
+        .input("Status", sql.NVarChar, updatedRow.Status)
         .input("Start_Year", sql.Date, updatedRow.Start_Year)
         .input("End_Year", sql.Date, updatedRow.End_Year)
-        .input("keyfield", sql.VarChar, updatedRow.keyfield)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
-        .input("tempstr1", sql.NVarChar, updatedRow.tempstr1)
-        .input("tempstr2", sql.NVarChar, updatedRow.tempstr2)
-        .input("tempstr3", sql.NVarChar, updatedRow.tempstr3)
-        .input("tempstr4", sql.NVarChar, updatedRow.tempstr4)
-        .input("datetime1", sql.NVarChar, updatedRow.datetime1)
-        .input("datetime2", sql.NVarChar, updatedRow.datetime2)
-        .input("datetime3", sql.NVarChar, updatedRow.datetime3)
-        .input("datetime4", sql.NVarChar, updatedRow.datetime4).query(`
-                EXEC sp_Loan_Type 
-                  @mode, @company_code, @Loan_ID, @Loan_Eligible_Amount, @Start_Year, @End_Year, 
-                  @keyfield, '', @Modified_by, null, null, null, null, null, null, null, null
-              `);
+        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', '', @Modified_by,
+            '', '', '', '', '', '', '', ''`);
     }
 
     res.status(200).json("Data updated successfully");
@@ -27891,9 +27858,8 @@ const updateLoanType = async (req, res) => {
 const allLoanType = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      `EXEC sp_Loan_Type 'A','',0,0,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-    );
+    const result = await sql
+    .query(`EXEC sp_Loan_Type 'A', '', 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -27909,17 +27875,14 @@ const deleteLoanType = async (req, res) => {
   }
 
   try {
-    const pool = await connection.connectToDatabase();
-
+    const pool = await sql.connect(dbConfig);
     for (const updatedRow of editedData) {
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
-        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(
-          `EXEC sp_Loan_Type @mode, @company_code, '', 0, '', '', @keyfield, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`,
-        );
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("Loan_Type_ID", sql.Int, updatedRow.Loan_Type_ID)
+        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, '', 0, 0, 0, '', '', '', '', '', '','', '', '', '', '', '', '', '', ''`,);
     }
 
     res.status(200).json("Data deleted successfully");
@@ -28139,27 +28102,29 @@ const getPFContribution = async (req, res) => {
 };
 //CODE ENDED BY PAVUN
 const getLoanType = async (req, res) => {
-  const { company_code, Loan_ID, Loan_Eligible_Amount, Start_Year, End_Year } =
-    req.body;
+  const { company_code, Loan_Type_ID, Loan_Type_Name, Max_amount, Max_repayment_months, Default_interest_rate, Start_Year, End_Year, Description, Status } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
       .input("company_code", sql.NVarChar, company_code)
-      .input("Loan_ID", sql.VarChar, Loan_ID)
-      .input("Loan_Eligible_Amount", sql.Decimal(14, 2), Loan_Eligible_Amount)
+      .input("Loan_Type_ID", sql.NVarChar, Loan_Type_ID)
+      .input("Loan_Type_Name", sql.VarChar, Loan_Type_Name)
+      .input("Max_amount", sql.Decimal(12, 2), Max_amount)
+      .input("Max_repayment_months", sql.NVarChar, Max_repayment_months)
+      .input("Default_interest_rate", sql.Decimal(12, 2), Default_interest_rate)
+      .input("Description", sql.NVarChar, Description)
+      .input("Status", sql.NVarChar, Status)
       .input("Start_Year", sql.NVarChar, Start_Year)
       .input("End_Year", sql.NVarChar, End_Year)
-      .query(
-        `EXEC sp_Loan_Type 'sc',@company_code,@Loan_ID,@Loan_Eligible_Amount,@Start_Year,@End_Year,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
-    // Send response
-    if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset); // 200 OK if data is found
-    } else {
-      res.status(404).json("Data not found"); // 404 Not Found if no data is found
-    }
+      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', '','',
+            '', '', '', '', '', '', '', ''`);
+      if (result.recordset.length > 0) {
+        res.status(200).json(result.recordset); 
+      } else {
+        res.status(404).json("Data not found"); 
+      }
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -43487,7 +43452,7 @@ const travel_requestsUpdate = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("department_id", sql.Int, department_id)
+      .input("department_id", sql.NVarChar, department_id)
       .input("travel_type", sql.NVarChar, travel_type)
       .input("destination_country_id", sql.Int, destination_country_id)
       .input("destination_city", sql.NVarChar, destination_city)
@@ -43501,7 +43466,7 @@ const travel_requestsUpdate = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("priority_level", sql.NVarChar, priority_level)
-      .input("manager_id", sql.Int, manager_id)
+      .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
@@ -43522,32 +43487,7 @@ const travel_requestsUpdate = async (req, res) => {
 };
 
 const travel_requestsDelete = async (req, res) => {
-  const {
-    travel_request_id,
-    request_number,
-    employee_id,
-    department_id,
-    travel_type,
-    destination_country_id,
-    destination_city,
-    purpose_of_travel,
-    travel_start_date,
-    travel_end_date,
-    transport_mode,
-    accommodation_required,
-    estimated_cost,
-    currency_code,
-    request_status,
-    Remarks,
-    priority_level,
-    manager_id,
-    company_code,
-    keyfield,
-    created_by,
-    created_date,
-    modified_by,
-    modified_date,
-  } = req.body;
+  const { travel_request_id, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43555,32 +43495,8 @@ const travel_requestsDelete = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "D")
       .input("travel_request_id", sql.Int, travel_request_id)
-      .input("request_number", sql.NVarChar, request_number)
-      .input("employee_id", sql.NVarChar, employee_id)
-      .input("department_id", sql.Int, department_id)
-      .input("travel_type", sql.NVarChar, travel_type)
-      .input("destination_country_id", sql.Int, destination_country_id)
-      .input("destination_city", sql.NVarChar, destination_city)
-      .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
-      .input("travel_start_date", sql.Date, travel_start_date)
-      .input("travel_end_date", sql.Date, travel_end_date)
-      .input("transport_mode", sql.NVarChar, transport_mode)
-      .input("accommodation_required", sql.Bit, accommodation_required)
-      .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
-      .input("currency_code", sql.NVarChar, currency_code)
-      .input("request_status", sql.NVarChar, request_status)
-      .input("Remarks", sql.NVarChar, Remarks)
-      .input("priority_level", sql.NVarChar, priority_level)
-      .input("manager_id", sql.Int, manager_id)
       .input("company_code", sql.NVarChar, company_code)
-      .input("keyfield", sql.NVarChar, keyfield)
-      .input("created_by", sql.NVarChar, created_by)
-      .input("created_date", sql.DateTime, created_date)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("modified_date", sql.DateTime, modified_date)
-      .query(
-        `EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, @created_by, @created_date, @modified_by, @modified_date`,
-      );
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`,);
 
     res
       .status(200)
@@ -43607,9 +43523,9 @@ const travel_requestsLoopInsert = async (req, res) => {
         .input("travel_request_id", sql.Int, item.travel_request_id)
         .input("request_number", sql.NVarChar, item.request_number)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("department_id", sql.Int, item.department_id)
+        .input("department_id", sql.NVarChar, item.department_id)
         .input("travel_type", sql.NVarChar, item.travel_type)
-        .input("destination_country_id", sql.Int, item.destination_country_id)
+        .input("destination_country_id", sql.NVarChar, item.destination_country_id)
         .input("destination_city", sql.NVarChar, item.destination_city)
         .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
         .input("travel_start_date", sql.Date, item.travel_start_date)
@@ -43621,7 +43537,7 @@ const travel_requestsLoopInsert = async (req, res) => {
         .input("request_status", sql.NVarChar, item.request_status)
         .input("Remarks", sql.NVarChar, item.Remarks)
         .input("priority_level", sql.NVarChar, item.priority_level)
-        .input("manager_id", sql.Int, item.manager_id)
+        .input("manager_id", sql.NVarChar, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
@@ -43652,9 +43568,9 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("travel_request_id", sql.Int, item.travel_request_id)
         .input("request_number", sql.NVarChar, item.request_number)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("department_id", sql.Int, item.department_id)
+        .input("department_id", sql.NVarChar, item.department_id)
         .input("travel_type", sql.NVarChar, item.travel_type)
-        .input("destination_country_id", sql.Int, item.destination_country_id)
+        .input("destination_country_id", sql.NVarChar, item.destination_country_id)
         .input("destination_city", sql.NVarChar, item.destination_city)
         .input("purpose_of_travel", sql.NVarChar, item.purpose_of_travel)
         .input("travel_start_date", sql.Date, item.travel_start_date)
@@ -43666,13 +43582,11 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("request_status", sql.NVarChar, item.request_status)
         .input("Remarks", sql.NVarChar, item.Remarks)
         .input("priority_level", sql.NVarChar, item.priority_level)
-        .input("manager_id", sql.Int, item.manager_id)
+        .input("manager_id", sql.NVarChar, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(
-          `EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, '', '', @modified_by, ''`,
-        );
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, '', '', @modified_by, ''`,);
     }
     res.status(200).json("travel_requests data updated successfully");
   } catch (err) {
@@ -43696,9 +43610,7 @@ const travel_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("travel_request_id", sql.Int, item.travel_request_id)
         .input("company_code", sql.NVarChar, item.company_code)
-        .query(
-          `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', @company_code, '', '', '', '',''`,
-        );
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`,);
     }
     res.status(200).json("travel_requests data deleted successfully");
   } catch (err) {
@@ -44113,13 +44025,13 @@ const loanRequestSearch = async (req, res) => {
     request_status,
     company_code,
   } = req.body;
-
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
+
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
       .input("request_number", sql.NVarChar, request_number)
       .input("employee_id", sql.NVarChar, employee_id)
       .input("loan_type_id", sql.VarChar, loan_type_id)
@@ -44131,9 +44043,7 @@ const loanRequestSearch = async (req, res) => {
       .input("purpose", sql.NVarChar, purpose)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, '', '', '', '', ''`,
-      );
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, @currency_code, @purpose, @request_status, @company_code, '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44195,7 +44105,7 @@ const loanPaymentSearch = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SC")
       .input("payment_id", sql.NVarChar, payment_id)
-      .input("loan_request_id", sql.NVarChar, loan_request_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
       .input("payment_date", sql.NVarChar, payment_date)
       .input("paid_amount", sql.Decimal(12, 2), paid_amount)
       .input("payment_method", sql.NVarChar, payment_method)
