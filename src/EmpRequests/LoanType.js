@@ -1,76 +1,87 @@
 import { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import "ag-grid-enterprise";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-import { AgGridReact } from "ag-grid-react";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
-import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
+import Select from 'react-select';
 const config = require('../Apiconfig');
 
-function LoanSchedule({ }) {
+const getFinancialYearDates = () => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
+    let startYear, endYear;
 
+    if (currentMonth < 4) {
+        startYear = currentYear - 1;
+        endYear = currentYear;
+    } else {
+        startYear = currentYear;
+        endYear = currentYear + 1;
+    }
+
+    const FirstDate = `${startYear}-04-01`;
+    const LastDate = `${endYear}-03-31`;
+
+    return { FirstDate, LastDate };
+};
+
+const { FirstDate, LastDate } = getFinancialYearDates();
+
+function LoanType({ }) {
+    const [error, setError] = useState(false);
+    const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState([]);
-    const [error, setError] = useState("");
+    const [gridApi, setGridApi] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const [scheduleId, setScheduleId] = useState('');
-    const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
-    const [loanReqId, setLoanReqId] = useState('');
-    const [selectedLoanReqId, setSelectedLoanReqId] = useState('');
-    const [installmentNo, setIntallmentNo] = useState('');
-    const [installmentDate, setIntallmentDate] = useState('');
-    const [principleAmount, setPrincipleAmount] = useState('');
-    const [interestAmount, setInterestAmount] = useState('');
-    const [totalInstallment, setTotalInstallment] = useState('');
-    const [paymentStatusDrop, setPaymentStatusDrop] = useState([]);
-    const [paymentStatus, setPaymentStatus] = useState('');
-    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
+    const [loanTypeId, setLoanTypeId] = useState('');
+    const [loanTypeNameDrop, setLoanTypeNameDrop] = useState([]);
+    const [loanTypeName, setLoanTypeName] = useState('');
+    const [selectedLoanTypeName, setSelectedLoanTypeName] = useState('');
+    const [maxAmount, setMaxAmount] = useState('');
+    const [maxRepaymentMonths, setMaxRepaymentMonths] = useState('');
+    const [defaultInterestRate, setDefaultInterestRate] = useState('');
+    const [description, setDescription] = useState('');
+    const [statusDrop, setStatusDrop] = useState([]);
+    const [status, setStatus] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
+    const [startYear, setStartYear] = useState(FirstDate);
+    const [endYear, setEndYear] = useState(LastDate);
 
-    const [scheduleIdSc, setScheduleIdSc] = useState('');
-    const [loanReqIdDropSc, setLoanReqIdDropSc] = useState([]);
-    const [loanReqIdSc, setLoanReqIdSc] = useState('');
-    const [selectedLoanReqIdSc, setSelectedLoanReqIdSc] = useState('');
-    const [installmentNoSc, setIntallmentNoSc] = useState('');
-    const [principleAmountSc, setPrincipleAmountSc] = useState('');
-    const [interestAmountSc, setInterestAmountSc] = useState('');
-    const [totalInstallmentSc, setTotalInstallmentSc] = useState('');
-    const [paymentStatusDropSc, setPaymentStatusDropSc] = useState([]);
-    const [paymentStatusSc, setPaymentStatusSc] = useState('');
-    const [selectedPaymentStatusSc, setSelectedPaymentStatusSc] = useState('');
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
+    const [loanTypeIdSc, setLoanTypeIdSc] = useState('');
+    const [loanTypeNameDropSc, setLoanTypeNameDropSc] = useState([]);
+    const [loanTypeNameSc, setLoanTypeNameSc] = useState('');
+    const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState('');
+    const [maxAmountSc, setMaxAmountSc] = useState('');
+    const [maxRepaymentMonthsSc, setMaxRepaymentMonthsSc] = useState('');
+    const [defaultInterestRateSc, setDefaultInterestRateSc] = useState('');
+    const [descriptionSc, setDescriptionSc] = useState('');
+    const [statusDropSc, setStatusDropSc] = useState([]);
+    const [statusSc, setStatusSc] = useState('');
+    const [selectedStatusSc, setSelectedStatusSc] = useState('');
+    const [startYearSc, setStartYearSc] = useState(FirstDate);
+    const [endYearSc, setEndYearSc] = useState(LastDate);
 
-    const [loanReqIdDropGrid, setLoanReqIdDropGrid] = useState([]);
-    const [paymentStatusDropGrid, setPaymentStatusDropGrid] = useState([]);
+    const [isSelectedLoanTypeName, setIsSelectedLoanTypeName] = useState(false);
+    const [isSelectedStatus, setIsSelectedStatus] = useState(false);
 
-    const [isSelectedLoanReqId, setIsSelectedLoanReqId] = useState('');
-    const [isSelectedPaymentStatus, setIsSelectedPaymentStatus] = useState('');
+    const [isSelectedLoanTypeNameSc, setIsSelectedLoanTypeNameSc] = useState(false);
+    const [isSelectedStatusSc, setIsSelectedStatusSc] = useState(false);
 
-    const [isSelectedLoanReqIdSc, setIsSelectedLoanReqIdSc] = useState('');
-    const [isSelectedPaymentStatusSc, setIsSelectedPaymentStatusSc] = useState('');
-
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setLoanReqIdDrop(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+    const [loanTypeNameDropGrid, setLoanTypeNameDropGrid] = useState([]);
+    const [statusDropGrid, setStatusDropGrid] = useState([]);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,50 +89,13 @@ function LoanSchedule({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setPaymentStatusDrop(val))
+            .then((val) => setLoanTypeNameDrop(val))
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-
-    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
-
-    const filteredOptionPaymentStatus = paymentStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-
-    const handleChangeLoanReqId = (selectedLoanReqId) => {
-        setSelectedLoanReqId(selectedLoanReqId);
-        setLoanReqId(selectedLoanReqId ? selectedLoanReqId.value : "");
-    };
-
-    const handleChangePaymentStatus = (selectedPaymentStatus) => {
-        setSelectedPaymentStatus(selectedPaymentStatus);
-        setPaymentStatus(selectedPaymentStatus ? selectedPaymentStatus.value : "");
-    };
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setLoanReqIdDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
+        fetch(`${config.apiBaseUrl}/status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -129,33 +103,81 @@ function LoanSchedule({ }) {
             body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
-            .then((val) => setPaymentStatusDropSc(val))
+            .then((val) => setStatusDrop(val))
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
-
-    const filteredOptionPaymentStatusSc = paymentStatusDropSc.map((option) => ({
+    const filteredOptionLoanType = loanTypeNameDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
-        setSelectedLoanReqIdSc(selectedLoanReqIdSc);
-        setLoanReqIdSc(selectedLoanReqIdSc ? selectedLoanReqIdSc.value : "");
+    const filteredOptionStatus = statusDrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const handleChangeLoanType = (selectedLoanTypeName) => {
+        setSelectedLoanTypeName(selectedLoanTypeName);
+        setLoanTypeName(selectedLoanTypeName ? selectedLoanTypeName.value : "");
     };
 
-    const handleChangePaymentStatusSc = (selectedPaymentStatusSc) => {
-        setSelectedPaymentStatusSc(selectedPaymentStatusSc);
-        setPaymentStatusSc(selectedPaymentStatusSc ? selectedPaymentStatusSc.value : "");
+    const handleChangeStatus = (selectedStatus) => {
+        setSelectedStatus(selectedStatus);
+        setStatus(selectedStatus ? selectedStatus.value : "");
     };
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanTypeNameDropSc(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setStatusDropSc(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    const filteredOptionLoanTypeSc = loanTypeNameDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const filteredOptionStatusSc = statusDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }));
+
+    const handleChangeLoanTypeSc = (selectedLoanTypeNameSc) => {
+        setSelectedLoanTypeNameSc(selectedLoanTypeNameSc);
+        setLoanTypeNameSc(selectedLoanTypeNameSc ? selectedLoanTypeNameSc.value : "");
+    };
+
+    const handleChangeStatusSc = (selectedStatusSc) => {
+        setSelectedStatusSc(selectedStatusSc);
+        setStatusSc(selectedStatusSc ? selectedStatusSc.value : "");
+    };
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -164,15 +186,15 @@ function LoanSchedule({ }) {
         })
             .then((data) => data.json())
             .then((val) => {
-                const payment = val.map(option => option.loan_request_id);
-                setLoanReqIdDropGrid(payment);
+                const visaType = val.map(option => option.attributedetails_name);
+                setLoanTypeNameDropGrid(visaType);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
+        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,24 +203,24 @@ function LoanSchedule({ }) {
         })
             .then((data) => data.json())
             .then((val) => {
-                const payment = val.map(option => option.attributedetails_name);
-                setPaymentStatusDropGrid(payment);
+                const status = val.map(option => option.attributedetails_name);
+                setStatusDropGrid(status);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     const searchClearInputFields = () => {
-        setScheduleIdSc("");
-        setLoanReqIdSc("");
-        setSelectedLoanReqIdSc("");
-        setIntallmentNoSc("");
-        setPrincipleAmountSc("");
-        setInterestAmountSc("");
-        setTotalInstallmentSc("");
-        setPaymentStatusSc("");
-        setSelectedPaymentStatusSc("");
-        setFromDate("");
-        setToDate("");
+        setLoanTypeIdSc("");
+        setLoanTypeNameSc("");
+        setSelectedLoanTypeNameSc("");
+        setMaxAmountSc("");
+        setMaxRepaymentMonthsSc("");
+        setDefaultInterestRateSc("");
+        setDescriptionSc("");
+        setStatusSc("");
+        setSelectedStatusSc("");
+        setStartYearSc("");
+        setEndYearSc("");
     };
 
     const columnDefs = [
@@ -209,7 +231,6 @@ function LoanSchedule({ }) {
                 const cellWidth = params.column.getActualWidth();
                 const isWideEnough = cellWidth > 20;
                 const showIcons = isWideEnough;
-
                 return (
                     <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
                         {showIcons && (
@@ -236,59 +257,63 @@ function LoanSchedule({ }) {
             },
         },
         {
-            headerName: "Schedule ID",
-            field: "schedule_id",
-            editable: false
+            headerName: "Start Year",
+            field: "Start_Year",
+            editable: true,
         },
         {
-            headerName: "Loan Request ID",
-            field: "loan_request_id",
+            headerName: "End Year",
+            field: "End_Year",
+            editable: true,
+        },
+        {
+            headerName: "Loan Type ID",
+            field: "Loan_Type_ID",
+            editable: false,
+        },
+        {
+            headerName: "Loan Type Name",
+            field: "Loan_Type_Name",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: loanReqIdDropGrid,
+                values: loanTypeNameDropGrid,
             },
         },
         {
-            headerName: "Installment No",
-            field: "installment_number",
-            editable: true
+            headerName: "Max Amount",
+            field: "Max_amount",
+            editable: true,
         },
         {
-            headerName: "Installment Date",
-            field: "installment_date",
-            editable: true
+            headerName: "Max Repayment Months",
+            field: "Max_repayment_months",
+            editable: true,
         },
         {
-            headerName: "Principle Amount",
-            field: "principal_amount",
-            editable: true
+            headerName: "Default Interest Rate",
+            field: "Default_interest_rate",
+            editable: true,
         },
         {
-            headerName: "Interest Amount",
-            field: "interest_amount",
-            editable: true
+            headerName: "Description",
+            field: "Description",
+            editable: true,
         },
         {
-            headerName: "Total Installment",
-            field: "total_installment",
-            editable: true
-        },
-        {
-            headerName: "Payment Status",
-            field: "payment_status",
+            headerName: "Status",
+            field: "Status",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: paymentStatusDropGrid,
+                values: statusDropGrid,
             },
         },
         {
             headerName: "Keyfield",
             field: "keyfield",
-            editable: true,
             hide: true
-        }
+        },
     ]
 
     const gridOptions = {
@@ -296,78 +321,33 @@ function LoanSchedule({ }) {
         paginationPageSize: 10,
     };
 
-    const handleSave = async () => {
-        if (!scheduleId ||
-            !loanReqId ||
-            !installmentNo ||
-            !installmentDate ||
-            !principleAmount ||
-            !interestAmount ||
-            !totalInstallment ||
-            !paymentStatus
-        ) {
-            setError(" ");
-            toast.warning("Error: Missing required fields");
-            return;
-        }
+    const reloadGridData = () => {
+        setRowData([]);
+        searchClearInputFields();
+    }
 
-        setLoading(true);
-
-        try {
-            const Header = {
-                schedule_id: scheduleId,
-                loan_request_id: loanReqId,
-                installment_number: installmentNo,
-                installment_date: installmentDate,
-                principal_amount: principleAmount,
-                interest_amount: interestAmount,
-                total_installment: totalInstallment,
-                payment_status: paymentStatus,
-                company_code: sessionStorage.getItem('selectedCompanyCode'),
-                created_by: sessionStorage.getItem('selectedUserCode')
-            };
-            const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleInsert`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(Header),
-            });
-            if (response.ok) {
-                console.log("Data inserted successfully");
-                toast.success("Data inserted successfully!", {
-                    onClose: () => window.location.reload(),
-                });
-            } else {
-                const errorResponse = await response.json();
-                toast.warning(errorResponse.message || "Failed to insert sales data");
-                console.error(errorResponse.details || errorResponse.message);
-            }
-        } catch (error) {
-            console.error("Error inserting data:", error);
-            toast.error('Error inserting data: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
+    const onGridReady = (params) => {
+        setGridApi(params.api);
+        setGridColumnApi(params.columnApi);
     };
 
     const handleSearch = async () => {
-        setLoading(true);
+        setLoading(true)
         try {
             const body = {
-                schedule_id: scheduleIdSc,
-                loan_request_id: loanReqIdSc,
-                installment_number: installmentNoSc,
-                principal_amount: principleAmountSc ? principleAmountSc : 0,
-                interest_amount: interestAmountSc ? interestAmountSc : 0,
-                total_installment: totalInstallmentSc ? totalInstallmentSc : 0,
-                FromDate: fromDate,
-                ToDate: toDate,
-                payment_status: paymentStatusSc,
-                company_code: sessionStorage.getItem('selectedCompanyCode'),
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Loan_Type_ID: loanTypeIdSc,
+                Loan_Type_Name: loanTypeNameSc,
+                Max_amount: maxAmountSc ? maxAmountSc : 0,
+                Max_repayment_months: maxRepaymentMonthsSc,
+                Default_interest_rate: defaultInterestRateSc ? defaultInterestRateSc : 0,
+                Description: descriptionSc,
+                Status: statusSc,
+                Start_Year: startYearSc,
+                End_Year: endYearSc,
             };
 
-            const response = await fetch(`${config.apiBaseUrl}/loanScheduleSearch`, {
+            const response = await fetch(`${config.apiBaseUrl}/getLoanType`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -384,51 +364,92 @@ function LoanSchedule({ }) {
                 setRowData([]);
             } else {
                 const errorResponse = await response.json();
-                toast.warning(errorResponse.message || "Failed to insert sales data");
+                toast.warning(errorResponse.message || "Failed to fetch loan data");
                 console.error(errorResponse.details || errorResponse.message);
                 setRowData([]);
             }
         } catch (error) {
             console.error("Error fetching search data:", error);
-            toast.error("Error fetching search data:", error);
-            setRowData([]);
+            toast.error("An unexpected error occurred while fetching data.");
         } finally {
             setLoading(false);
         }
     };
 
-    const reloadGridData = () => {
-        setRowData([]);
-        searchClearInputFields();
+    const handleInsert = async () => {
+        if (!loanTypeId || !loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status || !startYear || !endYear) {
+            setError(true);
+            toast.warning("Error: Missing required fields");
+            return;
+        }
+        setError(false);
+        setLoading(true);
+
+        try {
+            const Headers = {
+                Loan_Type_ID: loanTypeId,
+                Loan_Type_Name: loanTypeName,
+                Max_amount: maxAmount,
+                Max_repayment_months: maxRepaymentMonths,
+                Default_interest_rate: defaultInterestRate,
+                Description: description,
+                Status: status,
+                Start_Year: startYear,
+                End_Year: endYear,
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Created_by: sessionStorage.getItem("selectedUserCode"),
+            };
+
+            const response = await fetch(`${config.apiBaseUrl}/addLoanType`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(Headers),
+            });
+
+            if (response.ok) {
+                toast.success("Data inserted successfully!", {
+                    onClose: () => window.location.reload(),
+                });
+            } else {
+                const errorResponse = await response.json();
+                toast.warning(errorResponse.message || "Failed to insert data");
+            }
+        } catch (error) {
+            toast.error("Error inserting data: " + error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleUpdate = async (rowData) => {
+        const handleUpdate = async (rowData) => {
 
         showConfirmationToast(
-            "Are you sure you want to update the selected loan schedule data?",
+            "Are you sure you want to update the selected loan type data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        loan_repayment_scheduleData: Array.isArray(rowData)
+                        editedData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
-                                modified_by,
+                                Modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
-                                    modified_by,
+                                    Modified_by,
                                 },
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/updateLoanType`,
                         {
                             method: "POST",
                             headers: {
@@ -439,7 +460,7 @@ function LoanSchedule({ }) {
                     );
 
                     if (response.ok) {
-                        toast.success("loan schedule updated successfully", {
+                        toast.success("loan type updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -458,16 +479,15 @@ function LoanSchedule({ }) {
     };
 
     const handleDelete = async (rowData) => {
-
         showConfirmationToast(
-            "Are you sure you want to delete the selected loan schedule data?",
+            "Are you sure you want to delete the selected loan type data?",
             async () => {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        loan_repayment_scheduleData: Array.isArray(rowData)
+                        editedData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
@@ -480,7 +500,7 @@ function LoanSchedule({ }) {
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/loan_repayment_scheduleLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/deleteLoanType`,
                         {
                             method: "POST",
                             headers: {
@@ -492,7 +512,7 @@ function LoanSchedule({ }) {
                     );
 
                     if (response.ok) {
-                        toast.success("loan schedule deleted successfully", {
+                        toast.success("loan type deleted successfully", {
                             onClose: () => handleSearch(), // refresh data
                         });
                     } else {
@@ -500,8 +520,8 @@ function LoanSchedule({ }) {
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting loan schedule rows:", error);
-                    toast.error("Error deleting loan schedule data: " + error.message);
+                    console.error("Error deleting loan type rows:", error);
+                    toast.error("Error deleting loan type data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -517,18 +537,17 @@ function LoanSchedule({ }) {
     };
 
     const transformRowData = (data) => {
-        return data.map((row) => {
-            return {
-                "Schedule ID": row.schedule_id || "",
-                "Loan Request ID": row.loan_request_id || "",
-                "Installment No": row.installment_number || "",
-                "Installment Date": row.installment_date || "",
-                "Principle Amount": row.principal_amount || "",
-                "Interest Amount": row.interest_amount || "",
-                "Total Installment": row.total_installment || "",
-                "Payment Status": row.payment_status || "",
-            };
-        });
+        return data.map((row) => ({
+            "Start Year": row.Start_Year || "",
+            "End Year": row.End_Year || "",
+            "Loan Type ID": row.Loan_Type_ID || "",
+            "Loan Type Name": row.Loan_Type_Name || "",
+            "Max Amount": row.Max_amount || "",
+            "Max Repayment Months": row.Max_repayment_months || "",
+            "Default Interest Rate": row.Default_interest_rate || "",
+            "Description": row.Description || "",
+            "Status": row.Status || "",
+        }));
     };
 
     const handleExportToExcel = () => {
@@ -537,7 +556,7 @@ function LoanSchedule({ }) {
             return;
         }
 
-        const screenName = "Loan Repayment Schedule Search Report";
+        const screenName = "Loan Type Search Report";
         const company = sessionStorage.getItem("selectedCompanyName") || "";
 
         /* ================= THEME COLORS ================= */
@@ -635,9 +654,9 @@ function LoanSchedule({ }) {
         /* ================= EXPORT ================= */
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Repayment Schedule");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Type");
 
-        XLSX.writeFile(workbook, "Loan_Repayment_Schedule_Search_Report.xlsx");
+        XLSX.writeFile(workbook, "Loan_Type_Search_Report.xlsx");
     };
 
     return (
@@ -646,10 +665,9 @@ function LoanSchedule({ }) {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    {/* <h1 className="page-title">Loan Repayment Schedule</h1> */}
-                    <h1 className="page-title">Loan Repayment Schedule</h1>
+                    <h1 className="page-title">Loan Type</h1>
                     <div className="action-wrapper">
-                        <div onClick={handleSave} className="action-icon add">
+                        <div onClick={handleInsert} className="action-icon add">
                             <span className="tooltip">Save</span>
                             <i class="fa-solid fa-floppy-disk"></i>
                         </div>
@@ -662,172 +680,181 @@ function LoanSchedule({ }) {
                     <div className="col-md-2">
                         <div className="inputGroup">
                             <input
-                                id="fdate"
+                                id="Start_Year"
                                 class="exp-input-field form-control"
+                                type="Date"
+                                placeholder=""
+                                required
+                                value={startYear}
+                                autoComplete="off"
+                                onChange={(e) => setStartYear(e.target.value)}
+                            />
+                            <label For="city" className={`exp-form-labels ${error && !startYear ? 'text-danger' : ''}`}>Start Year<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="End_Year"
+                                class="exp-input-field form-control"
+                                type="date"
+                                placeholder=""
+                                required
+                                value={endYear}
+                                autoComplete="off"
+                                onChange={(e) => setEndYear(e.target.value)}
+                            />
+                            <label For="city" className={`exp-form-labels ${error && !endYear ? 'text-danger' : ''}`}>End Year<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_ID"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                value={loanTypeId}
                                 autoComplete="off"
-                                value={scheduleId}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
-                                    setScheduleId(value);
+                                    setLoanTypeId(value);
                                 }}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !scheduleId ? 'text-danger' : ''}`}>Schedule ID<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !loanTypeId ? 'text-danger' : ''}`}>Loan Type ID<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedLoanReqId ? "has-value" : ""} 
-                            ${isSelectedLoanReqId ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="department"
-                                placeholder=" "
-                                onFocus={() => setIsSelectedLoanReqId(true)}
-                                onBlur={() => setIsSelectedLoanReqId(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                                type="text"
-                                value={selectedLoanReqId}
-                                onChange={handleChangeLoanReqId}
-                                options={filteredOptionLoanReqId}
-                            />
-                            <label htmlFor="selecteddpt" className={`floating-label ${error && !loanReqId ? 'text-danger' : ''}`}>
-                                Loan Request ID<span className="text-danger">*</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required 
-                                autoComplete="off"
-                                value={installmentNo}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setIntallmentNo(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !installmentNo ? 'text-danger' : ''}`}>Installment No<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={installmentDate}
-                                onChange={(e) => setIntallmentDate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !installmentDate ? 'text-danger' : ''}`}>Payment Date<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={principleAmount}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setPrincipleAmount(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !principleAmount ? 'text-danger' : ''}`}>Principle Amount<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={interestAmount}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setInterestAmount(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !interestAmount ? 'text-danger' : ''}`}>Interest Amount<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={totalInstallment}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setTotalInstallment(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels ${error && !totalInstallment ? 'text-danger' : ''}`}>Total Installment<span className="text-danger">*</span></label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedPaymentStatus ? "has-value" : ""} 
-                            ${isSelectedPaymentStatus ? "is-focused" : ""}`}
+                            ${selectedLoanTypeName ? "has-value" : ""} 
+                            ${isSelectedLoanTypeName ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="country"
                                 type="text"
                                 classNamePrefix="react-select"
                                 placeholder=""
-                                onFocus={() => setIsSelectedPaymentStatus(true)}
-                                onBlur={() => setIsSelectedPaymentStatus(false)}
+                                onFocus={() => setIsSelectedLoanTypeName(true)}
+                                onBlur={() => setIsSelectedLoanTypeName(false)}
                                 isClearable
-                                value={selectedPaymentStatus}
-                                onChange={handleChangePaymentStatus}
-                                options={filteredOptionPaymentStatus}
+                                value={selectedLoanTypeName}
+                                onChange={handleChangeLoanType}
+                                options={filteredOptionLoanType}
                             />
-                            <label for="sname" className={`floating-label  ${error && !paymentStatus ? 'text-danger' : ''}`}>Payment Status<span className="text-danger">*</span></label>
+                            <label for="sname" className={`floating-label ${error && !loanTypeName ? 'text-danger' : ''}`}>Loan Type Name<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={maxAmount}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMaxAmount(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !maxAmount ? 'text-danger' : ''}`}>Max Amount<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={maxRepaymentMonths}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMaxRepaymentMonths(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !maxRepaymentMonths ? 'text-danger' : ''}`}>Max Repayment Months<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={defaultInterestRate}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    setDefaultInterestRate(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !defaultInterestRate ? 'text-danger' : ''}`}>Default Interest Rate<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required
+                                value={description}
+                                autoComplete="off"
+                                maxLength={255}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Description</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedStatus ? "has-value" : ""} 
+                            ${isSelectedStatus ? "is-focused" : ""}`}
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedStatus(true)}
+                                onBlur={() => setIsSelectedStatus(false)}
+                                isClearable
+                                value={selectedStatus}
+                                onChange={handleChangeStatus}
+                                options={filteredOptionStatus}
+                            />
+                            <label for="sname" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -843,7 +870,39 @@ function LoanSchedule({ }) {
                     <div className="col-md-2">
                         <div className="inputGroup">
                             <input
-                                id="fdate"
+                                id="Start_Year"
+                                class="exp-input-field form-control"
+                                type="Date"
+                                placeholder=""
+                                required
+                                value={startYearSc}
+                                autoComplete="off"
+                                onChange={(e) => setStartYearSc(e.target.value)}
+                            />
+                            <label For="city" className={`exp-form-labels`}>Start Year</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="End_Year"
+                                class="exp-input-field form-control"
+                                type="date"
+                                placeholder=""
+                                required
+                                value={endYearSc}
+                                autoComplete="off"
+                                onChange={(e) => setEndYearSc(e.target.value)}
+                            />
+                            <label For="city" className={`exp-form-labels`}>End Year</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_ID"
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
@@ -851,200 +910,162 @@ function LoanSchedule({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                value={loanTypeIdSc}
                                 autoComplete="off"
-                                value={scheduleIdSc}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
-                                    setScheduleIdSc(value);
+                                    setLoanTypeIdSc(value);
                                 }}
                             />
-                            <label for="sname" className={`exp-form-labels`}>Schedule ID</label>
+                            <label for="sname" className={`exp-form-labels`}>Loan Type ID</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedLoanReqIdSc ? "has-value" : ""} 
-                            ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="department"
-                                placeholder=" "
-                                onFocus={() => setIsSelectedLoanReqIdSc(true)}
-                                onBlur={() => setIsSelectedLoanReqIdSc(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                                type="text"
-                                value={selectedLoanReqIdSc}
-                                onChange={handleChangeLoanReqIdSc}
-                                options={filteredOptionLoanReqIdSc}
-                            />
-                            <label htmlFor="selecteddpt" className={`floating-label`}>
-                                Loan Request ID
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required 
-                                autoComplete="off"
-                                value={installmentNoSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setIntallmentNoSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Installment No</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={fromDate}
-                                onChange={(e) => setFromDate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Installment From</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="date"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={toDate}
-                                onChange={(e) => setToDate((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Installment To</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={principleAmountSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setPrincipleAmountSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Principle Amount</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={interestAmountSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setInterestAmountSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Interest Amount</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={totalInstallmentSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setTotalInstallmentSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Total Installment</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedPaymentStatusSc ? "has-value" : ""} 
-                            ${isSelectedPaymentStatusSc ? "is-focused" : ""}`}
+                            ${selectedLoanTypeNameSc ? "has-value" : ""} 
+                            ${isSelectedLoanTypeNameSc ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="country"
                                 type="text"
                                 classNamePrefix="react-select"
                                 placeholder=""
-                                onFocus={() => setIsSelectedPaymentStatusSc(true)}
-                                onBlur={() => setIsSelectedPaymentStatusSc(false)}
+                                onFocus={() => setIsSelectedLoanTypeNameSc(true)}
+                                onBlur={() => setIsSelectedLoanTypeNameSc(false)}
                                 isClearable
-                                value={selectedPaymentStatusSc}
-                                onChange={handleChangePaymentStatusSc}
-                                options={filteredOptionPaymentStatusSc}
+                                value={selectedLoanTypeNameSc}
+                                onChange={handleChangeLoanTypeSc}
+                                options={filteredOptionLoanTypeSc}
                             />
-                            <label for="sname" className={`floating-label`}>Payment Status</label>
+                            <label for="sname" className={`floating-label`}>Loan Type Name</label>
                         </div>
                     </div>
 
-                    {/* Search + Reload Buttons */}
-                    <div className="col-12">
-                        <div className="search-btn-wrapper">
-                            <div className="icon-btn search" onClick={handleSearch}>
-                                <span className="tooltip">Search</span>
-                                <i className="fa-solid fa-magnifying-glass"></i>
-                            </div>
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={10}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={maxAmountSc}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMaxAmountSc(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Max Amount</label>
+                        </div>
+                    </div>
 
-                            <div className="icon-btn reload" onClick={reloadGridData}>
-                                <span className="tooltip">Reload</span>
-                                <i className="fa-solid fa-rotate-right"></i>
-                            </div>
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={maxRepaymentMonthsSc}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMaxRepaymentMonthsSc(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Max Repayment Months</label>
+                        </div>
+                    </div>
 
-                            <div className="icon-btn excel" onClick={handleExportToExcel}>
-                                <span className="tooltip">Excel</span>
-                                <i className="fa-solid fa-file-excel"></i>
-                            </div>
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                value={defaultInterestRateSc}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    setDefaultInterestRateSc(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Default Interest Rate</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required
+                                value={descriptionSc}
+                                autoComplete="off"
+                                maxLength={255}
+                                onChange={(e) => setDescriptionSc(e.target.value)}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Description</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedStatusSc ? "has-value" : ""} 
+                            ${isSelectedStatusSc ? "is-focused" : ""}`}
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedStatusSc(true)}
+                                onBlur={() => setIsSelectedStatusSc(false)}
+                                isClearable
+                                value={selectedStatusSc}
+                                onChange={handleChangeStatusSc}
+                                options={filteredOptionStatusSc}
+                            />
+                            <label for="sname" className={`floating-label`}>Status</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Search + Reload Buttons */}
+                <div className="col-12">
+                    <div className="search-btn-wrapper">
+                        <div className="icon-btn search" onClick={handleSearch}>
+                            <span className="tooltip">Search</span>
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </div>
+
+                        <div className="icon-btn reload" onClick={reloadGridData}>
+                            <span className="tooltip">Reload</span>
+                            <i className="fa-solid fa-rotate-right"></i>
+                        </div>
+
+                        <div className="icon-btn excel" onClick={handleExportToExcel}>
+                            <span className="tooltip">Excel</span>
+                            <i className="fa-solid fa-file-excel"></i>
                         </div>
                     </div>
                 </div>
@@ -1053,17 +1074,16 @@ function LoanSchedule({ }) {
             <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
                 <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
                     <AgGridReact
-                        columnDefs={columnDefs}
                         rowData={rowData}
+                        columnDefs={columnDefs}
+                        onGridReady={onGridReady}
                         pagination={true}
                         paginationAutoPageSize={true}
                         gridOptions={gridOptions}
                     />
                 </div>
             </div>
-
-
         </div>
     );
 }
-export default LoanSchedule;
+export default LoanType;
