@@ -220,7 +220,8 @@ const menuData = [
           { label: "Loan Request", path: "/LoanRequest" },
           { label: "Loan Approvals", path: "/LoanApprovals" },
           { label: "Loan Payment", path: "/LoanPayment" },
-          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+          { label: "Loan Status History", path: "/LoanStatusHistory" },
         ],
       },
       {

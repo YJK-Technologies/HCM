@@ -66,19 +66,13 @@ function TravelRequest({ }) {
   const [empIdSc, setEmpIdSc] = useState("");
   const [selectedEmpIdSc, setSelectedEmpIdSc] = useState("");
   const [countryIdDropSc, setCountyIdDropSc] = useState([]);
-  const [countryIdSc, setCountryIdSc] = useState("");
-  const [selectedCountryIdSc, setSelectedCountryIdSc] = useState("");
   const [visaTypeDropSc, setVisaTypeDropSc] = useState([]);
-  const [visaTypeSc, setVisaTypeSc] = useState("");
-  const [selectedVisaTypeSc, setSelectedVisaTypeSc] = useState("");
-  const [purposeSc, setPurposeSc] = useState("");
   const [travelStartDateSc, setTravelStartDateSc] = useState("");
   const [travelEndDateSc, setTravelEndDateSc] = useState("");
   const [reqStatusDropSC, setReqStatusDropSC] = useState([]);
   const [priorityDropSc, setPriorityDropSc] = useState([]);
   const [prioritySc, setPrioritySc] = useState("");
   const [selectedPrioritySc, setSelectedPrioritySc] = useState("");
-  const [estimatedCostSc, setEstimatedCostSc] = useState("");
   const [remarksSc, setRemarksSc] = useState("");
   const [dynamicOptions, setDynamicOptions] = useState([]);
   const [selectedmanager, setselectedmanager] = useState("");
@@ -707,7 +701,7 @@ function TravelRequest({ }) {
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: true,
+      editable: false,
     },
 
     {
@@ -734,14 +728,14 @@ function TravelRequest({ }) {
       headerName: "Destination Country",
       field: "destination_country_id",
       editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: CountrydropGR.map((d) => d.value),
-      },
-      valueFormatter: (params) => {
-        const country = CountrydropGR.find((d) => d.value == params.value);
-        return country ? country.label : params.value;
-      },
+      // cellEditor: "agSelectCellEditor",
+      // cellEditorParams: {
+      //   values: CountrydropGR.map((d) => d.value),
+      // },
+      // valueFormatter: (params) => {
+      //   const country = CountrydropGR.find((d) => d.value == params.value);
+      //   return country ? country.label : params.value;
+      // },
     },
 
     {
@@ -816,17 +810,27 @@ function TravelRequest({ }) {
   };
 
   const handleSave = async () => {
-    // if (!dpt ||
-    //     !job_title ||
-    //     !Country_Code ||
-    //     !location ||
-    //     !employment_type ||
-    //     !updated_on
-    // ) {
-    //     setError(" ");
-    //     toast.warning("Error: Missing required fields");
-    //     return;
-    // }
+    if (
+      !travel_request_id ||
+      !empId ||
+      !dpt ||
+      !travel_type ||
+      !destination_country_id ||
+      !destination_city ||
+      !purpose_of_travel ||
+      !travelStartDate ||
+      !travelEndDate ||
+      !transport_mode ||
+      !accommodation_required ||
+      !estimated_cost ||
+      !priority ||
+      !ProjectManager ||
+      !reqStatus
+    ) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
+    }
     if (new Date(travelStartDate) > new Date(travelEndDate)) {
       toast.warning("Start Date cannot be greater than End Date");
       return;
@@ -836,7 +840,7 @@ function TravelRequest({ }) {
 
     try {
       const Header = {
-        travel_request_id: 0,
+        travel_request_id: travel_request_id,
         request_number: request_number,
         employee_id: empId,
         department_id: dpt,
@@ -891,6 +895,7 @@ function TravelRequest({ }) {
   };
 
   const handleSearch = async () => {
+
     setLoading(true);
 
     try {
@@ -898,7 +903,7 @@ function TravelRequest({ }) {
         travel_request_id: travel_request_idSC || null,
         request_number: request_numberSC || "",
         employee_id: empIdSc || "",
-        department_id: dptSC || null,
+        department_id: dptSC || "",
         travel_type: travel_typeSC || "",
         destination_country_id: destination_country_idSC || null,
         destination_city: destination_citySC || "",

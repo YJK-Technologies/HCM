@@ -111,6 +111,7 @@ import ShiftSumRep from "./ShiftSumRep.js";
 import VisaRequest from "./EmpRequests/VisaRequest.js"
 import TravelRequest from "./EmpRequests/TravelRequest.js"
 import LoanRequest from "./EmpRequests/LoanRequest.js"
+import LoanStatusHistory from "./EmpRequests/LoanStatusHistory.js"
 import LoanApprovals from "./EmpRequests/LoanApprovals.js"
 import LoanDocuments from "./EmpRequests/LoanDocuments.js"
 import LoanPayment from "./EmpRequests/LoanPayment.js"
@@ -303,6 +304,7 @@ function Main() {
     { path: "/VisaRequest", component: <VisaRequest /> },
     { path: "/TravelRequest", component: <TravelRequest /> },
     { path: "/LoanRequest", component: <LoanRequest /> },
+    { path: "/LoanStatusHistory", component: <LoanStatusHistory /> },
     { path: "/LoanApprovals", component: <LoanApprovals /> },
     { path: "/LoanDocuments", component: <LoanDocuments /> },
     { path: "/LoanPayment", component: <LoanPayment /> },
