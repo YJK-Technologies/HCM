@@ -21,6 +21,7 @@ function LoanStatusHistory() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
+    
 
     const [timeZoneName, setTimeZoneName] = useState('');
     const [utcOffset, setUtcOffset] = useState('');
@@ -33,6 +34,17 @@ function LoanStatusHistory() {
     const [statusDropGrid, setStatusDropGrid] = useState([]);
     const [dstApplicableDropGrid, setDstApplicableDropGrid] = useState([]);
 
+    // New - Input
+    const [history_id, sethistory_id] = useState('');
+    const [loan_request_id, setloan_request_id] = useState('');
+    const [old_status, setold_status] = useState('');
+    const [new_status, setnew_status] = useState('');
+    const [changed_by, setchanged_by] = useState('');
+    const [changed_date, setchanged_date] = useState('');
+    const [remarks, setRemarks] = useState('');
+    // const [loan_request_id, setloan_request_id] = useState('');
+    // const [loan_request_id, setloan_request_id] = useState('');
+
     const [timeZoneIdSc, setTimeZoneIdSc] = useState('');
     const [timeZoneNameSc, setTimeZoneNameSc] = useState('');
     const [utcOffsetSc, setUtcOffsetSc] = useState('');
@@ -43,14 +55,120 @@ function LoanStatusHistory() {
     const [selectedDstApplicableSc, setSelectedDstApplicableSc] = useState('');
     const [dstApplicableDropSc, setDstApplicableDropSc] = useState([]);
 
+    // New - Input
+    const [history_idSc, sethistory_idSc] = useState('');
+    const [loan_request_idSc, setloan_request_idSc] = useState('');
+    const [old_statusSc, setold_statusSc] = useState('');
+    const [new_statusSc, setnew_statusSc] = useState('');
+    const [changed_bySc, setchanged_bySc] = useState('');
+    const [changed_dateSc, setchanged_dateSc] = useState('');
+    const [remarksSc, setremarksSc] = useState('');
+
     const [isSelectedStatus, setIsSelectedStatus] = useState('');
     const [isSelectedDstApplicable, setIsSelectedDstApplicable] = useState('');
     const [isSelectedStatusSc, setIsSelectedStatusSc] = useState('');
     const [isSelectedDstApplicableSc, setIsSelectedDstApplicableSc] = useState('');
 
+    // Newly added
+    const [isSelectedLoanReqId, setIsSelectedLoanReqId] = useState('');
+    const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
+    const [selectedLoanReqIdSc, setSelectedLoanReqIdSc] = useState('');
+    const [loanReqIdSc, setLoanReqIdSc] = useState('');
+    const [loanReqIdDropSc, setLoanReqIdDropSc] = useState([]);
+    const [selectedLoanReqId, setSelectedLoanReqId] = useState('');
+    const [loanReqId, setLoanReqId] = useState('');
+    const [loanStatusDrop, setLoanStatusDrop] = useState([]);
+    const [isSelectedLoanStatus, setIsSelectedLoanStatus] = useState('');
+    const [selectedLoanStatus, setSelectedLoanStatus] = useState('');
+    const [selectedLoanNewStatus, setSelectedLoanNewStatus] = useState('');
+    const [loanStatus, setLoanStatus] = useState([]);
+    const [isSelectedLoanNewStatus, setIsSelectedLoanNewStatus] = useState('');
+    const [loanNewStatusDrop, setLoanNewStatusDrop] = useState([]);
+    const [loanNewStatus, setLoanNewStatus] = useState([]);
+    const [isSelectedLoanReqIdSc, setIsSelectedLoanReqIdSc] = useState('');
+    const [selectedLoanStatusSc, setSelectedLoanStatusSc] = useState('');
+    const [isSelectedLoanStatusSc, setIsSelectedLoanStatusSc] = useState('');
+    const [loanStatusDropSc, setLoanStatusDropSc] = useState([]);
+    const [loanStatusSc, setLoanStatusSc] = useState([]);
+    const [isSelectedLoanNewStatusSc, setIsSelectedLoanNewStatusSc] = useState('');
+    const [selectedLoanNewStatusSc, setSelectedLoanNewStatusSc] = useState('');
+    const [loanNewStatusDropSc, setLoanNewStatusDropSc] = useState([]);
+    const [loanNewStatusSc, setLoanNewStatusSc] = useState([]);
+    
+    
+    
+    
+    
+
+
+    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
+    }));
+    const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
+        setSelectedLoanReqIdSc(selectedLoanReqIdSc);
+        setLoanReqIdSc(selectedLoanReqIdSc ? selectedLoanReqIdSc.value : "");
+    };
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanReqIdDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+    
+    const filteredOptionLoanStatus = loanStatusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+}));
+
+const filteredOptionLoanStatusSc = loanStatusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+}));
+const handleChangeLoanStatus = (selectedLoanStatus) => {
+    setSelectedLoanStatus(selectedLoanStatus);
+    setLoanStatus(selectedLoanStatus ? selectedLoanStatus.value : "");
+};
+const handleChangeLoanStatusSc = (selectedLoanStatusSc) => {
+    setSelectedLoanStatusSc(selectedLoanStatusSc);
+    setLoanStatusSc(selectedLoanStatusSc ? selectedLoanStatusSc.value : "");
+};
+const filteredOptionLoanNewStatus = loanStatusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+}));
+const filteredOptionLoanNewStatusSc = loanStatusDropSc.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+}));
+
+const handleChangeLoanReqId = (selectedLoanReqId) => {
+        setSelectedLoanReqId(selectedLoanReqId);
+        setLoanReqId(selectedLoanReqId ? selectedLoanReqId.value : "");
+    };
+    
+const handleChangeLoanNewStatus = (selectedLoanNewStatus) => {
+    setSelectedLoanNewStatus(selectedLoanNewStatus);
+    setLoanNewStatus(selectedLoanNewStatus ? selectedLoanNewStatus.value : "");
+};
+const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
+    setSelectedLoanNewStatusSc(selectedLoanNewStatusSc);
+    setLoanNewStatusSc(selectedLoanNewStatusSc ? selectedLoanNewStatusSc.value : "");
+};
+
+
+
 
     //Temp
-    const [travelEndDate, setTravelEndDate] = useState("");
+
 
     //code added by Harish purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -59,22 +177,30 @@ function LoanStatusHistory() {
         .map((permission) => permission.permission_type.toLowerCase());
 
     const addClearInputFields = () => {
-        setTimeZoneName("");
-        setUtcOffset("");
-        setStatus("");
-        setSelectedStatus("");
-        setDstApplicable("");
-        setSelectedDstApplicable("");
+        sethistory_id("");
+        setloan_request_id("");
+        setold_status("");
+        setnew_status("");
+        setchanged_by("");
+        setchanged_date("");
+        setRemarks("");
     };
 
     const searchClearInputFields = () => {
-        setTimeZoneIdSc("");
-        setTimeZoneNameSc("");
-        setUtcOffsetSc("");
-        setStatusSc("");
-        setSelectedStatusSc("");
-        setDstApplicableSc("");
-        setSelectedDstApplicableSc("");
+        sethistory_id("");
+        setloan_request_id("");
+        setold_status("");
+        setnew_status("");
+        setchanged_by("");
+        setchanged_date("");
+        setRemarks("");
+        sethistory_idSc("");
+        setloan_request_idSc("");
+        setold_statusSc("");
+        setnew_statusSc("");
+        setchanged_bySc("");
+        setchanged_dateSc("");
+        setremarksSc("");
     };
 
     useEffect(() => {
@@ -174,6 +300,96 @@ function LoanStatusHistory() {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
+        useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanReqIdDrop(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+        useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setStatusDrop(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+    })
+        .then((data) => data.json())
+        .then((val) => setLoanStatusDrop(val))
+        .catch((error) => console.error("Error fetching loan status:", error));
+}, []);
+
+useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+    })
+        .then((data) => data.json())
+        .then((val) => setLoanStatusDropSc(val))
+        .catch((error) => console.error("Error fetching loan status:", error));
+}, []);
+
+useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+    })
+        .then((data) => data.json())
+        .then((val) => setLoanNewStatusDrop(val))
+        .catch((error) => console.error("Error fetching loan status:", error));
+}, []);
+
+useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+    })
+        .then((data) => data.json())
+        .then((val) => setLoanNewStatusDropSc(val))
+        .catch((error) => console.error("Error fetching loan status:", error));
+}, []);
+
+
     const filteredOptionStatus = statusDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
@@ -194,6 +410,11 @@ function LoanStatusHistory() {
         label: option.attributedetails_name,
     }));
 
+    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
+    value: option.loan_request_id,
+    label: option.loan_request_id,
+}));
+
     const handleChangeStatus = (selectedStatus) => {
         setSelectedStatus(selectedStatus);
         setStatus(selectedStatus ? selectedStatus.value : "");
@@ -213,6 +434,8 @@ function LoanStatusHistory() {
         setSelectedDstApplicableSc(selectedDstApplicableSc);
         setDstApplicableSc(selectedDstApplicableSc ? selectedDstApplicableSc.value : "");
     };
+
+    
 
     const handleSearch = async () => {
         setLoading(true);
@@ -298,24 +521,24 @@ function LoanStatusHistory() {
             },
         },
         {
-            headerName: "Time Zone ID",
-            field: "TimeZone_ID",
+            headerName: "History ID",
+            field: "history_id",
             editable: false,
             cellStyle: { textAlign: "left" },
         },
         {
-            headerName: "Time Zone Name",
-            field: "TimeZone_Name",
+            headerName: "Loan Request ID",
+            field: "loan_request_id",
             editable: true,
         },
         {
-            headerName: "UTC Offset",
-            field: "UTC_Offset",
+            headerName: "Old Status",
+            field: "old_status",
             editable: true,
         },
         {
-            headerName: "DST Applicable",
-            field: "DST_Applicable",
+            headerName: "New Status",
+            field: "new_status",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -323,8 +546,8 @@ function LoanStatusHistory() {
             },
         },
         {
-            headerName: "Status",
-            field: "Status",
+            headerName: "Changed By",
+            field: "changed_by",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -332,8 +555,16 @@ function LoanStatusHistory() {
             },
         },
         {
-            headerName: "keyfield",
-            field: "keyfield",
+            headerName: "Changed Date",
+            field: "changed_date",
+            editable: true,
+            filter: true,
+            hide: true,
+            sortable: false,
+        },
+        {
+            headerName: "Remarks",
+            field: "remarks",
             editable: true,
             filter: true,
             hide: true,
@@ -406,7 +637,7 @@ function LoanStatusHistory() {
     };
 
     const handleSave = async () => {
-        if (!timeZoneName || !utcOffset || !status) {
+        if (!history_id || !loanReqId || !loanStatus || !loanNewStatus  ) {
             toast.warning("Missing Required Fields");
             setError(true);
             return;
@@ -415,17 +646,20 @@ function LoanStatusHistory() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${config.apiBaseUrl}/TimeZonemasterInsert`,
+            const response = await fetch(`${config.apiBaseUrl}/loan_status_historyInsert`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        TimeZone_Name: timeZoneName,
-                        UTC_Offset: utcOffset,
-                        Status: status,
-                        DST_Applicable: dstApplicable,
+                        history_id: history_id,
+                        loan_request_id: loanReqId,
+                        old_status: loanStatus,
+                        new_status: loanNewStatus,
+                        remarks: remarks,
+                        changed_by: sessionStorage.getItem("selectedUserCode"),
+                        
                         company_code: sessionStorage.getItem("selectedCompanyCode"),
                         created_by: sessionStorage.getItem("selectedUserCode"),
                     }),
@@ -708,10 +942,10 @@ function LoanStatusHistory() {
                                     autoComplete="off"
                                     required
                                     maxLength={50}
-                                    value={timeZoneName}
-                                    onChange={(e) => setTimeZoneName(e.target.value)}
+                                    value={history_id}
+                                    onChange={(e) => sethistory_id(e.target.value)}
                                 />
-                                <label for="state" className={`exp-form-labels ${error && !timeZoneName ? "text-danger" : ""}`}>
+                                <label for="state" className={`exp-form-labels ${error && !history_id ? "text-danger" : ""}`}>
                                     History ID<span className="text-danger">*</span>
                                 </label>
                             </div>
@@ -720,40 +954,41 @@ function LoanStatusHistory() {
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedStatus ? "has-value" : ""} 
-                                    ${isSelectedStatus ? "is-focused" : ""}`}
+                                    ${selectedLoanReqId ? "has-value" : ""} 
+                                    ${isSelectedLoanReqId ? "is-focused" : ""}`}
                             >
                                 <Select
-                                    id="status"
+                                    id="department"
+                                    type="text"
                                     isClearable
-                                    value={selectedStatus}
-                                    onChange={handleChangeStatus}
-                                    options={filteredOptionStatus}
+                                    value={selectedLoanReqId}
+                                    onChange={handleChangeLoanReqId}
+                                    options={filteredOptionLoanReqId}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedStatus(true)}
-                                    onBlur={() => setIsSelectedStatus(false)}
+                                    onFocus={() => setIsSelectedLoanReqId(true)}
+                                    onBlur={() => setIsSelectedLoanReqId(false)}
                                 />
-                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
+                                <label className={`floating-label ${error && !loan_request_id ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedDstApplicable ? "has-value" : ""} 
-                                    ${isSelectedDstApplicable ? "is-focused" : ""}`}
+                                    ${selectedLoanStatus ? "has-value" : ""} 
+                                    ${isSelectedLoanStatus ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedDstApplicable}
-                                    onChange={handleChangeDstApplicable}
-                                    options={filteredOptionDstApplicable}
+                                    value={selectedLoanStatus}
+                                    onChange={handleChangeLoanStatus}
+                                    options={filteredOptionLoanStatus}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedDstApplicable(true)}
-                                    onBlur={() => setIsSelectedDstApplicable(false)}
+                                    onFocus={() => setIsSelectedLoanStatus(true)}
+                                    onBlur={() => setIsSelectedLoanStatus(false)}
                                 />
                                 <label className={`floating-label`}>Old Status</label>
                             </div>
@@ -762,25 +997,25 @@ function LoanStatusHistory() {
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedStatus ? "has-value" : ""} 
-                                    ${isSelectedStatus ? "is-focused" : ""}`}
+                                    ${selectedLoanNewStatus ? "has-value" : ""} 
+                                    ${isSelectedLoanNewStatus ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedStatus}
-                                    onChange={handleChangeStatus}
-                                    options={filteredOptionStatus}
+                                    value={selectedLoanNewStatus}
+                                    onChange={handleChangeLoanNewStatus}
+                                    options={filteredOptionLoanNewStatus}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedStatus(true)}
-                                    onBlur={() => setIsSelectedStatus(false)}
+                                    onFocus={() => setIsSelectedLoanNewStatus(true)}
+                                    onBlur={() => setIsSelectedLoanNewStatus(false)}
                                 />
-                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>New Status<span className="text-danger">*</span></label>
+                                <label className={`floating-label ${error && !new_status ? "text-danger" : ""}`}>New Status<span className="text-danger">*</span></label>
                             </div>
                         </div>
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
                                     ${selectedStatus ? "has-value" : ""} 
@@ -789,7 +1024,7 @@ function LoanStatusHistory() {
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedStatus}
+                                    value={changed_by}
                                     onChange={handleChangeStatus}
                                     options={filteredOptionStatus}
                                     classNamePrefix="react-select"
@@ -797,7 +1032,7 @@ function LoanStatusHistory() {
                                     onFocus={() => setIsSelectedStatus(true)}
                                     onBlur={() => setIsSelectedStatus(false)}
                                 />
-                                <label className={`floating-label ${error && !status ? "text-danger" : ""}`}>Changed By<span className="text-danger">*</span></label>
+                                <label className={`floating-label ${error && !changed_by ? "text-danger" : ""}`}>Changed By<span className="text-danger">*</span></label>
                             </div>
                         </div>
 
@@ -811,38 +1046,36 @@ function LoanStatusHistory() {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={travelEndDate}
+                value={changed_date}
                 onChange={(e) => setTravelEndDate(e.target.value)}
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !travelEndDate ? "text-danger" : ""}`}
+                className={`exp-form-labels ${error && !changed_date ? "text-danger" : ""}`}
               >
-                Travel End Date<span className="text-danger">*</span>
+                Changed Date<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
                         <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={timeZoneName}
-                                    onChange={(e) => setTimeZoneName(e.target.value)}
-                                />
-                                <label for="state" className={`exp-form-labels ${error && !timeZoneName ? "text-danger" : ""}`}>
-                                    Remarks<span className="text-danger">*</span>
-                                </label>
-                            </div>
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={remarks}
+                                onChange={(e) => setRemarks((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
                         </div>
-
                     </div>
+
                 </div>
+            </div>
 
                 <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                     <div className="header-flex">
@@ -859,8 +1092,8 @@ function LoanStatusHistory() {
                                     autoComplete="off"
                                     required
                                     maxLength={50}
-                                    value={timeZoneIdSc}
-                                    onChange={(e) => setTimeZoneIdSc(e.target.value)}
+                                    value={history_idSc}
+                                    onChange={(e) => sethistory_idSc(e.target.value)}
                                 />
                                 <label for="state" className={`exp-form-labels`}>History ID</label>
                             </div>
@@ -869,62 +1102,67 @@ function LoanStatusHistory() {
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedDstApplicableSc ? "has-value" : ""} 
-                                    ${isSelectedDstApplicableSc ? "is-focused" : ""}`}
+                                    ${selectedLoanReqIdSc ? "has-value" : ""} 
+                                    ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedDstApplicableSc}
-                                    onChange={handleChangeDstApplicableSc}
-                                    options={filteredOptionDstApplicableSc}
+                                    value={selectedLoanReqIdSc}
+                                    onChange={handleChangeLoanReqIdSc}
+                                    options={filteredOptionLoanReqIdSc}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedDstApplicableSc(true)}
-                                    onBlur={() => setIsSelectedDstApplicableSc(false)}
+                                    onFocus={() => setIsSelectedLoanReqIdSc(true)}
+                                    onBlur={() => setIsSelectedLoanReqIdSc(false)}
                                 />
                                 <label className={`floating-label`}>Loan Request ID</label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    class="exp-input-field form-control"
-                                    type="text"
+                            <div
+                                className={`inputGroup selectGroup 
+                                    ${selectedLoanStatusSc ? "has-value" : ""} 
+                                    ${isSelectedLoanStatusSc ? "is-focused" : ""}`}
+                            >
+                                <Select
+                                    id="status"
+                                    isClearable
+                                    value={selectedLoanStatus}
+                                    onChange={handleChangeLoanStatusSc}
+                                    options={filteredOptionLoanStatusSc}
+                                    classNamePrefix="react-select"
                                     placeholder=" "
-                                    autoComplete="off"
-                                    required
-                                    maxLength={50}
-                                    value={utcOffsetSc}
-                                    onChange={(e) => setUtcOffsetSc(e.target.value)}
+                                    onFocus={() => setIsSelectedLoanStatusSc(true)}
+                                    onBlur={() => setIsSelectedLoanStatusSc(false)}
                                 />
-                                <label for="state" className={`exp-form-labels`}>Old Status</label>
+                                <label className={`floating-label`}>Old Status</label>
                             </div>
                         </div>
 
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedDstApplicableSc ? "has-value" : ""} 
-                                    ${isSelectedDstApplicableSc ? "is-focused" : ""}`}
+                                    ${selectedLoanNewStatus ? "has-value" : ""} 
+                                    ${isSelectedLoanNewStatusSc ? "is-focused" : ""}`}
                             >
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedDstApplicableSc}
-                                    onChange={handleChangeDstApplicableSc}
-                                    options={filteredOptionDstApplicableSc}
+                                    value={selectedLoanNewStatusSc}
+                                    onChange={handleChangeLoanNewStatusSc}
+                                    options={filteredOptionLoanNewStatusSc}
                                     classNamePrefix="react-select"
                                     placeholder=" "
-                                    onFocus={() => setIsSelectedDstApplicableSc(true)}
-                                    onBlur={() => setIsSelectedDstApplicableSc(false)}
+                                    onFocus={() => setIsSelectedLoanNewStatusSc(true)}
+                                    onBlur={() => setIsSelectedLoanNewStatusSc(false)}
                                 />
-                                <label className={`floating-label`}>DST Applicable</label>
+                                <label className={`floating-label`}>New Status</label>
                             </div>
                         </div>
 
-                        <div className="col-md-2">
+                        {/* <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
                                     ${selectedStatusSc ? "has-value" : ""} 
@@ -933,7 +1171,7 @@ function LoanStatusHistory() {
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedStatusSc}
+                                    value={changed_bySc}
                                     onChange={handleChangeStatusSc}
                                     options={filteredOptionStatusSc}
                                     classNamePrefix="react-select"
@@ -941,7 +1179,42 @@ function LoanStatusHistory() {
                                     onFocus={() => setIsSelectedStatusSc(true)}
                                     onBlur={() => setIsSelectedStatusSc(false)}
                                 />
-                                <label className={`floating-label`}>Status</label>
+                                <label className={`floating-label`}>Changed By</label>
+                            </div>
+                        </div>
+
+                        <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={changed_dateSc}
+                onChange={(e) => setchanged_dateSc(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Changed Date
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+                            <div className="inputGroup">
+                                <input
+                                    class="exp-input-field form-control"
+                                    type="number"
+                                    placeholder=" "
+                                    autoComplete="off"
+                                    required
+                                    maxLength={50}
+                                    value={remarksSc}
+                                    onChange={(e) => setremarksSc(e.target.value)}
+                                />
+                                <label for="state" className={`exp-form-labels`}>Remarks</label>
                             </div>
                         </div>
 

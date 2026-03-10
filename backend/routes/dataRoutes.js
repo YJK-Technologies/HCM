@@ -1312,6 +1312,13 @@ router.post("/getLoanRequest",dataController.getLoanRequest)
 router.post("/loanPaymentSearch",dataController.loanPaymentSearch)
 router.post("/getPaymentStatus",dataController.getPaymentStatus) 
 router.post("/loanScheduleSearch",dataController.loanScheduleSearch)
+router.post("/loan_status_historyInsert", dataController.loan_status_historyInsert)
+router.post("/loan_status_historyUpdate", dataController.loan_status_historyUpdate)
+router.post("/loan_status_historyDelete", dataController.loan_status_historyDelete)
+router.post("/loan_status_historyLoopInsert", dataController.loan_status_historyLoopInsert)
+router.post("/loan_status_historyLoopUpdate", dataController.loan_status_historyLoopUpdate)
+router.post("/loan_status_historyLoopDelete", dataController.loan_status_historyLoopDelete)
+router.post("/GetLoanStatus", dataController.GetLoanStatus)
 router.post("/loan_documentsSearch",dataController.loan_documentsSearch)
 
 

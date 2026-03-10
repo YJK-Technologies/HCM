@@ -44429,6 +44429,196 @@ const loan_approvalsSearch = async (req, res) => {
 };
 //code ended by Sakthi on 09-03-26
 
+//code added by mathu -09-03-2026
+
+const loan_status_historyInsert = async (req, res) => {
+  const { history_id, loan_request_id, old_status, new_status, changed_by, changed_date, remarks, company_code, key_field, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("history_id", sql.Int, history_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("old_status", sql.NVarChar, old_status)
+      .input("new_status", sql.NVarChar, new_status)
+      .input("changed_by", sql.NVarChar, changed_by)
+      .input("changed_date", sql.DateTime, changed_date)
+      .input("remarks", sql.NVarChar, remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("key_field", sql.NVarChar, key_field)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, '', '', ''`);
+
+    res.status(200).json({ success: true, message: "sp_loan_status_history insertd successfully" });
+  } catch (err) {
+    console.error("Error during sp_loan_status_history insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+const loan_status_historyUpdate = async (req, res) => {
+  const { history_id, loan_request_id, old_status, new_status, changed_by, changed_date, remarks, company_code, key_field, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("history_id", sql.Int, history_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("old_status", sql.NVarChar, old_status)
+      .input("new_status", sql.NVarChar, new_status)
+      .input("changed_by", sql.Int, changed_by)
+      .input("changed_date", sql.DateTime, changed_date)
+      .input("remarks", sql.NVarChar, remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("key_field", sql.NVarChar, key_field)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, @created_date, @modified_by, @modified_date`);
+
+    res.status(200).json({ success: true, message: "sp_loan_status_history updated successfully" });
+  } catch (err) {
+    console.error("Error during sp_loan_status_history update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const loan_status_historyDelete = async (req, res) => {
+  const { history_id, loan_request_id, old_status, new_status, changed_by, changed_date, remarks, company_code, key_field, created_by, created_date, modified_by, modified_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("history_id", sql.Int, history_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("key_field", sql.NVarChar, key_field)
+      .query(`EXEC sp_loan_status_history @mode, @history_id, '', '', '', '', '', '', @company_code, @key_field, '', '', '', ''`);
+
+    res.status(200).json({ success: true, message: "sp_loan_status_history deleted successfully" });
+  } catch (err) {
+    console.error("Error during sp_loan_status_history delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// ---------- HEADER LOOP CRUD ----------
+// Auto-generated sp_loan_status_historyLoopInsert API for sp_sp_loan_status_history
+const loan_status_historyLoopInsert = async (req, res) => {
+  const sp_loan_status_historyData = req.body.sp_loan_status_historyData;
+  if (!sp_loan_status_historyData || !sp_loan_status_historyData.length) {
+    return res.status(400).json("Invalid or empty sp_loan_status_historyData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_loan_status_historyData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("history_id", sql.Int, item.history_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("old_status", sql.NVarChar, item.old_status)
+        .input("new_status", sql.NVarChar, item.new_status)
+        .input("changed_by", sql.Int, item.changed_by)
+        .input("changed_date", sql.DateTime, item.changed_date)
+        .input("remarks", sql.NVarChar, item.remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("key_field", sql.NVarChar, item.key_field)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("sp_loan_status_history data inserted successfully");
+  } catch (err) {
+    console.error("Error in sp_loan_status_historyLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated sp_loan_status_historyLoopUpdate API for sp_sp_loan_status_history
+const loan_status_historyLoopUpdate = async (req, res) => {
+  const sp_loan_status_historyData = req.body.sp_loan_status_historyData;
+  if (!sp_loan_status_historyData || !sp_loan_status_historyData.length) {
+    return res.status(400).json("Invalid or empty sp_loan_status_historyData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_loan_status_historyData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("history_id", sql.Int, item.history_id)
+        .input("loan_request_id", sql.Int, item.loan_request_id)
+        .input("old_status", sql.NVarChar, item.old_status)
+        .input("new_status", sql.NVarChar, item.new_status)
+        .input("changed_by", sql.Int, item.changed_by)
+        .input("changed_date", sql.DateTime, item.changed_date)
+        .input("remarks", sql.NVarChar, item.remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("key_field", sql.NVarChar, item.key_field)
+        .input("created_by", sql.NVarChar, item.created_by)
+        .input("created_date", sql.DateTime, item.created_date)
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("modified_date", sql.DateTime, item.modified_date)
+        .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, @created_date, @modified_by, @modified_date`);
+    }
+    res.status(200).json("sp_loan_status_history data updated successfully");
+  } catch (err) {
+    console.error("Error in sp_loan_status_historyLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Auto-generated sp_loan_status_historyLoopDelete API for sp_sp_loan_status_history
+const loan_status_historyLoopDelete = async (req, res) => {
+  const sp_loan_status_historyData = req.body.sp_loan_status_historyData;
+  if (!sp_loan_status_historyData || !sp_loan_status_historyData.length) {
+    return res.status(400).json("Invalid or empty sp_loan_status_historyData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of sp_loan_status_historyData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("history_id", sql.Int, item.history_id)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("key_field", sql.NVarChar, item.key_field)
+       .query(`EXEC sp_loan_status_history @mode, @history_id, '', '', '', '', '', '', @company_code, @key_field, '', '', '', ''`);
+
+    }
+    res.status(200).json("sp_loan_status_history data deleted successfully");
+  } catch (err) {
+    console.error("Error in sp_loan_status_historyLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// Code added by Dinesh Gokul 10-03-2026
+const GetLoanStatus = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Loan Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//code added by mathu -09-03-2026
+
+
 //code added by sakthi on 10-03-26
 const loan_documentsSearch = async (req, res) => {
   const {
@@ -45588,179 +45778,189 @@ module.exports = {
   CRM_PV,
   GetCalendarEvent,
   PrintTemplateUpdate,
-  candidate_masterLoopUpdate,
-  candidate_masterLoopDelete,
-  candidate_masterInsert,
-  interview_panelInsert,
-  interview_panelLoopUpdate,
-  interview_panelLoopDelete,
-  job_masterInsert,
-  job_masterLoopInsert,
-  job_masterLoopUpdate,
-  job_masterLoopDelete,
-  interview_panel_membersInsert,
-  interview_panel_membersLoopInsert,
-  interview_panel_membersLoopUpdate,
-  interview_panel_membersLoopDelete,
-  interview_scheduleInsert,
-  interview_scheduleLoopUpdate,
-  interview_scheduleLoopDelete,
-  interview_feedbackInsert,
-  interview_feedbackLoopUpdate,
-  interview_feedbackLoopDelete,
-  interview_decisionInsert,
-  interview_decisionLoopUpdate,
-  interview_decisionLoopDelete,
-  CandidateSearch,
-  JobmasterSearch,
-  InterviewPanel,
-  InterviewPanelMembers,
-  InterviewSchedule,
-  InterviewFeedbackSC,
-  InterviewDecisionSC,
-  DeptID,
-  JobMaster,
-  InterviewPanelData,
-  ScheduleID,
-  CanditateID,
-  Feedback_ID,
-  Decision_ID,
-  Employee_ID,
-  InterviewMode,
-  InterviewStatus,
-  Recommendation,
-  TimeZonemasterInsert,
-  TimeZonemasterUpdate,
-  TimeZonemasterDelete,
-  getTimeZoneData,
-  getTimeZonesearchdata,
-  getTitle,
-  getReligion,
-  getNationality,
-  CountryMasterInsert,
-  CountryMasterUpdate,
-  deleteCountryMaster,
-  getCountrySearchData,
-  Country_MasterLoopUpdate,
-  Country_MasterLoopDelete,
-  GetCountry,
-  Time_Zone_masterLoopUpdate,
-  Time_Zone_masterLoopDelete,
-  Shift_MasterInsert,
-  getShiftsearchdata,
-  sp_Shift_MasterLoopUpdate,
-  getSex,
-  getAccountType,
-  getBoolean,
-  getEmployeeType,
-  Employment_Type_MasterInsert,
-  Employment_Type_MasterUpdate,
-  Employment_Type_MasterDelete,
-  Employment_Type_MasterLoopUpdate,
-  Employment_Type_MasterLoopDelete,
-  Shift_Pattern_MasterInsert,
-  Shift_Pattern_MasterUpdate,
-  Shift_Pattern_MasterDelete,
-  Shift_Pattern_MasterLoopInsert,
-  Shift_Pattern_MasterLoopUpdate,
-  Shift_Pattern_MasterLoopDelete,
-  Shift_Pattern_DetailInsert,
-  Shift_Pattern_DetailUpdate,
-  Shift_Pattern_DetailDelete,
-  Shift_Pattern_DetailLoopInsert,
-  Shift_Pattern_DetailLoopUpdate,
-  Shift_Pattern_DetailLoopDelete,
-  Employee_shift_mappingInsert,
-  Employee_shift_mappingUpdate,
-  Employee_shift_mappingDelete,
-  Employee_shift_mappingLoopInsert,
-  Employee_shift_mappingLoopUpdate,
-  Employee_shift_mappingLoopDelete,
-  sp_Shift_MasterLoopDelete,
-  Shift_Type_MasterInsert,
-  getShift_TypeSC,
-  Shift_TypeMasterUpdate,
-  Shift_TypeMasterDelete,
-  ShiftPattern_Insert,
-  ShiftPattern_SC,
-  ShiftPattern_Update,
-  ShiftPattern_Delete,
-  ShiftPatternDetail_SC,
-  Employment_Type_MasterSc,
-  ShiftMasterDropDown,
-  ShiftTypeDropDown,
-  ShiftPatternMasterDropDown,
-  Employee_shift_mappingSc,
-  InterviewScheduleSearch,
-  InterviewFeedbackSearch,
-  InterviewProgressSearch,
-  PanelPerformanceSearch,
-  HiringDecisionSearch,
-  CandidateAppliedSearch,
-  getHolidayType,
-  TotalInterviewSchedule,
-  InterviewCompletionRateSC,
-  getEmployeeTypeDD,
-  getInterviewDashboardCount,
-  getGenerateShift,
-  getEmpShiftReport,
-  getDepartmentDashboard,
-  getDepartment,
-  getAdEmpShiftReport,
-  shiftPatternChart,
-  Shift_Summary_Report,
-  visa_requestsInsert,
-  visa_requestsUpdate,
-  visa_requestsDelete,
-  visa_requestsLoopInsert,
-  visa_requestsLoopUpdate,
-  visa_requestsLoopDelete,
-  travel_requestsInsert,
-  travel_requestsUpdate,
-  travel_requestsDelete,
-  travel_requestsLoopInsert,
-  travel_requestsLoopUpdate,
-  travel_requestsLoopDelete,
-  loan_requestsInsert,
-  loan_requestsUpdate,
-  loan_requestsDelete,
-  loan_requestsLoopInsert,
-  loan_requestsLoopUpdate,
-  loan_requestsLoopDelete,
-  getVisaType,
-  travel_requestsSearch,
-  visaRequestSearch,
-  loan_approvalsInsert,
-  loan_approvalsUpdate,
-  loan_approvalsDelete,
-  loan_approvalsLoopInsert,
-  loan_approvalsLoopUpdate,
-  loan_approvalsLoopDelete,
-  loan_repayment_scheduleInsert,
-  loan_repayment_scheduleUpdate,
-  loan_repayment_scheduleDelete,
-  loan_repayment_scheduleLoopInsert,
-  loan_repayment_scheduleLoopUpdate,
-  loan_repayment_scheduleLoopDelete,
-  loan_paymentsInsert,
-  loan_paymentsUpdate,
-  loan_paymentsDelete,
-  loan_paymentsLoopInsert,
-  loan_paymentsLoopUpdate,
-  loan_paymentsLoopDelete,
-  getLoanTypes,
-  loanRequestSearch,
-  loan_documentsInsert,
-  loan_documentsUpdate,
-  loan_documentsDelete,
-  loan_documentsLoopInsert,
-  loan_documentsLoopUpdate,
-  loan_documentsLoopDelete,
-  getPaymentMethod,
-  getLoanRequest,
-  loanPaymentSearch,
-  getPaymentStatus,
-  loanScheduleSearch,
-  loan_approvalsSearch,
-  loan_documentsSearch,
+    candidate_masterLoopUpdate,
+    candidate_masterLoopDelete,
+    candidate_masterInsert,
+    interview_panelInsert,
+    interview_panelLoopUpdate,
+    interview_panelLoopDelete,
+    job_masterInsert,
+    job_masterLoopInsert,
+    job_masterLoopUpdate,
+    job_masterLoopDelete,
+    interview_panel_membersInsert,
+    interview_panel_membersLoopInsert,
+    interview_panel_membersLoopUpdate,
+    interview_panel_membersLoopDelete,
+    interview_scheduleInsert,
+    interview_scheduleLoopUpdate,
+    interview_scheduleLoopDelete,
+    interview_feedbackInsert,
+    interview_feedbackLoopUpdate,
+    interview_feedbackLoopDelete,
+    interview_decisionInsert,
+    interview_decisionLoopUpdate,
+    interview_decisionLoopDelete,
+    CandidateSearch,
+    JobmasterSearch,
+    InterviewPanel,
+    InterviewPanelMembers,
+    InterviewSchedule,
+    InterviewFeedbackSC,
+    InterviewDecisionSC,
+    DeptID,
+    JobMaster,
+    InterviewPanelData,
+    ScheduleID,
+    CanditateID,
+    Feedback_ID,
+    Decision_ID,
+    Employee_ID,
+    InterviewMode,
+    InterviewStatus,
+    Recommendation,
+    TimeZonemasterInsert,
+    TimeZonemasterUpdate,
+    TimeZonemasterDelete,
+    getTimeZoneData,
+    getTimeZonesearchdata,
+    getTitle,
+    getReligion,
+    getNationality,
+    CountryMasterInsert,
+    CountryMasterUpdate,
+    deleteCountryMaster,
+    getCountrySearchData,
+    Country_MasterLoopUpdate,
+    Country_MasterLoopDelete,
+    GetCountry,
+    Time_Zone_masterLoopUpdate,
+    Time_Zone_masterLoopDelete,
+    Shift_MasterInsert,
+    getShiftsearchdata,
+    sp_Shift_MasterLoopUpdate,
+    getSex,
+    getAccountType,
+    getBoolean,
+    getEmployeeType,
+    Employment_Type_MasterInsert, 
+    Employment_Type_MasterUpdate, 
+    Employment_Type_MasterDelete,
+    Employment_Type_MasterLoopUpdate, 
+    Employment_Type_MasterLoopDelete,
+    Shift_Pattern_MasterInsert, 
+    Shift_Pattern_MasterUpdate, 
+    Shift_Pattern_MasterDelete,
+    Shift_Pattern_MasterLoopInsert, 
+    Shift_Pattern_MasterLoopUpdate, 
+    Shift_Pattern_MasterLoopDelete,
+    Shift_Pattern_DetailInsert, 
+    Shift_Pattern_DetailUpdate, 
+    Shift_Pattern_DetailDelete,
+    Shift_Pattern_DetailLoopInsert, 
+    Shift_Pattern_DetailLoopUpdate, 
+    Shift_Pattern_DetailLoopDelete,
+    Employee_shift_mappingInsert,
+    Employee_shift_mappingUpdate,
+    Employee_shift_mappingDelete,
+    Employee_shift_mappingLoopInsert,
+    Employee_shift_mappingLoopUpdate,
+    Employee_shift_mappingLoopDelete,
+    sp_Shift_MasterLoopDelete,
+    Shift_Type_MasterInsert,
+    getShift_TypeSC,
+    Shift_TypeMasterUpdate,
+    Shift_TypeMasterDelete,
+    ShiftPattern_Insert,
+    ShiftPattern_SC,
+    ShiftPattern_Update,
+    ShiftPattern_Delete,
+    ShiftPatternDetail_SC,
+    Employment_Type_MasterSc,
+    ShiftMasterDropDown,
+    ShiftTypeDropDown,
+    ShiftPatternMasterDropDown,
+    Employee_shift_mappingSc,
+    InterviewScheduleSearch,
+    InterviewFeedbackSearch,
+    InterviewProgressSearch,
+    PanelPerformanceSearch,
+    HiringDecisionSearch,
+    CandidateAppliedSearch,
+    getHolidayType,
+    TotalInterviewSchedule,
+    InterviewCompletionRateSC,
+    getEmployeeTypeDD,
+    getInterviewDashboardCount,
+    getGenerateShift,
+    getEmpShiftReport,
+    getDepartmentDashboard,
+    getDepartment,
+    getAdEmpShiftReport,
+    shiftPatternChart,
+    Shift_Summary_Report,
+    visa_requestsInsert,
+    visa_requestsUpdate,
+    visa_requestsDelete,
+    visa_requestsLoopInsert,
+    visa_requestsLoopUpdate,
+    visa_requestsLoopDelete,
+    travel_requestsInsert,
+    travel_requestsUpdate,
+    travel_requestsDelete,
+    travel_requestsLoopInsert,
+    travel_requestsLoopUpdate,
+    travel_requestsLoopDelete,
+    loan_requestsInsert,
+    loan_requestsUpdate,
+    loan_requestsDelete,
+    loan_requestsLoopInsert,
+    loan_requestsLoopUpdate,
+    loan_requestsLoopDelete,
+    getVisaType,
+    travel_requestsSearch,
+    visaRequestSearch,
+    loan_approvalsInsert,
+    loan_approvalsUpdate,
+    loan_approvalsDelete,
+    loan_approvalsLoopInsert,
+    loan_approvalsLoopUpdate,
+    loan_approvalsLoopDelete,
+    loan_repayment_scheduleInsert,
+    loan_repayment_scheduleUpdate,
+    loan_repayment_scheduleDelete,
+    loan_repayment_scheduleLoopInsert,
+    loan_repayment_scheduleLoopUpdate,
+    loan_repayment_scheduleLoopDelete,
+    loan_paymentsInsert,
+    loan_paymentsUpdate,
+    loan_paymentsDelete,
+    loan_paymentsLoopInsert,
+    loan_paymentsLoopUpdate,
+    loan_paymentsLoopDelete,
+    getLoanTypes,
+    loanRequestSearch,
+    loan_documentsInsert,
+    loan_documentsUpdate,
+    loan_documentsDelete,
+    loan_documentsLoopInsert,
+    loan_documentsLoopUpdate,
+    loan_documentsLoopDelete,
+    loan_approvalsSearch,
+    loan_status_historyInsert,
+    loan_status_historyUpdate,
+    loan_status_historyDelete,
+    loan_status_historyLoopInsert,
+    loan_status_historyLoopUpdate,
+    loan_status_historyLoopDelete,
+    GetLoanStatus,
+    getPaymentMethod,
+    getLoanRequest,
+    loanPaymentSearch,
+    getPaymentStatus,
+    loanScheduleSearch,
+    loan_approvalsSearch,
+    loan_documentsSearch
+
+
 };
