@@ -215,7 +215,7 @@ const menuData = [
           { label: "Travel Request", path: "/TravelRequest" },
           { label: "Loan Request", path: "/LoanRequest" },
           { label: "Loan Payment", path: "/LoanPayment" },
-          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
           { label: "Loan Approvals", path: "/LoanApprovals" },
           { label: "Loan Documents", path: "/LoanDocuments" },
         ],

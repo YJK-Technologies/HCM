@@ -22,17 +22,23 @@ function LoanDocuments({}) {
   const [selectedLoanReq, setSelectedLoanReq] = useState(null);
   const [selectedLoanReqSC, setSelectedLoanReqSC] = useState(null);
   const [loanReqIdDrop, setLoanReqIdDrop] = useState([]);
+  const [loanReqIdDropSC, setLoanReqIdDropSC] = useState([]);
   const [isLoanReqFocus, setIsLoanReqFocus] = useState(false);
   const [isLoanReqFocusSC, setIsLoanReqFocusSC] = useState(false);
   const [document_id, setdocument_id] = useState("");
+  const [document_idSC, setdocument_idSC] = useState("");
   const [document_type, setdocument_type] = useState("");
+  const [document_typeSC, setdocument_typeSC] = useState("");
   const [file_path, setfile_path] = useState("");
+  const [file_pathSC, setfile_pathSC] = useState("");
   const [uploaded_by, setuploaded_by] = useState([]);
+  const [uploaded_bySC, setuploaded_bySC] = useState([]);
   const [selectedStatus, setselectedStatus] = useState("");
   const [selectedStatusSC, setselectedStatusSC] = useState("");
   const [ApprovalStatus, setApprovalStatus] = useState("");
   const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
   const [uploaded_at, setuploaded_at] = useState("");
+  const [uploaded_atSC, setuploaded_atSC] = useState("");
   const [approval_dateSC, setapproval_dateSC] = useState("");
   const [remarks, setRemarks] = useState("");
   const [remarksSC, setRemarksSC] = useState("");
@@ -90,6 +96,20 @@ function LoanDocuments({}) {
       .then((val) => setLoanReqIdDrop(val));
   }, []);
 
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setLoanReqIdDropSC(val));
+  }, []);
+
     useEffect(() => {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
   
@@ -135,6 +155,11 @@ function LoanDocuments({}) {
 
 
   const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+    value: option.loan_request_id,
+    label: option.loan_request_id,
+  }));
+
+  const filteredOptionLoanReqIdSC = loanReqIdDropSC.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
   }));
@@ -674,10 +699,7 @@ const handleSearch = async () => {
                 value={document_id}
                 onChange={(e) => setdocument_id(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !document_id ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !document_id ? "text-danger" : ""}`}>
                 Document ID<span className="text-danger">*</span>
               </label>
             </div>
@@ -736,10 +758,7 @@ const handleSearch = async () => {
                 value={file_path}
                 onChange={(e) => setfile_path(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !file_path ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !file_path ? "text-danger" : ""}`}>
                 File Path<span className="text-danger">*</span>
               </label>
             </div>
@@ -758,10 +777,7 @@ const handleSearch = async () => {
                 value={uploaded_by}
                 onChange={(e) => setuploaded_by(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !uploaded_by ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !uploaded_by ? "text-danger" : ""}`}>
                 Uploaded By<span className="text-danger">*</span>
               </label>
             </div>
@@ -781,33 +797,12 @@ const handleSearch = async () => {
                 value={uploaded_at}
                 onChange={(e) => setuploaded_at(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !uploaded_at ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !uploaded_at ? "text-danger" : ""}`}>
                 Uploaded Date<span className="text-danger">*</span>
               </label>
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
-              <label htmlFor="sname" className={`exp-form-labels`}>
-                Remarks
-              </label>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -816,6 +811,7 @@ const handleSearch = async () => {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -825,11 +821,11 @@ const handleSearch = async () => {
                 placeholder=""
                 required
                 autoComplete="off"
-                value={approval_idSC}
-                onChange={(e) => setapproval_idSC(e.target.value)}
+                value={document_idSC}
+                onChange={(e) => setdocument_idSC(e.target.value)}
               />
-              <label for="sname" className={`exp-form-labels `}>
-                Approval ID
+              <label for="sname" className={`exp-form-labels`}>
+                Document ID
               </label>
             </div>
           </div>
@@ -844,7 +840,7 @@ const handleSearch = async () => {
                 id="loanReq"
                 value={selectedLoanReqSC}
                 onChange={handleLoanReqSC}
-                options={filteredOptionLoanReqId}
+                options={filteredOptionLoanReqIdSC}
                 placeholder=" "
                 onFocus={() => setIsLoanReqFocusSC(true)}
                 onBlur={() => setIsLoanReqFocusSC(false)}
@@ -865,70 +861,11 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approver_idSC}
-                onChange={(e) => setapprover_idSC(e.target.value)}
+                value={document_typeSC}
+                onChange={(e) => setdocument_typeSC(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                Approver ID
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={approval_levelSC}
-                onChange={(e) => setapproval_levelSC(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Approval Level
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-                ${selectedStatusSC ? "has-value" : ""} 
-                ${isSearchStatusSC ? "is-focused" : ""}`}
-            >
-              <Select
-                id="Select_slots"
-                value={selectedStatusSC}
-                onChange={handleStatusSC}
-                options={filterOptionStatusSC}
-                placeholder=" "
-                onFocus={() => setIsSearchStatusSC(true)}
-                onBlur={() => setIsSearchStatusSC(false)}
-                classNamePrefix="react-select"
-                isClearable
-              />
-              <label className="floating-label">Approval Status</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={approval_dateSC}
-                onChange={(e) => setapproval_dateSC(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Approval Date
+                Document Type
               </label>
             </div>
           </div>
@@ -943,11 +880,50 @@ const handleSearch = async () => {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={remarksSC}
-                onChange={(e) => setRemarksSC(e.target.value)}
+                value={file_pathSC}
+                onChange={(e) => setfile_pathSC(e.target.value)}
               />
-              <label htmlFor="sname" className={`exp-form-labels`}>
-                Remarks
+              <label for="sname" className={`exp-form-labels`}>
+                File Path
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={uploaded_bySC}
+                onChange={(e) => setuploaded_bySC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels `}>
+                Uploaded By
+              </label>
+            </div>
+          </div>
+
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={uploaded_atSC}
+                onChange={(e) => setuploaded_atSC(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Uploaded Date
               </label>
             </div>
           </div>
