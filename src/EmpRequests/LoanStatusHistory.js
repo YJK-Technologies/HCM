@@ -21,15 +21,11 @@ function LoanStatusHistory() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    
 
-    const [timeZoneName, setTimeZoneName] = useState('');
-    const [utcOffset, setUtcOffset] = useState('');
-    const [status, setStatus] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('');
+
     const [statusDrop, setStatusDrop] = useState([]);
-    const [dstApplicable, setDstApplicable] = useState('');
-    const [selectedDstApplicable, setSelectedDstApplicable] = useState('');
+    const [statusDropAG, setStatusDropAG] = useState([]);
+    const [NewstatusDropAG, setNewstatusDropAG] = useState([]);
     const [dstApplicableDrop, setDstApplicableDrop] = useState([]);
     const [statusDropGrid, setStatusDropGrid] = useState([]);
     const [dstApplicableDropGrid, setDstApplicableDropGrid] = useState([]);
@@ -45,29 +41,12 @@ function LoanStatusHistory() {
     // const [loan_request_id, setloan_request_id] = useState('');
     // const [loan_request_id, setloan_request_id] = useState('');
 
-    const [timeZoneIdSc, setTimeZoneIdSc] = useState('');
-    const [timeZoneNameSc, setTimeZoneNameSc] = useState('');
-    const [utcOffsetSc, setUtcOffsetSc] = useState('');
-    const [statusSc, setStatusSc] = useState('');
-    const [selectedStatusSc, setSelectedStatusSc] = useState('');
     const [statusDropSc, setStatusDropSc] = useState([]);
-    const [dstApplicableSc, setDstApplicableSc] = useState('');
-    const [selectedDstApplicableSc, setSelectedDstApplicableSc] = useState('');
     const [dstApplicableDropSc, setDstApplicableDropSc] = useState([]);
 
-    // New - Input
+    // New - Search
     const [history_idSc, sethistory_idSc] = useState('');
-    const [loan_request_idSc, setloan_request_idSc] = useState('');
-    const [old_statusSc, setold_statusSc] = useState('');
-    const [new_statusSc, setnew_statusSc] = useState('');
-    const [changed_bySc, setchanged_bySc] = useState('');
-    const [changed_dateSc, setchanged_dateSc] = useState('');
     const [remarksSc, setremarksSc] = useState('');
-
-    const [isSelectedStatus, setIsSelectedStatus] = useState('');
-    const [isSelectedDstApplicable, setIsSelectedDstApplicable] = useState('');
-    const [isSelectedStatusSc, setIsSelectedStatusSc] = useState('');
-    const [isSelectedDstApplicableSc, setIsSelectedDstApplicableSc] = useState('');
 
     // Newly added
     const [isSelectedLoanReqId, setIsSelectedLoanReqId] = useState('');
@@ -89,86 +68,82 @@ function LoanStatusHistory() {
     const [selectedLoanStatusSc, setSelectedLoanStatusSc] = useState('');
     const [isSelectedLoanStatusSc, setIsSelectedLoanStatusSc] = useState('');
     const [loanStatusDropSc, setLoanStatusDropSc] = useState([]);
-    const [loanStatusSc, setLoanStatusSc] = useState([]);
+    const [loanStatusSc, setLoanStatusSc] = useState('');
     const [isSelectedLoanNewStatusSc, setIsSelectedLoanNewStatusSc] = useState('');
     const [selectedLoanNewStatusSc, setSelectedLoanNewStatusSc] = useState('');
     const [loanNewStatusDropSc, setLoanNewStatusDropSc] = useState([]);
-    const [loanNewStatusSc, setLoanNewStatusSc] = useState([]);
-    
-    
-    
-    
-    
+    const [loanNewStatusSc, setLoanNewStatusSc] = useState('');
+    const [LoanReqIdGridDrop, setLoanReqIdGridDrop] = useState([]);
+    const [OldStatusGridDrop, setOldStatusGridDrop] = useState([]);
+    const [NewStatusGridDrop, setNewStatusGridDrop] = useState([]);
+    const [loanReqIdDropAG, setLoanReqIdDropAG] = useState([]);
 
 
-    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
+    const filteredOptionLoanStatus = Array.isArray(loanStatusDrop)
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
+
+    const filteredOptionLoanStatusSc = Array.isArray(loanStatusDrop)
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
+    const handleChangeLoanStatus = (selectedLoanStatus) => {
+        setSelectedLoanStatus(selectedLoanStatus);
+        setLoanStatus(selectedLoanStatus ? selectedLoanStatus.value : "");
+    };
+    const handleChangeLoanStatusSc = (selectedLoanStatusSc) => {
+        setSelectedLoanStatusSc(selectedLoanStatusSc);
+        setLoanStatusSc(selectedLoanStatusSc ? selectedLoanStatusSc.value : "");
+    };
+
+    const filteredOptionLoanNewStatus = Array.isArray(loanStatusDrop)
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
+
+    const filteredOptionLoanNewStatusSc = Array.isArray(loanStatusDropSc)
+        ? loanStatusDropSc.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
+
+    const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
+        ? loanReqIdDrop.map((option) => ({
+            value: option.loan_request_id,
+            label: option.loan_request_id,
+        }))
+        : [];
+
     const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
         setSelectedLoanReqIdSc(selectedLoanReqIdSc);
         setLoanReqIdSc(selectedLoanReqIdSc ? selectedLoanReqIdSc.value : "");
     };
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setLoanReqIdDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-    
-    const filteredOptionLoanStatus = loanStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-}));
-
-const filteredOptionLoanStatusSc = loanStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-}));
-const handleChangeLoanStatus = (selectedLoanStatus) => {
-    setSelectedLoanStatus(selectedLoanStatus);
-    setLoanStatus(selectedLoanStatus ? selectedLoanStatus.value : "");
-};
-const handleChangeLoanStatusSc = (selectedLoanStatusSc) => {
-    setSelectedLoanStatusSc(selectedLoanStatusSc);
-    setLoanStatusSc(selectedLoanStatusSc ? selectedLoanStatusSc.value : "");
-};
-const filteredOptionLoanNewStatus = loanStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-}));
-const filteredOptionLoanNewStatusSc = loanStatusDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-}));
-
-const handleChangeLoanReqId = (selectedLoanReqId) => {
+    const handleChangeLoanReqId = (selectedLoanReqId) => {
         setSelectedLoanReqId(selectedLoanReqId);
         setLoanReqId(selectedLoanReqId ? selectedLoanReqId.value : "");
     };
-    
-const handleChangeLoanNewStatus = (selectedLoanNewStatus) => {
-    setSelectedLoanNewStatus(selectedLoanNewStatus);
-    setLoanNewStatus(selectedLoanNewStatus ? selectedLoanNewStatus.value : "");
-};
-const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
-    setSelectedLoanNewStatusSc(selectedLoanNewStatusSc);
-    setLoanNewStatusSc(selectedLoanNewStatusSc ? selectedLoanNewStatusSc.value : "");
-};
 
-
-
-
-    //Temp
-
+    const handleChangeLoanNewStatus = (selectedLoanNewStatus) => {
+        setSelectedLoanNewStatus(selectedLoanNewStatus);
+        setLoanNewStatus(selectedLoanNewStatus ? selectedLoanNewStatus.value : "");
+    };
+    const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
+        setSelectedLoanNewStatusSc(selectedLoanNewStatusSc);
+        setLoanNewStatusSc(selectedLoanNewStatusSc ? selectedLoanNewStatusSc.value : "");
+    };
+    const filteredOptionLoanReqIdAG = loanReqIdDropAG.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
+    }));
 
     //code added by Harish purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -187,20 +162,15 @@ const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
     };
 
     const searchClearInputFields = () => {
-        sethistory_id("");
-        setloan_request_id("");
-        setold_status("");
-        setnew_status("");
-        setchanged_by("");
-        setchanged_date("");
-        setRemarks("");
         sethistory_idSc("");
-        setloan_request_idSc("");
-        setold_statusSc("");
-        setnew_statusSc("");
-        setchanged_bySc("");
-        setchanged_dateSc("");
+        setLoanReqIdSc("");
+        setSelectedLoanReqIdSc("");
+        setLoanStatusSc("");
+        setSelectedLoanStatusSc("");
+        setLoanNewStatusSc("");
+        setSelectedLoanNewStatusSc("");
         setremarksSc("");
+
     };
 
     useEffect(() => {
@@ -300,7 +270,7 @@ const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-        useEffect(() => {
+    useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
         fetch(`${config.apiBaseUrl}/getLoanRequest`, {
@@ -315,125 +285,174 @@ const handleChangeLoanNewStatusSc = (selectedLoanNewStatusSc) => {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-        useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setStatusDrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setStatusDrop(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
     useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-    })
-        .then((data) => data.json())
-        .then((val) => setLoanStatusDrop(val))
-        .catch((error) => console.error("Error fetching loan status:", error));
-}, []);
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanStatusDrop(val))
+            .catch((error) => console.error("Error fetching loan status:", error));
+    }, []);
 
-useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-    })
-        .then((data) => data.json())
-        .then((val) => setLoanStatusDropSc(val))
-        .catch((error) => console.error("Error fetching loan status:", error));
-}, []);
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanStatusDropSc(val))
+            .catch((error) => console.error("Error fetching loan status:", error));
+    }, []);
 
-useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-    })
-        .then((data) => data.json())
-        .then((val) => setLoanNewStatusDrop(val))
-        .catch((error) => console.error("Error fetching loan status:", error));
-}, []);
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanNewStatusDrop(val))
+            .catch((error) => console.error("Error fetching loan status:", error));
+    }, []);
 
-useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-    })
-        .then((data) => data.json())
-        .then((val) => setLoanNewStatusDropSc(val))
-        .catch((error) => console.error("Error fetching loan status:", error));
-}, []);
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanNewStatusDropSc(val))
+            .catch((error) => console.error("Error fetching loan status:", error));
+    }, []);
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const loan = val.map((option) => ({
+                    value: option.loan_request_id,
+                    label: `${option.loan_request_id}`,
+                }));
+
+                setLoanReqIdDropAG(loan);
+            })
+            .catch((error) => console.error("Error fetching loan request:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const OldStatus = val.map(option => option.attributedetails_name);
+                setStatusDropAG(OldStatus);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetLoanStatus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const NewStatus = val.map(option => option.attributedetails_name);
+                setNewstatusDropAG(NewStatus);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLoanReqIdDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
 
 
-    const filteredOptionStatus = statusDrop.map((option) => ({
+    const filteredOptionLoanReqIdDrop = LoanReqIdGridDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const filteredOptionStatusSc = statusDropSc.map((option) => ({
+    const filteredOptionOldStatusDrop = OldStatusGridDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const filteredOptionDstApplicable = dstApplicableDrop.map((option) => ({
+
+    const filteredOptionNewStatusDrop = NewStatusGridDrop.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }));
 
-    const filteredOptionDstApplicableSc = dstApplicableDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanReqIdSc = Array.isArray(loanReqIdDropSc)
+        ? loanReqIdDropSc.map((option) => ({
+            value: option.loan_request_id,
+            label: option.loan_request_id,
+        }))
+        : [];
 
-    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
-    value: option.loan_request_id,
-    label: option.loan_request_id,
-}));
-
-    const handleChangeStatus = (selectedStatus) => {
-        setSelectedStatus(selectedStatus);
-        setStatus(selectedStatus ? selectedStatus.value : "");
-    };
-
-    const handleChangeStatusSc = (selectedStatusSc) => {
-        setSelectedStatusSc(selectedStatusSc);
-        setStatusSc(selectedStatusSc ? selectedStatusSc.value : "");
-    };
-
-    const handleChangeDstApplicable = (selectedDstApplicable) => {
-        setSelectedDstApplicable(selectedDstApplicable);
-        setDstApplicable(selectedDstApplicable ? selectedDstApplicable.value : "");
-    };
-
-    const handleChangeDstApplicableSc = (selectedDstApplicableSc) => {
-        setSelectedDstApplicableSc(selectedDstApplicableSc);
-        setDstApplicableSc(selectedDstApplicableSc ? selectedDstApplicableSc.value : "");
-    };
 
     
 
@@ -443,17 +462,19 @@ useEffect(() => {
         try {
             const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-            const response = await fetch(`${config.apiBaseUrl}/getTimeZonesearchdata`, {
+            const response = await fetch(`${config.apiBaseUrl}/loan_status_history_search`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    TimeZone_ID: timeZoneIdSc ? timeZoneIdSc : null,
-                    TimeZone_Name: timeZoneNameSc,
-                    UTC_Offset: utcOffsetSc,
-                    DST_Applicable: dstApplicableSc ? dstApplicableSc : null,
-                    Status: statusSc,
+                    history_id: history_idSc ? history_idSc : 0,
+                    loan_request_id: loanReqIdSc,
+                    old_status: loanStatusSc,
+                    new_status: loanNewStatusSc,
+                    // changed_by: changed_bySc,
+                    // changed_date: changed_dateSc,
+                    remarks: remarksSc,
                     company_code,
                 }),
             });
@@ -530,11 +551,23 @@ useEffect(() => {
             headerName: "Loan Request ID",
             field: "loan_request_id",
             editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: loanReqIdDropAG.map((d) => d.value),
+            },
+            valueFormatter: (params) => {
+                const loan = loanReqIdDropAG.find((d) => d.value === params.value);
+                return loan ? loan.label : params.value;
+            },
         },
         {
             headerName: "Old Status",
             field: "old_status",
             editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: statusDropAG,
+            },
         },
         {
             headerName: "New Status",
@@ -542,34 +575,37 @@ useEffect(() => {
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: dstApplicableDropGrid,
+                values: NewstatusDropAG,
             },
         },
+        // {
+        //     headerName: "Changed By",
+        //     field: "changed_by",
+        //     editable: true,
+        //     cellEditor: "agSelectCellEditor",
+        //     cellEditorParams: {
+        //         values: statusDropGrid,
+        //     },
+        // },
+        // {
+        //     headerName: "Changed Date",
+        //     field: "changed_date",
+        //     editable: true,
+        //     cellEditor: "agSelectCellEditor",
+        //     cellEditorParams: {
+        //         values: dstApplicableDropGrid,
+        //     },
+        // },
         {
-            headerName: "Changed By",
-            field: "changed_by",
+            headerName: "Remarks",
+            field: "remarks",
             editable: true,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
                 values: statusDropGrid,
             },
         },
-        {
-            headerName: "Changed Date",
-            field: "changed_date",
-            editable: true,
-            filter: true,
-            hide: true,
-            sortable: false,
-        },
-        {
-            headerName: "Remarks",
-            field: "remarks",
-            editable: true,
-            filter: true,
-            hide: true,
-            sortable: false,
-        },
+
     ];
 
     const defaultColDef = {
@@ -578,14 +614,7 @@ useEffect(() => {
         editable: true,
     };
 
-    const tabs = [
-        { label: "Shift Master" },
-        { label: "Shift Type Master" },
-        { label: "Shift Pattern Master" },
-        { label: "Shift Pattern Details" },
-        { label: "Employment Type Master" },
-        { label: "Employee Shift Mapping" },
-    ];
+
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -637,7 +666,7 @@ useEffect(() => {
     };
 
     const handleSave = async () => {
-        if (!history_id || !loanReqId || !loanStatus || !loanNewStatus  ) {
+        if (!history_id || !loanReqId || !loanStatus || !loanNewStatus) {
             toast.warning("Missing Required Fields");
             setError(true);
             return;
@@ -659,7 +688,7 @@ useEffect(() => {
                         new_status: loanNewStatus,
                         remarks: remarks,
                         changed_by: sessionStorage.getItem("selectedUserCode"),
-                        
+
                         company_code: sessionStorage.getItem("selectedCompanyCode"),
                         created_by: sessionStorage.getItem("selectedUserCode"),
                     }),
@@ -695,24 +724,27 @@ useEffect(() => {
                 try {
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
                     const modified_by = sessionStorage.getItem("selectedUserCode");
+                    const changed_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        Time_Zone_masterData: Array.isArray(rowData)
+                        sp_loan_status_historyData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
                                 modified_by,
+                                changed_by
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
                                     modified_by,
+                                    changed_by
                                 },
                             ],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Time_Zone_masterLoopUpdate`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_status_historyLoopUpdate`,
                         {
                             method: "POST",
                             headers: {
@@ -723,7 +755,7 @@ useEffect(() => {
                     );
 
                     if (response.ok) {
-                        toast.success("Time zone master updated successfully", {
+                        toast.success("Loan Status History updated successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -751,10 +783,10 @@ useEffect(() => {
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
                     const dataToSend = {
-                        Time_Zone_masterData: Array.isArray(rowData) ? rowData : [rowData],
+                        sp_loan_status_historyData: Array.isArray(rowData) ? rowData : [rowData],
                     };
 
-                    const response = await fetch(`${config.apiBaseUrl}/Time_Zone_masterLoopDelete`,
+                    const response = await fetch(`${config.apiBaseUrl}/loan_status_historyLoopDelete`,
                         {
                             method: "POST",
                             headers: {
@@ -766,7 +798,7 @@ useEffect(() => {
                     );
 
                     if (response.ok) {
-                        toast.success("Time zone master deleted successfully", {
+                        toast.success("Loan Status History deleted successfully", {
                             onClose: () => handleSearch(),
                         });
                     } else {
@@ -774,8 +806,8 @@ useEffect(() => {
                         toast.warning(errorResponse.message || "Delete failed");
                     }
                 } catch (error) {
-                    console.error("Error deleting time zone master rows:", error);
-                    toast.error("Error deleting time zone master data: " + error.message);
+                    console.error("Error deleting Loan Status History rows:", error);
+                    toast.error("Error deleting Loan Status History data: " + error.message);
                 } finally {
                     setLoading(false);
                 }
@@ -792,11 +824,11 @@ useEffect(() => {
 
     const transformRowData = (data) => {
         return data.map((row) => ({
-            "Time Zone ID": row.TimeZone_ID || "",
-            "Time Zone Name": row.TimeZone_Name || "",
-            "UTC Offset": row.UTC_Offset || "",
-            "DST Applicable": row.DST_Applicable || "",
-            "Status": row.Status || "",
+            "History ID": row.history_id || "",
+            "Loan Request ID": row.loan_request_id || "",
+            "Old Status": row.old_status || "",
+            "New Status": row.new_status || "",
+            "Remarks": row.remarks || "",
         }));
     };
 
@@ -906,7 +938,7 @@ useEffect(() => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Time Zone Master");
 
-        XLSX.writeFile(workbook, "Time_Zone_Master_Search_Report.xlsx");
+        XLSX.writeFile(workbook, "Loan_Status_Histroy_Search_Report.xlsx");
     };
 
     return (
@@ -990,7 +1022,7 @@ useEffect(() => {
                                     onFocus={() => setIsSelectedLoanStatus(true)}
                                     onBlur={() => setIsSelectedLoanStatus(false)}
                                 />
-                                <label className={`floating-label`}>Old Status</label>
+                                <label className={`floating-label ${error && !old_status ? "text-danger" : ""}`}>Old Status<span className="text-danger">*</span></label>
                             </div>
                         </div>
 
@@ -1015,67 +1047,24 @@ useEffect(() => {
                             </div>
                         </div>
 
-                        {/* <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                                    ${selectedStatus ? "has-value" : ""} 
-                                    ${isSelectedStatus ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="status"
-                                    isClearable
-                                    value={changed_by}
-                                    onChange={handleChangeStatus}
-                                    options={filteredOptionStatus}
-                                    classNamePrefix="react-select"
-                                    placeholder=" "
-                                    onFocus={() => setIsSelectedStatus(true)}
-                                    onBlur={() => setIsSelectedStatus(false)}
+                        <div className="col-md-2">
+                            <div className="inputGroup">
+                                <input
+                                    id="fdate"
+                                    class="exp-input-field form-control"
+                                    type="text"
+                                    placeholder=""
+                                    required title="Please Enter the Annual Bonus"
+                                    autoComplete="off"
+                                    value={remarks}
+                                    onChange={(e) => setRemarks((e.target.value))}
                                 />
-                                <label className={`floating-label ${error && !changed_by ? "text-danger" : ""}`}>Changed By<span className="text-danger">*</span></label>
+                                <label for="sname" className={`exp-form-labels`}>Remarks</label>
                             </div>
                         </div>
 
-                        <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={changed_date}
-                onChange={(e) => setTravelEndDate(e.target.value)}
-              />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !changed_date ? "text-danger" : ""}`}
-              >
-                Changed Date<span className="text-danger">*</span>
-              </label>
-            </div>
-          </div> */}
-
-                        <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={remarks}
-                                onChange={(e) => setRemarks((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Remarks</label>
-                        </div>
                     </div>
-
                 </div>
-            </div>
 
                 <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                     <div className="header-flex">
@@ -1129,7 +1118,7 @@ useEffect(() => {
                                 <Select
                                     id="status"
                                     isClearable
-                                    value={selectedLoanStatus}
+                                    value={selectedLoanStatusSc}
                                     onChange={handleChangeLoanStatusSc}
                                     options={filteredOptionLoanStatusSc}
                                     classNamePrefix="react-select"
@@ -1144,7 +1133,7 @@ useEffect(() => {
                         <div className="col-md-2">
                             <div
                                 className={`inputGroup selectGroup 
-                                    ${selectedLoanNewStatus ? "has-value" : ""} 
+                                    ${selectedLoanNewStatusSc ? "has-value" : ""} 
                                     ${isSelectedLoanNewStatusSc ? "is-focused" : ""}`}
                             >
                                 <Select
@@ -1162,51 +1151,11 @@ useEffect(() => {
                             </div>
                         </div>
 
-                        {/* <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                                    ${selectedStatusSc ? "has-value" : ""} 
-                                    ${isSelectedStatusSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="status"
-                                    isClearable
-                                    value={changed_bySc}
-                                    onChange={handleChangeStatusSc}
-                                    options={filteredOptionStatusSc}
-                                    classNamePrefix="react-select"
-                                    placeholder=" "
-                                    onFocus={() => setIsSelectedStatusSc(true)}
-                                    onBlur={() => setIsSelectedStatusSc(false)}
-                                />
-                                <label className={`floating-label`}>Changed By</label>
-                            </div>
-                        </div>
-
                         <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Annual Bonus"
-                autoComplete="off"
-                value={changed_dateSc}
-                onChange={(e) => setchanged_dateSc(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Changed Date
-              </label>
-            </div>
-          </div> */}
-
-          <div className="col-md-2">
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
-                                    type="number"
+                                    type="text"
                                     placeholder=" "
                                     autoComplete="off"
                                     required
