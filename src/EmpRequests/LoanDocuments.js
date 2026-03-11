@@ -42,6 +42,8 @@ function LoanDocuments({}) {
   const [selectedFile, setSelectedFile] = useState([]);
   const gridApiRef = useRef(null);
   const [gridApi, setGridApi] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
@@ -128,23 +130,28 @@ function LoanDocuments({}) {
       .catch((error) => console.error("Error fetching loan request:", error));
   }, []);
 
+  const filteredOptionLoanReqIdSC = Array.isArray(loanReqIdDropSC)
+    ? loanReqIdDropSC.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
+      }))
+    : [];
+
+  const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
+    ? loanReqIdDrop.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
+      }))
+    : [];
+
+  const filteredOptionLoanReqIdAG = Array.isArray(loanReqIdDropAG)
+    ? loanReqIdDropAG.map((option) => ({
+        value: option.loan_request_id,
+        label: option.loan_request_id,
+      }))
+    : [];
 
 
-  const filteredOptionLoanReqIdSC = loanReqIdDropSC.map((option) => ({
-    value: option.loan_request_id,
-    label: option.loan_request_id,
-  }));
-
-  const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
-  value: option.loan_request_id,
-  label: option.loan_request_id,
-}));
-
-  const filteredOptionLoanReqIdAG = loanReqIdDropAG.map((option) => ({
-  value: option.loan_request_id,
-  label: option.loan_request_id,
-}));
-  
   const handleLoanReq = (SelectedLoanReq) => {
     setSelectedLoanReq(SelectedLoanReq);
     setLoanReqId(SelectedLoanReq ? SelectedLoanReq.value : "");
@@ -158,157 +165,158 @@ function LoanDocuments({}) {
   const searchClearInputFields = () => {
     setLoanReqIdSC("");
     setSelectedLoanReqSC("");
+    setdocument_idSC("");
+    setdocument_typeSC("");
+    setfile_pathSC("");
+    setuploaded_bySC("");
+    setFromDate("");
+    setToDate("");
   };
 
-const columnDefs = [
-  {
-    headerCheckboxSelection: true,
-    checkboxSelection: true,
-    headerName: "Actions",
-    field: "actions",
-    cellRenderer: (params) => {
-      const cellWidth = params.column.getActualWidth();
-      const showIcons = cellWidth > 20;
+  const columnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      cellRenderer: (params) => {
+        const cellWidth = params.column.getActualWidth();
+        const showIcons = cellWidth > 20;
 
-      return (
-        <div
-          className="position-relative d-flex align-items-center"
-          style={{ minHeight: "100%", justifyContent: "center" }}
-        >
-          {showIcons && (
-            <>
-              <span
-                className="icon mx-2"
-                onClick={() => handleUpdate(params.data)}
-                style={{ cursor: "pointer" }}
-              >
-                <i className="fa-regular fa-floppy-disk"></i>
-              </span>
+        return (
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
+            {showIcons && (
+              <>
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleUpdate(params.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-regular fa-floppy-disk"></i>
+                </span>
 
-              <span
-                className="icon mx-2"
-                onClick={() => handleDelete(params.data)}
-                style={{ cursor: "pointer" }}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </span>
-            </>
-          )}
-        </div>
-      );
+                <span
+                  className="icon mx-2"
+                  onClick={() => handleDelete(params.data)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </span>
+              </>
+            )}
+          </div>
+        );
+      },
     },
-  },
 
-  {
-    headerName: "Document ID",
-    field: "document_id",
-    editable: false,
-  },
-
-  {
-    headerName: "Loan Request ID",
-    field: "loan_request_id",
-    editable: true,
-    cellEditor: "agSelectCellEditor",
-    cellEditorParams: {
-      values: loanReqIdDropAG.map((d) => d.value),
+    {
+      headerName: "Document ID",
+      field: "document_id",
+      editable: false,
     },
-    valueFormatter: (params) => {
-      const loan = loanReqIdDropAG.find((d) => d.value === params.value);
-      return loan ? loan.label : params.value;
+
+    {
+      headerName: "Loan Request ID",
+      field: "loan_request_id",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: loanReqIdDropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const loan = loanReqIdDropAG.find((d) => d.value === params.value);
+        return loan ? loan.label : params.value;
+      },
     },
-  },
 
-  {
-    headerName: "Document Type",
-    field: "document_type",
-    editable: true,
-  },
-
-  {
-    headerName: "File Path",
-    field: "file_path",
-    editable: true,
-  },
-
-  {
-    headerName: "Uploaded By",
-    field: "uploaded_by",
-    editable: true,
-  },
-
-  {
-    headerName: "Uploaded Date",
-    field: "uploaded_at",
-    editable: true,
-  },
-
-  // ⭐ PDF PREVIEW COLUMN
-  {
-    headerName: "Preview",
-    field: "document",
-    width: 120,
-    editable: false,
-    cellRenderer: (params) => {
-      if (!params.value) return null;
-
-      const base64 = params.value;
-
-      return (
-        <button
-          className="btn btn-sm btn-primary"
-          onClick={() => {
-
-            const pdfWindow = window.open("");
-
-            pdfWindow.document.write(
-              `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64}"></iframe>`
-            );
-
-          }}
-        >
-          Preview
-        </button>
-      );
+    {
+      headerName: "Document Type",
+      field: "document_type",
+      editable: true,
     },
-  },
 
-  {
-    headerName: "Company Code",
-    field: "company_code",
-    editable: false,
-    hide: true,
-  },
+    {
+      headerName: "File Path",
+      field: "file_path",
+      editable: true,
+    },
 
-  {
-    headerName: "Keyfield",
-    field: "keyfield",
-    hide: true,
-  },
-];
+    {
+      headerName: "Uploaded By",
+      field: "uploaded_by",
+      editable: true,
+    },
+
+    {
+      headerName: "Uploaded Date",
+      field: "uploaded_at",
+      editable: true,
+    },
+
+    // ⭐ PDF PREVIEW COLUMN
+    {
+      headerName: "Preview",
+      field: "document",
+      width: 120,
+      editable: false,
+      cellRenderer: (params) => {
+        if (!params.value) return null;
+
+        const base64 = params.value;
+
+        return (
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={() => {
+              const pdfWindow = window.open("");
+
+              pdfWindow.document.write(
+                `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64}"></iframe>`,
+              );
+            }}
+          >
+            Preview
+          </button>
+        );
+      },
+    },
+
+    {
+      headerName: "Company Code",
+      field: "company_code",
+      editable: false,
+      hide: true,
+    },
+
+    {
+      headerName: "Keyfield",
+      field: "keyfield",
+      hide: true,
+    },
+  ];
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
   };
 
   const handleRemove = (index) => {
-
     setSelectedFile((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async (e) => {
-        if (
-          !document_id ||
-          !loanReqId ||
-          !file_path ||
-          !uploaded_by ||
-          !uploaded_at
-        ) {
-          setError(" ");
-          toast.warning("Error: Missing required fields");
-          return;
-        }
-    
+    if (
+      !document_id ||
+      !loanReqId ||
+      !file_path ||
+      !uploaded_by ||
+      !uploaded_at
+    ) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
     e.preventDefault();
 
     const formData = new FormData();
@@ -360,6 +368,8 @@ const columnDefs = [
         file_path: file_pathSC || "",
         uploaded_by: uploaded_bySC || "",
         uploaded_at: uploaded_atSC || "",
+        FromDate: fromDate,
+        ToDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -530,7 +540,7 @@ const columnDefs = [
     });
   };
 
-    const onGridReady = (params) => {
+  const onGridReady = (params) => {
     setGridApi(params.api);
     gridApiRef.current = params.api;
   };
@@ -721,7 +731,11 @@ const columnDefs = [
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label className={`exp-form-labels ${error && !loanReqId ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
+              <label
+                className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}
+              >
+                Loan Request ID<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -994,11 +1008,30 @@ const columnDefs = [
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={uploaded_atSC}
-                onChange={(e) => setuploaded_atSC(e.target.value)}
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                Uploaded Date
+                Uploaded From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Uploaded To
               </label>
             </div>
           </div>
