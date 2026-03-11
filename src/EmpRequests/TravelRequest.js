@@ -10,14 +10,9 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function TravelRequest({ }) {
+function TravelRequest({}) {
   const [rowData, setRowData] = useState([]);
-  const [job_titleSC, setjob_titleSC] = useState("");
-  const [job_title, setjob_title] = useState("");
   const [Country_Code, setCountry_Code] = useState("");
-  const [Country_CodeSC, setCountry_CodeSC] = useState("");
-  const [locationSC, setlocationSC] = useState("");
-  const [employment_typeSC, setemployment_typeSC] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSelectDepartment, setIsSelectDepartment] = useState(false);
@@ -28,14 +23,11 @@ function TravelRequest({ }) {
   const [CountrydropSC, setCountrydropSC] = useState([]);
   const [employmentdrop, setEmploymentdrop] = useState([]);
   const [employmentdropGR, setEmploymentdropGR] = useState([]);
-  const [employmentdropSC, setEmploymentdropSC] = useState([]);
   const [departmentDrop, setDepartmentDrop] = useState([]);
   const [dpt, setdpt] = useState("");
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
   const [dptSC, setdptSC] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
 
   const [travel_request_id, settravel_request_id] = useState("");
   const [request_number, setrequest_number] = useState("");
@@ -55,6 +47,7 @@ function TravelRequest({ }) {
   const [estimated_cost, setestimated_cost] = useState("");
   const [Currency_Code, setCurrency_Code] = useState("");
   const [reqStatusDrop, setReqStatusDrop] = useState([]);
+  const [reqStatusDropAG, setReqStatusDropAG] = useState([]);
   const [reqStatus, setReqStatus] = useState("");
   const [selectedReqStatus, setSelectedReqStatus] = useState("");
   const [priorityDrop, setPriorityDrop] = useState([]);
@@ -79,6 +72,7 @@ function TravelRequest({ }) {
   const [ProjectManager, setProjectManager] = useState("");
   const [isSelectManager, setIsSelectManager] = useState(false);
   const [Managerdrop, setManagerdrop] = useState([]);
+  const [ManagerdropAG, setManagerdropAG] = useState([]);
   const [travel_request_idSC, settravel_request_idSC] = useState("");
   const [request_numberSC, setrequest_numberSC] = useState("");
   const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
@@ -97,6 +91,7 @@ function TravelRequest({ }) {
   const [ManagerdropSC, setManagerdropSC] = useState([]);
   const [destination_citySC, setdestination_citySC] = useState("");
   const [ProjectManagerSC, setProjectManagerSC] = useState("");
+  const [PriorityGridDrop, setPriorityGridDrop] = useState([]);
 
   const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
   const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
@@ -118,34 +113,6 @@ function TravelRequest({ }) {
     })
       .then((data) => data.json())
       .then((val) => setEmpIdDrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setCountyIdDrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/getVisaType`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setVisaTypeDrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -190,6 +157,45 @@ function TravelRequest({ }) {
       .then((response) => response.json())
       .then(setManagerdrop)
       .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const Manager = val.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId}`,
+        }));
+
+        setManagerdropAG(Manager);
+      })
+      .catch((error) => console.error("Error fetching Travel request:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const reqStatus = val.map((option) => option.attributedetails_name);
+        setReqStatusDropAG(reqStatus);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const fetchProductCodes = async (selectedValue) => {
@@ -243,30 +249,48 @@ function TravelRequest({ }) {
     }
   };
 
-  const filteredOptionEmpId = empIdDrop.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.First_Name}`,
-  }));
+  const filteredOptionEmpId = Array.isArray(empIdDrop)
+    ? empIdDrop.map((option) => ({
+        value: option.EmployeeId,
+        label: `${option.EmployeeId}-${option.First_Name}`,
+      }))
+    : [];
 
-  const filteredOptionPriority = priorityDrop.map((option) => ({
+  const filteredOptionPriority = Array.isArray(priorityDrop)
+    ? priorityDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
-  }));
+      }))
+    : [];
 
-  const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
+  const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
+    ? reqStatusDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
-  }));
+      }))
+    : [];
 
-  const filteredOptionManager = Managerdrop.map((option) => ({
+      const filteredOptionManager = Array.isArray(Managerdrop)
+    ? Managerdrop.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId}-${option.full_name}`,
-  }));
-
-  const filteredOptionManagerSC = ManagerdropSC.map((option) => ({
+      }))
+    : [];
+    
+      const filteredOptionManagerAG = Array.isArray(ManagerdropAG)
+    ? ManagerdropAG.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId}-${option.full_name}`,
-  }));
+      }))
+    : [];
+
+      const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
+    ? ManagerdropSC.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+      }))
+    : [];
+
 
   const handleChangeEmpId = (selectedEmpId) => {
     setSelectedEmpId(selectedEmpId);
@@ -316,34 +340,6 @@ function TravelRequest({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setCountyIdDropSc(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/getVisaType`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setVisaTypeDropSc(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getPriority`, {
       method: "POST",
       headers: {
@@ -385,14 +381,27 @@ function TravelRequest({ }) {
       .catch((error) => console.error("Error fetching warehouse:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getPriority`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Extract city names from the fetched data
+        const statusOption = data.map((option) => option.attributedetails_name);
+        setPriorityGridDrop(statusOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId}-${option.First_Name}`,
-  }));
-
-  const filteredOptionCountryIdSc = countryIdDropSc.map((option) => ({
-    value: option.Country_Code,
-    label: `${option.Country_Code} - ${option.Country_Name}`,
   }));
 
   const filteredOptionVisaTypeSc = visaTypeDropSc.map((option) => ({
@@ -745,6 +754,12 @@ function TravelRequest({ }) {
     },
 
     {
+      headerName: "Purpose of Travel",
+      field: "purpose_of_travel",
+      editable: true,
+    },
+
+    {
       headerName: "Start Date",
       field: "travel_start_date",
       editable: true,
@@ -759,6 +774,12 @@ function TravelRequest({ }) {
     {
       headerName: "Transport Mode",
       field: "transport_mode",
+      editable: true,
+    },
+
+    {
+      headerName: "Accommodation Required",
+      field: "accommodation_required",
       editable: true,
     },
 
@@ -778,6 +799,10 @@ function TravelRequest({ }) {
       headerName: "Request Status",
       field: "request_status",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: reqStatusDropAG,
+      },
     },
 
     {
@@ -790,12 +815,25 @@ function TravelRequest({ }) {
       headerName: "Priority",
       field: "priority_level",
       editable: true,
+      filter: "agNumberColumnFilter",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: PriorityGridDrop,
+      },
     },
 
     {
       headerName: "Manager",
       field: "manager_id",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: ManagerdropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const loan = ManagerdropAG.find((d) => d.value === params.value);
+        return loan ? loan.label : params.value;
+      },
     },
 
     {
@@ -895,7 +933,6 @@ function TravelRequest({ }) {
   };
 
   const handleSearch = async () => {
-
     setLoading(true);
 
     try {
@@ -981,7 +1018,6 @@ function TravelRequest({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-
     showConfirmationToast(
       "Are you sure you want to update the selected travel request data?",
       async () => {
@@ -993,20 +1029,21 @@ function TravelRequest({ }) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                ...row,
-                company_code,
-                modified_by,
-              }))
-              : [
-                {
-                  ...rowData,
+                  ...row,
                   company_code,
                   modified_by,
-                },
-              ],
+                }))
+              : [
+                  {
+                    ...rowData,
+                    company_code,
+                    modified_by,
+                  },
+                ],
           };
 
-          const response = await fetch(`${config.apiBaseUrl}/travel_requestsLoopUpdate`,
+          const response = await fetch(
+            `${config.apiBaseUrl}/travel_requestsLoopUpdate`,
             {
               method: "POST",
               headers: {
@@ -1036,7 +1073,6 @@ function TravelRequest({ }) {
   };
 
   const handleDelete = async (rowData) => {
-
     showConfirmationToast(
       "Are you sure you want to delete the selected travel request data?",
       async () => {
@@ -1047,23 +1083,24 @@ function TravelRequest({ }) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                ...row,
-                company_code,
-              }))
-              : [
-                {
-                  ...rowData,
+                  ...row,
                   company_code,
-                },
-              ],
+                }))
+              : [
+                  {
+                    ...rowData,
+                    company_code,
+                  },
+                ],
           };
 
-          const response = await fetch(`${config.apiBaseUrl}/travel_requestsLoopDelete`,
+          const response = await fetch(
+            `${config.apiBaseUrl}/travel_requestsLoopDelete`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "company_code": company_code
+                company_code: company_code,
               },
               body: JSON.stringify(dataToSend),
             },
@@ -1285,8 +1322,8 @@ function TravelRequest({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                            ${selectedEmpId ? "has-value" : ""} 
-                            ${isSelectedEmpId ? "is-focused" : ""}`}
+                ${selectedEmpId ? "has-value" : ""} 
+                ${isSelectedEmpId ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
@@ -1622,7 +1659,7 @@ function TravelRequest({ }) {
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !job_title ? "text-danger" : ""}`}
+                className={`exp-form-labels ${error && !remarks ? "text-danger" : ""}`}
               >
                 Remarks<span className="text-danger">*</span>
               </label>
