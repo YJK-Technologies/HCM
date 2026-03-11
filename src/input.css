@@ -303,7 +303,8 @@
 .inputGroup textarea:focus+label,
 .inputGroup textarea:not(:placeholder-shown)+label {
   top: 0;
-  transform: translateY(-50%) scale(0.85);
+  /* transform: translateY(-50%) scale(0.85); */
+  transform: translateY(-55%) scale(0.85);
   color: var(--but);
   background: var(--chart-bg);
   padding: 0 6px;

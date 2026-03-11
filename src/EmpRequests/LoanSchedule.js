@@ -56,7 +56,7 @@ function LoanSchedule({ }) {
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -82,17 +82,19 @@ function LoanSchedule({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
+        ? loanReqIdDrop.map((option) => ({
+            value: option?.loan_request_id,
+            label: option?.loan_request_id,
+        }))
+        : [];
 
-    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
-
-    const filteredOptionPaymentStatus = paymentStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
+    const filteredOptionPaymentStatus = Array.isArray(paymentStatusDrop)
+        ? paymentStatusDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanReqId = (selectedLoanReqId) => {
         setSelectedLoanReqId(selectedLoanReqId);
@@ -107,7 +109,7 @@ function LoanSchedule({ }) {
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -133,15 +135,19 @@ function LoanSchedule({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
+    const filteredOptionLoanReqIdSc = Array.isArray(loanReqIdDropSc)
+        ? loanReqIdDropSc.map((option) => ({
+            value: option?.loan_request_id,
+            label: option?.loan_request_id,
+        }))
+        : [];
 
-    const filteredOptionPaymentStatusSc = paymentStatusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionPaymentStatusSc = Array.isArray(paymentStatusDropSc)
+        ? paymentStatusDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
         setSelectedLoanReqIdSc(selectedLoanReqIdSc);
@@ -155,7 +161,7 @@ function LoanSchedule({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -715,7 +721,7 @@ function LoanSchedule({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required 
+                                required
                                 autoComplete="off"
                                 value={installmentNo}
                                 onChange={(e) => {
@@ -739,7 +745,7 @@ function LoanSchedule({ }) {
                                 value={installmentDate}
                                 onChange={(e) => setIntallmentDate((e.target.value))}
                             />
-                            <label for="sname" className={`exp-form-labels ${error && !installmentDate ? 'text-danger' : ''}`}>Payment Date<span className="text-danger">*</span></label>
+                            <label for="sname" className={`exp-form-labels ${error && !installmentDate ? 'text-danger' : ''}`}>Installment Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -896,7 +902,7 @@ function LoanSchedule({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required 
+                                required
                                 autoComplete="off"
                                 value={installmentNoSc}
                                 onChange={(e) => {

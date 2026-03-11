@@ -41,6 +41,8 @@ function LoanApprovals({}) {
   const [statusDropSC, setstatusDropSC] = useState([]);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
   const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const [approval_idSC, setapproval_idSC] = useState("");
   const [approver_idSC, setapprover_idSC] = useState("");
@@ -154,57 +156,69 @@ function LoanApprovals({}) {
       .then((val) => setLoanReqIdDropSC(val));
   }, []);
 
-    useEffect(() => {
-      fetch(`${config.apiBaseUrl}/getLoanRequest`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const loan = val.map((option) => ({
+          value: option.loan_request_id,
+          label: `${option.loan_request_id}`,
+        }));
+
+        setLoanReqIdDropAG(loan);
       })
-        .then((data) => data.json())
-        .then((val) => {
-          const loan = val.map((option) => ({
-            value: option.loan_request_id,
-            label: `${option.loan_request_id}`,
-          }));
-  
-          setLoanReqIdDropAG(loan);
-        })
-        .catch((error) => console.error("Error fetching loan request:", error));
-    }, []);
+      .catch((error) => console.error("Error fetching loan request:", error));
+  }, []);
 
-  const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
+  const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
+    ? loanReqIdDrop.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
-  }));
+      }))
+    : [];
 
-    const filteredOptionLoanReqIdSC = loanReqIdDropSC.map((option) => ({
+  const filteredOptionLoanReqIdSC = Array.isArray(loanReqIdDropSC)
+    ? loanReqIdDropSC.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
-  }));
+      }))
+    : [];
 
-  const filterOptionStatus = statusDrop.map((option) => ({
+  const filterOptionStatus = Array.isArray(statusDrop)
+    ? statusDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
-  }));
+      }))
+    : [];
 
-  const filterOptionStatusAG = statusDropAG.map((option) => ({
+  const filterOptionStatusAG = Array.isArray(statusDropAG)
+    ? statusDropAG.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
-  }));
+      }))
+    : [];
 
-  const filterOptionStatusSC = statusDropSC.map((option) => ({
+  const filterOptionStatusSC = Array.isArray(statusDropSC)
+    ? statusDropSC.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
-  }));
+      }))
+    : [];
 
-  const filteredOptionLoanReqIdAG = loanReqIdDropAG.map((option) => ({
+  const filteredOptionLoanReqIdAG = Array.isArray(loanReqIdDropAG)
+    ? loanReqIdDropAG.map((option) => ({
     value: option.loan_request_id,
     label: option.loan_request_id,
-  }));
+      }))
+    : [];
 
   const handleStatus = (SelectedStatus) => {
     setselectedStatus(SelectedStatus);
@@ -236,6 +250,8 @@ function LoanApprovals({}) {
     setselectedStatusSC("");
     setApprovalStatusSC("");
     setapproval_dateSC("");
+    setFromDate("");
+    setToDate("");
   };
 
   const columnDefs = [
@@ -436,6 +452,8 @@ function LoanApprovals({}) {
         approval_status: ApprovalStatusSC || "",
         approval_date: approval_dateSC || "",
         remarks: remarksSc || "",
+        FromDate: fromDate,
+        ToDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -771,7 +789,11 @@ function LoanApprovals({}) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}>Loan Request ID<span className="text-danger">*</span></label>
+              <label
+                className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}
+              >
+                Loan Request ID<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -997,11 +1019,30 @@ function LoanApprovals({}) {
                 required
                 title="Please Enter the Annual Bonus"
                 autoComplete="off"
-                value={approval_dateSC}
-                onChange={(e) => setapproval_dateSC(e.target.value)}
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                Approval Date
+                Approval From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Annual Bonus"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Approval To
               </label>
             </div>
           </div>
