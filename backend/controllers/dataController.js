@@ -44555,16 +44555,13 @@ const loan_status_historyLoopUpdate = async (req, res) => {
         .input("loan_request_id", sql.Int, item.loan_request_id)
         .input("old_status", sql.NVarChar, item.old_status)
         .input("new_status", sql.NVarChar, item.new_status)
-        .input("changed_by", sql.Int, item.changed_by)
+        .input("changed_by", sql.NVarChar, item.changed_by)
         .input("changed_date", sql.DateTime, item.changed_date)
         .input("remarks", sql.NVarChar, item.remarks)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("key_field", sql.NVarChar, item.key_field)
-        .input("created_by", sql.NVarChar, item.created_by)
-        .input("created_date", sql.DateTime, item.created_date)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .input("modified_date", sql.DateTime, item.modified_date)
-        .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, @created_date, @modified_by, @modified_date`);
+        .query(`EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, '', '', @modified_by, ''`);
     }
     res.status(200).json("sp_loan_status_history data updated successfully");
   } catch (err) {
@@ -44669,6 +44666,40 @@ const loan_documentsSearch = async (req, res) => {
   }
 };
 //code ended by sakthi on 10-03-26
+
+// Code added by Dinesh Gokul on 11-03-2026
+
+const loan_status_history_search = async (req, res) => {
+  const {history_id, loan_request_id, old_status, new_status, changed_by, changed_date, remarks, company_code
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("history_id", sql.Int, history_id)
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("old_status", sql.NVarChar, old_status || null)
+      .input("new_status", sql.NVarChar, new_status || null)
+      .input("changed_by", sql.NVarChar, changed_by)
+      .input("changed_date", sql.DateTime, changed_date || null)
+      .input("remarks", sql.NVarChar, remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, '', '', '', '', ''`,
+      );
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_status_history insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
 
 module.exports = {
   login,
@@ -45960,7 +45991,8 @@ module.exports = {
     getPaymentStatus,
     loanScheduleSearch,
     loan_approvalsSearch,
-    loan_documentsSearch
+    loan_documentsSearch,
+    loan_status_history_search
 
 
 };
