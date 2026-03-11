@@ -1321,6 +1321,7 @@ router.post("/loan_status_historyLoopDelete", dataController.loan_status_history
 router.post("/GetLoanStatus", dataController.GetLoanStatus)
 router.post("/loan_documentsSearch",dataController.loan_documentsSearch)
 router.post("/getApprovalLoanRequest",dataController.getApprovalLoanRequest)
+router.post("/loan_status_history_search",dataController.loan_status_history_search)
 
 
 
