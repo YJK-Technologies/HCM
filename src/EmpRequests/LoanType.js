@@ -107,15 +107,19 @@ function LoanType({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionLoanType = loanTypeNameDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanType = Array.isArray(loanTypeNameDrop)
+        ? loanTypeNameDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionStatus = statusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionStatus = Array.isArray(statusDrop)
+        ? statusDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanType = (selectedLoanTypeName) => {
         setSelectedLoanTypeName(selectedLoanTypeName);
@@ -155,15 +159,19 @@ function LoanType({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionLoanTypeSc = loanTypeNameDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanTypeSc = Array.isArray(loanTypeNameDropSc)
+        ? loanTypeNameDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionStatusSc = statusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionStatusSc = Array.isArray(statusDropSc)
+        ? statusDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanTypeSc = (selectedLoanTypeNameSc) => {
         setSelectedLoanTypeNameSc(selectedLoanTypeNameSc);
@@ -423,7 +431,7 @@ function LoanType({ }) {
         }
     };
 
-        const handleUpdate = async (rowData) => {
+    const handleUpdate = async (rowData) => {
 
         showConfirmationToast(
             "Are you sure you want to update the selected loan type data?",

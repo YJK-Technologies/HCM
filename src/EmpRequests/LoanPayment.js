@@ -61,7 +61,7 @@ function LoanPayment({ }) {
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -88,15 +88,19 @@ function LoanPayment({ }) {
     }, []);
 
 
-    const filteredOptionLoanReqId = loanReqIdDrop.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
+    const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
+        ? loanReqIdDrop.map((option) => ({
+            value: option?.loan_request_id,
+            label: option?.loan_request_id,
+        }))
+        : [];
 
-    const filteredOptionPayment = paymentDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionPayment = Array.isArray(paymentDrop)
+        ? paymentDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanReqId = (selectedLoanReqId) => {
         setSelectedLoanReqId(selectedLoanReqId);
@@ -111,7 +115,7 @@ function LoanPayment({ }) {
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -137,15 +141,19 @@ function LoanPayment({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionLoanReqIdSc = loanReqIdDropSc.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-    }));
+    const filteredOptionLoanReqIdSc = Array.isArray(loanReqIdDropSc)
+        ? loanReqIdDropSc.map((option) => ({
+            value: option?.loan_request_id,
+            label: option?.loan_request_id,
+        }))
+        : [];
 
-    const filteredOptionPaymentSc = paymentDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionPaymentSc = Array.isArray(paymentDropSc)
+        ? paymentDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
         setSelectedLoanReqIdSc(selectedLoanReqIdSc);
@@ -159,7 +167,7 @@ function LoanPayment({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanRequest`, {
+        fetch(`${config.apiBaseUrl}/getApprovalLoanRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -710,7 +718,7 @@ function LoanPayment({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required 
+                                required
                                 autoComplete="off"
                                 value={paymentAmount}
                                 onChange={(e) => {

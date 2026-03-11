@@ -42,7 +42,7 @@ import {
   BsWrenchAdjustable,
   BsPeopleFill,
   BsArrowRepeat,
-  
+  BsPersonPlus,
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -53,13 +53,18 @@ import {
   MdOutlineGroupAdd,
   MdOutlineEventAvailable,
   MdOutlineSchedule,
-  MdTravelExplore ,
+  MdTravelExplore,
   MdFlightTakeoff,
   MdPayments,
   MdCalendarMonth,
-  MdOutlineAccountBalance 
+  MdOutlineAccountBalance,
 } from "react-icons/md";
-
+import { 
+  HiOutlineUserGroup
+} from "react-icons/hi";
+import { RiMoneyDollarCircleLine } from "react-icons/ri";
+import { TbClockCheck, TbHistory } from "react-icons/tb";
+import { FiDatabase } from "react-icons/fi";
 import {
   AiOutlinePercentage,
   AiOutlineFileDone,
@@ -144,6 +149,7 @@ export const leafIconMap = {
   "Loan Repayment Schedule": MdCalendarMonth,
   "Loan Payment": MdPayments,
   "Loan Type": MdOutlineAccountBalance,
+  "Loan Status History": TbHistory,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -204,99 +210,49 @@ const menuData = [
     ],
   },
   {
-    label: "HCM",
-    icon: BsPersonVcard,
+    label: "ESS",
+    icon: HiOutlineUserGroup,
     isDropdown: true,
     subMenus: [
-      {
-        label: "Employee Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Employee Information", path: "/AddEmployeeInfo" },
-          { label: "Visa Requests", path: "/VisaRequest" },
-          { label: "Travel Request", path: "/TravelRequest" },
-          { label: "Loan Type", path: "/LoanType" },
-          { label: "Loan Documents", path: "/LoanDocuments" },
-          { label: "Loan Request", path: "/LoanRequest" },
-          { label: "Loan Approvals", path: "/LoanApprovals" },
-          { label: "Loan Payment", path: "/LoanPayment" },
-          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
-          { label: "Loan Status History", path: "/LoanStatusHistory" },
-        ],
-      },
-      {
-        label: "Dashboard",
-        isDropdown: true,
-        subMenus: [
-          { label: "Department Dashboard", path: "/DepartmentDashboard" },
-          { label: "Admin Dashboard", path: "/ESSDashboard" },
-          { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-        ],
-      },
-      {
-        label: "Payroll Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Salary Process", path: "/salarypath" },
-          { label: "Payslip Master", path: "/PayslipSalaryDays" },
-        ],
-      },
-      {
-        label: "Shift Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Country Master", path: "/CountryMaster" },
-          { label: "Time Zone Master", path: "/TimeZoneGrid" },
-          { label: "Shift Master", path: "/ShiftMasterGrid" },
-        ],
-      },
-      {
-        label: "Shift Reports",
-        isDropdown: true,
-        subMenus: [
-          { label: "Shift Summary Report", path: "/ShiftSumRep" },
-        ],
-      },
-      {
-        label: "Interview Management",
-        isDropdown: true,
-        subMenus: [
-          { label: "Interview Dashboard", path: "/InterviewDashboard" },
-          { label: "Interview Master", path: "/JobMaster" },
-        ], 
-      }, 
-      {
-        label: "Interview Panel Reports",
-        isDropdown: true,
-        subMenus: [
-           { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
-           { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
-           { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },
-           { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
-           { label: "Hiring Decision Report", path: "/HiringDecisionReport" },
-           { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
-           { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
-           { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
-        ], 
-      }, 
+      { label: "Employee Information", path: "/AddEmployeeInfo" },
+      { label: "Admin Dashboard", path: "/ESSDashboard" },
+      { label: "Employee Dashboard", path: "/EmployeeDashboard" },
+      { label: "Department Dashboard", path: "/DepartmentDashboard" },
+      { label: "Visa Requests", path: "/VisaRequest" },
+      { label: "Travel Request", path: "/TravelRequest" },
       {
         label: "Masters",
         isDropdown: true,
         subMenus: [
           { label: "Grade", path: "/EmployeeGrade" },
           { label: "Leave", path: "/EmpLeave" },
-          { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
+          { label: "Setting", path: "/WeekOff" },
         ],
       },
-      { label: "Setting", path: "/WeekOff" },
-      { label: "Generate Shift", path: "/GenerateShift" },
     ],
   },
   {
-    label: "PMS",
-    icon: BsCalendarEvent,
+    label: "Payroll",
+    icon: RiMoneyDollarCircleLine,
+    isDropdown: true,
+    subMenus: [
+      { label: "Payslip Master", path: "/PayslipSalaryDays" },
+      { label: "Salary Process", path: "/salarypath" },
+      { label: "Loan", path: "/EmployeeLoan" },
+      { label: "Loan Type", path: "/LoanType" },
+      { label: "Loan Documents", path: "/LoanDocuments" },
+      { label: "Loan Request", path: "/LoanRequest" },
+      { label: "Loan Approvals", path: "/LoanApprovals" },
+      { label: "Loan Payment", path: "/LoanPayment" },
+      { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+      { label: "Loan Status History", path: "/LoanStatusHistory" },
+    ],
+  },
+  {
+    label: "Attendance",
+    icon: TbClockCheck,
     isDropdown: true,
     subMenus: [
       {
@@ -315,6 +271,7 @@ const menuData = [
         subMenus: [
           { label: "Open Tickets", path: "/OpenTickets" },
           { label: "Task Update", path: "/ProjectDetails" },
+          { label: "Generate Shift", path: "/GenerateShift" },
         ],
       },
       {
@@ -324,10 +281,39 @@ const menuData = [
           { label: "Task Hours & Time Tracking", path: "/TaskHours" },
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
+          { label: "Shift Master", path: "/ShiftMasterGrid" },
+          { label: "Shift Summary Report", path: "/ShiftSumRep" },
         ],
       },
     ],
-  }
+  },
+  {
+    label: "Recruitment",
+    icon: BsPersonPlus,
+    isDropdown: true,
+    subMenus: [
+      { label: "Interview Master", path: "/JobMaster" },
+      { label: "Interview Dashboard", path: "/InterviewDashboard" },
+      { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
+      { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
+      { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },
+      { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
+      { label: "Hiring Decision Report", path: "/HiringDecisionReport" },
+      { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
+      { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
+      { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
+    ],
+  },
+  {
+    label: "Masters",
+    icon: FiDatabase,
+    isDropdown: true,
+    subMenus: [
+      { label: "Country Master", path: "/CountryMaster" },
+      { label: "Interview Dashboard", path: "/InterviewDashboard" },
+      { label: "Time Zone Master", path: "/TimeZoneGrid" },
+    ],
+  },
 ];
 
 const secondaryMenuData = [

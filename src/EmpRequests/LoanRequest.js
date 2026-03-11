@@ -110,20 +110,26 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpId = empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpId = Array.isArray(empIdDrop)
+        ? empIdDrop.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionLoanType = loanTypeIdDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
+        ? loanTypeIdDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
+        ? reqStatusDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpId = (selectedEmpId) => {
         setSelectedEmpId(selectedEmpId);
@@ -183,20 +189,26 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+        ? empIdDropSc.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionLoanTypeSc = loanTypeIdDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
+        ? loanTypeIdDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatusSc = reqStatusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
+        ? reqStatusDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
