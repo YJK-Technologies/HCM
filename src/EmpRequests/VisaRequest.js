@@ -156,30 +156,40 @@ function VisaRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpId = empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpId = Array.isArray(empIdDrop)
+        ? empIdDrop.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionCountryId = countryIdDrop.map(option => ({
-        value: option.Country_Code,
-        label: `${option.Country_Code} - ${option.Country_Name}`
-    }));
+    const filteredOptionCountryId = Array.isArray(countryIdDrop)
+        ? countryIdDrop.map((option) => ({
+            value: option?.Country_Code,
+            label: `${option?.Country_Code} - ${option?.Country_Name}`,
+        }))
+        : [];
 
-    const filteredOptionVisaType = visaTypeDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionVisaType = Array.isArray(visaTypeDrop)
+        ? visaTypeDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionPriority = priorityDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionPriority = Array.isArray(priorityDrop)
+        ? priorityDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
+        ? reqStatusDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpId = (selectedEmpId) => {
         setSelectedEmpId(selectedEmpId);
@@ -276,30 +286,40 @@ function VisaRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+        ? empIdDropSc.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionCountryIdSc = countryIdDropSc.map(option => ({
-        value: option.Country_Code,
-        label: `${option.Country_Code} - ${option.Country_Name}`
-    }));
+    const filteredOptionCountryIdSc = Array.isArray(countryIdDropSc)
+        ? countryIdDropSc.map((option) => ({
+            value: option?.Country_Code,
+            label: `${option?.Country_Code} - ${option?.Country_Name}`,
+        }))
+        : [];
 
-    const filteredOptionVisaTypeSc = visaTypeDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionVisaTypeSc = Array.isArray(visaTypeDropSc)
+        ? visaTypeDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionPrioritySc = priorityDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionPrioritySc = Array.isArray(priorityDropSc)
+        ? priorityDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatusSc = reqStatusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
+        ? reqStatusDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
@@ -1005,7 +1025,7 @@ function VisaRequest({ }) {
                                 autoComplete="off"
                                 value={visaRequestId}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setVisaRequestId(value);
                                 }}
                             />
@@ -1051,7 +1071,7 @@ function VisaRequest({ }) {
                                 autoComplete="off"
                                 value={passportId}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setPassportId(value);
                                 }}
                             />
@@ -1184,11 +1204,11 @@ function VisaRequest({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 placeholder=""
-                                required 
+                                required
                                 autoComplete="off"
                                 value={reqNumber}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setReqNumber(value);
                                 }}
                             />
@@ -1249,7 +1269,7 @@ function VisaRequest({ }) {
                                 pattern="[0-9]*"
                                 value={estimatedCost}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setEstimatedCost(value);
                                 }}
                             />
@@ -1297,7 +1317,7 @@ function VisaRequest({ }) {
                                 autoComplete="off"
                                 value={visaRequestIdSc}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setVisaRequestIdSc(value);
                                 }}
                             />
@@ -1342,8 +1362,8 @@ function VisaRequest({ }) {
                                 required title="Please Enter the Annual Bonus"
                                 autoComplete="off"
                                 value={passportIdSc}
-                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setPassportIdSc(value);
                                 }}
                             />
@@ -1480,7 +1500,7 @@ function VisaRequest({ }) {
                                 autoComplete="off"
                                 value={reqNumberSc}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setReqNumberSc(value);
                                 }}
                             />
@@ -1541,7 +1561,7 @@ function VisaRequest({ }) {
                                 autoComplete="off"
                                 value={estimatedCostSc}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, ""); 
+                                    const value = e.target.value.replace(/\D/g, "");
                                     setEstimatedCostSc(value);
                                 }}
                             />

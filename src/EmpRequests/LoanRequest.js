@@ -33,6 +33,7 @@ function LoanRequest({ }) {
     const [reqStatusDrop, setReqStatusDrop] = useState([]);
     const [reqStatus, setReqStatus] = useState('');
     const [selectedReqStatus, setSelectedReqStatus] = useState('');
+    const [repaymentDate, setRepaymentDate] = useState('');
 
     const [loanReqIdSc, setLoanReqIdSc] = useState('');
     const [reqNumberSc, setReqNumberSc] = useState('');
@@ -51,6 +52,7 @@ function LoanRequest({ }) {
     const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
     const [reqStatusSc, setReqStatusSc] = useState('');
     const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
+    const [repaymentDateSc, setRepaymentDateSc] = useState('');
 
     const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
     const [isSelectedLoanType, setIsSelectedLoanType] = useState(false);
@@ -108,20 +110,26 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpId = empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpId = Array.isArray(empIdDrop)
+        ? empIdDrop.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionLoanType = loanTypeIdDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
+        ? loanTypeIdDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatus = reqStatusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
+        ? reqStatusDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpId = (selectedEmpId) => {
         setSelectedEmpId(selectedEmpId);
@@ -181,20 +189,26 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-    }));
+    const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+        ? empIdDropSc.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
 
-    const filteredOptionLoanTypeSc = loanTypeIdDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
+        ? loanTypeIdDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionReqStatusSc = reqStatusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
+        ? reqStatusDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
@@ -281,6 +295,7 @@ function LoanRequest({ }) {
         setPurposeSc("");
         setReqStatusSc("");
         setSelectedReqStatusSc("");
+        setRepaymentDateSc("");
     };
 
     const columnDefs = [
@@ -385,11 +400,15 @@ function LoanRequest({ }) {
             headerName: "Request Status",
             field: "request_status",
             editable: true,
-            cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
                 values: reqStatusDropGrid,
             },
+        },
+        {
+            headerName: "Repayment Date",
+            field: "repayment_date",
+            editable: true,
         },
         {
             headerName: "Keyfield",
@@ -413,7 +432,8 @@ function LoanRequest({ }) {
             !repayMonth ||
             !monthlyInstallment ||
             !currencyCode ||
-            !reqStatus
+            !reqStatus ||
+            !repaymentDate
         ) {
             setError(" ");
             toast.warning("Error: Missing required fields");
@@ -435,6 +455,7 @@ function LoanRequest({ }) {
                 currency_code: currencyCode,
                 purpose: purpose,
                 request_status: reqStatus,
+                repayment_date: repaymentDate,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
                 created_by: sessionStorage.getItem('selectedUserCode')
             };
@@ -478,6 +499,7 @@ function LoanRequest({ }) {
                 currency_code: currencyCodeSc,
                 purpose: purposeSc,
                 request_status: reqStatusSc,
+                repayment_date: repaymentDateSc,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
@@ -652,6 +674,7 @@ function LoanRequest({ }) {
                 "Currency Code": row.currency_code || "",
                 "Purpose": row.purpose || "",
                 "Request Status": row.request_status || "",
+                "Repayment Date": row.repayment_date || "",
             };
         });
     };
@@ -1020,6 +1043,41 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={2}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={repaymentDate}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+
+                                    if (value === "") {
+                                        setRepaymentDate("");
+                                        return;
+                                    }
+
+                                    const num = parseInt(value, 10);
+
+                                    if (num === 0 || num > 31) {
+                                        toast.warning("Please enter a date between 1 and 31");
+                                        return;
+                                    }
+
+                                    setRepaymentDate(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !repaymentDate ? 'text-danger' : ''}`}>Repayment Date<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -1218,7 +1276,7 @@ function LoanRequest({ }) {
                                 autoComplete="off"
                                 maxLength={3}
                                 value={currencyCodeSc}
-                                 onChange={(e) => {
+                                onChange={(e) => {
                                     const value = e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
                                     setCurrencyCodeSc(value);
                                 }}
@@ -1263,6 +1321,41 @@ function LoanRequest({ }) {
                                 options={filteredOptionReqStatusSc}
                             />
                             <label for="sname" className={`floating-label`}>Request Status</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={2}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={repaymentDateSc}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+
+                                    if (value === "") {
+                                        setRepaymentDateSc("");
+                                        return;
+                                    }
+
+                                    const num = parseInt(value, 10);
+
+                                    if (num === 0 || num > 31) {
+                                        toast.warning("Please enter a date between 1 and 31");
+                                        return;
+                                    }
+
+                                    setRepaymentDateSc(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Repayment Date</label>
                         </div>
                     </div>
 
