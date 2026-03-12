@@ -27867,6 +27867,8 @@ const deleteLoanType = async (req, res) => {
     return res.status(400).json("Invalid or empty editedData array.");
   }
 
+  console.log(editedData)
+
   try {
     const pool = await sql.connect(dbConfig);
     for (const updatedRow of editedData) {

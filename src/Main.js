@@ -79,7 +79,7 @@ import EmpPFCompany from './ESSComponents/EmployeePFCompany.js'
 import EmpProfessionalTax from './ESSComponents/EmpProfessionalTax.js'
 import EmpTDS from './ESSComponents/EmpTDS.js'
 import AddFinancialYearAccess from './AddFInancialYearAccess.js'
-import LeaveReq from './ESSDashboard/LeaveRequest.js'
+import ApplyLeave from './ESSDashboard/ApplyLeave.js'
 import CandidateMaster from "./OtherMasters/CandidateMaster.js";
 import JobMaster from "./OtherMasters/JobMaster.js";
 import InterviewPanel from "./OtherMasters/InterviewPanel.js";
@@ -118,6 +118,7 @@ import LoanPayment from "./EmpRequests/LoanPayment.js"
 import LoanSchedule from "./EmpRequests/LoanSchedule.js"
 import LoanType from "./EmpRequests/LoanType.js"
 import ManualEmployeeInfo from "./ESSComponents/ManualEmployeeInfo.js"
+import LeaveRequest from "./EmpRequests/LeaveRequest.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -271,7 +272,7 @@ function Main() {
     { path: "/PayslipEmpProTax", component: <EmpProfessionalTax /> },
     { path: "/PayslipEmpTDS", component: <EmpTDS /> },
     { path: "/AddFYA", component: <AddFinancialYearAccess /> },
-    { path: "/LeaveReq", component: <LeaveReq /> },
+    { path: "/ApplyLeave", component: <ApplyLeave /> },
     { path: "/salarypath", component: <ESSDailyAtten mode="salarypath" /> },
     { path: "/CandidateMaster", component: <CandidateMaster /> },
     { path: "/JobMaster", component: <JobMaster /> },
@@ -312,6 +313,7 @@ function Main() {
     { path: "/LoanSchedule", component: <LoanSchedule /> },
     { path: "/LoanType", component: <LoanType /> },
     { path: "/ManualEmployeeInfo", component: <ManualEmployeeInfo /> },
+    { path: "/LeaveRequest", component: <LeaveRequest /> },
 
   
   ];
