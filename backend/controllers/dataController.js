@@ -42061,7 +42061,7 @@ const loan_approvalsInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, '', '', @company_code, '', @created_by, '', '',''`,
+        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, '', '', @remarks,  @company_code, '', @created_by, '', '',''`,
       );
 
     res
@@ -42105,7 +42105,7 @@ const loan_approvalsUpdate = async (req, res) => {
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, '', '', @company_code, @keyfield, '', '', @modified_by, ''`,
+        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, '', '', @remarks,  @company_code, @keyfield, '', '', @modified_by, ''`,
       );
 
     res
@@ -42167,7 +42167,7 @@ const loan_approvalsLoopInsert = async (req, res) => {
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
         .query(
-          `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, '', '', @company_code, @keyfield, @created_by, '', '', ''`,
+          `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, '', '',  @remarks,  @company_code, @keyfield, @created_by, '', '', ''`,
         );
     }
     res.status(200).json("loan_approvals data inserted successfully");
@@ -42202,7 +42202,7 @@ const loan_approvalsLoopUpdate = async (req, res) => {
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, '', '', @company_code, @keyfield, '', '', @modified_by, ''`,
+          `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, '', '', @remarks,  @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_approvals data updated successfully");
@@ -44371,7 +44371,7 @@ const loan_approvalsSearch = async (req, res) => {
       .input("FromDate", sql.NVarChar, FromDate)
       .input("ToDate", sql.NVarChar, ToDate)
       .query(
-        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @remarks, @FromDate, @ToDate, @company_code,'','','','',''`,
+        `EXEC sp_loan_approvals @mode, @approval_id, @loan_request_id, @approver_id, @approval_level, @approval_status, @approval_date, @FromDate, @ToDate, @remarks,  @company_code,'','','','',''`,
       );
 
     if (result.recordset.length > 0) {

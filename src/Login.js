@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import './loginsass.scss'
 import ForgotPopup from "./Forgotpopup";
 import login from './Images/login.svg'
+import Logo from "./main.png";
 
 const config = require('./Apiconfig');
 
@@ -200,8 +201,15 @@ const Login = () => {
 
   return (
     <>
+    
       {isPageLoading}
+      
       <div className="login-page">
+        {/* Top Center Logo */}
+  <div className="top-logo">
+    <img src={Logo} alt="YJK Logo" className="orb-logo" />
+  </div>
+        
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
         <div className="orb orb-3"></div>

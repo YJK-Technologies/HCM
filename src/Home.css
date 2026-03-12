@@ -26,12 +26,12 @@
 .hcm-navbar {
   display: flex;
   justify-content: space-between;
-  padding: 30px 10%;
+  padding: 20px 11%;
   position: relative;
   z-index: 10;
 }
 
-.logo { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
+.logo { font-size: 3.4rem; font-weight: 800; letter-spacing: -1px; }
 .logo span { color: #38bdf8; }
 
 .nav-group { display: flex; gap: 2rem; align-items: center; }
@@ -69,10 +69,13 @@
 
 .status-pill {
   color: #22c55e;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   margin-bottom: 20px;
   letter-spacing: 1px;
+  position: relative;
+  top: -42px;
+  left: 350px;
 }
 
 .glass-hero-card h1 {
@@ -148,20 +151,20 @@
 .brand-icons {
   display: flex;
   align-items: center;
-  gap: 12px;         
+  gap: 2px;         
   justify-content: center; 
   margin-top: 10px;
 }
 
 .brand-logo {
-  width: 30px;     
-  height: 30px;
+  width: 45px;     
+  height: 45px;
   object-fit: contain;
   filter: brightness(1.2);
 }
 
 .brand-icons strong {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   letter-spacing: 1px;
   color: #f8fafc;     
 }
