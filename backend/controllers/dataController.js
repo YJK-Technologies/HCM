@@ -27835,8 +27835,9 @@ const updateLoanType = async (req, res) => {
         .input("Status", sql.NVarChar, updatedRow.Status)
         .input("Start_Year", sql.Date, updatedRow.Start_Year)
         .input("End_Year", sql.Date, updatedRow.End_Year)
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
-        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', '', @Modified_by,
+        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, @keyfield, '', @Modified_by,
             '', '', '', '', '', '', '', ''`);
     }
 
@@ -27866,6 +27867,8 @@ const deleteLoanType = async (req, res) => {
     return res.status(400).json("Invalid or empty editedData array.");
   }
 
+  console.log(editedData)
+
   try {
     const pool = await sql.connect(dbConfig);
     for (const updatedRow of editedData) {
@@ -27873,7 +27876,7 @@ const deleteLoanType = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, updatedRow.company_code)
-        .input("Loan_Type_ID", sql.NVarChar, updatedRow.keyfield)
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', @keyfield, '','', '', '', '', '', '', '', '', ''`,);
     }
 

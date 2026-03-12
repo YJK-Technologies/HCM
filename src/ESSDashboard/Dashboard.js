@@ -1876,7 +1876,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-layout spacing-mt-2">
+      <div className="dashboard-layout mt-2">
         <div className="dashboard-row">
 
           <div className="grid-col-md-4">
@@ -1911,68 +1911,70 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-row spacing-mt-2">
-        <div className="grid-col-lg-4 grid-col-md-6 spacing-mb-3">
-          <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading spacing-mb-0">Today Attendance</h6>
-              <button className="shadow-none-custom app-btn btn-outline-primary-custom" onClick={handleToggle}>
-                {showChart ? "Leave Chart" : "Show Chart"}
-              </button>
-            </div>
+      <div className="dashboard-row row spacing-mt-2">
 
-            <div className="chart-area-container" style={{ width: "100%", height: "280px", padding: "20px" }}>
-              {showChart ? (
-                chartData ? (
-                  <Bar ref={chartRef} data={chartData} options={chartOptions} onClick={onBarClick} />
-                ) : (
-                  <p>Loading...</p>
-                )
-              ) : (
-                <div className="app-grid-theme ag-theme-alpine" style={{ height: 255, width: '100%' }}>
-                  <AgGridReact
-                    rowData={leaveRowData}
-                    columnDefs={columnLeave}
-                    rowHeight={30}
-                  />
+        <div className="col-lg-8">
+          <div className="dashboard-row ">
+            <div className="grid-col-lg-6 grid-col-md-6">
+              <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
+                <div className="display-flex flex-between-center">
+                  <h6 className="card-title-heading spacing-mb-0">Today Attendance</h6>
+                  <button className="shadow-none-custom app-btn btn-outline-primary-custom" onClick={handleToggle}>
+                    {showChart ? "Leave Chart" : "Show Chart"}
+                  </button>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
 
-        {/* 2. SHIFT PATTERN SUMMARY (Center) */}
-        <div className="grid-col-lg-4 grid-col-md-6 spacing-mb-3">
-          <div className="app-card-base shift-pattern-wrapper rounded app-shadow-lg height-full">
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading spacing-mb-0">Shift Pattern</h6>
-            </div>
-
-            <div className="shift-chart-container" style={{ position: 'relative', height: '240px', marginTop: '30px' }}>
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={shiftData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                  // label={({ name, value }) => `${name} (${value})`}
-                  >
-
-                    {shiftData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+                <div className="chart-area-container" style={{ width: "100%", height: "280px", padding: "20px" }}>
+                  {showChart ? (
+                    chartData ? (
+                      <Bar ref={chartRef} data={chartData} options={chartOptions} onClick={onBarClick} />
+                    ) : (
+                      <p>Loading...</p>
+                    )
+                  ) : (
+                    <div className="app-grid-theme ag-theme-alpine" style={{ height: 255, width: '100%' }}>
+                      <AgGridReact
+                        rowData={leaveRowData}
+                        columnDefs={columnLeave}
+                        rowHeight={30}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* <div className="shift-legend-list spacing-mt-3">
+            <div className="grid-col-lg-6 grid-col-md-6">
+              <div className="app-card-base shift-pattern-wrapper rounded app-shadow-lg height-full">
+                <div className="display-flex flex-between-center">
+                  <h6 className="card-title-heading spacing-mb-0">Shift Pattern</h6>
+                </div>
+
+                <div className="shift-chart-container" style={{ position: 'relative', height: '240px', marginTop: '30px' }}>
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
+                      <Pie
+                        data={shiftData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={90}
+                      // label={({ name, value }) => `${name} (${value})`}
+                      >
+
+                        {shiftData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* <div className="shift-legend-list spacing-mt-3">
               {shiftData.map((item, idx) => (
                 <div key={idx} className="shift-legend-item">
                   <span className="dot" style={{ backgroundColor: item.color }}></span>
@@ -1981,11 +1983,169 @@ const Dashboard = () => {
                 </div>
               ))}
             </div> */}
+              </div>
+            </div>
+
+            <div className="grid-col-lg-6 spacing-mt-2">
+              <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
+                <div className="display-flex flex-between-center flex-wrap">
+                  <h6 className="card-title-heading">New Joinees</h6>
+                </div>
+                <div id="newJoineesCarousel" style={{ height: "250px" }} className="app-carousel carousel-slide" data-bs-ride="carousel">
+                  <div className="carousel-inner-custom" >
+                    {NewJoinees.length > 0 ? (
+                      NewJoinees.map((joinee, index) => (
+                        <div
+                          key={joinee.id}
+                          className={`carousel-item-custom ${index === 0 ? "active-state" : ""}`}
+                        >
+                          <div className="joinee-profile-card text-align-center">
+                            <img
+                              src={joinee.Photos}
+                              width={110}
+                              height={110}
+                              alt={`${joinee.EmployeeId}`}
+                              className="display-block-custom margin-x-auto rounded-custom"
+                            />
+                            <p className="app-badge rounded-pill-custom badge-info-color font-size-6 spacing-mt-2">
+                              {joinee.department_ID} - {joinee.EmployeeId}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-align-center text-muted-color spacing-mt-3">No new joinees</p>
+                    )}
+                  </div>
+                  {NewJoinees.length > 1 && (
+                    <div className="carousel-nav-container">
+                      <button
+                        className="carousel-control-prev-custom"
+                        type="button"
+                        data-bs-target="#newJoineesCarousel"
+                        data-bs-slide="prev"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill text-color-dark" viewBox="0 0 16 16">
+                          <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+                        </svg>
+                      </button>
+                      <button
+                        className="carousel-control-next-custom"
+                        type="button"
+                        data-bs-target="#newJoineesCarousel"
+                        data-bs-slide="next"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill text-color-dark" viewBox="0 0 16 16">
+                          <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid-col-lg-6 spacing-mt-2">
+              <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
+                <div className="display-flex flex-between-center">
+                  <h6 className="card-title-heading">Upcoming Birthdays</h6>
+                </div>
+                <div className="birthday-list-container" style={{ height: "250px" }}>
+                  {upcomingBirthdays.length > 0 ? (
+                    upcomingBirthdays.map((person) => (
+                      <div key={person.id} className="birthday-profile-item">
+                        <div className="display-flex justify-center spacing-mt-2">
+                          <div className="">
+                            <img
+                              src={person.Photos}
+                              width={110}
+                              height={110}
+                              className="image-rounded-20"
+                              alt={person.Plainimg}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid-col-12 spacing-mt-2">
+                          <h3 className="text-color-dark">{person.EmployeeName}</h3>
+                          <p className="app-badge spacing-p-1 text-bg-warning font-size-6">🎉🎂🎉🎂</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-align-center text-muted-color spacing-mt-3">No Upcoming Birthdays</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid-col-12 spacing-mt-2">
+              <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+
+                {/* Header */}
+                <div className="myteam-header">
+
+                  <h6 className="card-title-heading spacing-mb-2">My Team</h6>
+
+                  <div className="myteam-actions">
+
+                    <Select
+                      id="status"
+                      value={SelectedManager}
+                      onChange={handleChangeManager}
+                      options={filteredOptionManager}
+                      className="team-select-wrapper"
+                    />
+
+                    <button
+                      className="shadow-none-custom team-toggle-button"
+                      onClick={() => {
+                        setViewChart(!viewChart);
+                        if (viewChart) {
+                          fetchGridData();
+                        }
+                      }}
+                    >
+                      {viewChart ? "Team List" : "Chart"}
+                    </button>
+
+                  </div>
+
+                </div>
+
+                {/* Content */}
+                {viewChart ? (
+                  <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
+                    <div className="grid-col-md-8 grid-col-12">
+                      <div className="chart-container spacing-mt-2" style={{ height: 250, width: "100%" }}>
+                        {teamData?.labels?.length > 0 ? (
+                          <Doughnut data={teamData} options={teamOptions} />
+                        ) : (
+                          <div>No data</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl"
+                    style={{ height: 255, width: "100%" }}
+                  >
+                    <AgGridReact
+                      columnDefs={columnDefsList}
+                      rowData={rowDataTeamList}
+                      rowHeight={30}
+                    />
+                  </div>
+                )}
+
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="grid-col-lg-4 grid-col-12 spacing-mb-3">
-          <div className="app-card-base leave-list-wrapper rounded app-shadow-lg height-full" style={{ maxHeight: "465px", overflow: 'hidden' }}>
+        {/* Leave Approval */}
+        <div className="grid-col-lg-4">
+          <div className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg height-full" style={{ overflow: 'hidden' }}>
 
             {/* Header with Count */}
             <div className="display-flex flex-between-center spacing-mb-3 padding-horizontal-2">
@@ -2058,152 +2218,6 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-row spacing-mt-2">
-        <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
-            <div className="display-flex flex-between-center flex-wrap">
-              <h6 className="card-title-heading">New Joinees</h6>
-            </div>
-            <div id="newJoineesCarousel" style={{ height: "250px" }} className="app-carousel carousel-slide" data-bs-ride="carousel">
-              <div className="carousel-inner-custom" >
-                {NewJoinees.length > 0 ? (
-                  NewJoinees.map((joinee, index) => (
-                    <div
-                      key={joinee.id}
-                      className={`carousel-item-custom ${index === 0 ? "active-state" : ""}`}
-                    >
-                      <div className="joinee-profile-card text-align-center">
-                        <img
-                          src={joinee.Photos}
-                          width={110}
-                          height={110}
-                          alt={`${joinee.EmployeeId}`}
-                          className="display-block-custom margin-x-auto rounded-custom"
-                        />
-                        <p className="app-badge rounded-pill-custom badge-info-color font-size-6 spacing-mt-2">
-                          {joinee.department_ID} - {joinee.EmployeeId}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-align-center text-muted-color spacing-mt-3">No new joinees</p>
-                )}
-              </div>
-              {NewJoinees.length > 1 && (
-                <div className="carousel-nav-container">
-                  <button
-                    className="carousel-control-prev-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="prev"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
-                    </svg>
-                  </button>
-                  <button
-                    className="carousel-control-next-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="next"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading">Upcoming Birthdays</h6>
-            </div>
-            <div className="birthday-list-container" style={{ height: "250px" }}>
-              {upcomingBirthdays.length > 0 ? (
-                upcomingBirthdays.map((person) => (
-                  <div key={person.id} className="birthday-profile-item">
-                    <div className="display-flex justify-center spacing-mt-2">
-                      <div className="">
-                        <img
-                          src={person.Photos}
-                          width={110}
-                          height={110}
-                          className="image-rounded-20"
-                          alt={person.Plainimg}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid-col-12 spacing-mt-2">
-                      <h3 className="text-color-dark">{person.EmployeeName}</h3>
-                      <p className="app-badge spacing-p-1 text-bg-warning font-size-6">🎉🎂🎉🎂</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-align-center text-muted-color spacing-mt-3">No Upcoming Birthdays</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid-col-lg-6">
-          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading spacing-mb-2">My Team</h6>
-              <div className="display-flex flex-end">
-                <Select
-                  id="status"
-                  value={SelectedManager}
-                  onChange={handleChangeManager}
-                  options={filteredOptionManager}
-                  className="team-select-wrapper"
-                />
-                <button
-                  className="shadow-none-custom team-toggle-button"
-                  onClick={() => {
-                    setViewChart(!viewChart);
-                    if (viewChart) {
-                      fetchGridData();
-                    }
-                  }}
-                >
-                  {viewChart ? "Team List" : "Chart"}
-                </button>
-              </div>
-            </div>
-            {viewChart ? (
-              <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
-                {/* <div className="grid-col-sm-1">
-                  <img src={Vector} width={230} height={230} />
-                </div> */}
-                <div className="grid-col-md-8 grid-col-12">
-                  <div className="chart-container spacing-mt-2" style={{ height: 250, width: "100%" }}>
-                    {teamData?.labels?.length > 0 ? (
-                      <Doughnut data={teamData} options={teamOptions} />
-                    ) : (
-                      <div>No data </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl" style={{ height: 255, width: '100%' }}>
-                <AgGridReact
-                  columnDefs={columnDefsList}
-                  rowData={rowDataTeamList}
-                  rowHeight={30}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -2429,7 +2443,7 @@ const Dashboard = () => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={ShiftColDefs}
                   rowData={shiftRowData}
@@ -2644,7 +2658,7 @@ const Dashboard = () => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={columnDefs}
                   rowData={rowData}

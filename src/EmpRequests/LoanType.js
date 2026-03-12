@@ -202,7 +202,7 @@ function LoanType({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+        fetch(`${config.apiBaseUrl}/status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
