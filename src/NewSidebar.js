@@ -69,8 +69,9 @@ import {
   AiOutlinePercentage,
   AiOutlineFileDone,
 } from "react-icons/ai";
+import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
 
-import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt } from "react-icons/fa";
+
 
 const cleanPath = (path) => {
   if (!path) return '';
@@ -126,6 +127,7 @@ export const leafIconMap = {
 
   // --- HCM ---
   "Employee Information": BsPersonCheck,
+  "Manual Employee Info": BsPersonCheck,
   "Department Dashboard": BsBarChartLine,
   "Admin Dashboard": BsSpeedometer2,
   "Employee Dashboard": BsFileBarGraph,
@@ -143,6 +145,7 @@ export const leafIconMap = {
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
+  "Leave Request": FaCalendarAlt,
   "Loan Approvals": FaCheckCircle,
   "Loan Documents": FaFileAlt,
   "Travel Request": MdFlightTakeoff,
@@ -207,6 +210,8 @@ const menuData = [
       { label: "Number Series", path: "/NumberSeries" },
       { label: "Warehouse", path: "/Warehouse" },
       { label: "Financial Year Access", path: "/FinancialYearAccess" },
+      { label: "Country Master", path: "/CountryMaster" },
+      { label: "Time Zone Master", path: "/TimeZoneGrid" },
     ],
   },
   {
@@ -220,6 +225,8 @@ const menuData = [
       { label: "Department Dashboard", path: "/DepartmentDashboard" },
       { label: "Visa Requests", path: "/VisaRequest" },
       { label: "Travel Request", path: "/TravelRequest" },
+      { label: "Manual Employee Info", path: "/ManualEmployeeInfo" },
+      { label: "Leave Request", path: "/LeaveRequest" },
       {
         label: "Masters",
         isDropdown: true,
@@ -262,6 +269,7 @@ const menuData = [
           { label: "Project", path: "/Project" },
           { label: "Project Mapping", path: "/ProjectMapping" },
           { label: "Task", path: "/Task" },
+          { label: "Shift Master", path: "/ShiftMasterGrid" },
           { label: "Setting Screen", path: "/PMSsettings" },
         ],
       },
@@ -281,7 +289,6 @@ const menuData = [
           { label: "Task Hours & Time Tracking", path: "/TaskHours" },
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
-          { label: "Shift Master", path: "/ShiftMasterGrid" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
         ],
       },
@@ -302,16 +309,6 @@ const menuData = [
       { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
       { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
       { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
-    ],
-  },
-  {
-    label: "Masters",
-    icon: FiDatabase,
-    isDropdown: true,
-    subMenus: [
-      { label: "Country Master", path: "/CountryMaster" },
-      { label: "Interview Dashboard", path: "/InterviewDashboard" },
-      { label: "Time Zone Master", path: "/TimeZoneGrid" },
     ],
   },
 ];

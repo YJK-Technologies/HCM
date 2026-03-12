@@ -315,6 +315,7 @@ function LoanRequest({ }) {
                                     className="icon mx-2"
                                     onClick={() => handleUpdate(params.data, params.node.data)}
                                     style={{ cursor: 'pointer' }}
+                                    title="Update"
                                 >
                                     <i className="fa-regular fa-floppy-disk"></i>
                                 </span>
@@ -323,6 +324,7 @@ function LoanRequest({ }) {
                                     className="icon mx-2"
                                     onClick={() => handleDelete(params.data)}
                                     style={{ cursor: 'pointer' }}
+                                    title="Delete"
                                 >
                                     <i className="fa-solid fa-trash"></i>
                                 </span>
@@ -817,6 +819,7 @@ function LoanRequest({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Loan Request ID"
                                 autoComplete="off"
                                 value={loanReqId}
                                 onChange={(e) => {
@@ -833,6 +836,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedEmpId ? "has-value" : ""} 
                             ${isSelectedEmpId ? "is-focused" : ""}`}
+                            title="Please enter the Employee ID"
                         >
                             <Select
                                 id="department"
@@ -862,7 +866,7 @@ function LoanRequest({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Request Number"
                                 autoComplete="off"
                                 value={reqNumber}
                                 onChange={(e) => {
@@ -879,6 +883,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanTypeId ? "has-value" : ""} 
                             ${isSelectedLoanType ? "is-focused" : ""}`}
+                            title="Please enter the Loan Type ID"
                         >
                             <Select
                                 id="country"
@@ -906,7 +911,7 @@ function LoanRequest({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Loan Amount"
                                 autoComplete="off"
                                 value={loanAmount}
                                 onChange={(e) => {
@@ -928,6 +933,7 @@ function LoanRequest({ }) {
                                 maxLength={5}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
+                                title="Please enter the Interest Rate"
                                 required
                                 autoComplete="off"
                                 value={interestRate}
@@ -951,6 +957,7 @@ function LoanRequest({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Repayment Months"
                                 autoComplete="off"
                                 value={repayMonth}
                                 onChange={(e) => {
@@ -972,7 +979,7 @@ function LoanRequest({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Monthly Installment"
                                 autoComplete="off"
                                 value={monthlyInstallment}
                                 onChange={(e) => {
@@ -991,7 +998,7 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Currency Code"
                                 autoComplete="off"
                                 maxLength={3}
                                 value={currencyCode}
@@ -1011,7 +1018,7 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Purpose"
                                 autoComplete="off"
                                 value={purpose}
                                 maxLength={100}
@@ -1026,6 +1033,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedReqStatus ? "has-value" : ""} 
                             ${isSelectedReqStatus ? "is-focused" : ""}`}
+                            required title="Please Enter the Request Status"
                         >
                             <Select
                                 id="country"
@@ -1053,7 +1061,7 @@ function LoanRequest({ }) {
                                 maxLength={2}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Repayment Date"
                                 autoComplete="off"
                                 value={repaymentDate}
                                 onChange={(e) => {
@@ -1098,6 +1106,7 @@ function LoanRequest({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Loan Request ID"
                                 autoComplete="off"
                                 value={loanReqIdSc}
                                 onChange={(e) => {
@@ -1114,6 +1123,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedEmpIdSc ? "has-value" : ""} 
                             ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+                            title="Please enter the Employee ID"
                         >
                             <Select
                                 id="department"
@@ -1143,7 +1153,7 @@ function LoanRequest({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Request Number"
                                 autoComplete="off"
                                 value={reqNumberSc}
                                 onChange={(e) => {
@@ -1160,6 +1170,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanTypeIdSc ? "has-value" : ""} 
                             ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
+                            title="Please enter the Loan Type ID"
                         >
                             <Select
                                 id="country"
@@ -1187,7 +1198,7 @@ function LoanRequest({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Loan Amount"
                                 autoComplete="off"
                                 value={loanAmountSc}
                                 onChange={(e) => {
@@ -1209,7 +1220,7 @@ function LoanRequest({ }) {
                                 maxLength={5}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Interest Rate"
                                 autoComplete="off"
                                 value={interestRateSc}
                                 onChange={(e) => {
@@ -1231,7 +1242,7 @@ function LoanRequest({ }) {
                                 maxLength={5}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Repayment Months"
                                 autoComplete="off"
                                 value={repayMonthSc}
                                 onChange={(e) => {
@@ -1253,7 +1264,7 @@ function LoanRequest({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Monthly Installment"
                                 autoComplete="off"
                                 value={monthlyInstallmentSc}
                                 onChange={(e) => {
@@ -1272,7 +1283,7 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Currency Code"
                                 autoComplete="off"
                                 maxLength={3}
                                 value={currencyCodeSc}
@@ -1292,7 +1303,7 @@ function LoanRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Purpose"
                                 autoComplete="off"
                                 value={purposeSc}
                                 maxLength={100}
@@ -1307,6 +1318,7 @@ function LoanRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedReqStatusSc ? "has-value" : ""} 
                             ${isSelectedReqStatusSc ? "is-focused" : ""}`}
+                            title="Please enter the Request Status"
                         >
                             <Select
                                 id="country"
@@ -1334,7 +1346,7 @@ function LoanRequest({ }) {
                                 maxLength={2}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Repayment Date"
                                 autoComplete="off"
                                 value={repaymentDateSc}
                                 onChange={(e) => {

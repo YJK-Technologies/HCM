@@ -14,9 +14,6 @@ function LoanDocuments({}) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const [remarksSc, setRemarksSc] = useState("");
-
   const [loanReqId, setLoanReqId] = useState("");
   const [loanReqIdSC, setLoanReqIdSC] = useState("");
   const [selectedLoanReq, setSelectedLoanReq] = useState(null);
@@ -36,7 +33,6 @@ function LoanDocuments({}) {
   const [uploaded_bySC, setuploaded_bySC] = useState("");
   const [uploaded_at, setuploaded_at] = useState("");
   const [uploaded_atSC, setuploaded_atSC] = useState("");
-  const [statusDrop, setstatusDrop] = useState([]);
   const [documentFile, setDocumentFile] = useState([]);
   const [documentUrl, setDocumentUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState([]);
@@ -45,19 +41,7 @@ function LoanDocuments({}) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    })
-      .then((data) => data.json())
-      .then((val) => setstatusDrop(val));
-  }, []);
+
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLoanRequest`, {
@@ -85,27 +69,6 @@ function LoanDocuments({}) {
     })
       .then((data) => data.json())
       .then((val) => setLoanReqIdDropSC(val));
-  }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => {
-        const emp = val.map((option) => ({
-          value: option.attributedetails_name,
-          label: `${option.attributedetails_name}`,
-        }));
-        setstatusDrop(emp);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
@@ -151,7 +114,6 @@ function LoanDocuments({}) {
       }))
     : [];
 
-
   const handleLoanReq = (SelectedLoanReq) => {
     setSelectedLoanReq(SelectedLoanReq);
     setLoanReqId(SelectedLoanReq ? SelectedLoanReq.value : "");
@@ -192,6 +154,7 @@ function LoanDocuments({}) {
                   className="icon mx-2"
                   onClick={() => handleUpdate(params.data)}
                   style={{ cursor: "pointer" }}
+                  title="Update"
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
                 </span>
@@ -200,6 +163,7 @@ function LoanDocuments({}) {
                   className="icon mx-2"
                   onClick={() => handleDelete(params.data)}
                   style={{ cursor: "pointer" }}
+                  title="Delete"
                 >
                   <i className="fa-solid fa-trash"></i>
                 </span>
@@ -253,8 +217,7 @@ function LoanDocuments({}) {
       field: "uploaded_at",
       editable: true,
     },
-
-    // ⭐ PDF PREVIEW COLUMN
+    // PDF PREVIEW COLUMN
     {
       headerName: "Preview",
       field: "document",
@@ -625,7 +588,6 @@ function LoanDocuments({}) {
         worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
 
       if (!cell) continue;
-
       cell.s = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
         fill: { fgColor: { rgb: tableHeaderBg } },
@@ -646,7 +608,6 @@ function LoanDocuments({}) {
         const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
         if (!cell) continue;
-
         cell.s = {
           font: { color: { rgb: fontColor } },
           fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
@@ -698,17 +659,21 @@ function LoanDocuments({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder=""
                 required
+                title="Please enter the Document ID"
                 autoComplete="off"
                 value={document_id}
-                onChange={(e) => setdocument_id(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setdocument_id(value);
+                }}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !document_id ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !document_id ? "text-danger" : ""}`}>
                 Document ID<span className="text-danger">*</span>
               </label>
             </div>
@@ -719,6 +684,7 @@ function LoanDocuments({}) {
               className={`inputGroup selectGroup 
                 ${selectedLoanReq ? "has-value" : ""} 
                 ${isLoanReqFocus ? "is-focused" : ""}`}
+                title="Please enter the Loan Request ID"
             >
               <Select
                 id="loanReq"
@@ -731,9 +697,7 @@ function LoanDocuments({}) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label
-                className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}
-              >
+              <label className={`floating-label ${error && !loanReqId ? "text-danger" : ""}`}>
                 Loan Request ID<span className="text-danger">*</span>
               </label>
             </div>
@@ -747,7 +711,8 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Document Type"
+                maxLength={50}
                 autoComplete="off"
                 value={document_type}
                 onChange={(e) => setdocument_type(e.target.value)}
@@ -766,19 +731,17 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the File Path"
+                maxLength={255}
                 autoComplete="off"
                 value={file_path}
                 onChange={(e) => setfile_path(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !file_path ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !file_path ? "text-danger" : ""}`}>
                 File Path<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> 
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -788,15 +751,13 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Uploaded By"
+                maxLength={100}
                 autoComplete="off"
                 value={uploaded_by}
                 onChange={(e) => setuploaded_by(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !uploaded_by ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !uploaded_by ? "text-danger" : ""}`}>
                 Uploaded By<span className="text-danger">*</span>
               </label>
             </div>
@@ -810,15 +771,12 @@ function LoanDocuments({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Uploaded Date"
                 autoComplete="off"
                 value={uploaded_at}
                 onChange={(e) => setuploaded_at(e.target.value)}
               />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !uploaded_at ? "text-danger" : ""}`}
-              >
+              <label for="sname" className={`exp-form-labels ${error && !uploaded_at ? "text-danger" : ""}`}>
                 Uploaded Date<span className="text-danger">*</span>
               </label>
             </div>
@@ -907,12 +865,19 @@ function LoanDocuments({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder=""
                 required
+                title="Please enter the Document ID"
                 autoComplete="off"
                 value={document_idSC}
-                onChange={(e) => setdocument_idSC(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setdocument_id(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Document ID
@@ -925,6 +890,7 @@ function LoanDocuments({}) {
               className={`inputGroup selectGroup 
                 ${selectedLoanReqSC ? "has-value" : ""} 
                 ${isLoanReqFocusSC ? "is-focused" : ""}`}
+              title="Please enter the Loan Request ID"
             >
               <Select
                 id="loanReq"
@@ -949,7 +915,8 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Document Type"
+                maxLength={50}
                 autoComplete="off"
                 value={document_typeSC}
                 onChange={(e) => setdocument_typeSC(e.target.value)}
@@ -968,7 +935,8 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the File Path"
+                maxLength={255}
                 autoComplete="off"
                 value={file_pathSC}
                 onChange={(e) => setfile_pathSC(e.target.value)}
@@ -987,7 +955,8 @@ function LoanDocuments({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Uploaded By"
+                maxLength={100}
                 autoComplete="off"
                 value={uploaded_bySC}
                 onChange={(e) => setuploaded_bySC(e.target.value)}
@@ -1006,7 +975,7 @@ function LoanDocuments({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Uploaded From Date"
                 autoComplete="off"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
@@ -1025,7 +994,7 @@ function LoanDocuments({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please Enter the Uploaded To Date"
                 autoComplete="off"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}

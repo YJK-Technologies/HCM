@@ -27,7 +27,7 @@ const Home = () => {
         <div className="nav-group">
           {/* <button className="text-link">Product</button> */}
           {/* <button className="text-link">Pricing</button> */}
-          <button className="cta-outline" onClick={() => navigate("/Login")}>Login</button>
+          {/* <button className="cta-outline" onClick={() => navigate("/Login")}>Login</button> */}
         </div>
       </nav>
 

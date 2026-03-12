@@ -272,6 +272,7 @@ function LoanApprovals({}) {
                 <span
                   className="icon mx-2"
                   onClick={() => handleUpdate(params.data)}
+                  title="Update"
                   style={{ cursor: "pointer" }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
@@ -280,6 +281,7 @@ function LoanApprovals({}) {
                 <span
                   className="icon mx-2"
                   onClick={() => handleDelete(params.data)}
+                  title="Delete"
                   style={{ cursor: "pointer" }}
                 >
                   <i className="fa-solid fa-trash"></i>
@@ -756,12 +758,19 @@ function LoanApprovals({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="test"
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder=""
                 required
                 autoComplete="off"
                 value={approval_id}
-                onChange={(e) => setapproval_id(e.target.value)}
+                title="Please enter the Approval ID"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapproval_id(value);
+                }}
               />
               <label
                 for="sname"
@@ -777,6 +786,7 @@ function LoanApprovals({}) {
               className={`inputGroup selectGroup 
                 ${selectedLoanReq ? "has-value" : ""} 
                 ${isLoanReqFocus ? "is-focused" : ""}`}
+                title="Please select the Loan Request ID"
             >
               <Select
                 id="loanReq"
@@ -804,11 +814,17 @@ function LoanApprovals({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={approver_id}
-                onChange={(e) => setapprover_id(e.target.value)}
+                title="Please enter the Approver ID"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapprover_id(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Approver ID
@@ -821,13 +837,19 @@ function LoanApprovals({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={approval_level}
-                onChange={(e) => setapproval_level(e.target.value)}
+                title="Please enter the Approval Level"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapproval_level(value);
+                }}
               />
               <label
                 for="sname"
@@ -843,6 +865,7 @@ function LoanApprovals({}) {
               className={`inputGroup selectGroup 
                 ${selectedStatus ? "has-value" : ""} 
                 ${isSearchStatus ? "is-focused" : ""}`}
+                title="Please select the Approval Status"
             >
               <Select
                 id="Select_slots"
@@ -871,9 +894,9 @@ function LoanApprovals({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={approval_date}
+                title="Please select the Approval Date"
                 onChange={(e) => setapproval_date(e.target.value)}
               />
               <label
@@ -893,9 +916,10 @@ function LoanApprovals({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                maxLength={255}
                 autoComplete="off"
                 value={remarks}
+                title="Please enter the Remarks"
                 onChange={(e) => setRemarks(e.target.value)}
               />
               <label htmlFor="sname" className={`exp-form-labels`}>
@@ -916,12 +940,19 @@ function LoanApprovals({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 autoComplete="off"
                 value={approval_idSC}
-                onChange={(e) => setapproval_idSC(e.target.value)}
+                title="Please enter the Approval ID"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapproval_idSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels `}>
                 Approval ID
@@ -934,6 +965,7 @@ function LoanApprovals({}) {
               className={`inputGroup selectGroup 
                 ${selectedLoanReqSC ? "has-value" : ""} 
                 ${isLoanReqFocusSC ? "is-focused" : ""}`}
+                title="Please select the Loan Request ID"
             >
               <Select
                 id="loanReq"
@@ -957,11 +989,17 @@ function LoanApprovals({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={approver_idSC}
-                onChange={(e) => setapprover_idSC(e.target.value)}
+                title="Please enter the Approver ID"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapprover_idSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Approver ID
@@ -974,13 +1012,19 @@ function LoanApprovals({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={approval_levelSC}
-                onChange={(e) => setapproval_levelSC(e.target.value)}
+                title="Please enter the Approval Level"
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setapproval_levelSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Approval Level
@@ -993,6 +1037,7 @@ function LoanApprovals({}) {
               className={`inputGroup selectGroup 
                 ${selectedStatusSC ? "has-value" : ""} 
                 ${isSearchStatusSC ? "is-focused" : ""}`}
+                title="Please select the Approval Status"
             >
               <Select
                 id="Select_slots"
@@ -1017,9 +1062,9 @@ function LoanApprovals({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={fromDate}
+                title="Please select the Approval From Date"
                 onChange={(e) => setFromDate(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
@@ -1036,9 +1081,9 @@ function LoanApprovals({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={toDate}
+                title="Please select the Approval To Date"
                 onChange={(e) => setToDate(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
@@ -1054,10 +1099,11 @@ function LoanApprovals({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={255}
                 required
-                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={remarksSC}
+                title="Please enter the Remarks"
                 onChange={(e) => setRemarksSC(e.target.value)}
               />
               <label htmlFor="sname" className={`exp-form-labels`}>

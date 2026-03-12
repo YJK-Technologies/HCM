@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
-const LeaveRequestPage = () => {
+const ApplyLeave = () => {
   const [LeaveType, setLeaveType] = useState("");
   const [FromDate, setFromDate] = useState("");
   const [ToDate, setToDate] = useState("");
@@ -732,4 +732,4 @@ const LeaveRequestPage = () => {
   );
 };
 
-export default LeaveRequestPage;
+export default ApplyLeave;
