@@ -531,6 +531,7 @@ function LoanStatusHistory() {
                                 <span
                                     className="icon mx-2"
                                     onClick={() => handleDelete(params.data)}
+                                    title="Delete"
                                     style={{ cursor: "pointer" }}
                                 >
                                     <i className="fa-solid fa-trash"></i>
@@ -600,10 +601,7 @@ function LoanStatusHistory() {
             headerName: "Remarks",
             field: "remarks",
             editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: statusDropGrid,
-            },
+            
         },
 
     ];
@@ -971,11 +969,17 @@ function LoanStatusHistory() {
                                     class="exp-input-field form-control"
                                     type="text"
                                     placeholder=" "
-                                    autoComplete="off"
+                                    maxLength={15}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
                                     required
-                                    maxLength={50}
+                                    autoComplete="off"
                                     value={history_id}
-                                    onChange={(e) => sethistory_id(e.target.value)}
+                                    title="Please enter the History ID"
+                                    onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    sethistory_id(value);
+                                }}
                                 />
                                 <label for="state" className={`exp-form-labels ${error && !history_id ? "text-danger" : ""}`}>
                                     History ID<span className="text-danger">*</span>
@@ -988,6 +992,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanReqId ? "has-value" : ""} 
                                     ${isSelectedLoanReqId ? "is-focused" : ""}`}
+                                    title="Please select the Loan Request ID"
                             >
                                 <Select
                                     id="department"
@@ -1010,6 +1015,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanStatus ? "has-value" : ""} 
                                     ${isSelectedLoanStatus ? "is-focused" : ""}`}
+                                    title="Please select the Old Status"
                             >
                                 <Select
                                     id="status"
@@ -1031,6 +1037,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanNewStatus ? "has-value" : ""} 
                                     ${isSelectedLoanNewStatus ? "is-focused" : ""}`}
+                                    title="Please select the New Status"
                             >
                                 <Select
                                     id="status"
@@ -1054,9 +1061,11 @@ function LoanStatusHistory() {
                                     class="exp-input-field form-control"
                                     type="text"
                                     placeholder=""
-                                    required title="Please Enter the Annual Bonus"
+                                    required 
                                     autoComplete="off"
                                     value={remarks}
+                                    maxLength={255}
+                                    title="Please enter the Remarks"
                                     onChange={(e) => setRemarks((e.target.value))}
                                 />
                                 <label for="sname" className={`exp-form-labels`}>Remarks</label>
@@ -1076,13 +1085,19 @@ function LoanStatusHistory() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
-                                    type="number"
+                                    type="text"
                                     placeholder=" "
+                                    maxLength={15}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
                                     autoComplete="off"
                                     required
-                                    maxLength={50}
                                     value={history_idSc}
-                                    onChange={(e) => sethistory_idSc(e.target.value)}
+                                    title="Please enter the History ID"
+                                    onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    sethistory_idSc(value);
+                                }}
                                 />
                                 <label for="state" className={`exp-form-labels`}>History ID</label>
                             </div>
@@ -1093,6 +1108,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanReqIdSc ? "has-value" : ""} 
                                     ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
+                                    title="Please select the Loan Request ID"
                             >
                                 <Select
                                     id="status"
@@ -1114,6 +1130,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanStatusSc ? "has-value" : ""} 
                                     ${isSelectedLoanStatusSc ? "is-focused" : ""}`}
+                                    title="Please select the Old Status"
                             >
                                 <Select
                                     id="status"
@@ -1135,6 +1152,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanNewStatusSc ? "has-value" : ""} 
                                     ${isSelectedLoanNewStatusSc ? "is-focused" : ""}`}
+                                    title="Please select the New Status"
                             >
                                 <Select
                                     id="status"
@@ -1159,8 +1177,9 @@ function LoanStatusHistory() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
-                                    maxLength={50}
+                                    maxLength={255}
                                     value={remarksSc}
+                                    title="Please enter the Remarks"
                                     onChange={(e) => setremarksSc(e.target.value)}
                                 />
                                 <label for="state" className={`exp-form-labels`}>Remarks</label>

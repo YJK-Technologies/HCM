@@ -678,6 +678,7 @@ function TravelRequest({}) {
             <span
               className="icon mx-2"
               onClick={() => handleUpdate(params.data)}
+              title="Update"
               style={{ cursor: "pointer" }}
             >
               <i className="fa-regular fa-floppy-disk"></i>
@@ -686,6 +687,7 @@ function TravelRequest({}) {
             <span
               className="icon mx-2"
               onClick={() => handleDelete(params.data)}
+              title="Delete"
               style={{ cursor: "pointer" }}
             >
               <i className="fa-solid fa-trash"></i>
@@ -1280,13 +1282,19 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Travel Request ID"
                 autoComplete="off"
                 value={travel_request_id}
-                onChange={(e) => settravel_request_id(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    settravel_request_id(value);
+                }}
               />
               <label
                 for="sname"
@@ -1303,9 +1311,10 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={50}
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Request Number"
                 autoComplete="off"
                 value={request_number}
                 onChange={(e) => setrequest_number(e.target.value)}
@@ -1324,6 +1333,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpId ? "has-value" : ""} 
                 ${isSelectedEmpId ? "is-focused" : ""}`}
+                title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1351,6 +1361,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
               ${isSelectDepartment ? "is-focused" : ""}`}
+              title="Please select the Department"
             >
               <Select
                 id="department"
@@ -1374,43 +1385,16 @@ function TravelRequest({}) {
             </div>
           </div>
 
-          {/* <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${Designation ? "has-value" : ""} 
-              ${isSelectDesignation ? "is-focused" : ""}`}
-            >
-              <Select
-                id="designation"
-                placeholder=" "
-                onFocus={() => setIsSelectDesignation(true)}
-                onBlur={() => setIsSelectDesignation(false)}
-                classNamePrefix="react-select"
-                isClearable
-                name="designation_ID"
-                value={Designation}
-                options={dynamicOptions}
-                onChange={handleChangedesgination}
-              />
-              <label
-                htmlFor="selecteddpt"
-                className={`floating-label ${error && !selecteddesg ? "text-danger" : ""}`}
-              >
-                Designation
-                {showAsterisk && <span className="text-danger">*</span>}
-              </label>
-            </div>
-          </div> */}
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={20}
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Travel Type"
                 autoComplete="off"
                 value={travel_type}
                 onChange={(e) => settravel_type(e.target.value)}
@@ -1432,7 +1416,7 @@ function TravelRequest({}) {
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Destination Country ID"
                 autoComplete="off"
                 value={destination_country_id}
                 onChange={(e) => setdestination_country_id(e.target.value)}
@@ -1454,7 +1438,7 @@ function TravelRequest({}) {
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Destination City"
                 autoComplete="off"
                 value={destination_city}
                 onChange={(e) => setdestination_city(e.target.value)}
@@ -1476,7 +1460,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Purpose of Travel"
                 autoComplete="off"
                 value={purpose_of_travel}
                 onChange={(e) => setpurpose_of_travel(e.target.value)}
@@ -1485,7 +1469,7 @@ function TravelRequest({}) {
                 for="sname"
                 className={`exp-form-labels ${error && !purpose_of_travel ? "text-danger" : ""}`}
               >
-                purpose of travel<span className="text-danger">*</span>
+                Purpose of Travel<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -1498,7 +1482,7 @@ function TravelRequest({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please select the Travel Start Date"
                 autoComplete="off"
                 value={travelStartDate}
                 onChange={(e) => setTravelStartDate(e.target.value)}
@@ -1520,7 +1504,7 @@ function TravelRequest({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please select the Travel End Date"
                 autoComplete="off"
                 value={travelEndDate}
                 onChange={(e) => setTravelEndDate(e.target.value)}
@@ -1542,7 +1526,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Transport Mode"
                 autoComplete="off"
                 value={transport_mode}
                 onChange={(e) => settransport_mode(e.target.value)}
@@ -1564,7 +1548,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Accommodation Required"
                 autoComplete="off"
                 value={accommodation_required}
                 onChange={(e) => setaccommodation_required(e.target.value)}
@@ -1586,7 +1570,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_cost}
                 onChange={(e) => setestimated_cost(e.target.value)}
@@ -1609,7 +1593,7 @@ function TravelRequest({}) {
                 placeholder=""
                 maxLength={10}
                 required
-                title="Please Enter the  Company PF Contribution"
+                title="Please enter the Currency Code"
                 value={Currency_Code}
                 onChange={(e) => setCurrency_Code(e.target.value)}
               />
@@ -1622,6 +1606,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedReqStatus ? "has-value" : ""} 
                 ${isSelectedReqStatus ? "is-focused" : ""}`}
+                title="Please select the Request Status"
             >
               <Select
                 id="country"
@@ -1652,7 +1637,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Remarks"
                 autoComplete="off"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
@@ -1671,6 +1656,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                ${selectedPriority ? "has-value" : ""} 
                ${isSelectedPriority ? "is-focused" : ""}`}
+               title="Please select the Priority Level"
             >
               <Select
                 id="country"
@@ -1698,6 +1684,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
+              title="Please select the Manager"
             >
               <Select
                 id="LoanEligibleAmount"
@@ -1736,7 +1723,7 @@ function TravelRequest({}) {
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Travel Request ID"
                 autoComplete="off"
                 value={travel_request_idSC}
                 onChange={(e) => settravel_request_idSC(e.target.value)}
@@ -1755,7 +1742,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Request Number"
                 autoComplete="off"
                 value={request_numberSC}
                 onChange={(e) => setrequest_numberSC(e.target.value)}
@@ -1771,6 +1758,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpIdSc ? "has-value" : ""} 
                 ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+                title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1795,6 +1783,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
               ${selecteddptSC ? "has-value" : ""} 
               ${isSelectDepartmentSC ? "is-focused" : ""}`}
+              title="Please select the Department"
             >
               <Select
                 id="department"
@@ -1822,7 +1811,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Travel Type"
                 autoComplete="off"
                 value={travel_typeSC}
                 onChange={(e) => settravel_typeSC(e.target.value)}
@@ -1841,7 +1830,7 @@ function TravelRequest({}) {
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Destination Country ID"
                 autoComplete="off"
                 value={destination_country_idSC}
                 onChange={(e) => setdestination_country_idSC(e.target.value)}
@@ -1860,7 +1849,7 @@ function TravelRequest({}) {
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Destination City"
                 autoComplete="off"
                 value={destination_citySC}
                 onChange={(e) => setdestination_citySC(e.target.value)}
@@ -1879,13 +1868,13 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Purpose of Travel"
                 autoComplete="off"
                 value={purpose_of_travelSC}
                 onChange={(e) => setpurpose_of_travelSC(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels`}>
-                purpose of travel
+                Purpose of Travel
               </label>
             </div>
           </div>
@@ -1898,7 +1887,7 @@ function TravelRequest({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please select the Travel Start Date"
                 autoComplete="off"
                 value={travelStartDateSc}
                 onChange={(e) => setTravelStartDateSc(e.target.value)}
@@ -1917,7 +1906,7 @@ function TravelRequest({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please select the Travel End Date"
                 autoComplete="off"
                 value={travelEndDateSc}
                 onChange={(e) => setTravelEndDateSc(e.target.value)}
@@ -1936,7 +1925,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Transport Mode"
                 autoComplete="off"
                 value={transport_modeSc}
                 onChange={(e) => settransport_modeSc(e.target.value)}
@@ -1955,7 +1944,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Accommodation Required"
                 autoComplete="off"
                 value={accommodation_requiredSc}
                 onChange={(e) => setaccommodation_requiredSc(e.target.value)}
@@ -1974,7 +1963,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_costSC}
                 onChange={(e) => setestimated_costSC(e.target.value)}
@@ -1994,7 +1983,7 @@ function TravelRequest({}) {
                 placeholder=""
                 maxLength={10}
                 required
-                title="Please Enter the  Company PF Contribution"
+                title="Please enter the Currency Code"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
               />
@@ -2007,6 +1996,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedReqStatusSC ? "has-value" : ""} 
                 ${isSelectedReqStatusSC ? "is-focused" : ""}`}
+                title="Please select the Request Status"
             >
               <Select
                 id="country"
@@ -2034,7 +2024,7 @@ function TravelRequest({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Annual Bonus"
+                title="Please enter the Remarks"
                 autoComplete="off"
                 value={remarksSc}
                 onChange={(e) => setRemarksSc(e.target.value)}
@@ -2050,6 +2040,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedPrioritySc ? "has-value" : ""} 
                 ${isSelectedPrioritySc ? "is-focused" : ""}`}
+                title="Please select the Priority Level"
             >
               <Select
                 id="country"
@@ -2074,6 +2065,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
               ${selectedmanagerSC ? "has-value" : ""} 
               ${isSelectManagerSC ? "is-focused" : ""}`}
+              title="Please select the Manager"
             >
               <Select
                 id="LoanEligibleAmount"

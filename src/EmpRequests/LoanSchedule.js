@@ -223,6 +223,7 @@ function LoanSchedule({ }) {
                                 <span
                                     className="icon mx-2"
                                     onClick={() => handleUpdate(params.data, params.node.data)}
+                                    title="Update"
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <i className="fa-regular fa-floppy-disk"></i>
@@ -231,6 +232,7 @@ function LoanSchedule({ }) {
                                 <span
                                     className="icon mx-2"
                                     onClick={() => handleDelete(params.data)}
+                                    title="Delete"
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <i className="fa-solid fa-trash"></i>
@@ -678,6 +680,7 @@ function LoanSchedule({ }) {
                                 required
                                 autoComplete="off"
                                 value={scheduleId}
+                                title="Please enter the Schedule ID"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setScheduleId(value);
@@ -692,6 +695,7 @@ function LoanSchedule({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanReqId ? "has-value" : ""} 
                             ${isSelectedLoanReqId ? "is-focused" : ""}`}
+                            title="Please select the Loan Request ID"
                         >
                             <Select
                                 id="department"
@@ -724,6 +728,7 @@ function LoanSchedule({ }) {
                                 required
                                 autoComplete="off"
                                 value={installmentNo}
+                                title="Please enter the Installment No."
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setIntallmentNo(value);
@@ -740,9 +745,10 @@ function LoanSchedule({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={installmentDate}
+                                title="Please select the Installment Date"
                                 onChange={(e) => setIntallmentDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !installmentDate ? 'text-danger' : ''}`}>Installment Date<span className="text-danger">*</span></label>
@@ -759,9 +765,10 @@ function LoanSchedule({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={principleAmount}
+                                title="Please enter the Principle Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPrincipleAmount(value);
@@ -781,9 +788,10 @@ function LoanSchedule({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={interestAmount}
+                                title="Please enter the Interest Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setInterestAmount(value);
@@ -803,9 +811,10 @@ function LoanSchedule({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={totalInstallment}
+                                title="Please enter the Total Installment Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setTotalInstallment(value);
@@ -820,6 +829,7 @@ function LoanSchedule({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPaymentStatus ? "has-value" : ""} 
                             ${isSelectedPaymentStatus ? "is-focused" : ""}`}
+                            title="Please select the Payment Status"
                         >
                             <Select
                                 id="country"
@@ -859,6 +869,7 @@ function LoanSchedule({ }) {
                                 required
                                 autoComplete="off"
                                 value={scheduleIdSc}
+                                title="Please enter the Schedule ID"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setScheduleIdSc(value);
@@ -873,6 +884,7 @@ function LoanSchedule({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanReqIdSc ? "has-value" : ""} 
                             ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
+                            title="Please select the Loan Request ID"
                         >
                             <Select
                                 id="department"
@@ -905,6 +917,7 @@ function LoanSchedule({ }) {
                                 required
                                 autoComplete="off"
                                 value={installmentNoSc}
+                                title="Please enter the Installment No."
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setIntallmentNoSc(value);
@@ -921,9 +934,10 @@ function LoanSchedule({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={fromDate}
+                                title="Please select the Installment From Date"
                                 onChange={(e) => setFromDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Installment From</label>
@@ -937,9 +951,10 @@ function LoanSchedule({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={toDate}
+                                title="Please select the Installment To Date"
                                 onChange={(e) => setToDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Installment To</label>
@@ -956,9 +971,10 @@ function LoanSchedule({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={principleAmountSc}
+                                title="Please enter the Principle Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPrincipleAmountSc(value);
@@ -978,9 +994,10 @@ function LoanSchedule({ }) {
                                 maxLength={10}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={interestAmountSc}
+                                title="Please enter the Interest Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setInterestAmountSc(value);
@@ -1000,9 +1017,10 @@ function LoanSchedule({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={totalInstallmentSc}
+                                title="Please enter the Total Installment Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setTotalInstallmentSc(value);
@@ -1017,6 +1035,7 @@ function LoanSchedule({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPaymentStatusSc ? "has-value" : ""} 
                             ${isSelectedPaymentStatusSc ? "is-focused" : ""}`}
+                            title="Please select the Payment Status"
                         >
                             <Select
                                 id="country"

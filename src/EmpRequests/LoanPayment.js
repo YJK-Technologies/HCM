@@ -226,6 +226,7 @@ function LoanPayment({ }) {
                                 <span
                                     className="icon mx-2"
                                     onClick={() => handleUpdate(params.data, params.node.data)}
+                                    title="Update"
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <i className="fa-regular fa-floppy-disk"></i>
@@ -234,6 +235,7 @@ function LoanPayment({ }) {
                                 <span
                                     className="icon mx-2"
                                     onClick={() => handleDelete(params.data)}
+                                    title="Delete"
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <i className="fa-solid fa-trash"></i>
@@ -659,6 +661,7 @@ function LoanPayment({ }) {
                                 required
                                 autoComplete="off"
                                 value={paymentId}
+                                title="Please enter the Payment ID"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPaymentId(value);
@@ -673,6 +676,7 @@ function LoanPayment({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanReqId ? "has-value" : ""} 
                             ${isSelectedLoanReqId ? "is-focused" : ""}`}
+                            title="Please select the Loan Request ID"
                         >
                             <Select
                                 id="department"
@@ -699,9 +703,10 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={paymentDate}
+                                title="Please select the Loan Payment Date"
                                 onChange={(e) => setPaymentDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !paymentDate ? 'text-danger' : ''}`}>Payment Date<span className="text-danger">*</span></label>
@@ -721,6 +726,7 @@ function LoanPayment({ }) {
                                 required
                                 autoComplete="off"
                                 value={paymentAmount}
+                                title="Please enter the Paid Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPaymentAmount(value);
@@ -735,6 +741,7 @@ function LoanPayment({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPayment ? "has-value" : ""} 
                             ${isSelectedPayment ? "is-focused" : ""}`}
+                            title="Please select the Payment Method"
                         >
                             <Select
                                 id="country"
@@ -774,6 +781,7 @@ function LoanPayment({ }) {
                                 required
                                 autoComplete="off"
                                 value={paymentIdSc}
+                                title="Please enter the Payment ID"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPaymentIdSc(value);
@@ -788,6 +796,7 @@ function LoanPayment({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanReqIdSc ? "has-value" : ""} 
                             ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
+                            title="Please select the Loan Request ID"
                         >
                             <Select
                                 id="department"
@@ -814,9 +823,10 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={fromDate}
+                                title="Please select the Loan Payment From Date"
                                 onChange={(e) => setFromDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Payment From</label>
@@ -830,9 +840,10 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required 
                                 autoComplete="off"
                                 value={toDate}
+                                title="Please select the Loan Payment To Date"
                                 onChange={(e) => setToDate((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Payment To</label>
@@ -852,6 +863,7 @@ function LoanPayment({ }) {
                                 required
                                 autoComplete="off"
                                 value={paymentAmountSc}
+                                title="Please enter the Paid Amount"
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setPaymentAmountSc(value);
@@ -866,6 +878,7 @@ function LoanPayment({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPaymentSc ? "has-value" : ""} 
                             ${isSelectedPaymentSc ? "is-focused" : ""}`}
+                            title="Please select the Payment Method"
                         >
                             <Select
                                 id="country"
