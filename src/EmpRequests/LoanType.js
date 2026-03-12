@@ -247,6 +247,7 @@ function LoanType({ }) {
                                     className="icon mx-2"
                                     onClick={() => handleUpdate(params.data, params.node.data)}
                                     style={{ cursor: 'pointer' }}
+                                    title="Update"
                                 >
                                     <i className="fa-regular fa-floppy-disk"></i>
                                 </span>
@@ -255,6 +256,7 @@ function LoanType({ }) {
                                     className="icon mx-2"
                                     onClick={() => handleDelete(params.data)}
                                     style={{ cursor: 'pointer' }}
+                                    title="Delete"
                                 >
                                     <i className="fa-solid fa-trash"></i>
                                 </span>
@@ -692,6 +694,7 @@ function LoanType({ }) {
                                 class="exp-input-field form-control"
                                 type="Date"
                                 placeholder=""
+                                title="Please enter the Start Year"
                                 required
                                 value={startYear}
                                 autoComplete="off"
@@ -709,6 +712,7 @@ function LoanType({ }) {
                                 type="date"
                                 placeholder=""
                                 required
+                                title="Please enter the End Year"
                                 value={endYear}
                                 autoComplete="off"
                                 onChange={(e) => setEndYear(e.target.value)}
@@ -728,6 +732,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Loan Type ID"
                                 value={loanTypeId}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -744,6 +749,7 @@ function LoanType({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanTypeName ? "has-value" : ""} 
                             ${isSelectedLoanTypeName ? "is-focused" : ""}`}
+                            title="Please enter the Loan Type Name"
                         >
                             <Select
                                 id="country"
@@ -753,6 +759,7 @@ function LoanType({ }) {
                                 onFocus={() => setIsSelectedLoanTypeName(true)}
                                 onBlur={() => setIsSelectedLoanTypeName(false)}
                                 isClearable
+                                maxLength={100}
                                 value={selectedLoanTypeName}
                                 onChange={handleChangeLoanType}
                                 options={filteredOptionLoanType}
@@ -772,6 +779,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Max Amount"
                                 value={maxAmount}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -794,6 +802,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Max Repayment Months"
                                 value={maxRepaymentMonths}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -816,6 +825,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Default Interest Rate"
                                 value={defaultInterestRate}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -835,6 +845,7 @@ function LoanType({ }) {
                                 type="text"
                                 placeholder=""
                                 required
+                                title="Please enter the Description"
                                 value={description}
                                 autoComplete="off"
                                 maxLength={255}
@@ -849,6 +860,7 @@ function LoanType({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedStatus ? "has-value" : ""} 
                             ${isSelectedStatus ? "is-focused" : ""}`}
+                            title="Please enter the Status"
                         >
                             <Select
                                 id="country"
@@ -883,6 +895,7 @@ function LoanType({ }) {
                                 type="Date"
                                 placeholder=""
                                 required
+                                title="Please enter the Start Year"
                                 value={startYearSc}
                                 autoComplete="off"
                                 onChange={(e) => setStartYearSc(e.target.value)}
@@ -899,6 +912,7 @@ function LoanType({ }) {
                                 type="date"
                                 placeholder=""
                                 required
+                                title="Please enter the End Year"
                                 value={endYearSc}
                                 autoComplete="off"
                                 onChange={(e) => setEndYearSc(e.target.value)}
@@ -918,6 +932,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Loan Type ID"
                                 value={loanTypeIdSc}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -934,6 +949,7 @@ function LoanType({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedLoanTypeNameSc ? "has-value" : ""} 
                             ${isSelectedLoanTypeNameSc ? "is-focused" : ""}`}
+                            title="Please enter the Loan Type Name"
                         >
                             <Select
                                 id="country"
@@ -943,6 +959,7 @@ function LoanType({ }) {
                                 onFocus={() => setIsSelectedLoanTypeNameSc(true)}
                                 onBlur={() => setIsSelectedLoanTypeNameSc(false)}
                                 isClearable
+                                maxLength={100}
                                 value={selectedLoanTypeNameSc}
                                 onChange={handleChangeLoanTypeSc}
                                 options={filteredOptionLoanTypeSc}
@@ -962,6 +979,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Max Amount"
                                 value={maxAmountSc}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -984,6 +1002,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Max Repayment Months"
                                 value={maxRepaymentMonthsSc}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -1006,6 +1025,7 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Default Interest Rate"
                                 value={defaultInterestRateSc}
                                 autoComplete="off"
                                 onChange={(e) => {
@@ -1025,6 +1045,7 @@ function LoanType({ }) {
                                 type="text"
                                 placeholder=""
                                 required
+                                title="Please enter the Description"
                                 value={descriptionSc}
                                 autoComplete="off"
                                 maxLength={255}
@@ -1039,6 +1060,7 @@ function LoanType({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedStatusSc ? "has-value" : ""} 
                             ${isSelectedStatusSc ? "is-focused" : ""}`}
+                            title="Please enter the Status"
                         >
                             <Select
                                 id="country"

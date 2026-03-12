@@ -72,6 +72,8 @@ import {
 
 import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt } from "react-icons/fa";
 
+
+
 const cleanPath = (path) => {
   if (!path) return '';
   let cleaned = path.startsWith('/') ? path : '/' + path;
@@ -126,6 +128,7 @@ export const leafIconMap = {
 
   // --- HCM ---
   "Employee Information": BsPersonCheck,
+  "Manual Employee Info": BsPersonCheck,
   "Department Dashboard": BsBarChartLine,
   "Admin Dashboard": BsSpeedometer2,
   "Employee Dashboard": BsFileBarGraph,
@@ -220,6 +223,7 @@ const menuData = [
       { label: "Department Dashboard", path: "/DepartmentDashboard" },
       { label: "Visa Requests", path: "/VisaRequest" },
       { label: "Travel Request", path: "/TravelRequest" },
+      { label: "Manual Employee Info", path: "/ManualEmployeeInfo" },
       {
         label: "Masters",
         isDropdown: true,
