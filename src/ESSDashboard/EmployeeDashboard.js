@@ -790,7 +790,7 @@ const Dashboard = (payslip) => {
 
 
   const handleLeave = () => {
-    navigate('/LeaveReq')
+    navigate('/ApplyLeave')
   }
 
   const fetchBirthdaysinfo = async () => {
@@ -1406,7 +1406,6 @@ const Dashboard = (payslip) => {
         <div className="leave-balance-container mt-2">
           <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
 
-            {/* Header Section: Title & Toggle */}
             <div className="d-flex justify-content-between align-items-center spacing-mb-2">
               <h6 className="card-title-heading mb-0">Shift Routine</h6>
               <button
@@ -1418,7 +1417,6 @@ const Dashboard = (payslip) => {
               </button>
             </div>
 
-            {/* Search Filters Section (DO NOT REMOVE) */}
             <div className="d-flex flex-row align-items-center gap-2 spacing-mb-3">
               <div className="inputGroup flex-grow-1">
                 <input
@@ -1468,7 +1466,6 @@ const Dashboard = (payslip) => {
               </button>
             </div>
 
-            {/* Conditional Rendering: Calendar vs Ag-Grid */}
             <div className="shift-content-area" style={{ height: "320px" }}>
               {isShiftCalendarVisible ? (
                 <div className="calendar-container">
@@ -1882,7 +1879,7 @@ const Dashboard = (payslip) => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={Employeecol}
                   rowData={rowData}
@@ -1895,7 +1892,6 @@ const Dashboard = (payslip) => {
           </div>
         </div>
       </div>
-
 
       {/* Modal for Preview */}
       {showModal && payslipData && (
