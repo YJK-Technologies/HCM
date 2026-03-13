@@ -1582,7 +1582,7 @@ const Dashboard = (payslip) => {
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start mt-0">
                 <div className="d-flex justify-content-start">
-                  <h6 className="card-title-heading">Payslip Analysis</h6>
+                  <h6 className="card-title-heading">Payslip Generate</h6>
                 </div>
               </div>
 
