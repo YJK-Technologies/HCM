@@ -426,7 +426,8 @@ function LoanRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!loanReqId ||
+        if (
+            // !loanReqId ||
             !empId ||
             !loanTypeId ||
             !loanAmount ||
@@ -808,7 +809,7 @@ function LoanRequest({ }) {
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -829,7 +830,7 @@ function LoanRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels ${error && !loanReqId ? 'text-danger' : ''}`}>Loan Request ID<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div
