@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
-import TabButtons from './Tabs.js';
-import Select from 'react-select';
+import { useLocation } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import TabButtons from "./Tabs.js";
+import Select from "react-select";
 import EmployeeInfoPopup from "./EmployeeinfoPopup.js";
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
 
-const config = require('../Apiconfig');
+const config = require("../Apiconfig");
 
-function ManualEmployeeInfo({ }) {
-  const [activeTab, setActiveTab] = useState('Personal Details');
+function ManualEmployeeInfo({}) {
+  const [activeTab, setActiveTab] = useState("Personal Details");
   const [EmployeeId, setEmployeeId] = useState("");
   const [First_Name, setFirst_Name] = useState("");
   const [first_Name, setfirst_Name] = useState("");
@@ -40,7 +40,7 @@ function ManualEmployeeInfo({ }) {
   const [reference_Phone, setReference_Phone] = useState("");
   const [marital_Status, setMarital_Status] = useState("");
   const [Marital_StatusDrop, setMarital_StatusDrop] = useState([]);
-  const [pan_No, setPan_No] = useState('');
+  const [pan_No, setPan_No] = useState("");
   const [Aadhaar_no, setAadhar_no] = useState("");
   const [kids, setKids] = useState("");
   const [KidsDrop, setKidsDrop] = useState([]);
@@ -58,43 +58,47 @@ function ManualEmployeeInfo({ }) {
   const [updateButtonVisible, setUpdateButtonVisible] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [placeOfBirth, setPlaceOfBirth] = useState('');
-  const [bloodGroup, setBloodGroup] = useState('');
-  const [spouseName, setSpouseName] = useState('');
-  const [noOfChildren, setNoOfChildren] = useState('');
-  const [noOfSiblings, setNoOfSiblings] = useState('');
-  const [businessEmail, setBusinessEmail] = useState('');
-  const [emergencyContactName, setEmergencyContactName] = useState('');
-  const [emergencyContactRelation, setEmergencyContactRelation] = useState('');
-  const [selectedEmergencyContactRelation, setSelectedEmergencyContactRelation] = useState('')
-  const [emergencyContactRelationDrop, setEmergencyContactRelationDrop] = useState([]);
-  const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
-  const [city, setCity] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
+  const [placeOfBirth, setPlaceOfBirth] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [spouseName, setSpouseName] = useState("");
+  const [noOfChildren, setNoOfChildren] = useState("");
+  const [noOfSiblings, setNoOfSiblings] = useState("");
+  const [businessEmail, setBusinessEmail] = useState("");
+  const [emergencyContactName, setEmergencyContactName] = useState("");
+  const [emergencyContactRelation, setEmergencyContactRelation] = useState("");
+  const [
+    selectedEmergencyContactRelation,
+    setSelectedEmergencyContactRelation,
+  ] = useState("");
+  const [emergencyContactRelationDrop, setEmergencyContactRelationDrop] =
+    useState([]);
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [cityDrop, setCityDrop] = useState([]);
-  const [title, setTitle] = useState('');
-  const [selectedTitle, setSelectedTitle] = useState('');
+  const [title, setTitle] = useState("");
+  const [selectedTitle, setSelectedTitle] = useState("");
   const [titleDrop, setTitleDrop] = useState([]);
-  const [nationality, setNationality] = useState('');
-  const [selectedNationality, setSelectedNationality] = useState('');
+  const [nationality, setNationality] = useState("");
+  const [selectedNationality, setSelectedNationality] = useState("");
   const [nationalityDrop, setNationalityDrop] = useState([]);
-  const [religion, setReligion] = useState('');
-  const [selectedReligion, setSelectedReligion] = useState('');
+  const [religion, setReligion] = useState("");
+  const [selectedReligion, setSelectedReligion] = useState("");
   const [religionDrop, setReligionDrop] = useState([]);
-  const [state, setState] = useState('');
-  const [selectedState, setSelectedState] = useState('');
+  const [state, setState] = useState("");
+  const [selectedState, setSelectedState] = useState("");
   const [stateDrop, setStateDrop] = useState([]);
-  const [country, setCountry] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('');
+  const [country, setCountry] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [countryDrop, setCountryDrop] = useState([]);
-  const [postalCode, setPostalCode] = useState('');
-  const [passportNo, setPassportNo] = useState('');
-  const [passportExpiryDate, setPassportExpiryDate] = useState('');
-  const [otherIdType, setOtherIdType] = useState('');
-  const [selectedOtherIdType, setSelectedOtherIdType] = useState('');
+  const [postalCode, setPostalCode] = useState("");
+  const [passportNo, setPassportNo] = useState("");
+  const [passportExpiryDate, setPassportExpiryDate] = useState("");
+  const [otherIdType, setOtherIdType] = useState("");
+  const [selectedOtherIdType, setSelectedOtherIdType] = useState("");
   const [otherDrop, setOtherDrop] = useState([]);
-  const [otherIdNo, setOtherIdNo] = useState('');
-
+  const [otherIdNo, setOtherIdNo] = useState("");
+  const [purpose, setpurpose] = useState("");
 
   const [isSelectGender, setIsSelectGender] = useState(false);
   const [isSelectGrade, setIsSelectGrade] = useState(false);
@@ -108,18 +112,18 @@ function ManualEmployeeInfo({ }) {
   const [isSelectState, setIsSelectState] = useState(false);
   const [isSelectCountry, setIsSelectCountry] = useState(false);
   const [isSelectOtherType, setIsSelectOtherType] = useState(false);
-  const logo = useRef(null)
+  const logo = useRef(null);
 
-  const employeeId = sessionStorage.getItem('selectedUserCode');
-    useEffect(() => {
-        handleRefNo(employeeId);
-    }, []);
+  const employeeId = sessionStorage.getItem("selectedUserCode");
+  useEffect(() => {
+    handleRefNo(employeeId);
+  }, []);
 
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const employeePermissions = permissions
-    .filter(permission => permission.screen_type === 'AddEmployeeInfo')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "AddEmployeeInfo")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   const handleInsert = async () => {
     if (
@@ -128,7 +132,7 @@ function ManualEmployeeInfo({ }) {
       !Father_Name ||
       !Mother_Name ||
       !DOB ||
-      !Gender ||
+      !selectedGender ||
       !Email ||
       !Phone1 ||
       !Phone2 ||
@@ -139,8 +143,7 @@ function ManualEmployeeInfo({ }) {
       !pan_No ||
       !Aadhaar_no ||
       !selectedmartial ||
-      !kids ||
-      !Grade_id ||
+      !selectedkids ||
       !title ||
       !placeOfBirth ||
       !nationality ||
@@ -158,21 +161,18 @@ function ManualEmployeeInfo({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
-
     if (!validateEmail(Email)) {
       setError(true);
-      toast.warning("Please enter a valid email address")
+      toast.warning("Please enter a valid email address");
       return;
     }
-
     if (businessEmail && !validateEmail(businessEmail)) {
       setError(true);
-      toast.warning("Please enter a valid email business");
+      toast.warning("Please enter a valid business email");
       return;
     }
     setError(false);
     setLoading(true);
-
     try {
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
@@ -195,58 +195,66 @@ function ManualEmployeeInfo({ }) {
       formData.append("Pan_No", pan_No);
       formData.append("Aadhar_no", Aadhaar_no);
       formData.append("Marital_Status", selectedmartial);
+      formData.append("Siblings", noOfSiblings);
       formData.append("Kids", selectedkids);
-      formData.append("Grade_id", selectedgradeid);
+      formData.append("Title", title);
+      formData.append("Place_of_Birth", placeOfBirth);
+      formData.append("Nationality", nationality);
+      formData.append("Religion", religion);
+      formData.append("Blood_Group", bloodGroup);
+      formData.append("Spouse_Name", spouseName);
+      formData.append("Number_of_Siblings", noOfSiblings);
+      formData.append("Number_of_Children", noOfChildren);
+      formData.append("Email_Business", businessEmail);
+      // formData.append("Phone_Alternate", alternatePhone);
+      formData.append("Emergency_Contact_Name", emergencyContactName);
+      formData.append(
+        "Emergency_Contact_Relationship",
+        emergencyContactRelation,
+      );
+      formData.append("Emergency_Contact_Phone", emergencyContactPhone);
       formData.append("City", city);
       formData.append("State", state);
       formData.append("Country", country);
       formData.append("Postal_Code", postalCode);
-      formData.append("Emergency_Contact_Phone", emergencyContactPhone);
-      formData.append("Emergency_Contact_Relationship", emergencyContactRelation);
-      formData.append("Emergency_Contact_Name", emergencyContactName);
-      formData.append("Email_Business", businessEmail);
-      formData.append("Number_of_Children", noOfChildren);
-      formData.append("Number_of_Siblings", noOfSiblings);
-      formData.append("Spouse_Name", spouseName);
-      formData.append("Other_Id_No", otherIdNo);
-      formData.append("Blood_Group", bloodGroup);
-      formData.append("Other_Id_Type", otherIdType);
-      formData.append("Religion", religion);
-      formData.append("Nationality", nationality);
-      formData.append("Passport_Expiry_Date", passportExpiryDate);
-      formData.append("Title", title);
-      formData.append("Place_of_Birth", placeOfBirth);
       formData.append("Passport_No", passportNo);
+      formData.append("Passport_Expiry_Date", passportExpiryDate);
+      formData.append("Other_Id_Type", otherIdType);
+      formData.append("Other_Id_No", otherIdNo);
       formData.append("Created_by", sessionStorage.getItem("selectedUserCode"));
-      formData.append("company_code", sessionStorage.getItem('selectedCompanyCode'));
+      formData.append(
+        "company_code",
+        sessionStorage.getItem("selectedCompanyCode"),
+      );
+      // workflow fields
+      formData.append("request_status", "Pending");
+      formData.append("purpose", purpose || "");
+
+      // Photo upload
       if (user_images) {
         formData.append("Photos", user_images);
       }
-
-      const response = await fetch(`${config.apiBaseUrl}/addEmployeePersonalData`, {
-        method: "POST",
-        body: formData,
-      });
-
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      const response = await fetch(
+        `${config.apiBaseUrl}/EmployeeDetailsRequest`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       if (response.ok) {
-        const searchData = await response.json();
-        console.log(searchData);
-        const [{ EmployeeId }] = searchData;
-        setEmployeeId(EmployeeId);
-
-        toast.success("Data inserted successfully!", {
+        toast.success("Employee change request submitted successfully!", {
           onClose: () => window.location.reload(),
         });
-
-        console.log("Employee Personal Data Data inserted successfully");
       } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert Employee Personal Data");
-        console.error(errorResponse.details || errorResponse.message);
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to submit employee request");
       }
     } catch (error) {
-      console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      console.error("Insert Error:", error);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -258,41 +266,69 @@ function ManualEmployeeInfo({ }) {
   }
 
   const AcademicDet = () => {
-    navigate("/AcademicDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AcademicDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
   const Insurance1 = () => {
-    navigate("/Family", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Family", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
   const Documents = () => {
-    navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Documents", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
   const EmployeeLoan = () => {
-    navigate("/ManualEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/ManualEmployeeInfo", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'Personal Details':
+      case "Personal Details":
         EmployeeLoan();
         break;
-    //   case 'Academic Details':
-    //     AcademicDet();
-    //     break;
-    //   case 'Family':
-    //     Insurance1();
-    //     break;
-    //   case 'Documents':
-    //     Documents();
-    //     break;
+      //   case 'Academic Details':
+      //     AcademicDet();
+      //     break;
+      //   case 'Family':
+      //     Insurance1();
+      //     break;
+      //   case 'Documents':
+      //     Documents();
+      //     break;
       default:
         break;
     }
   };
 
   const tabs = [
-    { label: 'Personal Details' },
+    { label: "Personal Details" },
     // { label: 'Academic Details' },
     // { label: 'Family' },
     // { label: 'Documents' }
@@ -300,14 +336,14 @@ function ManualEmployeeInfo({ }) {
 
   const handleGradeID = (selectedgradeid) => {
     setGrade_id(selectedgradeid);
-    setselectedgradeid(selectedgradeid ? selectedgradeid.value : '');
+    setselectedgradeid(selectedgradeid ? selectedgradeid.value : "");
   };
 
   const filteredOptionGradeid = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
-      value: option.GradeID,
-      label: option.GradeID,
-    }))
+        value: option.GradeID,
+        label: option.GradeID,
+      }))
     : [];
 
   useEffect(() => {
@@ -316,7 +352,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((response) => response.json())
@@ -326,14 +361,13 @@ function ManualEmployeeInfo({ }) {
         }
       })
       .catch((error) => {
-        console.error('Error fetching gender data:', error);
+        console.error("Error fetching gender data:", error);
       });
   }, []);
 
   const Handlegender = (selectedgender) => {
     setGender(selectedgender);
-    setselectedGender(selectedgender ? selectedgender.value : '');
-
+    setselectedGender(selectedgender ? selectedgender.value : "");
   };
 
   const filteredOptiongender = genderdrop.map((option) => ({
@@ -347,7 +381,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((response) => response.json())
@@ -357,13 +390,13 @@ function ManualEmployeeInfo({ }) {
         }
       })
       .catch((error) => {
-        console.error('Error fetching gender data:', error);
+        console.error("Error fetching gender data:", error);
       });
   }, []);
 
   const handleKids = (selectedkids) => {
     setKids(selectedkids);
-    setselectedkids(selectedkids ? selectedkids.value : '');
+    setselectedkids(selectedkids ? selectedkids.value : "");
   };
 
   const filteredOptionKids = KidsDrop.map((option) => ({
@@ -377,7 +410,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
@@ -386,7 +418,7 @@ function ManualEmployeeInfo({ }) {
 
   const handleChangeTitle = (selectedTitle) => {
     setSelectedTitle(selectedTitle);
-    setTitle(selectedTitle ? selectedTitle.value : '');
+    setTitle(selectedTitle ? selectedTitle.value : "");
   };
 
   const filteredOptionTitle = titleDrop.map((option) => ({
@@ -400,7 +432,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
@@ -409,7 +440,7 @@ function ManualEmployeeInfo({ }) {
 
   const handleChangeNationality = (selectedNationality) => {
     setSelectedNationality(selectedNationality);
-    setNationality(selectedNationality ? selectedNationality.value : '');
+    setNationality(selectedNationality ? selectedNationality.value : "");
   };
 
   const filteredOptionNationality = nationalityDrop.map((option) => ({
@@ -423,7 +454,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
@@ -432,7 +462,7 @@ function ManualEmployeeInfo({ }) {
 
   const handleChangeReligion = (selectedReligion) => {
     setSelectedReligion(selectedReligion);
-    setReligion(selectedReligion ? selectedReligion.value : '');
+    setReligion(selectedReligion ? selectedReligion.value : "");
   };
 
   const filteredOptionReligion = religionDrop.map((option) => ({
@@ -446,7 +476,6 @@ function ManualEmployeeInfo({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
@@ -455,7 +484,7 @@ function ManualEmployeeInfo({ }) {
 
   const handlemartial = (martilalselected) => {
     setMarital_Status(martilalselected);
-    setselectedmartial(martilalselected ? martilalselected.value : '');
+    setselectedmartial(martilalselected ? martilalselected.value : "");
   };
 
   const filteredOptionmartial = Marital_StatusDrop.map((option) => ({
@@ -477,7 +506,11 @@ function ManualEmployeeInfo({ }) {
 
   const handleChangeRelation = (selectedEmergencyContactRelation) => {
     setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
-    setEmergencyContactRelation(selectedEmergencyContactRelation ? selectedEmergencyContactRelation.value : '');
+    setEmergencyContactRelation(
+      selectedEmergencyContactRelation
+        ? selectedEmergencyContactRelation.value
+        : "",
+    );
   };
 
   const filteredOptionRelation = emergencyContactRelationDrop.map((option) => ({
@@ -486,7 +519,6 @@ function ManualEmployeeInfo({ }) {
   }));
 
   useEffect(() => {
-
     fetch(`${config.apiBaseUrl}/getrelation`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -500,7 +532,7 @@ function ManualEmployeeInfo({ }) {
 
   const handleChangeCity = (selectedCity) => {
     setSelectedCity(selectedCity);
-    setCity(selectedCity ? selectedCity.value : '');
+    setCity(selectedCity ? selectedCity.value : "");
   };
 
   const filteredOptionCity = cityDrop.map((option) => ({
@@ -509,23 +541,23 @@ function ManualEmployeeInfo({ }) {
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/city`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCityDrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleChangeCountry = (selectedCountry) => {
     setSelectedCountry(selectedCountry);
-    setCountry(selectedCountry ? selectedCountry.value : '');
+    setCountry(selectedCountry ? selectedCountry.value : "");
   };
 
   const filteredOptionCountry = countryDrop.map((option) => ({
@@ -534,23 +566,23 @@ function ManualEmployeeInfo({ }) {
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/country`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCountryDrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleChangeState = (selectedState) => {
     setSelectedState(selectedState);
-    setState(selectedState ? selectedState.value : '');
+    setState(selectedState ? selectedState.value : "");
   };
 
   const filteredOptionState = stateDrop.map((option) => ({
@@ -559,23 +591,23 @@ function ManualEmployeeInfo({ }) {
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/state`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setStateDrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleChangeOtherType = (selectedOtherIdType) => {
     setSelectedOtherIdType(selectedOtherIdType);
-    setOtherIdType(selectedOtherIdType ? selectedOtherIdType.value : '');
+    setOtherIdType(selectedOtherIdType ? selectedOtherIdType.value : "");
   };
 
   const filteredOptionOtherType = otherDrop.map((option) => ({
@@ -608,10 +640,10 @@ function ManualEmployeeInfo({ }) {
       const maxSize = 1 * 1024 * 1024;
       if (file.size > maxSize) {
         Swal.fire({
-          icon: 'error',
-          title: 'File Too Large',
-          text: 'File size exceeds 1MB. Please upload a smaller file.',
-          confirmButtonText: 'OK'
+          icon: "error",
+          title: "File Too Large",
+          text: "File size exceeds 1MB. Please upload a smaller file.",
+          confirmButtonText: "OK",
         });
         event.target.value = null;
         return;
@@ -624,39 +656,88 @@ function ManualEmployeeInfo({ }) {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleRefNo(EmployeeId)
+    if (e.key === "Enter") {
+      handleRefNo(EmployeeId);
     }
   };
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   const handleRefNo = async (code) => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/getEmployeePersonaldet`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${config.apiBaseUrl}/getEmployeePersonaldet`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            Id: code,
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+          }),
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), })
-      });
+      );
       if (response.ok) {
-        setSaveButtonVisible(false);
+        setSaveButtonVisible(true);
         setUpdateButtonVisible(true);
         const searchData = await response.json();
-        const [{ EmployeeId, First_Name, Middle_Name, Last_Name, father_name, mother_name, DOB,
-          email, Aadhar_no, Reference_Phone, phone1, phone2, Address1, address2, address3,
-          PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender,
-          Marital_Status, Kids, Title, Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
-          Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name,
-          Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
-          Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
+        const [
+          {
+            EmployeeId,
+            First_Name,
+            Middle_Name,
+            Last_Name,
+            father_name,
+            mother_name,
+            DOB,
+            email,
+            Aadhar_no,
+            Reference_Phone,
+            phone1,
+            phone2,
+            Address1,
+            address2,
+            address3,
+            PermanantAddress,
+            designation_id,
+            department_id,
+            Reference_name,
+            Pan_No,
+            Photos,
+            Grade_id,
+            Gender,
+            Marital_Status,
+            Kids,
+            Title,
+            Place_of_Birth,
+            Nationality,
+            Religion,
+            Blood_Group,
+            Spouse_Name,
+            Number_of_Siblings,
+            Number_of_Children,
+            Email_Business,
+            Phone_Alternate,
+            Emergency_Contact_Name,
+            Emergency_Contact_Relationship,
+            Emergency_Contact_Phone,
+            City,
+            State,
+            Country,
+            Postal_Code,
+            Passport_No,
+            Passport_Expiry_Date,
+            Other_Id_Type,
+            Other_Id_No,
+          },
+        ] = searchData;
 
         setEmployeeId(EmployeeId);
         setFirst_Name(First_Name);
@@ -691,7 +772,9 @@ function ManualEmployeeInfo({ }) {
         setPassportExpiryDate(formatDate(Passport_Expiry_Date));
         setOtherIdNo(Other_Id_No);
 
-        const imageBlob = new Blob([new Uint8Array(Photos.data)], { type: 'image/jpeg' });
+        const imageBlob = new Blob([new Uint8Array(Photos.data)], {
+          type: "image/jpeg",
+        });
 
         setuser_image(imageBlob);
 
@@ -700,57 +783,81 @@ function ManualEmployeeInfo({ }) {
 
         setPan_No(Pan_No);
 
-        const selectedGrade = filteredOptionGradeid.find(option => option.value === Grade_id);
+        const selectedGrade = filteredOptionGradeid.find(
+          (option) => option.value === Grade_id,
+        );
         setGrade_id(selectedGrade);
         setselectedgradeid(selectedGrade?.value || null);
 
-        const selectedGender = filteredOptiongender.find(option => option.value === Gender);
+        const selectedGender = filteredOptiongender.find(
+          (option) => option.value === Gender,
+        );
         setGender(selectedGender);
         setselectedGender(selectedGender?.value || null);
 
-        const martialStatus = filteredOptionmartial.find(option => option.value === Marital_Status);
+        const martialStatus = filteredOptionmartial.find(
+          (option) => option.value === Marital_Status,
+        );
         setMarital_Status(martialStatus);
         setselectedmartial(martialStatus?.value || null);
 
-        const kids = filteredOptionKids.find(option => option.value === Kids);
+        const kids = filteredOptionKids.find((option) => option.value === Kids);
         setKids(kids);
         setselectedkids(kids?.value || null);
 
-        const selectedTitle = filteredOptionTitle.find(option => option.value === Title);
+        const selectedTitle = filteredOptionTitle.find(
+          (option) => option.value === Title,
+        );
         setSelectedTitle(selectedTitle);
         setTitle(selectedTitle?.value || null);
 
-        const selectedNationality = filteredOptionNationality.find(option => option.value === Nationality);
+        const selectedNationality = filteredOptionNationality.find(
+          (option) => option.value === Nationality,
+        );
         setSelectedNationality(selectedNationality);
         setNationality(selectedNationality?.value || null);
 
-        const selectedReligion = filteredOptionReligion.find(option => option.value === Religion);
+        const selectedReligion = filteredOptionReligion.find(
+          (option) => option.value === Religion,
+        );
         setSelectedReligion(selectedReligion);
         setReligion(selectedReligion?.value || null);
 
-        const selectedEmergencyContactRelation = filteredOptionRelation.find(option => option.value === Emergency_Contact_Relationship);
+        const selectedEmergencyContactRelation = filteredOptionRelation.find(
+          (option) => option.value === Emergency_Contact_Relationship,
+        );
         setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
-        setEmergencyContactRelation(selectedEmergencyContactRelation?.value || null);
+        setEmergencyContactRelation(
+          selectedEmergencyContactRelation?.value || null,
+        );
 
-        const selectedCity = filteredOptionCity.find(option => option.value === City);
+        const selectedCity = filteredOptionCity.find(
+          (option) => option.value === City,
+        );
         setSelectedCity(selectedCity);
         setCity(selectedCity?.value || null);
 
-        const selectedState = filteredOptionState.find(option => option.value === State);
+        const selectedState = filteredOptionState.find(
+          (option) => option.value === State,
+        );
         setSelectedState(selectedState);
         setState(selectedState?.value || null);
 
-        const selectedCountry = filteredOptionCountry.find(option => option.value === Country);
+        const selectedCountry = filteredOptionCountry.find(
+          (option) => option.value === Country,
+        );
         setSelectedCountry(selectedCountry);
         setCountry(selectedCountry?.value || null);
 
-        const selectedOtherIdType = filteredOptionOtherType.find(option => option.value === Other_Id_Type);
+        const selectedOtherIdType = filteredOptionOtherType.find(
+          (option) => option.value === Other_Id_Type,
+        );
         setSelectedOtherIdType(selectedOtherIdType);
         setOtherIdType(selectedOtherIdType?.value || null);
 
-        console.log("data fetched successfully")
+        console.log("data fetched successfully");
       } else if (response.status === 404) {
-        toast.error("Data not found")
+        toast.error("Data not found");
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -758,10 +865,9 @@ function ManualEmployeeInfo({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
-
 
   const reloadGridData = () => {
     window.location.reload();
@@ -777,7 +883,7 @@ function ManualEmployeeInfo({ }) {
     setOpen(true);
   };
 
-  const base64ToBlob = (base64, contentType = 'image/jpeg') => {
+  const base64ToBlob = (base64, contentType = "image/jpeg") => {
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
 
@@ -795,19 +901,55 @@ function ManualEmployeeInfo({ }) {
     setSaveButtonVisible(false);
     setUpdateButtonVisible(true);
 
-    const [{
-      EmployeeId, First_Name, Middle_Name, Last_Name, Father_Name, Mother_Name, DOB,
-      Email, Aadhar_no, Reference_Phone, phone1, phone2,
-      Address1, Address2, Address3, PermanantAddress,
-      designation_id, department_id, Reference_Name, Pan_No,
-      Photos, Grade_id, Gender, Marital_Status, Kids, Title,
-      Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
-      Number_of_Siblings, Number_of_Children, Email_Business,
-      Emergency_Contact_Name, Emergency_Contact_Phone,
-      Emergency_Contact_Relationship, City, State, Country,
-      Postal_Code, Passport_No, Passport_Expiry_Date,
-      Other_Id_Type, Other_Id_No
-    }] = data;
+    const [
+      {
+        EmployeeId,
+        First_Name,
+        Middle_Name,
+        Last_Name,
+        Father_Name,
+        Mother_Name,
+        DOB,
+        Email,
+        Aadhar_no,
+        Reference_Phone,
+        phone1,
+        phone2,
+        Address1,
+        Address2,
+        Address3,
+        PermanantAddress,
+        designation_id,
+        department_id,
+        Reference_Name,
+        Pan_No,
+        Photos,
+        Grade_id,
+        Gender,
+        Marital_Status,
+        Kids,
+        Title,
+        Place_of_Birth,
+        Nationality,
+        Religion,
+        Blood_Group,
+        Spouse_Name,
+        Number_of_Siblings,
+        Number_of_Children,
+        Email_Business,
+        Emergency_Contact_Name,
+        Emergency_Contact_Phone,
+        Emergency_Contact_Relationship,
+        City,
+        State,
+        Country,
+        Postal_Code,
+        Passport_No,
+        Passport_Expiry_Date,
+        Other_Id_Type,
+        Other_Id_No,
+      },
+    ] = data;
 
     // 🔹 BASIC FIELDS
     setEmployeeId(EmployeeId);
@@ -853,51 +995,65 @@ function ManualEmployeeInfo({ }) {
 
     // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
 
-    const selectedGrade = filteredOptionGradeid.find(o => o.value === Grade_id);
+    const selectedGrade = filteredOptionGradeid.find(
+      (o) => o.value === Grade_id,
+    );
     setGrade_id(selectedGrade);
     setselectedgradeid(selectedGrade?.value || null);
 
-    const selectedGender = filteredOptiongender.find(o => o.value === Gender);
+    const selectedGender = filteredOptiongender.find((o) => o.value === Gender);
     setGender(selectedGender);
     setselectedGender(selectedGender?.value || null);
 
-    const selectedMartial = filteredOptionmartial.find(o => o.value === Marital_Status);
+    const selectedMartial = filteredOptionmartial.find(
+      (o) => o.value === Marital_Status,
+    );
     setMarital_Status(selectedMartial);
     setselectedmartial(selectedMartial?.value || null);
 
-    const selectedKids = filteredOptionKids.find(o => o.value === Kids);
+    const selectedKids = filteredOptionKids.find((o) => o.value === Kids);
     setKids(selectedKids);
     setselectedkids(selectedKids?.value || null);
 
-    const selectedTitle = filteredOptionTitle.find(o => o.value === Title);
+    const selectedTitle = filteredOptionTitle.find((o) => o.value === Title);
     setSelectedTitle(selectedTitle);
     setTitle(selectedTitle?.value || null);
 
-    const selectedNationality = filteredOptionNationality.find(o => o.value === Nationality);
+    const selectedNationality = filteredOptionNationality.find(
+      (o) => o.value === Nationality,
+    );
     setSelectedNationality(selectedNationality);
     setNationality(selectedNationality?.value || null);
 
-    const selectedReligion = filteredOptionReligion.find(o => o.value === Religion);
+    const selectedReligion = filteredOptionReligion.find(
+      (o) => o.value === Religion,
+    );
     setSelectedReligion(selectedReligion);
     setReligion(selectedReligion?.value || null);
 
-    const selectedRelation = filteredOptionRelation.find(o => o.value === Emergency_Contact_Relationship);
+    const selectedRelation = filteredOptionRelation.find(
+      (o) => o.value === Emergency_Contact_Relationship,
+    );
     setSelectedEmergencyContactRelation(selectedRelation);
     setEmergencyContactRelation(selectedRelation?.value || null);
 
-    const selectedCity = filteredOptionCity.find(o => o.value === City);
+    const selectedCity = filteredOptionCity.find((o) => o.value === City);
     setSelectedCity(selectedCity);
     setCity(selectedCity?.value || null);
 
-    const selectedState = filteredOptionState.find(o => o.value === State);
+    const selectedState = filteredOptionState.find((o) => o.value === State);
     setSelectedState(selectedState);
     setState(selectedState?.value || null);
 
-    const selectedCountry = filteredOptionCountry.find(o => o.value === Country);
+    const selectedCountry = filteredOptionCountry.find(
+      (o) => o.value === Country,
+    );
     setSelectedCountry(selectedCountry);
     setCountry(selectedCountry?.value || null);
 
-    const selectedOtherIdType = filteredOptionOtherType.find(o => o.value === Other_Id_Type);
+    const selectedOtherIdType = filteredOptionOtherType.find(
+      (o) => o.value === Other_Id_Type,
+    );
     setSelectedOtherIdType(selectedOtherIdType);
     setOtherIdType(selectedOtherIdType?.value || null);
 
@@ -905,7 +1061,8 @@ function ManualEmployeeInfo({ }) {
   };
 
   useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+    const { employeeId, firstName, department_id, designation_id } =
+      location.state || {};
 
     if (employeeId) {
       setEmployeeId(employeeId);
@@ -928,17 +1085,24 @@ function ManualEmployeeInfo({ }) {
   return (
     <div class="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Manual Employee Info</h1>
+          <h1 className="page-title">Employee Personal Details</h1>
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && (
-              <div className="action-icon add" onClick={handleInsert}>
-                <span className="tooltip">save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
-              </div>
-            )}
+            {saveButtonVisible &&
+              ["add", "all permission"].some((permission) =>
+                employeePermissions.includes(permission),
+              ) && (
+                <div className="action-icon add" onClick={handleInsert}>
+                  <span className="tooltip">save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -947,32 +1111,38 @@ function ManualEmployeeInfo({ }) {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleInsert}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
+              {saveButtonVisible &&
+                ["add", "all permission"].some((p) =>
+                  employeePermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleInsert}>
+                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  </li>
+                )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
-
             </ul>
           </div>
-
         </div>
       </div>
 
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
       <div className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -986,7 +1156,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={75}
                 autoComplete="off"
               />
-              <label htmlFor="FirstName" className={`exp-form-labels ${error && !First_Name ? 'text-danger' : ''}`}>First Name{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="FirstName"
+                className={`exp-form-labels ${error && !First_Name ? "text-danger" : ""}`}
+              >
+                First Name
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1002,7 +1178,9 @@ function ManualEmployeeInfo({ }) {
                 maxLength={75}
                 autoComplete="off"
               />
-              <label htmlFor="MiddleName" className="exp-form-labels">Middle Name</label>
+              <label htmlFor="MiddleName" className="exp-form-labels">
+                Middle Name
+              </label>
             </div>
           </div>
 
@@ -1018,7 +1196,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={75}
                 autoComplete="off"
               />
-              <label htmlFor="LastName" className={`exp-form-labels ${error && !Last_Name ? 'text-danger' : ''}`}>Last Name{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="LastName"
+                className={`exp-form-labels ${error && !Last_Name ? "text-danger" : ""}`}
+              >
+                Last Name
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1034,7 +1218,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="FatherName" className={`exp-form-labels ${error && !Father_Name ? 'text-danger' : ''}`}>Father Name{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="FatherName"
+                className={`exp-form-labels ${error && !Father_Name ? "text-danger" : ""}`}
+              >
+                Father Name
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1050,8 +1240,12 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="MotherName" className={`exp-form-labels ${error && !Mother_Name ? 'text-danger' : ''}`}>
-                Mother Name{showAsterisk && <span className="text-danger">*</span>}
+              <label
+                htmlFor="MotherName"
+                className={`exp-form-labels ${error && !Mother_Name ? "text-danger" : ""}`}
+              >
+                Mother Name
+                {showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -1066,7 +1260,12 @@ function ManualEmployeeInfo({ }) {
                 value={DOB}
                 onChange={(e) => setDOB(e.target.value)}
               />
-              <label htmlFor="dob" className={`exp-form-labels ${error && !DOB ? 'text-danger' : ''}`}>DOB{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="dob"
+                className={`exp-form-labels ${error && !DOB ? "text-danger" : ""}`}
+              >
+                DOB{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1091,7 +1290,12 @@ function ManualEmployeeInfo({ }) {
                 maxLength={10}
                 autoComplete="off"
               />
-              <label htmlFor="gender" className={`floating-label ${error && !selectedGender ? 'text-danger' : ''}`}>Gender{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="gender"
+                className={`floating-label ${error && !selectedGender ? "text-danger" : ""}`}
+              >
+                Gender{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1107,7 +1311,12 @@ function ManualEmployeeInfo({ }) {
                 maxLength={225}
                 autoComplete="off"
               />
-              <label htmlFor="email" className={`exp-form-labels ${error && !Email ? 'text-danger' : ''}`}>Email{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="email"
+                className={`exp-form-labels ${error && !Email ? "text-danger" : ""}`}
+              >
+                Email{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1129,7 +1338,12 @@ function ManualEmployeeInfo({ }) {
                 onChange={handleGradeID}
                 options={filteredOptionGradeid}
               />
-              <label htmlFor="gradeid" className={`floating-label ${error && !selectedgradeid ? 'text-danger' : ''}`}>Grade ID{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="gradeid"
+                className={`floating-label ${error && !selectedgradeid ? "text-danger" : ""}`}
+              >
+                Grade ID{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1151,7 +1365,12 @@ function ManualEmployeeInfo({ }) {
                 maxLength={13}
                 autoComplete="off"
               />
-              <label htmlFor="Phone" className={`exp-form-labels ${error && !Phone1 ? 'text-danger' : ''}`}>Phone No{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="Phone"
+                className={`exp-form-labels ${error && !Phone1 ? "text-danger" : ""}`}
+              >
+                Phone No{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1173,7 +1392,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={20}
                 autoComplete="off"
               />
-              <label htmlFor="phone2" className={`exp-form-labels ${error && !Phone2 ? 'text-danger' : ''}`}>Alternative Phone No{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="phone2"
+                className={`exp-form-labels ${error && !Phone2 ? "text-danger" : ""}`}
+              >
+                Alternative Phone No
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1189,7 +1414,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="address1" className={`exp-form-labels ${error && !address1 ? 'text-danger' : ''}`}>Address 1{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="address1"
+                className={`exp-form-labels ${error && !address1 ? "text-danger" : ""}`}
+              >
+                Address 1
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1205,7 +1436,13 @@ function ManualEmployeeInfo({ }) {
                 onChange={(e) => setAddress2(e.target.value)}
                 autoComplete="off"
               />
-              <label htmlFor="address2" className={`exp-form-labels ${error && !address2 ? 'text-danger' : ''}`}>Address 2{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="address2"
+                className={`exp-form-labels ${error && !address2 ? "text-danger" : ""}`}
+              >
+                Address 2
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1221,7 +1458,13 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={100}
               />
-              <label htmlFor="address3" className={`exp-form-labels ${error && !address3 ? 'text-danger' : ''}`}>Address 3{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="address3"
+                className={`exp-form-labels ${error && !address3 ? "text-danger" : ""}`}
+              >
+                Address 3
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1237,7 +1480,13 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={300}
               />
-              <label htmlFor="permanantAddress" className={`exp-form-labels ${error && !permanantAddress ? 'text-danger' : ''}`}>Permanent Address{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="permanantAddress"
+                className={`exp-form-labels ${error && !permanantAddress ? "text-danger" : ""}`}
+              >
+                Permanent Address
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1254,7 +1503,12 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
               />
               {/* <label htmlFor="ReferenceName" className="exp-form-labels">Reference Name</label> */}
-              <label for="ReferenceName" className={`exp-form-labels ${error && !reference_Name ? 'text-danger' : ''}`}>Reference Name<span className="text-danger">*</span></label>
+              <label
+                for="ReferenceName"
+                className={`exp-form-labels ${error && !reference_Name ? "text-danger" : ""}`}
+              >
+                Reference Name<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1276,7 +1530,12 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={20}
               />
-              <label for="ReferencePhone" className={`exp-form-labels ${error && !reference_Phone ? 'text-danger' : ''}`}>Reference Phone No<span className="text-danger">*</span></label>
+              <label
+                for="ReferencePhone"
+                className={`exp-form-labels ${error && !reference_Phone ? "text-danger" : ""}`}
+              >
+                Reference Phone No<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1299,7 +1558,13 @@ function ManualEmployeeInfo({ }) {
                 options={filteredOptionmartial}
                 autoComplete="off"
               />
-              <label htmlFor="maritalStatus" className={`floating-label ${error && !selectedmartial ? 'text-danger' : ''}`}>Marital Status{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="maritalStatus"
+                className={`floating-label ${error && !selectedmartial ? "text-danger" : ""}`}
+              >
+                Marital Status
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1321,7 +1586,12 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={20}
               />
-              <label htmlFor="Panno" className={`exp-form-labels ${error && !pan_No ? 'text-danger' : ''}`}>PAN No{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="Panno"
+                className={`exp-form-labels ${error && !pan_No ? "text-danger" : ""}`}
+              >
+                PAN No{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1343,7 +1613,13 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={18}
               />
-              <label htmlFor="Aadharno" className={`exp-form-labels ${error && !Aadhaar_no ? 'text-danger' : ''}`}>Aadhaar No{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="Aadharno"
+                className={`exp-form-labels ${error && !Aadhaar_no ? "text-danger" : ""}`}
+              >
+                Aadhaar No
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1366,7 +1642,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="KidS" className={`floating-label ${error && !selectedkids ? 'text-danger' : ''}`}>Kids{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="KidS"
+                className={`floating-label ${error && !selectedkids ? "text-danger" : ""}`}
+              >
+                Kids{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1389,7 +1670,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="title" className={`floating-label ${error && !title ? 'text-danger' : ''}`}>Title{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="title"
+                className={`floating-label ${error && !title ? "text-danger" : ""}`}
+              >
+                Title{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1405,7 +1691,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="placeOfBirth" className={`exp-form-labels ${error && !placeOfBirth ? 'text-danger' : ''}`}>Place of Birth{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="placeOfBirth"
+                className={`exp-form-labels ${error && !placeOfBirth ? "text-danger" : ""}`}
+              >
+                Place of Birth
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1428,7 +1720,13 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="nationality" className={`floating-label ${error && !nationality ? 'text-danger' : ''}`}>Nationality{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="nationality"
+                className={`floating-label ${error && !nationality ? "text-danger" : ""}`}
+              >
+                Nationality
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1451,7 +1749,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="religion" className={`floating-label ${error && !religion ? 'text-danger' : ''}`}>Religion{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="religion"
+                className={`floating-label ${error && !religion ? "text-danger" : ""}`}
+              >
+                Religion{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1467,7 +1770,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={10}
                 autoComplete="off"
               />
-              <label htmlFor="bloodGroup" className={`exp-form-labels ${error && !bloodGroup ? 'text-danger' : ''}`}>Blood Group{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="bloodGroup"
+                className={`exp-form-labels ${error && !bloodGroup ? "text-danger" : ""}`}
+              >
+                Blood Group
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1483,7 +1792,9 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="spouseName" className="exp-form-labels">Spouse Name</label>
+              <label htmlFor="spouseName" className="exp-form-labels">
+                Spouse Name
+              </label>
             </div>
           </div>
 
@@ -1504,7 +1815,9 @@ function ManualEmployeeInfo({ }) {
                   }
                 }}
               />
-              <label htmlFor="noOfChildren" className="exp-form-labels">No of Children</label>
+              <label htmlFor="noOfChildren" className="exp-form-labels">
+                No of Children
+              </label>
             </div>
           </div>
 
@@ -1525,7 +1838,9 @@ function ManualEmployeeInfo({ }) {
                   }
                 }}
               />
-              <label htmlFor="noOfSiblings" className="exp-form-labels">No of Siblings</label>
+              <label htmlFor="noOfSiblings" className="exp-form-labels">
+                No of Siblings
+              </label>
             </div>
           </div>
 
@@ -1541,7 +1856,9 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="businessEmail" className="exp-form-labels">Email Business</label>
+              <label htmlFor="businessEmail" className="exp-form-labels">
+                Email Business
+              </label>
             </div>
           </div>
 
@@ -1557,7 +1874,13 @@ function ManualEmployeeInfo({ }) {
                 maxLength={100}
                 autoComplete="off"
               />
-              <label htmlFor="emergencyContactName" className={`exp-form-labels ${error && !emergencyContactName ? 'text-danger' : ''}`}>Emergency Contact Name{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="emergencyContactName"
+                className={`exp-form-labels ${error && !emergencyContactName ? "text-danger" : ""}`}
+              >
+                Emergency Contact Name
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1580,7 +1903,13 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="emergencyContactRelation" className={`floating-label ${error && !emergencyContactRelation ? 'text-danger' : ''}`}>Emergency Relation{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="emergencyContactRelation"
+                className={`floating-label ${error && !emergencyContactRelation ? "text-danger" : ""}`}
+              >
+                Emergency Relation
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1601,7 +1930,13 @@ function ManualEmployeeInfo({ }) {
                 }}
                 autoComplete="off"
               />
-              <label htmlFor="emergencyContactPhone" className={`exp-form-labels ${error && !emergencyContactPhone ? 'text-danger' : ''}`}>Emergency Contact Phone{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="emergencyContactPhone"
+                className={`exp-form-labels ${error && !emergencyContactPhone ? "text-danger" : ""}`}
+              >
+                Emergency Contact Phone
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1624,7 +1959,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="city" className={`floating-label ${error && !city ? 'text-danger' : ''}`}>City{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="city"
+                className={`floating-label ${error && !city ? "text-danger" : ""}`}
+              >
+                City{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1647,7 +1987,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="state" className={`floating-label ${error && !state ? 'text-danger' : ''}`}>State{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="state"
+                className={`floating-label ${error && !state ? "text-danger" : ""}`}
+              >
+                State{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1670,7 +2015,12 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="country" className={`floating-label ${error && !country ? 'text-danger' : ''}`}>Country{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="country"
+                className={`floating-label ${error && !country ? "text-danger" : ""}`}
+              >
+                Country{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1691,7 +2041,13 @@ function ManualEmployeeInfo({ }) {
                   }
                 }}
               />
-              <label htmlFor="postalCode" className={`exp-form-labels ${error && !postalCode ? 'text-danger' : ''}`}>Postal Code{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                htmlFor="postalCode"
+                className={`exp-form-labels ${error && !postalCode ? "text-danger" : ""}`}
+              >
+                Postal Code
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -1707,7 +2063,9 @@ function ManualEmployeeInfo({ }) {
                 maxLength={30}
                 autoComplete="off"
               />
-              <label htmlFor="passportNo" className="exp-form-labels">Passport No</label>
+              <label htmlFor="passportNo" className="exp-form-labels">
+                Passport No
+              </label>
             </div>
           </div>
 
@@ -1723,7 +2081,9 @@ function ManualEmployeeInfo({ }) {
                 maxLength={225}
                 autoComplete="off"
               />
-              <label htmlFor="passportExpiryDate" className="exp-form-labels">Passport Expiry Date</label>
+              <label htmlFor="passportExpiryDate" className="exp-form-labels">
+                Passport Expiry Date
+              </label>
             </div>
           </div>
 
@@ -1746,7 +2106,9 @@ function ManualEmployeeInfo({ }) {
                 classNamePrefix="react-select"
                 isClearable
               />
-              <label htmlFor="otherIdType" className="floating-label">Other ID Type</label>
+              <label htmlFor="otherIdType" className="floating-label">
+                Other ID Type
+              </label>
             </div>
           </div>
 
@@ -1762,7 +2124,27 @@ function ManualEmployeeInfo({ }) {
                 maxLength={50}
                 autoComplete="off"
               />
-              <label htmlFor="otherIdNo" className="exp-form-labels">Other ID No</label>
+              <label htmlFor="otherIdNo" className="exp-form-labels">
+                Other ID No
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="passportNo"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={purpose}
+                onChange={(e) => setpurpose(e.target.value)}
+                maxLength={30}
+                autoComplete="off"
+              />
+              <label htmlFor="passportNo" className="exp-form-labels">
+                Purpose
+              </label>
             </div>
           </div>
 
@@ -1804,10 +2186,8 @@ function ManualEmployeeInfo({ }) {
               </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }
