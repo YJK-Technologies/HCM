@@ -1323,6 +1323,8 @@ router.post("/loan_documentsSearch",dataController.loan_documentsSearch)
 router.post("/getApprovalLoanRequest",dataController.getApprovalLoanRequest)
 router.post("/loan_status_history_search",dataController.loan_status_history_search)
 router.post("/getCurrenyCode",dataController.getCurrenyCode)
+router.post("/EmployeeDetailsRequest", upload.single('Photos'),dataController.EmployeeDetailsRequest) 
+
 
 
 

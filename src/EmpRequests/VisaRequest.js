@@ -614,7 +614,7 @@ function VisaRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!visaRequestId ||
+        if (
             !empId ||
             !passportId ||
             !visaType ||
@@ -1014,7 +1014,7 @@ function VisaRequest({ }) {
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1034,7 +1034,7 @@ function VisaRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels ${error && !visaRequestId ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div

@@ -848,7 +848,7 @@ function TravelRequest({ }) {
 
   const handleSave = async () => {
     if (
-      !travel_request_id ||
+      // !travel_request_id ||
       !empId ||
       !dpt ||
       !travel_type ||
@@ -1274,7 +1274,8 @@ function TravelRequest({ }) {
       </div>
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-          <div className="col-md-2">
+
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1300,7 +1301,7 @@ function TravelRequest({ }) {
                 Travel Request ID<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1411,6 +1412,7 @@ function TravelRequest({ }) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="Text"
+                maxLength={10}
                 placeholder=""
                 required
                 title="Please enter the Destination Country ID"
@@ -1433,6 +1435,7 @@ function TravelRequest({ }) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="Text"
+                maxLength={100}
                 placeholder=""
                 required
                 title="Please enter the Destination City"
@@ -1521,6 +1524,7 @@ function TravelRequest({ }) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={50}
                 placeholder=""
                 required
                 title="Please enter the Transport Mode"
@@ -1538,26 +1542,32 @@ function TravelRequest({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please enter the Accommodation Required"
-                autoComplete="off"
-                value={accommodation_required}
-                onChange={(e) => setaccommodation_required(e.target.value)}
-              />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
-              >
-                Accommodation Required<span className="text-danger">*</span>
-              </label>
-            </div>
-          </div>
+  <div className="inputGroup">
+    <input
+      id="fdate"
+      className="exp-input-field form-control"
+      type="text"
+      placeholder=""
+      maxLength={1}
+      inputMode="numeric"
+      pattern="[0-1]"
+      required
+      title="Please enter the Accommodation Required (Only - 0 or 1)"
+      autoComplete="off"
+      value={accommodation_required}
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^01]/g, "");
+        setaccommodation_required(value);
+      }}
+    />
+    <label
+      htmlFor="fdate"
+      className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
+    >
+      Accommodation Required<span className="text-danger">*</span>
+    </label>
+  </div>
+</div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1566,11 +1576,17 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={14}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_cost}
-                onChange={(e) => setestimated_cost(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setestimated_cost(value);
+                }}
               />
               <label
                 for="sname"
@@ -1632,6 +1648,7 @@ function TravelRequest({ }) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={255}
                 placeholder=""
                 required
                 title="Please enter the Remarks"
@@ -1717,13 +1734,19 @@ function TravelRequest({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Travel Request ID"
                 autoComplete="off"
                 value={travel_request_idSC}
-                onChange={(e) => settravel_request_idSC(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    settravel_request_idSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Travel Request ID
@@ -1738,6 +1761,7 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required
                 title="Please enter the Request Number"
                 autoComplete="off"
@@ -1807,6 +1831,7 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={20}
                 required
                 title="Please enter the Travel Type"
                 autoComplete="off"
@@ -1826,6 +1851,7 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="number"
                 placeholder=""
+                maxLength={10}
                 required
                 title="Please enter the Destination Country ID"
                 autoComplete="off"
@@ -1845,6 +1871,7 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
+                maxLength={100}
                 required
                 title="Please enter the Destination City"
                 autoComplete="off"
@@ -1921,6 +1948,7 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required
                 title="Please enter the Transport Mode"
                 autoComplete="off"
@@ -1940,11 +1968,17 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={1}
+                inputMode="numeric"
+                pattern="[0-1]"
                 required
-                title="Please enter the Accommodation Required"
+                title="Please enter the Accommodation Required (Only - 0 or 1)"
                 autoComplete="off"
                 value={accommodation_requiredSc}
-                onChange={(e) => setaccommodation_requiredSc(e.target.value)}
+                onChange={(e) => {
+                const value = e.target.value.replace(/[^01]/g, "");
+                setaccommodation_requiredSc(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Accommodation Required
@@ -1959,11 +1993,17 @@ function TravelRequest({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={14}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_costSC}
-                onChange={(e) => setestimated_costSC(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setestimated_costSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels `}>
                 Estimated Cost
@@ -2019,6 +2059,7 @@ function TravelRequest({ }) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={255}
                 placeholder=""
                 required
                 title="Please enter the Remarks"
