@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function TravelRequest({}) {
+function TravelRequest({ }) {
   const [rowData, setRowData] = useState([]);
   const [Country_Code, setCountry_Code] = useState("");
   const [error, setError] = useState("");
@@ -183,7 +183,7 @@ function TravelRequest({}) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -251,44 +251,37 @@ function TravelRequest({}) {
 
   const filteredOptionEmpId = Array.isArray(empIdDrop)
     ? empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.First_Name}`,
+    }))
     : [];
 
   const filteredOptionPriority = Array.isArray(priorityDrop)
     ? priorityDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
     ? reqStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
-      const filteredOptionManager = Array.isArray(Managerdrop)
+  const filteredOptionManager = Array.isArray(Managerdrop)
     ? Managerdrop.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
-    : [];
-    
-      const filteredOptionManagerAG = Array.isArray(ManagerdropAG)
-    ? ManagerdropAG.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.full_name}`,
+    }))
     : [];
 
-      const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
+  const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
     ? ManagerdropSC.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.full_name}`,
+    }))
     : [];
 
 
@@ -353,7 +346,7 @@ function TravelRequest({}) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -399,25 +392,29 @@ function TravelRequest({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.First_Name}`,
-  }));
+  const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+    ? empIdDropSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
 
-  const filteredOptionVisaTypeSc = visaTypeDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionPrioritySc = Array.isArray(priorityDropSc)
+    ? priorityDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionPrioritySc = priorityDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const filteredOptionReqStatusSC = reqStatusDropSC.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionReqStatusSC = Array.isArray(reqStatusDropSC)
+    ? [
+      { value: "All", label: "All" },
+      ...reqStatusDropSC.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      })),
+    ]
+    : [{ value: "All", label: "All" }];
 
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
@@ -800,7 +797,7 @@ function TravelRequest({}) {
     {
       headerName: "Request Status",
       field: "request_status",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: reqStatusDropAG,
@@ -851,7 +848,7 @@ function TravelRequest({}) {
 
   const handleSave = async () => {
     if (
-      !travel_request_id ||
+      // !travel_request_id ||
       !empId ||
       !dpt ||
       !travel_type ||
@@ -864,8 +861,8 @@ function TravelRequest({}) {
       !accommodation_required ||
       !estimated_cost ||
       !priority ||
-      !ProjectManager ||
-      !reqStatus
+      !ProjectManager
+      // !reqStatus
     ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
@@ -894,7 +891,7 @@ function TravelRequest({}) {
         accommodation_required: accommodation_required,
         estimated_cost: estimated_cost,
         currency_code: Currency_Code,
-        request_status: reqStatus,
+        request_status: 'Pending',
         Remarks: remarks,
         priority_level: priority,
         manager_id: ProjectManager,
@@ -1031,17 +1028,17 @@ function TravelRequest({}) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -1085,15 +1082,15 @@ function TravelRequest({}) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
-                  company_code,
-                }))
+                ...row,
+                company_code,
+              }))
               : [
-                  {
-                    ...rowData,
-                    company_code,
-                  },
-                ],
+                {
+                  ...rowData,
+                  company_code,
+                },
+              ],
           };
 
           const response = await fetch(
@@ -1277,7 +1274,8 @@ function TravelRequest({}) {
       </div>
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-          <div className="col-md-2">
+
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1292,8 +1290,8 @@ function TravelRequest({}) {
                 autoComplete="off"
                 value={travel_request_id}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    settravel_request_id(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  settravel_request_id(value);
                 }}
               />
               <label
@@ -1303,7 +1301,7 @@ function TravelRequest({}) {
                 Travel Request ID<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1333,7 +1331,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpId ? "has-value" : ""} 
                 ${isSelectedEmpId ? "is-focused" : ""}`}
-                title="Please select the Employee ID"
+              title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1414,6 +1412,7 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="Text"
+                maxLength={10}
                 placeholder=""
                 required
                 title="Please enter the Destination Country ID"
@@ -1436,6 +1435,7 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="Text"
+                maxLength={100}
                 placeholder=""
                 required
                 title="Please enter the Destination City"
@@ -1524,6 +1524,7 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={50}
                 placeholder=""
                 required
                 title="Please enter the Transport Mode"
@@ -1541,26 +1542,32 @@ function TravelRequest({}) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please enter the Accommodation Required"
-                autoComplete="off"
-                value={accommodation_required}
-                onChange={(e) => setaccommodation_required(e.target.value)}
-              />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
-              >
-                Accommodation Required<span className="text-danger">*</span>
-              </label>
-            </div>
-          </div>
+  <div className="inputGroup">
+    <input
+      id="fdate"
+      className="exp-input-field form-control"
+      type="text"
+      placeholder=""
+      maxLength={1}
+      inputMode="numeric"
+      pattern="[0-1]"
+      required
+      title="Please enter the Accommodation Required (Only - 0 or 1)"
+      autoComplete="off"
+      value={accommodation_required}
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^01]/g, "");
+        setaccommodation_required(value);
+      }}
+    />
+    <label
+      htmlFor="fdate"
+      className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
+    >
+      Accommodation Required<span className="text-danger">*</span>
+    </label>
+  </div>
+</div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1569,11 +1576,17 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={14}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_cost}
-                onChange={(e) => setestimated_cost(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setestimated_cost(value);
+                }}
               />
               <label
                 for="sname"
@@ -1601,7 +1614,7 @@ function TravelRequest({}) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedReqStatus ? "has-value" : ""} 
@@ -1627,7 +1640,7 @@ function TravelRequest({}) {
                 Request Status<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1635,6 +1648,7 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={255}
                 placeholder=""
                 required
                 title="Please enter the Remarks"
@@ -1656,7 +1670,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                ${selectedPriority ? "has-value" : ""} 
                ${isSelectedPriority ? "is-focused" : ""}`}
-               title="Please select the Priority Level"
+              title="Please select the Priority Level"
             >
               <Select
                 id="country"
@@ -1720,13 +1734,19 @@ function TravelRequest({}) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Travel Request ID"
                 autoComplete="off"
                 value={travel_request_idSC}
-                onChange={(e) => settravel_request_idSC(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    settravel_request_idSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Travel Request ID
@@ -1741,6 +1761,7 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required
                 title="Please enter the Request Number"
                 autoComplete="off"
@@ -1758,7 +1779,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpIdSc ? "has-value" : ""} 
                 ${isSelectedEmpIdSc ? "is-focused" : ""}`}
-                title="Please select the Employee ID"
+              title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1810,6 +1831,7 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={20}
                 required
                 title="Please enter the Travel Type"
                 autoComplete="off"
@@ -1829,6 +1851,7 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="number"
                 placeholder=""
+                maxLength={10}
                 required
                 title="Please enter the Destination Country ID"
                 autoComplete="off"
@@ -1848,6 +1871,7 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
+                maxLength={100}
                 required
                 title="Please enter the Destination City"
                 autoComplete="off"
@@ -1924,6 +1948,7 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={50}
                 required
                 title="Please enter the Transport Mode"
                 autoComplete="off"
@@ -1943,11 +1968,17 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={1}
+                inputMode="numeric"
+                pattern="[0-1]"
                 required
-                title="Please enter the Accommodation Required"
+                title="Please enter the Accommodation Required (Only - 0 or 1)"
                 autoComplete="off"
                 value={accommodation_requiredSc}
-                onChange={(e) => setaccommodation_requiredSc(e.target.value)}
+                onChange={(e) => {
+                const value = e.target.value.replace(/[^01]/g, "");
+                setaccommodation_requiredSc(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Accommodation Required
@@ -1962,11 +1993,17 @@ function TravelRequest({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={14}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please enter the Estimated Cost"
                 autoComplete="off"
                 value={estimated_costSC}
-                onChange={(e) => setestimated_costSC(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setestimated_costSC(value);
+                }}
               />
               <label for="sname" className={`exp-form-labels `}>
                 Estimated Cost
@@ -1996,7 +2033,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedReqStatusSC ? "has-value" : ""} 
                 ${isSelectedReqStatusSC ? "is-focused" : ""}`}
-                title="Please select the Request Status"
+              title="Please select the Request Status"
             >
               <Select
                 id="country"
@@ -2022,6 +2059,7 @@ function TravelRequest({}) {
                 id="fdate"
                 class="exp-input-field form-control"
                 type="text"
+                maxLength={255}
                 placeholder=""
                 required
                 title="Please enter the Remarks"
@@ -2040,7 +2078,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedPrioritySc ? "has-value" : ""} 
                 ${isSelectedPrioritySc ? "is-focused" : ""}`}
-                title="Please select the Priority Level"
+              title="Please select the Priority Level"
             >
               <Select
                 id="country"

@@ -19,7 +19,7 @@ function Input({ }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '' }] }]);
+  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
   const [documentNameDrop, setDocumentNameDrop] = useState([]);
   const [documentUrl, setDocumentUrl] = useState({});
   const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
@@ -482,15 +482,13 @@ function Input({ }) {
       return;
     }
 
-    if (!member.documentName || !member.document || member.keyfield) {
+    if (!member.documentName || !member.keyfield) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
-
     const fileBase64 = member.document ? await convertToBase64(member.document) : null;
-    console.log(fileBase64);
 
     const editedData = {
       EmployeeId: employeeId,

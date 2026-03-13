@@ -274,7 +274,7 @@ function VisaRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -315,11 +315,14 @@ function VisaRequest({ }) {
         : [];
 
     const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
-        ? reqStatusDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
+        ? [
+            { value: "All", label: "All" },
+            ...reqStatusDropSc.map((option) => ({
+                value: option?.attributedetails_name,
+                label: option?.attributedetails_name,
+            })),
+        ]
+        : [{ value: "All", label: "All" }];
 
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
@@ -423,7 +426,7 @@ function VisaRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -503,7 +506,7 @@ function VisaRequest({ }) {
         {
             headerName: "Employee ID",
             field: "employee_id",
-            editable: true,
+            editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
                 values: empIdDropGrid.map(d => d.value),
@@ -560,7 +563,7 @@ function VisaRequest({ }) {
         {
             headerName: "Request Status",
             field: "request_status",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -611,13 +614,13 @@ function VisaRequest({ }) {
     };
 
     const handleSave = async () => {
-        if (!visaRequestId ||
+        if (
             !empId ||
             !passportId ||
             !visaType ||
             !travelStartDate ||
             !travelEndDate ||
-            !reqStatus ||
+            // !reqStatus ||
             !priority ||
             !estimatedCost
         ) {
@@ -643,7 +646,7 @@ function VisaRequest({ }) {
                 purpose: purpose,
                 travel_start_date: travelStartDate,
                 travel_end_date: travelEndDate,
-                request_status: reqStatus,
+                request_status: 'Pending',
                 request_number: reqNumber,
                 priority_level: priority,
                 sponsor_name: sponsorName,
@@ -1011,7 +1014,7 @@ function VisaRequest({ }) {
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1031,7 +1034,7 @@ function VisaRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels ${error && !visaRequestId ? 'text-danger' : ''}`}>Visa Request ID<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div
@@ -1172,7 +1175,7 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedReqStatus ? "has-value" : ""} 
@@ -1192,7 +1195,7 @@ function VisaRequest({ }) {
                             />
                             <label for="sname" className={`floating-label ${error && !reqStatus ? 'text-danger' : ''}`}>Request Status<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div className="inputGroup">
