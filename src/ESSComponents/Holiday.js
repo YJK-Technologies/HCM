@@ -768,7 +768,7 @@ function HoliDays() {
                 onChange={(e) => setCountryCode(e.target.value)}
                 maxLength={255}
               />
-              <label for="cname" className={`exp-form-labels`}>Coutry Code</label>
+              <label for="cname" className={`exp-form-labels`}>Country Code</label>
             </div>
           </div>
 
@@ -779,11 +779,16 @@ function HoliDays() {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 title="Please Enter the Description"
                 value={locationId}
-                onChange={(e) => setLocationId(e.target.value)}
-                maxLength={255}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setLocationId(value);
+                }}
               />
               <label for="cname" className={`exp-form-labels`}>Location ID</label>
             </div>
@@ -940,7 +945,7 @@ function HoliDays() {
                 onChange={(e) => setCountryCodeSc(e.target.value)}
                 maxLength={255}
               />
-              <label for="cname" className={`exp-form-labels`}>Coutry Code</label>
+              <label for="cname" className={`exp-form-labels`}>Country Code</label>
             </div>
           </div>
 
