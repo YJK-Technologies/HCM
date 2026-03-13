@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function TravelRequest({}) {
+function TravelRequest({ }) {
   const [rowData, setRowData] = useState([]);
   const [Country_Code, setCountry_Code] = useState("");
   const [error, setError] = useState("");
@@ -183,7 +183,7 @@ function TravelRequest({}) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -251,44 +251,37 @@ function TravelRequest({}) {
 
   const filteredOptionEmpId = Array.isArray(empIdDrop)
     ? empIdDrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.First_Name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.First_Name}`,
+    }))
     : [];
 
   const filteredOptionPriority = Array.isArray(priorityDrop)
     ? priorityDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
     ? reqStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
-      const filteredOptionManager = Array.isArray(Managerdrop)
+  const filteredOptionManager = Array.isArray(Managerdrop)
     ? Managerdrop.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
-    : [];
-    
-      const filteredOptionManagerAG = Array.isArray(ManagerdropAG)
-    ? ManagerdropAG.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.full_name}`,
+    }))
     : [];
 
-      const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
+  const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
     ? ManagerdropSC.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.full_name}`,
-      }))
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.full_name}`,
+    }))
     : [];
 
 
@@ -353,7 +346,7 @@ function TravelRequest({}) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/status`, {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -399,25 +392,29 @@ function TravelRequest({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  const filteredOptionEmpIdSc = empIdDropSc.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId}-${option.First_Name}`,
-  }));
+  const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+    ? empIdDropSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
 
-  const filteredOptionVisaTypeSc = visaTypeDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionPrioritySc = Array.isArray(priorityDropSc)
+    ? priorityDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionPrioritySc = priorityDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const filteredOptionReqStatusSC = reqStatusDropSC.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionReqStatusSC = Array.isArray(reqStatusDropSC)
+    ? [
+      { value: "All", label: "All" },
+      ...reqStatusDropSC.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      })),
+    ]
+    : [{ value: "All", label: "All" }];
 
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
@@ -800,7 +797,7 @@ function TravelRequest({}) {
     {
       headerName: "Request Status",
       field: "request_status",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: reqStatusDropAG,
@@ -864,8 +861,8 @@ function TravelRequest({}) {
       !accommodation_required ||
       !estimated_cost ||
       !priority ||
-      !ProjectManager ||
-      !reqStatus
+      !ProjectManager
+      // !reqStatus
     ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
@@ -894,7 +891,7 @@ function TravelRequest({}) {
         accommodation_required: accommodation_required,
         estimated_cost: estimated_cost,
         currency_code: Currency_Code,
-        request_status: reqStatus,
+        request_status: 'Pending',
         Remarks: remarks,
         priority_level: priority,
         manager_id: ProjectManager,
@@ -1031,17 +1028,17 @@ function TravelRequest({}) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -1085,15 +1082,15 @@ function TravelRequest({}) {
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
-                  company_code,
-                }))
+                ...row,
+                company_code,
+              }))
               : [
-                  {
-                    ...rowData,
-                    company_code,
-                  },
-                ],
+                {
+                  ...rowData,
+                  company_code,
+                },
+              ],
           };
 
           const response = await fetch(
@@ -1292,8 +1289,8 @@ function TravelRequest({}) {
                 autoComplete="off"
                 value={travel_request_id}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    settravel_request_id(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  settravel_request_id(value);
                 }}
               />
               <label
@@ -1333,7 +1330,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpId ? "has-value" : ""} 
                 ${isSelectedEmpId ? "is-focused" : ""}`}
-                title="Please select the Employee ID"
+              title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1601,7 +1598,7 @@ function TravelRequest({}) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedReqStatus ? "has-value" : ""} 
@@ -1627,7 +1624,7 @@ function TravelRequest({}) {
                 Request Status<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1656,7 +1653,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                ${selectedPriority ? "has-value" : ""} 
                ${isSelectedPriority ? "is-focused" : ""}`}
-               title="Please select the Priority Level"
+              title="Please select the Priority Level"
             >
               <Select
                 id="country"
@@ -1758,7 +1755,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedEmpIdSc ? "has-value" : ""} 
                 ${isSelectedEmpIdSc ? "is-focused" : ""}`}
-                title="Please select the Employee ID"
+              title="Please select the Employee ID"
             >
               <Select
                 id="department"
@@ -1996,7 +1993,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedReqStatusSC ? "has-value" : ""} 
                 ${isSelectedReqStatusSC ? "is-focused" : ""}`}
-                title="Please select the Request Status"
+              title="Please select the Request Status"
             >
               <Select
                 id="country"
@@ -2040,7 +2037,7 @@ function TravelRequest({}) {
               className={`inputGroup selectGroup 
                 ${selectedPrioritySc ? "has-value" : ""} 
                 ${isSelectedPrioritySc ? "is-focused" : ""}`}
-                title="Please select the Priority Level"
+              title="Please select the Priority Level"
             >
               <Select
                 id="country"

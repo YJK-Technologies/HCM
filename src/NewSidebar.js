@@ -8,6 +8,7 @@ import {
   BsGeoAlt,
   BsShieldLock,
   BsPerson,
+  BsPersonBadge,
   BsPersonLinesFill,
   BsCalendarCheck,
   BsBank,
@@ -127,7 +128,7 @@ export const leafIconMap = {
 
   // --- HCM ---
   "Employee Information": BsPersonCheck,
-  "Manual Employee Info": BsPersonCheck,
+  "Employee Personal Details": BsPersonBadge,
   "Department Dashboard": BsBarChartLine,
   "Admin Dashboard": BsSpeedometer2,
   "Employee Dashboard": BsFileBarGraph,
@@ -141,7 +142,7 @@ export const leafIconMap = {
   Loan: BsCashStack,
   Announcement: BsBell,
   "Employee Holiday": BsSun,
-  "Setting": BsGear,
+  "Settings": BsGear,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
@@ -219,23 +220,41 @@ const menuData = [
     icon: HiOutlineUserGroup,
     isDropdown: true,
     subMenus: [
-      { label: "Employee Information", path: "/AddEmployeeInfo" },
-      { label: "Admin Dashboard", path: "/ESSDashboard" },
-      { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-      { label: "Department Dashboard", path: "/DepartmentDashboard" },
-      { label: "Visa Requests", path: "/VisaRequest" },
-      { label: "Travel Request", path: "/TravelRequest" },
-      { label: "Manual Employee Info", path: "/ManualEmployeeInfo" },
-      { label: "Leave Request", path: "/LeaveRequest" },
       {
-        label: "Masters",
+        label: "Dashboard",
+        isDropdown: true,
+        subMenus: [
+          { label: "Admin Dashboard", path: "/ESSDashboard" },
+          { label: "Employee Dashboard", path: "/EmployeeDashboard" },
+          { label: "Department Dashboard", path: "/DepartmentDashboard" },
+        ],
+      },
+      {
+        label: "Employee",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Information", path: "/AddEmployeeInfo" },
+          { label: "Employee Personal Details", path: "/ManualEmployeeInfo" },
+        ],
+      },
+      {
+        label: "Requests",
+        isDropdown: true,
+        subMenus: [
+          { label: "Leave Request", path: "/LeaveRequest" },
+          { label: "Visa Requests", path: "/VisaRequest" },
+          { label: "Travel Request", path: "/TravelRequest" },
+        ],
+      },
+      {
+        label: "Others",
         isDropdown: true,
         subMenus: [
           { label: "Grade", path: "/EmployeeGrade" },
           { label: "Leave", path: "/EmpLeave" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Setting", path: "/WeekOff" },
+          { label: "Settings", path: "/WeekOff" },
         ],
       },
     ],

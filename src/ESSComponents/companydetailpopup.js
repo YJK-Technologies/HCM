@@ -82,6 +82,12 @@ const columnDefs = [
     filter: 'agTextColumnFilter',
     editable: false,
   },
+  {
+    headerName: "Employee Type",
+    field: "Employee_Type",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
 ];
 
 const gridOptions = {
@@ -127,6 +133,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
             manager: item.manager,
             shift: item.shift,
             status: item.status,
+            Employee_Type: item.Employee_Type,
             // First_Name: item.First_Name,
             // Photos: item.Photos ? arrayBufferToBase64(item.Photos.data) : null,
 
@@ -179,7 +186,8 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
       status: row.status,
       First_name: row.first_name,
       Section: row.Section,
-      Work_Location: row.Work_Location
+      Work_Location: row.Work_Location,
+      Employee_Type: row.Employee_Type
     }));
     CompanyDetails(selectedData);
     handleClose();

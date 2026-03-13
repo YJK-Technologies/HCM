@@ -177,7 +177,7 @@ function LoanRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -204,11 +204,14 @@ function LoanRequest({ }) {
         : [];
 
     const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
-        ? reqStatusDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
+        ? [
+            { value: "All", label: "All" },
+            ...reqStatusDropSc.map((option) => ({
+                value: option?.attributedetails_name,
+                label: option?.attributedetails_name,
+            })),
+        ]
+        : [{ value: "All", label: "All" }];
 
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
@@ -265,7 +268,7 @@ function LoanRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -401,7 +404,7 @@ function LoanRequest({ }) {
         {
             headerName: "Request Status",
             field: "request_status",
-            editable: true,
+            editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
                 values: reqStatusDropGrid,
@@ -434,7 +437,7 @@ function LoanRequest({ }) {
             !repayMonth ||
             !monthlyInstallment ||
             !currencyCode ||
-            !reqStatus ||
+            // !reqStatus ||
             !repaymentDate
         ) {
             setError(" ");
@@ -456,7 +459,7 @@ function LoanRequest({ }) {
                 monthly_installment: monthlyInstallment,
                 currency_code: currencyCode,
                 purpose: purpose,
-                request_status: reqStatus,
+                request_status: 'Pending',
                 repayment_date: repaymentDate,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
                 created_by: sessionStorage.getItem('selectedUserCode')
@@ -1028,7 +1031,7 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedReqStatus ? "has-value" : ""} 
@@ -1049,7 +1052,7 @@ function LoanRequest({ }) {
                             />
                             <label for="sname" className={`floating-label ${error && !reqStatus ? 'text-danger' : ''}`}>Request Status<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div className="inputGroup">

@@ -280,7 +280,7 @@ function Input() {
 
   const handleSave = async () => {
 
-    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status) {
+    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
@@ -299,6 +299,7 @@ function Input() {
         status: status,
         Section: section,
         Work_Location: workLocation,
+        Employee_Type: empType,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
@@ -337,7 +338,7 @@ function Input() {
       return;
     }
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to Delete the data?",
       async () => {
@@ -380,13 +381,14 @@ function Input() {
   };
 
   const handleUpdate = async () => {
-    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status) {
+    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
@@ -403,6 +405,7 @@ function Input() {
             status: status,
             Section: section,
             Work_Location: workLocation,
+            Employee_Type: empType,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
             modified_by: sessionStorage.getItem('selectedUserCode')
           };
@@ -486,7 +489,7 @@ function Input() {
       setSaveButtonVisible(false);
       setUpdateButtonVisible(true);
       setShowAsterisk(false);
-      const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location }] = data;
+      const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = data;
       const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
       const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
@@ -516,6 +519,10 @@ function Input() {
       const selectedShift = filteredOptionShift.find(option => option.value === shift);
       setSelectedShift(selectedShift);
       setShift(selectedShift?.value || null);
+
+      const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
+      setSelectedEmpType(selectedEmpType);
+      setEmpType(selectedEmpType?.value || null);
 
       const selectedStatus = filteredOptionStatus.find(option => option.value === status);
       setSelectedStatus(selectedStatus);
@@ -558,7 +565,7 @@ function Input() {
         const searchData = await response.json();
 
         if (searchData && searchData.length > 0) {
-          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location }] = searchData;
+          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = searchData;
           const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
           const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
@@ -588,6 +595,10 @@ function Input() {
           const selectedShift = filteredOptionShift.find(option => option.value === shift);
           setSelectedShift(selectedShift);
           setShift(selectedShift?.value || null);
+
+          const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
+          setSelectedEmpType(selectedEmpType);
+          setEmpType(selectedEmpType?.value || null);
 
           const selectedStatus = filteredOptionStatus.find(option => option.value === status);
           setSelectedStatus(selectedStatus);
@@ -633,11 +644,12 @@ function Input() {
       employeeId &&
       DPTdrop?.length > 0 &&
       statusdrop?.length > 0 &&
-      Managerdrop?.length > 0
+      Managerdrop?.length > 0 &&
+      empTypeDrop?.length > 0 
     ) {
       handleRefNO(employeeId);
     }
-  }, [location.state, DPTdrop, Managerdrop, statusdrop]);
+  }, [location.state, DPTdrop, Managerdrop, statusdrop, empTypeDrop]);
 
   // useEffect(() => {
   //   if (location.state) {
@@ -808,7 +820,7 @@ function Input() {
                 options={filteredOptionDPt}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Department{showAsterisk && <span className="text-danger">*</span>}
+                Department<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -832,7 +844,7 @@ function Input() {
                 onChange={handleChangedesgination}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !selecteddesg ? 'text-danger' : ''}`}>
-                Designation{showAsterisk && <span className="text-danger">*</span>}
+                Designation<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -850,7 +862,7 @@ function Input() {
                 required
               />
               <label htmlFor="DOJ" className={`exp-form-labels ${error && !DOJ ? 'text-danger' : ''}`}>
-                DOJ{showAsterisk && <span className="text-danger">*</span>}
+                DOJ<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -891,7 +903,7 @@ function Input() {
                 required
               />
               <label htmlFor="selectedmanager" className={`floating-label ${error && !manager ? 'text-danger' : ''}`}>
-                Manager{showAsterisk && <span className="text-danger">*</span>}
+                Manager<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -916,7 +928,7 @@ function Input() {
               />
 
               <label htmlFor="selectedshift" className={`floating-label ${error && !Shift ? 'text-danger' : ''}`}>
-                Shift{showAsterisk && <span className="text-danger">*</span>}
+                Shift<span className="text-danger">*</span>
               </label>
             </div>
           </div>
@@ -940,12 +952,12 @@ function Input() {
                 options={filteredOptionStatus}
               />
               <label htmlFor="Status" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
-                Status{showAsterisk && <span className="text-danger">*</span>}
+                Status<span className="text-danger">*</span>
               </label>
             </div>
           </div>
 
-          {/* <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedEmpType ? "has-value" : ""} 
@@ -964,11 +976,11 @@ function Input() {
                 isClearable
               />
           
-            <label htmlFor="selectedshift" className={`floating-label`}>
-              Employee Type
+            <label htmlFor="selectedshift" className={`floating-label ${error && !empType ? 'text-danger' : ''}`}>
+              Employee Type<span className="text-danger">*</span>
             </label>
             </div>
-          </div> */}
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">

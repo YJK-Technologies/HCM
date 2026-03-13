@@ -505,7 +505,7 @@ function WeekOff() {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-2 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">ESS Setting Screen</h1>
+          <h1 className="page-title">Settings</h1>
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => weekOffPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>

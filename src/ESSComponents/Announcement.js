@@ -201,15 +201,15 @@ function Input({ }) {
         maxLength: 250,
       },
     },
-    {
-      headerName: "Request for Do Not Show Again",
-      field: "RequestfordoNotShowAgainOption",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditorParams: {
-        maxLength: 250,
-      },
-    },
+    // {
+    //   headerName: "Request for Do Not Show Again",
+    //   field: "RequestfordoNotShowAgainOption",
+    //   editable: true,
+    //   cellStyle: { textAlign: "left" },
+    //   cellEditorParams: {
+    //     maxLength: 250,
+    //   },
+    // },
     {
       headerName: "Start Date",
       field: "Start_Date",
@@ -264,10 +264,10 @@ function Input({ }) {
           RequestfordoNotShowAgainOption: RequestfordoNotShowAgainOption,
           MessageTitle: MessageTitle,
           status: status,
-          Start_Date: startdate,
-          Start_Time: Start_Time,
-          End_Date: enddate,
-          End_Time: End_Time,
+          Start_Date: Start_Date,
+          Start_Time: Start_time,
+          End_Date: End_Date,
+          End_Time: endtime,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
         })
       });
@@ -742,7 +742,7 @@ function Input({ }) {
       "Message Type": row.Messagetype || "",
       "Message Title": row.MessageTitle || "",
       "Status": row.status || "",
-      "Request for Do Not Show Again": row.RequestfordoNotShowAgainOption || "",
+      // "Request for Do Not Show Again": row.RequestfordoNotShowAgainOption || "",
       "Start Date": row.Start_Date || "",
       "Start Time": row.Start_Time || "",
       "End Date": row.End_Date || "",
