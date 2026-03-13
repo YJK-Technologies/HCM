@@ -52,6 +52,10 @@ function Input({ }) {
   const [isDelete, setIsDelete] = useState('');
   const [sNo, setSNo] = useState('');
 
+  const [currencyDrop, setCurrencyDrop] = useState([]);
+  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -61,6 +65,33 @@ function Input({ }) {
 
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCurrency = Array.isArray(currencyDrop)
+    ? currencyDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCurrency = (selectedCurrency) => {
+    setSelectedCurrency(selectedCurrency);
+    setSalaryCurrency(selectedCurrency ? selectedCurrency.value : "");
+  };
 
   const NavigatecomDet = () => {
     navigate("/CompanyDetails", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
@@ -277,7 +308,7 @@ function Input({ }) {
       return;
     }
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to Delete the data?",
       async () => {
@@ -356,9 +387,13 @@ function Input({ }) {
         setBranchName(branchName);
         setBankCity(Bank_City);
         setBankCountry(Bank_Country);
-        setSalaryCurrency(Salary_Currency);
+        // setSalaryCurrency(Salary_Currency);
         setWPSMemberId(WPS_Member_Id);
         setSNo(S_NO);
+
+        const selectedCurrency = filteredOptionCurrency.find(option => option.value === Salary_Currency);
+        setSelectedCurrency(selectedCurrency);
+        setSalaryCurrency(selectedCurrency?.value || null);
 
         setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
         setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
@@ -402,7 +437,7 @@ function Input({ }) {
       return;
     }
     setError(false);
-    
+
     try {
       setLoading(true)
       const formData = new FormData();
@@ -524,9 +559,13 @@ function Input({ }) {
       setBranchName(branchName);
       setBankCity(Bank_City);
       setBankCountry(Bank_Country);
-      setSalaryCurrency(Salary_Currency);
+      // setSalaryCurrency(Salary_Currency);
       setWPSMemberId(WPS_Member_Id);
       setSNo(S_NO);
+
+      const selectedCurrency = filteredOptionCurrency.find(option => option.value === Salary_Currency);
+        setSelectedCurrency(selectedCurrency);
+        setSalaryCurrency(selectedCurrency?.value || null);
 
       setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
       setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
@@ -595,10 +634,10 @@ function Input({ }) {
       setdesignation_id(designation_id || "");
     }
 
-    if (employeeId) {
+    if (employeeId && currencyDrop.length > 0) {
       handleRefNo(employeeId);
     }
-  }, [location.state]);
+  }, [location.state,currencyDrop]);
 
   const handleRemoveLogo = () => {
     setSelectedImage(null);
@@ -893,7 +932,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="salaryCurrency"
@@ -906,6 +945,29 @@ function Input({ }) {
                 onChange={(e) => setSalaryCurrency(e.target.value)}
               />
               <label for="add1" className={`exp-form-labels`}>Salary Currency</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCurrency ? "has-value" : ""} 
+              ${isSelectedCurrency ? "is-focused" : ""}`}
+              title="Please select the Salary Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCurrency(true)}
+                onBlur={() => setIsSelectedCurrency(false)}
+                isClearable
+                value={selectedCurrency}
+                onChange={handleChangeCurrency}
+                options={filteredOptionCurrency}
+              />
+              <label for="sname" className={`floating-label`}>Salary Currency</label>
             </div>
           </div>
 
@@ -978,7 +1040,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedIsActive ? "has-value" : ""} 
@@ -1000,9 +1062,9 @@ function Input({ }) {
                 Is Active
               </label>
             </div>
-          </div>
+          </div> */}
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedIsDelete ? "has-value" : ""} 
@@ -1024,7 +1086,7 @@ function Input({ }) {
                 Is Delete
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">

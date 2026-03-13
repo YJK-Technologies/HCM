@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
+import Select from "react-select";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -55,6 +56,15 @@ function Input({ }) {
   const [ctccurrency, setCurrency] = useState('');
   const [minimumtakesalary, setMinimumSalary] = useState('');
 
+  const [currencyCTCDrop, setCurrencyCTCDrop] = useState([]);
+  const [currencyCTCDropGrid, setCurrencyCTCDropGrid] = useState([]);
+  const [selectedCTCCurrency, setSelectedCTCCurrency] = useState('');
+  const [isSelectedCTCCurrency, setIsSelectedCTCCurrency] = useState(false);
+
+  const [currencyCTCDropSc, setCurrencyCTCDropSc] = useState([]);
+  const [selectedCTCCurrencySc, setSelectedCTCCurrencySc] = useState('');
+  const [isSelectedCTCCurrencySc, setIsSelectedCTCCurrencySc] = useState(false);
+
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -75,7 +85,80 @@ function Input({ }) {
     setotherDeductions("");
     setCtcCurrency("");
     setMinimumTakeSalary("");
+    setSelectedCTCCurrency("");
+    setSelectedCTCCurrencySc("");
   };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyCTCDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCTCCurrency = Array.isArray(currencyCTCDrop)
+    ? currencyCTCDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCTCCurrency = (selectedCTCCurrency) => {
+    setSelectedCTCCurrency(selectedCTCCurrency);
+    setCurrency(selectedCTCCurrency ? selectedCTCCurrency.value : "");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyCTCDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCTCCurrencySc = Array.isArray(currencyCTCDropSc)
+    ? currencyCTCDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCTCCurrencySc = (selectedCTCCurrencySc) => {
+    setSelectedCTCCurrencySc(selectedCTCCurrencySc);
+    setCtcCurrency(selectedCTCCurrencySc ? selectedCTCCurrencySc.value : "");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        setCurrencyCTCDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/EmployeeGrade", { state: { mode: "update", selectedRow } });
@@ -227,7 +310,10 @@ function Input({ }) {
     {
       headerName: "CTC Currency",
       field: "ctc_currency",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: currencyCTCDropGrid,
+      },
       editable: true
     },
     {
@@ -668,7 +754,7 @@ function Input({ }) {
                 // onKeyPress={handleKeyPress}
                 maxLength={50}
               />
-              <label for="cname" className={` exp-form-labels ${error && !Gradeid ? 'text-danger' : ''}`}>Grade ID{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label for="cname" className={` exp-form-labels ${error && !Gradeid ? 'text-danger' : ''}`}>Grade ID<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -684,7 +770,7 @@ function Input({ }) {
                 onChange={(e) => setGradename(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Gradename ? 'text-danger' : ''}`}>  Grade Name {showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !Gradename ? 'text-danger' : ''}`}>  Grade Name<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -699,7 +785,7 @@ function Input({ }) {
                 value={salaryrrangefrom}
                 onChange={(e) => setsalaryrrangefrom(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !salaryrrangefrom ? 'text-danger' : ''}`}>Salary Range From{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !salaryrrangefrom ? 'text-danger' : ''}`}>Salary Range From<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -714,7 +800,7 @@ function Input({ }) {
                 value={salaryrangeto}
                 onChange={(e) => setsalaryrangeto(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !salaryrangeto ? 'text-danger' : ''}`}>Salary Range To{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !salaryrangeto ? 'text-danger' : ''}`}>Salary Range To<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -729,7 +815,7 @@ function Input({ }) {
                 value={basic}
                 onChange={(e) => setbasic(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !basic ? 'text-danger' : ''}`}>Basic{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !basic ? 'text-danger' : ''}`}>Basic<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -745,7 +831,7 @@ function Input({ }) {
                 onChange={(e) => setHra(e.target.value)}
                 maxLength={250}
               />
-              <label className={`exp-form-labels ${error && !Hra ? 'text-danger' : ''}`}>HRA{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !Hra ? 'text-danger' : ''}`}>HRA<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -791,7 +877,7 @@ function Input({ }) {
                 value={SpecialAllowance}
                 onChange={(e) => setSpecialAllowance(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !SpecialAllowance ? 'text-danger' : ''}`}>Special Allowance{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !SpecialAllowance ? 'text-danger' : ''}`}>Special Allowance<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -806,7 +892,7 @@ function Input({ }) {
                 value={CompanyPfContribution}
                 onChange={(e) => setCompanyPfContribution(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !CompanyPfContribution ? 'text-danger' : ''}`}>  Company PF Contribution{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !CompanyPfContribution ? 'text-danger' : ''}`}>  Company PF Contribution<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -871,7 +957,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -883,7 +969,30 @@ function Input({ }) {
                 onChange={(e) => setCurrency(e.target.value)}
                 maxLength={10}
               />
-              <label className={` exp-form-labels ${error && !ctccurrency ? 'text-danger' : ''}`}> CTC Currency{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !ctccurrency ? 'text-danger' : ''}`}> CTC Currency<span className="text-danger">*</span></label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCTCCurrency ? "has-value" : ""} 
+              ${isSelectedCTCCurrency ? "is-focused" : ""}`}
+              title="Please select the CTC Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCTCCurrency(true)}
+                onBlur={() => setIsSelectedCTCCurrency(false)}
+                isClearable
+                value={selectedCTCCurrency}
+                onChange={handleChangeCTCCurrency}
+                options={filteredOptionCTCCurrency}
+              />
+              <label for="sname" className={`floating-label ${error && !ctccurrency ? 'text-danger' : ''}`}>CTC Currency<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1138,7 +1247,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="ctc_currency"
@@ -1151,6 +1260,29 @@ function Input({ }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">  CTC Currency</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCTCCurrencySc ? "has-value" : ""} 
+              ${isSelectedCTCCurrencySc ? "is-focused" : ""}`}
+              title="Please select the CTC Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCTCCurrencySc(true)}
+                onBlur={() => setIsSelectedCTCCurrencySc(false)}
+                isClearable
+                value={selectedCTCCurrencySc}
+                onChange={handleChangeCTCCurrencySc}
+                options={filteredOptionCTCCurrencySc}
+              />
+              <label for="sname" className={`floating-label`}>CTC Currency</label>
             </div>
           </div>
 

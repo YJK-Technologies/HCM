@@ -136,7 +136,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
 
       <header className="main-header-box header-flex" style={{ padding: "15px", marginBottom: "20px" }}>
-        <h1 className="page-title">Employee Dashboard</h1>
+        <h1 className="page-title">Department Dashboard</h1>
       </header>
 
       {/* SUMMARY CARDS */}
