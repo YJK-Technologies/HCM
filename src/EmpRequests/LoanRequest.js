@@ -66,6 +66,15 @@ function LoanRequest({ }) {
     const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
     const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
 
+    const [currencyDrop, setCurrencyDrop] = useState([]);
+    const [selectedCurrency, setSelectedCurrency] = useState('');
+    const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+
+    const [currencyDropSc, setCurrencyDropSc] = useState([]);
+    const [selectedCurrencySc, setSelectedCurrencySc] = useState('');
+    const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
+
+    const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -110,6 +119,21 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setCurrencyDrop(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
     const filteredOptionEmpId = Array.isArray(empIdDrop)
         ? empIdDrop.map((option) => ({
             value: option?.EmployeeId,
@@ -119,6 +143,13 @@ function LoanRequest({ }) {
 
     const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
         ? loanTypeIdDrop.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
+
+    const filteredOptionCurrency = Array.isArray(currencyDrop)
+        ? currencyDrop.map((option) => ({
             value: option?.attributedetails_name,
             label: option?.attributedetails_name,
         }))
@@ -144,6 +175,11 @@ function LoanRequest({ }) {
     const handleChangeReqStatus = (selectedReqStatus) => {
         setSelectedReqStatus(selectedReqStatus);
         setReqStatus(selectedReqStatus ? selectedReqStatus.value : "");
+    };
+
+    const handleChangeCurrency = (selectedCurrency) => {
+        setSelectedCurrency(selectedCurrency);
+        setCurrencyCode(selectedCurrency ? selectedCurrency.value : "");
     };
 
     useEffect(() => {
@@ -189,6 +225,21 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setCurrencyDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
     const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
         ? empIdDropSc.map((option) => ({
             value: option?.EmployeeId,
@@ -213,6 +264,13 @@ function LoanRequest({ }) {
         ]
         : [{ value: "All", label: "All" }];
 
+    const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
+        ? currencyDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
+
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
         setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -226,6 +284,11 @@ function LoanRequest({ }) {
     const handleChangeReqStatusSc = (selectedReqStatusSc) => {
         setSelectedReqStatusSc(selectedReqStatusSc);
         setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
+    };
+
+    const handleChangeCurrencySc = (selectedCurrencySc) => {
+        setSelectedCurrencySc(selectedCurrencySc);
+        setCurrencyCodeSc(selectedCurrencySc ? selectedCurrencySc.value : "");
     };
 
     useEffect(() => {
@@ -283,6 +346,23 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const currency = val.map(option => option.attributedetails_name);
+                setCurrencyDropGrid(currency);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
     const searchClearInputFields = () => {
         setLoanReqIdSc("");
         setReqNumberSc("");
@@ -299,6 +379,8 @@ function LoanRequest({ }) {
         setReqStatusSc("");
         setSelectedReqStatusSc("");
         setRepaymentDateSc("");
+        setSelectedCurrencySc("");
+        setSelectedCurrency("");
     };
 
     const columnDefs = [
@@ -394,7 +476,11 @@ function LoanRequest({ }) {
         {
             headerName: "Currency Code",
             field: "currency_code",
-            editable: true
+            editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: currencyDropGrid,
+            },
         },
         {
             headerName: "Purpose",
@@ -995,7 +1081,7 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1012,6 +1098,29 @@ function LoanRequest({ }) {
                                 }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !currencyCode ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
+                        </div>
+                    </div> */}
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedCurrency ? "has-value" : ""} 
+                            ${isSelectedCurrency ? "is-focused" : ""}`}
+                            title="Please select the Currency Code"
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedCurrency(true)}
+                                onBlur={() => setIsSelectedCurrency(false)}
+                                isClearable
+                                value={selectedCurrency}
+                                onChange={handleChangeCurrency}
+                                options={filteredOptionCurrency}
+                            />
+                            <label for="sname" className={`floating-label ${error && !currencyCode ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -1280,7 +1389,7 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1297,6 +1406,29 @@ function LoanRequest({ }) {
                                 }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Currency Code</label>
+                        </div>
+                    </div> */}
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedCurrencySc ? "has-value" : ""} 
+                            ${isSelectedCurrencySc ? "is-focused" : ""}`}
+                            title="Please select the Currency Code"
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedCurrencySc(true)}
+                                onBlur={() => setIsSelectedCurrencySc(false)}
+                                isClearable
+                                value={selectedCurrencySc}
+                                onChange={handleChangeCurrencySc}
+                                options={filteredOptionCurrencySc}
+                            />
+                            <label for="sname" className={`floating-label`}>Currency Code</label>
                         </div>
                     </div>
 

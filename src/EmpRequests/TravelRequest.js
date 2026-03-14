@@ -101,6 +101,16 @@ function TravelRequest({ }) {
   const [isSelectedReqStatusSC, setIsSelectedReqStatusSC] = useState(false);
   const [isSelectedPrioritySc, setIsSelectedPrioritySc] = useState(false);
 
+  const [currencyDrop, setCurrencyDrop] = useState([]);
+  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+
+  const [currencyDropSc, setCurrencyDropSc] = useState([]);
+  const [selectedCurrencySc, setSelectedCurrencySc] = useState('');
+  const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
+
+  const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -150,7 +160,6 @@ function TravelRequest({ }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // user_code: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       }),
     })
@@ -223,6 +232,7 @@ function TravelRequest({ }) {
       return [];
     }
   };
+  
   const fetchProductCodesSC = async (selectedValue) => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -248,6 +258,21 @@ function TravelRequest({ }) {
       return [];
     }
   };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const filteredOptionEmpId = Array.isArray(empIdDrop)
     ? empIdDrop.map((option) => ({
@@ -284,6 +309,12 @@ function TravelRequest({ }) {
     }))
     : [];
 
+  const filteredOptionCurrency = Array.isArray(currencyDrop)
+    ? currencyDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeEmpId = (selectedEmpId) => {
     setSelectedEmpId(selectedEmpId);
@@ -308,12 +339,15 @@ function TravelRequest({ }) {
   const handleChangemanager = (selectedOption) => {
     setselectedmanager(selectedOption);
     setProjectManager(selectedOption ? selectedOption.value : "");
-    setError(false);
   };
   const handleChangemanagerSC = (selectedOption) => {
     setselectedmanagerSC(selectedOption);
     setProjectManagerSC(selectedOption ? selectedOption.value : "");
-    setError(false);
+  };
+
+  const handleChangeCurrency = (selectedCurrency) => {
+    setSelectedCurrency(selectedCurrency);
+    setCurrency_Code(selectedCurrency ? selectedCurrency.value : "");
   };
 
   useEffect(() => {
@@ -392,6 +426,21 @@ function TravelRequest({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
     ? empIdDropSc.map((option) => ({
       value: option?.EmployeeId,
@@ -416,6 +465,13 @@ function TravelRequest({ }) {
     ]
     : [{ value: "All", label: "All" }];
 
+  const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
+    ? currencyDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
     setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -424,6 +480,11 @@ function TravelRequest({ }) {
   const handleChangePrioritySc = (selectedPrioritySc) => {
     setSelectedPrioritySc(selectedPrioritySc);
     setPrioritySc(selectedPrioritySc ? selectedPrioritySc.value : "");
+  };
+
+  const handleChangeCurrencySc = (selectedCurrencySc) => {
+    setSelectedCurrencySc(selectedCurrencySc);
+    setCurrency_CodeSC(selectedCurrencySc ? selectedCurrencySc.value : "");
   };
 
   const searchClearInputFields = () => {
@@ -450,6 +511,8 @@ function TravelRequest({ }) {
     setRemarks("");
     setSelectedPrioritySc("");
     setPrioritySc("");
+    setSelectedCurrencySc("");
+    setSelectedCurrency("");
   };
 
   const handleDPT = (selectedDPT) => {
@@ -665,6 +728,23 @@ function TravelRequest({ }) {
       );
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        setCurrencyDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -693,18 +773,17 @@ function TravelRequest({ }) {
         );
       },
     },
-
     {
       headerName: "Travel Request ID",
       field: "travel_request_id",
       editable: true,
     },
 
-    {
-      headerName: "Request Number",
-      field: "request_number",
-      editable: true,
-    },
+    // {
+    //   headerName: "Request Number",
+    //   field: "request_number",
+    //   editable: true,
+    // },
 
     {
       headerName: "Employee ID",
@@ -792,6 +871,10 @@ function TravelRequest({ }) {
       headerName: "Currency Code",
       field: "currency_code",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: currencyDropGrid,
+      },
     },
 
     {
@@ -841,6 +924,7 @@ function TravelRequest({ }) {
       hide: true,
     },
   ];
+
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
@@ -1303,7 +1387,7 @@ function TravelRequest({ }) {
             </div>
           </div> */}
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1324,7 +1408,7 @@ function TravelRequest({ }) {
                 Request Number<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
@@ -1542,32 +1626,32 @@ function TravelRequest({ }) {
           </div>
 
           <div className="col-md-2">
-  <div className="inputGroup">
-    <input
-      id="fdate"
-      className="exp-input-field form-control"
-      type="text"
-      placeholder=""
-      maxLength={1}
-      inputMode="numeric"
-      pattern="[0-1]"
-      required
-      title="Please enter the Accommodation Required (Only - 0 or 1)"
-      autoComplete="off"
-      value={accommodation_required}
-      onChange={(e) => {
-        const value = e.target.value.replace(/[^01]/g, "");
-        setaccommodation_required(value);
-      }}
-    />
-    <label
-      htmlFor="fdate"
-      className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
-    >
-      Accommodation Required<span className="text-danger">*</span>
-    </label>
-  </div>
-</div>
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                maxLength={1}
+                inputMode="numeric"
+                pattern="[0-1]"
+                required
+                title="Please enter the Accommodation Required (Only - 0 or 1)"
+                autoComplete="off"
+                value={accommodation_required}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^01]/g, "");
+                  setaccommodation_required(value);
+                }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !accommodation_required ? "text-danger" : ""}`}
+              >
+                Accommodation Required<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1584,8 +1668,8 @@ function TravelRequest({ }) {
                 autoComplete="off"
                 value={estimated_cost}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setestimated_cost(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  setestimated_cost(value);
                 }}
               />
               <label
@@ -1597,7 +1681,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -1611,6 +1695,29 @@ function TravelRequest({ }) {
                 onChange={(e) => setCurrency_Code(e.target.value)}
               />
               <label className="exp-form-labels">Currency Code</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCurrency ? "has-value" : ""} 
+              ${isSelectedCurrency ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCurrency(true)}
+                onBlur={() => setIsSelectedCurrency(false)}
+                isClearable
+                value={selectedCurrency}
+                onChange={handleChangeCurrency}
+                options={filteredOptionCurrency}
+              />
+              <label for="sname" className={`floating-label ${error && !Currency_Code ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1744,8 +1851,8 @@ function TravelRequest({ }) {
                 autoComplete="off"
                 value={travel_request_idSC}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    settravel_request_idSC(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  settravel_request_idSC(value);
                 }}
               />
               <label for="sname" className={`exp-form-labels`}>
@@ -1754,7 +1861,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1772,7 +1879,7 @@ function TravelRequest({ }) {
                 Request Number
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
@@ -1976,8 +2083,8 @@ function TravelRequest({ }) {
                 autoComplete="off"
                 value={accommodation_requiredSc}
                 onChange={(e) => {
-                const value = e.target.value.replace(/[^01]/g, "");
-                setaccommodation_requiredSc(value);
+                  const value = e.target.value.replace(/[^01]/g, "");
+                  setaccommodation_requiredSc(value);
                 }}
               />
               <label for="sname" className={`exp-form-labels`}>
@@ -2001,8 +2108,8 @@ function TravelRequest({ }) {
                 autoComplete="off"
                 value={estimated_costSC}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setestimated_costSC(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  setestimated_costSC(value);
                 }}
               />
               <label for="sname" className={`exp-form-labels `}>
@@ -2011,7 +2118,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -2025,6 +2132,29 @@ function TravelRequest({ }) {
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels">Currency Code</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCurrencySc ? "has-value" : ""} 
+              ${isSelectedCurrencySc ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCurrencySc(true)}
+                onBlur={() => setIsSelectedCurrencySc(false)}
+                isClearable
+                value={selectedCurrencySc}
+                onChange={handleChangeCurrencySc}
+                options={filteredOptionCurrencySc}
+              />
+              <label for="sname" className={`floating-label`}>Currency Code</label>
             </div>
           </div>
 
