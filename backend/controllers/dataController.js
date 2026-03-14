@@ -21285,7 +21285,7 @@ const addEmployeeCompany = async (req, res) => {
       .input("Work_Location", sql.VarChar, Work_Location)
       .input("Employee_Type", sql.VarChar, Employee_Type)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_employee_company_Test @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,@created_by,'','','','','','','','',''`,
+      .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,@created_by,'','','','','','','','',''`,
       );
     res.status(200).json("Employee company data inserted successfully");
   } catch (err) {
@@ -21301,7 +21301,7 @@ const allEmployeeCompanyData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_employee_company_Test 'A','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+    .query(`EXEC sp_employee_company 'A','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
 
     res.json(result.recordset);
   } catch (err) {
@@ -21319,7 +21319,7 @@ const deleteEmployeeCompany = async (req, res) => {
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_employee_company_Test 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+      .query(`EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
 
     res.status(200).json("Employee data deleted successfully.");
   } catch (err) {
@@ -21352,7 +21352,7 @@ const updateEmployeeCompany = async (req, res) => {
         .input("Work_Location", sql.VarChar, Work_Location)
         .input("Employee_Type", sql.VarChar, Employee_Type)
         .input("modified_by", sql.VarChar, modified_by)
-        .query(`EXEC sp_employee_company_Test @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,'',@modified_by,'','','','','','','',''`,);
+        .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,'',@modified_by,'','','','','','','',''`,);
     res.status(200).json("Employee company data updated successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -22692,7 +22692,7 @@ const getemployeemanager = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_employee_company_Test 'f','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    .query(`EXEC sp_employee_company 'f','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -25332,7 +25332,7 @@ const EmployeeCompanyISC = async (req, res) => {
       .input("manager", sql.NVarChar, manager)
       .input("Name", sql.NVarChar, Name)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company_Test @mode,@EmployeeId,@department_Id,@designation_Id,'','',@manager,'','','',@Name,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_Id,@designation_Id,'','',@manager,'','','',@Name,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -25904,7 +25904,7 @@ const getESSmanager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "CEO")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company_Test @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
     if (
       result.recordset &&
       Array.isArray(result.recordset) &&
@@ -30030,7 +30030,7 @@ const Getmanager = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_employee_company_Test 'M','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    .query(`EXEC sp_employee_company 'M','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -31181,7 +31181,7 @@ const ESSManager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "M")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company_Test @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -44962,6 +44962,160 @@ const EmployeeDetailsRequest = async (req, res) => {
 };
 //code ended by sakthi on 13-03-26
 
+//Code added by pavun on 14-03-26
+const LoanRequestDashboard = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "LR")
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const visaRequestDashboard = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "VR")
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_visa_requests @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during visa_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const travelRequestsDashboard = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+
+      .input("mode", sql.NVarChar, "TR")
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_travel_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error fetching travel requests Search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DashboardEmployeeInfoChange = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_employee_personal_Changes_Request_Test 'sc','','','','','','','','','','','','','','','','','','','',NULL,'','','',@company_code,'','', '','','',NULL,0, 0,'','','','','','','','','','','','','','',NULL,'0','','',0,''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error fetching Employee Change Requests:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const ApprovalLoan = async (req, res) => {
+  const { loan_request_id, request_status, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "AL")
+      .input("loan_request_id", sql.Int, loan_request_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_requests @mode, @loan_request_id, '', '', '', 0, 0, 0, 0, '', '', @request_status, 0, @company_code, '', '', '', '', ''`);
+
+    res.status(200).json("loan approval successfully");
+  } catch (err) {
+    console.error("Error during loan_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const ApprovalVisa = async (req, res) => {
+  const { visa_request_id, request_status, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AV")
+      .input("visa_request_id", sql.Int, visa_request_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', ''`);
+
+     res.status(200).json("visa approval successfully");
+  } catch (err) {
+    console.error("Error during visa_requests insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const ApprovalTravel= async (req, res) => {
+  const { travel_request_id, request_status, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+
+      .input("mode", sql.NVarChar, "AT")
+      .input("travel_request_id", sql.Int, travel_request_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', '', '', '', ''`);
+
+     res.status(200).json("travel approval successfully");
+  } catch (err) {
+    console.error("Error fetching travel requests Search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 14-06-26
+
 
 module.exports = {
   login,
@@ -46257,7 +46411,14 @@ module.exports = {
     getApprovalLoanRequest,
     loan_status_history_search,
     getCurrenyCode,
-    EmployeeDetailsRequest
+    EmployeeDetailsRequest,
+    LoanRequestDashboard,
+    visaRequestDashboard,
+    travelRequestsDashboard,
+    DashboardEmployeeInfoChange,
+    ApprovalLoan,
+    ApprovalVisa,
+    ApprovalTravel
 
 
 };
