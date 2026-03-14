@@ -1324,6 +1324,14 @@ router.post("/getApprovalLoanRequest",dataController.getApprovalLoanRequest)
 router.post("/loan_status_history_search",dataController.loan_status_history_search)
 router.post("/getCurrenyCode",dataController.getCurrenyCode)
 router.post("/EmployeeDetailsRequest", upload.single('Photos'),dataController.EmployeeDetailsRequest) 
+router.post("/AcademicDetailsRequest",dataController.AcademicDetailsRequest)
+router.post("/LoanRequestDashboard",dataController.LoanRequestDashboard) 
+router.post("/visaRequestDashboard",dataController.visaRequestDashboard) 
+router.post("/travelRequestsDashboard",dataController.travelRequestsDashboard) 
+router.post("/DashboardEmployeeInfoChange",dataController.DashboardEmployeeInfoChange) 
+router.post("/ApprovalLoan",dataController.ApprovalLoan) 
+router.post("/ApprovalVisa",dataController.ApprovalVisa) 
+router.post("/ApprovalTravel",dataController.ApprovalTravel) 
 
 
 
