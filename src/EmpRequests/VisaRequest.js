@@ -570,11 +570,11 @@ function VisaRequest({ }) {
                 values: reqStatusDropGrid,
             },
         },
-        {
-            headerName: "Request Number",
-            field: "request_number",
-            editable: true
-        },
+        // {
+        //     headerName: "Request Number",
+        //     field: "request_number",
+        //     editable: true
+        // },
         {
             headerName: "Priority Level",
             field: "priority_level",
@@ -1131,23 +1131,6 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={purpose}
-                                maxLength={100}
-                                onChange={(e) => setPurpose((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
@@ -1175,6 +1158,23 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={purpose}
+                                maxLength={100}
+                                onChange={(e) => setPurpose((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
+                        </div>
+                    </div>
+
                     {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
@@ -1197,7 +1197,7 @@ function VisaRequest({ }) {
                         </div>
                     </div> */}
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1217,7 +1217,7 @@ function VisaRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div
@@ -1489,7 +1489,7 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1509,7 +1509,7 @@ function VisaRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div
