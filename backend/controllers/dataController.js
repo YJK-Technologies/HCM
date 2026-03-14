@@ -44963,6 +44963,66 @@ const EmployeeDetailsRequest = async (req, res) => {
 //code ended by sakthi on 13-03-26
 
 
+//code added by Dinesh Gokul on 14-03-26
+const AcademicDetailsRequest = async (req, res) => {
+
+  const employeeData = req.body.employeeData;
+
+  if (!employeeData || !employeeData.length) {
+    return res.status(400).json("Invalid or empty employee data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of employeeData) {
+
+      let document = insertRow.document || null;
+
+      if (document) {
+        const buffer = Buffer.from(document, "base64");
+        document = buffer;
+      }
+
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("academicName", sql.NVarChar, insertRow.academicName)
+        .input("major", sql.NVarChar, insertRow.major)
+        .input("institution", sql.NVarChar, insertRow.institution)
+        .input("academicYear", sql.Date, insertRow.academicYear)
+        .input("document", sql.VarBinary, document)
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .input("approver_id", sql.NVarChar, insertRow.approver_id)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("Info_request_id", sql.Int, 0)
+        .input("keyfield", sql.NVarChar, "")
+        .query(`
+          EXEC sp_ess_employee_academic_details_request
+          @mode, @EmployeeId, @academicName, @major, @institution,
+          @academicYear, @document, @company_code, @created_by, '',
+          @approver_id, @request_status, @purpose, @Info_request_id, @keyfield
+        `);
+
+    }
+
+    res.status(200).json("Academic request inserted successfully");
+
+  } catch (error) {
+
+    console.log(error.message);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error"
+    });
+
+  }
+
+};
+//code ended by Dinesh Gokul on 14-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -46257,7 +46317,8 @@ module.exports = {
     getApprovalLoanRequest,
     loan_status_history_search,
     getCurrenyCode,
-    EmployeeDetailsRequest
+    EmployeeDetailsRequest,
+    AcademicDetailsRequest
 
 
 };

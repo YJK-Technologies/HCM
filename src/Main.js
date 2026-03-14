@@ -118,6 +118,7 @@ import LoanPayment from "./EmpRequests/LoanPayment.js"
 import LoanSchedule from "./EmpRequests/LoanSchedule.js"
 import LoanType from "./EmpRequests/LoanType.js"
 import ManualEmployeeInfo from "./ESSComponents/ManualEmployeeInfo.js"
+import AcademicDetReq from "./ESSComponents/AcademicDetailsRequest.js"
 import LeaveRequest from "./EmpRequests/LeaveRequest.js"
 
 import { ToastContainer } from "react-toastify";
@@ -314,6 +315,7 @@ function Main() {
     { path: "/LoanType", component: <LoanType /> },
     { path: "/ManualEmployeeInfo", component: <ManualEmployeeInfo /> },
     { path: "/LeaveRequest", component: <LeaveRequest /> },
+    { path: "/AcademicDetReq", component: <AcademicDetReq /> },
 
   
   ];
