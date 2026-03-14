@@ -266,44 +266,12 @@ function ManualEmployeeInfo({}) {
   }
 
   const AcademicDet = () => {
-    navigate("/AcademicDet", {
-      state: {
-        employeeId: EmployeeId,
-        firstName: First_Name,
-        department_id: department_id,
-        designation_id: designation_id,
-      },
-    });
+    navigate("/AcademicDetReq");
   };
-  const Insurance1 = () => {
-    navigate("/Family", {
-      state: {
-        employeeId: EmployeeId,
-        firstName: First_Name,
-        department_id: department_id,
-        designation_id: designation_id,
-      },
-    });
-  };
-  const Documents = () => {
-    navigate("/Documents", {
-      state: {
-        employeeId: EmployeeId,
-        firstName: First_Name,
-        department_id: department_id,
-        designation_id: designation_id,
-      },
-    });
-  };
+
+
   const EmployeeLoan = () => {
-    navigate("/ManualEmployeeInfo", {
-      state: {
-        employeeId: EmployeeId,
-        firstName: First_Name,
-        department_id: department_id,
-        designation_id: designation_id,
-      },
-    });
+    navigate("/ManualEmployeeInfo");
   };
 
   const handleTabClick = (tabLabel) => {
@@ -313,15 +281,9 @@ function ManualEmployeeInfo({}) {
       case "Personal Details":
         EmployeeLoan();
         break;
-      //   case 'Academic Details':
-      //     AcademicDet();
-      //     break;
-      //   case 'Family':
-      //     Insurance1();
-      //     break;
-      //   case 'Documents':
-      //     Documents();
-      //     break;
+        case 'Academic Details':
+          AcademicDet();
+          break;
       default:
         break;
     }
@@ -329,9 +291,7 @@ function ManualEmployeeInfo({}) {
 
   const tabs = [
     { label: "Personal Details" },
-    // { label: 'Academic Details' },
-    // { label: 'Family' },
-    // { label: 'Documents' }
+    { label: 'Academic Details' },
   ];
 
   const handleGradeID = (selectedgradeid) => {
@@ -655,12 +615,6 @@ function ManualEmployeeInfo({}) {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleRefNo(EmployeeId);
-    }
-  };
-
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -873,214 +827,6 @@ function ManualEmployeeInfo({}) {
     window.location.reload();
   };
 
-  const [open, setOpen] = React.useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleEmployeeInfo = () => {
-    setOpen(true);
-  };
-
-  const base64ToBlob = (base64, contentType = "image/jpeg") => {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: contentType });
-  };
-
-  const EmployeeInfo = (data) => {
-    if (!data || data.length === 0) return;
-
-    setSaveButtonVisible(false);
-    setUpdateButtonVisible(true);
-
-    const [
-      {
-        EmployeeId,
-        First_Name,
-        Middle_Name,
-        Last_Name,
-        Father_Name,
-        Mother_Name,
-        DOB,
-        Email,
-        Aadhar_no,
-        Reference_Phone,
-        phone1,
-        phone2,
-        Address1,
-        Address2,
-        Address3,
-        PermanantAddress,
-        designation_id,
-        department_id,
-        Reference_Name,
-        Pan_No,
-        Photos,
-        Grade_id,
-        Gender,
-        Marital_Status,
-        Kids,
-        Title,
-        Place_of_Birth,
-        Nationality,
-        Religion,
-        Blood_Group,
-        Spouse_Name,
-        Number_of_Siblings,
-        Number_of_Children,
-        Email_Business,
-        Emergency_Contact_Name,
-        Emergency_Contact_Phone,
-        Emergency_Contact_Relationship,
-        City,
-        State,
-        Country,
-        Postal_Code,
-        Passport_No,
-        Passport_Expiry_Date,
-        Other_Id_Type,
-        Other_Id_No,
-      },
-    ] = data;
-
-    // 🔹 BASIC FIELDS
-    setEmployeeId(EmployeeId);
-    setFirst_Name(First_Name);
-    setfirst_Name(First_Name);
-    setMiddle_Name(Middle_Name);
-    setLast_Name(Last_Name);
-    setFather_Name(Father_Name);
-    setMother_Name(Mother_Name);
-    setDOB(formatDate(DOB));
-    setEmail(Email);
-    setPhone1(phone1);
-    setPhone2(phone2);
-    setAddress1(Address1);
-    setAddress2(Address2);
-    setAddress3(Address3);
-    setPermanantAddress(PermanantAddress);
-    setReference_Name(Reference_Name);
-    setReference_Phone(Reference_Phone);
-    setPan_No(Pan_No);
-    setAadhar_no(Aadhar_no);
-    setdepartment_id(department_id);
-    setdesignation_id(designation_id);
-    setPlaceOfBirth(Place_of_Birth);
-    setBloodGroup(Blood_Group);
-    setSpouseName(Spouse_Name);
-    setNoOfSiblings(Number_of_Siblings);
-    setNoOfChildren(Number_of_Children);
-    setBusinessEmail(Email_Business);
-    setEmergencyContactName(Emergency_Contact_Name);
-    setEmergencyContactPhone(Emergency_Contact_Phone);
-    setPostalCode(Postal_Code);
-    setPassportNo(Passport_No);
-    setPassportExpiryDate(formatDate(Passport_Expiry_Date));
-    setOtherIdNo(Other_Id_No);
-
-    if (Photos) {
-      const imageBlob = base64ToBlob(Photos);
-      setuser_image(imageBlob);
-      const imageUrl = URL.createObjectURL(imageBlob);
-      setSelectedImage(imageUrl);
-    }
-
-    // 🔽 DROPDOWN VALUE FETCH (SAME AS handleRefNo)
-
-    const selectedGrade = filteredOptionGradeid.find(
-      (o) => o.value === Grade_id,
-    );
-    setGrade_id(selectedGrade);
-    setselectedgradeid(selectedGrade?.value || null);
-
-    const selectedGender = filteredOptiongender.find((o) => o.value === Gender);
-    setGender(selectedGender);
-    setselectedGender(selectedGender?.value || null);
-
-    const selectedMartial = filteredOptionmartial.find(
-      (o) => o.value === Marital_Status,
-    );
-    setMarital_Status(selectedMartial);
-    setselectedmartial(selectedMartial?.value || null);
-
-    const selectedKids = filteredOptionKids.find((o) => o.value === Kids);
-    setKids(selectedKids);
-    setselectedkids(selectedKids?.value || null);
-
-    const selectedTitle = filteredOptionTitle.find((o) => o.value === Title);
-    setSelectedTitle(selectedTitle);
-    setTitle(selectedTitle?.value || null);
-
-    const selectedNationality = filteredOptionNationality.find(
-      (o) => o.value === Nationality,
-    );
-    setSelectedNationality(selectedNationality);
-    setNationality(selectedNationality?.value || null);
-
-    const selectedReligion = filteredOptionReligion.find(
-      (o) => o.value === Religion,
-    );
-    setSelectedReligion(selectedReligion);
-    setReligion(selectedReligion?.value || null);
-
-    const selectedRelation = filteredOptionRelation.find(
-      (o) => o.value === Emergency_Contact_Relationship,
-    );
-    setSelectedEmergencyContactRelation(selectedRelation);
-    setEmergencyContactRelation(selectedRelation?.value || null);
-
-    const selectedCity = filteredOptionCity.find((o) => o.value === City);
-    setSelectedCity(selectedCity);
-    setCity(selectedCity?.value || null);
-
-    const selectedState = filteredOptionState.find((o) => o.value === State);
-    setSelectedState(selectedState);
-    setState(selectedState?.value || null);
-
-    const selectedCountry = filteredOptionCountry.find(
-      (o) => o.value === Country,
-    );
-    setSelectedCountry(selectedCountry);
-    setCountry(selectedCountry?.value || null);
-
-    const selectedOtherIdType = filteredOptionOtherType.find(
-      (o) => o.value === Other_Id_Type,
-    );
-    setSelectedOtherIdType(selectedOtherIdType);
-    setOtherIdType(selectedOtherIdType?.value || null);
-
-    console.log("Popup data mapped successfully");
-  };
-
-  useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } =
-      location.state || {};
-
-    if (employeeId) {
-      setEmployeeId(employeeId);
-      setFirst_Name(firstName || "");
-      setdepartment_id(department_id || "");
-      setdesignation_id(designation_id || "");
-    }
-
-    if (
-      employeeId &&
-      genderdrop?.length > 0 &&
-      IDdrop?.length > 0 &&
-      Marital_StatusDrop?.length > 0 &&
-      KidsDrop?.length > 0
-    ) {
-      handleRefNo(employeeId);
-    }
-  }, [location.state, genderdrop, IDdrop, Marital_StatusDrop, KidsDrop]);
 
   return (
     <div class="container-fluid Topnav-screen">
