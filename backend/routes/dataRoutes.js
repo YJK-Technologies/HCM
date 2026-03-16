@@ -1332,6 +1332,7 @@ router.post("/DashboardEmployeeInfoChange",dataController.DashboardEmployeeInfoC
 router.post("/ApprovalLoan",dataController.ApprovalLoan) 
 router.post("/ApprovalVisa",dataController.ApprovalVisa) 
 router.post("/ApprovalTravel",dataController.ApprovalTravel) 
+router.post("/getEmployeeLeaveReport",dataController.getEmployeeLeaveReport) 
 
 
 
