@@ -1333,6 +1333,7 @@ router.post("/ApprovalLoan",dataController.ApprovalLoan)
 router.post("/ApprovalVisa",dataController.ApprovalVisa) 
 router.post("/ApprovalTravel",dataController.ApprovalTravel) 
 router.post("/ApprovalAcademicInfo",dataController.ApprovalAcademicInfo) 
+router.post("/getEmployeeLeaveReport",dataController.getEmployeeLeaveReport) 
 
 
 

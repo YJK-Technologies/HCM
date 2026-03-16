@@ -722,7 +722,6 @@ const ApplyLeave = () => {
                 defaultColDef={defaultColDef}
                 rowSelection="single"
                 ref={gridRef}
-              // onSelectionChanged={handleRowSelected}
               />
             </div>
           </div>
