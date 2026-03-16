@@ -45179,6 +45179,26 @@ const AcademicDetailsRequest = async (req, res) => {
 };
 //code ended by Dinesh Gokul on 14-03-26
 
+//code added by Dinesh Gokul on 16-03-26
+const ApprovalAcademicInfo = async (req, res) => { 
+  const { Info_request_id, request_status, modified_by, approver_id, company_code, } = req.body; 
+  try { 
+    const pool = await sql.connect(dbConfig); 
+    await pool .request() 
+    .input("mode", sql.NVarChar, "AP") 
+    .input("Info_request_id", sql.Int, Info_request_id) 
+    .input("request_status", sql.NVarChar, request_status) 
+    .input("approver_id", sql.NVarChar, approver_id) 
+    .input("modified_by", sql.NVarChar, modified_by) 
+    .input("company_code", sql.NVarChar, company_code) 
+    .query(`EXEC sp_ess_employee_academic_details_request @mode, '', '', '', '', '', NULL, @company_code, '', @modified_by, @approver_id, @request_status, '', @Info_request_id, ''`); 
+
+    res.status(200).json("Academic details request approved successfully"); 
+  } catch (err) { console.error("Error approving academic request:", err); 
+    res.status(500).json({ message: err.message || "Internal Server Error" }); 
+  } 
+};
+//code ended by Dinesh Gokul on 16-03-26
 
 module.exports = {
   login,
@@ -46482,7 +46502,8 @@ module.exports = {
     DashboardEmployeeInfoChange,
     ApprovalLoan,
     ApprovalVisa,
-    ApprovalTravel
+    ApprovalTravel,
+    ApprovalAcademicInfo
 
 
 };
