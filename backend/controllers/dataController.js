@@ -45130,6 +45130,8 @@ const AcademicDetailsRequest = async (req, res) => {
     const pool = await sql.connect(dbConfig);
 
     for (const insertRow of employeeData) {
+      
+      if (!insertRow) continue;
 
       let document = insertRow.document || null;
 

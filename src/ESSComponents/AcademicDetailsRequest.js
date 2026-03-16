@@ -99,31 +99,34 @@ function Input({ }) {
 
       Academic.flatMap((relationGroup) =>
         relationGroup.members.map(async (member) => {
-          if (member.document) {
-            // Check if file size exceeds 1MB before proceeding
-            const fileSize = member.document.size;
-            const maxSize = 1 * 1024 * 1024; // 1MB
 
-            if (fileSize > maxSize) {
-              toast.warning('File size exceeds 1MB. Please upload a smaller file.');
-              return; // Exit early if file is too large
-            }
+  let fileBase64 = null;
 
-            const fileBase64 = member.document ? await convertToBase64(member.document) : null;
-            console.log(fileBase64)
-            return {
-              EmployeeId: EmployeeId,
-              academicName: member.academicName,
-              major: member.major,
-              institution: member.institution,
-              academicYear: member.academicYear,
-              document: fileBase64,
-              company_code: sessionStorage.getItem("selectedCompanyCode"),
-              created_by: sessionStorage.getItem("selectedUserCode"),
-              purpose: member.purpose
-            };
-          }
-        })
+  if (member.document) {
+    const fileSize = member.document.size;
+    const maxSize = 1 * 1024 * 1024;
+
+    if (fileSize > maxSize) {
+      toast.warning("File size exceeds 1MB");
+      return null;
+    }
+
+    fileBase64 = await convertToBase64(member.document);
+  }
+
+  return {
+    EmployeeId: EmployeeId,
+    academicName: member.academicName,
+    major: member.major,
+    institution: member.institution,
+    academicYear: member.academicYear,
+    document: fileBase64,
+    company_code: sessionStorage.getItem("selectedCompanyCode"),
+    created_by: sessionStorage.getItem("selectedUserCode"),
+    purpose: member.purpose
+  };
+
+})
       )
 
     );
