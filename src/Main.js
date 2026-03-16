@@ -120,6 +120,7 @@ import LoanType from "./EmpRequests/LoanType.js"
 import ManualEmployeeInfo from "./ESSComponents/ManualEmployeeInfo.js"
 import AcademicDetReq from "./ESSComponents/AcademicDetailsRequest.js"
 import LeaveRequest from "./EmpRequests/LeaveRequest.js"
+import RequestReport from "./ESSDashboard/RequestReport.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -316,6 +317,7 @@ function Main() {
     { path: "/ManualEmployeeInfo", component: <ManualEmployeeInfo /> },
     { path: "/LeaveRequest", component: <LeaveRequest /> },
     { path: "/AcademicDetReq", component: <AcademicDetReq /> },
+    { path: "/RequestReport", component: <RequestReport /> },
 
   
   ];
