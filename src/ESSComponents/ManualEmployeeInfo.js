@@ -125,6 +125,7 @@ function ManualEmployeeInfo({}) {
     .filter((permission) => permission.screen_type === "AddEmployeeInfo")
     .map((permission) => permission.permission_type.toLowerCase());
 
+
   const handleInsert = async () => {
     if (
       !First_Name ||
@@ -276,7 +277,7 @@ function ManualEmployeeInfo({}) {
     });
   };
   const Insurance1 = () => {
-    navigate("/Family", {
+    navigate("/EmpFamPersonalDetail", {
       state: {
         employeeId: EmployeeId,
         firstName: First_Name,
@@ -316,9 +317,9 @@ function ManualEmployeeInfo({}) {
       //   case 'Academic Details':
       //     AcademicDet();
       //     break;
-      //   case 'Family':
-      //     Insurance1();
-      //     break;
+        case 'Family':
+          Insurance1();
+          break;
       //   case 'Documents':
       //     Documents();
       //     break;
@@ -330,7 +331,7 @@ function ManualEmployeeInfo({}) {
   const tabs = [
     { label: "Personal Details" },
     // { label: 'Academic Details' },
-    // { label: 'Family' },
+    { label: 'Family' },
     // { label: 'Documents' }
   ];
 

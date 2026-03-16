@@ -1,0 +1,1101 @@
+import React, { useState, useEffect } from "react";
+import "../input.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate, useLocation } from "react-router-dom";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+import TabButtons from "./Tabs";
+import Select from 'react-select'
+import FamilyDetails from "./FamilyPopup";
+import { showConfirmationToast } from '../ToastConfirmation';
+import LoadingScreen from '../Loading';
+const config = require('../Apiconfig');
+
+function EmpFamPersonalDetail({ }) {
+
+  const [familyMembers, setFamilyMembers] = useState([{
+    relation: 'familyMembers', members: [{
+      relationName: '', name: '', dob: '', Age: '', aadharNo: '', sex: '',
+      nationality: '', CRPNo: '', CRP_ExpiryDate: '', passportNo: '', passportExpiryDate: '', visaEntitled: '', visaExpiryDate: '', airTicketEntitled: '', keyfield: ''
+    }]
+  }]);
+  const [employeeID, setEmployeeId] = useState("");
+  const [error, setError] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [relativedrop, setrelationdrop] = useState([]);
+  const [booleanDrop, setBooleanDrop] = useState([]);
+  const [sexDrop, setSexDrop] = useState([]);
+  const [nationalityDrop, setNationalityDrop] = useState([]);
+  const [saveButtonVisible, setSaveButtonVisible] = useState(true);
+  const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
+  const [showAsterisk, setShowAsterisk] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [First_Name, setFirst_Name] = useState('');
+  const [department_id, setdepartment_id] = useState("");
+  const [designation_id, setdesignation_id] = useState("");
+
+  const [isSelectRelation, setIsSelectRelation] = useState({});
+  const [isSelectSex, setIsSelectSex] = useState({});
+  const [isSelectNationality, setIsSelectNationality] = useState({});
+  const [isSelectAirTicket, setIsSelectAirTicket] = useState({});
+  const [isSelectVisa, setIsSelectVisa] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const familyPermissions = permissions
+    .filter(permission => permission.screen_type === 'Family')
+    .map(permission => permission.permission_type.toLowerCase());
+
+      const employeeId = sessionStorage.getItem("selectedUserCode");
+      useEffect(() => {
+        handleEmployeeFamily(employeeId);
+      }, []);
+    
+  const EmployeeLoan = () => {
+    navigate("/ManualEmployeeInfo", {
+      state: {
+        employeeId: employeeID,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
+  };
+
+  const Insurance1 = () => {
+    navigate("/EmpFamPersonalDetail", { state: { employeeId: employeeID, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  };
+
+
+
+  const addRow = (relation) => {
+    setFamilyMembers((prev) =>
+      prev.map((item) =>
+        item.relation === relation
+          ? { ...item, members: [...item.members, { relationName: '', name: '', dob: '', Age: '', aadharNo: '' }] }
+          : item
+      )
+    );
+  };
+
+  const deleteRow = (relation, index) => {
+    setFamilyMembers((prev) =>
+      prev.map((item) =>
+        item.relation === relation
+          ? { ...item, members: item.members.filter((_, i) => i !== index) }
+          : item
+      )
+    );
+  };
+
+  const RelationInputChange = (relation, index, field, value) => {
+    setFamilyMembers((prev) =>
+      prev.map((item) =>
+        item.relation === relation
+          ? {
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member
+            ),
+          }
+          : item
+      )
+    );
+  };
+
+  const [activeTab, setActiveTab] = useState('Family');
+  const handleTabClick = (tabLabel) => {
+    setActiveTab(tabLabel);
+
+    switch (tabLabel) {
+      case 'Personal Details':
+        EmployeeLoan();
+        break;
+      case 'Family':
+        Insurance1();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const tabs = [
+    { label: 'Personal Details' },
+    { label: 'Family' },
+  ];
+
+  const handleSave = async () => {
+
+    if (!employeeID) {
+      setError(true);
+      toast.warning("Error: Missing required keyfield")
+      return;
+    }
+
+    for (const relationGroup of familyMembers) {
+      for (const member of relationGroup.members) {
+        if (!member.relationName || !member.name || !member.dob || !member.Age) {
+          setError(true);
+          toast.warning("Error: Missing required fields")
+
+          return;
+        }
+      }
+    }
+
+    const employeeData = familyMembers.flatMap((relationGroup) =>
+      relationGroup.members.map((member) => ({
+        EmployeeId: employeeID,
+        Relation: member.relationName,
+        Name: member.name,
+        DOB: member.dob,
+        AGE: member.Age,
+        aadhar_no: member.aadharNo,
+        Sex: member.sex,
+        Nationality: member.nationality,
+        CPR_No: member.CRPNo,
+        CPR_Expiry_Date: member.CRP_ExpiryDate,
+        Passport_No: member.passportNo,
+        Passport_Expiry_Date: member.passportExpiryDate,
+        Visa_Entitled: Number(member.visaEntitled),
+        Visa_Expiry_Date: member.visaExpiryDate,
+        Air_Ticket_Entitled: Number(member.airTicketEntitled),
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        created_by: sessionStorage.getItem("selectedUserCode")
+      }))
+    );
+    setError(false);
+    setLoading(true)
+
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/addEmployeeFamily`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ employeeData }),
+      });
+      if (response.ok) {
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message, {
+        })
+      }
+    } catch (err) {
+      console.error("Error delete data:", err);
+      toast.error('Error delete data: ' + err.message, {
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (relationName, index) => {
+    const relationGroup = familyMembers.find(group => group.relation === relationName);
+    const member = relationGroup ? relationGroup.members[index] : null;
+
+    if (!member.keyfield) {
+      setDeleteError(" ");
+      toast.warning("Error: Missing required keyfield")
+      return;
+    }
+
+    if (!member) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    if (!member.relationName || !member.name || !member.dob || !member.Age) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    const keyfieldsToDelete = {
+      keyfield: member.keyfield,
+      company_code: sessionStorage.getItem("selectedCompanyCode")
+    };
+    setError(false);
+    
+    showConfirmationToast(
+      "Are you sure you want to Delete the data in the row?",
+      async () => {
+        try {
+          setLoading(true)
+          const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeFamily`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ keyfieldsToDelete: [keyfieldsToDelete] }),
+          });
+
+          if (response.ok) {
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            console.error(errorResponse.message);
+            toast.warning(errorResponse.message, {
+            })
+          }
+        } catch (err) {
+          console.error("Error delete data:", err);
+          toast.error('Error delete data: ' + err.message, {
+          });
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data Delete cancelled.");
+      }
+    );
+  };
+
+  const handleUpdate = async (relationName, index) => {
+    const relationGroup = familyMembers.find(group => group.relation === relationName);
+    const member = relationGroup ? relationGroup.members[index] : null;
+
+    if (!member.keyfield) {
+      setDeleteError(" ");
+      toast.warning("Error: Missing required keyfield")
+      return;
+    }
+
+    if (!member) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    if (!member.relationName || !member.name || !member.dob || !member.Age) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    const editedData = {
+      EmployeeId: employeeID,
+      Relation: member.relationName,
+      Name: member.name,
+      DOB: member.dob,
+      AGE: member.Age,
+      aadhar_no: member.aadharNo,
+      keyfield: member.keyfield,
+      Sex: member.sex,
+      Nationality: member.nationality,
+      CPR_No: member.CRPNo,
+      CPR_Expiry_Date: member.CRP_ExpiryDate,
+      Passport_No: member.passportNo,
+      Passport_Expiry_Date: member.passportExpiryDate,
+      Visa_Entitled: Number(member.visaEntitled),
+      Visa_Expiry_Date: member.visaExpiryDate,
+      Air_Ticket_Entitled: Number(member.airTicketEntitled),
+      company_code: sessionStorage.getItem("selectedCompanyCode")
+    };
+    setError(false);
+    
+    showConfirmationToast(
+      "Are you sure you want to update the data in the row ?",
+      async () => {
+        try {
+          setLoading(true)
+          const response = await fetch(`${config.apiBaseUrl}/updateEmployeeFamily`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ editedData: [editedData] }),
+          });
+
+          if (response.ok) {
+              toast.success("Data updated successfully!", {
+                onClose: () => window.location.reload(),
+              });
+          } else {
+            const errorResponse = await response.json();
+            console.error(errorResponse.message);
+            toast.warning(errorResponse.message, {
+            })
+          }
+        } catch (err) {
+          console.error("Error delete data:", err);
+          toast.error('Error delete data: ' + err.message, {
+          });
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleEmployeeFamily(employeeID)
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (typeof dateString === 'string' && dateString) {
+      const dateParts = dateString.split('T')[0].split('-');
+      if (dateParts.length === 3) {
+        return `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+      }
+    }
+    return '';
+  };
+
+  const handleEmployeeFamily = async (code) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmployeeFamily`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), }),
+      });
+
+      if (response.ok) {
+        setSaveButtonVisible(false);
+        setIsAcademicDataLoaded(true);
+        setShowAsterisk(false);
+        const searchData = await response.json();
+
+        const [{ EmployeeId, department_id, designation_id, First_Name }] = searchData;
+        setdepartment_id(department_id);
+        setdesignation_id(designation_id);
+        setFirst_Name(First_Name);
+
+        const updatedFamilyMembers = searchData.reduce((acc, item) => {
+          const { Relation, Name, DOB, AGE, aadhar_no, keyfield, Sex, Nationality, CPR_No, CPR_Expiry_Date,
+            Passport_No, Passport_Expiry_Date, Visa_Entitled, Visa_Expiry_Date, Air_Ticket_Entitled
+          } = item;
+
+          const formattedDOB = formatDate(DOB);
+          const formattedCRP_ExpiryDate = formatDate(CPR_Expiry_Date);
+          const formattedpassportExpiryDate = formatDate(Passport_Expiry_Date);
+          const formattedvisaExpiryDate = formatDate(Visa_Expiry_Date);
+
+          const airTicketValue = Air_Ticket_Entitled === true ? "1" : "0";
+
+          const memberData = {
+            relationName: Relation || "",
+            selectRelation: Relation
+              ? { value: Relation, label: Relation }
+              : null,
+            name: Name,
+            dob: formattedDOB,
+            Age: AGE,
+            aadharNo: aadhar_no,
+            keyfield: keyfield,
+            sex: Sex || "",
+            selectSex: Sex
+              ? { value: Sex, label: Sex }
+              : null,
+            nationality: Nationality || "",
+            selectNationality: Nationality
+              ? { value: Nationality, label: Nationality }
+              : null,
+            visaEntitled: Visa_Entitled || "",
+            selectVisa: Visa_Entitled
+              ? { value: Visa_Entitled, label: Visa_Entitled }
+              : null,
+            airTicketEntitled: airTicketValue || "",
+            selectAirTicket: airTicketValue
+              ? { value: airTicketValue, label: airTicketValue }
+              : null,
+            CRPNo: CPR_No,
+            CRP_ExpiryDate: formattedCRP_ExpiryDate,
+            passportNo: Passport_No,
+            passportExpiryDate: formattedpassportExpiryDate,
+            visaExpiryDate: formattedvisaExpiryDate,
+          };
+
+          const existingRelation = acc.find(group => group.relation === Relation);
+
+          if (existingRelation) {
+            existingRelation.members.push(memberData);
+          } else {
+            acc.push({
+              relation: Relation,
+              members: [memberData]
+            });
+          }
+          return acc;
+        }, []);
+
+        setFamilyMembers(updatedFamilyMembers);
+        setEmployeeId(EmployeeId);
+      } else if (response.status === 404) {
+        toast.warning('Data not found');
+        setFamilyMembers([
+          {
+            relation: 'familyMembers',
+            members: [{
+              relationName: '', name: '', dob: '', Age: '', aadharNo: '', sex: '',
+              nationality: '', CRPNo: '', CRP_ExpiryDate: '', passportNo: '', passportExpiryDate: '', visaEntitled: '', visaExpiryDate: '', airTicketEntitled: '', keyfield: ''
+            }]
+          }
+        ]);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to insert sales data");
+        console.error(errorResponse.details || errorResponse.message);
+      }
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error('Error inserting data: ' + error.message);
+    }
+  };
+
+  const filteredOptionrelation = relativedrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionSex = sexDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionNationality = nationalityDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredOptionBoolean = booleanDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getrelation`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setrelationdrop(val));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setBooleanDrop(val));
+  }, []);
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getSex`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setSexDrop(val));
+  }, []);
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getNationality`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setNationalityDrop(val));
+  }, []);
+
+
+  const handleChangeRelation = (selectedRelation, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  relationName: selectedRelation
+                    ? selectedRelation.value
+                    : "",
+                  selectRelation: selectedRelation,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  const handleChangeAirTicket = (selectedAirTicket, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  airTicketEntitled: selectedAirTicket
+                    ? selectedAirTicket.value
+                    : "",
+                  selectAirTicket: selectedAirTicket,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  const handleChangeVisa = (selectedVisa, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  visaEntitled: selectedVisa
+                    ? selectedVisa.value
+                    : "",
+                  selectVisa: selectedVisa,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  const handleChangeSex = (selectedSex, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  sex: selectedSex
+                    ? selectedSex.value
+                    : "",
+                  selectSex: selectedSex,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  const handleChangeNationality = (selectedNationality, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  nationality: selectedNationality
+                    ? selectedNationality.value
+                    : "",
+                  selectNationality: selectedNationality,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  const reloadGridData = () => {
+    window.location.reload();
+  };
+
+  const [open1, setOpen1] = React.useState(false);
+
+  const handleFamilyDetails = () => {
+    setOpen1(true);
+  };
+
+  const handleClose = () => {
+    setOpen1(false);
+  };
+
+  const familyDetails = async (data) => {
+    if (data && data.length > 0) {
+      setSaveButtonVisible(false);
+      setShowAsterisk(false);
+      setIsAcademicDataLoaded(true);
+      const [{ employeeId }] = data;
+
+      handleEmployeeFamily(employeeId);
+
+    } else {
+      console.log("Data not fetched...!");
+    }
+  };
+
+  const handleDateChange = (e, relation, idx) => {
+    const selectedDate = e.target.value;
+    const today = new Date();
+    const dob = new Date(selectedDate);
+
+    if (selectedDate > today.toISOString().split("T")[0]) {
+      toast.warning("Future dates are not allowed!");
+      return;
+    }
+
+    // Calculate age
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--; // Adjust age if birthday hasn't occurred yet this year
+    }
+
+    // Update both DOB and Age
+    RelationInputChange(relation, idx, "dob", selectedDate);
+    RelationInputChange(relation, idx, "Age", age);
+  };
+
+  // useEffect(() => {
+  //   if (location.state) {
+  //     if (location.state.employeeId) {
+  //       setEmployeeId(location.state.employeeId);
+  //       handleEmployeeFamily(location.state.employeeId);
+  //     }
+  //     if (location.state.firstName) {
+  //       setFirst_Name(location.state.firstName);
+  //     }
+  //     if (location.state.department_id) {
+  //       setdepartment_id(location.state.department_id);
+  //     }
+  //     if (location.state.designation_id) {
+  //       setdesignation_id(location.state.designation_id);
+  //     }
+  //   }
+  // }, [location.state]);
+
+  useEffect(() => {
+    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+
+    if (employeeId) {
+      setEmployeeId(employeeId);
+      setFirst_Name(firstName || "");
+      setdepartment_id(department_id || "");
+      setdesignation_id(designation_id || "");
+    }
+
+    if (employeeId) {
+      handleEmployeeFamily(employeeId);
+    }
+  }, [location.state]);
+
+  return (
+    <div class="container-fluid Topnav-screen ">
+      {loading && <LoadingScreen />}
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Family</h1>
+
+          <div className="action-wrapper desktop-actions">
+            {saveButtonVisible && ['add', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={reloadGridData}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
+            </div>
+          </div>
+
+          <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {saveButtonVisible && ['add', 'all permission'].some(p => familyPermissions.includes(p)) && (
+                <li className="dropdown-item" onClick={handleSave}>
+                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                </li>
+              )}
+
+              <li className="dropdown-item" onClick={reloadGridData}>
+                <i className="fa-solid fa-arrow-rotate-right"></i>
+              </li>
+
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+
+      {familyMembers.map((relationGroup, relationIndex) => (
+        <div key={relationIndex} className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
+          {relationGroup.members.map((member, index) => (
+            <div key={index} className="row g-3">
+
+              <div className="col-md-1">
+                <div className="inputGroup">
+                  <button type="button" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
+                    <i className="fa-solid fa-circle-plus"></i>
+                  </button>
+                  {relationGroup.members.length > 1 && (
+                    <button type="button" className="btn btn-danger" onClick={() => deleteRow(relationGroup.relation, index)}>
+                      <i className="fa-regular fa-trash-can"></i>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectRelation ? "has-value" : ""} 
+                  ${isSelectRelation[index] ? "is-focused" : ""}`}
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() => setIsSelectRelation((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectRelation((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRelation}
+                    options={filteredOptionrelation}
+                    maxLength={50}
+                    onChange={(selectedRelation) =>
+                      handleChangeRelation(selectedRelation, relationGroup.relation, index)
+                    }
+                  />
+                  <label for="cno" className={`floating-label ${error && !member.relationName ? 'text-danger' : ''}`}>Relation{showAsterisk && <span className="text-danger">*</span>}</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    placeholder=" "
+                    autoComplete="off"
+                    value={member.name}
+                    pattern="[A-Za-z]+"
+                    maxLength={250}
+                    // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'name', e.target.value)}
+                    onChange={(e) => {
+                      const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      RelationInputChange(relationGroup.relation, index, 'name', onlyLetters);
+                    }}
+                  />
+                  <label for="cno" className={`exp-form-labels ${error && !member.name ? 'text-danger' : ''}`}>Name{showAsterisk && <span className="text-danger">*</span>}</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    placeholder=" "
+                    autoComplete="off"
+                    value={member.dob}
+                    max={new Date().toISOString().split("T")[0]} // Restrict future dates
+                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+                  />
+                  <label for="cno" className={`exp-form-labels ${error && !member.dob ? 'text-danger' : ''}`}>DOB{showAsterisk && <span className="text-danger">*</span>}</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={member.Age}
+                    placeholder=" "
+                    maxLength={3}
+                    autoComplete="off"
+                    readOnly
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
+                  />
+                  <label for="cno" className={`exp-form-labels ${error && !member.Age ? 'text-danger' : ''}`}>Age{showAsterisk && <span className="text-danger">*</span>}</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={member.aadharNo}
+                    maxLength={12}
+                    placeholder=" "
+                    autoComplete="off"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        RelationInputChange(relationGroup.relation, index, 'aadharNo', value);
+                      }
+                    }}
+                  />
+                  <label for="cno" className="exp-form-labels">Aadhaar No</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectSex ? "has-value" : ""} 
+                  ${isSelectSex[index] ? "is-focused" : ""}`}
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() => setIsSelectSex((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectSex((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectSex}
+                    options={filteredOptionSex}
+                    maxLength={50}
+                    onChange={(selectedSex) =>
+                      handleChangeSex(selectedSex, relationGroup.relation, index)
+                    }
+                  />
+                  <label for="cno" className={`floating-label ${error && !member.sex ? 'text-danger' : ''}`}>Sex</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectNationality ? "has-value" : ""} 
+                  ${isSelectNationality[index] ? "is-focused" : ""}`}
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() => setIsSelectNationality((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectNationality((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectNationality}
+                    options={filteredOptionNationality}
+                    maxLength={50}
+                    onChange={(selectNationality) =>
+                      handleChangeNationality(selectNationality, relationGroup.relation, index)
+                    }
+                  />
+                  <label for="cno" className={`floating-label ${error && !member.nationality ? 'text-danger' : ''}`}>Nationality</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="number"
+                    className="exp-input-field form-control"
+                    value={member.CRPNo}
+                    maxLength={30}
+                    placeholder=" "
+                    autoComplete="off"
+                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'CRPNo', e.target.value)}
+                  />
+                  <label for="cno" className="exp-form-labels">CRP No</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={member.CRP_ExpiryDate}
+                    maxLength={18}
+                    placeholder=" "
+                    autoComplete="off"
+                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'CRP_ExpiryDate', e.target.value)}
+                  />
+                  <label for="cno" className="exp-form-labels">CRP Expiry Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={member.passportNo}
+                    maxLength={9}
+                    placeholder=" "
+                    autoComplete="off"
+                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'passportNo', e.target.value)}
+                  />
+                  <label for="cno" className="exp-form-labels">Passport No</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={member.passportExpiryDate}
+                    maxLength={18}
+                    placeholder=" "
+                    autoComplete="off"
+                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'passportExpiryDate', e.target.value)}
+                  />
+                  <label for="cno" className="exp-form-labels">Passport Expiry Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectVisa ? "has-value" : ""} 
+                  ${isSelectVisa[index] ? "is-focused" : ""}`}
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() => setIsSelectVisa((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectVisa((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectVisa}
+                    options={filteredOptionBoolean}
+                    maxLength={50}
+                    onChange={(selectVisa) =>
+                      handleChangeVisa(selectVisa, relationGroup.relation, index)
+                    }
+                  />
+                  <label for="cno" className={`floating-label`}>Visa Entitled</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={member.visaExpiryDate}
+                    maxLength={18}
+                    placeholder=" "
+                    autoComplete="off"
+                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'visaExpiryDate', e.target.value)}
+                  />
+                  <label for="cno" className="exp-form-labels">Visa Expiry Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectAirTicket ? "has-value" : ""} 
+                  ${isSelectAirTicket[index] ? "is-focused" : ""}`}
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() => setIsSelectAirTicket((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectAirTicket((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectAirTicket}
+                    options={filteredOptionBoolean}
+                    maxLength={50}
+                    onChange={(selectAirTicket) =>
+                      handleChangeAirTicket(selectAirTicket, relationGroup.relation, index)
+                    }
+                  />
+                  <label for="cno" className={`floating-label`}>Air Ticket Entitled</label>
+                </div>
+              </div>
+
+              <div className="col-md-1">
+                {isAcademicDataLoaded && (
+                  <div className="inputGroup">
+                    {['update', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        title="Update"
+                        onClick={() => handleUpdate(relationGroup.relation, index)} // Pass the specific row data
+                      >
+                        <i className="fa-solid fa-floppy-disk"></i>
+                      </button>
+                    )}
+                    {['delete', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        title="Delete"
+                        onClick={() => handleDelete(relationGroup.relation, index)}>
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+      <div>
+        <FamilyDetails open={open1} handleClose={handleClose} familyDetails={familyDetails} />
+      </div>
+    </div>
+  );
+}
+export default EmpFamPersonalDetail;
