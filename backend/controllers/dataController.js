@@ -21264,8 +21264,21 @@ const updateGrade = async (req, res) => {
 };
 
 const addEmployeeCompany = async (req, res) => {
-  const { EmployeeId, department_ID, designation_ID, DOJ, DOL, manager, shift,
-    status, company_code, Section, Work_Location, Employee_Type, created_by } = req.body;
+  const {
+    EmployeeId,
+    department_ID,
+    designation_ID,
+    DOJ,
+    DOL,
+    manager,
+    shift,
+    status,
+    company_code,
+    Section,
+    Work_Location,
+    Employee_Type,
+    created_by,
+  } = req.body;
   let pool;
   try {
     pool = await sql.connect(dbConfig);
@@ -21285,7 +21298,8 @@ const addEmployeeCompany = async (req, res) => {
       .input("Work_Location", sql.VarChar, Work_Location)
       .input("Employee_Type", sql.VarChar, Employee_Type)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,@created_by,'','','','','','','','',''`,
+      .query(
+        `EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,@created_by,'','','','','','','','',''`,
       );
     res.status(200).json("Employee company data inserted successfully");
   } catch (err) {
@@ -21300,8 +21314,9 @@ const addEmployeeCompany = async (req, res) => {
 const allEmployeeCompanyData = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql
-    .query(`EXEC sp_employee_company 'A','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+    const result = await sql.query(
+      `EXEC sp_employee_company 'A','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+    );
 
     res.json(result.recordset);
   } catch (err) {
@@ -21319,7 +21334,9 @@ const deleteEmployeeCompany = async (req, res) => {
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+      .query(
+        `EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
 
     res.status(200).json("Employee data deleted successfully.");
   } catch (err) {
@@ -21332,27 +21349,42 @@ const deleteEmployeeCompany = async (req, res) => {
 };
 
 const updateEmployeeCompany = async (req, res) => {
-  const { EmployeeId, department_ID, Section, Work_Location, designation_ID,
-    DOJ, DOL, manager, shift, status, company_code, Employee_Type, modified_by } = req.body;
+  const {
+    EmployeeId,
+    department_ID,
+    Section,
+    Work_Location,
+    designation_ID,
+    DOJ,
+    DOL,
+    manager,
+    shift,
+    status,
+    company_code,
+    Employee_Type,
+    modified_by,
+  } = req.body;
   try {
     const pool = await connection.connectToDatabase(dbConfig);
-      await pool
-        .request()
-        .input("mode", sql.NVarChar, "U")
-        .input("EmployeeId", sql.VarChar, EmployeeId)
-        .input("department_ID", sql.VarChar, department_ID)
-        .input("designation_ID", sql.VarChar, designation_ID)
-        .input("DOJ", sql.Date, DOJ && DOJ !== "" ? DOJ : null)
-        .input("DOL", sql.Date, DOL && DOL !== "" ? DOL : null)
-        .input("manager", sql.VarChar, manager)
-        .input("shift", sql.VarChar, shift)
-        .input("status", sql.VarChar, status)
-        .input("company_code", sql.VarChar, company_code)
-        .input("Section", sql.VarChar, Section)
-        .input("Work_Location", sql.VarChar, Work_Location)
-        .input("Employee_Type", sql.VarChar, Employee_Type)
-        .input("modified_by", sql.VarChar, modified_by)
-        .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,'',@modified_by,'','','','','','','',''`,);
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "U")
+      .input("EmployeeId", sql.VarChar, EmployeeId)
+      .input("department_ID", sql.VarChar, department_ID)
+      .input("designation_ID", sql.VarChar, designation_ID)
+      .input("DOJ", sql.Date, DOJ && DOJ !== "" ? DOJ : null)
+      .input("DOL", sql.Date, DOL && DOL !== "" ? DOL : null)
+      .input("manager", sql.VarChar, manager)
+      .input("shift", sql.VarChar, shift)
+      .input("status", sql.VarChar, status)
+      .input("company_code", sql.VarChar, company_code)
+      .input("Section", sql.VarChar, Section)
+      .input("Work_Location", sql.VarChar, Work_Location)
+      .input("Employee_Type", sql.VarChar, Employee_Type)
+      .input("modified_by", sql.VarChar, modified_by)
+      .query(
+        `EXEC sp_employee_company @mode,@EmployeeId,@department_ID,@designation_ID,@DOJ,@DOL,@manager,@shift,@status,'','',@company_code,@Section,@Work_Location,@Employee_Type,'',@modified_by,'','','','','','','',''`,
+      );
     res.status(200).json("Employee company data updated successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -21413,6 +21445,7 @@ const addEmployeeFamily = async (req, res) => {
     });
   }
 };
+
 const allEmployeeFamilyData = async (req, res) => {
   try {
     await connection.connectToDatabase();
@@ -21560,8 +21593,9 @@ const addSalaryDetails = async (req, res) => {
 const allSalaryDetailsData = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result =
-      await sql.query(`EXEC sp_salary_details 'A','','','','','',0,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    const result = await sql.query(
+      `EXEC sp_salary_details 'A','','','','','',0,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+    );
 
     res.json(result.recordset);
   } catch (err) {
@@ -21580,7 +21614,9 @@ const deleteSalaryDetails = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("PFNo", sql.NVarChar, PFNo)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(
+        `EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
 
     res.status(200).json("Employee salary data deleted successfully");
   } catch (err) {
@@ -22691,8 +22727,9 @@ const addLeaveType = async (req, res) => {
 const getemployeemanager = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql
-    .query(`EXEC sp_employee_company 'f','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    const result = await sql.query(
+      `EXEC sp_employee_company 'f','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+    );
 
     res.json(result.recordset);
   } catch (err) {
@@ -25332,7 +25369,9 @@ const EmployeeCompanyISC = async (req, res) => {
       .input("manager", sql.NVarChar, manager)
       .input("Name", sql.NVarChar, Name)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company @mode,@EmployeeId,@department_Id,@designation_Id,'','',@manager,'','','',@Name,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(
+        `EXEC sp_employee_company @mode,@EmployeeId,@department_Id,@designation_Id,'','',@manager,'','','',@Name,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -25904,15 +25943,17 @@ const getESSmanager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "CEO")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
+      .query(
+        `EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
     if (
       result.recordset &&
       Array.isArray(result.recordset) &&
       result.recordset.length > 0
     ) {
-      res.status(200).json(result.recordset); 
+      res.status(200).json(result.recordset);
     } else {
-      res.status(404).json("Data not found"); 
+      res.status(404).json("Data not found");
     }
   } catch (err) {
     console.error(err);
@@ -30029,8 +30070,9 @@ const getTaskHourReportDetail = async (req, res) => {
 const Getmanager = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql
-    .query(`EXEC sp_employee_company 'M','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    const result = await sql.query(
+      `EXEC sp_employee_company 'M','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+    );
 
     res.json(result.recordset);
   } catch (err) {
@@ -30398,13 +30440,19 @@ const AnnouncementSearchCretria = async (req, res) => {
       .input("Messagetype", sql.NVarChar, Messagetype)
       .input("MessageTitle", sql.NVarChar, MessageTitle)
       .input("status", sql.NVarChar, status)
-      .input("RequestfordoNotShowAgainOption", sql.NVarChar, RequestfordoNotShowAgainOption)
+      .input(
+        "RequestfordoNotShowAgainOption",
+        sql.NVarChar,
+        RequestfordoNotShowAgainOption,
+      )
       .input("Start_Date", sql.NVarChar, Start_Date)
       .input("Start_Time", sql.NVarChar, Start_Time)
       .input("End_Date", sql.NVarChar, End_Date)
       .input("End_Time", sql.NVarChar, End_Time)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Announcement @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,@MessageTitle,@status,@RequestfordoNotShowAgainOption,@Start_Date,@Start_Time,@End_Date,@End_Time,@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(
+        `EXEC sp_Announcement @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,@MessageTitle,@status,@RequestfordoNotShowAgainOption,@Start_Date,@Start_Time,@End_Date,@End_Time,@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -31181,7 +31229,9 @@ const ESSManager = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "M")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(
+        `EXEC sp_employee_company @mode,'','','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -44460,12 +44510,10 @@ const loan_status_historyInsert = async (req, res) => {
         `EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "sp_loan_status_history insertd successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "sp_loan_status_history insertd successfully",
+    });
   } catch (err) {
     console.error("Error during sp_loan_status_history insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -44510,12 +44558,10 @@ const loan_status_historyUpdate = async (req, res) => {
         `EXEC sp_loan_status_history @mode, @history_id, @loan_request_id, @old_status, @new_status, @changed_by, @changed_date, @remarks, @company_code, @key_field, @created_by, @created_date, @modified_by, @modified_date`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "sp_loan_status_history updated successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "sp_loan_status_history updated successfully",
+    });
   } catch (err) {
     console.error("Error during sp_loan_status_history update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -44551,12 +44597,10 @@ const loan_status_historyDelete = async (req, res) => {
         `EXEC sp_loan_status_history @mode, @history_id, '', '', '', '', '', '', @company_code, @key_field, '', '', '', ''`,
       );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "sp_loan_status_history deleted successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "sp_loan_status_history deleted successfully",
+    });
   } catch (err) {
     console.error("Error during sp_loan_status_history delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -44819,7 +44863,9 @@ const getCurrenyCode = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_attribute_Info 'F',@company_code,'Currency Code','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(
+        `EXEC sp_attribute_Info 'F',@company_code,'Currency Code','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -44950,9 +44996,11 @@ const EmployeeDetailsRequest = async (req, res) => {
               @Address1,@Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @company_code, @Title,
               @Place_of_Birth,@Nationality, @Religion, @Blood_Group, @Spouse_Name, @Number_of_Siblings, @Number_of_Children, @Email_Business, @Phone_Alternate, @Emergency_Contact_Name,
               @Emergency_Contact_Relationship, @Emergency_Contact_Phone, @City, @State, @Country, @Postal_Code, @Passport_No, @Passport_Expiry_Date, @Other_Id_Type, @Other_Id_No, @Created_by,
-               '', 0, @request_status, @purpose, 0, '' `);
+               '', '', @request_status, @purpose, 0, '' `);
     // Return success response
-   res.status(200).json("sp_employee_personal_Changes_Request data Inserted successfully");
+    res
+      .status(200)
+      .json("sp_employee_personal_Changes_Request data Inserted successfully");
   } catch (error) {
     console.log(error.message);
     return res
@@ -44972,7 +45020,9 @@ const LoanRequestDashboard = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "LR")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_requests @mode, 0, '', '', '', 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44994,7 +45044,9 @@ const visaRequestDashboard = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "VR")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_visa_requests @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45018,7 +45070,9 @@ const travelRequestsDashboard = async (req, res) => {
 
       .input("mode", sql.NVarChar, "TR")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_travel_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', '', '', '', ''`,
+      );
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45032,25 +45086,27 @@ const travelRequestsDashboard = async (req, res) => {
 };
 
 const DashboardEmployeeInfoChange = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code } = req.body;
 
-  try {
-    const pool = await connection.connectToDatabase();
+  try {
+    const pool = await connection.connectToDatabase();
 
-    const result = await pool
-      .request()
-      .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_personal_Changes_Request_Test 'sc','','','','','','','','','','','','','','','','','','','',NULL,'','','',@company_code,'','', '','','',NULL,0, 0,'','','','','','','','','','','','','','',NULL,'0','','',0,''`);
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_employee_personal_Changes_Request_Test 'sc','','','','','','','','','','','','','','','','','','','',NULL,'','','',@company_code,'','', '','','',NULL,0, 0,'','','','','','','','','','','','','','',NLL,'','','',0,''`,
+      );
 
-    if (result.recordset.length > 0) {
-      res.status(200).json(result.recordset);
-    } else {
-      res.status(404).json("Data not found");
-    }
-  } catch (err) {
-    console.error("Error fetching Employee Change Requests:", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
-  }
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error fetching Employee Change Requests:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
 };
 
 const ApprovalLoan = async (req, res) => {
@@ -45064,7 +45120,9 @@ const ApprovalLoan = async (req, res) => {
       .input("loan_request_id", sql.Int, loan_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests @mode, @loan_request_id, '', '', '', 0, 0, 0, 0, '', '', @request_status, 0, @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_loan_requests @mode, @loan_request_id, '', '', '', 0, 0, 0, 0, '', '', @request_status, 0, @company_code, '', '', '', '', ''`,
+      );
 
     res.status(200).json("loan approval successfully");
   } catch (err) {
@@ -45084,16 +45142,18 @@ const ApprovalVisa = async (req, res) => {
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_visa_requests @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', ''`,
+      );
 
-     res.status(200).json("visa approval successfully");
+    res.status(200).json("visa approval successfully");
   } catch (err) {
     console.error("Error during visa_requests insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
 
-const ApprovalTravel= async (req, res) => {
+const ApprovalTravel = async (req, res) => {
   const { travel_request_id, request_status, company_code } = req.body;
 
   try {
@@ -45106,9 +45166,11 @@ const ApprovalTravel= async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', '', '', '', ''`);
+      .query(
+        `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', '', '', '', ''`,
+      );
 
-     res.status(200).json("travel approval successfully");
+    res.status(200).json("travel approval successfully");
   } catch (err) {
     console.error("Error fetching travel requests Search:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -45116,10 +45178,8 @@ const ApprovalTravel= async (req, res) => {
 };
 //Code ended by pavun on 14-06-26
 
-
 //code added by Dinesh Gokul on 14-03-26
 const AcademicDetailsRequest = async (req, res) => {
-
   const employeeData = req.body.employeeData;
 
   if (!employeeData || !employeeData.length) {
@@ -45130,8 +45190,7 @@ const AcademicDetailsRequest = async (req, res) => {
     const pool = await sql.connect(dbConfig);
 
     for (const insertRow of employeeData) {
-      
-      if (!insertRow) continue;
+            if (!insertRow) continue;
 
       let document = insertRow.document || null;
 
@@ -45140,7 +45199,8 @@ const AcademicDetailsRequest = async (req, res) => {
         document = buffer;
       }
 
-      await pool.request()
+      await pool
+        .request()
         .input("mode", sql.NVarChar, "I")
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("academicName", sql.NVarChar, insertRow.academicName)
@@ -45154,31 +45214,135 @@ const AcademicDetailsRequest = async (req, res) => {
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("purpose", sql.NVarChar, insertRow.purpose)
         .input("Info_request_id", sql.Int, 0)
-        .input("keyfield", sql.NVarChar, "")
-        .query(`
+        .input("keyfield", sql.NVarChar, "").query(`
           EXEC sp_ess_employee_academic_details_request
           @mode, @EmployeeId, @academicName, @major, @institution,
           @academicYear, @document, @company_code, @created_by, '',
           @approver_id, @request_status, @purpose, @Info_request_id, @keyfield
         `);
-
     }
 
     res.status(200).json("Academic request inserted successfully");
-
   } catch (error) {
-
     console.log(error.message);
 
     res.status(500).json({
-      message: error.message || "Internal Server Error"
+      message: error.message || "Internal Server Error",
     });
-
   }
-
 };
 //code ended by Dinesh Gokul on 14-03-26
 
+//code added by sakthi on 16-03-26
+const ApprovalPersonalInfo = async (req, res) => {
+  const {
+    Info_request_id,
+    request_status,
+    Modified_by,
+    approver_id,
+    company_code,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "AP")
+      .input("Info_request_id", sql.Int, Info_request_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("approver_id", sql.NVarChar, approver_id)
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_employee_personal_Changes_Request_Test @mode, '', '', '', '', '', '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', NULL,
+         '', '', '', @company_code, '', '', '', '', '', NULL, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', NULL, @Modified_by,
+          @approver_id, @request_status, '', @Info_request_id, '' `);
+
+    res.status(200).json("Personal info request approved successfully");
+  } catch (err) {
+    console.error("Error approving personal info request:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi on 16-03-26
+
+//code added by sakthi on 16-03-26
+const FamilyDetailRequest = async (req, res) => {
+  const employeeData = req.body.employeeData;
+
+  if (!employeeData || !employeeData.length) {
+    return res.status(400).json("Invalid or empty employeeData array.");
+  }
+
+  try {
+    const pool = await connection.connectToDatabase(dbConfig);
+
+    for (const insertRow of employeeData) {
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("EmployeeId", insertRow.EmployeeId)
+        .input("Relation", insertRow.Relation)
+        .input("Name", insertRow.Name)
+        .input("EmployeeName", insertRow.Name)
+        .input("DOB", insertRow.DOB)
+        .input("AGE", insertRow.AGE)
+        .input("aadhar_no", insertRow.aadhar_no)
+        .input("company_code", insertRow.company_code)
+        .input("Sex", insertRow.Sex)
+        .input("Nationality", insertRow.Nationality)
+        .input("CPR_No", insertRow.CPR_No)
+        .input("CPR_Expiry_Date", insertRow.CPR_Expiry_Date)
+        .input("Passport_No", insertRow.Passport_No)
+        .input("Passport_Expiry_Date", insertRow.Passport_Expiry_Date)
+        .input("Visa_Entitled", insertRow.Visa_Entitled)
+        .input("Visa_Expiry_Date", insertRow.Visa_Expiry_Date)
+        .input("Air_Ticket_Entitled", insertRow.Air_Ticket_Entitled)
+        .input("created_by", insertRow.created_by)
+        .input("modified_by", insertRow.modified_by )
+        .input("request_status", insertRow.request_status )
+        .input("purpose", insertRow.purpose )
+        .query(`
+        EXEC sp_ess_Family_Detail_Request @mode, @EmployeeId, @Relation, @Name, @EmployeeName, @DOB, @AGE, @aadhar_no, '', @company_code, @Sex, @Nationality, @CPR_No, @CPR_Expiry_Date, @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, @modified_by, '', @request_status, @purpose, 0`);
+    }
+    res.status(200).json("Employee family request inserted successfully");
+  } catch (err) {
+    console.error("Error inserting data:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by sakthi on 16-03-26
+
+//code added by sakthi on 16-03-26
+const DashboardFamilyDetailChange = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC sp_ess_Family_Detail_Request 'SC','','','','','',0,'','',@company_code,'','','','','','',0,'',0,'',NULL,
+'','','',0`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Family Detail Change Requests:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//code ended by sakthi on 16-03-26  
 //code added by Dinesh Gokul on 16-03-26
 const ApprovalAcademicInfo = async (req, res) => { 
   const { Info_request_id, request_status, modified_by, approver_id, company_code, } = req.body; 
@@ -45230,6 +45394,138 @@ const getEmployeeLeaveReport = async (req, res) => {
   }
 };
 //Code ended by pavun on 16-03-26
+
+//code added by sakthi on 3-17-26
+const ApprovalFamilyDetail = async (req, res) => {
+  const {
+    Info_request_id,
+    request_status,
+    modified_by,
+    approver_id,
+    company_code,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "AP")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("approver_id", sql.NVarChar, approver_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Info_request_id", sql.Int, Info_request_id)
+      .query( `EXEC sp_ess_Family_Detail_Request 'AP','','','','',NULL,NULL,'','',@company_code,'','','',NULL,'',NULL,'',NULL,'','','',@modified_by,@approver_id,@request_status,'',@Info_request_id `);
+    res.status(200).json({
+      message: `Family detail request ${request_status} successfully`,
+    });
+
+  } catch (err) {
+    console.error("Error approving family detail request:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+// code ended by sakthi on 3-17-26
+
+//code added by sakthi on 3-17-26
+const employeePersonalRequestSearch = async (req, res) => {
+  const {
+    EmployeeId,
+    First_Name,
+    Middle_Name,
+    Last_Name,
+    Gender,
+    Email,
+    Phone1,
+    City,
+    State,
+    Country,
+    request_status,
+    purpose,
+    Info_request_id,
+    company_code
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+
+      .input("mode", sql.NVarChar, "SC")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("First_Name", sql.NVarChar, First_Name)
+      .input("Middle_Name", sql.NVarChar, Middle_Name)
+      .input("Last_Name", sql.NVarChar, Last_Name)
+      .input("Father_Name", sql.NVarChar, "")
+      .input("Mother_Name", sql.NVarChar, "")
+      .input("DOB", sql.Date, null)
+      .input("Gender", sql.NVarChar, Gender)
+      .input("Email", sql.NVarChar, Email)
+      .input("Phone1", sql.NVarChar, Phone1)
+      .input("Phone2", sql.NVarChar, "")
+      .input("Address1", sql.NVarChar, "")
+      .input("Address2", sql.NVarChar, "")
+      .input("Address3", sql.NVarChar, "")
+      .input("PermanantAddress", sql.NVarChar, "")
+      .input("Reference_Name", sql.NVarChar, "")
+      .input("Reference_Phone", sql.NVarChar, "")
+      .input("Pan_No", sql.NVarChar, "")
+      .input("Aadhar_no", sql.NVarChar, "")
+      .input("Photos", sql.VarBinary, null)
+      .input("Marital_Status", sql.NVarChar, "")
+      .input("Siblings", sql.NVarChar, "")
+      .input("Kids", sql.NVarChar, "")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Title", sql.NVarChar, "")
+      .input("Place_of_Birth", sql.NVarChar, "")
+      .input("Nationality", sql.NVarChar, "")
+      .input("Religion", sql.NVarChar, "")
+      .input("Blood_Group", sql.NVarChar, "")
+      .input("Spouse_Name", sql.NVarChar, "")
+      .input("Number_of_Siblings", sql.Int, 0)
+      .input("Number_of_Children", sql.Int, 0)
+      .input("Email_Business", sql.NVarChar, "")
+      .input("Phone_Alternate", sql.NVarChar, "")
+      .input("Emergency_Contact_Name", sql.NVarChar, "")
+      .input("Emergency_Contact_Relationship", sql.NVarChar, "")
+      .input("Emergency_Contact_Phone", sql.NVarChar, "")
+      .input("City", sql.NVarChar, City)
+      .input("State", sql.NVarChar, State)
+      .input("Country", sql.NVarChar, Country)
+      .input("Postal_Code", sql.NVarChar, "")
+      .input("Passport_No", sql.NVarChar, "")
+      .input("Passport_Expiry_Date", sql.Date, null)
+      .input("Other_Id_Type", sql.NVarChar, "")
+      .input("Other_Id_No", sql.NVarChar, "")
+      .input("Created_by", sql.NVarChar, "")
+      .input("Modified_by", sql.NVarChar, "")
+      .input("approver_id", sql.NVarChar, "")
+      .input("request_status", sql.NVarChar, request_status)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("Info_request_id", sql.Int, Info_request_id || 0)
+      .input("keyfield", sql.NVarChar, "")
+      .query(`
+        EXEC sp_employee_personal_Changes_Request_Test @mode,@EmployeeId,@First_Name,@Middle_Name, @Last_Name, '', '', NULL,@Gender, @Email, @Phone1, '', '', '', '', '', '', '', '', '', NULL,'', '', '',@company_code,'', '', '', '', '', '',NULL, 0, 0,'', '', '', '', '', '', '',@City, @State, '','', '', NULL, '', '','', '',@request_status,'', 0, ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error during employee search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+// code ended by sakthi on 3-17-26
+
+
+
 
 module.exports = {
   login,
@@ -46339,203 +46635,206 @@ module.exports = {
   CRM_PV,
   GetCalendarEvent,
   PrintTemplateUpdate,
-    candidate_masterLoopUpdate,
-    candidate_masterLoopDelete,
-    candidate_masterInsert,
-    interview_panelInsert,
-    interview_panelLoopUpdate,
-    interview_panelLoopDelete,
-    job_masterInsert,
-    job_masterLoopInsert,
-    job_masterLoopUpdate,
-    job_masterLoopDelete,
-    interview_panel_membersInsert,
-    interview_panel_membersLoopInsert,
-    interview_panel_membersLoopUpdate,
-    interview_panel_membersLoopDelete,
-    interview_scheduleInsert,
-    interview_scheduleLoopUpdate,
-    interview_scheduleLoopDelete,
-    interview_feedbackInsert,
-    interview_feedbackLoopUpdate,
-    interview_feedbackLoopDelete,
-    interview_decisionInsert,
-    interview_decisionLoopUpdate,
-    interview_decisionLoopDelete,
-    CandidateSearch,
-    JobmasterSearch,
-    InterviewPanel,
-    InterviewPanelMembers,
-    InterviewSchedule,
-    InterviewFeedbackSC,
-    InterviewDecisionSC,
-    DeptID,
-    JobMaster,
-    InterviewPanelData,
-    ScheduleID,
-    CanditateID,
-    Feedback_ID,
-    Decision_ID,
-    Employee_ID,
-    InterviewMode,
-    InterviewStatus,
-    Recommendation,
-    TimeZonemasterInsert,
-    TimeZonemasterUpdate,
-    TimeZonemasterDelete,
-    getTimeZoneData,
-    getTimeZonesearchdata,
-    getTitle,
-    getReligion,
-    getNationality,
-    CountryMasterInsert,
-    CountryMasterUpdate,
-    deleteCountryMaster,
-    getCountrySearchData,
-    Country_MasterLoopUpdate,
-    Country_MasterLoopDelete,
-    GetCountry,
-    Time_Zone_masterLoopUpdate,
-    Time_Zone_masterLoopDelete,
-    Shift_MasterInsert,
-    getShiftsearchdata,
-    sp_Shift_MasterLoopUpdate,
-    getSex,
-    getAccountType,
-    getBoolean,
-    getEmployeeType,
-    Employment_Type_MasterInsert, 
-    Employment_Type_MasterUpdate, 
-    Employment_Type_MasterDelete,
-    Employment_Type_MasterLoopUpdate, 
-    Employment_Type_MasterLoopDelete,
-    Shift_Pattern_MasterInsert, 
-    Shift_Pattern_MasterUpdate, 
-    Shift_Pattern_MasterDelete,
-    Shift_Pattern_MasterLoopInsert, 
-    Shift_Pattern_MasterLoopUpdate, 
-    Shift_Pattern_MasterLoopDelete,
-    Shift_Pattern_DetailInsert, 
-    Shift_Pattern_DetailUpdate, 
-    Shift_Pattern_DetailDelete,
-    Shift_Pattern_DetailLoopInsert, 
-    Shift_Pattern_DetailLoopUpdate, 
-    Shift_Pattern_DetailLoopDelete,
-    Employee_shift_mappingInsert,
-    Employee_shift_mappingUpdate,
-    Employee_shift_mappingDelete,
-    Employee_shift_mappingLoopInsert,
-    Employee_shift_mappingLoopUpdate,
-    Employee_shift_mappingLoopDelete,
-    sp_Shift_MasterLoopDelete,
-    Shift_Type_MasterInsert,
-    getShift_TypeSC,
-    Shift_TypeMasterUpdate,
-    Shift_TypeMasterDelete,
-    ShiftPattern_Insert,
-    ShiftPattern_SC,
-    ShiftPattern_Update,
-    ShiftPattern_Delete,
-    ShiftPatternDetail_SC,
-    Employment_Type_MasterSc,
-    ShiftMasterDropDown,
-    ShiftTypeDropDown,
-    ShiftPatternMasterDropDown,
-    Employee_shift_mappingSc,
-    InterviewScheduleSearch,
-    InterviewFeedbackSearch,
-    InterviewProgressSearch,
-    PanelPerformanceSearch,
-    HiringDecisionSearch,
-    CandidateAppliedSearch,
-    getHolidayType,
-    TotalInterviewSchedule,
-    InterviewCompletionRateSC,
-    getEmployeeTypeDD,
-    getInterviewDashboardCount,
-    getGenerateShift,
-    getEmpShiftReport,
-    getDepartmentDashboard,
-    getDepartment,
-    getAdEmpShiftReport,
-    shiftPatternChart,
-    Shift_Summary_Report,
-    visa_requestsInsert,
-    visa_requestsUpdate,
-    visa_requestsDelete,
-    visa_requestsLoopInsert,
-    visa_requestsLoopUpdate,
-    visa_requestsLoopDelete,
-    travel_requestsInsert,
-    travel_requestsUpdate,
-    travel_requestsDelete,
-    travel_requestsLoopInsert,
-    travel_requestsLoopUpdate,
-    travel_requestsLoopDelete,
-    loan_requestsInsert,
-    loan_requestsUpdate,
-    loan_requestsDelete,
-    loan_requestsLoopInsert,
-    loan_requestsLoopUpdate,
-    loan_requestsLoopDelete,
-    getVisaType,
-    travel_requestsSearch,
-    visaRequestSearch,
-    loan_approvalsInsert,
-    loan_approvalsUpdate,
-    loan_approvalsDelete,
-    loan_approvalsLoopInsert,
-    loan_approvalsLoopUpdate,
-    loan_approvalsLoopDelete,
-    loan_repayment_scheduleInsert,
-    loan_repayment_scheduleUpdate,
-    loan_repayment_scheduleDelete,
-    loan_repayment_scheduleLoopInsert,
-    loan_repayment_scheduleLoopUpdate,
-    loan_repayment_scheduleLoopDelete,
-    loan_paymentsInsert,
-    loan_paymentsUpdate,
-    loan_paymentsDelete,
-    loan_paymentsLoopInsert,
-    loan_paymentsLoopUpdate,
-    loan_paymentsLoopDelete,
-    getLoanTypes,
-    loanRequestSearch,
-    loan_documentsInsert,
-    loan_documentsUpdate,
-    loan_documentsDelete,
-    loan_documentsLoopInsert,
-    loan_documentsLoopUpdate,
-    loan_documentsLoopDelete,
-    loan_approvalsSearch,
-    loan_status_historyInsert,
-    loan_status_historyUpdate,
-    loan_status_historyDelete,
-    loan_status_historyLoopInsert,
-    loan_status_historyLoopUpdate,
-    loan_status_historyLoopDelete,
-    GetLoanStatus,
-    getPaymentMethod,
-    getLoanRequest,
-    loanPaymentSearch,
-    getPaymentStatus,
-    loanScheduleSearch,
-    loan_approvalsSearch,
-    loan_documentsSearch,
-    getApprovalLoanRequest,
-    loan_status_history_search,
-    getCurrenyCode,
-    EmployeeDetailsRequest,
-    AcademicDetailsRequest,
-    LoanRequestDashboard,
-    visaRequestDashboard,
-    travelRequestsDashboard,
-    DashboardEmployeeInfoChange,
-    ApprovalLoan,
-    ApprovalVisa,
-    ApprovalTravel,
-    ApprovalAcademicInfo,
-    getEmployeeLeaveReport
-
+  candidate_masterLoopUpdate,
+  candidate_masterLoopDelete,
+  candidate_masterInsert,
+  interview_panelInsert,
+  interview_panelLoopUpdate,
+  interview_panelLoopDelete,
+  job_masterInsert,
+  job_masterLoopInsert,
+  job_masterLoopUpdate,
+  job_masterLoopDelete,
+  interview_panel_membersInsert,
+  interview_panel_membersLoopInsert,
+  interview_panel_membersLoopUpdate,
+  interview_panel_membersLoopDelete,
+  interview_scheduleInsert,
+  interview_scheduleLoopUpdate,
+  interview_scheduleLoopDelete,
+  interview_feedbackInsert,
+  interview_feedbackLoopUpdate,
+  interview_feedbackLoopDelete,
+  interview_decisionInsert,
+  interview_decisionLoopUpdate,
+  interview_decisionLoopDelete,
+  CandidateSearch,
+  JobmasterSearch,
+  InterviewPanel,
+  InterviewPanelMembers,
+  InterviewSchedule,
+  InterviewFeedbackSC,
+  InterviewDecisionSC,
+  DeptID,
+  JobMaster,
+  InterviewPanelData,
+  ScheduleID,
+  CanditateID,
+  Feedback_ID,
+  Decision_ID,
+  Employee_ID,
+  InterviewMode,
+  InterviewStatus,
+  Recommendation,
+  TimeZonemasterInsert,
+  TimeZonemasterUpdate,
+  TimeZonemasterDelete,
+  getTimeZoneData,
+  getTimeZonesearchdata,
+  getTitle,
+  getReligion,
+  getNationality,
+  CountryMasterInsert,
+  CountryMasterUpdate,
+  deleteCountryMaster,
+  getCountrySearchData,
+  Country_MasterLoopUpdate,
+  Country_MasterLoopDelete,
+  GetCountry,
+  Time_Zone_masterLoopUpdate,
+  Time_Zone_masterLoopDelete,
+  Shift_MasterInsert,
+  getShiftsearchdata,
+  sp_Shift_MasterLoopUpdate,
+  getSex,
+  getAccountType,
+  getBoolean,
+  getEmployeeType,
+  Employment_Type_MasterInsert,
+  Employment_Type_MasterUpdate,
+  Employment_Type_MasterDelete,
+  Employment_Type_MasterLoopUpdate,
+  Employment_Type_MasterLoopDelete,
+  Shift_Pattern_MasterInsert,
+  Shift_Pattern_MasterUpdate,
+  Shift_Pattern_MasterDelete,
+  Shift_Pattern_MasterLoopInsert,
+  Shift_Pattern_MasterLoopUpdate,
+  Shift_Pattern_MasterLoopDelete,
+  Shift_Pattern_DetailInsert,
+  Shift_Pattern_DetailUpdate,
+  Shift_Pattern_DetailDelete,
+  Shift_Pattern_DetailLoopInsert,
+  Shift_Pattern_DetailLoopUpdate,
+  Shift_Pattern_DetailLoopDelete,
+  Employee_shift_mappingInsert,
+  Employee_shift_mappingUpdate,
+  Employee_shift_mappingDelete,
+  Employee_shift_mappingLoopInsert,
+  Employee_shift_mappingLoopUpdate,
+  Employee_shift_mappingLoopDelete,
+  sp_Shift_MasterLoopDelete,
+  Shift_Type_MasterInsert,
+  getShift_TypeSC,
+  Shift_TypeMasterUpdate,
+  Shift_TypeMasterDelete,
+  ShiftPattern_Insert,
+  ShiftPattern_SC,
+  ShiftPattern_Update,
+  ShiftPattern_Delete,
+  ShiftPatternDetail_SC,
+  Employment_Type_MasterSc,
+  ShiftMasterDropDown,
+  ShiftTypeDropDown,
+  ShiftPatternMasterDropDown,
+  Employee_shift_mappingSc,
+  InterviewScheduleSearch,
+  InterviewFeedbackSearch,
+  InterviewProgressSearch,
+  PanelPerformanceSearch,
+  HiringDecisionSearch,
+  CandidateAppliedSearch,
+  getHolidayType,
+  TotalInterviewSchedule,
+  InterviewCompletionRateSC,
+  getEmployeeTypeDD,
+  getInterviewDashboardCount,
+  getGenerateShift,
+  getEmpShiftReport,
+  getDepartmentDashboard,
+  getDepartment,
+  getAdEmpShiftReport,
+  shiftPatternChart,
+  Shift_Summary_Report,
+  visa_requestsInsert,
+  visa_requestsUpdate,
+  visa_requestsDelete,
+  visa_requestsLoopInsert,
+  visa_requestsLoopUpdate,
+  visa_requestsLoopDelete,
+  travel_requestsInsert,
+  travel_requestsUpdate,
+  travel_requestsDelete,
+  travel_requestsLoopInsert,
+  travel_requestsLoopUpdate,
+  travel_requestsLoopDelete,
+  loan_requestsInsert,
+  loan_requestsUpdate,
+  loan_requestsDelete,
+  loan_requestsLoopInsert,
+  loan_requestsLoopUpdate,
+  loan_requestsLoopDelete,
+  getVisaType,
+  travel_requestsSearch,
+  visaRequestSearch,
+  loan_approvalsInsert,
+  loan_approvalsUpdate,
+  loan_approvalsDelete,
+  loan_approvalsLoopInsert,
+  loan_approvalsLoopUpdate,
+  loan_approvalsLoopDelete,
+  loan_repayment_scheduleInsert,
+  loan_repayment_scheduleUpdate,
+  loan_repayment_scheduleDelete,
+  loan_repayment_scheduleLoopInsert,
+  loan_repayment_scheduleLoopUpdate,
+  loan_repayment_scheduleLoopDelete,
+  loan_paymentsInsert,
+  loan_paymentsUpdate,
+  loan_paymentsDelete,
+  loan_paymentsLoopInsert,
+  loan_paymentsLoopUpdate,
+  loan_paymentsLoopDelete,
+  getLoanTypes,
+  loanRequestSearch,
+  loan_documentsInsert,
+  loan_documentsUpdate,
+  loan_documentsDelete,
+  loan_documentsLoopInsert,
+  loan_documentsLoopUpdate,
+  loan_documentsLoopDelete,
+  loan_approvalsSearch,
+  loan_status_historyInsert,
+  loan_status_historyUpdate,
+  loan_status_historyDelete,
+  loan_status_historyLoopInsert,
+  loan_status_historyLoopUpdate,
+  loan_status_historyLoopDelete,
+  GetLoanStatus,
+  getPaymentMethod,
+  getLoanRequest,
+  loanPaymentSearch,
+  getPaymentStatus,
+  loanScheduleSearch,
+  loan_approvalsSearch,
+  loan_documentsSearch,
+  getApprovalLoanRequest,
+  loan_status_history_search,
+  getCurrenyCode,
+  EmployeeDetailsRequest,
+  AcademicDetailsRequest,
+  LoanRequestDashboard,
+  visaRequestDashboard,
+  travelRequestsDashboard,
+  DashboardEmployeeInfoChange,
+  ApprovalLoan,
+  ApprovalVisa,
+  ApprovalTravel,
+  ApprovalAcademicInfo,
+  getEmployeeLeaveReport,
+  ApprovalPersonalInfo,
+  FamilyDetailRequest,
+  DashboardFamilyDetailChange,
+  ApprovalFamilyDetail
 
 };

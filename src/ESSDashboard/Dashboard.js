@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import "./Dashboard.css";
-import Circle from '../DashboardImages/circle.svg'
+import Circle from "../DashboardImages/circle.svg";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { getElementAtEvent } from "react-chartjs-2";
-import Vector from './Team.png';
+import Vector from "./Team.png";
 import Select from "react-select";
 import {
   Chart as ChartJS,
@@ -13,14 +13,14 @@ import {
   Tooltip as ChartTooltip,
   Legend as ChartLegend,
   Title,
-  ArcElement
+  ArcElement,
 } from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import config from '../Apiconfig';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import config from "../Apiconfig";
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
@@ -29,11 +29,19 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip, // Add this
-  Legend
+  Tooltip,
+  Legend,
 } from "recharts";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, ChartTooltip, ChartLegend, Title, ArcElement);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  ChartTooltip,
+  ChartLegend,
+  Title,
+  ArcElement,
+);
 
 const Dashboard = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -54,7 +62,7 @@ const Dashboard = () => {
   const gridColumnApiRef = useRef(null);
   const [rowData, setRowData] = useState([]);
   const [rowDataTeamList, setRowDataTeamList] = useState([]);
-  const user_code = sessionStorage.getItem('selectedUserCode');
+  const user_code = sessionStorage.getItem("selectedUserCode");
 
   const [employeeId, setEmployeeId] = useState("");
   const [employeeName, setEmployeeName] = useState("");
@@ -74,47 +82,49 @@ const Dashboard = () => {
   const [ipAddress, setIpAddress] = useState("");
   const [location, setLocation] = useState("");
   const [totalActiveEmployees, setTotalActiveEmployees] = useState(0);
-  const [formattedTotalActiveEmployees, setFormattedTotalActiveEmployees] = useState('0');
+  const [formattedTotalActiveEmployees, setFormattedTotalActiveEmployees] =
+    useState("0");
   const [TotalNetEarnings, setTotalNetEarnings] = useState(0);
-  const [formatedTotalEarnings, setformatedTotalEarnings] = useState('0');
-  const [FormatedTotalPayslip, setFormatedTotalPayslip] = useState('0');
-  const [TotalPayslips, setTotalPayslips] = useState(0)
+  const [formatedTotalEarnings, setformatedTotalEarnings] = useState("0");
+  const [FormatedTotalPayslip, setFormatedTotalPayslip] = useState("0");
+  const [TotalPayslips, setTotalPayslips] = useState(0);
 
   const [isSelectMarital, setIsSelectMarital] = useState(false);
   const [isSelectShift, setIsSelectShift] = useState(false);
   const navigate = useNavigate();
 
-  const [shiftEmpId, setShiftEmpId] = useState('');
-  const [selectedShiftEmpId, setSelectedShiftEmpId] = useState('');
+  const [shiftEmpId, setShiftEmpId] = useState("");
+  const [selectedShiftEmpId, setSelectedShiftEmpId] = useState("");
   const [shiftEmpIdDrop, setShiftEmpIdDrop] = useState([]);
   const [shiftEmpIdDropGrid, setShiftEmpIdDropGrid] = useState([]);
-  const [shiftDeptId, setShiftDeptId] = useState('');
-  const [selectedShiftDeptId, setSelectedShiftDeptId] = useState('');
+  const [shiftDeptId, setShiftDeptId] = useState("");
+  const [selectedShiftDeptId, setSelectedShiftDeptId] = useState("");
   const [shiftDeptIdDrop, setShiftDeptIdDrop] = useState([]);
   const [shiftDeptIdDropGrid, setShiftDeptIdDropGrid] = useState([]);
-  const [shiftDesigId, setShiftDesigId] = useState('');
-  const [selectedShiftDesigId, setSelectedShiftDesigId] = useState('');
+  const [shiftDesigId, setShiftDesigId] = useState("");
+  const [selectedShiftDesigId, setSelectedShiftDesigId] = useState("");
   const [shiftDesigIdDrop, setShiftDesigIdDrop] = useState([]);
   const [shiftDesigIdDropGrid, setShiftDesigIdDropGrid] = useState([]);
-  const [shiftPatternId, setShiftPatternId] = useState('');
-  const [selectedShiftPatternId, setSelectedShiftPatternId] = useState('');
+  const [shiftPatternId, setShiftPatternId] = useState("");
+  const [selectedShiftPatternId, setSelectedShiftPatternId] = useState("");
   const [shiftPatternIdDrop, setShiftPatternIdDrop] = useState([]);
   const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
-  const [shiftDay, setShiftDay] = useState('');
-  const [shiftFromDate, setShiftFromDate] = useState('');
-  const [shiftToDate, setShiftToDate] = useState('');
-  const [shiftCode, setShiftCode] = useState('');
-  const [selectedShiftCode, setSelectedShiftCode] = useState('');
+  const [shiftDay, setShiftDay] = useState("");
+  const [shiftFromDate, setShiftFromDate] = useState("");
+  const [shiftToDate, setShiftToDate] = useState("");
+  const [shiftCode, setShiftCode] = useState("");
+  const [selectedShiftCode, setSelectedShiftCode] = useState("");
   const [shiftCodeDrop, setShiftCodeDrop] = useState([]);
   const [shiftCodeDropGrid, setShiftCodeDropGrid] = useState([]);
-  const [shiftStartTime, setShiftStartTime] = useState('');
-  const [shiftEndTime, setShiftEndTime] = useState('');
+  const [shiftStartTime, setShiftStartTime] = useState("");
+  const [shiftEndTime, setShiftEndTime] = useState("");
   const [shiftRowData, setShiftRowData] = useState([]);
 
   const [isSelectedShiftEmpId, setIsSelectedShiftEmpId] = useState(false);
   const [isSelectedShiftDeptId, setIsSelectedShiftDeptId] = useState(false);
   const [isSelectedShiftDesigId, setIsSelectedShiftDesigId] = useState(false);
-  const [isSelectedShiftPatternId, setIsSelectedShiftPatternId] = useState(false);
+  const [isSelectedShiftPatternId, setIsSelectedShiftPatternId] =
+    useState(false);
   const [isSelectedShiftCode, setIsSelectedShiftCode] = useState(false);
   const [shiftData, setShiftData] = useState([]);
 
@@ -126,8 +136,8 @@ const Dashboard = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          company_code: sessionStorage.getItem('selectedCompanyCode'),
-        })
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       const data = await response.json();
@@ -140,17 +150,16 @@ const Dashboard = () => {
         "#F44336",
         "#00BCD4",
         "#8BC34A",
-        "#FFC107"
+        "#FFC107",
       ];
 
       const formatted = data.map((item, index) => ({
         name: item.Shift_Name,
         value: item.Employee_Count,
-        color: colors[index % colors.length]
+        color: colors[index % colors.length],
       }));
 
       setShiftData(formatted);
-
     } catch (error) {
       console.error(error);
     }
@@ -161,26 +170,28 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof totalActiveEmployees === 'number') {
-      setFormattedTotalActiveEmployees(totalActiveEmployees.toLocaleString('en-IN'));
+    if (typeof totalActiveEmployees === "number") {
+      setFormattedTotalActiveEmployees(
+        totalActiveEmployees.toLocaleString("en-IN"),
+      );
     } else {
-      setFormattedTotalActiveEmployees('0');
+      setFormattedTotalActiveEmployees("0");
     }
   }, [totalActiveEmployees]);
 
   useEffect(() => {
-    if (typeof TotalNetEarnings === 'number') {
-      setformatedTotalEarnings(TotalNetEarnings.toLocaleString('en-IN'));
+    if (typeof TotalNetEarnings === "number") {
+      setformatedTotalEarnings(TotalNetEarnings.toLocaleString("en-IN"));
     } else {
-      setformatedTotalEarnings('0');
+      setformatedTotalEarnings("0");
     }
   }, [TotalNetEarnings]);
 
   useEffect(() => {
-    if (typeof TotalPayslips === 'number') {
-      setFormatedTotalPayslip(TotalPayslips.toLocaleString('en-IN'));
+    if (typeof TotalPayslips === "number") {
+      setFormatedTotalPayslip(TotalPayslips.toLocaleString("en-IN"));
     } else {
-      setFormatedTotalPayslip('0');
+      setFormatedTotalPayslip("0");
     }
   }, [TotalPayslips]);
 
@@ -224,7 +235,7 @@ const Dashboard = () => {
       })
       // .then((val) => setDPTdrop(val))
       .catch((error) =>
-        console.error("Error fetching department data:", error)
+        console.error("Error fetching department data:", error),
       );
   }, []);
 
@@ -249,13 +260,13 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -265,7 +276,7 @@ const Dashboard = () => {
         }));
         setShiftCodeDropGrid(shiftOption);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
@@ -356,7 +367,7 @@ const Dashboard = () => {
   const handleChangeDeptId = (selectedShiftDeptId) => {
     setSelectedShiftDeptId(selectedShiftDeptId);
     setShiftDeptId(selectedShiftDeptId ? selectedShiftDeptId.value : "");
-    fetchDesignation(selectedShiftDeptId ? selectedShiftDeptId.value : '');
+    fetchDesignation(selectedShiftDeptId ? selectedShiftDeptId.value : "");
   };
 
   const handleChangeDesigId = (selectedShiftDesigId) => {
@@ -371,49 +382,56 @@ const Dashboard = () => {
 
   const handleChangeShiftPatternId = (selectedShiftPatternId) => {
     setSelectedShiftPatternId(selectedShiftPatternId);
-    setShiftPatternId(selectedShiftPatternId ? selectedShiftPatternId.value : "");
+    setShiftPatternId(
+      selectedShiftPatternId ? selectedShiftPatternId.value : "",
+    );
   };
 
   const fetchDesignation = async (selectedValue) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ dept_id: selectedValue, company_code: sessionStorage.getItem("selectedCompanyCode") }),
+        body: JSON.stringify({
+          dept_id: selectedValue,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       const data = await response.json();
       const formattedData = [
-        { value: 'All', label: 'All' },
+        { value: "All", label: "All" },
         ...data.map((product) => ({
           value: product.Desgination,
           label: product.Desgination,
-        }))
+        })),
       ];
 
       setShiftDesigIdDrop(formattedData);
       return formattedData;
     } catch (error) {
-      console.error('Error fetching product codes:', error);
+      console.error("Error fetching product codes:", error);
       return [];
     }
   };
-
 
   useEffect(() => {
     const fetchTotalActiveEmployees = async () => {
       try {
         const companyCode = sessionStorage.getItem("selectedCompanyCode");
 
-        const response = await fetch(`${config.apiBaseUrl}/TotalActiveEmployees`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `${config.apiBaseUrl}/TotalActiveEmployees`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code: companyCode }),
           },
-          body: JSON.stringify({ company_code: companyCode }),
-        });
+        );
 
         if (!response.ok) {
           throw new Error(`Server error: ${response.status}`);
@@ -421,7 +439,11 @@ const Dashboard = () => {
 
         const data = await response.json();
 
-        if (Array.isArray(data) && data.length > 0 && data[0].TotalActiveEmployeesWithPayslip !== undefined) {
+        if (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          data[0].TotalActiveEmployeesWithPayslip !== undefined
+        ) {
           const [{ TotalActiveEmployeesWithPayslip }] = data;
           setTotalActiveEmployees(TotalActiveEmployeesWithPayslip);
         } else {
@@ -429,7 +451,7 @@ const Dashboard = () => {
           setTotalActiveEmployees(0); // fallback
         }
       } catch (error) {
-        console.error('Error fetching TotalActiveEmployees:', error);
+        console.error("Error fetching TotalActiveEmployees:", error);
         setTotalActiveEmployees(0); // fallback
       }
     };
@@ -442,9 +464,9 @@ const Dashboard = () => {
         const companyCode = sessionStorage.getItem("selectedCompanyCode");
 
         const response = await fetch(`${config.apiBaseUrl}/TotalNetEarnings`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ company_code: companyCode }),
         });
@@ -455,7 +477,11 @@ const Dashboard = () => {
 
         const data = await response.json();
 
-        if (Array.isArray(data) && data.length > 0 && data[0].TotalNetEarnings_PreviousMonth !== undefined) {
+        if (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          data[0].TotalNetEarnings_PreviousMonth !== undefined
+        ) {
           const [{ TotalNetEarnings_PreviousMonth }] = data;
           setTotalNetEarnings(TotalNetEarnings_PreviousMonth);
         } else {
@@ -471,18 +497,15 @@ const Dashboard = () => {
     fetchTotalNetEarnings();
   }, []);
 
-
-
-
   useEffect(() => {
     const fetchTotalPayslips = async () => {
       try {
         const companyCode = sessionStorage.getItem("selectedCompanyCode");
 
         const response = await fetch(`${config.apiBaseUrl}/TotalPayslips`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ company_code: companyCode }),
         });
@@ -493,11 +516,18 @@ const Dashboard = () => {
 
         const data = await response.json();
 
-        if (Array.isArray(data) && data.length > 0 && data[0].TotalPayslips !== undefined) {
+        if (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          data[0].TotalPayslips !== undefined
+        ) {
           const [{ TotalPayslips }] = data;
           setTotalPayslips(TotalPayslips);
         } else {
-          console.warn("Unexpected or empty response for Total Payslips:", data);
+          console.warn(
+            "Unexpected or empty response for Total Payslips:",
+            data,
+          );
           setTotalPayslips(0);
         }
       } catch (error) {
@@ -530,7 +560,7 @@ const Dashboard = () => {
             (error) => {
               console.error("Error fetching location:", error);
               setLocation("Location unavailable");
-            }
+            },
           );
         } else {
           setLocation("Geolocation not supported");
@@ -543,16 +573,18 @@ const Dashboard = () => {
     fetchDeviceInfo();
   }, []);
 
-
   const handleChangeShift = (selectedShift) => {
     setSelectedShift(selectedShift);
-    setShift(selectedShift ? selectedShift.value : '');
+    setShift(selectedShift ? selectedShift.value : "");
   };
 
-  const filteredOptionShift = [{ value: 'All', label: 'All' }, ...shiftDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }))];
+  const filteredOptionShift = [
+    { value: "All", label: "All" },
+    ...shiftDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    })),
+  ];
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getcompanyshift`, {
@@ -560,23 +592,24 @@ const Dashboard = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
       .then((val) => setShiftDrop(val));
   }, []);
 
-
   const handleChangeMartial = (selectedMarital) => {
     setSelectedMaritalStatus(selectedMarital);
-    setMaritalStatus(selectedMarital ? selectedMarital.value : '');
+    setMaritalStatus(selectedMarital ? selectedMarital.value : "");
   };
 
-  const filteredOptionMartial = [{ value: 'All', label: 'All' }, ...maritalStatusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }))];
+  const filteredOptionMartial = [
+    { value: "All", label: "All" },
+    ...maritalStatusDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    })),
+  ];
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getMartial`, {
@@ -617,7 +650,7 @@ const Dashboard = () => {
   }, []);
 
   const startTimer = () => {
-    setIsCheckedIn(prev => {
+    setIsCheckedIn((prev) => {
       const newState = !prev;
 
       // SAVE CHECK-IN STATE
@@ -656,12 +689,11 @@ const Dashboard = () => {
     return `${hrs}:${mins}:${secs}`;
   };
 
-
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${day}-${month}-${year}`;
   };
 
@@ -706,10 +738,8 @@ const Dashboard = () => {
   //   return () => clearInterval(interval);
   // }, []);
 
-
   useEffect(() => {
     const fetchDashboardRequests = async () => {
-
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
       let leaveData = [];
@@ -717,6 +747,7 @@ const Dashboard = () => {
       let visaData = [];
       let travelData = [];
       let empData = [];
+      let familyChangeData = [];
 
       /* ---------- Leave ---------- */
       try {
@@ -725,8 +756,8 @@ const Dashboard = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             manager: user_code,
-            company_code
-          })
+            company_code,
+          }),
         });
 
         if (res.ok) leaveData = await res.json();
@@ -739,7 +770,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code })
+          body: JSON.stringify({ company_code }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -752,7 +783,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code })
+          body: JSON.stringify({ company_code }),
         });
 
         if (res.ok) visaData = await res.json();
@@ -762,11 +793,14 @@ const Dashboard = () => {
 
       /* ---------- Travel ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code })
-        });
+        const res = await fetch(
+          `${config.apiBaseUrl}/travelRequestsDashboard`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
 
         if (res.ok) travelData = await res.json();
       } catch (err) {
@@ -775,21 +809,39 @@ const Dashboard = () => {
 
       /* ---------- Employee Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/DashboardEmployeeInfoChange`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code })
-        });
+        const res = await fetch(
+          `${config.apiBaseUrl}/DashboardEmployeeInfoChange`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
 
         if (res.ok) empData = await res.json();
       } catch (err) {
         console.log("Employee API failed");
       }
+      /* ---------- Employee Family Change ---------- */
+      try {
+        const res = await fetch(
+          `${config.apiBaseUrl}/DashboardFamilyDetailChange`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
+
+        if (res.ok) familyChangeData = await res.json();
+      } catch (err) {
+        console.log("Family API failed");
+      }
 
       /* ---------- Leave ---------- */
       const formattedLeave = leaveData
-        .filter(r => r.LeaveStatus === "Pending")
-        .map(row => ({
+        .filter((r) => r.LeaveStatus === "Pending")
+        .map((row) => ({
           type: "Leave",
           id: row.EmployeeId,
           EmployeeId: row.EmployeeId,
@@ -802,17 +854,17 @@ const Dashboard = () => {
         }));
 
       /* ---------- Loan ---------- */
-      const formattedLoan = loanData.map(row => ({
+      const formattedLoan = loanData.map((row) => ({
         type: "Loan",
         id: row.loan_request_id,
         EmployeeId: row.employee_id,
         EmployeeName: row.Employee_Name,
         title: row.loan_type_id,
-        status: row.request_status
+        status: row.request_status,
       }));
 
       /* ---------- Visa ---------- */
-      const formattedVisa = visaData.map(row => ({
+      const formattedVisa = visaData.map((row) => ({
         type: "Visa",
         id: row.visa_request_id,
         EmployeeId: row.employee_id,
@@ -825,7 +877,7 @@ const Dashboard = () => {
       }));
 
       /* ---------- Travel ---------- */
-      const formattedTravel = travelData.map(row => ({
+      const formattedTravel = travelData.map((row) => ({
         type: "Travel",
         id: row.travel_request_id,
         EmployeeId: row.employee_id,
@@ -840,22 +892,38 @@ const Dashboard = () => {
       /* ---------- Employee Change Group ---------- */
       const grouped = {};
 
-      empData.forEach(row => {
-
+      empData.forEach((row) => {
         if (!grouped[row.Info_request_id]) {
           grouped[row.Info_request_id] = {
-            type: "Employee Change",
+            type: "Employee",
             id: row.Info_request_id,
             EmployeeId: row.EmployeeId,
             EmployeeName: row.Employee_Name,
-            title: "Employee Profile Changes",
-            status: row.request_status
+            title: "Detail Changes",
+            status: row.request_status,
           };
         }
-
       });
 
       const formattedEmp = Object.values(grouped);
+
+      /* ---------- Family Change Group ---------- */
+      const groupedFamily = {};
+
+      familyChangeData.forEach((row) => {
+        if (!groupedFamily[row.Info_request_id]) {
+          groupedFamily[row.Info_request_id] = {
+            type: "Family",
+            id: row.Info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Detail Changes",
+            status: row.request_status,
+          };
+        }
+      });
+
+      const formattedFamily = Object.values(groupedFamily);
 
       /* ---------- Merge ---------- */
       const merged = [
@@ -863,11 +931,11 @@ const Dashboard = () => {
         ...formattedVisa,
         ...formattedTravel,
         ...formattedLoan,
-        ...formattedEmp
+        ...formattedEmp,
+        ...formattedFamily,
       ];
 
       setDashboardRequests(merged);
-
     };
 
     fetchDashboardRequests();
@@ -876,7 +944,6 @@ const Dashboard = () => {
   }, []);
 
   const handleApproval = async (type, id, FromDate, isApproved) => {
-
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -887,7 +954,6 @@ const Dashboard = () => {
 
       /* ---------- Leave ---------- */
       if (type === "Leave") {
-
         const [day, month, year] = FromDate.split("-");
         const backendDate = `${year}-${month}-${day}`;
 
@@ -896,52 +962,64 @@ const Dashboard = () => {
         body = {
           EmployeeId: id,
           LeaveStatus: status,
-          FromDate: backendDate
+          FromDate: backendDate,
         };
-      }
-
-      /* ---------- Loan ---------- */
-      else if (type === "Loan") {
-
+      } else if (type === "Loan") {
+        /* ---------- Loan ---------- */
         url = `${config.apiBaseUrl}/ApprovalLoan`;
 
         body = {
           loan_request_id: id,
           company_code,
-          request_status: status
+          request_status: status,
         };
-      }
-
-      /* ---------- Visa ---------- */
-      else if (type === "Visa") {
-
+      } else if (type === "Visa") {
+        /* ---------- Visa ---------- */
         url = `${config.apiBaseUrl}/ApprovalVisa`;
 
         body = {
           visa_request_id: id,
           company_code,
-          request_status: status
+          request_status: status,
         };
-      }
-
-      /* ---------- Travel ---------- */
-      else if (type === "Travel") {
-
+      } else if (type === "Travel") {
+        /* ---------- Travel ---------- */
         url = `${config.apiBaseUrl}/ApprovalTravel`;
 
         body = {
           travel_request_id: id,
           company_code,
-          request_status: status
+          request_status: status,
+        };
+      } else if (type === "Employee Change") {
+        /* ---------- Employee Change ---------- */
+        url = `${config.apiBaseUrl}/ApprovalPersonalInfo`;
+
+        body = {
+          Info_request_id: id,
+          company_code,
+          request_status: status,
+          approver_id: sessionStorage.getItem("selectedUserCode"),
+        };
+      } else if (type === "Family Change") {
+        /* ---------- Family Change ---------- */
+        url = `${config.apiBaseUrl}/ApprovalFamilyDetail`;
+
+        body = {
+          Info_request_id: id,
+          company_code,
+          request_status: status,
+          approver_id: sessionStorage.getItem("selectedUserCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode"),
         };
       }
 
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
@@ -950,7 +1028,6 @@ const Dashboard = () => {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to process request");
       }
-
     } catch (error) {
       console.error("Approval error:", error);
       toast.error("Something went wrong");
@@ -965,7 +1042,7 @@ const Dashboard = () => {
   }, []);
 
   const bufferToBlobUrl = (buffer) => {
-    const blob = new Blob([new Uint8Array(buffer)], { type: 'image/jpeg' });
+    const blob = new Blob([new Uint8Array(buffer)], { type: "image/jpeg" });
     const url = URL.createObjectURL(blob); // Creates a Blob URL
     return url;
   };
@@ -997,7 +1074,6 @@ const Dashboard = () => {
 
       // Set final formatted data into state
       setNewJoinees(employeesWithImages);
-
     } catch (error) {
       console.error("Error fetching new joinees:", error);
     }
@@ -1026,7 +1102,7 @@ const Dashboard = () => {
       const responseData = await response.json();
 
       const employeesWithImages = responseData.map((person) => {
-        console.log(person.Photos);  // Check image buffer structure
+        console.log(person.Photos); // Check image buffer structure
 
         return {
           ...person,
@@ -1047,10 +1123,8 @@ const Dashboard = () => {
     fetchBirthdaysinfo();
   }, []);
 
-
   const [teamData, setTeamData] = useState(null); // State to store fetched data
   const [loading, setLoading] = useState(true); // State to handle loading
-
 
   const fetchTeamData = async () => {
     try {
@@ -1060,8 +1134,8 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          manager: manager, company_code: sessionStorage.getItem("selectedCompanyCode")
-
+          manager: manager,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });
       console.log(manager);
@@ -1079,8 +1153,8 @@ const Dashboard = () => {
             {
               label: "Team Distribution",
               data: teamDistribution,
-              backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-              borderColor: '#fff',
+              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
+              borderColor: "#fff",
               borderWidth: 2,
             },
           ],
@@ -1104,12 +1178,13 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          manager: manager, company_code: sessionStorage.getItem("selectedCompanyCode"),
+          manager: manager,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });
 
       const data = await response.json();
-      setRowDataTeamList(data)
+      setRowDataTeamList(data);
     } catch (error) {
       console.error("Error fetching grid data:", error);
       setRowDataTeamList([]);
@@ -1145,14 +1220,14 @@ const Dashboard = () => {
 
   const handleChangeManager = (SelectedManager) => {
     setSelectedManager(SelectedManager);
-    setManager(SelectedManager ? SelectedManager.value : '');
+    setManager(SelectedManager ? SelectedManager.value : "");
   };
 
   const teamOptions = {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       tooltip: {
         callbacks: {
@@ -1171,7 +1246,7 @@ const Dashboard = () => {
       field: "EmployeeId",
       onCellClicked: (params) => {
         const empId = params.value;
-        navigate('/AddEmployeeInfo', { state: { employeeId: empId } });
+        navigate("/AddEmployeeInfo", { state: { employeeId: empId } });
       },
     },
     {
@@ -1193,7 +1268,7 @@ const Dashboard = () => {
     {
       headerName: "Date",
       field: "Date",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       headerName: "Shift Pattern",
@@ -1201,10 +1276,12 @@ const Dashboard = () => {
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: shiftPatternIdDropGrid.map(d => d.value),
+        values: shiftPatternIdDropGrid.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+        const dept = shiftPatternIdDropGrid.find(
+          (d) => d.value === params.value,
+        );
         return dept ? dept.label : params.value;
       },
     },
@@ -1219,10 +1296,10 @@ const Dashboard = () => {
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: shiftCodeDropGrid.map(d => d.value),
+        values: shiftCodeDropGrid.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = shiftCodeDropGrid.find(d => d.value === params.value);
+        const dept = shiftCodeDropGrid.find((d) => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
@@ -1232,10 +1309,10 @@ const Dashboard = () => {
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: shiftEmpIdDropGrid.map(d => d.value),
+        values: shiftEmpIdDropGrid.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = shiftEmpIdDropGrid.find(d => d.value === params.value);
+        const dept = shiftEmpIdDropGrid.find((d) => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
@@ -1245,27 +1322,27 @@ const Dashboard = () => {
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: shiftDeptIdDropGrid.map(d => d.value),
+        values: shiftDeptIdDropGrid.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = shiftDeptIdDropGrid.find(d => d.value === params.value);
+        const dept = shiftDeptIdDropGrid.find((d) => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
     {
       headerName: "Designation",
       field: "desgination_id",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       headerName: "Start Time",
       field: "Start_Time",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       headerName: "End Time",
       field: "End_Time",
-      minWidth: 100
+      minWidth: 100,
     },
   ];
 
@@ -1343,7 +1420,6 @@ const Dashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-
   // const handleInsert = async () => {
   //   try {
   //     const response = await fetch(`${config.apiBaseUrl}/addDailyattendance`, {
@@ -1385,7 +1461,7 @@ const Dashboard = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userID: sessionStorage.getItem('selectedUserCode'),
+          userID: sessionStorage.getItem("selectedUserCode"),
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
@@ -1415,7 +1491,6 @@ const Dashboard = () => {
   //   }
   // }, []);
 
-
   // const handleRowSelection = (id, isChecked) => {
   //   if (isChecked) {
   //     console.log(`Row with ID ${id} selected`);
@@ -1428,7 +1503,7 @@ const Dashboard = () => {
 
   const handleRowSelection = (id, isChecked) => {
     setSelectedRows((prev) =>
-      isChecked ? [...prev, id] : prev.filter((rowId) => rowId !== id)
+      isChecked ? [...prev, id] : prev.filter((rowId) => rowId !== id),
     );
   };
 
@@ -1437,7 +1512,7 @@ const Dashboard = () => {
       const response = await fetch(`${config.apiBaseUrl}/EmpSearch`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           Employeeid: employeeId,
@@ -1451,13 +1526,13 @@ const Dashboard = () => {
           shift: shift,
           manager: sessionStorage.getItem("selectedUserCode"),
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-        })
+        }),
       });
       if (response.ok) {
         const searchData = await response.json();
         setRowData(searchData);
-        console.log(searchData)
-        console.log("data fetched successfully")
+        console.log(searchData);
+        console.log("data fetched successfully");
       } else if (response.status === 404) {
         console.log("Data not found");
         toast.warning("Data not found");
@@ -1477,7 +1552,7 @@ const Dashboard = () => {
       const response = await fetch(`${config.apiBaseUrl}/getAdEmpShiftReport`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           From_Date: shiftFromDate,
@@ -1491,12 +1566,12 @@ const Dashboard = () => {
           Start_Time: shiftStartTime,
           End_Time: shiftEndTime,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-        })
+        }),
       });
       if (response.ok) {
         const searchData = await response.json();
         setShiftRowData(searchData);
-        console.log(searchData)
+        console.log(searchData);
       } else if (response.status === 404) {
         console.log("Data not found");
         toast.warning("Data not found");
@@ -1608,17 +1683,20 @@ const Dashboard = () => {
     fetchAttendanceData();
   }, []);
 
-  const fetchLeaveStatusData = async (LeaveStatus = '') => {
+  const fetchLeaveStatusData = async (LeaveStatus = "") => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/DashboardOverallAttendanceData`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          manager: sessionStorage.getItem('selectedUserCode'),
-          company_code: sessionStorage.getItem('selectedCompanyCode'),
-          LeaveStatus: LeaveStatus
-        })
-      });
+      const response = await fetch(
+        `${config.apiBaseUrl}/DashboardOverallAttendanceData`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            manager: sessionStorage.getItem("selectedUserCode"),
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            LeaveStatus: LeaveStatus,
+          }),
+        },
+      );
 
       const result = await response.json();
 
@@ -1638,22 +1716,22 @@ const Dashboard = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          manager: sessionStorage.getItem('selectedUserCode'),
-          company_code: sessionStorage.getItem('selectedCompanyCode'),
-        })
+          manager: sessionStorage.getItem("selectedUserCode"),
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       const result = await response.json();
 
       if (Array.isArray(result)) {
-        const labels = result.map(item => item.Status);
-        const dataValues = result.map(item => item.Employees);
-        const backgroundColors = result.map(item =>
+        const labels = result.map((item) => item.Status);
+        const dataValues = result.map((item) => item.Employees);
+        const backgroundColors = result.map((item) =>
           item.Status === "Present"
             ? "green"
             : item.Status === "Leave"
               ? "blue"
-              : "red"
+              : "red",
         );
 
         const chart = {
@@ -1664,9 +1742,9 @@ const Dashboard = () => {
               data: dataValues,
               backgroundColor: backgroundColors,
               borderRadius: 0,
-              barThickness: 70
-            }
-          ]
+              barThickness: 70,
+            },
+          ],
         };
 
         setChartData(chart);
@@ -1713,24 +1791,24 @@ const Dashboard = () => {
     setShowChart(newState);
 
     if (!newState) {
-      fetchLeaveStatusData('');
+      fetchLeaveStatusData("");
     }
   };
 
   const columnLeave = [
     {
-      headerName: 'S.No',
+      headerName: "S.No",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
-      cellStyle: { textAlign: 'center' }
+      cellStyle: { textAlign: "center" },
     },
-    { headerName: 'Date', field: 'Date' },
-    { headerName: 'Employee ID', field: 'EmployeeId' },
-    { headerName: 'Employee Name', field: 'EmployeeName' },
-    { headerName: 'Department', field: 'department_ID' },
-    { headerName: 'Designation', field: 'designation_ID' },
-    { headerName: 'Manager', field: 'Manager' },
-    { headerName: 'Attendance Status', field: 'AttendanceStatus' }
+    { headerName: "Date", field: "Date" },
+    { headerName: "Employee ID", field: "EmployeeId" },
+    { headerName: "Employee Name", field: "EmployeeName" },
+    { headerName: "Department", field: "department_ID" },
+    { headerName: "Designation", field: "designation_ID" },
+    { headerName: "Manager", field: "Manager" },
+    { headerName: "Attendance Status", field: "AttendanceStatus" },
   ];
 
   const stopTimer = () => {
@@ -1749,7 +1827,7 @@ const Dashboard = () => {
 
     if (storedCheckIn === "true" && checkInTime) {
       const elapsedSeconds = Math.floor(
-        (Date.now() - Number(checkInTime)) / 1000
+        (Date.now() - Number(checkInTime)) / 1000,
       );
 
       setIsCheckedIn(true);
@@ -1758,9 +1836,7 @@ const Dashboard = () => {
 
       // 🔥 Restart timer after screen switch
       const id = setInterval(() => {
-        const seconds = Math.floor(
-          (Date.now() - Number(checkInTime)) / 1000
-        );
+        const seconds = Math.floor((Date.now() - Number(checkInTime)) / 1000);
         setSecondsPassed(seconds);
         setTimer(formatTime(seconds));
       }, 1000);
@@ -1778,7 +1854,7 @@ const Dashboard = () => {
   const transformShiftRowData = (data) => {
     return data.map((row) => {
       const patternObj = shiftPatternIdDropGrid.find(
-        (d) => d.value === row.Shift_Pattern_ID
+        (d) => d.value === row.Shift_Pattern_ID,
       );
 
       const patternName = patternObj
@@ -1786,7 +1862,7 @@ const Dashboard = () => {
         : "";
 
       const shiftObj = shiftCodeDropGrid.find(
-        (d) => d.value === row.Shift_Code
+        (d) => d.value === row.Shift_Code,
       );
 
       const shiftName = shiftObj
@@ -1794,29 +1870,27 @@ const Dashboard = () => {
         : "";
 
       const empObj = shiftEmpIdDropGrid.find(
-        (d) => d.value === row.Employee_ID
+        (d) => d.value === row.Employee_ID,
       );
 
       const empName = empObj
         ? empObj.label.split(" - ").slice(1).join(" - ")
         : "";
 
-      const deptObj = shiftDeptIdDropGrid.find(
-        (d) => d.value === row.dept_id
-      );
+      const deptObj = shiftDeptIdDropGrid.find((d) => d.value === row.dept_id);
 
       const deptName = deptObj
         ? deptObj.label.split(" - ").slice(1).join(" - ")
         : "";
 
       return {
-        "Date": row.Date || "",
+        Date: row.Date || "",
         "Shift Pattern": `${row.Shift_Pattern_ID} - ${patternName}` || "",
         "Day Sequence": row.Day_Sequence || "",
-        "Shift": `${row.Shift_Code} - ${shiftName}` || "",
+        Shift: `${row.Shift_Code} - ${shiftName}` || "",
         "Employee ID": `${row.Employee_ID} - ${empName}` || "",
-        "Department": `${row.dept_id} - ${deptName}` || "",
-        "Designation": row.desgination_id || "",
+        Department: `${row.dept_id} - ${deptName}` || "",
+        Designation: row.desgination_id || "",
         "Start Time": row.Start_Time || "",
         "End Time": row.End_Time || "",
       };
@@ -1869,7 +1943,10 @@ const Dashboard = () => {
     };
 
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
     ];
 
     /* ================= TABLE HEADER STYLE ================= */
@@ -1899,17 +1976,13 @@ const Dashboard = () => {
 
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell =
-          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
         if (!cell) continue;
 
         cell.s = {
           font: { color: { rgb: fontColor } },
-          fill:
-            R % 2 === 0
-              ? { fgColor: { rgb: altRowBg } }
-              : undefined,
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -1937,16 +2010,16 @@ const Dashboard = () => {
       return {
         "Employee ID": row.Employeeid || "",
         "Employee Name": row.First_Name || "",
-        "Department": row.department_ID || "",
-        "Designation": row.designation_ID || "",
-        "Manager": row.manager || "",
-        "Shift": row.shift || "",
+        Department: row.department_ID || "",
+        Designation: row.designation_ID || "",
+        Manager: row.manager || "",
+        Shift: row.shift || "",
         "Aadhaar No": row.AAdhar_no || "",
         "PF No": row.PFNo || "",
         "Account No": row.Account_NO || "",
         "Marital Status": row.marital_status || "",
-        "DOJ": row.DOJ || "",
-        "DOL": row.DOL || "",
+        DOJ: row.DOJ || "",
+        DOL: row.DOL || "",
       };
     });
   };
@@ -1997,7 +2070,10 @@ const Dashboard = () => {
     };
 
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
     ];
 
     /* ================= TABLE HEADER STYLE ================= */
@@ -2027,17 +2103,13 @@ const Dashboard = () => {
 
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell =
-          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
         if (!cell) continue;
 
         cell.s = {
           font: { color: { rgb: fontColor } },
-          fill:
-            R % 2 === 0
-              ? { fgColor: { rgb: altRowBg } }
-              : undefined,
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -2061,25 +2133,23 @@ const Dashboard = () => {
   };
 
   const convertDate = (date) => {
-
     if (!date) return "";
-
     const parts = date.split(/[-\/]/);
-
     const day = parts[0];
     const month = parts[1];
     const year = parts[2];
-
     return `${year}-${month}-${day}`;
-
   };
 
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="app-shadow-lg spacing-p-1 bg-light-color rounded-base main-header-box">
         <div className="header-flex">
-
           <div className="grid-col-12 grid-col-md-8">
             <div className="ticker-wrapper">
               <div className="ticker-text">{announcement}</div>
@@ -2100,7 +2170,7 @@ const Dashboard = () => {
               className="check-btn"
               style={{
                 backgroundColor: isCheckedIn ? "red" : "green",
-                color: "white"
+                color: "white",
               }}
               title={isCheckedIn ? "Check Out" : "Check In"}
             >
@@ -2112,19 +2182,28 @@ const Dashboard = () => {
 
       <div className="dashboard-layout mt-2">
         <div className="dashboard-row">
-
           <div className="grid-col-md-4">
             <div className="info-card-base rounded card-gradient-blue">
-              <img src={Circle} className='card-pulse-image' alt='' />
-              <div className="text-color-white font-weight-bold">Total Active Employees</div>
-              <div className="text-color-white font-size-4 display-flex spacing-mt-2"> {formattedTotalActiveEmployees}</div>
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Total Active Employees
+              </div>
+              <div className="text-color-white font-size-4 display-flex spacing-mt-2">
+                {" "}
+                {formattedTotalActiveEmployees}
+              </div>
             </div>
           </div>
 
           <div className="grid-col-md-4">
-            <div className="info-card-base rounded card-gradient-pink" style={{ cursor: "pointer" }}>
-              <img src={Circle} className='card-pulse-image' alt='' />
-              <div className="text-color-white font-weight-bold">Total Salary Generated</div>
+            <div
+              className="info-card-base rounded card-gradient-pink"
+              style={{ cursor: "pointer" }}
+            >
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Total Salary Generated
+              </div>
               <div className="text-color-white font-size-4 display-flex spacing-mt-2">
                 &#8377; {formatedTotalEarnings}
               </div>
@@ -2133,9 +2212,14 @@ const Dashboard = () => {
           </div>
 
           <div className="grid-col-md-4">
-            <div className="info-card-base rounded card-gradient-indigo" style={{ cursor: "pointer" }}>
-              <img src={Circle} className='card-pulse-image' alt='' />
-              <div className="text-color-white font-weight-bold">Number of Salary Generated</div>
+            <div
+              className="info-card-base rounded card-gradient-indigo"
+              style={{ cursor: "pointer" }}
+            >
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Number of Salary Generated
+              </div>
               <div className="text-color-white font-size-4 display-flex spacing-mt-2">
                 {FormatedTotalPayslip}
               </div>
@@ -2146,27 +2230,42 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-row row spacing-mt-2">
-
         <div className="col-lg-8">
           <div className="dashboard-row ">
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
                 <div className="display-flex flex-between-center">
-                  <h6 className="card-title-heading spacing-mb-0">Today Attendance</h6>
-                  <button className="shadow-none-custom app-btn btn-outline-primary-custom" onClick={handleToggle}>
+                  <h6 className="card-title-heading spacing-mb-0">
+                    Today Attendance
+                  </h6>
+                  <button
+                    className="shadow-none-custom app-btn btn-outline-primary-custom"
+                    onClick={handleToggle}
+                  >
                     {showChart ? "Leave Chart" : "Show Chart"}
                   </button>
                 </div>
 
-                <div className="chart-area-container" style={{ width: "100%", height: "280px", padding: "20px" }}>
+                <div
+                  className="chart-area-container"
+                  style={{ width: "100%", height: "280px", padding: "20px" }}
+                >
                   {showChart ? (
                     chartData ? (
-                      <Bar ref={chartRef} data={chartData} options={chartOptions} onClick={onBarClick} />
+                      <Bar
+                        ref={chartRef}
+                        data={chartData}
+                        options={chartOptions}
+                        onClick={onBarClick}
+                      />
                     ) : (
                       <p>Loading...</p>
                     )
                   ) : (
-                    <div className="app-grid-theme ag-theme-alpine" style={{ height: 255, width: '100%' }}>
+                    <div
+                      className="app-grid-theme ag-theme-alpine"
+                      style={{ height: 255, width: "100%" }}
+                    >
                       <AgGridReact
                         rowData={leaveRowData}
                         columnDefs={columnLeave}
@@ -2181,10 +2280,19 @@ const Dashboard = () => {
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base shift-pattern-wrapper rounded app-shadow-lg height-full">
                 <div className="display-flex flex-between-center">
-                  <h6 className="card-title-heading spacing-mb-0">Shift Pattern</h6>
+                  <h6 className="card-title-heading spacing-mb-0">
+                    Shift Pattern
+                  </h6>
                 </div>
 
-                <div className="shift-chart-container" style={{ position: 'relative', height: '240px', marginTop: '30px' }}>
+                <div
+                  className="shift-chart-container"
+                  style={{
+                    position: "relative",
+                    height: "240px",
+                    marginTop: "30px",
+                  }}
+                >
                   <ResponsiveContainer width="100%" height={240}>
                     <PieChart>
                       <Pie
@@ -2194,13 +2302,11 @@ const Dashboard = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={90}
-                      // label={({ name, value }) => `${name} (${value})`}
+                        // label={({ name, value }) => `${name} (${value})`}
                       >
-
                         {shiftData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
-
                       </Pie>
                       <Tooltip />
                       <Legend />
@@ -2225,8 +2331,13 @@ const Dashboard = () => {
                 <div className="display-flex flex-between-center flex-wrap">
                   <h6 className="card-title-heading">New Joinees</h6>
                 </div>
-                <div id="newJoineesCarousel" style={{ height: "250px" }} className="app-carousel carousel-slide" data-bs-ride="carousel">
-                  <div className="carousel-inner-custom" >
+                <div
+                  id="newJoineesCarousel"
+                  style={{ height: "250px" }}
+                  className="app-carousel carousel-slide"
+                  data-bs-ride="carousel"
+                >
+                  <div className="carousel-inner-custom">
                     {NewJoinees.length > 0 ? (
                       NewJoinees.map((joinee, index) => (
                         <div
@@ -2248,7 +2359,9 @@ const Dashboard = () => {
                         </div>
                       ))
                     ) : (
-                      <p className="text-align-center text-muted-color spacing-mt-3">No new joinees</p>
+                      <p className="text-align-center text-muted-color spacing-mt-3">
+                        No new joinees
+                      </p>
                     )}
                   </div>
                   {NewJoinees.length > 1 && (
@@ -2259,7 +2372,14 @@ const Dashboard = () => {
                         data-bs-target="#newJoineesCarousel"
                         data-bs-slide="prev"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill text-color-dark" viewBox="0 0 16 16">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-caret-left-fill text-color-dark"
+                          viewBox="0 0 16 16"
+                        >
                           <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
                         </svg>
                       </button>
@@ -2269,7 +2389,14 @@ const Dashboard = () => {
                         data-bs-target="#newJoineesCarousel"
                         data-bs-slide="next"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill text-color-dark" viewBox="0 0 16 16">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-caret-right-fill text-color-dark"
+                          viewBox="0 0 16 16"
+                        >
                           <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
                         </svg>
                       </button>
@@ -2280,11 +2407,14 @@ const Dashboard = () => {
             </div>
 
             <div className="grid-col-lg-6 spacing-mt-2">
-              <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
+              <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full">
                 <div className="display-flex flex-between-center">
                   <h6 className="card-title-heading">Upcoming Birthdays</h6>
                 </div>
-                <div className="birthday-list-container" style={{ height: "250px" }}>
+                <div
+                  className="birthday-list-container"
+                  style={{ height: "250px" }}
+                >
                   {upcomingBirthdays.length > 0 ? (
                     upcomingBirthdays.map((person) => (
                       <div key={person.id} className="birthday-profile-item">
@@ -2300,13 +2430,19 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div className="grid-col-12 spacing-mt-2">
-                          <h3 className="text-color-dark">{person.EmployeeName}</h3>
-                          <p className="app-badge spacing-p-1 text-bg-warning font-size-6">🎉🎂🎉🎂</p>
+                          <h3 className="text-color-dark">
+                            {person.EmployeeName}
+                          </h3>
+                          <p className="app-badge spacing-p-1 text-bg-warning font-size-6">
+                            🎉🎂🎉🎂
+                          </p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-align-center text-muted-color spacing-mt-3">No Upcoming Birthdays</p>
+                    <p className="text-align-center text-muted-color spacing-mt-3">
+                      No Upcoming Birthdays
+                    </p>
                   )}
                 </div>
               </div>
@@ -2314,14 +2450,11 @@ const Dashboard = () => {
 
             <div className="grid-col-12 spacing-mt-2">
               <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
-
                 {/* Header */}
                 <div className="myteam-header">
-
                   <h6 className="card-title-heading spacing-mb-2">My Team</h6>
 
                   <div className="myteam-actions">
-
                     <Select
                       id="status"
                       value={SelectedManager}
@@ -2341,16 +2474,17 @@ const Dashboard = () => {
                     >
                       {viewChart ? "Team List" : "Chart"}
                     </button>
-
                   </div>
-
                 </div>
 
                 {/* Content */}
                 {viewChart ? (
                   <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
                     <div className="grid-col-md-8 grid-col-12">
-                      <div className="chart-container spacing-mt-2" style={{ height: 250, width: "100%" }}>
+                      <div
+                        className="chart-container spacing-mt-2"
+                        style={{ height: 250, width: "100%" }}
+                      >
                         {teamData?.labels?.length > 0 ? (
                           <Doughnut data={teamData} options={teamOptions} />
                         ) : (
@@ -2371,7 +2505,6 @@ const Dashboard = () => {
                     />
                   </div>
                 )}
-
               </div>
             </div>
           </div>
@@ -2379,55 +2512,76 @@ const Dashboard = () => {
 
         {/* Leave Approval */}
         <div className="grid-col-lg-4">
-          <div className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg height-full" style={{ overflow: 'hidden' }}>
-
+          <div
+            className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg height-full"
+            style={{ overflow: "hidden" }}
+          >
             {/* Header with Count */}
             <div className="display-flex flex-between-center spacing-mb-3 padding-horizontal-2">
-              <h6 className="card-title-heading spacing-mb-0">Pending Requests</h6>
+              <h6 className="card-title-heading spacing-mb-0">
+                Pending Requests
+              </h6>
               <span className="leave-count-badge">
-                {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length} Pending
+                {
+                  dashboardRequests.filter(
+                    (r) => (r.status || "").toLowerCase() === "pending",
+                  ).length
+                }{" "}
+                Pending
               </span>
             </div>
 
             {/* Scrollable List Container */}
-            <div className="custom-list-container" style={{ height: "1000px", overflowY: "auto" }}>
-
+            <div
+              className="custom-list-container"
+              style={{ height: "1000px", overflowY: "auto" }}
+            >
               {dashboardRequests.length > 0 ? (
                 dashboardRequests.map((req, index) => (
-                  <div key={index} className="leave-item-modern" onClick={() =>
-                    navigate("/RequestReport", {
-                      state: {
-                        type: req.type,
-                        id: req.id,
-                        fromDate: convertDate(req.FromDate),
-                        toDate: convertDate(req.ToDate),
-                        employeeId: req.EmployeeId,
-                        status: "Pending",
-                        mode: "item"
-                      }
-                    })
-                  }>
-
+                  <div
+                    key={index}
+                    className="leave-item-modern"
+                    onClick={() =>
+                      navigate("/RequestReport", {
+                        state: {
+                          type: req.type,
+                          id: req.id,
+                          fromDate: convertDate(req.FromDate),
+                          toDate: convertDate(req.ToDate),
+                          employeeId: req.EmployeeId,
+                          status: "Pending",
+                          mode: "item",
+                        },
+                      })
+                    }
+                  >
                     {/* LEFT */}
                     <div className="leave-item-left">
                       <div className="emp-details">
                         <div className="emp-info-header">
                           <span className="emp-id-text">{req.EmployeeId}</span>
                           <span className="separator">-</span>
-                          <span className="emp-name-text">{req.EmployeeName}</span>
+                          <span className="emp-name-text">
+                            {req.EmployeeName}
+                          </span>
                         </div>
-                        <div className="leave-type-pill" onClick={(e) => {
-                          e.stopPropagation();
+                        <div
+                          className="leave-type-pill"
+                          onClick={(e) => {
+                            e.stopPropagation();
 
-                          navigate("/RequestReport", {
-                            state: {
-                              type: req.type,
-                              status: "Pending",
-                              mode: "type"
-                            }
-                          });
-                        }}>
-                          {req.type === "Employee Change" ? req.title : `${req.type} - ${req.title}`}
+                            navigate("/RequestReport", {
+                              state: {
+                                type: req.type,
+                                status: "Pending",
+                                mode: "type",
+                              },
+                            });
+                          }}
+                        >
+                          {req.type === "Employee Change"
+                            ? req.title
+                            : `${req.type} - ${req.title}`}
                         </div>
                       </div>
                     </div>
@@ -2437,7 +2591,9 @@ const Dashboard = () => {
                       {req.FromDate && (
                         <div className="date-box">
                           <span className="date-label">
-                            {req.days ? `Duration (${req.days} Days)` : "Duration"}
+                            {req.days
+                              ? `Duration (${req.days} Days)`
+                              : "Duration"}
                           </span>
                           <div className="date-range-text">
                             {req.FromDate}
@@ -2453,14 +2609,23 @@ const Dashboard = () => {
                       <div className="action-button-group">
                         <button
                           className="btn-action-minimal approve"
-                          onClick={() => handleApproval(req.type, req.id, req.FromDate, true)}
+                          onClick={() =>
+                            handleApproval(req.type, req.id, req.FromDate, true)
+                          }
                         >
                           <i className="fa-solid fa-check"></i>
                         </button>
                         <div className="action-divider"></div>
                         <button
                           className="btn-action-minimal reject"
-                          onClick={() => handleApproval(req.type, req.id, req.FromDate, false)}
+                          onClick={() =>
+                            handleApproval(
+                              req.type,
+                              req.id,
+                              req.FromDate,
+                              false,
+                            )
+                          }
                         >
                           <i className="fa-solid fa-xmark"></i>
                         </button>
@@ -2468,7 +2633,6 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))
-
               ) : (
                 <div className="no-data-state">
                   <i className="fa-solid fa-calendar-check"></i>
@@ -2476,7 +2640,6 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-
           </div>
         </div>
       </div>
@@ -2484,10 +2647,11 @@ const Dashboard = () => {
       <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
           <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
-            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Employee Shift Details</h6>
+            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">
+              Employee Shift Details
+            </h6>
 
             <div className="dashboard-row mb-2-me-1">
-
               <div className="grid-col-md-3">
                 <div className="inputGroup">
                   <input
@@ -2693,7 +2857,10 @@ const Dashboard = () => {
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
-                  <div className="icon-btn excel" onClick={handleExportToExcelShift}>
+                  <div
+                    className="icon-btn excel"
+                    onClick={handleExportToExcelShift}
+                  >
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
                   </div>
@@ -2702,7 +2869,10 @@ const Dashboard = () => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div
+                className="app-grid-theme ag-theme-alpine mt-2 rounded-xl"
+                style={{ height: 440, width: "100%" }}
+              >
                 <AgGridReact
                   columnDefs={ShiftColDefs}
                   rowData={shiftRowData}
@@ -2721,7 +2891,9 @@ const Dashboard = () => {
       <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
           <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
-            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Employee Details</h6>
+            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">
+              Employee Details
+            </h6>
 
             <div className="dashboard-row mb-2-me-1">
               <div className="grid-col-md-3">
@@ -2917,7 +3089,10 @@ const Dashboard = () => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div
+                className="app-grid-theme ag-theme-alpine mt-2 rounded-xl"
+                style={{ height: 440, width: "100%" }}
+              >
                 <AgGridReact
                   columnDefs={columnDefs}
                   rowData={rowData}

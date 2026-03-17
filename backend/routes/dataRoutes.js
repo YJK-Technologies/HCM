@@ -1332,8 +1332,12 @@ router.post("/DashboardEmployeeInfoChange",dataController.DashboardEmployeeInfoC
 router.post("/ApprovalLoan",dataController.ApprovalLoan) 
 router.post("/ApprovalVisa",dataController.ApprovalVisa) 
 router.post("/ApprovalTravel",dataController.ApprovalTravel) 
+router.post("/ApprovalPersonalInfo",dataController.ApprovalPersonalInfo) 
+router.post("/FamilyDetailRequest",dataController.FamilyDetailRequest) 
+router.post("/DashboardFamilyDetailChange",dataController.DashboardFamilyDetailChange) 
 router.post("/ApprovalAcademicInfo",dataController.ApprovalAcademicInfo) 
 router.post("/getEmployeeLeaveReport",dataController.getEmployeeLeaveReport) 
+router.post("/ApprovalFamilyDetail",dataController.ApprovalFamilyDetail) 
 
 
 

@@ -118,6 +118,7 @@ import LoanPayment from "./EmpRequests/LoanPayment.js"
 import LoanSchedule from "./EmpRequests/LoanSchedule.js"
 import LoanType from "./EmpRequests/LoanType.js"
 import ManualEmployeeInfo from "./ESSComponents/ManualEmployeeInfo.js"
+import EmpFamPersonalDetail from "./ESSComponents/EmpFamPersonalDetail.js"
 import AcademicDetReq from "./ESSComponents/AcademicDetailsRequest.js"
 import LeaveRequest from "./EmpRequests/LeaveRequest.js"
 import RequestReport from "./ESSDashboard/RequestReport.js"
@@ -316,6 +317,7 @@ function Main() {
     { path: "/LoanType", component: <LoanType /> },
     { path: "/ManualEmployeeInfo", component: <ManualEmployeeInfo /> },
     { path: "/LeaveRequest", component: <LeaveRequest /> },
+    { path: "/EmpFamPersonalDetail", component: <EmpFamPersonalDetail /> },
     { path: "/AcademicDetReq", component: <AcademicDetReq /> },
     { path: "/RequestReport", component: <RequestReport /> },
 
