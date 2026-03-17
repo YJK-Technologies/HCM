@@ -45326,7 +45326,8 @@ const DashboardFamilyDetailChange = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .query(`
-        EXEC sp_ess_Family_Detail_Request 'SC','','','','',NULL,'','',0,@company_code,'','','',NULL,'',NULL,'',NULL,'','','','','',0`);
+        EXEC sp_ess_Family_Detail_Request 'SC','','','','','',0,'','',@company_code,'','','','','','',0,'',0,'',NULL,
+'','','',0`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45393,6 +45394,41 @@ const getEmployeeLeaveReport = async (req, res) => {
   }
 };
 //Code ended by pavun on 16-03-26
+
+//code added by sakthi on 3-17-26
+const ApprovalFamilyDetail = async (req, res) => {
+  const {
+    Info_request_id,
+    request_status,
+    modified_by,
+    approver_id,
+    company_code,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "AP")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("approver_id", sql.NVarChar, approver_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("Info_request_id", sql.Int, Info_request_id)
+      .query( `EXEC sp_ess_Family_Detail_Request 'AP','','','','',NULL,NULL,'','',@company_code,'','','',NULL,'',NULL,'',NULL,'','','',@modified_by,@approver_id,@request_status,'',@Info_request_id `);
+    res.status(200).json({
+      message: `Family detail request ${request_status} successfully`,
+    });
+
+  } catch (err) {
+    console.error("Error approving family detail request:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+// code ended by sakthi on 3-17-26
 
 module.exports = {
   login,
@@ -46697,10 +46733,11 @@ module.exports = {
   ApprovalLoan,
   ApprovalVisa,
   ApprovalTravel,
-    ApprovalAcademicInfo,
-    getEmployeeLeaveReport,
+  ApprovalAcademicInfo,
+  getEmployeeLeaveReport,
   ApprovalPersonalInfo,
   FamilyDetailRequest,
-  DashboardFamilyDetailChange
+  DashboardFamilyDetailChange,
+  ApprovalFamilyDetail
 
 };

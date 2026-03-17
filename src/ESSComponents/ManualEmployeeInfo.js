@@ -116,8 +116,25 @@ function ManualEmployeeInfo({}) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-    handleRefNo(employeeId);
-  }, []);
+    if(IDdrop.length > 0 ||
+      genderdrop.length > 0 ||
+      KidsDrop.length > 0 ||
+      titleDrop.length > 0 ||
+      nationalityDrop.length > 0 ||
+      religionDrop.length > 0 ||
+      Marital_StatusDrop.length > 0 ||
+      emergencyContactRelationDrop.length > 0 ||
+      cityDrop.length > 0 ||
+      countryDrop.length > 0 || 
+      stateDrop.length > 0 ||
+      otherDrop.length > 0 || employeeId
+    ){
+      handleRefNo(employeeId);
+    }
+    
+  }, [employeeId, IDdrop, genderdrop, KidsDrop, titleDrop, nationalityDrop, religionDrop,
+     Marital_StatusDrop, emergencyContactRelationDrop, cityDrop, countryDrop, stateDrop, otherDrop
+  ]);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -843,7 +860,7 @@ function ManualEmployeeInfo({}) {
 
 
   return (
-    <div class="container-fluid Topnav-screen">
+    <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
       <ToastContainer
         position="top-right"
@@ -907,7 +924,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="FirstName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 required
@@ -930,7 +947,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="MiddleName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 value={Middle_Name}
@@ -948,7 +965,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="LastName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 value={Last_Name}
@@ -970,7 +987,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="FatherName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 value={Father_Name}
@@ -992,7 +1009,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="MotherName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 value={Mother_Name}
@@ -1014,7 +1031,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="dob"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="date"
                 placeholder=""
                 value={DOB}
@@ -1166,7 +1183,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="address1"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
                 value={address1}
@@ -1188,7 +1205,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="address2"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
                 value={address2}
@@ -1210,7 +1227,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="address3"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
                 value={address3}
@@ -1232,7 +1249,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="permanantAddress"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
                 value={permanantAddress}
@@ -1254,7 +1271,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="ReferenceName"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
                 value={reference_Name}
@@ -1276,7 +1293,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="ReferencePhone"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="Number"
                 placeholder=""
                 value={reference_Phone}
@@ -1332,7 +1349,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="Panno"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 value={pan_No}
@@ -1359,7 +1376,7 @@ function ManualEmployeeInfo({}) {
             <div className="inputGroup">
               <input
                 id="Aadharno"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="Number"
                 placeholder=""
                 value={Aadhaar_no}

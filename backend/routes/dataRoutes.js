@@ -1337,6 +1337,7 @@ router.post("/FamilyDetailRequest",dataController.FamilyDetailRequest)
 router.post("/DashboardFamilyDetailChange",dataController.DashboardFamilyDetailChange) 
 router.post("/ApprovalAcademicInfo",dataController.ApprovalAcademicInfo) 
 router.post("/getEmployeeLeaveReport",dataController.getEmployeeLeaveReport) 
+router.post("/ApprovalFamilyDetail",dataController.ApprovalFamilyDetail) 
 
 
 
