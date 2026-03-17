@@ -114,6 +114,18 @@ function RequestReport({ }) {
 
         }
 
+        else if (type === "Travel") {
+
+            url = `${config.apiBaseUrl}/DashboardEmployeeInfoChange`;
+
+            body = {
+                travel_request_id: safeId,
+                request_status: status,
+                company_code
+            };
+
+        }
+
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

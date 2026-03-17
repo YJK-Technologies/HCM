@@ -2,25 +2,40 @@ import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import TabButtons from "./Tabs";
 import AcademicDetails from "./AcademicDetPopup.js";
-import PdfPreview from './PdfPreviewHelp'
-import LoadingScreen from '../Loading';
+import PdfPreview from "./PdfPreviewHelp";
+import LoadingScreen from "../Loading";
 
-const config = require('../Apiconfig');
+const config = require("../Apiconfig");
 
-function Input({ }) {
-
-  const [Academic, setAcademic] = useState([{ relation: 'Academic', members: [{ academicName: '', major: '', institution: '', academicYear: '', document: null, documentUrl: '', keyfield: '', purpose: '' }] }]);
+function Input({}) {
+  const [Academic, setAcademic] = useState([
+    {
+      relation: "Academic",
+      members: [
+        {
+          academicName: "",
+          major: "",
+          institution: "",
+          academicYear: "",
+          document: null,
+          documentUrl: "",
+          keyfield: "",
+          purpose: "",
+        },
+      ],
+    },
+  ]);
   const [EmployeeId, setEmployeeId] = useState("");
   const [error, setError] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [document, setDocument] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
   const navigate = useNavigate();
-  const created_by = sessionStorage.getItem('selectedUserCode')
+  const created_by = sessionStorage.getItem("selectedUserCode");
   const [open, setOpen] = React.useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
@@ -29,20 +44,20 @@ function Input({ }) {
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
-  const [First_Name, setFirst_Name] = useState('');
+  const [First_Name, setFirst_Name] = useState("");
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
   const [loading, setLoading] = useState(false);
 
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const academicPermissions = permissions
-    .filter(permission => permission.screen_type === 'AcademicDet')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "AcademicDet")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
-    setIsModalOpen(true);  // Show the modal
+    setIsModalOpen(true); // Show the modal
   };
 
   const handleCloseModal = () => {
@@ -55,14 +70,28 @@ function Input({ }) {
     handleAcademic(employeeId);
   }, []);
 
-
   const addRow = (relation) => {
     setAcademic((prev) =>
       prev.map((item) =>
         item.relation === relation
-          ? { ...item, members: [...item.members, { academicName: '', major: '', institution: '', academicYear: '', document: null, documentUrl: '', keyfield: '', purpose: '' }] }
-          : item
-      )
+          ? {
+              ...item,
+              members: [
+                ...item.members,
+                {
+                  academicName: "",
+                  major: "",
+                  institution: "",
+                  academicYear: "",
+                  document: null,
+                  documentUrl: "",
+                  keyfield: "",
+                  purpose: "",
+                },
+              ],
+            }
+          : item,
+      ),
     );
   };
 
@@ -71,14 +100,13 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? { ...item, members: item.members.filter((_, i) => i !== index) }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
   const handleSave = async () => {
-    if (
-      !EmployeeId) {
+    if (!EmployeeId) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
@@ -86,7 +114,13 @@ function Input({ }) {
 
     for (const relationGroup of Academic) {
       for (const member of relationGroup.members) {
-        if (!member.academicName || !member.major || !member.institution || !member.academicYear|| !member.purpose) {
+        if (
+          !member.academicName ||
+          !member.major ||
+          !member.institution ||
+          !member.academicYear ||
+          !member.purpose
+        ) {
           setError(true);
           toast.warning("Error: Missing required fields");
           return;
@@ -95,8 +129,6 @@ function Input({ }) {
     }
 
     const employeeData = await Promise.all(
-
-
       Academic.flatMap((relationGroup) =>
         relationGroup.members.map(async (member) => {
 
@@ -134,13 +166,16 @@ function Input({ }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/AcademicDetailsRequest`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.apiBaseUrl}/AcademicDetailsRequest`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employeeData }),
         },
-        body: JSON.stringify({ employeeData }),
-      });
+      );
       if (response.ok) {
         toast.success("Data inserted successfully!", {
           onClose: () => window.location.reload(),
@@ -148,13 +183,11 @@ function Input({ }) {
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
@@ -169,7 +202,11 @@ function Input({ }) {
     });
   };
 
-  const convertBufferToBlobUrlAndFile = (buffer, fileName = "document.pdf", mimeType = "application/pdf") => {
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf",
+  ) => {
     if (buffer && buffer.type === "Buffer") {
       const byteArray = new Uint8Array(buffer.data);
       const blob = new Blob([byteArray], { type: mimeType });
@@ -187,7 +224,10 @@ function Input({ }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), })
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       if (response.ok) {
@@ -195,15 +235,24 @@ function Input({ }) {
         setSaveButtonVisible(true);
         setShowAsterisk(false);
         setIsAcademicDataLoaded(true);
-        const [{ EmployeeId, department_id, designation_id, First_Name }] = searchData;
+        const [{ EmployeeId, department_id, designation_id, First_Name }] =
+          searchData;
         setdepartment_id(department_id);
         setdesignation_id(designation_id);
         setFirst_Name(First_Name);
 
         const updatedFamilyMembers = searchData.reduce((acc, item) => {
-          const { academicName, academicYear, document, institution, keyfield, major, purpose} = item;
+          const {
+            academicName,
+            academicYear,
+            document,
+            institution,
+            keyfield,
+            major,
+            purpose,
+          } = item;
 
-          console.log(document)
+          console.log(document);
           const formattedDOB = formatDate(academicYear);
 
           let documentUrl = null;
@@ -228,17 +277,19 @@ function Input({ }) {
             keyfield: keyfield,
             documentUrl: documentUrl,
             document: documentFile,
-            purpose:purpose
+            purpose: purpose,
           };
 
-          const existingRelation = acc.find(group => group.relation === academicName);
+          const existingRelation = acc.find(
+            (group) => group.relation === academicName,
+          );
 
           if (existingRelation) {
             existingRelation.members.push(memberData);
           } else {
             acc.push({
               relation: academicName,
-              members: [memberData]
+              members: [memberData],
             });
           }
           return acc;
@@ -247,21 +298,23 @@ function Input({ }) {
         setAcademic(updatedFamilyMembers);
         setEmployeeId(EmployeeId);
       } else if (response.status === 404) {
-        toast.warning('Data not found');
+        toast.warning("Data not found");
         setAcademic([
           {
-            relation: 'Academic',
-            members: [{
-              academicName: '',
-              major: '',
-              institution: '',
-              academicYear: '',
-              document: null,
-              documentUrl: '',
-              keyfield: '',
-              purpose: ''
-            }]
-          }
+            relation: "Academic",
+            members: [
+              {
+                academicName: "",
+                major: "",
+                institution: "",
+                academicYear: "",
+                document: null,
+                documentUrl: "",
+                keyfield: "",
+                purpose: "",
+              },
+            ],
+          },
         ]);
       } else {
         const errorResponse = await response.json();
@@ -270,7 +323,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
 
@@ -279,38 +332,38 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: item.members.map((member, i) =>
-              i === index ? { ...member, [field]: value } : member
-            ),
-          }
-          : item
-      )
+              ...item,
+              members: item.members.map((member, i) =>
+                i === index ? { ...member, [field]: value } : member,
+              ),
+            }
+          : item,
+      ),
     );
   };
 
   const handleFileChange = (event, relation, index) => {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
+    if (file && file.type === "application/pdf") {
       const fileUrl = URL.createObjectURL(file);
 
       setAcademic((prevDocuments) =>
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                    ...member,
-                    document: file,
-                    documentUrl: fileUrl,
-                  }
-                  : member
-              ),
-            }
-            : doc
-        )
+                ...doc,
+                members: doc.members.map((member, i) =>
+                  i === index
+                    ? {
+                        ...member,
+                        document: file,
+                        documentUrl: fileUrl,
+                      }
+                    : member,
+                ),
+              }
+            : doc,
+        ),
       );
 
       setDocumentUrl((prev) => ({
@@ -318,30 +371,33 @@ function Input({ }) {
         [index]: fileUrl,
       }));
     } else {
-      toast.warning('Please upload a valid PDF file.');
-      event.target.value = '';
+      toast.warning("Please upload a valid PDF file.");
+      event.target.value = "";
     }
   };
-
 
   const AcademicDet = () => {
     navigate("/AcademicDetReq");
   };
-
+  const Insurance1 = () => {
+    navigate("/EmpFamPersonalDetail");
+  };
   const EmployeeLoan = () => {
     navigate("/ManualEmployeeInfo");
   };
 
-
-  const [activeTab, setActiveTab] = useState('Academic Details');
+  const [activeTab, setActiveTab] = useState("Academic Details");
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'Personal Details':
+      case "Personal Details":
         EmployeeLoan();
         break;
-      case 'Academic Details':
+      case "Family":
+        Insurance1();
+        break;
+      case "Academic Details":
         AcademicDet();
         break;
       default:
@@ -350,9 +406,9 @@ function Input({ }) {
   };
 
   const tabs = [
-    { label: 'Personal Details' },
-    { label: 'Academic Details' },
-
+    { label: "Personal Details" },
+    { label: "Family" },
+    { label: "Academic Details" },
   ];
 
   const reloadGridData = () => {
@@ -360,12 +416,14 @@ function Input({ }) {
   };
 
   const handleUpdate = async (relationName, index) => {
-    const relationGroup = Academic.find(group => group.relation === relationName);
+    const relationGroup = Academic.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -375,13 +433,20 @@ function Input({ }) {
       return;
     }
 
-    if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
+    if (
+      !member.academicName ||
+      !member.major ||
+      !member.institution ||
+      !member.academicYear
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
     console.log(fileBase64);
 
     const editedData = {
@@ -392,19 +457,22 @@ function Input({ }) {
       academicYear: member.academicYear,
       document: fileBase64,
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
 
     try {
-      setLoading(true)
-      const response = await fetch(`${config.apiBaseUrl}/updateEmployeeAcademicDetails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      setLoading(true);
+      const response = await fetch(
+        `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ editedData: [editedData] }),
         },
-        body: JSON.stringify({ editedData: [editedData] }),
-      });
+      );
 
       if (response.ok) {
         toast.success("Data updated successfully!", {
@@ -413,25 +481,25 @@ function Input({ }) {
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (relationName, index) => {
-    const relationGroup = Academic.find(group => group.relation === relationName);
+    const relationGroup = Academic.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -441,30 +509,40 @@ function Input({ }) {
       return;
     }
 
-    if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
+    if (
+      !member.academicName ||
+      !member.major ||
+      !member.institution ||
+      !member.academicYear
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
     console.log(fileBase64);
 
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
 
     try {
-      setLoading(true)
-      const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeAcademicDetails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      setLoading(true);
+      const response = await fetch(
+        `${config.apiBaseUrl}/deleteEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ keyfieldsToDelete: [keyfieldsToDelete] }),
         },
-        body: JSON.stringify({ keyfieldsToDelete: [keyfieldsToDelete] }),
-      });
+      );
 
       if (response.ok) {
         toast.success("Data deleted successfully!", {
@@ -473,13 +551,11 @@ function Input({ }) {
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
@@ -488,8 +564,8 @@ function Input({ }) {
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -500,43 +576,47 @@ function Input({ }) {
     if (selectedDate > today) {
       toast.warning("Future dates are not allowed!");
     } else {
-      RelationInputChange(relation, idx, 'academicYear', e.target.value);
+      RelationInputChange(relation, idx, "academicYear", e.target.value);
     }
   };
 
   const handleRemovePdf = (relation, index) => {
-    setAcademic(prev =>
-      prev.map(doc =>
+    setAcademic((prev) =>
+      prev.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((m, i) =>
-              i === index
-                ? { ...m, document: null, documentUrl: "" }
-                : m
-            )
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((m, i) =>
+                i === index ? { ...m, document: null, documentUrl: "" } : m,
+              ),
+            }
+          : doc,
+      ),
     );
   };
-
 
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Academic Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && ['add', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
-              <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
-              </div>
-            )}
+            {saveButtonVisible &&
+              ["add", "all permission"].some((permission) =>
+                academicPermissions.includes(permission),
+              ) && (
+                <div className="action-icon add" onClick={handleSave}>
+                  <span className="tooltip">save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -544,43 +624,59 @@ function Input({ }) {
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              {saveButtonVisible && ['add', 'all permission'].some(p => academicPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
+              {saveButtonVisible &&
+                ["add", "all permission"].some((p) =>
+                  academicPermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  </li>
+                )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
-
             </ul>
           </div>
-
         </div>
       </div>
 
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
 
       {Academic.map((relationGroup, relationIndex) => (
-        <div key={relationIndex} className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
+        <div
+          key={relationIndex}
+          className="shadow-lg p-2 bg-light rounded mt-2 container-form-box"
+        >
           {relationGroup.members.map((member, index) => (
             <div key={index} className="row g-3">
-
               <div className="col-md-1">
                 <div className="inputGroup">
-                  <button type="button" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
+                  <button
+                    type="button"
+                    className="btn btn-primary ms-3"
+                    onClick={() => addRow(relationGroup.relation)}
+                  >
                     <i className="fa-solid fa-circle-plus"></i>
                   </button>
                   {relationGroup.members.length > 1 && (
-                    <button type="button" className="btn btn-danger"
-                      onClick={() => deleteRow(relationGroup.relation, index)}>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => deleteRow(relationGroup.relation, index)}
+                    >
                       <i className="fa-regular fa-trash-can"></i>
                     </button>
                   )}
@@ -596,9 +692,20 @@ function Input({ }) {
                     placeholder=" "
                     autoComplete="off"
                     maxLength={50}
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicName', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "academicName",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.academicName ? 'text-danger' : ''}`}>Academic Name<span className="text-danger">*</span></label>
+                  <label
+                    className={`exp-form-labels ${error && !member.academicName ? "text-danger" : ""}`}
+                  >
+                    Academic Name<span className="text-danger">*</span>
+                  </label>
                 </div>
               </div>
 
@@ -611,9 +718,20 @@ function Input({ }) {
                     maxLength={125}
                     placeholder=" "
                     autoComplete="off"
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'major', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "major",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.major ? 'text-danger' : ''}`}>Major<span className="text-danger">*</span></label>
+                  <label
+                    className={`exp-form-labels ${error && !member.major ? "text-danger" : ""}`}
+                  >
+                    Major<span className="text-danger">*</span>
+                  </label>
                 </div>
               </div>
 
@@ -626,9 +744,20 @@ function Input({ }) {
                     maxLength={225}
                     placeholder=" "
                     autoComplete="off"
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'institution', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "institution",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.institution ? 'text-danger' : ''}`}>Institution<span className="text-danger">*</span></label>
+                  <label
+                    className={`exp-form-labels ${error && !member.institution ? "text-danger" : ""}`}
+                  >
+                    Institution<span className="text-danger">*</span>
+                  </label>
                 </div>
               </div>
 
@@ -643,9 +772,16 @@ function Input({ }) {
                     // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicYear', e.target.value)}
                     value={member.academicYear}
                     max={new Date().toISOString().split("T")[0]} // Restrict future dates
-                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+                    onChange={(e) =>
+                      handleDateChange(e, relationGroup.relation, index)
+                    }
                   />
-                  <label for="add1" className={`exp-form-labels ${error && !member.relationName ? 'text-danger' : ''}`}>Academic Year<span className="text-danger">*</span></label>
+                  <label
+                    for="add1"
+                    className={`exp-form-labels ${error && !member.relationName ? "text-danger" : ""}`}
+                  >
+                    Academic Year<span className="text-danger">*</span>
+                  </label>
                 </div>
               </div>
 
@@ -658,16 +794,26 @@ function Input({ }) {
                     placeholder=" "
                     autoComplete="off"
                     maxLength={50}
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'purpose', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "purpose",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.purpose ? 'text-danger' : ''}`}>Purpose<span className="text-danger">*</span></label>
+                  <label
+                    className={`exp-form-labels ${error && !member.purpose ? "text-danger" : ""}`}
+                  >
+                    Purpose<span className="text-danger">*</span>
+                  </label>
                 </div>
               </div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className="image-upload-container">
-
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"
@@ -716,22 +862,31 @@ function Input({ }) {
               <div className="col-md-1 ">
                 {isAcademicDataLoaded && (
                   <div className="inputGroup">
-                    {['update', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
+                    {["update", "all permission"].some((permission) =>
+                      academicPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-success"
                         title="Update"
-                        onClick={() => handleUpdate(relationGroup.relation, index)} // Pass the specific row data
+                        onClick={() =>
+                          handleUpdate(relationGroup.relation, index)
+                        } // Pass the specific row data
                       >
                         <i className="fa-solid fa-floppy-disk"></i>
                       </button>
                     )}
-                    {['delete', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
+                    {["delete", "all permission"].some((permission) =>
+                      academicPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-danger"
                         title="Delete"
-                        onClick={() => handleDelete(relationGroup.relation, index)}>
+                        onClick={() =>
+                          handleDelete(relationGroup.relation, index)
+                        }
+                      >
                         <i className="fa-solid fa-trash"></i>
                       </button>
                     )}
@@ -743,7 +898,11 @@ function Input({ }) {
         </div>
       ))}
       <div>
-        <PdfPreview open={isModalOpen} pdfUrl={currentPdfUrl} handleClose={handleCloseModal} />
+        <PdfPreview
+          open={isModalOpen}
+          pdfUrl={currentPdfUrl}
+          handleClose={handleCloseModal}
+        />
       </div>
     </div>
   );
