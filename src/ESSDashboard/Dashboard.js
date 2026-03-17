@@ -5,16 +5,7 @@ import { Doughnut, Bar } from "react-chartjs-2";
 import { getElementAtEvent } from "react-chartjs-2";
 import Vector from './Team.png';
 import Select from "react-select";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip as ChartTooltip,
-  Legend as ChartLegend,
-  Title,
-  ArcElement
-} from "chart.js";
+import {Chart as ChartJS,BarElement,CategoryScale,LinearScale,Tooltip as ChartTooltip,Legend as ChartLegend,Title,ArcElement} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -24,14 +15,7 @@ import config from '../Apiconfig';
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip, // Add this
-  Legend
-} from "recharts";
+import { PieChart,Pie,Cell,ResponsiveContainer,Tooltip,Legend} from "recharts";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, ChartTooltip, ChartLegend, Title, ArcElement);
 
@@ -117,6 +101,8 @@ const Dashboard = () => {
   const [isSelectedShiftPatternId, setIsSelectedShiftPatternId] = useState(false);
   const [isSelectedShiftCode, setIsSelectedShiftCode] = useState(false);
   const [shiftData, setShiftData] = useState([]);
+
+  const [dashboardRequests, setDashboardRequests] = useState([]);
 
   const fetchShiftPatternSummary = async () => {
     try {
@@ -663,77 +649,340 @@ const Dashboard = () => {
     return `${day}-${month}-${year}`;
   };
 
+  // useEffect(() => {
+  //   const fetchLeaveRequests = async () => {
+  //     try {
+  //       const response = await fetch(`${config.apiBaseUrl}/LeaveStatus`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           manager: user_code,
+  //           company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //         }),
+  //       });
+
+  //       const data = await response.json();
+  //       const formattedRequests = data.map((row) => ({
+  //         id: row.EmployeeId,
+  //         EmployeeId: row.EmployeeId,
+  //         EmployeeName: row.EmployeeName,
+  //         FromDate: formatDate(row.FromDate),
+  //         ToDate: formatDate(row.ToDate),
+  //         LeaveType: row.LeaveType,
+  //         LeaveDays: row.LeaveDays,
+  //         status: row.LeaveStatus,
+  //       }));
+  //       setLeaveRequests(formattedRequests);
+  //     } catch (err) {
+  //       setError(err.message || 'Error fetching leave requests');
+  //       setLeaveRequests([])
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchLeaveRequests();
+
+  //   const interval = setInterval(fetchLeaveRequests, 5000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
+
   useEffect(() => {
-    const fetchLeaveRequests = async () => {
+    const fetchDashboardRequests = async () => {
+
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      let leaveData = [];
+      let loanData = [];
+      let visaData = [];
+      let travelData = [];
+      let empData = [];
+
+      /* ---------- Leave ---------- */
       try {
-        const response = await fetch(`${config.apiBaseUrl}/LeaveStatus`, {
+        const res = await fetch(`${config.apiBaseUrl}/LeaveStatus`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             manager: user_code,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-          }),
+            company_code
+          })
         });
 
-        const data = await response.json();
-        const formattedRequests = data.map((row) => ({
+        if (res.ok) leaveData = await res.json();
+      } catch (err) {
+        console.log("Leave API failed");
+      }
+
+      /* ---------- Loan ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_code })
+        });
+
+        if (res.ok) loanData = await res.json();
+      } catch (err) {
+        console.log("Loan API failed");
+      }
+
+      /* ---------- Visa ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_code })
+        });
+
+        if (res.ok) visaData = await res.json();
+      } catch (err) {
+        console.log("Visa API failed");
+      }
+
+      /* ---------- Travel ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_code })
+        });
+
+        if (res.ok) travelData = await res.json();
+      } catch (err) {
+        console.log("Travel API failed");
+      }
+
+      /* ---------- Employee Change ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/DashboardEmployeeInfoChange`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_code })
+        });
+
+        if (res.ok) empData = await res.json();
+      } catch (err) {
+        console.log("Employee API failed");
+      }
+      /* ---------- Employee Family Change ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/DashboardFamilyDetailChange`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_code })
+        });
+
+        if (res.ok) empData = await res.json();
+      } catch (err) {
+        console.log("Employee API failed");
+      }
+
+      /* ---------- Leave ---------- */
+      const formattedLeave = leaveData
+        .filter(r => r.LeaveStatus === "Pending")
+        .map(row => ({
+          type: "Leave",
           id: row.EmployeeId,
           EmployeeId: row.EmployeeId,
           EmployeeName: row.EmployeeName,
+          title: row.LeaveType,
           FromDate: formatDate(row.FromDate),
           ToDate: formatDate(row.ToDate),
-          LeaveType: row.LeaveType,
-          LeaveDays: row.LeaveDays,
           status: row.LeaveStatus,
+          days: row.LeaveDays,
         }));
-        setLeaveRequests(formattedRequests);
-      } catch (err) {
-        setError(err.message || 'Error fetching leave requests');
-        setLeaveRequests([])
-      } finally {
-        setLoading(false);
-      }
+
+      /* ---------- Loan ---------- */
+      const formattedLoan = loanData.map(row => ({
+        type: "Loan",
+        id: row.loan_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.loan_type_id,
+        status: row.request_status
+      }));
+
+      /* ---------- Visa ---------- */
+      const formattedVisa = visaData.map(row => ({
+        type: "Visa",
+        id: row.visa_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.visa_type_id,
+        FromDate: formatDate(row.travel_start_date),
+        ToDate: formatDate(row.travel_end_date),
+        status: row.request_status,
+        days: row.TravelDays,
+      }));
+
+      /* ---------- Travel ---------- */
+      const formattedTravel = travelData.map(row => ({
+        type: "Travel",
+        id: row.travel_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.travel_type,
+        FromDate: formatDate(row.travel_start_date),
+        ToDate: formatDate(row.travel_end_date),
+        status: row.request_status,
+        days: row.TravelDays,
+      }));
+
+      /* ---------- Employee Change Group ---------- */
+      const grouped = {};
+
+      empData.forEach(row => {
+
+        if (!grouped[row.Info_request_id]) {
+          grouped[row.Info_request_id] = {
+            type: "Employee Change",
+            id: row.Info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Employee Profile Changes",
+            status: row.request_status
+          };
+        }
+
+      });
+
+      const formattedEmp = Object.values(grouped);
+      /* ---------- Employee Change Group ---------- */
+      const groupedS = {};
+
+      empData.forEach(row => {
+
+        if (!groupedS[row.Info_request_id]) {
+          groupedS[row.Info_request_id] = {
+            type: "Family Change",
+            id: row.Info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Employee Family Changes",
+            status: row.request_status
+          };
+        }
+
+      });
+
+      const formattedEmpS = Object.values(groupedS);
+
+      /* ---------- Merge ---------- */
+      const merged = [
+        ...formattedLeave,
+        ...formattedVisa,
+        ...formattedTravel,
+        ...formattedLoan,
+        ...formattedEmp,
+        ...formattedEmpS
+      ];
+
+      setDashboardRequests(merged);
+
     };
 
-    fetchLeaveRequests();
-
-    const interval = setInterval(fetchLeaveRequests, 5000);
-
+    fetchDashboardRequests();
+    const interval = setInterval(fetchDashboardRequests, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const handleApproval = async (type, id, FromDate, isApproved) => {
 
-
-  const handleApproval = async (id, FromDate, isApproved) => {
     try {
-      const leaveStatus = isApproved ? "Approved" : "Rejected";
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      const [day, month, year] = FromDate.split("-");
-      const backendDate = `${year}-${month}-${day}`;
+      let url = "";
+      let body = {};
 
-      const response = await fetch(`${config.apiBaseUrl}/LeaveAuthorization`, {
+      const status = isApproved ? "Approved" : "Rejected";
+
+      /* ---------- Leave ---------- */
+      if (type === "Leave") {
+
+        const [day, month, year] = FromDate.split("-");
+        const backendDate = `${year}-${month}-${day}`;
+
+        url = `${config.apiBaseUrl}/LeaveAuthorization`;
+
+        body = {
+          EmployeeId: id,
+          LeaveStatus: status,
+          FromDate: backendDate
+        };
+      }
+
+      /* ---------- Loan ---------- */
+      else if (type === "Loan") {
+
+        url = `${config.apiBaseUrl}/ApprovalLoan`;
+
+        body = {
+          loan_request_id: id,
+          company_code,
+          request_status: status
+        };
+      }
+
+      /* ---------- Visa ---------- */
+      else if (type === "Visa") {
+
+        url = `${config.apiBaseUrl}/ApprovalVisa`;
+
+        body = {
+          visa_request_id: id,
+          company_code,
+          request_status: status
+        };
+      }
+
+      /* ---------- Travel ---------- */
+      else if (type === "Travel") {
+
+        url = `${config.apiBaseUrl}/ApprovalTravel`;
+
+        body = {
+          travel_request_id: id,
+          company_code,
+          request_status: status
+        };
+      }
+
+      /* ---------- Employee Change ---------- */
+      else if (type === "Employee Change") {
+
+        url = `${config.apiBaseUrl}/ApprovalPersonalInfo`;
+
+        body = {
+          Info_request_id: id,
+          company_code,
+          request_status: status,
+          approver_id: sessionStorage.getItem("selectedUserCode")
+        };
+      }
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          EmployeeId: id,
-          LeaveStatus: leaveStatus,
-          FromDate: backendDate,
-        }),
+        body: JSON.stringify(body)
       });
 
       if (response.ok) {
-        toast.success("Leave status updated successfully.");
+        toast.success(`${type} ${status} successfully`);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.message || "Failed to process the request.");
+        toast.error(errorData.message || "Failed to process request");
       }
+
     } catch (error) {
-      console.error("Error updating leave status:", error);
-      toast.error("Error updating leave status:", error);
+      console.error("Approval error:", error);
+      toast.error("Something went wrong");
     }
   };
 
@@ -2149,61 +2398,62 @@ const Dashboard = () => {
 
             {/* Header with Count */}
             <div className="display-flex flex-between-center spacing-mb-3 padding-horizontal-2">
-              <h6 className="card-title-heading spacing-mb-0">Leave Approvals</h6>
+              <h6 className="card-title-heading spacing-mb-0">Pending Requests</h6>
               <span className="leave-count-badge">
-                {leaveRequests.filter(r => r.status === "Pending").length} Pending
+                {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length} Pending
               </span>
             </div>
 
             {/* Scrollable List Container */}
-            <div className="custom-list-container" style={{ height: "380px", overflowY: "auto" }}>
-              {leaveRequests.filter(r => r.status === "Pending").length > 0 ? (
-                leaveRequests.map((request, index) => (
+            <div className="custom-list-container" style={{ height: "1000px", overflowY: "auto" }}>
+
+              {dashboardRequests.length > 0 ? (
+                dashboardRequests.map((req, index) => (
                   <div key={index} className="leave-item-modern">
 
-                    {/* Left Side: Checkbox & Emp Info */}
+                    {/* LEFT */}
                     <div className="leave-item-left">
-                      <div className="checkbox-wrapper">
-                        <input
-                          type="checkbox"
-                          className="app-checkbox-input"
-                          id={`select-row-${index}`}
-                          onChange={(e) => handleRowSelection(request.id, request.FromDate, e.target.checked)}
-                        />
-                      </div>
                       <div className="emp-details">
                         <div className="emp-info-header">
-                          <span className="emp-id-text">{request.EmployeeId}</span>
+                          <span className="emp-id-text">{req.EmployeeId}</span>
                           <span className="separator">-</span>
-                          <span className="emp-name-text">{request.EmployeeName}</span>
+                          <span className="emp-name-text">{req.EmployeeName}</span>
                         </div>
-                        <div className="leave-type-pill">{request.LeaveType}</div>
+                        <div className="leave-type-pill">
+                          {req.type === "Employee Change" ? req.title : `${req.type} - ${req.title}`}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Center: Date Info */}
+                    {/* CENTER */}
                     <div className="leave-item-center">
-                      <div className="date-box">
-                        <span className="date-label">Duration ({request.LeaveDays} Days)</span>
-                        <div className="date-range-text">
-                          {request.FromDate} <i className="fa-solid fa-arrow-right"></i> {request.ToDate}
+                      {req.FromDate && (
+                        <div className="date-box">
+                          <span className="date-label">
+                            {req.days ? `Duration (${req.days} Days)` : "Duration"}
+                          </span>
+                          <div className="date-range-text">
+                            {req.FromDate} 
+                            <i className="fa-solid fa-arrow-right"></i>
+                             {req.ToDate}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
-                    {/* Right Side: Quick Actions */}
+                    {/* RIGHT */}
                     <div className="leave-item-right">
                       <div className="action-button-group">
                         <button
                           className="btn-action-minimal approve"
-                          onClick={() => handleApproval(request.id, request.FromDate, true)}
+                          onClick={() => handleApproval(req.type, req.id, req.FromDate, true)}
                         >
                           <i className="fa-solid fa-check"></i>
                         </button>
                         <div className="action-divider"></div>
                         <button
                           className="btn-action-minimal reject"
-                          onClick={() => handleApproval(request.id, request.FromDate, false)}
+                          onClick={() => handleApproval(req.type, req.id, req.FromDate, false)}
                         >
                           <i className="fa-solid fa-xmark"></i>
                         </button>
@@ -2211,13 +2461,15 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))
+
               ) : (
                 <div className="no-data-state">
                   <i className="fa-solid fa-calendar-check"></i>
-                  <p>All caught up!</p>
+                  <p>No Pending Requests</p>
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </div>
