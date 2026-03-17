@@ -1,26 +1,230 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { AgGridReact } from "ag-grid-react";
-import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { format } from 'date-fns';
 const config = require('../Apiconfig');
 
 function RequestReport({ }) {
 
-    const [rowLoanData, setRowLoanData] = useState([]);
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const location = useLocation();
+    const requestData = location.state || {};
+    const [requestType, setRequestType] = useState("");
+    const [searchId, setSearchId] = useState("");
+    const [Status, setStatus] = useState("");
+    const [mode, setMode] = useState("");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+
+        if (requestData.type) {
+            setRequestType(requestData.type);
+            setStatus(requestData.status || "Pending");
+            setMode(requestData.mode);
+
+            if (requestData.mode === "item") {
+                setSearchId(requestData.id || requestData.EmployeeId);
+                handleSearch(
+                    requestData.type,
+                    requestData.id || requestData.EmployeeId,
+                    requestData.status,
+                    requestData.fromDate,
+                    requestData.toDate
+                );
+            }
+
+            if (requestData.mode === "type") {
+                setSearchId(requestData.id || requestData.EmployeeId);
+                handleSearch(
+                    requestData.type,
+                    requestData.id || requestData.EmployeeId || 0,
+                    requestData.status
+                );
+            }
+        }
+
+    }, []);
+
+    const handleSearch = async (type, id, status, fromDate, toDate) => {
+
+        console.log(id)
+
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        let url = "";
+        let body = {};
+        const safeId = id ? id.toString() : "";
+
+        if (type === "Leave") {
+
+            url = `${config.apiBaseUrl}/getEmployeeLeaveReport`;
+
+            body = {
+                EmployeeId: safeId,
+                LeaveStatus: status,
+                FromDate: fromDate,
+                ToDate: toDate,
+                company_code,
+                ReportingManager: sessionStorage.getItem('selectedUserCode')
+            };
+
+        }
+
+        else if (type === "Loan") {
+
+            url = `${config.apiBaseUrl}/loanRequestSearch`;
+
+            body = {
+                loan_request_id: safeId,
+                request_status: status,
+                company_code
+            };
+
+        }
+
+        else if (type === "Visa") {
+
+            url = `${config.apiBaseUrl}/visaRequestSearch`;
+
+            body = {
+                visa_request_id: safeId,
+                request_status: status,
+                company_code
+            };
+
+        }
+
+        else if (type === "Travel") {
+
+            url = `${config.apiBaseUrl}/travel_requestsSearch`;
+
+            body = {
+                travel_request_id: safeId,
+                request_status: status,
+                company_code
+            };
+
+        }
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (type === "Leave") {
+                setLeaveRowData(data);
+            }
+
+            else if (type === "Loan") {
+                setRowLoanData(data);
+            }
+
+            else if (type === "Visa") {
+                setRowVisaData(data);
+            }
+
+            else if (type === "Travel") {
+                setRowTavelData(data);
+            }
+        }
+
+    };
+
+    const handleApproval = async (type, id, FromDate, isApproved) => {
+        try {
+            const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+            let url = "";
+            let body = {};
+            const status = isApproved ? "Approved" : "Rejected";
+
+            if (type === "Leave") {
+
+                const [day, month, year] = FromDate.split("-");
+                const backendDate = `${year}-${month}-${day}`;
+
+                url = `${config.apiBaseUrl}/LeaveAuthorization`;
+
+                body = {
+                    EmployeeId: id,
+                    LeaveStatus: status,
+                    FromDate: FromDate
+                };
+            }
+
+            else if (type === "Loan") {
+
+                url = `${config.apiBaseUrl}/ApprovalLoan`;
+
+                body = {
+                    loan_request_id: id,
+                    company_code,
+                    request_status: status
+                };
+            }
+
+            else if (type === "Visa") {
+
+                url = `${config.apiBaseUrl}/ApprovalVisa`;
+
+                body = {
+                    visa_request_id: id,
+                    company_code,
+                    request_status: status
+                };
+            }
+
+            else if (type === "Travel") {
+
+                url = `${config.apiBaseUrl}/ApprovalTravel`;
+
+                body = {
+                    travel_request_id: id,
+                    company_code,
+                    request_status: status
+                };
+            }
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                toast.success(`${type} ${status} successfully`);
+                handleSearch(requestType, searchId, Status);
+            } else {
+                const errorData = await response.json();
+                toast.error(errorData.message || "Failed to process request");
+            }
+
+        } catch (error) {
+            console.error("Approval error:", error);
+            toast.error("Something went wrong");
+        }
+    };
 
     //Loan Report Screen Input Fields
+    const [rowLoanData, setRowLoanData] = useState([]);
     const [loanReqIdSc, setLoanReqIdSc] = useState('');
     const [empIdLoanDropSc, setEmpIdLoanDropSc] = useState([]);
     const [empIdLoanSc, setEmpIdLoanSc] = useState('');
     const [selectedEmpIdLoanSc, setSelectedEmpIdLoanSc] = useState('');
+    const [ReqNoLoanSc, setReqNoLoanSc] = useState('');
     const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
     const [loanTypeIdSc, setLoanTypeIdSc] = useState('');
     const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState('');
@@ -30,19 +234,12 @@ function RequestReport({ }) {
     const [monthlyInstallmentLoanSc, setMonthlyInstallmentLoanSc] = useState('');
     const [currencyCodeLoanSc, setCurrencyCodeLoanSc] = useState('');
     const [purposeLoanSc, setPurposeLoanSc] = useState("");
-    const [reqStatusDropLoanSc, setReqStatusDropLoanSc] = useState([]);
-    const [reqStatusLoanSc, setReqStatusLoanSc] = useState('');
-    const [selectedReqStatusLoanSc, setSelectedReqStatusLoanSc] = useState('');
     const [repaymentDateLoanSc, setRepaymentDateLoanSc] = useState('');
+
+    const [empIdLoanDropGrid, setEmpIdLoanDropGrid] = useState([]);
 
     const [isSelectedEmpIdLoanSc, setIsSelectedEmpIdLoanSc] = useState(false);
     const [isSelectedLoanTypeSc, setIsSelectedLoanTypeSc] = useState(false);
-    const [isSelectedReqStatusLoanSc, setIsSelectedReqStatusLoanSc] = useState(false);
-
-    const [empIdDropLoanGrid, setEmpIdDropLoanGrid] = useState([]);
-    const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
-    const [reqStatusDropLoanGrid, setReqStatusDropLoanGrid] = useState([]);
-    const [currencyDropLoanGrid, setCurrencyDropLoanGrid] = useState([]);
 
     const [currencyDropLoanSc, setCurrencyDropLoanSc] = useState([]);
     const [selectedCurrencyLoanSc, setSelectedCurrencyLoanSc] = useState('');
@@ -78,20 +275,6 @@ function RequestReport({ }) {
     }, []);
 
     useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDropLoanSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
         fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
@@ -120,16 +303,6 @@ function RequestReport({ }) {
         }))
         : [];
 
-    const filteredOptionReqStatusLoanSc = Array.isArray(reqStatusDropLoanSc)
-        ? [
-            { value: "All", label: "All" },
-            ...reqStatusDropLoanSc.map((option) => ({
-                value: option?.attributedetails_name,
-                label: option?.attributedetails_name,
-            })),
-        ]
-        : [{ value: "All", label: "All" }];
-
     const filteredOptionCurrencyLoanSc = Array.isArray(currencyDropLoanSc)
         ? currencyDropLoanSc.map((option) => ({
             value: option?.attributedetails_name,
@@ -145,11 +318,6 @@ function RequestReport({ }) {
     const handleChangeLoanTypeSc = (selectedLoanTypeIdSc) => {
         setSelectedLoanIypeIdSc(selectedLoanTypeIdSc);
         setLoanTypeIdSc(selectedLoanTypeIdSc ? selectedLoanTypeIdSc.value : "");
-    };
-
-    const handleChangeReqStatusLoanSc = (selectedReqStatusSc) => {
-        setSelectedReqStatusLoanSc(selectedReqStatusSc);
-        setReqStatusLoanSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
     };
 
     const handleChangeCurrencyLoanSc = (selectedCurrencySc) => {
@@ -173,65 +341,13 @@ function RequestReport({ }) {
                     value: option.EmployeeId,
                     label: `${option.EmployeeId} - ${option.First_Name}`,
                 }));
-                setEmpIdDropLoanGrid(emp);
+                setEmpIdLoanDropGrid(emp);
             })
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const visaType = val.map(option => option.attributedetails_name);
-                setLoanTypeIdDropGrid(visaType);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const reqStatus = val.map(option => option.attributedetails_name);
-                setReqStatusDropLoanGrid(reqStatus);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const currency = val.map(option => option.attributedetails_name);
-                setCurrencyDropLoanGrid(currency);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
     const searchClearLoanInputFields = () => {
         setLoanReqIdSc("");
-        setReqNumberSc("");
         setEmpIdLoanSc("");
         setSelectedEmpIdLoanSc("");
         setLoanTypeIdSc("");
@@ -242,8 +358,6 @@ function RequestReport({ }) {
         setMonthlyInstallmentLoanSc("");
         setCurrencyCodeLoanSc("");
         setPurposeLoanSc("");
-        setReqStatusLoanSc("");
-        setSelectedReqStatusLoanSc("");
         setRepaymentDateLoanSc("");
     };
 
@@ -251,8 +365,46 @@ function RequestReport({ }) {
         {
             headerName: "Actions",
             field: "actions",
-        },
+            width: 120,
+            cellRenderer: (params) => {
 
+                const row = params.data;
+
+                return (
+                    <div className="grid-action-buttons">
+
+                        <button
+                            className="grid-approve-btn"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    true
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-check"></i>
+                        </button>
+
+                        <button
+                            className="grid-reject-btn"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    false
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+                );
+            }
+        },
         {
             headerName: "Loan Request ID",
             field: "loan_request_id",
@@ -261,83 +413,70 @@ function RequestReport({ }) {
         {
             headerName: "Employee ID",
             field: "employee_id",
-            editable: true,
+            editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: empIdDropLoanGrid.map(d => d.value),
+                values: empIdLoanDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const dept = empIdDropLoanGrid.find(d => d.value === params.value);
+                const dept = empIdLoanDropGrid.find(d => d.value === params.value);
                 return dept ? dept.label : params.value;
             },
         },
         {
             headerName: "Request Number",
             field: "request_number",
-            editable: true
+            editable: false
         },
         {
             headerName: "Loan Type ID",
             field: "loan_type_id",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: loanTypeIdDropGrid,
-            },
+            editable: false,
         },
         {
             headerName: "Loan Amount",
             field: "loan_amount",
-            editable: true
+            editable: false
         },
         {
             headerName: "Interest Rate",
             field: "interest_rate",
-            editable: true
+            editable: false
         },
         {
             headerName: "Repayment Months",
             field: "repayment_months",
-            editable: true
+            editable: false
         },
         {
             headerName: "Monthly Installment",
             field: "monthly_installment",
-            editable: true
+            editable: false
         },
         {
             headerName: "Currency Code",
             field: "currency_code",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: currencyDropLoanGrid,
-            },
+            editable: false,
         },
         {
             headerName: "Purpose",
             field: "purpose",
-            editable: true
+            editable: false
         },
         {
             headerName: "Request Status",
             field: "request_status",
             editable: false,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: reqStatusDropLoanGrid,
-            },
         },
         {
             headerName: "Repayment Date",
             field: "repayment_date",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Keyfield",
             field: "keyfield",
-            editable: true,
+            editable: false,
             hide: true
         }
     ]
@@ -352,16 +491,16 @@ function RequestReport({ }) {
         try {
             const body = {
                 loan_request_id: loanReqIdSc,
-                request_number: reqNumberSc,
-                employee_id: empIdSc,
+                employee_id: empIdLoanSc,
+                request_number: ReqNoLoanSc,
                 loan_type_id: loanTypeIdSc,
                 loan_amount: loanAmountSc ? loanAmountSc : 0,
                 interest_rate: interestRateLoanSc ? interestRateLoanSc : 0,
                 repayment_months: repayMonthLoanSc,
                 monthly_installment: monthlyInstallmentLoanSc ? monthlyInstallmentLoanSc : 0,
                 currency_code: currencyCodeLoanSc,
-                purpose: purposeSc,
-                request_status: reqStatusSc,
+                purpose: purposeLoanSc,
+                request_status: "pending",
                 repayment_date: repaymentDateLoanSc,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
@@ -407,9 +546,10 @@ function RequestReport({ }) {
             .trim();
     };
 
-    const transformRowanData = (data) => {
+    const transformRowLoanData = (data) => {
         return data.map((row) => {
-            const empObj = empIdDropLoanGrid.find(
+
+            const empObj = empIdLoanDropGrid.find(
                 (d) => d.value === row.employee_id
             );
 
@@ -462,7 +602,7 @@ function RequestReport({ }) {
 
         /* ================= TABLE DATA ================= */
 
-        const transformedData = transformRowanData(rowLoanData);
+        const transformedData = transformRowLoanData(rowLoanData);
 
         XLSX.utils.sheet_add_json(worksheet, transformedData, {
             origin: `A${headerData.length + 1}`,
@@ -575,11 +715,8 @@ function RequestReport({ }) {
     const [isSelectedReqStatusVisaSc, setIsSelectedReqStatusVisaSc] = useState(false);
     const [isSelectedPriorityVisaSc, setIsSelectedPriorityVisaSc] = useState(false);
 
-    const [empIdDropVisaGrid, setEmpIdDropVisaGrid] = useState([]);
-    const [countryIdDropVisaGrid, setCountyIdDropVisaGrid] = useState([]);
-    const [visaTypeDropGrid, setVisaTypeDropGrid] = useState([]);
-    const [reqStatusDropVisaGrid, setReqStatusDropVisaGrid] = useState([]);
-    const [priorityDropVisaGrid, setPriorityDropVisaGrid] = useState([]);
+    const [empIdVisaDropGrid, setEmpIdVisaDropGrid] = useState([]);
+    const [countryIdVisaDropGrid, setCountyIdVisaDropGrid] = useState([]);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -730,7 +867,7 @@ function RequestReport({ }) {
                     value: option.EmployeeId,
                     label: `${option.EmployeeId} - ${option.First_Name}`,
                 }));
-                setEmpIdDropVisaGrid(emp);
+                setEmpIdVisaDropGrid(emp);
             })
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
@@ -750,58 +887,7 @@ function RequestReport({ }) {
                     value: option.Country_Code,
                     label: `${option.Country_Code} - ${option.Country_Name}`,
                 }));
-                setCountyIdDropVisaGrid(country);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getVisaType`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const visaType = val.map(option => option.attributedetails_name);
-                setVisaTypeDropGrid(visaType);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const priority = val.map(option => option.attributedetails_name);
-                setPriorityDropVisaGrid(priority);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const reqStatus = val.map(option => option.attributedetails_name);
-                setReqStatusDropVisaGrid(reqStatus);
+                setCountyIdVisaDropGrid(country);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
@@ -831,8 +917,46 @@ function RequestReport({ }) {
         {
             headerName: "Actions",
             field: "actions",
-        },
+            width: 120,
+            cellRenderer: (params) => {
 
+                const row = params.data;
+
+                return (
+                    <div className="grid-action-buttons">
+
+                        <button
+                            className="grid-approve-btn"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    true
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-check"></i>
+                        </button>
+
+                        <button
+                            className="grid-reject-btn"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    false
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+                );
+            }
+        },
         {
             headerName: "Visa Request ID",
             field: "visa_request_id",
@@ -844,10 +968,10 @@ function RequestReport({ }) {
             editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: empIdDropVisaGrid.map(d => d.value),
+                values: empIdVisaDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const dept = empIdDropVisaGrid.find(d => d.value === params.value);
+                const dept = empIdVisaDropGrid.find(d => d.value === params.value);
                 return dept ? dept.label : params.value;
             },
         },
@@ -859,86 +983,74 @@ function RequestReport({ }) {
         {
             headerName: "Country ID",
             field: "destination_country_id",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: countryIdDropVisaGrid.map(d => d.value),
+                values: countryIdVisaDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const dept = countryIdDropVisaGrid.find(d => d.value === params.value);
+                const dept = countryIdVisaDropGrid.find(d => d.value === params.value);
                 return dept ? dept.label : params.value;
             },
         },
         {
             headerName: "Visa Type",
             field: "visa_type_id",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: visaTypeDropGrid,
-            },
         },
         {
             headerName: "Purpose",
             field: "purpose",
-            editable: true
+            editable: false
         },
         {
             headerName: "Travel Start Date",
             field: "travel_start_date",
-            editable: true
+            editable: false
         },
         {
             headerName: "Travel End Date",
             field: "travel_end_date",
-            editable: true
+            editable: false
         },
         {
             headerName: "Request Status",
             field: "request_status",
             editable: false,
             cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: reqStatusDropVisaGrid,
-            },
         },
         {
             headerName: "Request Number",
             field: "request_number",
-            editable: true
+            editable: false
         },
         {
             headerName: "Priority Level",
             field: "priority_level",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: priorityDropVisaGrid,
-            },
         },
         {
             headerName: "Sponsor Name",
             field: "sponsor_name",
-            editable: true
+            editable: false
         },
         {
             headerName: "Estimated Cost",
             field: "estimated_cost",
-            editable: true
+            editable: false
         },
         {
             headerName: "Remarks",
             field: "Remarks",
-            editable: true
+            editable: false
         },
         {
             headerName: "Keyfield",
             field: "keyfield",
-            editable: true,
+            editable: false,
             hide: true
         }
     ]
@@ -961,7 +1073,6 @@ function RequestReport({ }) {
                 travel_start_date: travelStartDateVisaSc,
                 travel_end_date: travelEndDateVisaSc,
                 request_status: reqStatusVisaSc,
-                request_number: reqNumberVisaSc,
                 priority_level: priorityVisaSc,
                 sponsor_name: sponsorNameVisaSc,
                 estimated_cost: estimatedCostVisaSc ? estimatedCostVisaSc : 0,
@@ -1006,7 +1117,8 @@ function RequestReport({ }) {
 
     const transformRowVisaData = (data) => {
         return data.map((row) => {
-            const empObj = empIdDropVisaGrid.find(
+
+            const empObj = empIdVisaDropGrid.find(
                 (d) => d.value === row.employee_id
             );
 
@@ -1014,7 +1126,7 @@ function RequestReport({ }) {
                 ? empObj.label.split(" - ").slice(1).join(" - ")
                 : "";
 
-            const countryObj = countryIdDropVisaGrid.find(
+            const countryObj = countryIdVisaDropGrid.find(
                 (d) => d.value === row.destination_country_id
             );
 
@@ -1042,7 +1154,7 @@ function RequestReport({ }) {
     };
 
     const handleExportToExcelVisa = () => {
-        if (!rowData || rowData.length === 0) {
+        if (!rowVisaData || rowVisaData.length === 0) {
             toast.warning("There is no data to export.");
             return;
         }
@@ -1151,28 +1263,26 @@ function RequestReport({ }) {
     };
 
     //Travel Report Screen Input Fields
+    const [rowTravelData, setRowTavelData] = useState([]);
     const [travelReqIdSc, setTravelReqIdSc] = useState('');
     const [empIdTravelDropSc, setEmpIdTravelDropSc] = useState([]);
     const [selectedEmpIdTravelSc, setSelectedEmpIdTravelSc] = useState('');
-    const [empIdTravelSc, setEmpIdTravelSc] =useState('');
+    const [empIdTravelSc, setEmpIdTravelSc] = useState('');
     const [DepTravelDropSc, setDepTravelDropSc] = useState([]);
     const [selectedDepTravelSc, setSelectedDepTravelSc] = useState('');
-    const [depTravelSc, setDepTravelSc] =useState('');
+    const [depTravelSc, setDepTravelSc] = useState('');
     const [travelTypeSc, setTravelTypeSc] = useState('');
-    const [countryTravelSc, setCountryTravelSc]= useState('');
-    const [destinationTravelSc, setDestinationTravelSc]= useState('');
-    const [purposeTravelSc, setPurposeTravelSc]= useState('');
-    const [travelStartDateSc, setTravelStartDateSc]= useState('');
-    const [travelEndDateSc, setTravelEndDateSc]= useState('');
+    const [countryTravelSc, setCountryTravelSc] = useState('');
+    const [destinationTravelSc, setDestinationTravelSc] = useState('');
+    const [purposeTravelSc, setPurposeTravelSc] = useState('');
+    const [travelStartDateSc, setTravelStartDateSc] = useState('');
+    const [travelEndDateSc, setTravelEndDateSc] = useState('');
     const [transportModeTravel, setTransportModeTravel] = useState('');
     const [accReqTravelSc, setAccReqTravelSc] = useState('');
     const [estimatedCostTravel, setEstimatedCostTravel] = useState('');
     const [currencyTravelDropSc, setCurrencyTravelDropSc] = useState([]);
     const [selectedCurrencyTravelSc, setSelectedCurrencyTravelSc] = useState('');
     const [currencyTravelSc, setCurrencyTravelSc] = useState('');
-    const [reqStatusDropTravelSc, setReqStatusDropTravelSc] = useState([]);
-    const [reqStatusTravelSc, setReqStatusTravelSc] = useState('');
-    const [selectedReqStatusTravelSc, setSelectedReqStatusTravelSc] = useState('');
     const [remarksTravelSc, setRemarksTravelSc] = useState('');
     const [priorityDropTravelSc, setPriorityDropTravelSc] = useState([]);
     const [priorityTravelSc, setPriorityTravelSc] = useState('');
@@ -1180,44 +1290,19 @@ function RequestReport({ }) {
     const [managerDropTravelSc, setManagerDropTravelSc] = useState([]);
     const [managerTravelSc, setManagerTravelSc] = useState('');
     const [selectedManagerTravelSc, setSelectedManagerTravelSc] = useState('');
-   
+
     const [isSelectedEmpIdTravelSc, setIsSelectedEmpIdTravelSc] = useState(false);
+    const [isSelectedDepTravelSc, setIsSelectedDepTravelSc] = useState(false);
     const [isSelectedCurrencyTravelSc, setIsSelectedCurrencyTravelSc] = useState(false);
-    const [isSelectedReqStatusTravelSc, setIsSelectedReqStatusTravelSc] = useState(false);
     const [isSelectedPriorityTravelSc, setIsSelectedPriorityTravelSc] = useState(false);
     const [isSelectedManagerTravelSc, setIsSelectedManagerTravelSc] = useState(false);
 
-    const [DepTravelDropGrid, setDepTravelDropGrid] = useState([]);
-    const [currencyTravelDropGrid, setCurrencyTravelDropGrid] = useState([]);
-    const [reqStatusDropTravelGrid, setReqStatusDropTravelGrid] = useState([]);
-    const [priorityDropTravelGrid, setPriorityDropTravelGrid] = useState([]);
-    const [managerDropTravelGrid, setManagerDropTravelGrid] = useState([]);
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/ESSManager`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const Manager = val.map((option) => ({
-                    value: option.EmployeeId,
-                    label: `${option.EmployeeId}`,
-                }));
-
-                setManagerdropAG(Manager);
-            })
-            .catch((error) => console.error("Error fetching Travel request:", error));
-    }, []);
+    const [empIdTravelDropGrid, setEmpIdTravelDropGrid] = useState([]);
+    const [depTavelDropGrid, setDepTavelDropGrid] = useState([]);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+        fetch(`${config.apiBaseUrl}/DeptID`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1225,45 +1310,122 @@ function RequestReport({ }) {
             body: JSON.stringify({ company_code }),
         })
             .then((data) => data.json())
-            .then((val) => {
-                const reqStatus = val.map((option) => option.attributedetails_name);
-                setReqStatusDropAG(reqStatus);
-            })
+            .then((val) => setDepTravelDropSc(val));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setEmpIdTravelDropSc(val));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setManagerDropTravelSc(val));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/getPriority`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setPriorityDropTravelSc(val));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setCurrencyTravelDropSc(val))
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-    const fetchProductCodesSC = async (selectedValue) => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        try {
-            const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ dept_id: selectedValue, company_code }),
-            });
-
-            const data = await response.json();
-            const formattedData = data.map((product) => ({
-                value: product.Desgination,
-                label: product.Desgination,
-            }));
-
-            setDynamicOptions(formattedData);
-            return formattedData;
-        } catch (error) {
-            console.error("Error fetching product codes:", error);
-            return [];
-        }
-    };
-
-    const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
-        ? ManagerdropSC.map((option) => ({
-            value: option.EmployeeId,
-            label: `${option.EmployeeId}-${option.full_name}`,
+    const filteredOptionDepTravel = Array.isArray(DepTravelDropSc)
+        ? DepTravelDropSc.map((option) => ({
+            value: option?.dept_id,
+            label: `${option?.dept_id}-${option?.dept_name}`,
         }))
         : [];
+
+    const filteredOptionEmpIdTravel = Array.isArray(empIdTravelDropSc)
+        ? empIdTravelDropSc.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.First_Name}`,
+        }))
+        : [];
+
+    const filteredOptionManagerTravel = Array.isArray(managerDropTravelSc)
+        ? managerDropTravelSc.map((option) => ({
+            value: option?.EmployeeId,
+            label: `${option?.EmployeeId}-${option?.full_name}`,
+        }))
+        : [];
+
+    const filteredOptionPriorityTravel = Array.isArray(priorityDropTravelSc)
+        ? priorityDropTravelSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
+
+    const filteredOptionCurrencyTravel = Array.isArray(currencyTravelDropSc)
+        ? currencyTravelDropSc.map((option) => ({
+            value: option?.attributedetails_name,
+            label: option?.attributedetails_name,
+        }))
+        : [];
+
+    const handleChangeDepTravel = (selectedDepTravelSc) => {
+        setSelectedDepTravelSc(selectedDepTravelSc);
+        setDepTravelSc(selectedDepTravelSc ? selectedDepTravelSc.value : "");
+    };
+
+    const handleChangeEmpIdTravel = (selectedEmpIdTravelSc) => {
+        setSelectedEmpIdTravelSc(selectedEmpIdTravelSc);
+        setEmpIdTravelSc(selectedEmpIdTravelSc ? selectedEmpIdTravelSc.value : "");
+    };
+
+    const handleChangeManagerTravel = (selectedManagerTravelSc) => {
+        setSelectedManagerTravelSc(selectedManagerTravelSc);
+        setManagerTravelSc(selectedManagerTravelSc ? selectedManagerTravelSc.value : "");
+    };
+
+    const handleChangePriorityTravel = (selectedPriorityTravelSc) => {
+        setSelectedPriorityTravelSc(selectedPriorityTravelSc);
+        setPriorityTravelSc(selectedPriorityTravelSc ? selectedPriorityTravelSc.value : "");
+    };
+
+    const handleChangeTravelCurrency = (selectedCurrencyTravelSc) => {
+        setSelectedCurrencyTravelSc(selectedCurrencyTravelSc);
+        setCurrencyTravelSc(selectedCurrencyTravelSc ? selectedCurrencyTravelSc.value : "");
+    };
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -1276,259 +1438,19 @@ function RequestReport({ }) {
             body: JSON.stringify({ company_code }),
         })
             .then((data) => data.json())
-            .then((val) => setEmpIdDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setPriorityDropSc(val));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDropSC(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/ESSManager`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                // user_code: sessionStorage.getItem("selectedUserCode"),
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((response) => response.json())
-            .then(setManagerdropSC)
-            .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/getPriority`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                // Extract city names from the fetched data
-                const statusOption = data.map((option) => option.attributedetails_name);
-                setPriorityGridDrop(statusOption);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setCurrencyDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
-        ? empIdDropSc.map((option) => ({
-            value: option?.EmployeeId,
-            label: `${option?.EmployeeId}-${option?.First_Name}`,
-        }))
-        : [];
-
-    const filteredOptionPrioritySc = Array.isArray(priorityDropSc)
-        ? priorityDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
-
-    const filteredOptionReqStatusSC = Array.isArray(reqStatusDropSC)
-        ? [
-            { value: "All", label: "All" },
-            ...reqStatusDropSC.map((option) => ({
-                value: option?.attributedetails_name,
-                label: option?.attributedetails_name,
-            })),
-        ]
-        : [{ value: "All", label: "All" }];
-
-    const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
-        ? currencyDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
-
-    const handleChangeEmpIdSc = (selectedEmpIdSc) => {
-        setSelectedEmpIdSc(selectedEmpIdSc);
-        setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
-    };
-
-    const handleChangePrioritySc = (selectedPrioritySc) => {
-        setSelectedPrioritySc(selectedPrioritySc);
-        setPrioritySc(selectedPrioritySc ? selectedPrioritySc.value : "");
-    };
-
-    const handleChangeCurrencySc = (selectedCurrencySc) => {
-        setSelectedCurrencySc(selectedCurrencySc);
-        setCurrency_CodeSC(selectedCurrencySc ? selectedCurrencySc.value : "");
-    };
-
-    const searchClearInputFields = () => {
-        settravel_request_idSC("");
-        setrequest_numberSC("");
-        setSelectedEmpIdSc("");
-        setEmpIdSc("");
-        setselecteddeptSC("");
-        setdptSC("");
-        settravel_typeSC("");
-        setdestination_country_idSC("");
-        setdestination_citySC("");
-        setpurpose_of_travelSC("");
-        setTravelStartDateSc("");
-        setTravelEndDateSc("");
-        settransport_modeSc("");
-        setaccommodation_requiredSc("");
-        setestimated_costSC("");
-        setCurrency_CodeSC("");
-        setSelectedReqStatusSC("");
-        setReqStatusSC("");
-        setselectedmanagerSC("");
-        setProjectManagerSC("");
-        setSelectedPrioritySc("");
-        setPrioritySc("");
-        setSelectedCurrencySc("");
-    };
-
-    const handleDPTSC = (selectedDPTSC) => {
-        setselecteddeptSC(selectedDPTSC);
-        setdptSC(selectedDPTSC ? selectedDPTSC.value : "");
-        fetchProductCodesSC(selectedDPTSC ? selectedDPTSC.value : "");
-    };
-
-    const filteredOptionDPtSC = DPTdropSC.map((option) => ({
-        value: option.dept_id,
-        label: `${option.dept_id} - ${option.dept_name}`,
-    }));
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setCountrydropSC(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        const fetchDept = async () => {
-            try {
-                const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ company_code }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-
-                const val = await response.json();
-                setDPTdropSC(val);
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-
-        if (company_code) {
-            fetchDept();
-        }
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const Countryptions = data.map((option) => ({
-                    value: option.Country_Code,
-                    label: `${option.Country_Code} - ${option.Country_Name}`,
+            .then((val) => {
+                const emp = val.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId} - ${option.First_Name}`,
                 }));
-                setCountrydropGR(Countryptions);
+                setEmpIdTravelDropGrid(emp);
             })
-            .catch((error) => console.error("Error fetching country data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmployeeTypeDD`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const employmentptions = data.map((option) => ({
-                    value: option.attributedetails_name,
-                    label: `${option.attributedetails_name}`,
-                }));
-                setEmploymentdropGR(employmentptions);
-            })
-            .catch((error) =>
-                console.error("Error fetching employee type data:", error),
-            );
+            .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+        fetch(`${config.apiBaseUrl}/DeptID`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1537,92 +1459,157 @@ function RequestReport({ }) {
         })
             .then((data) => data.json())
             .then((val) => {
-                const currency = val.map(option => option.attributedetails_name);
-                setCurrencyDropGrid(currency);
+                const department = val.map((option) => ({
+                    value: option?.dept_id,
+                    label: `${option?.dept_id}-${option?.dept_name}`,
+                }));
+                setDepTavelDropGrid(department);
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-    const columnDefs = [
+    const searchClearTravelInputFields = () => {
+        setTravelReqIdSc("");
+        setSelectedEmpIdTravelSc("");
+        setEmpIdTravelSc("");
+        setSelectedDepTravelSc("");
+        setDepTravelSc("");
+        setTravelTypeSc("");
+        setCountryTravelSc("");
+        setDestinationTravelSc("");
+        setPurposeTravelSc("");
+        setTravelStartDateSc("");
+        setTravelEndDateSc("");
+        setTransportModeTravel("");
+        setAccReqTravelSc("");
+        setEstimatedCostTravel("");
+        setSelectedCurrencyTravelSc("");
+        setCurrencyTravelSc("");
+        setRemarksTravelSc("");
+        setPriorityTravelSc("");
+        setSelectedPriorityTravelSc("");
+        setManagerTravelSc("");
+        setSelectedManagerTravelSc("");
+    };
+
+    const columnTravelDefs = [
         {
             headerName: "Actions",
             field: "actions",
+            width: 120,
+            cellRenderer: (params) => {
+
+                const row = params.data;
+
+                return (
+                    <div className="grid-action-buttons">
+
+                        <button
+                            className="grid-approve-btn"
+                            title="Approved"
+                            aria-label="Approve"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    true
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-check"></i>
+                        </button>
+
+                        <button
+                            className="grid-reject-btn"
+                            title="Rejected"
+                            aria-label="Reject"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate,
+                                    false
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+                );
+            }
         },
         {
             headerName: "Travel Request ID",
             field: "travel_request_id",
-            editable: true,
+            editable: false,
         },
-        // {
-        //   headerName: "Request Number",
-        //   field: "request_number",
-        //   editable: true,
-        // },
         {
             headerName: "Employee ID",
             field: "employee_id",
             editable: false,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: empIdTravelDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = empIdTravelDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
         },
         {
             headerName: "Department",
             field: "department_id",
-            editable: true,
+            editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
-                values: departmentDrop.map((d) => d.value),
+                values: depTavelDropGrid.map(d => d.value),
             },
             valueFormatter: (params) => {
-                const dept = departmentDrop.find((d) => d.value == params.value);
+                const dept = depTavelDropGrid.find(d => d.value === params.value);
                 return dept ? dept.label : params.value;
             },
         },
         {
             headerName: "Travel Type",
             field: "travel_type",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Destination Country",
             field: "destination_country_id",
-            editable: true,
-            // cellEditor: "agSelectCellEditor",
-            // cellEditorParams: {
-            //   values: CountrydropGR.map((d) => d.value),
-            // },
-            // valueFormatter: (params) => {
-            //   const country = CountrydropGR.find((d) => d.value == params.value);
-            //   return country ? country.label : params.value;
-            // },
+            editable: false,
         },
         {
             headerName: "Destination City",
             field: "destination_city",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Purpose of Travel",
             field: "purpose_of_travel",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Start Date",
             field: "travel_start_date",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "End Date",
             field: "travel_end_date",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Transport Mode",
             field: "transport_mode",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Accommodation Required",
             field: "accommodation_required",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Estimated Cost",
@@ -1632,48 +1619,27 @@ function RequestReport({ }) {
         {
             headerName: "Currency Code",
             field: "currency_code",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: currencyDropGrid,
-            },
+            editable: false,
         },
         {
             headerName: "Request Status",
             field: "request_status",
             editable: false,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: reqStatusDropAG,
-            },
         },
         {
             headerName: "Remarks",
             field: "Remarks",
-            editable: true,
+            editable: false,
         },
         {
             headerName: "Priority",
             field: "priority_level",
-            editable: true,
-            filter: "agNumberColumnFilter",
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: PriorityGridDrop,
-            },
+            editable: false,
         },
         {
             headerName: "Manager",
             field: "manager_id",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: ManagerdropAG.map((d) => d.value),
-            },
-            valueFormatter: (params) => {
-                const loan = ManagerdropAG.find((d) => d.value === params.value);
-                return loan ? loan.label : params.value;
-            },
+            editable: false,
         },
         {
             headerName: "Keyfield",
@@ -1687,34 +1653,32 @@ function RequestReport({ }) {
         paginationPageSize: 10,
     };
 
-    const handleSearch = async () => {
+    const handleTravelSearch = async () => {
         setLoading(true);
 
         try {
             const body = {
-                travel_request_id: travel_request_idSC || null,
-                request_number: request_numberSC || "",
-                employee_id: empIdSc || "",
-                department_id: dptSC || "",
-                travel_type: travel_typeSC || "",
-                destination_country_id: destination_country_idSC || null,
-                destination_city: destination_citySC || "",
-                purpose_of_travel: purpose_of_travelSC || "",
+                travel_request_id: travelReqIdSc || null,
+                employee_id: empIdTravelSc || "",
+                department_id: depTravelSc || "",
+                travel_type: travelTypeSc || "",
+                destination_country_id: countryTravelSc || null,
+                destination_city: destinationTravelSc || "",
+                purpose_of_travel: purposeTravelSc || "",
                 travel_start_date: travelStartDateSc || null,
                 travel_end_date: travelEndDateSc || null,
-                transport_mode: transport_modeSc || "",
-                accommodation_required: accommodation_requiredSc || null,
-                estimated_cost: estimated_costSC || null,
-                currency_code: Currency_CodeSC || "",
-                request_status: reqStatusSC || "",
-                Remarks: remarksSc || "",
-                priority_level: prioritySc || "",
-                manager_id: ProjectManagerSC || null,
+                transport_mode: transportModeTravel || "",
+                accommodation_required: accReqTravelSc || null,
+                estimated_cost: estimatedCostTravel || null,
+                currency_code: currencyTravelSc || "",
+                request_status: "Pending",
+                Remarks: remarksTravelSc || "",
+                priority_level: priorityTravelSc || "",
+                manager_id: managerTravelSc || null,
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
             };
 
-            const response = await fetch(
-                `${config.apiBaseUrl}/travel_requestsSearch`,
+            const response = await fetch(`${config.apiBaseUrl}/travel_requestsSearch`,
                 {
                     method: "POST",
                     headers: {
@@ -1726,69 +1690,54 @@ function RequestReport({ }) {
 
             if (response.ok) {
                 const fetchedData = await response.json();
-
-                const newRows = fetchedData.map((item) => ({
-                    travel_request_id: item.travel_request_id,
-                    request_number: item.request_number,
-                    employee_id: item.employee_id,
-                    department_id: item.department_id,
-                    travel_type: item.travel_type,
-                    destination_country_id: item.destination_country_id,
-                    destination_city: item.destination_city,
-                    purpose_of_travel: item.purpose_of_travel,
-                    travel_start_date: item.travel_start_date,
-                    travel_end_date: item.travel_end_date,
-                    transport_mode: item.transport_mode,
-                    accommodation_required: item.accommodation_required,
-                    estimated_cost: item.estimated_cost,
-                    currency_code: item.currency_code,
-                    request_status: item.request_status,
-                    Remarks: item.Remarks,
-                    priority_level: item.priority_level,
-                    manager_id: item.manager_id,
-                    keyfield: item.keyfield,
-                }));
-
-                setRowData(newRows);
+                setRowTavelData(fetchedData);
             } else if (response.status === 404) {
                 toast.warning("Data Not found");
-                setRowData([]);
+                setRowTavelData([]);
             } else {
                 const errorResponse = await response.json();
                 toast.warning(errorResponse.message || "Search failed");
-                setRowData([]);
+                setRowTavelData([]);
             }
         } catch (error) {
             console.error("Error fetching search data:", error);
             toast.error("Error fetching search data: " + error.message);
-            setRowData([]);
+            setRowTavelData([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const reloadGridData = () => {
-        setRowData([]);
-        searchClearInputFields();
+    const reloadGridTravelData = () => {
+        setRowTavelData([]);
+        searchClearTravelInputFields();
     };
 
-    const transformRowData = (data) => {
+    const transformRowTravelData = (data) => {
         return data.map((row) => {
-            const deptObj = departmentDrop.find((d) => d.value == row.department_id);
-            const deptName = deptObj ? deptObj.label : "";
 
-            const countryObj = CountrydropGR.find(
-                (c) => c.value == row.destination_country_id,
+            const empObj = empIdTravelDropGrid.find(
+                (d) => d.value === row.employee_id
             );
-            const countryName = countryObj ? countryObj.label : "";
+
+            const empName = empObj
+                ? empObj.label.split(" - ").slice(1).join(" - ")
+                : "";
+
+            const depObj = depTavelDropGrid.find(
+                (d) => d.value === row.destination_country_id
+            );
+
+            const depName = depObj
+                ? depObj.label.split(" - ").slice(1).join(" - ")
+                : "";
 
             return {
                 "Travel Request ID": row.travel_request_id || "",
-                "Request Number": row.request_number || "",
-                "Employee ID": row.employee_id || "",
-                Department: deptName,
+                "Employee ID": `${row.employee_id} - ${empName}` || "",
+                "Department": `${row.department_id} - ${depName}` || "",
                 "Travel Type": row.travel_type || "",
-                "Destination Country": countryName,
+                "Destination Country": row.destination_country_id || "",
                 "Destination City": row.destination_city || "",
                 "Start Date": row.travel_start_date || "",
                 "End Date": row.travel_end_date || "",
@@ -1803,8 +1752,8 @@ function RequestReport({ }) {
         });
     };
 
-    const handleExportToExcel = () => {
-        if (!rowData || rowData.length === 0) {
+    const handleExportToExcelTravel = () => {
+        if (!rowTravelData || rowTravelData.length === 0) {
             toast.warning("There is no data to export.");
             return;
         }
@@ -1825,7 +1774,7 @@ function RequestReport({ }) {
 
         const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-        const transformedData = transformRowData(rowData);
+        const transformedData = transformRowTravelData(rowTravelData);
 
         XLSX.utils.sheet_add_json(worksheet, transformedData, {
             origin: `A${headerData.length + 1}`,
@@ -1895,6 +1844,294 @@ function RequestReport({ }) {
         XLSX.writeFile(workbook, "Travel_Requests_Search_Report.xlsx");
     };
 
+    const goBack = () => {
+        navigate('/ESSDashboard');
+    };
+
+    //Leave Request Screen Input Fields
+    const [leaveRowData, setLeaveRowData] = useState([]);
+    const [leaveFromDate, setLeaveFromDate] = useState("");
+    const [leaveToDate, setLeaveToDate] = useState("");
+    const [leaveDrop, setLeaveDrop] = useState([]);
+    const [leaveType, setLeaveType] = useState("");
+    const [selectedLeave, setSelectedLeave] = useState("");
+    const [isSearchLeave, setIsSearchLeave] = useState(false);
+
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/getapplyLeavetype`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => setLeaveDrop(val))
+    }, []);
+
+    const filterOptionLeaves = [{ value: 'All', label: 'All' }, ...leaveDrop.map((option) => ({
+        value: option.LeaveId,
+        label: option.LeaveId,
+    }))];
+
+    const handleLeaves = (SelectedLeave) => {
+        setSelectedLeave(SelectedLeave);
+        setLeaveType(SelectedLeave ? SelectedLeave.value : '');
+    };
+
+    const leaveColumnDefs = [
+        {
+            headerName: "Actions",
+            field: "actions",
+            width: 120,
+            cellRenderer: (params) => {
+
+                const row = params.data;
+
+                return (
+                    <div className="grid-action-buttons">
+
+                        <button
+                            className="grid-approve-btn"
+                            title="Approved"
+                            aria-label="Approve"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate || row.EmployeeId,
+                                    true
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-check"></i>
+                        </button>
+
+                        <button
+                            className="grid-reject-btn"
+                            title="Rejected"
+                            aria-label="Reject"
+                            onClick={() =>
+                                handleApproval(
+                                    requestType,
+                                    row.loan_request_id || row.visa_request_id || row.travel_request_id,
+                                    row.travel_start_date || row.FromDate || row.EmployeeId,
+                                    false
+                                )
+                            }
+                        >
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+                );
+            }
+        },
+        {
+            headerName: "Employee ID",
+            field: "EmployeeId",
+            cellStyle: { textAlign: "center" },
+            editable: false,
+        },
+        {
+            headerName: "Employee Name",
+            field: "EmployeeName",
+            cellStyle: { textAlign: "center" },
+            editable: false,
+        },
+        {
+            headerName: "Leave Type",
+            field: "LeaveType",
+            cellStyle: { textAlign: "center" },
+            editable: false,
+        },
+        {
+            headerName: "From Date",
+            field: "FromDate",
+            editable: false,
+            cellStyle: { textAlign: "center" },
+        },
+        {
+            headerName: "To Date",
+            field: "ToDate",
+            editable: false,
+            cellStyle: { textAlign: "center" },
+        },
+        {
+            headerName: "Leave Status",
+            field: "LeaveStatus",
+            editable: false,
+            cellStyle: { textAlign: "center" },
+        },
+    ];
+
+    const handleSearchItem = async () => {
+        const from = new Date(leaveFromDate);
+        const to = new Date(leaveToDate);
+
+        if (from > to) {
+            toast.warning("From Date should not be greater than To Date");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/getEmployeeLeaveReport`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    company_code: sessionStorage.getItem('selectedCompanyCode'),
+                    EmployeeId: sessionStorage.getItem('selectedUserCode'),
+                    FromDate: leaveFromDate,
+                    ToDate: leaveToDate,
+                    LeaveStatus: 'Pending',
+                    LeaveType: leaveType,
+                    getEmployeeLeaveReport: sessionStorage.getItem('selectedUserCode'),
+                })
+            });
+            if (response.ok) {
+                const searchData = await response.json();
+                setLeaveRowData(searchData);
+                console.log("data fetched successfully")
+            } else if (response.status === 404) {
+                setLeaveRowData([]);
+                toast.warning("Data not found")
+                console.log("Data not found");
+            } else {
+                const errorResponse = await response.json();
+                console.error(errorResponse.message);
+                toast.warning(errorResponse.message, {
+                })
+            }
+        } catch (error) {
+            console.error("Error fetching search data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const clearLeaveInputs = () => {
+        setLeaveFromDate('');
+        setLeaveToDate('');
+        setLeaveType('');
+        setSelectedLeave("");
+    };
+
+    const handleLeaveReload = () => {
+        clearLeaveInputs([])
+        setLeaveRowData([])
+    };
+
+    const transformRowLeaveData = (data) => {
+        return data.map((row) => {
+
+            return {
+                "Employee ID": row.EmployeeId || "",
+                "Employee Name": row.EmployeeName || "",
+                "Leave Type": row.LeaveType || "",
+                "From Date": row.FromDate || "",
+                "To Date": row.ToDate || "",
+                "Leave Status": row.LeaveStatus || "",
+            };
+        });
+    };
+
+    const handleExportToExcelLeave = () => {
+        if (!leaveRowData || leaveRowData.length === 0) {
+            toast.warning("There is no data to export.");
+            return;
+        }
+
+        const screenName = "Leave Requests Search Report";
+        const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+        const titleBg = getCSSVariable("--but").replace("#", "");
+        const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+        const fontColor = getCSSVariable("--font-color").replace("#", "");
+        const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+        const headerData = [
+            [screenName],
+            company ? [`Company Name: ${company}`] : [],
+            [],
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+        const transformedData = transformRowLeaveData(leaveRowData);
+
+        XLSX.utils.sheet_add_json(worksheet, transformedData, {
+            origin: `A${headerData.length + 1}`,
+        });
+
+        const range = XLSX.utils.decode_range(worksheet["!ref"]);
+        const headerRowIndex = headerData.length;
+
+        worksheet["A1"].s = {
+            font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: titleBg } },
+            alignment: { horizontal: "center", vertical: "center" },
+        };
+
+        worksheet["!merges"] = [
+            {
+                s: { r: 0, c: 0 },
+                e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+            },
+        ];
+
+        const totalColumns = Object.keys(transformedData[0]).length;
+
+        for (let C = 0; C < totalColumns; C++) {
+            const cell =
+                worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+            if (!cell) continue;
+
+            cell.s = {
+                font: { bold: true, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: tableHeaderBg } },
+                alignment: { horizontal: "center" },
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" },
+                },
+            };
+        }
+
+        for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+            for (let C = 0; C < totalColumns; C++) {
+                const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+                if (!cell) continue;
+
+                cell.s = {
+                    font: { color: { rgb: fontColor } },
+                    fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+                    border: {
+                        top: { style: "thin" },
+                        bottom: { style: "thin" },
+                        left: { style: "thin" },
+                        right: { style: "thin" },
+                    },
+                };
+            }
+        }
+
+        worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Leave Requests");
+
+        XLSX.writeFile(workbook, "Leave_Requests_Search_Report.xlsx");
+    };
+
     return (
         <div class="container-fluid Topnav-screen ">
             {loading && <LoadingScreen />}
@@ -1903,504 +2140,509 @@ function RequestReport({ }) {
                 <div className="header-flex">
                     <h1 className="page-title">Request Report</h1>
                     <div className="action-wrapper">
-                        <div onClick={handleSave} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
+                        <div className="action-icon delete" onClick={goBack}>
+                            <span className="tooltip">Close</span>
+                            <i className="fa-solid fa-xmark"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             <>
-                <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-                    <div className="header-flex">
-                        <h6 className="">Search Criteria:</h6>
-                    </div>
-                    <div className="row g-3">
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={15}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required
-                                    title="Please enter the Loan Request ID"
-                                    autoComplete="off"
-                                    value={loanReqIdSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setLoanReqIdSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
-                            </div>
+                {requestType === "Loan" && mode === "type" && (
+                    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+                        <div className="header-flex">
+                            <h6 className="">Search Criteria:</h6>
                         </div>
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                            ${selectedEmpIdLoanSc ? "has-value" : ""} 
-                            ${isSelectedEmpIdLoanSc ? "is-focused" : ""}`}
-                                title="Please enter the Employee ID"
-                            >
-                                <Select
-                                    id="department"
-                                    placeholder=" "
-                                    onFocus={() => setIsSelectedEmpIdLoanSc(true)}
-                                    onBlur={() => setIsSelectedEmpIdLoanSc(false)}
-                                    classNamePrefix="react-select"
-                                    isClearable
-                                    type="text"
-                                    value={selectedEmpIdLoanSc}
-                                    onChange={handleChangeEmpIdLoanSc}
-                                    options={filteredOptionEmpIdLoanSc}
-                                />
-                                <label htmlFor="selecteddpt" className={`floating-label`}>
-                                    Employee ID
-                                </label>
-                            </div>
-                        </div>
+                        <div className="row g-3">
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                            ${selectedLoanTypeIdSc ? "has-value" : ""} 
-                            ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
-                                title="Please enter the Loan Type ID"
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedLoanTypeSc(true)}
-                                    onBlur={() => setIsSelectedLoanTypeSc(false)}
-                                    isClearable
-                                    value={selectedLoanTypeIdSc}
-                                    onChange={handleChangeLoanTypeSc}
-                                    options={filteredOptionLoanTypeSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Loan Type ID</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={10}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Loan Amount"
-                                    autoComplete="off"
-                                    value={loanAmountSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setLoanAmountSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={5}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Interest Rate"
-                                    autoComplete="off"
-                                    value={interestRateLoanSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/[^0-9.]/g, "");
-                                        setInterestRateLoanSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={5}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Repayment Months"
-                                    autoComplete="off"
-                                    value={repayMonthLoanSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setRepayMonthLoanSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={10}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Monthly Installment"
-                                    autoComplete="off"
-                                    value={monthlyInstallmentLoanSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setMonthlyInstallmentLoanSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                            ${selectedCurrencyLoanSc ? "has-value" : ""} 
-                            ${isSelectedCurrencyLoanSc ? "is-focused" : ""}`}
-                                title="Please select the Salary Currency"
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedCurrencyLoanSc(true)}
-                                    onBlur={() => setIsSelectedCurrencyLoanSc(false)}
-                                    isClearable
-                                    value={selectedCurrencyLoanSc}
-                                    onChange={handleChangeCurrencyLoanSc}
-                                    options={filteredOptionCurrencyLoanSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Currency Code</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    required title="Please Enter the Purpose"
-                                    autoComplete="off"
-                                    value={purposeLoanSc}
-                                    maxLength={100}
-                                    onChange={(e) => setPurposeLoanSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
-                            ${selectedReqStatusLoanSc ? "has-value" : ""} 
-                            ${isSelectedReqStatusLoanSc ? "is-focused" : ""}`}
-                                title="Please enter the Request Status"
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedReqStatusLoanSc(true)}
-                                    onBlur={() => setIsSelectedReqStatusLoanSc(false)}
-                                    isClearable
-                                    value={selectedReqStatusLoanSc}
-                                    onChange={handleChangeReqStatusLoanSc}
-                                    options={filteredOptionReqStatusLoanSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Request Status</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={2}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Repayment Date"
-                                    autoComplete="off"
-                                    value={repaymentDateLoanSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-
-                                        if (value === "") {
-                                            setRepaymentDateLoanSc("");
-                                            return;
-                                        }
-
-                                        const num = parseInt(value, 10);
-
-                                        if (num === 0 || num > 31) {
-                                            toast.warning("Please enter a date between 1 and 31");
-                                            return;
-                                        }
-
-                                        setRepaymentDateLoanSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Repayment Date</label>
-                            </div>
-                        </div>
-
-                        {/* Search + Reload Buttons */}
-                        <div className="col-12">
-                            <div className="search-btn-wrapper">
-                                <div className="icon-btn search" onClick={handLoanSearch}>
-                                    <span className="tooltip">Search</span>
-                                    <i className="fa-solid fa-magnifying-glass"></i>
-                                </div>
-
-                                <div className="icon-btn reload" onClick={reloadGridLoanData}>
-                                    <span className="tooltip">Reload</span>
-                                    <i className="fa-solid fa-rotate-right"></i>
-                                </div>
-
-                                <div className="icon-btn excel" onClick={handleExportToExcelLoan}>
-                                    <span className="tooltip">Excel</span>
-                                    <i className="fa-solid fa-file-excel"></i>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={15}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required
+                                        title="Please enter the Loan Request ID"
+                                        autoComplete="off"
+                                        value={loanReqIdSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setLoanReqIdSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
                                 </div>
                             </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedEmpIdLoanSc ? "has-value" : ""} 
+                                    ${isSelectedEmpIdLoanSc ? "is-focused" : ""}`}
+                                    title="Please enter the Employee ID"
+                                >
+                                    <Select
+                                        id="department"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectedEmpIdLoanSc(true)}
+                                        onBlur={() => setIsSelectedEmpIdLoanSc(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedEmpIdLoanSc}
+                                        onChange={handleChangeEmpIdLoanSc}
+                                        options={filteredOptionEmpIdLoanSc}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        Employee ID
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={15}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Request Number"
+                                        autoComplete="off"
+                                        value={ReqNoLoanSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setReqNoLoanSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Request Number</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedLoanTypeIdSc ? "has-value" : ""} 
+                                    ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
+                                    title="Please enter the Loan Type ID"
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedLoanTypeSc(true)}
+                                        onBlur={() => setIsSelectedLoanTypeSc(false)}
+                                        isClearable
+                                        value={selectedLoanTypeIdSc}
+                                        onChange={handleChangeLoanTypeSc}
+                                        options={filteredOptionLoanTypeSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Loan Type ID</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={10}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Loan Amount"
+                                        autoComplete="off"
+                                        value={loanAmountSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setLoanAmountSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={5}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Interest Rate"
+                                        autoComplete="off"
+                                        value={interestRateLoanSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/[^0-9.]/g, "");
+                                            setInterestRateLoanSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={5}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Repayment Months"
+                                        autoComplete="off"
+                                        value={repayMonthLoanSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setRepayMonthLoanSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={10}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Monthly Installment"
+                                        autoComplete="off"
+                                        value={monthlyInstallmentLoanSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setMonthlyInstallmentLoanSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedCurrencyLoanSc ? "has-value" : ""} 
+                                    ${isSelectedCurrencyLoanSc ? "is-focused" : ""}`}
+                                    title="Please select the Salary Currency"
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedCurrencyLoanSc(true)}
+                                        onBlur={() => setIsSelectedCurrencyLoanSc(false)}
+                                        isClearable
+                                        value={selectedCurrencyLoanSc}
+                                        onChange={handleChangeCurrencyLoanSc}
+                                        options={filteredOptionCurrencyLoanSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Currency Code</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        required title="Please Enter the Purpose"
+                                        autoComplete="off"
+                                        value={purposeLoanSc}
+                                        maxLength={100}
+                                        onChange={(e) => setPurposeLoanSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Purpose</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={2}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Repayment Date"
+                                        autoComplete="off"
+                                        value={repaymentDateLoanSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+
+                                            if (value === "") {
+                                                setRepaymentDateLoanSc("");
+                                                return;
+                                            }
+
+                                            const num = parseInt(value, 10);
+
+                                            if (num === 0 || num > 31) {
+                                                toast.warning("Please enter a date between 1 and 31");
+                                                return;
+                                            }
+
+                                            setRepaymentDateLoanSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Repayment Date</label>
+                                </div>
+                            </div>
+
+                            {/* Search + Reload Buttons */}
+                            <div className="col-12">
+                                <div className="search-btn-wrapper">
+                                    <div className="icon-btn search" onClick={handLoanSearch}>
+                                        <span className="tooltip">Search</span>
+                                        <i className="fa-solid fa-magnifying-glass"></i>
+                                    </div>
+
+                                    <div className="icon-btn reload" onClick={reloadGridLoanData}>
+                                        <span className="tooltip">Reload</span>
+                                        <i className="fa-solid fa-rotate-right"></i>
+                                    </div>
+
+                                    <div className="icon-btn excel" onClick={handleExportToExcelLoan}>
+                                        <span className="tooltip">Excel</span>
+                                        <i className="fa-solid fa-file-excel"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-                    <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                        <AgGridReact
-                            columnDefs={columnLoanDefs}
-                            rowData={rowLoanData}
-                            pagination={true}
-                            paginationAutoPageSize={true}
-                            gridOptions={gridOptions}
-                        />
+                {requestType === "Loan" && (
+                    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+                        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+                            <AgGridReact
+                                columnDefs={columnLoanDefs}
+                                rowData={rowLoanData}
+                                pagination={true}
+                                paginationAutoPageSize={true}
+                                gridOptions={gridLoanOptions}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
             </>
 
             <>
-                <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-                    <div className="header-flex">
-                        <h6 className="">Search Criteria:</h6>
-                    </div>
-                    <div className="row g-3">
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={15}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={visaRequestIdSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setVisaRequestIdSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Visa Request ID</label>
-                            </div>
+                {requestType === "Visa" && mode === "type" && (
+                    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+                        <div className="header-flex">
+                            <h6 className="">Search Criteria:</h6>
                         </div>
+                        <div className="row g-3">
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={15}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={visaRequestIdSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setVisaRequestIdSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Visa Request ID</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
                             ${selectedEmpIdVisaSc ? "has-value" : ""} 
                             ${isSelectedEmpIdVisaSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="department"
-                                    placeholder=" "
-                                    onFocus={() => setIsSelectedEmpIdVisaSc(true)}
-                                    onBlur={() => setIsSelectedEmpIdVisaSc(false)}
-                                    classNamePrefix="react-select"
-                                    isClearable
-                                    type="text"
-                                    value={selectedEmpIdVisaSc}
-                                    onChange={handleChangeEmpIdVisaSc}
-                                    options={filteredOptionEmpIdVisaSc}
-                                />
-                                <label htmlFor="selecteddpt" className={`floating-label`}>
-                                    Employee ID
-                                </label>
+                                >
+                                    <Select
+                                        id="department"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectedEmpIdVisaSc(true)}
+                                        onBlur={() => setIsSelectedEmpIdVisaSc(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedEmpIdVisaSc}
+                                        onChange={handleChangeEmpIdVisaSc}
+                                        options={filteredOptionEmpIdVisaSc}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        Employee ID
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={15}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={passportIdVisaSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setPassportIdVisaSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Passport ID</label>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={15}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={passportIdVisaSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setPassportIdVisaSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Passport ID</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
                             ${selectedCountryIdVisaSc ? "has-value" : ""} 
                             ${isSelectedCountryIdVisaSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedCountryIdVisaSc(true)}
-                                    onBlur={() => setIsSelectedCountryIdVisaSc(false)}
-                                    isClearable
-                                    value={selectedCountryIdVisaSc}
-                                    onChange={handleChangeCountryIdVisaSc}
-                                    options={filteredOptionCountryIdVisaSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Country ID</label>
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedCountryIdVisaSc(true)}
+                                        onBlur={() => setIsSelectedCountryIdVisaSc(false)}
+                                        isClearable
+                                        value={selectedCountryIdVisaSc}
+                                        onChange={handleChangeCountryIdVisaSc}
+                                        options={filteredOptionCountryIdVisaSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Country ID</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
                             ${selectedVisaTypeSc ? "has-value" : ""} 
                             ${isSelectedVisaTypeSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedVisaTypeSc(true)}
-                                    onBlur={() => setIsSelectedVisaTypeSc(false)}
-                                    isClearable
-                                    value={selectedVisaTypeSc}
-                                    onChange={handleChangeVisaTypeSc}
-                                    options={filteredOptionVisaTypeSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Visa Type ID</label>
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedVisaTypeSc(true)}
+                                        onBlur={() => setIsSelectedVisaTypeSc(false)}
+                                        isClearable
+                                        value={selectedVisaTypeSc}
+                                        onChange={handleChangeVisaTypeSc}
+                                        options={filteredOptionVisaTypeSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Visa Type ID</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={purposeVisaSc}
-                                    maxLength={100}
-                                    onChange={(e) => setPurposeVisaSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Purpose</label>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={purposeVisaSc}
+                                        maxLength={100}
+                                        onChange={(e) => setPurposeVisaSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Purpose</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="date"
-                                    placeholder=""
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={travelStartDateVisaSc}
-                                    onChange={(e) => setTravelStartDateVisaSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Travel Start Date</label>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="date"
+                                        placeholder=""
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={travelStartDateVisaSc}
+                                        onChange={(e) => setTravelStartDateVisaSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Travel Start Date</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="date"
-                                    placeholder=""
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={travelEndDateVisaSc}
-                                    onChange={(e) => setTravelEndDateVisaSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Travel End Date</label>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="date"
+                                        placeholder=""
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={travelEndDateVisaSc}
+                                        onChange={(e) => setTravelEndDateVisaSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Travel End Date</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
                             ${selectedReqStatusVisaSc ? "has-value" : ""} 
                             ${isSelectedReqStatusVisaSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedReqStatusVisaSc(true)}
-                                    onBlur={() => setIsSelectedReqStatusVisaSc(false)}
-                                    isClearable
-                                    value={selectedReqStatusVisaSc}
-                                    onChange={handleChangeReqStatusVisaSc}
-                                    options={filteredOptionReqStatusVisaSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Request Status</label>
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedReqStatusVisaSc(true)}
+                                        onBlur={() => setIsSelectedReqStatusVisaSc(false)}
+                                        isClearable
+                                        value={selectedReqStatusVisaSc}
+                                        onChange={handleChangeReqStatusVisaSc}
+                                        options={filteredOptionReqStatusVisaSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Request Status</label>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* <div className="col-md-2">
+                            {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -2422,117 +2664,625 @@ function RequestReport({ }) {
                         </div>
                     </div> */}
 
-                        <div className="col-md-2">
-                            <div
-                                className={`inputGroup selectGroup 
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
                             ${selectedPriorityVisaSc ? "has-value" : ""} 
                             ${isSelectedPriorityVisaSc ? "is-focused" : ""}`}
-                            >
-                                <Select
-                                    id="country"
-                                    type="text"
-                                    classNamePrefix="react-select"
-                                    placeholder=""
-                                    onFocus={() => setIsSelectedPriorityVisaSc(true)}
-                                    onBlur={() => setIsSelectedPriorityVisaSc(false)}
-                                    isClearable
-                                    value={selectedPriorityVisaSc}
-                                    onChange={handleChangePriorityVisaSc}
-                                    options={filteredOptionPriorityVisaSc}
-                                />
-                                <label for="sname" className={`floating-label`}>Priority Level</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={sponsorNameVisaSc}
-                                    maxLength={150}
-                                    onChange={(e) => setSponsorNameVisaSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    maxLength={6}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={estimatedCostVisaSc}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setEstimatedCostVisaSc(value);
-                                    }}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Estimated Cost</label>
-                            </div>
-                        </div>
-
-                        <div className="col-md-2">
-                            <div className="inputGroup">
-                                <input
-                                    id="fdate"
-                                    class="exp-input-field form-control"
-                                    type="text"
-                                    placeholder=""
-                                    required title="Please Enter the Annual Bonus"
-                                    autoComplete="off"
-                                    value={remarksVisaSc}
-                                    maxLength={255}
-                                    onChange={(e) => setRemarksVisaSc((e.target.value))}
-                                />
-                                <label for="sname" className={`exp-form-labels`}>Remarks</label>
-                            </div>
-                        </div>
-
-                        {/* Search + Reload Buttons */}
-                        <div className="col-12">
-                            <div className="search-btn-wrapper">
-                                <div className="icon-btn search" onClick={handleVisaSearch}>
-                                    <span className="tooltip">Search</span>
-                                    <i className="fa-solid fa-magnifying-glass"></i>
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedPriorityVisaSc(true)}
+                                        onBlur={() => setIsSelectedPriorityVisaSc(false)}
+                                        isClearable
+                                        value={selectedPriorityVisaSc}
+                                        onChange={handleChangePriorityVisaSc}
+                                        options={filteredOptionPriorityVisaSc}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Priority Level</label>
                                 </div>
+                            </div>
 
-                                <div className="icon-btn reload" onClick={reloadGridVisaData}>
-                                    <span className="tooltip">Reload</span>
-                                    <i className="fa-solid fa-rotate-right"></i>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={sponsorNameVisaSc}
+                                        maxLength={150}
+                                        onChange={(e) => setSponsorNameVisaSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Sponsor Name</label>
                                 </div>
+                            </div>
 
-                                <div className="icon-btn excel" onClick={handleExportToExcelVisa}>
-                                    <span className="tooltip">Excel</span>
-                                    <i className="fa-solid fa-file-excel"></i>
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={6}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={estimatedCostVisaSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setEstimatedCostVisaSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Estimated Cost</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        required title="Please Enter the Annual Bonus"
+                                        autoComplete="off"
+                                        value={remarksVisaSc}
+                                        maxLength={255}
+                                        onChange={(e) => setRemarksVisaSc((e.target.value))}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>Remarks</label>
+                                </div>
+                            </div>
+
+                            {/* Search + Reload Buttons */}
+                            <div className="col-12">
+                                <div className="search-btn-wrapper">
+                                    <div className="icon-btn search" onClick={handleVisaSearch}>
+                                        <span className="tooltip">Search</span>
+                                        <i className="fa-solid fa-magnifying-glass"></i>
+                                    </div>
+
+                                    <div className="icon-btn reload" onClick={reloadGridVisaData}>
+                                        <span className="tooltip">Reload</span>
+                                        <i className="fa-solid fa-rotate-right"></i>
+                                    </div>
+
+                                    <div className="icon-btn excel" onClick={handleExportToExcelVisa}>
+                                        <span className="tooltip">Excel</span>
+                                        <i className="fa-solid fa-file-excel"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-                    <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                        <AgGridReact
-                            columnDefs={columnVisaDefs}
-                            rowData={rowVisaData}
-                            pagination={true}
-                            paginationAutoPageSize={true}
-                            gridOptions={gridVisaOptions}
-                        />
+                {requestType === "Visa" && (
+                    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+                        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+                            <AgGridReact
+                                columnDefs={columnVisaDefs}
+                                rowData={rowVisaData}
+                                pagination={true}
+                                paginationAutoPageSize={true}
+                                gridOptions={gridVisaOptions}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
+            </>
+
+            <>
+                {requestType === "Travel" && mode === "type" && (
+
+                    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+                        <div className="header-flex">
+                            <h6 className="">Search Criteria:</h6>
+                        </div>
+                        <div className="row g-3">
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={15}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required
+                                        title="Please enter the Travel Request ID"
+                                        autoComplete="off"
+                                        value={travelReqIdSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setTravelReqIdSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Travel Request ID
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                ${selectedEmpIdTravelSc ? "has-value" : ""} 
+                                ${isSelectedEmpIdTravelSc ? "is-focused" : ""}`}
+                                    title="Please select the Employee ID"
+                                >
+                                    <Select
+                                        id="department"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectedEmpIdTravelSc(true)}
+                                        onBlur={() => setIsSelectedEmpIdTravelSc(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedEmpIdTravelSc}
+                                        onChange={handleChangeEmpIdTravel}
+                                        options={filteredOptionEmpIdTravel}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        Employee ID
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                ${selectedDepTravelSc ? "has-value" : ""} 
+                                ${isSelectedDepTravelSc ? "is-focused" : ""}`}
+                                    title="Please select the Department"
+                                >
+                                    <Select
+                                        id="department"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectedDepTravelSc(true)}
+                                        onBlur={() => setIsSelectedDepTravelSc(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedDepTravelSc}
+                                        onChange={handleChangeDepTravel}
+                                        options={filteredOptionDepTravel}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        Department
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={20}
+                                        required
+                                        title="Please enter the Travel Type"
+                                        autoComplete="off"
+                                        value={travelTypeSc}
+                                        onChange={(e) => setTravelTypeSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Travel Type
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="number"
+                                        placeholder=""
+                                        maxLength={10}
+                                        required
+                                        title="Please enter the Destination Country ID"
+                                        autoComplete="off"
+                                        value={countryTravelSc}
+                                        onChange={(e) => setCountryTravelSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Destination Country ID
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="Text"
+                                        placeholder=""
+                                        maxLength={100}
+                                        required
+                                        title="Please enter the Destination City"
+                                        autoComplete="off"
+                                        value={destinationTravelSc}
+                                        onChange={(e) => setDestinationTravelSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Destination City
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        required
+                                        title="Please enter the Purpose of Travel"
+                                        autoComplete="off"
+                                        value={purposeTravelSc}
+                                        onChange={(e) => setPurposeTravelSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Purpose of Travel
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="date"
+                                        placeholder=""
+                                        required
+                                        title="Please select the Travel Start Date"
+                                        autoComplete="off"
+                                        value={travelStartDateSc}
+                                        onChange={(e) => setTravelStartDateSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Travel Start Date
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="date"
+                                        placeholder=""
+                                        required
+                                        title="Please select the Travel End Date"
+                                        autoComplete="off"
+                                        value={travelEndDateSc}
+                                        onChange={(e) => setTravelEndDateSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Travel End Date
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={50}
+                                        required
+                                        title="Please enter the Transport Mode"
+                                        autoComplete="off"
+                                        value={transportModeTravel}
+                                        onChange={(e) => setTransportModeTravel(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Transport Mode
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={1}
+                                        inputMode="numeric"
+                                        pattern="[0-1]"
+                                        required
+                                        title="Please enter the Accommodation Required (Only - 0 or 1)"
+                                        autoComplete="off"
+                                        value={accReqTravelSc}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/[^01]/g, "");
+                                            setAccReqTravelSc(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Accommodation Required
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=""
+                                        maxLength={14}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        required
+                                        title="Please enter the Estimated Cost"
+                                        autoComplete="off"
+                                        value={estimatedCostTravel}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, "");
+                                            setEstimatedCostTravel(value);
+                                        }}
+                                    />
+                                    <label for="sname" className={`exp-form-labels `}>
+                                        Estimated Cost
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                ${selectedCurrencyTravelSc ? "has-value" : ""} 
+                                ${isSelectedCurrencyTravelSc ? "is-focused" : ""}`}
+                                    title="Please select the Currency Code"
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedCurrencyTravelSc(true)}
+                                        onBlur={() => setIsSelectedCurrencyTravelSc(false)}
+                                        isClearable
+                                        value={selectedCurrencyTravelSc}
+                                        onChange={handleChangeTravelCurrency}
+                                        options={filteredOptionCurrencyTravel}
+                                    />
+                                    <label for="sname" className={`floating-label`}>Currency Code</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="fdate"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        maxLength={255}
+                                        placeholder=""
+                                        required
+                                        title="Please enter the Remarks"
+                                        autoComplete="off"
+                                        value={remarksTravelSc}
+                                        onChange={(e) => setRemarksTravelSc(e.target.value)}
+                                    />
+                                    <label for="sname" className={`exp-form-labels`}>
+                                        Remarks
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                ${selectedPriorityTravelSc ? "has-value" : ""} 
+                                ${isSelectedPriorityTravelSc ? "is-focused" : ""}`}
+                                    title="Please select the Priority Level"
+                                >
+                                    <Select
+                                        id="country"
+                                        type="text"
+                                        classNamePrefix="react-select"
+                                        placeholder=""
+                                        onFocus={() => setIsSelectedPriorityTravelSc(true)}
+                                        onBlur={() => setIsSelectedPriorityTravelSc(false)}
+                                        isClearable
+                                        value={selectedPriorityTravelSc}
+                                        onChange={handleChangePriorityTravel}
+                                        options={filteredOptionPriorityTravel}
+                                    />
+                                    <label for="sname" className={`floating-label`}>
+                                        Priority Level
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                ${selectedManagerTravelSc ? "has-value" : ""} 
+                                ${isSelectedManagerTravelSc ? "is-focused" : ""}`}
+                                    title="Please select the Manager"
+                                >
+                                    <Select
+                                        id="LoanEligibleAmount"
+                                        type="text"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectedManagerTravelSc(true)}
+                                        onBlur={() => setIsSelectedManagerTravelSc(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        value={selectedManagerTravelSc}
+                                        options={filteredOptionManagerTravel}
+                                        onChange={handleChangeManagerTravel}
+                                        maxLength={18}
+                                    />
+                                    <label for="add1" className={`floating-label `}>
+                                        Manager
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Search + Reload Buttons */}
+                            <div className="col-12">
+                                <div className="search-btn-wrapper">
+                                    <div className="icon-btn search" onClick={handleTravelSearch}>
+                                        <span className="tooltip">Search</span>
+                                        <i className="fa-solid fa-magnifying-glass"></i>
+                                    </div>
+
+                                    <div className="icon-btn reload" onClick={reloadGridTravelData}>
+                                        <span className="tooltip">Reload</span>
+                                        <i className="fa-solid fa-rotate-right"></i>
+                                    </div>
+
+                                    <div className="icon-btn excel" onClick={handleExportToExcelTravel}>
+                                        <span className="tooltip">Excel</span>
+                                        <i className="fa-solid fa-file-excel"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {requestType === "Travel" && (
+                    <div
+                        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+                        style={{ width: "100%" }}
+                    >
+                        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+                            <AgGridReact
+                                columnDefs={columnTravelDefs}
+                                rowData={rowTravelData}
+                                pagination={true}
+                                paginationAutoPageSize={true}
+                                gridOptions={gridOptions}
+                            />
+                        </div>
+                    </div>
+                )}
+            </>
+
+            <>
+                {requestType === "Leave" && mode === "type" && (
+
+                    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+                        <div className="header-flex">
+                            <h6 className="">Search Criteria:</h6>
+                        </div>
+
+                        <div className="row g-3">
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        type="date"
+                                        className="exp-input-field form-control"
+                                        value={leaveFromDate}
+                                        placeholder=" "
+                                        autoComplete="off"
+                                        onChange={(e) => setLeaveFromDate(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+                                    />
+                                    <label className="exp-form-labels">From Date</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        type="date"
+                                        className="exp-input-field form-control"
+                                        value={leaveToDate}
+                                        placeholder=" "
+                                        autoComplete="off"
+                                        onChange={(e) => setLeaveToDate(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+                                    />
+                                    <label className="exp-form-labels">To Date</label>
+                                </div>
+                            </div>
+
+                            <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedLeave ? "has-value" : ""} 
+                                    ${isSearchLeave ? "is-focused" : ""}`}
+                                >
+                                    <Select
+                                        id="LeaveType"
+                                        value={selectedLeave}
+                                        onChange={handleLeaves}
+                                        options={filterOptionLeaves}
+                                        placeholder=" "
+                                        onFocus={() => setIsSearchLeave(true)}
+                                        onBlur={() => setIsSearchLeave(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
+                                    />
+                                    <label className="floating-label">Leave Type</label>
+                                </div>
+                            </div>
+
+                            <div className="col-12">
+                                <div className="search-btn-wrapper">
+                                    <div className="icon-btn search" onClick={handleSearchItem}>
+                                        <span className="tooltip">Search</span>
+                                        <i className="fa-solid fa-magnifying-glass"></i>
+                                    </div>
+
+                                    <div className="icon-btn reload" onClick={handleLeaveReload}>
+                                        <span className="tooltip">Reload</span>
+                                        <i className="fa-solid fa-rotate-right"></i>
+                                    </div>
+
+                                    <div className="icon-btn excel" onClick={handleExportToExcelLeave}>
+                                        <span className="tooltip">Excel</span>
+                                        <i className="fa-solid fa-file-excel"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {requestType === "Leave" && (
+                    <div
+                        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+                        style={{ width: "100%" }}
+                    >
+                        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+                            <AgGridReact
+                                rowData={leaveRowData}
+                                columnDefs={leaveColumnDefs}
+                                rowSelection="single"
+                            />
+                        </div>
+                    </div>
+                )}
             </>
 
         </div>

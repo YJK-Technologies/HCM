@@ -2089,6 +2089,20 @@ const Dashboard = () => {
     XLSX.writeFile(workbook, "Employee_Detail_Search_Report.xlsx");
   };
 
+  const convertDate = (date) => {
+
+    if (!date) return "";
+
+    const parts = date.split(/[-\/]/);
+
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+
+    return `${year}-${month}-${day}`;
+
+  };
+
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
@@ -2409,7 +2423,19 @@ const Dashboard = () => {
 
               {dashboardRequests.length > 0 ? (
                 dashboardRequests.map((req, index) => (
-                  <div key={index} className="leave-item-modern">
+                  <div key={index} className="leave-item-modern" onClick={() =>
+                    navigate("/RequestReport", {
+                      state: {
+                        type: req.type,
+                        id: req.id,
+                        fromDate: convertDate(req.FromDate),
+                        toDate: convertDate(req.ToDate),
+                        employeeId: req.EmployeeId,
+                        status: "Pending",
+                        mode: "item"
+                      }
+                    })
+                  }>
 
                     {/* LEFT */}
                     <div className="leave-item-left">
@@ -2419,7 +2445,17 @@ const Dashboard = () => {
                           <span className="separator">-</span>
                           <span className="emp-name-text">{req.EmployeeName}</span>
                         </div>
-                        <div className="leave-type-pill">
+                        <div className="leave-type-pill" onClick={(e) => {
+                          e.stopPropagation();
+
+                          navigate("/RequestReport", {
+                            state: {
+                              type: req.type,
+                              status: "Pending",
+                              mode: "type"
+                            }
+                          });
+                        }}>
                           {req.type === "Employee Change" ? req.title : `${req.type} - ${req.title}`}
                         </div>
                       </div>
@@ -2433,9 +2469,9 @@ const Dashboard = () => {
                             {req.days ? `Duration (${req.days} Days)` : "Duration"}
                           </span>
                           <div className="date-range-text">
-                            {req.FromDate} 
+                            {req.FromDate}
                             <i className="fa-solid fa-arrow-right"></i>
-                             {req.ToDate}
+                            {req.ToDate}
                           </div>
                         </div>
                       )}
