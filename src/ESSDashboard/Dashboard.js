@@ -824,12 +824,15 @@ const Dashboard = () => {
       }
       /* ---------- Employee Family Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/DashboardFamilyDetailChange`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code })
-        });
-      
+        const res = await fetch(
+          `${config.apiBaseUrl}/DashboardFamilyDetailChange`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
+
         if (res.ok) familyChangeData = await res.json();
       } catch (err) {
         console.log("Family API failed");
@@ -906,9 +909,8 @@ const Dashboard = () => {
 
       /* ---------- Family Change Group ---------- */
       const groupedFamily = {};
-      
-      familyChangeData.forEach(row => {
-      
+
+      familyChangeData.forEach((row) => {
         if (!groupedFamily[row.Info_request_id]) {
           groupedFamily[row.Info_request_id] = {
             type: "Family",
@@ -916,13 +918,12 @@ const Dashboard = () => {
             EmployeeId: row.EmployeeId,
             EmployeeName: row.Employee_Name,
             title: "Detail Changes",
-            status: row.request_status
+            status: row.request_status,
           };
         }
-      
       });
-      
-      const formattedFamily = Object.values(groupedFamily);      
+
+      const formattedFamily = Object.values(groupedFamily);
 
       /* ---------- Merge ---------- */
       const merged = [
@@ -931,7 +932,7 @@ const Dashboard = () => {
         ...formattedTravel,
         ...formattedLoan,
         ...formattedEmp,
-        ...formattedFamily
+        ...formattedFamily,
       ];
 
       setDashboardRequests(merged);
@@ -964,8 +965,7 @@ const Dashboard = () => {
           FromDate: backendDate,
         };
       } else if (type === "Loan") {
-
-      /* ---------- Loan ---------- */
+        /* ---------- Loan ---------- */
         url = `${config.apiBaseUrl}/ApprovalLoan`;
 
         body = {
@@ -974,8 +974,7 @@ const Dashboard = () => {
           request_status: status,
         };
       } else if (type === "Visa") {
-
-      /* ---------- Visa ---------- */
+        /* ---------- Visa ---------- */
         url = `${config.apiBaseUrl}/ApprovalVisa`;
 
         body = {
@@ -984,8 +983,7 @@ const Dashboard = () => {
           request_status: status,
         };
       } else if (type === "Travel") {
-
-      /* ---------- Travel ---------- */
+        /* ---------- Travel ---------- */
         url = `${config.apiBaseUrl}/ApprovalTravel`;
 
         body = {
@@ -994,8 +992,7 @@ const Dashboard = () => {
           request_status: status,
         };
       } else if (type === "Employee Change") {
-
-      /* ---------- Employee Change ---------- */
+        /* ---------- Employee Change ---------- */
         url = `${config.apiBaseUrl}/ApprovalPersonalInfo`;
 
         body = {
@@ -1004,19 +1001,16 @@ const Dashboard = () => {
           request_status: status,
           approver_id: sessionStorage.getItem("selectedUserCode"),
         };
-      }
-
-      /* ---------- Family Change ---------- */
-      else if (type === "Family Change") {
-      
+      } else if (type === "Family Change") {
+        /* ---------- Family Change ---------- */
         url = `${config.apiBaseUrl}/ApprovalFamilyDetail`;
-      
+
         body = {
           Info_request_id: id,
           company_code,
           request_status: status,
           approver_id: sessionStorage.getItem("selectedUserCode"),
-          modified_by: sessionStorage.getItem("selectedUserCode")
+          modified_by: sessionStorage.getItem("selectedUserCode"),
         };
       }
 
@@ -2138,6 +2132,15 @@ const Dashboard = () => {
     XLSX.writeFile(workbook, "Employee_Detail_Search_Report.xlsx");
   };
 
+  const convertDate = (date) => {
+    if (!date) return "";
+    const parts = date.split(/[-\/]/);
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  };
+
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
       <ToastContainer
@@ -2535,7 +2538,23 @@ const Dashboard = () => {
             >
               {dashboardRequests.length > 0 ? (
                 dashboardRequests.map((req, index) => (
-                  <div key={index} className="leave-item-modern">
+                  <div
+                    key={index}
+                    className="leave-item-modern"
+                    onClick={() =>
+                      navigate("/RequestReport", {
+                        state: {
+                          type: req.type,
+                          id: req.id,
+                          fromDate: convertDate(req.FromDate),
+                          toDate: convertDate(req.ToDate),
+                          employeeId: req.EmployeeId,
+                          status: "Pending",
+                          mode: "item",
+                        },
+                      })
+                    }
+                  >
                     {/* LEFT */}
                     <div className="leave-item-left">
                       <div className="emp-details">
@@ -2546,7 +2565,20 @@ const Dashboard = () => {
                             {req.EmployeeName}
                           </span>
                         </div>
-                        <div className="leave-type-pill">
+                        <div
+                          className="leave-type-pill"
+                          onClick={(e) => {
+                            e.stopPropagation();
+
+                            navigate("/RequestReport", {
+                              state: {
+                                type: req.type,
+                                status: "Pending",
+                                mode: "type",
+                              },
+                            });
+                          }}
+                        >
                           {req.type === "Employee Change"
                             ? req.title
                             : `${req.type} - ${req.title}`}

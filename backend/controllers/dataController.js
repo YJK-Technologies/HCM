@@ -45430,6 +45430,103 @@ const ApprovalFamilyDetail = async (req, res) => {
 };
 // code ended by sakthi on 3-17-26
 
+//code added by sakthi on 3-17-26
+const employeePersonalRequestSearch = async (req, res) => {
+  const {
+    EmployeeId,
+    First_Name,
+    Middle_Name,
+    Last_Name,
+    Gender,
+    Email,
+    Phone1,
+    City,
+    State,
+    Country,
+    request_status,
+    purpose,
+    Info_request_id,
+    company_code
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+
+      .input("mode", sql.NVarChar, "SC")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("First_Name", sql.NVarChar, First_Name)
+      .input("Middle_Name", sql.NVarChar, Middle_Name)
+      .input("Last_Name", sql.NVarChar, Last_Name)
+      .input("Father_Name", sql.NVarChar, "")
+      .input("Mother_Name", sql.NVarChar, "")
+      .input("DOB", sql.Date, null)
+      .input("Gender", sql.NVarChar, Gender)
+      .input("Email", sql.NVarChar, Email)
+      .input("Phone1", sql.NVarChar, Phone1)
+      .input("Phone2", sql.NVarChar, "")
+      .input("Address1", sql.NVarChar, "")
+      .input("Address2", sql.NVarChar, "")
+      .input("Address3", sql.NVarChar, "")
+      .input("PermanantAddress", sql.NVarChar, "")
+      .input("Reference_Name", sql.NVarChar, "")
+      .input("Reference_Phone", sql.NVarChar, "")
+      .input("Pan_No", sql.NVarChar, "")
+      .input("Aadhar_no", sql.NVarChar, "")
+      .input("Photos", sql.VarBinary, null)
+      .input("Marital_Status", sql.NVarChar, "")
+      .input("Siblings", sql.NVarChar, "")
+      .input("Kids", sql.NVarChar, "")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Title", sql.NVarChar, "")
+      .input("Place_of_Birth", sql.NVarChar, "")
+      .input("Nationality", sql.NVarChar, "")
+      .input("Religion", sql.NVarChar, "")
+      .input("Blood_Group", sql.NVarChar, "")
+      .input("Spouse_Name", sql.NVarChar, "")
+      .input("Number_of_Siblings", sql.Int, 0)
+      .input("Number_of_Children", sql.Int, 0)
+      .input("Email_Business", sql.NVarChar, "")
+      .input("Phone_Alternate", sql.NVarChar, "")
+      .input("Emergency_Contact_Name", sql.NVarChar, "")
+      .input("Emergency_Contact_Relationship", sql.NVarChar, "")
+      .input("Emergency_Contact_Phone", sql.NVarChar, "")
+      .input("City", sql.NVarChar, City)
+      .input("State", sql.NVarChar, State)
+      .input("Country", sql.NVarChar, Country)
+      .input("Postal_Code", sql.NVarChar, "")
+      .input("Passport_No", sql.NVarChar, "")
+      .input("Passport_Expiry_Date", sql.Date, null)
+      .input("Other_Id_Type", sql.NVarChar, "")
+      .input("Other_Id_No", sql.NVarChar, "")
+      .input("Created_by", sql.NVarChar, "")
+      .input("Modified_by", sql.NVarChar, "")
+      .input("approver_id", sql.NVarChar, "")
+      .input("request_status", sql.NVarChar, request_status)
+      .input("purpose", sql.NVarChar, purpose)
+      .input("Info_request_id", sql.Int, Info_request_id || 0)
+      .input("keyfield", sql.NVarChar, "")
+      .query(`
+        EXEC sp_employee_personal_Changes_Request_Test @mode,@EmployeeId,@First_Name,@Middle_Name, @Last_Name, '', '', NULL,@Gender, @Email, @Phone1, '', '', '', '', '', '', '', '', '', NULL,'', '', '',@company_code,'', '', '', '', '', '',NULL, 0, 0,'', '', '', '', '', '', '',@City, @State, '','', '', NULL, '', '','', '',@request_status,'', 0, ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error during employee search:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+// code ended by sakthi on 3-17-26
+
+
+
+
 module.exports = {
   login,
   forgetPassword,
