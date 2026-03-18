@@ -13,15 +13,25 @@ function Input({ }) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [userDrop, setUserDrop] = useState([]);
+  const [userDropAg, setUserDropAg] = useState([]);
+  const [userDropSc, setUserDropSc] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
+  const [selectedUserSc, setSelectedUserSc] = useState('');
   const [user, setUser] = useState("");
+  const [userSc, setUserSc] = useState("");
   const [projectDrop, setProjectDrop] = useState([]);
+  const [projectDropAg, setProjectDropAg] = useState([]);
+  const [projectDropSc, setProjectDropSc] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
+  const [selectedProjectSc, setSelectedProjectSc] = useState('');
   const [project, setProject] = useState("");
+  const [projectSc, setProjectSc] = useState("");
   const [projectId, setProjectId] = useState("");
   const [Projectname, setProjectname] = useState("");
   const [userId, setUserId] = useState("");
+  const [userIdSc, setUserIdSc] = useState("");
   const [user_name, setuser_name] = useState("");
+  const [user_nameSc, setuser_nameSc] = useState("");
   const [userCodeDrop, setUserCodeDrop] = useState([]);
   const [projectCodeDrop, setProjectCodeDrop] = useState([]);
   const [status, setstatus] = useState("");
@@ -29,7 +39,9 @@ function Input({ }) {
   const [statusdrop, setStatusdrop] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSelectProject, setIsSelectProject] = useState(false);
+  const [isSelectProjectSc, setIsSelectProjectSc] = useState(false);
   const [isSelectUser, setIsSelectUser] = useState(false);
+  const [isSelectUserSc, setIsSelectUserSc] = useState(false);
   const [isSelectStatus, setIsSelectStatus] = useState(false);
 
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -65,13 +77,88 @@ function Input({ }) {
   }, []);
 
   useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getProjectDrop`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const loan = val.map((option) => ({
+          value: option.ProjectID,
+          label: `${option.ProjectID}`,
+        }));
+
+        setProjectDropAg(loan);
+      })
+      .catch((error) => console.error("Error fetching loan request:", error));
+  }, []);
+
+  useEffect(() => {
+    if (!company_code) return; // Only run if company_code exists
+
+    fetch(`${config.apiBaseUrl}/getProjectDrop`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setProjectDropSc(data);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/Usercode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const user = val.map((option) => ({
+          value: option.user_code,
+          label: `${option.user_code}`,
+        }));
+
+        setUserDropAg(user);
+      })
+      .catch((error) => console.error("Error fetching user:", error));
+  }, []);
+
+
+  useEffect(() => {
     fetch(`${config.apiBaseUrl}/Usercode`)
       .then((data) => data.json())
       .then((val) => setUserDrop(val));
   }, []);
 
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/Usercode`)
+      .then((data) => data.json())
+      .then((val) => setUserDropSc(val));
+  }, []);
+
   const filteredOptionProject = Array.isArray(projectDrop)
     ? projectDrop.map((option) => ({
+      value: option.ProjectID,
+      label: `${option.ProjectID} - ${option.ProjectName}`
+    }))
+    : [];
+
+  const filteredOptionProjectSc = Array.isArray(projectDropSc)
+    ? projectDropSc.map((option) => ({
       value: option.ProjectID,
       label: `${option.ProjectID} - ${option.ProjectName}`
     }))
@@ -85,6 +172,13 @@ function Input({ }) {
   //   : [];
   const filteredOptionUser = Array.isArray(userDrop)
     ? userDrop.map((option) => ({
+      value: option.user_code,
+      label: `${option.user_code} - ${option.user_name}`,
+    }))
+    : [];
+
+  const filteredOptionUserSc = Array.isArray(userDropSc)
+    ? userDropSc.map((option) => ({
       value: option.user_code,
       label: `${option.user_code} - ${option.user_name}`,
     }))
@@ -185,10 +279,19 @@ function Input({ }) {
     setSelectedProject(selectedProject);
     setProject(selectedProject ? selectedProject.value : '');
   };
+  const handleChangeProjectSc = (selectedProjectSc) => {
+    setSelectedProjectSc(selectedProjectSc);
+    setProjectSc(selectedProjectSc ? selectedProjectSc.value : '');
+  };
 
   const handleChangeUser = (selectedUser) => {
     setSelectedUser(selectedUser);
     setUser(selectedUser ? selectedUser.value : '');
+  };
+
+  const handleChangeUserSc = (selectedUserSc) => {
+    setSelectedUserSc(selectedUserSc);
+    setUserSc(selectedUserSc ? selectedUserSc.value : '');
   };
 
   // //useEffect for Ag grid Filter Option
@@ -255,17 +358,17 @@ function Input({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: projectCodeDrop,
+        values: projectDropAg.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const loan = projectDropAg.find((d) => d.value === params.value);
+        return loan ? loan.label : params.value;
       },
     },
     {
       headerName: "Project Name",
       field: "ProjectName",
       editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: projectCodeDrop,
-      },
     },
     {
       headerName: "User ID",
@@ -273,17 +376,17 @@ function Input({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: userCodeDrop,
+        values: userDropAg.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const user = userDropAg.find((d) => d.value === params.value);
+        return user ? user.label : params.value;
       },
     },
     {
       headerName: "User Name",
       field: "user_name",
       editable: true,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: userCodeDrop,
-      },
     },
     {
       headerName: "Keyfield",
@@ -333,7 +436,7 @@ function Input({ }) {
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -342,10 +445,10 @@ function Input({ }) {
     try {
       setLoading(true);
       const body = {
-        ProjectID: projectId,
+        ProjectID: projectSc,
         ProjectName: Projectname,
         user_name: user_name,
-        userid: userId,
+        userID: userSc,
         company_code: sessionStorage.getItem('selectedCompanyCode')
 
       };
@@ -362,7 +465,6 @@ function Input({ }) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
           ProjectID: matchedItem.ProjectID,
-          userID: matchedItem.userID,
           ProjectName: matchedItem.ProjectName,
           user_name: matchedItem.user_name,
           userID: matchedItem.userID,
@@ -381,7 +483,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error fetching search data:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -396,73 +498,74 @@ function Input({ }) {
 
 
   const handleUpdate = async (rowData) => {
-            showConfirmationToast(
-          "Are you sure you want to Update the data in the selected rows?",
-          async () => {
-    try {
-      setLoading(true);
-      const modified_by = sessionStorage.getItem('selectedUserCode');
-      const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
-      const response = await fetch(`${config.apiBaseUrl}/updateProjectMapping`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "modified-by": modified_by
-        },
-        body: JSON.stringify(dataToSend)
-      });
+    showConfirmationToast(
+      "Are you sure you want to Update the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+          const modified_by = sessionStorage.getItem('selectedUserCode');
+          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const response = await fetch(`${config.apiBaseUrl}/updateProjectMapping`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "modified-by": modified_by
+            },
+            body: JSON.stringify(dataToSend)
+          });
 
-      if (response.ok) {
-        toast.success("Data updated successfully", {
-          onClose: () => handleSearch(), // Runs handleSearch when toast closes
-        });
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
-      }
-    } catch (error) {
-      console.error("Error deleting rows:", error);
-      toast.error('Error Deleting Data: ' + error.message);
-    }
-          },
-          () => {
-            toast.info("Data updated cancelled.");
+          if (response.ok) {
+            toast.success("Data updated successfully", {
+              onClose: () => handleSearch(), // Runs handleSearch when toast closes
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Failed to insert sales data");
           }
-        );
+        } catch (error) {
+          console.error("Error deleting rows:", error);
+          toast.error('Error Deleting Data: ' + error.message);
+        }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
   };
 
   const handleDelete = async (rowData) => {
-            showConfirmationToast(
-          "Are you sure you want to Delete the data in the selected rows?",
-          async () => {
-    try {
-      setLoading(true);
-      const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
-      const response = await fetch(`${config.apiBaseUrl}/deleteProjectMapping`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dataToSend)
-      });
+    showConfirmationToast(
+      "Are you sure you want to Delete the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const response = await fetch(`${config.apiBaseUrl}/deleteProjectMapping`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dataToSend)
+          });
 
-      if (response.ok) {
-        toast.success("Data deleted successfully", {
-          onClose: () => handleSearch(),
-        });
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
-      }
-    } catch (error) {
-      console.error("Error deleting rows:", error);
-      toast.error('Error Deleting Data: ' + error.message);
-    }
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Failed to insert sales data");
+          }
+        } catch (error) {
+          console.error("Error deleting rows:", error);
+          toast.error('Error Deleting Data: ' + error.message);
+        }
       },
       () => {
         toast.info("Data deleted cancelled.");
       }
-    );  };
+    );
+  };
 
   return (
     <div class="container-fluid Topnav-screen">
@@ -581,7 +684,7 @@ function Input({ }) {
         <h5>Search Criteria :</h5>
         <div className="row g-3">
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -593,7 +696,28 @@ function Input({ }) {
                 onChange={(e) => setProjectId(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
-              <label className="exp-form-labels">Project </label>
+              <label className="exp-form-labels">Project ID</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedProjectSc ? "has-value" : ""} 
+              ${isSelectProjectSc ? "is-focused" : ""}`}
+            >
+              <Select
+                id="gradeid"
+                placeholder=" "
+                onFocus={() => setIsSelectProjectSc(true)}
+                onBlur={() => setIsSelectProjectSc(false)}
+                classNamePrefix="react-select"
+                isClearable
+                onChange={handleChangeProjectSc}
+                value={selectedProjectSc}
+                options={filteredOptionProjectSc}
+              />
+              <label for="sname" className={`floating-label `}>Project ID</label>
             </div>
           </div>
 
@@ -614,7 +738,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -627,7 +751,28 @@ function Input({ }) {
                 options={filteredOptionUser}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
-              <label className="exp-form-labels">User</label>
+              <label className="exp-form-labels">User ID</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedUserSc ? "has-value" : ""} 
+              ${isSelectUserSc ? "is-focused" : ""}`}
+            >
+              <Select
+                id="gradeid"
+                placeholder=" "
+                onFocus={() => setIsSelectUserSc(true)}
+                onBlur={() => setIsSelectUserSc(false)}
+                classNamePrefix="react-select"
+                isClearable
+                onChange={handleChangeUserSc}
+                value={selectedUserSc}
+                options={filteredOptionUserSc}
+              />
+              <label for="sname" className={`floating-label `}>User ID</label>
             </div>
           </div>
 

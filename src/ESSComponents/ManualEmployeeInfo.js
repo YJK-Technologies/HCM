@@ -127,7 +127,8 @@ function ManualEmployeeInfo({}) {
       cityDrop.length > 0 ||
       countryDrop.length > 0 || 
       stateDrop.length > 0 ||
-      otherDrop.length > 0 || employeeId
+      otherDrop.length > 0 ||
+       employeeId
     ){
       handleRefNo(employeeId);
     }
@@ -290,9 +291,8 @@ function ManualEmployeeInfo({}) {
     navigate("/EmpFamPersonalDetail");
   };
   const Documents = () => {
-    navigate("/Documents");
+    navigate("/EmpDocumentReq");
   };
-
 
   const EmployeeLoan = () => {
     navigate("/ManualEmployeeInfo");
@@ -311,6 +311,9 @@ function ManualEmployeeInfo({}) {
         case 'Academic Details':
           AcademicDet();
           break;
+        case 'Documents':
+          Documents();
+          break;
       default:
         break;
     }
@@ -320,8 +323,8 @@ function ManualEmployeeInfo({}) {
     { label: "Personal Details" },
     // { label: 'Academic Details' },
     { label: 'Family' },
-    // { label: 'Documents' }
     { label: 'Academic Details' },
+    { label: 'Documents' }
   ];
 
   const handleGradeID = (selectedgradeid) => {

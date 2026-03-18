@@ -114,12 +114,12 @@ function RequestReport({ }) {
 
         }
 
-        else if (type === "Travel") {
+        else if (type === "Employee") {
 
             url = `${config.apiBaseUrl}/DashboardEmployeeInfoChange`;
 
             body = {
-                travel_request_id: safeId,
+                Info_request_id: safeId,
                 request_status: status,
                 company_code
             };

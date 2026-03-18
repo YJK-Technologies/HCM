@@ -45455,7 +45455,7 @@ const employeePersonalRequestSearch = async (req, res) => {
     const result = await pool
       .request()
 
-      .input("mode", sql.NVarChar, "SC")
+      .input("mode", sql.NVarChar, "SCC")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("First_Name", sql.NVarChar, First_Name)
       .input("Middle_Name", sql.NVarChar, Middle_Name)
