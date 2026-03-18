@@ -214,7 +214,7 @@ function Project({ }) {
       }
     },
     {
-      headerName: "Task Status",
+      headerName: "Status",
       field: "TaskStatus",
       filter: 'agNumberColumnFilter',
       // minWidth: 130,
@@ -636,7 +636,7 @@ function Project({ }) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   };
 
   return (
@@ -701,7 +701,7 @@ function Project({ }) {
                 maxLength={50}
                 readOnly
               />
-              <label className="exp-form-labels">Project</label>
+              <label className="exp-form-labels">Project ID</label>
             </div>
           </div>
 
@@ -755,10 +755,15 @@ function Project({ }) {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
+                maxLength={5}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 autoComplete="off"
                 value={EstimatedHours}
-                onChange={(e) => setEstimatedHours(e.target.value)}
-                maxLength={100}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setEstimatedHours(value);
+                }}
               />
               <label for="add3" className={`exp-form-labels ${error && !EstimatedHours ? 'text-danger' : ''}`}>
                 Estimated Hours<span className="text-danger">*</span>
@@ -891,7 +896,7 @@ function Project({ }) {
                 maxLength={50}
               />
               <label htmlFor="EmployeeId" className="exp-form-labels">
-                Project
+                Project ID
               </label>
             </div>
           </div>
