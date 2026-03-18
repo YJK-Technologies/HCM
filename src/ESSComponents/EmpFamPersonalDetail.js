@@ -80,6 +80,11 @@ function EmpFamPersonalDetail({}) {
     const AcademicDet = () => {
     navigate("/AcademicDetReq");
   };
+      const Documents = () => {
+    navigate("/EmpDocumentReq");
+  };
+
+
 
 
   const addRow = (relation) => {
@@ -137,7 +142,9 @@ function EmpFamPersonalDetail({}) {
       case "Academic Details":
         AcademicDet();
         break;
-
+      case 'Documents':
+        Documents();
+        break;
       default:
         break;
     }
@@ -147,6 +154,7 @@ function EmpFamPersonalDetail({}) {
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
+    { label: 'Documents' }
   ];
 
   const handleSave = async () => {

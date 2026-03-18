@@ -385,6 +385,10 @@ function Input({}) {
   const EmployeeLoan = () => {
     navigate("/ManualEmployeeInfo");
   };
+    const Documents = () => {
+    navigate("/EmpDocumentReq");
+  };
+
 
   const [activeTab, setActiveTab] = useState("Academic Details");
   const handleTabClick = (tabLabel) => {
@@ -400,6 +404,9 @@ function Input({}) {
       case "Academic Details":
         AcademicDet();
         break;
+      case 'Documents':
+        Documents();
+        break;
       default:
         break;
     }
@@ -409,6 +416,8 @@ function Input({}) {
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
+    { label: 'Documents' }
+
   ];
 
   const reloadGridData = () => {
