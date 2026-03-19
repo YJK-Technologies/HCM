@@ -589,7 +589,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="num"
+                type="number"
                 placeholder=""
                 required title="Please Enter the Employee Salary From"
                 value={Employee_Salary_From}
@@ -604,7 +604,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 required title="Please Enter the Employee Salary To"
                 value={Employee_Salary_To}
@@ -620,7 +620,7 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 required title="Please Enter the Taxable Amount"
                 value={Taxable_Amount}
@@ -680,7 +680,7 @@ function Input({ }) {
                 required title="Please Enter the Employee Salary From"
                 value={Empsalaryfrom}
                 onChange={(e) => setEmpsalaryfrom(Number(e.target.value))}
-                type="text"
+                type="number"
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <label for="add1" className="exp-form-labels"> Employee Salary From </label>
@@ -691,7 +691,7 @@ function Input({ }) {
             <div className="inputGroup">
               <input id="status"
                 className="exp-input-field form-control"
-                type="text"
+                type="number"
                 required title="Please Enter the Employee Salary To"
                 value={EmpsalaryTo}
                 onChange={(e) => setEmpsalaryTo(Number(e.target.value))}

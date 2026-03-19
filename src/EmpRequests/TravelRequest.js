@@ -894,7 +894,7 @@ function TravelRequest({ }) {
     },
 
     {
-      headerName: "Priority",
+      headerName: "Priority Level",
       field: "priority_level",
       editable: true,
       filter: "agNumberColumnFilter",
@@ -1956,7 +1956,7 @@ function TravelRequest({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="number"
+                type="text"
                 placeholder=""
                 maxLength={10}
                 required

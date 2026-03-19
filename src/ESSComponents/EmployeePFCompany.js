@@ -564,7 +564,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 title="Please Enter the Company Contribution"
                 required
@@ -581,7 +581,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 title="Please Enter the Employee PF"
                 required
