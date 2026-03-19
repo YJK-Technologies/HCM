@@ -566,7 +566,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 required title="Please Enter the Employee Salary"
                 value={Employee_Salary}
@@ -583,7 +583,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 required title="Please Enter the Taxable Amount"
                 value={Taxable_Amount}
