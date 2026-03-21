@@ -1343,6 +1343,9 @@ router.post("/AcademicRequestHdr",dataController.AcademicRequestHdr)
 router.post("/AcademicRequestDetails",dataController.AcademicRequestDetails)
 router.post("/GetAcademicRequestDetails",dataController.GetAcademicRequestDetails)
 router.post("/ApproveAcademicRequest",dataController.ApproveAcademicRequest)
-
+router.post("/PersonalRequestDetails",dataController.PersonalRequestDetails)
+router.post("/PersonalRequestHdr",dataController.PersonalRequestHdr)
+router.post("/ApprovePersonalRequest",dataController.ApprovePersonalRequest)
+router.post("/GetPersonalRequestDetails",dataController.GetPersonalRequestDetails)
 
 module.exports = router;
