@@ -105,95 +105,227 @@ function Input({}) {
     );
   };
 
-  const handleSave = async () => {
-    if (!EmployeeId) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
+//   const handleSave = async () => {
+//     if (!EmployeeId) {
+//       setError(true);
+//       toast.warning("Error: Missing required fields");
+//       return;
+//     }
+
+//     for (const relationGroup of Academic) {
+//       for (const member of relationGroup.members) {
+//         if (
+//           !member.academicName ||
+//           !member.major ||
+//           !member.institution ||
+//           !member.academicYear ||
+//           !member.purpose
+//         ) {
+//           setError(true);
+//           toast.warning("Error: Missing required fields");
+//           return;
+//         }
+//       }
+//     }
+
+//     const employeeData = await Promise.all(
+//       Academic.flatMap((relationGroup) =>
+//         relationGroup.members.map(async (member) => {
+
+//   let fileBase64 = null;
+
+//   if (member.document) {
+//     const fileSize = member.document.size;
+//     const maxSize = 1 * 1024 * 1024;
+
+//     if (fileSize > maxSize) {
+//       toast.warning("File size exceeds 1MB");
+//       return null;
+//     }
+
+//     fileBase64 = await convertToBase64(member.document);
+//   }
+
+//   return {
+//     EmployeeId: EmployeeId,
+//     academicName: member.academicName,
+//     major: member.major,
+//     institution: member.institution,
+//     academicYear: member.academicYear,
+//     document: fileBase64,
+//     company_code: sessionStorage.getItem("selectedCompanyCode"),
+//     created_by: sessionStorage.getItem("selectedUserCode"),
+//     purpose: member.purpose
+//   };
+
+// })
+//       )
+
+//     );
+//     setError(false);
+//     setLoading(true);
+
+//     try {
+//       const response = await fetch(
+//         `${config.apiBaseUrl}/AcademicDetailsRequest`,
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({ employeeData }),
+//         },
+//       );
+//       if (response.ok) {
+//         toast.success("Data inserted successfully!", {
+//           onClose: () => window.location.reload(),
+//         });
+//       } else {
+//         const errorResponse = await response.json();
+//         console.error(errorResponse.message);
+//         toast.warning(errorResponse.message, {});
+//       }
+//     } catch (err) {
+//       console.error("Error delete data:", err);
+//       toast.error("Error delete data: " + err.message, {});
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+const handleSave = async () => {
+  if (!EmployeeId) {
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    const headerPayload = {
+      company_code,
+      EmployeeId,
+      purpose: Academic[0]?.members[0]?.purpose,
+      request_status: "Pending",
+      created_by,
+    };
+
+    const headerRes = await fetch(
+      `${config.apiBaseUrl}/AcademicRequestHdr`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ headerData: [headerPayload] }),
+      }
+    );
+
+    if (!headerRes.ok) {
+      const err = await headerRes.json();
+      throw new Error(err.message);
+    }
+
+    const headerResult = await headerRes.json();
+
+    // ✅ ONLY DB VALUE
+    const info_request_id = headerResult?.[0]?.info_request_id;
+
+    if (!info_request_id) {
+      throw new Error("info_request_id not returned from backend");
+    }
+
+    await saveAcademicDetails(info_request_id);
+
+    toast.success("Data inserted successfully!", {
+      onClose: () => window.location.reload(),
+    });
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Error: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+const saveAcademicDetails = async (info_request_id) => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    const detailsData = await Promise.all(
+      Academic.flatMap((group) =>
+        group.members.map(async (member) => {
+          if (
+            !member.academicName ||
+            !member.major ||
+            !member.institution ||
+            !member.academicYear
+          ) {
+            return null;
+          }
+
+          let fileBase64 = null;
+
+          if (member.document) {
+            if (member.document.size > 1 * 1024 * 1024) {
+              toast.warning("File size exceeds 1MB");
+              return null;
+            }
+            fileBase64 = await convertToBase64(member.document);
+          }
+
+          return {
+            info_request_id,
+            company_code,
+            EmployeeId,
+            request_status: "Pending",
+            academicName: member.academicName,
+            major: member.major,
+            institution: member.institution,
+            academicYear: member.academicYear,
+            document: fileBase64,
+            created_by,
+          };
+        })
+      )
+    );
+
+    const filteredData = detailsData.filter(Boolean);
+
+    if (filteredData.length === 0) {
+      toast.warning("No valid academic details found");
       return;
     }
 
-    for (const relationGroup of Academic) {
-      for (const member of relationGroup.members) {
-        if (
-          !member.academicName ||
-          !member.major ||
-          !member.institution ||
-          !member.academicYear ||
-          !member.purpose
-        ) {
-          setError(true);
-          toast.warning("Error: Missing required fields");
-          return;
-        }
-      }
-    }
-
-    const employeeData = await Promise.all(
-      Academic.flatMap((relationGroup) =>
-        relationGroup.members.map(async (member) => {
-
-  let fileBase64 = null;
-
-  if (member.document) {
-    const fileSize = member.document.size;
-    const maxSize = 1 * 1024 * 1024;
-
-    if (fileSize > maxSize) {
-      toast.warning("File size exceeds 1MB");
-      return null;
-    }
-
-    fileBase64 = await convertToBase64(member.document);
-  }
-
-  return {
-    EmployeeId: EmployeeId,
-    academicName: member.academicName,
-    major: member.major,
-    institution: member.institution,
-    academicYear: member.academicYear,
-    document: fileBase64,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
-    created_by: sessionStorage.getItem("selectedUserCode"),
-    purpose: member.purpose
-  };
-
-})
-      )
-
-    );
-    setError(false);
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/AcademicDetailsRequest`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ employeeData }),
+    const res = await fetch(
+      `${config.apiBaseUrl}/AcademicRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
-      if (response.ok) {
-        toast.success("Data inserted successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {});
+        body: JSON.stringify({ detailsData: filteredData }),
       }
-    } catch (err) {
-      console.error("Error delete data:", err);
-      toast.error("Error delete data: " + err.message, {});
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
 
-  const convertToBase64 = (file) => {
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message);
+    }
+
+    console.log("Academic Details inserted successfully");
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Error inserting details: " + error.message);
+  }
+};
+
+const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);

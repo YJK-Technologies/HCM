@@ -2,25 +2,39 @@ import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import TabButtons from "./Tabs";
 import AcademicDetails from "./AcademicDetPopup.js";
-import PdfPreview from './PdfPreviewHelp'
-import LoadingScreen from '../Loading';
+import PdfPreview from "./PdfPreviewHelp";
+import LoadingScreen from "../Loading";
 
-const config = require('../Apiconfig');
+const config = require("../Apiconfig");
 
-function Input({ }) {
-
-  const [Academic, setAcademic] = useState([{ relation: 'Academic', members: [{ academicName: '', major: '', institution: '', academicYear: '', document: null, documentUrl: '', keyfield: '' }] }]);
+function Input({}) {
+  const [Academic, setAcademic] = useState([
+    {
+      relation: "Academic",
+      members: [
+        {
+          academicName: "",
+          major: "",
+          institution: "",
+          academicYear: "",
+          document: null,
+          documentUrl: "",
+          keyfield: "",
+        },
+      ],
+    },
+  ]);
   const [EmployeeId, setEmployeeId] = useState("");
   const [error, setError] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [document, setDocument] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
   const navigate = useNavigate();
-  const created_by = sessionStorage.getItem('selectedUserCode')
+  const created_by = sessionStorage.getItem("selectedUserCode");
   const [open, setOpen] = React.useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
@@ -29,20 +43,20 @@ function Input({ }) {
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
-  const [First_Name, setFirst_Name] = useState('');
+  const [First_Name, setFirst_Name] = useState("");
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
   const [loading, setLoading] = useState(false);
 
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const academicPermissions = permissions
-    .filter(permission => permission.screen_type === 'AcademicDet')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "AcademicDet")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
-    setIsModalOpen(true);  // Show the modal
+    setIsModalOpen(true); // Show the modal
   };
 
   const handleCloseModal = () => {
@@ -50,14 +64,27 @@ function Input({ }) {
     setCurrentPdfUrl(null);
   };
 
-
   const addRow = (relation) => {
     setAcademic((prev) =>
       prev.map((item) =>
         item.relation === relation
-          ? { ...item, members: [...item.members, { academicName: '', major: '', institution: '', academicYear: '', document: null, documentUrl: '', keyfield: '' }] }
-          : item
-      )
+          ? {
+              ...item,
+              members: [
+                ...item.members,
+                {
+                  academicName: "",
+                  major: "",
+                  institution: "",
+                  academicYear: "",
+                  document: null,
+                  documentUrl: "",
+                  keyfield: "",
+                },
+              ],
+            }
+          : item,
+      ),
     );
   };
 
@@ -66,88 +93,110 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? { ...item, members: item.members.filter((_, i) => i !== index) }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
   const handleSave = async () => {
-    if (
-      !EmployeeId) {
-      setError(true);
+    if (!EmployeeId) {
       toast.warning("Error: Missing required fields");
       return;
     }
 
-    for (const relationGroup of Academic) {
-      for (const member of relationGroup.members) {
-        if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
-          setError(true);
-          toast.warning("Error: Missing required fields");
-          return;
-        }
-      }
-    }
-
-    const employeeData = await Promise.all(
-
-
-      Academic.flatMap((relationGroup) =>
-        relationGroup.members.map(async (member) => {
-          if (member.document) {
-            // Check if file size exceeds 1MB before proceeding
-            const fileSize = member.document.size;
-            const maxSize = 1 * 1024 * 1024; // 1MB
-
-            if (fileSize > maxSize) {
-              toast.warning('File size exceeds 1MB. Please upload a smaller file.');
-              return; // Exit early if file is too large
-            }
-
-            const fileBase64 = member.document ? await convertToBase64(member.document) : null;
-            console.log(fileBase64)
-            return {
-              EmployeeId: EmployeeId,
-              academicName: member.academicName,
-              major: member.major,
-              institution: member.institution,
-              academicYear: member.academicYear,
-              document: fileBase64,
-              company_code: sessionStorage.getItem("selectedCompanyCode"),
-              created_by: sessionStorage.getItem("selectedUserCode"),
-            };
-          }
-        })
-      )
-
-    );
-    setError(false);
-    setLoading(true);
-
     try {
-      const response = await fetch(`${config.apiBaseUrl}/addEmployeeAcademicDetails`, {
+      setLoading(true);
+
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
+
+      // ================= HEADER =================
+      const headerPayload = {
+        company_code,
+        EmployeeId,
+        purpose: Academic[0]?.members[0]?.purpose,
+        request_status: "Pending",
+        created_by,
+      };
+
+      const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ employeeData }),
+        body: JSON.stringify({ headerData: [headerPayload] }),
       });
-      if (response.ok) {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-      } else {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+
+      const headerResult = await headerRes.json();
+
+      console.log("HEADER RESPONSE:", headerResult);
+
+      if (!Array.isArray(headerResult) || !headerResult[0]) {
+        throw new Error("Invalid header response");
       }
-    } catch (err) {
-      console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
+
+      const info_request_id = headerResult[0].info_request_id;
+
+      // ================= DETAILS =================
+      await saveAcademicDetails(info_request_id);
+
+      toast.success("Data inserted successfully!", {
+        onClose: () => window.location.reload(),
       });
+    } catch (err) {
+      console.error(err);
+      toast.error("Error: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveAcademicDetails = async (info_request_id) => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    const detailsData = await Promise.all(
+      Academic.flatMap((group) =>
+        group.members.map(async (member) => {
+          let fileBase64 = null;
+
+          if (member.document) {
+            if (member.document.size > 1 * 1024 * 1024) {
+              toast.warning("File size exceeds 1MB");
+              return null;
+            }
+            fileBase64 = await convertToBase64(member.document);
+          }
+
+          return {
+            info_request_id,
+            company_code,
+            EmployeeId,
+            request_status: "Pending",
+            academicName: member.academicName,
+            major: member.major,
+            institution: member.institution,
+            academicYear: member.academicYear,
+            document: fileBase64,
+            created_by,
+          };
+        }),
+      ),
+    );
+
+    const filtered = detailsData.filter(Boolean);
+
+    const res = await fetch(`${config.apiBaseUrl}/AcademicRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ detailsData: filtered }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message);
     }
   };
 
@@ -161,8 +210,8 @@ function Input({ }) {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleAcademic(EmployeeId)
+    if (e.key === "Enter") {
+      handleAcademic(EmployeeId);
     }
   };
 
@@ -176,7 +225,11 @@ function Input({ }) {
   //   return '';
   // };
 
-  const convertBufferToBlobUrlAndFile = (buffer, fileName = "document.pdf", mimeType = "application/pdf") => {
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf",
+  ) => {
     if (buffer && buffer.type === "Buffer") {
       const byteArray = new Uint8Array(buffer.data);
       const blob = new Blob([byteArray], { type: mimeType });
@@ -194,7 +247,10 @@ function Input({ }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), })
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       if (response.ok) {
@@ -202,15 +258,23 @@ function Input({ }) {
         setSaveButtonVisible(false);
         setShowAsterisk(false);
         setIsAcademicDataLoaded(true);
-        const [{ EmployeeId, department_id, designation_id, First_Name }] = searchData;
+        const [{ EmployeeId, department_id, designation_id, First_Name }] =
+          searchData;
         setdepartment_id(department_id);
         setdesignation_id(designation_id);
         setFirst_Name(First_Name);
 
         const updatedFamilyMembers = searchData.reduce((acc, item) => {
-          const { academicName, academicYear, document, institution, keyfield, major } = item;
+          const {
+            academicName,
+            academicYear,
+            document,
+            institution,
+            keyfield,
+            major,
+          } = item;
 
-          console.log(document)
+          console.log(document);
           const formattedDOB = formatDate(academicYear);
 
           let documentUrl = null;
@@ -234,17 +298,19 @@ function Input({ }) {
             academicYear: formattedDOB,
             keyfield: keyfield,
             documentUrl: documentUrl,
-            document: documentFile
+            document: documentFile,
           };
 
-          const existingRelation = acc.find(group => group.relation === academicName);
+          const existingRelation = acc.find(
+            (group) => group.relation === academicName,
+          );
 
           if (existingRelation) {
             existingRelation.members.push(memberData);
           } else {
             acc.push({
               relation: academicName,
-              members: [memberData]
+              members: [memberData],
             });
           }
           return acc;
@@ -253,20 +319,22 @@ function Input({ }) {
         setAcademic(updatedFamilyMembers);
         setEmployeeId(EmployeeId);
       } else if (response.status === 404) {
-        toast.warning('Data not found');
+        toast.warning("Data not found");
         setAcademic([
           {
-            relation: 'Academic',
-            members: [{
-              academicName: '',
-              major: '',
-              institution: '',
-              academicYear: '',
-              document: null,
-              documentUrl: '',
-              keyfield: ''
-            }]
-          }
+            relation: "Academic",
+            members: [
+              {
+                academicName: "",
+                major: "",
+                institution: "",
+                academicYear: "",
+                document: null,
+                documentUrl: "",
+                keyfield: "",
+              },
+            ],
+          },
         ]);
       } else {
         const errorResponse = await response.json();
@@ -275,7 +343,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
 
@@ -284,41 +352,38 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: item.members.map((member, i) =>
-              i === index ? { ...member, [field]: value } : member
-            ),
-          }
-          : item
-      )
+              ...item,
+              members: item.members.map((member, i) =>
+                i === index ? { ...member, [field]: value } : member,
+              ),
+            }
+          : item,
+      ),
     );
   };
 
-
-
-
   const handleFileChange = (event, relation, index) => {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
+    if (file && file.type === "application/pdf") {
       const fileUrl = URL.createObjectURL(file);
 
       setAcademic((prevDocuments) =>
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                    ...member,
-                    document: file,
-                    documentUrl: fileUrl,
-                  }
-                  : member
-              ),
-            }
-            : doc
-        )
+                ...doc,
+                members: doc.members.map((member, i) =>
+                  i === index
+                    ? {
+                        ...member,
+                        document: file,
+                        documentUrl: fileUrl,
+                      }
+                    : member,
+                ),
+              }
+            : doc,
+        ),
       );
 
       setDocumentUrl((prev) => ({
@@ -326,71 +391,126 @@ function Input({ }) {
         [index]: fileUrl,
       }));
     } else {
-      toast.warning('Please upload a valid PDF file.');
-      event.target.value = '';
+      toast.warning("Please upload a valid PDF file.");
+      event.target.value = "";
     }
   };
 
   const NavigatecomDet = () => {
-    navigate("/CompanyDetails", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/CompanyDetails", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const FinanceDet = () => {
-    navigate("/FinanceDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/FinanceDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const BankAccDet = () => {
-    navigate("/BankAccDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/BankAccDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const IdentDoc = () => {
-    navigate("/IdentDoc", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/IdentDoc", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const AcademicDet = () => {
-    navigate("/AcademicDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AcademicDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Insurance1 = () => {
-    navigate("/Family", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Family", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Documents = () => {
-    navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Documents", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const EmployeeLoan = () => {
-    navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AddEmployeeInfo", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
-
-  const [activeTab, setActiveTab] = useState('Academic Details');
+  const [activeTab, setActiveTab] = useState("Academic Details");
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'Personal Details':
+      case "Personal Details":
         EmployeeLoan();
         break;
-      case 'Company Details':
+      case "Company Details":
         NavigatecomDet();
         break;
-      case 'Financial Details':
+      case "Financial Details":
         FinanceDet();
         break;
-      case 'Bank Account Details':
+      case "Bank Account Details":
         BankAccDet();
         break;
-      case 'Identity Documents':
+      case "Identity Documents":
         IdentDoc();
         break;
-      case 'Academic Details':
+      case "Academic Details":
         AcademicDet();
         break;
-      case 'Family':
+      case "Family":
         Insurance1();
         break;
-      case 'Documents':
+      case "Documents":
         Documents();
         break;
       default:
@@ -399,14 +519,14 @@ function Input({ }) {
   };
 
   const tabs = [
-    { label: 'Personal Details' },
-    { label: 'Company Details' },
-    { label: 'Financial Details' },
-    { label: 'Bank Account Details' },
-    { label: 'Identity Documents' },
-    { label: 'Academic Details' },
-    { label: 'Family' },
-    { label: 'Documents' }
+    { label: "Personal Details" },
+    { label: "Company Details" },
+    { label: "Financial Details" },
+    { label: "Bank Account Details" },
+    { label: "Identity Documents" },
+    { label: "Academic Details" },
+    { label: "Family" },
+    { label: "Documents" },
   ];
 
   const reloadGridData = () => {
@@ -414,12 +534,14 @@ function Input({ }) {
   };
 
   const handleUpdate = async (relationName, index) => {
-    const relationGroup = Academic.find(group => group.relation === relationName);
+    const relationGroup = Academic.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -429,13 +551,20 @@ function Input({ }) {
       return;
     }
 
-    if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
+    if (
+      !member.academicName ||
+      !member.major ||
+      !member.institution ||
+      !member.academicYear
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
     console.log(fileBase64);
 
     const editedData = {
@@ -446,46 +575,49 @@ function Input({ }) {
       academicYear: member.academicYear,
       document: fileBase64,
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
-    
+
     try {
-      setLoading(true)
-      const response = await fetch(`${config.apiBaseUrl}/updateEmployeeAcademicDetails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      setLoading(true);
+      const response = await fetch(
+        `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ editedData: [editedData] }),
         },
-        body: JSON.stringify({ editedData: [editedData] }),
-      });
+      );
 
       if (response.ok) {
-          toast.success("Data updated successfully!", {
-            onClose: () => window.location.reload(),
-          });
+        toast.success("Data updated successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (relationName, index) => {
-    const relationGroup = Academic.find(group => group.relation === relationName);
+    const relationGroup = Academic.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -495,45 +627,53 @@ function Input({ }) {
       return;
     }
 
-    if (!member.academicName || !member.major || !member.institution || !member.academicYear) {
+    if (
+      !member.academicName ||
+      !member.major ||
+      !member.institution ||
+      !member.academicYear
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
     console.log(fileBase64);
 
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
-    
+
     try {
-      setLoading(true)
-      const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeAcademicDetails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      setLoading(true);
+      const response = await fetch(
+        `${config.apiBaseUrl}/deleteEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ keyfieldsToDelete: [keyfieldsToDelete] }),
         },
-        body: JSON.stringify({ keyfieldsToDelete: [keyfieldsToDelete] }),
-      });
+      );
 
       if (response.ok) {
-          toast.success("Data deleted successfully!", {
-            onClose: () => window.location.reload(),
-          });
+        toast.success("Data deleted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
@@ -550,15 +690,15 @@ function Input({ }) {
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   //base64 to pdf conversion (url + file)
   // const convertBase64ToBlobUrlAndFile = (base64, fileName = "document.pdf", mimeType = "application/pdf") => {
   //   if (base64) {
-  //     const byteCharacters = atob(base64); 
+  //     const byteCharacters = atob(base64);
   //     const byteArrays = new Uint8Array(byteCharacters.length);
 
   //     for (let i = 0; i < byteCharacters.length; i++) {
@@ -596,7 +736,7 @@ function Input({ }) {
   //         institution: item.institution,
   //         academicYear: formatDate(item.academicYear),
   //         document: file,
-  //         documentUrl: blobUrl, 
+  //         documentUrl: blobUrl,
   //         keyfield: item.keyfield || ''
   //       };
   //     });
@@ -616,7 +756,6 @@ function Input({ }) {
       const [{ employeeId }] = data;
 
       handleAcademic(employeeId);
-
     } else {
       console.log("Data not fetched...!");
     }
@@ -629,7 +768,7 @@ function Input({ }) {
     if (selectedDate > today) {
       toast.warning("Future dates are not allowed!");
     } else {
-      RelationInputChange(relation, idx, 'academicYear', e.target.value);
+      RelationInputChange(relation, idx, "academicYear", e.target.value);
     }
   };
 
@@ -645,9 +784,8 @@ function Input({ }) {
         // ? Just set the value in state
         setEmployeeId(EmployeeId);
       } else {
-        console.error('EmployeeId not found');
+        console.error("EmployeeId not found");
       }
-
     } else {
       console.log("Data not fetched...!");
     }
@@ -679,7 +817,8 @@ function Input({ }) {
   // }, [location.state]);
 
   useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+    const { employeeId, firstName, department_id, designation_id } =
+      location.state || {};
 
     if (employeeId) {
       setEmployeeId(employeeId);
@@ -693,40 +832,43 @@ function Input({ }) {
     }
   }, [location.state]);
 
-
   const handleRemovePdf = (relation, index) => {
-    setAcademic(prev =>
-      prev.map(doc =>
+    setAcademic((prev) =>
+      prev.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((m, i) =>
-              i === index
-                ? { ...m, document: null, documentUrl: "" }
-                : m
-            )
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((m, i) =>
+                i === index ? { ...m, document: null, documentUrl: "" } : m,
+              ),
+            }
+          : doc,
+      ),
     );
   };
-
 
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Academic Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && ['add', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
-              <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
-              </div>
-            )}
+            {saveButtonVisible &&
+              ["add", "all permission"].some((permission) =>
+                academicPermissions.includes(permission),
+              ) && (
+                <div className="action-icon add" onClick={handleSave}>
+                  <span className="tooltip">save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -734,31 +876,33 @@ function Input({ }) {
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              {saveButtonVisible && ['add', 'all permission'].some(p => academicPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
+              {saveButtonVisible &&
+                ["add", "all permission"].some((p) =>
+                  academicPermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  </li>
+                )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
-
             </ul>
           </div>
-
         </div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -774,8 +918,18 @@ function Input({ }) {
                 onKeyPress={handleKeyPress}
                 autoComplete="off"
               />
-              <label for="cno" className={`exp-form-labels ${error && !EmployeeId ? 'text-danger' : ''}`}>Employee ID{showAsterisk && <span className="text-danger">*</span>}</label>
-              <span className="select-add-btn" title="Academic Details Help" onClick={handleAcademicDetails}>
+              <label
+                for="cno"
+                className={`exp-form-labels ${error && !EmployeeId ? "text-danger" : ""}`}
+              >
+                Employee ID
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
+              <span
+                className="select-add-btn"
+                title="Academic Details Help"
+                onClick={handleAcademicDetails}
+              >
                 <i className="fa fa-search"></i>
               </span>
             </div>
@@ -784,17 +938,17 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='FirstNamelabel' className="partyName">
+                <label id="FirstNamelabel" className="partyName">
                   <strong>Employee Name:</strong> {First_Name}
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="col-md-2" style={{ marginRight: "20px", }}>
+          <div className="col-md-2" style={{ marginRight: "20px" }}>
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='Departmentlabel' className="partyName">
+                <label id="Departmentlabel" className="partyName">
                   <strong>Department:</strong> {department_id}
                 </label>
               </div>
@@ -804,31 +958,43 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='designationLabel' className="partyName">
+                <label id="designationLabel" className="partyName">
                   <strong>Designation:</strong> {designation_id}
                 </label>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
 
       {Academic.map((relationGroup, relationIndex) => (
-        <div key={relationIndex} className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
+        <div
+          key={relationIndex}
+          className="shadow-lg p-2 bg-light rounded mt-2 container-form-box"
+        >
           {relationGroup.members.map((member, index) => (
             <div key={index} className="row g-3">
-
               <div className="col-md-1">
                 <div className="inputGroup">
-                  <button type="button" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
+                  <button
+                    type="button"
+                    className="btn btn-primary ms-3"
+                    onClick={() => addRow(relationGroup.relation)}
+                  >
                     <i className="fa-solid fa-circle-plus"></i>
                   </button>
                   {relationGroup.members.length > 1 && (
-                    <button type="button" className="btn btn-danger"
-                      onClick={() => deleteRow(relationGroup.relation, index)}>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => deleteRow(relationGroup.relation, index)}
+                    >
                       <i className="fa-regular fa-trash-can"></i>
                     </button>
                   )}
@@ -844,9 +1010,21 @@ function Input({ }) {
                     placeholder=" "
                     autoComplete="off"
                     maxLength={50}
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicName', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "academicName",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.academicName ? 'text-danger' : ''}`}>Academic Name{showAsterisk && <span className="text-danger">*</span>}</label>
+                  <label
+                    className={`exp-form-labels ${error && !member.academicName ? "text-danger" : ""}`}
+                  >
+                    Academic Name
+                    {showAsterisk && <span className="text-danger">*</span>}
+                  </label>
                 </div>
               </div>
 
@@ -859,9 +1037,21 @@ function Input({ }) {
                     maxLength={125}
                     placeholder=" "
                     autoComplete="off"
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'major', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "major",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.major ? 'text-danger' : ''}`}>Major{showAsterisk && <span className="text-danger">*</span>}</label>
+                  <label
+                    className={`exp-form-labels ${error && !member.major ? "text-danger" : ""}`}
+                  >
+                    Major
+                    {showAsterisk && <span className="text-danger">*</span>}
+                  </label>
                 </div>
               </div>
 
@@ -874,9 +1064,21 @@ function Input({ }) {
                     maxLength={225}
                     placeholder=" "
                     autoComplete="off"
-                    onChange={(e) => RelationInputChange(relationGroup.relation, index, 'institution', e.target.value)}
+                    onChange={(e) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "institution",
+                        e.target.value,
+                      )
+                    }
                   />
-                  <label className={`exp-form-labels ${error && !member.institution ? 'text-danger' : ''}`}>Institution{showAsterisk && <span className="text-danger">*</span>}</label>
+                  <label
+                    className={`exp-form-labels ${error && !member.institution ? "text-danger" : ""}`}
+                  >
+                    Institution
+                    {showAsterisk && <span className="text-danger">*</span>}
+                  </label>
                 </div>
               </div>
 
@@ -891,16 +1093,23 @@ function Input({ }) {
                     // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicYear', e.target.value)}
                     value={member.academicYear}
                     max={new Date().toISOString().split("T")[0]} // Restrict future dates
-                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+                    onChange={(e) =>
+                      handleDateChange(e, relationGroup.relation, index)
+                    }
                   />
-                  <label for="add1" className={`exp-form-labels ${error && !member.relationName ? 'text-danger' : ''}`}>Academic Year{showAsterisk && <span className="text-danger">*</span>}</label>
+                  <label
+                    for="add1"
+                    className={`exp-form-labels ${error && !member.academicYear ? "text-danger" : ""}`}
+                  >
+                    Academic Year
+                    {showAsterisk && <span className="text-danger">*</span>}
+                  </label>
                 </div>
               </div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className="image-upload-container">
-
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"
@@ -949,22 +1158,31 @@ function Input({ }) {
               <div className="col-md-1 ">
                 {isAcademicDataLoaded && (
                   <div className="inputGroup">
-                    {['update', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
+                    {["update", "all permission"].some((permission) =>
+                      academicPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-success"
                         title="Update"
-                        onClick={() => handleUpdate(relationGroup.relation, index)} // Pass the specific row data
+                        onClick={() =>
+                          handleUpdate(relationGroup.relation, index)
+                        } // Pass the specific row data
                       >
                         <i className="fa-solid fa-floppy-disk"></i>
                       </button>
                     )}
-                    {['delete', 'all permission'].some(permission => academicPermissions.includes(permission)) && (
+                    {["delete", "all permission"].some((permission) =>
+                      academicPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-danger"
                         title="Delete"
-                        onClick={() => handleDelete(relationGroup.relation, index)}>
+                        onClick={() =>
+                          handleDelete(relationGroup.relation, index)
+                        }
+                      >
                         <i className="fa-solid fa-trash"></i>
                       </button>
                     )}
@@ -976,8 +1194,16 @@ function Input({ }) {
         </div>
       ))}
       <div>
-        <PdfPreview open={isModalOpen} pdfUrl={currentPdfUrl} handleClose={handleCloseModal} />
-        <AcademicDetails open={open} handleClose={handleClose} academicDetails={academicDetails} />
+        <PdfPreview
+          open={isModalOpen}
+          pdfUrl={currentPdfUrl}
+          handleClose={handleCloseModal}
+        />
+        <AcademicDetails
+          open={open}
+          handleClose={handleClose}
+          academicDetails={academicDetails}
+        />
       </div>
     </div>
   );
