@@ -748,6 +748,7 @@ const Dashboard = () => {
       let travelData = [];
       let empData = [];
       let familyChangeData = [];
+      let academicData = [];
 
       /* ---------- Leave ---------- */
       try {
@@ -838,6 +839,21 @@ const Dashboard = () => {
         console.log("Family API failed");
       }
 
+      /* ---------- Academic ---------- */
+      try {
+        const res = await fetch(
+          `${config.apiBaseUrl}/GetAcademicRequestDetails`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
+
+        if (res.ok) academicData = await res.json();
+      } catch (err) {
+        console.log("Academic API failed");
+      }
       /* ---------- Leave ---------- */
       const formattedLeave = leaveData
         .filter((r) => r.LeaveStatus === "Pending")
@@ -925,6 +941,28 @@ const Dashboard = () => {
 
       const formattedFamily = Object.values(groupedFamily);
 
+      /* ---------- Academic Group ---------- */
+      const groupedAcademic = {};
+
+      academicData.forEach((row) => {
+        if (!groupedAcademic[row.info_request_id]) {
+          groupedAcademic[row.info_request_id] = {
+            type: "Academic",
+            id: row.info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Academic Details",
+            status: row.request_status,
+
+            // 🔴 store full rows for approval
+            rows: [],
+          };
+        }
+
+        groupedAcademic[row.info_request_id].rows.push(row);
+      });
+
+      const formattedAcademic = Object.values(groupedAcademic);
       /* ---------- Merge ---------- */
       const merged = [
         ...formattedLeave,
@@ -933,6 +971,7 @@ const Dashboard = () => {
         ...formattedLoan,
         ...formattedEmp,
         ...formattedFamily,
+        ...formattedAcademic,
       ];
 
       setDashboardRequests(merged);
@@ -1011,6 +1050,23 @@ const Dashboard = () => {
           request_status: status,
           approver_id: sessionStorage.getItem("selectedUserCode"),
           modified_by: sessionStorage.getItem("selectedUserCode"),
+        };
+      } else if (type === "Academic") {
+        url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
+
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Academic",
+        );
+
+        body = {
+          approvalData: selectedRequest.rows.map((row) => ({
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          })),
         };
       }
 

@@ -143,142 +143,192 @@ function ManualEmployeeInfo({}) {
     .filter((permission) => permission.screen_type === "AddEmployeeInfo")
     .map((permission) => permission.permission_type.toLowerCase());
 
+    const convertToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
-  const handleInsert = async () => {
-    if (
-      !First_Name ||
-      !Last_Name ||
-      !Father_Name ||
-      !Mother_Name ||
-      !DOB ||
-      !selectedGender ||
-      !Email ||
-      !Phone1 ||
-      !Phone2 ||
-      !address1 ||
-      !address2 ||
-      !address3 ||
-      !permanantAddress ||
-      !pan_No ||
-      !Aadhaar_no ||
-      !selectedmartial ||
-      !selectedkids ||
-      !title ||
-      !placeOfBirth ||
-      !nationality ||
-      !religion ||
-      !bloodGroup ||
-      !emergencyContactName ||
-      !emergencyContactPhone ||
-      !emergencyContactRelation ||
-      !city ||
-      !state ||
-      !country ||
-      !postalCode
-    ) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
-    if (!validateEmail(Email)) {
-      setError(true);
-      toast.warning("Please enter a valid email address");
-      return;
-    }
-    if (businessEmail && !validateEmail(businessEmail)) {
-      setError(true);
-      toast.warning("Please enter a valid business email");
-      return;
-    }
-    setError(false);
+  const handleSave = async () => {
+  if (!EmployeeId) {
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  try {
     setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("EmployeeId", EmployeeId);
-      formData.append("First_Name", First_Name);
-      formData.append("Middle_Name", Middle_Name);
-      formData.append("Last_Name", Last_Name);
-      formData.append("Father_Name", Father_Name);
-      formData.append("Mother_Name", Mother_Name);
-      formData.append("DOB", DOB);
-      formData.append("Gender", selectedGender);
-      formData.append("Email", Email);
-      formData.append("Phone1", Phone1);
-      formData.append("Phone2", Phone2);
-      formData.append("Address1", address1);
-      formData.append("Address2", address2);
-      formData.append("Address3", address3);
-      formData.append("PermanantAddress", permanantAddress);
-      formData.append("Reference_Name", reference_Name);
-      formData.append("Reference_Phone", reference_Phone);
-      formData.append("Pan_No", pan_No);
-      formData.append("Aadhar_no", Aadhaar_no);
-      formData.append("Marital_Status", selectedmartial);
-      formData.append("Siblings", noOfSiblings);
-      formData.append("Kids", selectedkids);
-      formData.append("Title", title);
-      formData.append("Place_of_Birth", placeOfBirth);
-      formData.append("Nationality", nationality);
-      formData.append("Religion", religion);
-      formData.append("Blood_Group", bloodGroup);
-      formData.append("Spouse_Name", spouseName);
-      formData.append("Number_of_Siblings", noOfSiblings);
-      formData.append("Number_of_Children", noOfChildren);
-      formData.append("Email_Business", businessEmail);
-      // formData.append("Phone_Alternate", alternatePhone);
-      formData.append("Emergency_Contact_Name", emergencyContactName);
-      formData.append(
-        "Emergency_Contact_Relationship",
-        emergencyContactRelation,
-      );
-      formData.append("Emergency_Contact_Phone", emergencyContactPhone);
-      formData.append("City", city);
-      formData.append("State", state);
-      formData.append("Country", country);
-      formData.append("Postal_Code", postalCode);
-      formData.append("Passport_No", passportNo);
-      formData.append("Passport_Expiry_Date", passportExpiryDate);
-      formData.append("Other_Id_Type", otherIdType);
-      formData.append("Other_Id_No", otherIdNo);
-      formData.append("Created_by", sessionStorage.getItem("selectedUserCode"));
-      formData.append(
-        "company_code",
-        sessionStorage.getItem("selectedCompanyCode"),
-      );
-      // workflow fields
-      formData.append("request_status", "Pending");
-      formData.append("purpose", purpose || "");
 
-      // Photo upload
-      if (user_images) {
-        formData.append("Photos", user_images);
-      }
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-      const response = await fetch(
-        `${config.apiBaseUrl}/EmployeeDetailsRequest`,
-        {
-          method: "POST",
-          body: formData,
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    /* ---------------- HEADER ---------------- */
+    const headerPayload = {
+      company_code,
+      EmployeeId,
+      purpose: purpose,
+      request_status: "Pending",
+      created_by,
+    };
+
+    const headerRes = await fetch(
+      `${config.apiBaseUrl}/PersonalRequestHdr`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
-      if (response.ok) {
-        toast.success("Employee change request submitted successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to submit employee request");
+        body: JSON.stringify({ headerData: [headerPayload] }),
       }
-    } catch (error) {
-      console.error("Insert Error:", error);
-      toast.error("Error inserting data: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
 
+    if (!headerRes.ok) {
+      const err = await headerRes.json();
+      throw new Error(err.message);
+    }
+
+    const headerResult = await headerRes.json();
+    const info_request_id = headerResult?.[0]?.info_request_id;
+
+    if (!info_request_id) {
+      throw new Error("info_request_id not returned from backend");
+    }
+
+    /* ---------------- DETAILS ---------------- */
+    await savePersonalDetails(info_request_id);
+
+    toast.success("Personal details submitted successfully!", {
+      onClose: () => window.location.reload(),
+    });
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Error: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const savePersonalDetails = async (info_request_id) => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    let photoBase64 = null;
+
+    if (user_images) {
+      if (user_images.size > 1 * 1024 * 1024) {
+        toast.warning("Photo size exceeds 1MB");
+        return;
+      }
+      photoBase64 = await convertToBase64(user_images);
+    }
+
+    const detailsData = [
+      {
+        info_request_id,
+        company_code,
+        EmployeeId,
+        request_status: "Pending",
+
+        // ✅ Personal
+        First_Name,
+        Middle_Name,
+        Last_Name,
+        father_name: Father_Name,
+        mother_name: Mother_Name,
+        DOB,
+        Gender: selectedGender,
+        email: Email,
+        phone1: Phone1,
+        phone2: Phone2,
+
+        // ✅ Address
+        Address1: address1,
+        address2,
+        address3,
+        PermanantAddress: permanantAddress,
+
+        // ✅ Reference
+        Reference_name: reference_Name,
+        Reference_Phone: reference_Phone,
+
+        // ✅ IDs
+        Pan_No: pan_No,
+        Aadhar_no: Aadhaar_no,
+        Photos: photoBase64,
+
+        // ✅ Family
+        marital_status: selectedmartial,
+        Kids: selectedkids,
+
+        // ✅ Job
+        Grade_id: selectedgradeid,
+        Title: title,
+
+        // ✅ Extra
+        Place_of_Birth: placeOfBirth,
+        Nationality: nationality,
+        Religion: religion,
+        Blood_Group: bloodGroup,
+
+        // ✅ Family Details
+        Spouse_Name: spouseName,
+        Number_of_Siblings: noOfSiblings,
+        Number_of_Children: noOfChildren,
+
+        // ✅ Contact
+        Email_Business: businessEmail,
+        Phone_Alternate: Phone2,
+
+        // ✅ Emergency
+        Emergency_Contact_Name: emergencyContactName,
+        Emergency_Contact_Relationship: emergencyContactRelation,
+        Emergency_Contact_Phone: emergencyContactPhone,
+
+        // ✅ Location
+        City: city,
+        State: state,
+        Postal_Code: postalCode,
+        Country: country,
+
+        // ✅ Passport
+        Passport_No: passportNo,
+        Passport_Expiry_Date: passportExpiryDate,
+
+        // ✅ Other ID
+        Other_Id_Type: otherIdType,
+        Other_Id_No: otherIdNo,
+
+        created_by,
+      },
+    ];
+
+    const res = await fetch(
+      `${config.apiBaseUrl}/PersonalRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ detailsData }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message);
+    }
+
+    console.log("Personal Details inserted successfully");
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Error inserting details: " + error.message);
+  }
+};
   function validateEmail(email) {
     const emailRegex = /^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/;
     return emailRegex.test(email);
@@ -878,7 +928,7 @@ function ManualEmployeeInfo({}) {
               ["add", "all permission"].some((permission) =>
                 employeePermissions.includes(permission),
               ) && (
-                <div className="action-icon add" onClick={handleInsert}>
+                <div className="action-icon add" onClick={handleSave}>
                   <span className="tooltip">save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
@@ -903,7 +953,7 @@ function ManualEmployeeInfo({}) {
                 ["add", "all permission"].some((p) =>
                   employeePermissions.includes(p),
                 ) && (
-                  <li className="dropdown-item" onClick={handleInsert}>
+                  <li className="dropdown-item" onClick={handleSave}>
                     <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                   </li>
                 )}

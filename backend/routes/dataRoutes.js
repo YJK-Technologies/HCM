@@ -1339,8 +1339,13 @@ router.post("/ApprovalAcademicInfo",dataController.ApprovalAcademicInfo)
 router.post("/getEmployeeLeaveReport",dataController.getEmployeeLeaveReport) 
 router.post("/ApprovalFamilyDetail",dataController.ApprovalFamilyDetail) 
 router.post("/usercode",dataController.getUsercode)
-
-
-
+router.post("/AcademicRequestHdr",dataController.AcademicRequestHdr)
+router.post("/AcademicRequestDetails",dataController.AcademicRequestDetails)
+router.post("/GetAcademicRequestDetails",dataController.GetAcademicRequestDetails)
+router.post("/ApproveAcademicRequest",dataController.ApproveAcademicRequest)
+router.post("/PersonalRequestDetails",dataController.PersonalRequestDetails)
+router.post("/PersonalRequestHdr",dataController.PersonalRequestHdr)
+router.post("/ApprovePersonalRequest",dataController.ApprovePersonalRequest)
+router.post("/GetPersonalRequestDetails",dataController.GetPersonalRequestDetails)
 
 module.exports = router;
