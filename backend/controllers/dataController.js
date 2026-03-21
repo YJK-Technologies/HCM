@@ -45190,7 +45190,7 @@ const AcademicDetailsRequest = async (req, res) => {
     const pool = await sql.connect(dbConfig);
 
     for (const insertRow of employeeData) {
-            if (!insertRow) continue;
+      if (!insertRow) continue;
 
       let document = insertRow.document || null;
 
@@ -45278,7 +45278,6 @@ const FamilyDetailRequest = async (req, res) => {
     const pool = await connection.connectToDatabase(dbConfig);
 
     for (const insertRow of employeeData) {
-
       await pool
         .request()
         .input("mode", sql.NVarChar, "I")
@@ -45300,10 +45299,9 @@ const FamilyDetailRequest = async (req, res) => {
         .input("Visa_Expiry_Date", insertRow.Visa_Expiry_Date)
         .input("Air_Ticket_Entitled", insertRow.Air_Ticket_Entitled)
         .input("created_by", insertRow.created_by)
-        .input("modified_by", insertRow.modified_by )
-        .input("request_status", insertRow.request_status )
-        .input("purpose", insertRow.purpose )
-        .query(`
+        .input("modified_by", insertRow.modified_by)
+        .input("request_status", insertRow.request_status)
+        .input("purpose", insertRow.purpose).query(`
         EXEC sp_ess_Family_Detail_Request @mode, @EmployeeId, @Relation, @Name, @EmployeeName, @DOB, @AGE, @aadhar_no, '', @company_code, @Sex, @Nationality, @CPR_No, @CPR_Expiry_Date, @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, @modified_by, '', @request_status, @purpose, 0`);
     }
     res.status(200).json("Employee family request inserted successfully");
@@ -45324,8 +45322,7 @@ const DashboardFamilyDetailChange = async (req, res) => {
 
     const result = await pool
       .request()
-      .input("company_code", sql.NVarChar, company_code)
-      .query(`
+      .input("company_code", sql.NVarChar, company_code).query(`
         EXEC sp_ess_Family_Detail_Request 'SC','','','','','',0,'','',@company_code,'','','','','','',0,'',0,'',NULL,
 '','','',0`);
 
@@ -45334,39 +45331,55 @@ const DashboardFamilyDetailChange = async (req, res) => {
     } else {
       res.status(404).json("Data not found");
     }
-
   } catch (err) {
     console.error("Error fetching Family Detail Change Requests:", err);
     res.status(500).json({
-      message: err.message || "Internal Server Error"
+      message: err.message || "Internal Server Error",
     });
   }
 };
-//code ended by sakthi on 16-03-26  
+//code ended by sakthi on 16-03-26
 //code added by Dinesh Gokul on 16-03-26
-const ApprovalAcademicInfo = async (req, res) => { 
-  const { Info_request_id, request_status, modified_by, approver_id, company_code, } = req.body; 
-  try { 
-    const pool = await sql.connect(dbConfig); 
-    await pool .request() 
-    .input("mode", sql.NVarChar, "AP") 
-    .input("Info_request_id", sql.Int, Info_request_id) 
-    .input("request_status", sql.NVarChar, request_status) 
-    .input("approver_id", sql.NVarChar, approver_id) 
-    .input("modified_by", sql.NVarChar, modified_by) 
-    .input("company_code", sql.NVarChar, company_code) 
-    .query(`EXEC sp_ess_employee_academic_details_request @mode, '', '', '', '', '', NULL, @company_code, '', @modified_by, @approver_id, @request_status, '', @Info_request_id, ''`); 
+const ApprovalAcademicInfo = async (req, res) => {
+  const {
+    Info_request_id,
+    request_status,
+    modified_by,
+    approver_id,
+    company_code,
+  } = req.body;
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "AP")
+      .input("Info_request_id", sql.Int, Info_request_id)
+      .input("request_status", sql.NVarChar, request_status)
+      .input("approver_id", sql.NVarChar, approver_id)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_ess_employee_academic_details_request @mode, '', '', '', '', '', NULL, @company_code, '', @modified_by, @approver_id, @request_status, '', @Info_request_id, ''`,
+      );
 
-    res.status(200).json("Academic details request approved successfully"); 
-  } catch (err) { console.error("Error approving academic request:", err); 
-    res.status(500).json({ message: err.message || "Internal Server Error" }); 
-  } 
+    res.status(200).json("Academic details request approved successfully");
+  } catch (err) {
+    console.error("Error approving academic request:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
 };
 //code ended by Dinesh Gokul on 16-03-26
 //Code added by pavun on 16-03-26
 const getEmployeeLeaveReport = async (req, res) => {
-  const { FromDate, ToDate, LeaveType, LeaveStatus, company_code, EmployeeId, ReportingManager } =
-    req.body;
+  const {
+    FromDate,
+    ToDate,
+    LeaveType,
+    LeaveStatus,
+    company_code,
+    EmployeeId,
+    ReportingManager,
+  } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -45416,11 +45429,12 @@ const ApprovalFamilyDetail = async (req, res) => {
       .input("approver_id", sql.NVarChar, approver_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("Info_request_id", sql.Int, Info_request_id)
-      .query( `EXEC sp_ess_Family_Detail_Request 'AP','','','','',NULL,NULL,'','',@company_code,'','','',NULL,'',NULL,'',NULL,'','','',@modified_by,@approver_id,@request_status,'',@Info_request_id `);
+      .query(
+        `EXEC sp_ess_Family_Detail_Request 'AP','','','','',NULL,NULL,'','',@company_code,'','','',NULL,'',NULL,'',NULL,'','','',@modified_by,@approver_id,@request_status,'',@Info_request_id `,
+      );
     res.status(200).json({
       message: `Family detail request ${request_status} successfully`,
     });
-
   } catch (err) {
     console.error("Error approving family detail request:", err);
     res.status(500).json({
@@ -45430,86 +45444,128 @@ const ApprovalFamilyDetail = async (req, res) => {
 };
 // code ended by sakthi on 3-17-26
 
-//code added by sakthi on 3-17-26
-const employeePersonalRequestSearch = async (req, res) => {
+// Code added by Dinesh Gokul on 3-20-26
+const AcademicRequestHdr = async (req, res) => {
+  const headerData = req.body.headerData;
+
+  if (!headerData || !headerData.length) {
+    return res.status(400).json("Invalid or empty header data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    let insertedId = null;
+
+    for (const insertRow of headerData) {
+      if (!insertRow) continue;
+
+      const result = await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("info_request_id", sql.Int, 0) // ✅ DB generate pannum
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(`EXEC sp_ess_employee_academic_request_hdr 
+          @mode, @info_request_id, @company_code, @EmployeeId, '', 
+          @purpose, @request_status, @created_by`);
+
+      // ✅ முக்கியம்
+      insertedId = result.recordset[0].info_request_id;
+    }
+
+    // ✅ FRONTEND ku ID return
+    res.status(200).json([{ info_request_id: insertedId }]);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul on 3-20-26
+
+// Code added by Dinesh Gokul on 3-20-26
+const AcademicRequestDetails = async (req, res) => {
+  const detailsData = req.body.detailsData;
+
+  if (!detailsData || !detailsData.length) {
+    return res.status(400).json("Invalid or empty details data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of detailsData) {
+      if (!insertRow) continue;
+
+      let document = insertRow.document || null;
+
+      if (document) {
+        document = Buffer.from(document, "base64");
+      }
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("detail_id", sql.Int, insertRow.detail_id || 0)
+        .input("info_request_id", sql.Int, insertRow.info_request_id)
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("academicName", sql.NVarChar, insertRow.academicName)
+        .input("major", sql.NVarChar, insertRow.major)
+        .input("institution", sql.NVarChar, insertRow.institution)
+        .input("academicYear", sql.Date, insertRow.academicYear)
+        .input("document", sql.VarBinary, document)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(`EXEC sp_ess_employee_academic_request_dtls 
+          @mode, @detail_id, @info_request_id, '', @company_code, 
+          @EmployeeId, @request_status, @academicName, @major, 
+          @institution, @academicYear, @document, @created_by, '', '', ''`);
+    }
+
+    res.status(200).json("Details inserted successfully");
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul on 3-20-26
+
+// Code added by Dinesh Gokul 20-03-2026
+const GetAcademicRequestDetails = async (req, res) => {
   const {
-    EmployeeId,
-    First_Name,
-    Middle_Name,
-    Last_Name,
-    Gender,
-    Email,
-    Phone1,
-    City,
-    State,
-    Country,
-    request_status,
-    purpose,
+    company_code,
     Info_request_id,
-    company_code
+    EmployeeId,
+    column_name,
+    from_date,
+    to_date
   } = req.body;
+
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
 
   try {
     const pool = await sql.connect(dbConfig);
 
     const result = await pool
       .request()
-
-      .input("mode", sql.NVarChar, "SCC")
-      .input("EmployeeId", sql.NVarChar, EmployeeId)
-      .input("First_Name", sql.NVarChar, First_Name)
-      .input("Middle_Name", sql.NVarChar, Middle_Name)
-      .input("Last_Name", sql.NVarChar, Last_Name)
-      .input("Father_Name", sql.NVarChar, "")
-      .input("Mother_Name", sql.NVarChar, "")
-      .input("DOB", sql.Date, null)
-      .input("Gender", sql.NVarChar, Gender)
-      .input("Email", sql.NVarChar, Email)
-      .input("Phone1", sql.NVarChar, Phone1)
-      .input("Phone2", sql.NVarChar, "")
-      .input("Address1", sql.NVarChar, "")
-      .input("Address2", sql.NVarChar, "")
-      .input("Address3", sql.NVarChar, "")
-      .input("PermanantAddress", sql.NVarChar, "")
-      .input("Reference_Name", sql.NVarChar, "")
-      .input("Reference_Phone", sql.NVarChar, "")
-      .input("Pan_No", sql.NVarChar, "")
-      .input("Aadhar_no", sql.NVarChar, "")
-      .input("Photos", sql.VarBinary, null)
-      .input("Marital_Status", sql.NVarChar, "")
-      .input("Siblings", sql.NVarChar, "")
-      .input("Kids", sql.NVarChar, "")
-      .input("company_code", sql.NVarChar, company_code)
-      .input("Title", sql.NVarChar, "")
-      .input("Place_of_Birth", sql.NVarChar, "")
-      .input("Nationality", sql.NVarChar, "")
-      .input("Religion", sql.NVarChar, "")
-      .input("Blood_Group", sql.NVarChar, "")
-      .input("Spouse_Name", sql.NVarChar, "")
-      .input("Number_of_Siblings", sql.Int, 0)
-      .input("Number_of_Children", sql.Int, 0)
-      .input("Email_Business", sql.NVarChar, "")
-      .input("Phone_Alternate", sql.NVarChar, "")
-      .input("Emergency_Contact_Name", sql.NVarChar, "")
-      .input("Emergency_Contact_Relationship", sql.NVarChar, "")
-      .input("Emergency_Contact_Phone", sql.NVarChar, "")
-      .input("City", sql.NVarChar, City)
-      .input("State", sql.NVarChar, State)
-      .input("Country", sql.NVarChar, Country)
-      .input("Postal_Code", sql.NVarChar, "")
-      .input("Passport_No", sql.NVarChar, "")
-      .input("Passport_Expiry_Date", sql.Date, null)
-      .input("Other_Id_Type", sql.NVarChar, "")
-      .input("Other_Id_No", sql.NVarChar, "")
-      .input("Created_by", sql.NVarChar, "")
-      .input("Modified_by", sql.NVarChar, "")
-      .input("approver_id", sql.NVarChar, "")
-      .input("request_status", sql.NVarChar, request_status)
-      .input("purpose", sql.NVarChar, purpose)
+      .input("mode", sql.NVarChar, "SC")
       .input("Info_request_id", sql.Int, Info_request_id || 0)
-      .input("keyfield", sql.NVarChar, "")
-      .query(`
-        EXEC sp_employee_personal_Changes_Request_Test @mode,@EmployeeId,@First_Name,@Middle_Name, @Last_Name, '', '', NULL,@Gender, @Email, @Phone1, '', '', '', '', '', '', '', '', '', NULL,'', '', '',@company_code,'', '', '', '', '', '',NULL, 0, 0,'', '', '', '', '', '', '',@City, @State, '','', '', NULL, '', '','', '',@request_status,'', 0, ''`);
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("column_name", sql.NVarChar, column_name || "")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .query(` EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', @column_name, @from_date, @to_date`)
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45518,14 +45574,55 @@ const employeePersonalRequestSearch = async (req, res) => {
     }
 
   } catch (err) {
-    console.error("Error during employee search:", err);
+    console.error("Error fetching Academic Request Details:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-// code ended by sakthi on 3-17-26
+// Code ended by Dinesh Gokul 20-03-2026
 
+// Code added by Dinesh on 3-20-26
+const ApproveAcademicRequest = async (req, res) => {
+  const approvalData = req.body.approvalData;
 
+  if (!approvalData || !approvalData.length) {
+    return res.status(400).json("Invalid or empty approval data.");
+  }
 
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of approvalData) {
+      if (!row) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "AP")
+        .input("detail_id", sql.Int, row.detail_id)
+        .input("info_request_id", sql.Int, row.info_request_id)
+        .input("keyfield", sql.NVarChar, "")
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("EmployeeId", sql.NVarChar, row.EmployeeId)
+        .input("request_status", sql.NVarChar, row.request_status) // Approved / Rejected
+        .input("academicName", sql.NVarChar, "")
+        .input("major", sql.NVarChar, "")
+        .input("institution", sql.NVarChar, "")
+        .input("academicYear", sql.Date, null)
+        .input("document", sql.VarBinary, null)
+        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
+        .query(` EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
+        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, '', '', '' `);
+    }
+
+    res.status(200).json("Request processed successfully (Approved/Rejected)");
+  } catch (error) {
+    console.log(error.message);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh on 3-20-26
 
 module.exports = {
   login,
@@ -46835,6 +46932,9 @@ module.exports = {
   ApprovalPersonalInfo,
   FamilyDetailRequest,
   DashboardFamilyDetailChange,
-  ApprovalFamilyDetail
-
+  ApprovalFamilyDetail,
+  AcademicRequestHdr,
+  AcademicRequestDetails,
+  GetAcademicRequestDetails,
+  ApproveAcademicRequest,
 };
