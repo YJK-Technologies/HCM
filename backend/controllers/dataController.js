@@ -45783,7 +45783,7 @@ const PersonalRequestDetails = async (req, res) => {
           @City, @State, @Postal_Code, @Country,
           @Passport_No, @Passport_Expiry_Date,
           @Other_Id_Type, @Other_Id_No,
-          @created_by
+          @created_by, '', '', '', ''
         `);
     }
 
@@ -45899,7 +45899,7 @@ const ApprovePersonalRequest = async (req, res) => {
           @City, @State, @Postal_Code, @Country,
           @Passport_No, @Passport_Expiry_Date,
           @Other_Id_Type, @Other_Id_No,
-          @created_by
+          @created_by, '', '', '', ''
         `);
     }
 
@@ -45916,8 +45916,95 @@ const ApprovePersonalRequest = async (req, res) => {
 
 // Code added by Dinesh on 3-21-26
 const GetPersonalRequestDetails = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, column_name, from_date, to_date, info_request_id, EmployeeId } = req.body;
 
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("detail_id", sql.Int, 0)
+      .input("info_request_id", sql.Int, info_request_id || 0)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("column_name", sql.NVarChar, column_name || "")
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .query(`EXEC sp_ess_employee_personal_request_dtls @mode, @detail_id, @info_request_id, '',  @company_code, @EmployeeId, 
+    '', '', '', '', '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', NULL, '', '', '', 0, 
+    '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', '', '', '', '', NULL, '', '', '', '', @column_name, @from_date, @to_date;`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (error) {
+    console.error("Error fetching Personal Request Details:", error);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+    }
+  };
+// Code ended by Dinesh on 3-21-26
+
+// Code added by Dinesh Gokul 0n 23-03-2026
+const FamilyRequestHdr = async (req, res) => {
+  const headerData = req.body.headerData;
+
+  // Validation
+  if (!headerData || !headerData.length) {
+    return res.status(400).json("Invalid or empty header data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    let insertedId = null;
+
+    for (const insertRow of headerData) {
+      if (!insertRow) continue;
+
+      const result = await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("info_request_id", sql.Int, 0) // DB will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(` EXEC sp_ess_employee_family_request_hdr @mode, @info_request_id, @company_code, @EmployeeId, '', @purpose, @request_status, @created_by, '' 
+        `);
+
+      insertedId = result.recordset[0].info_request_id;
+    }
+
+    // Return generated ID to frontend
+    res.status(200).json([{ info_request_id: insertedId }]);
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 23-03-2026
+
+// Code added by Dinesh Gokul 0n 23-03-2026
+const GetFamilyRequestDetails = async (req, res) => {
+  const {
+    company_code,
+    Info_request_id,
+    EmployeeId,
+    column_name,
+    from_date,
+    to_date,
+  } = req.body;
+  // Validation
   if (!company_code) {
     return res.status(400).json("company_code is required.");
   }
@@ -45928,92 +46015,14 @@ const GetPersonalRequestDetails = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("detail_id", sql.Int, 0)
-      .input("info_request_id", sql.Int, 0)
-      .input("keyfield", sql.NVarChar, "")
+      .input("Info_request_id", sql.Int, Info_request_id || 0)
       .input("company_code", sql.NVarChar, company_code)
-      .input("EmployeeId", sql.NVarChar, "")
-      .input("request_status", sql.NVarChar, "Pending")
-
-      // :point_down: remaining params (not used in SC → pass empty)
-      .input("First_Name", sql.NVarChar, "")
-      .input("Middle_Name", sql.NVarChar, "")
-      .input("Last_Name", sql.NVarChar, "")
-      .input("father_name", sql.NVarChar, "")
-      .input("mother_name", sql.NVarChar, "")
-      .input("DOB", sql.Date, null)
-      .input("Gender", sql.NVarChar, "")
-      .input("email", sql.NVarChar, "")
-      .input("phone1", sql.NVarChar, "")
-      .input("phone2", sql.NVarChar, "")
-
-      .input("Address1", sql.NVarChar, "")
-      .input("address2", sql.NVarChar, "")
-      .input("address3", sql.NVarChar, "")
-      .input("PermanantAddress", sql.NVarChar, "")
-
-      .input("Reference_name", sql.NVarChar, "")
-      .input("Reference_Phone", sql.NVarChar, "")
-
-      .input("Pan_No", sql.NVarChar, "")
-      .input("Aadhar_no", sql.NVarChar, "")
-      .input("Photos", sql.VarBinary, null)
-
-      .input("marital_status", sql.NVarChar, "")
-      .input("siblings", sql.NVarChar, "")
-      .input("Kids", sql.NVarChar, "")
-
-      .input("Grade_id", sql.Int, 0)
-      .input("Title", sql.NVarChar, "")
-
-      .input("Place_of_Birth", sql.NVarChar, "")
-      .input("Nationality", sql.NVarChar, "")
-      .input("Religion", sql.NVarChar, "")
-      .input("Blood_Group", sql.NVarChar, "")
-
-      .input("Spouse_Name", sql.NVarChar, "")
-      .input("Number_of_Siblings", sql.Int, 0)
-      .input("Number_of_Children", sql.Int, 0)
-
-      .input("Email_Business", sql.NVarChar, "")
-      .input("Phone_Alternate", sql.NVarChar, "")
-
-      .input("Emergency_Contact_Name", sql.NVarChar, "")
-      .input("Emergency_Contact_Relationship", sql.NVarChar, "")
-      .input("Emergency_Contact_Phone", sql.NVarChar, "")
-
-      .input("City", sql.NVarChar, "")
-      .input("State", sql.NVarChar, "")
-      .input("Postal_Code", sql.NVarChar, "")
-      .input("Country", sql.NVarChar, "")
-
-      .input("Passport_No", sql.NVarChar, "")
-      .input("Passport_Expiry_Date", sql.Date, null)
-
-      .input("Other_Id_Type", sql.NVarChar, "")
-      .input("Other_Id_No", sql.NVarChar, "")
-
-      .input("created_by", sql.NVarChar, "")
-
-      .query(`
-        EXEC sp_ess_employee_personal_request_dtls
-        @mode, @detail_id, @info_request_id, @keyfield, @company_code,
-        @EmployeeId, @request_status,
-        @First_Name, @Middle_Name, @Last_Name, @father_name, @mother_name,
-        @DOB, @Gender, @email, @phone1, @phone2,
-        @Address1, @address2, @address3, @PermanantAddress,
-        @Reference_name, @Reference_Phone,
-        @Pan_No, @Aadhar_no, @Photos,
-        @marital_status, @siblings, @Kids,
-        @Grade_id, @Title,
-        @Place_of_Birth, @Nationality, @Religion, @Blood_Group,
-        @Spouse_Name, @Number_of_Siblings, @Number_of_Children,
-        @Email_Business, @Phone_Alternate,
-        @Emergency_Contact_Name, @Emergency_Contact_Relationship, @Emergency_Contact_Phone,
-        @City, @State, @Postal_Code, @Country,
-        @Passport_No, @Passport_Expiry_Date,
-        @Other_Id_Type, @Other_Id_No,
-        @created_by
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("column_name", sql.NVarChar, column_name || "")
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .query(` EXEC sp_ess_employee_family_request_dtls 'SC', 0,  @Info_request_id, '', @company_code, @EmployeeId, '',  
+        '', '', NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', @column_name, @from_date, @to_date 
       `);
 
     if (result.recordset.length > 0) {
@@ -46022,14 +46031,132 @@ const GetPersonalRequestDetails = async (req, res) => {
       res.status(404).json("Data not found");
     }
 
+  } catch (err) {
+    console.error("Error fetching Family Request Details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 23-03-2026
+
+// Code added by Dinesh Gokul 0n 23-03-2026
+const ApproveFamilyRequest = async (req, res) => {
+  const approvalData = req.body.approvalData;
+
+  // Validation
+  if (!approvalData || !approvalData.length) {
+    return res.status(400).json("Invalid or empty approval data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of approvalData) {
+      if (!row) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "AP")
+        .input("detail_id", sql.Int, row.detail_id)
+        .input("info_request_id", sql.Int, row.info_request_id)
+        .input("keyfield", sql.NVarChar, "")
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("EmployeeId", sql.NVarChar, row.EmployeeId)
+        .input("request_status", sql.NVarChar, row.request_status) // Approved / Rejected
+        // Dummy values (not used in AP mode)
+        .input("Relation", sql.NVarChar, "")
+        .input("Name", sql.NVarChar, "")
+        .input("DOB", sql.Date, null)
+        .input("AGE", sql.Int, null)
+        .input("aadhar_no", sql.NVarChar, "")
+        .input("Sex", sql.NVarChar, "")
+        .input("Nationality", sql.NVarChar, "")
+        .input("CPR_No", sql.NVarChar, "")
+        .input("CPR_Expiry_Date", sql.Date, null)
+        .input("Passport_No", sql.NVarChar, "")
+        .input("Passport_Expiry_Date", sql.Date, null)
+        .input("Visa_Entitled", sql.NVarChar, "")
+        .input("Visa_Expiry_Date", sql.Date, null)
+        .input("Air_Ticket_Entitled", sql.NVarChar, "")
+        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
+        .input("column_name", sql.NVarChar, "")
+        .input("from_date", sql.Date, null)
+        .input("to_date", sql.Date, null)
+        .query(` 
+          EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status,
+          @Relation, @Name, @DOB, @AGE, @aadhar_no, @Sex, @Nationality, @CPR_No, @CPR_Expiry_Date, 
+          @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, '', @column_name, @from_date, @to_date `);
+    }
+    res.status(200).json("Request processed successfully (Approved/Rejected)");
+
   } catch (error) {
-    console.error("Error fetching Personal Request Details:", error);
+    console.log(error.message);
+
     res.status(500).json({
       message: error.message || "Internal Server Error",
     });
   }
 };
-// Code ended by Dinesh on 3-21-26
+// Code ended by Dinesh Gokul 0n 23-03-2026
+
+// Code added by Dinesh Gokul 0n 23-03-2026
+const FamilyRequestDetails = async (req, res) => {
+  const detailsData = req.body.detailsData;
+
+  // Validation
+  if (!detailsData || !detailsData.length) {
+    return res.status(400).json("Invalid or empty details data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of detailsData) {
+      if (!insertRow) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("detail_id", sql.Int, insertRow.detail_id || 0)
+        .input("info_request_id", sql.Int, insertRow.info_request_id)
+        .input("keyfield", sql.NVarChar, "") // SP will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        // Family fields
+        .input("Relation", sql.NVarChar, insertRow.Relation)
+        .input("Name", sql.NVarChar, insertRow.Name)
+        .input("DOB", sql.Date, insertRow.DOB || null)
+        .input("AGE", sql.Int, insertRow.AGE || null)
+        .input("aadhar_no", sql.NVarChar, insertRow.aadhar_no)
+        .input("Sex", sql.NVarChar, insertRow.Sex)
+        .input("Nationality", sql.NVarChar, insertRow.Nationality)
+        .input("CPR_No", sql.NVarChar, insertRow.CPR_No)
+        .input("CPR_Expiry_Date", sql.Date, insertRow.CPR_Expiry_Date || null)
+        .input("Passport_No", sql.NVarChar, insertRow.Passport_No)
+        .input("Passport_Expiry_Date", sql.Date, insertRow.Passport_Expiry_Date || null)
+        .input("Visa_Entitled", sql.Int, insertRow.Visa_Entitled)
+        .input("Visa_Expiry_Date", sql.Date, insertRow.Visa_Expiry_Date || null)
+        .input("Air_Ticket_Entitled", sql.Bit, insertRow.Air_Ticket_Entitled)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        // Filters (not used in I mode → dummy)
+        .input("column_name", sql.NVarChar, "")
+        .input("from_date", sql.Date, null)
+        .input("to_date", sql.Date, null)
+        .query(` EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, 
+          @company_code, @EmployeeId, @request_status, @Relation, @Name, @DOB, @AGE, @aadhar_no, @Sex, @Nationality, @CPR_No, 
+          @CPR_Expiry_Date, @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, '', @column_name, @from_date, @to_date `);
+    }
+
+    res.status(200).json("Family request details inserted successfully");
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 23-03-2026
 
 module.exports = {
   login,
@@ -47347,5 +47474,9 @@ module.exports = {
   PersonalRequestHdr,
   PersonalRequestDetails,
   ApprovePersonalRequest,
-  GetPersonalRequestDetails
+  GetPersonalRequestDetails,
+  FamilyRequestHdr,
+  GetFamilyRequestDetails,
+  ApproveFamilyRequest,
+  FamilyRequestDetails
 };

@@ -1347,5 +1347,9 @@ router.post("/PersonalRequestDetails",dataController.PersonalRequestDetails)
 router.post("/PersonalRequestHdr",dataController.PersonalRequestHdr)
 router.post("/ApprovePersonalRequest",dataController.ApprovePersonalRequest)
 router.post("/GetPersonalRequestDetails",dataController.GetPersonalRequestDetails)
+router.post("/FamilyRequestHdr",dataController.FamilyRequestHdr)
+router.post("/GetFamilyRequestDetails",dataController.GetFamilyRequestDetails)
+router.post("/ApproveFamilyRequest",dataController.ApproveFamilyRequest)
+router.post("/FamilyRequestDetails",dataController.FamilyRequestDetails)
 
 module.exports = router;

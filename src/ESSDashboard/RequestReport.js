@@ -94,15 +94,7 @@ function RequestReport({}) {
         request_status: status,
         company_code,
       };
-    } else if (type === "Employee") {
-      url = `${config.apiBaseUrl}/DashboardEmployeeInfoChange`;
-
-      body = {
-        Info_request_id: safeId,
-        request_status: status,
-        company_code,
-      };
-    } else if (type === "Academic") {
+    }  else if (type === "Academic") {
       url = `${config.apiBaseUrl}/GetAcademicRequestDetails`;
 
       body = {
@@ -130,6 +122,8 @@ function RequestReport({}) {
         setRowTavelData(data);
       } else if (type === "Academic") {
         setAcademicRowData(data);
+      } else if (type === "Employee") {
+        setPersonalRowData(data);
       }
     }
   };
@@ -2448,6 +2442,218 @@ const handleAcademicReset = () => {
 //   XLSX.writeFile(workbook, "Academic_Requests_Search_Report.xlsx");
 // };
 
+
+  //Employee Report Screen Input Field
+  //Employee States
+  const [personalRowData, setPersonalRowData] = useState([]);
+  const [loadingPersonal, setLoadingPersonal] = useState(false);
+  const [PersonalInfoId, setPersonalInfoId] = useState("");
+  const [PersonalEmpId, setPersonalEmpId] = useState("");
+  const [personalColumn, setPersonalColumn] = useState("");
+  const [personalFromDate, setPersonalFromDate] = useState("");
+  const [personalToDate, setPersonalToDate] = useState("");
+
+    useEffect(() => {
+    if (requestType === "Employee") {
+      fetchPersonalData();
+    }
+  }, [requestType]);
+
+  const fetchPersonalData = async () => {
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          column_name: "",
+          from_date: null,
+          to_date: null,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      setPersonalRowData(data);
+    } else {
+      setPersonalRowData([]);
+    }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handlePersonalSearch = async () => {
+  try {
+    setLoadingPersonal(true);
+
+    const response = await fetch(
+      `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: PersonalInfoId || 0,
+          EmployeeId: PersonalEmpId,
+          column_name: personalColumn,
+          from_date: personalFromDate || null,
+          to_date: personalToDate || null,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      setPersonalRowData(data);
+    } else {
+      setPersonalRowData([]);
+      toast.warning("No data found");
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingPersonal(false);
+  }
+};
+
+const handlePersonalApproval = async (row, isApproved) => {
+  try {
+    const status = isApproved ? "Approved" : "Rejected";
+
+    const response = await fetch(
+      `${config.apiBaseUrl}/ApprovePersonalRequest`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          approvalData: [
+            {
+              detail_id: row.detail_id,
+              info_request_id: row.info_request_id,
+              company_code: row.company_code,
+              EmployeeId: row.EmployeeId,
+              request_status: status,
+              created_by: sessionStorage.getItem("selectedUserCode"),
+            },
+          ],
+        }),
+      }
+    );
+
+    if (response.ok) {
+      toast.success(`Personal Request ${status}`);
+      fetchPersonalData(); // 🔁 reload
+    } else {
+      const error = await response.json();
+      toast.error(error.message || "Failed to process request");
+    }
+  } catch (error) {
+    console.error("Approval Error:", error);
+    toast.error("Something went wrong");
+  }
+};
+
+const handlePersonalReset = () => {
+  setPersonalColumn("");
+  setPersonalFromDate("");
+  setPersonalEmpId("");
+  setPersonalToDate("");
+  fetchPersonalData(); // 🔁 reload all
+};
+
+
+
+const personalColumnDefs = [
+  {
+    headerName: "Actions",
+    field: "actions",
+    width: 120,
+    cellRenderer: (params) => {
+      const row = params.data;
+
+      return (
+        <div className="grid-action-buttons">
+          <button
+            className="grid-approve-btn"
+            title="Approve"
+            onClick={() => handlePersonalApproval(row, true)}
+          >
+            <i className="fa-solid fa-check"></i>
+          </button>
+
+          <button
+            className="grid-reject-btn"
+            title="Reject"
+            onClick={() => handlePersonalApproval(row, false)}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      );
+    },
+  },
+  {
+    headerName: "Employee ID",
+    field: "EmployeeId",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Request ID",
+    field: "info_request_id",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Field Name",
+    field: "column_name",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Old Value",
+    field: "old_value",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "New Value",
+    field: "new_value",
+    cellStyle: {
+      textAlign: "center",
+      color: "green",          // 🔥 highlight change
+      fontWeight: "bold",
+    },
+  },
+  {
+    headerName: "Status",
+    field: "request_status",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Created By",
+    field: "created_by",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Created Date",
+    field: "created_date",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Detail ID",
+    field: "detail_id",
+    hide: true,
+    cellStyle: { textAlign: "center" },
+  },
+];
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -3816,6 +4022,136 @@ const handleAcademicReset = () => {
               <AgGridReact
                 rowData={academicRowData}
                 columnDefs={academicColumnDefs}
+                rowSelection="single"
+                animateRows={true}
+              />
+            </div>
+          </div>
+        )}{" "}
+      </>
+
+            <>
+        {requestType === "Employee" && mode === "type" && (
+          <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+          
+            <div className="header-flex">
+              <h6>Search Criteria:</h6>
+            </div>
+        
+            <div className="row g-3">
+
+              {/* Request ID */}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="number"
+                    className="exp-input-field form-control"
+                    placeholder=""
+                    value={PersonalInfoId}
+                    onChange={(e) => setPersonalInfoId(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handlePersonalSearch()
+                    }
+                  />
+                  <label className="exp-form-labels">Request ID</label>
+                </div>
+              </div>
+
+              {/* Employee ID */}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    placeholder=""
+                    value={PersonalEmpId}
+                    onChange={(e) => setPersonalEmpId(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handlePersonalSearch()
+                    }
+                  />
+                  <label className="exp-form-labels">Employee ID</label>
+                </div>
+              </div>
+
+        
+              {/* Column Name */}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={personalColumn}
+                    onChange={(e) => setPersonalColumn(e.target.value)}
+                    placeholder=""
+                    onKeyDown={(e) => e.key === "Enter" && handlePersonalSearch()}
+                  />
+                  <label className="exp-form-labels">Field Name</label>
+                </div>
+              </div>
+        
+              {/* From Date */}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    placeholder=""
+                    value={personalFromDate}
+                    onChange={(e) => setPersonalFromDate(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handlePersonalSearch()}
+                  />
+                  <label className="exp-form-labels">From Date</label>
+                </div>
+              </div>
+        
+              {/* To Date */}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    placeholder=""
+                    value={personalToDate}
+                    onChange={(e) => setPersonalToDate(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handlePersonalSearch()}
+                  />
+                  <label className="exp-form-labels">To Date</label>
+                </div>
+              </div>
+        
+              {/* Buttons */}
+              <div className="col-12">
+                <div className="search-btn-wrapper">
+        
+                  <div className="icon-btn search" onClick={handlePersonalSearch}>
+                    <span className="tooltip">Search</span>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
+        
+                  <div className="icon-btn reload" onClick={handlePersonalReset}>
+                    <span className="tooltip">Reload</span>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+        
+                </div>
+              </div>
+        
+            </div>
+          </div>
+        )}        
+        {requestType === "Employee" && (
+          <div
+            className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+            style={{ width: "100%" }}
+          >
+            <div
+              className="ag-theme-alpine"
+              style={{ height: 455, width: "100%" }}
+            >
+              <AgGridReact
+                rowData={personalRowData}
+                columnDefs={personalColumnDefs}
                 rowSelection="single"
                 animateRows={true}
               />
