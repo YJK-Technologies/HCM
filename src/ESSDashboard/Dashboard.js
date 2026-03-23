@@ -811,7 +811,7 @@ const Dashboard = () => {
       /* ---------- Employee Change ---------- */
       try {
         const res = await fetch(
-          `${config.apiBaseUrl}/DashboardEmployeeInfoChange`,
+          `${config.apiBaseUrl}/GetPersonalRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
