@@ -124,6 +124,10 @@ function RequestReport({}) {
         setAcademicRowData(data);
       } else if (type === "Employee") {
         setPersonalRowData(data);
+      } else if (type === "Family") {
+        setFamilyRowData(data);
+      } else if (type === "Document") {
+        setDocumentRowData(data);
       }
     }
   };
@@ -2654,6 +2658,418 @@ const personalColumnDefs = [
   },
 ];
 
+  //family Report Screen Input Field
+  //family States
+  const [familyRowData, setFamilyRowData] = useState([]);
+  const [familyInfoId, setFamilyInfoId] = useState("");
+  const [familyEmpId, setFamilyEmpId] = useState("");
+  const [familyColumn, setFamilyColumn] = useState("");
+  const [familyFromDate, setFamilyFromDate] = useState("");
+  const [familyToDate, setFamilyToDate] = useState("");
+  
+  const [loadingFamily, setLoadingFamily] = useState(false);
+
+      useEffect(() => {
+    if (requestType === "Family") {
+      fetchFamilyData();
+    }
+  }, [requestType]);
+
+  const fetchFamilyData = async () => {
+  try {
+    setLoadingFamily(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: 0,
+        EmployeeId: "",
+        column_name: "",
+        from_date: null,
+        to_date: null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setFamilyRowData(data);
+    } else {
+      setFamilyRowData([]);
+    }
+  } catch (error) {
+    console.error("Error fetching Family Data:", error);
+  } finally {
+    setLoadingFamily(false);
+  }
+};
+
+  const handleFamilySearch = async () => {
+  if (familyFromDate && familyToDate) {
+    if (new Date(familyFromDate) > new Date(familyToDate)) {
+      toast.warning("From Date should not be greater than To Date");
+      return;
+    }
+  }
+
+  try {
+    setLoadingFamily(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: familyInfoId || 0,
+        EmployeeId: familyEmpId,
+        column_name: familyColumn,
+        from_date: familyFromDate || null,
+        to_date: familyToDate || null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setFamilyRowData(data);
+    } else {
+      setFamilyRowData([]);
+      toast.warning("No data found");
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingFamily(false);
+  }
+  };
+
+  const handleFamilyReset = () => {
+    setFamilyInfoId("");
+    setFamilyEmpId("");
+    setFamilyColumn("");
+    setFamilyFromDate("");
+    setFamilyToDate("");
+    fetchFamilyData();
+  };
+
+  const handleFamilyApproval = async (row, isApproved) => {
+  try {
+    const status = isApproved ? "Approved" : "Rejected";
+
+    const response = await fetch(`${config.apiBaseUrl}/ApproveFamilyRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        approvalData: [
+          {
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code: row.company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            created_by: sessionStorage.getItem("selectedUserCode"),
+          },
+        ],
+      }),
+    });
+
+    if (response.ok) {
+      toast.success(`Family Request ${status}`);
+      fetchFamilyData();
+    } else {
+      const err = await response.json();
+      toast.error(err.message || "Failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong");
+  }
+};
+
+  const familyColumnDefs = [
+  {
+    headerName: "Actions",
+    field: "actions",
+    width: 120,
+    cellRenderer: (params) => {
+      const row = params.data;
+
+      return (
+        <div className="grid-action-buttons">
+          <button
+            className="grid-approve-btn"
+            onClick={() => handleFamilyApproval(row, true)}
+          >
+            <i className="fa-solid fa-check"></i>
+          </button>
+
+          <button
+            className="grid-reject-btn"
+            onClick={() => handleFamilyApproval(row, false)}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      );
+    },
+  },
+  { 
+    headerName: "Employee ID", 
+    field: "EmployeeId", 
+    cellStyle: { textAlign: "center" } 
+  },
+  {
+     headerName: "Request ID", 
+     field: "info_request_id", 
+     cellStyle: { textAlign: "center" }
+  },
+  {
+    headerName: "Field Name",
+    field: "column_name", 
+    cellStyle: { textAlign: "center" } 
+  },
+
+  {
+    headerName: "Old Value",
+    field: "old_value",
+    cellStyle: { textAlign: "center"},
+  },
+
+  {
+    headerName: "New Value",
+    field: "new_value",
+    cellStyle: { textAlign: "center"},
+  },
+
+  { 
+    headerName: "Status", 
+    field: "request_status", 
+    cellStyle: { textAlign: "center" } 
+  },
+  { 
+    headerName: "Created By", 
+    field: "created_by", 
+    cellStyle: { textAlign: "center" } 
+  },
+
+  {
+    headerName: "Created Date",
+    field: "created_date",
+    cellStyle: { textAlign: "center" },
+
+  },
+
+  { 
+    headerName: "Detail ID", 
+    field: "detail_id", 
+    hide: true 
+  },
+];
+
+//document Report Screen Input Field
+const [documentRowData, setDocumentRowData] = useState([]);
+
+const [docInfoId, setDocInfoId] = useState("");
+const [docEmpId, setDocEmpId] = useState("");
+const [docColumn, setDocColumn] = useState("");
+const [docFromDate, setDocFromDate] = useState("");
+const [docToDate, setDocToDate] = useState("");
+
+const [loadingDocument, setLoadingDocument] = useState(false);
+
+useEffect(() => {
+  if (requestType === "Document") {
+    fetchDocumentData();
+  }
+}, [requestType]);
+
+const fetchDocumentData = async () => {
+  try {
+    setLoadingDocument(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: 0,
+        EmployeeId: "",
+        column_name: "",
+        from_date: null,
+        to_date: null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setDocumentRowData(data);
+    } else {
+      setDocumentRowData([]);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingDocument(false);
+  }
+};
+
+const handleDocumentSearch = async () => {
+  try {
+    setLoadingDocument(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: docInfoId || 0,
+        EmployeeId: docEmpId,
+        column_name: docColumn,
+        from_date: docFromDate || null,
+        to_date: docToDate || null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setDocumentRowData(data);
+    } else {
+      setDocumentRowData([]);
+      toast.warning("No data found");
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingDocument(false);
+  }
+};
+
+const handleDocumentReset = () => {
+  setDocInfoId("");
+  setDocEmpId("");
+  setDocColumn("");
+  setDocFromDate("");
+  setDocToDate("");
+
+  fetchDocumentData();
+};
+
+const handleDocumentApproval = async (row, isApproved) => {
+  try {
+    const status = isApproved ? "Approved" : "Rejected";
+
+    const response = await fetch(`${config.apiBaseUrl}/ApproveDocumentRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        approvalData: [
+          {
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code: row.company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            created_by: sessionStorage.getItem("selectedUserCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          },
+        ],
+      }),
+    });
+
+    if (response.ok) {
+      toast.success(`Document Request ${status}`);
+      fetchDocumentData();
+    } else {
+      const error = await response.json();
+      toast.error(error.message || "Failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong");
+  }
+};
+
+const documentColumnDefs = [
+  {
+    headerName: "Actions",
+    field: "actions",
+    width: 120,
+    cellRenderer: (params) => {
+      const row = params.data;
+
+      return (
+        <div className="grid-action-buttons">
+          <button
+            className="grid-approve-btn"
+            onClick={() => handleDocumentApproval(row, true)}
+          >
+            <i className="fa-solid fa-check"></i>
+          </button>
+
+          <button
+            className="grid-reject-btn"
+            onClick={() => handleDocumentApproval(row, false)}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      );
+    },
+  },
+  {
+    headerName: "Employee ID",
+    field: "EmployeeId",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Request ID",
+    field: "info_request_id",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Field Name",
+    field: "column_name",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Old Value",
+    field: "old_value",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "New Value",
+    field: "new_value",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Status",
+    field: "request_status",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Created By",
+    field: "created_by",
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Created Date",
+    field: "created_date",
+    cellStyle: { textAlign: "center" },
+  },
+];
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -4159,6 +4575,216 @@ const personalColumnDefs = [
           </div>
         )}{" "}
       </>
+      <>
+  {requestType === "Family" && mode === "type" && (
+    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+
+      <div className="header-flex">
+        <h6>Search Criteria:</h6>
+      </div>
+
+      <div className="row g-3">
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="number"
+              className="exp-input-field form-control"
+              value={familyInfoId}
+              onChange={(e) => setFamilyInfoId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+            />
+            <label className="exp-form-labels">Request ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="text"
+              className="exp-input-field form-control"
+              value={familyEmpId}
+              onChange={(e) => setFamilyEmpId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+            />
+            <label className="exp-form-labels">Employee ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="text"
+              className="exp-input-field form-control"
+              value={familyColumn}
+              onChange={(e) => setFamilyColumn(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+            />
+            <label className="exp-form-labels">Field Name</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="date"
+              className="exp-input-field form-control"
+              value={familyFromDate}
+              onChange={(e) => setFamilyFromDate(e.target.value)}
+            />
+            <label className="exp-form-labels">From Date</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="date"
+              className="exp-input-field form-control"
+              value={familyToDate}
+              onChange={(e) => setFamilyToDate(e.target.value)}
+            />
+            <label className="exp-form-labels">To Date</label>
+          </div>
+        </div>
+
+        <div className="col-12">
+          <div className="search-btn-wrapper">
+
+            <div className="icon-btn search" onClick={handleFamilySearch}>
+              <span className="tooltip">Search</span>
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <div className="icon-btn reload" onClick={handleFamilyReset}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-rotate-right"></i>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )}
+
+  {requestType === "Family" && (
+    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+      <div className="ag-theme-alpine" style={{ height: 455 }}>
+        <AgGridReact
+          rowData={familyRowData}
+          columnDefs={familyColumnDefs}
+          pagination={true}
+          paginationPageSize={10}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            resizable: true
+          }}
+        />
+        </div>
+        </div>
+      )}
+    </>
+
+    <>
+  {requestType === "Document" && mode === "type" && (
+    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="header-flex">
+        <h6>Search Criteria:</h6>
+      </div>
+
+      <div className="row g-3">
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input 
+            type="number" 
+            className="exp-input-field form-control"
+            value={docInfoId}
+            onChange={(e) => setDocInfoId(e.target.value)} 
+            />
+            <label>Request ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input 
+            type="text" 
+            className="exp-input-field form-control"
+            value={docEmpId}
+            onChange={(e) => setDocEmpId(e.target.value)} 
+            />
+            <label>Employee ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input 
+            type="text" 
+            className="exp-input-field form-control"
+            value={docColumn}
+            onChange={(e) => setDocColumn(e.target.value)} 
+            />
+            <label>Field Name</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input 
+            type="date" 
+            className="exp-input-field form-control"
+            value={docFromDate}
+            onChange={(e) => setDocFromDate(e.target.value)} 
+            />
+            <label>From Date</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input 
+            type="date" 
+            className="exp-input-field form-control"
+            value={docToDate}
+            onChange={(e) => setDocToDate(e.target.value)} 
+            />
+            <label>To Date</label>
+          </div>
+        </div>
+
+        <div className="col-12">
+          <div className="search-btn-wrapper">
+
+            <div className="icon-btn search" onClick={handleDocumentSearch}>
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <div className="icon-btn reload" onClick={handleDocumentReset}>
+              <i className="fa-solid fa-rotate-right"></i>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {requestType === "Document" && (
+    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+      <div className="ag-theme-alpine" style={{ height: 455 }}>
+        <AgGridReact
+          rowData={documentRowData}
+          columnDefs={documentColumnDefs}
+        />
+      </div>
+      </div>
+    )}
+  </>
+
     </div>
   );
 }

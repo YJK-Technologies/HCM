@@ -46158,6 +46158,181 @@ const FamilyRequestDetails = async (req, res) => {
 };
 // Code ended by Dinesh Gokul 0n 23-03-2026
 
+// Code added by Dinesh Gokul on 24-20-26
+const DocumentRequestDetails = async (req, res) => {
+  const detailsData = req.body.detailsData;
+
+  if (!detailsData || !detailsData.length) {
+    return res.status(400).json("Invalid or empty details data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of detailsData) {
+      if (!insertRow) continue;
+
+      let document_files = insertRow.document_files || null;
+
+      if (document_files) {
+        document_files = Buffer.from(document_files, "base64");
+      }
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("detail_id", sql.Int, insertRow.detail_id || 0)
+        .input("info_request_id", sql.Int, insertRow.info_request_id)
+        .input("keyfield", sql.NVarChar, "")
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("document_Name", sql.NVarChar, insertRow.document_Name)
+        .input("document_files", sql.VarBinary, document_files)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(`EXEC sp_ess_employee_document_request_dtls
+          @mode, @detail_id, @info_request_id, @keyfield, @company_code,
+          @EmployeeId, @request_status, @document_Name, @document_files, @created_by, '', '', '', ''`);
+    }
+
+    res.status(200).json("Details inserted successfully");
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul on 24-20-26
+
+// Code added by Dinesh Gokul 24-03-2026
+const GetDocumentsRequestDetails = async (req, res) => {
+  const {
+    company_code,
+    Info_request_id,
+    EmployeeId,
+    column_name,
+    from_date,
+    to_date,
+  } = req.body;
+
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Info_request_id", sql.Int, Info_request_id || 0)
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("column_name", sql.NVarChar, column_name || "")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .query(
+        ` EXEC sp_ess_employee_document_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', Null, '', '', @column_name, @from_date, @to_date`,
+      );
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error fetching Documents Request Details:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+// Code ended by Dinesh Gokul 24-03-2026
+
+// Code added by Dinesh on 20-20-26
+const ApproveDocumentRequest = async (req, res) => {
+  const approvalData = req.body.approvalData;
+
+  if (!approvalData || !approvalData.length) {
+    return res.status(400).json("Invalid or empty approval data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of approvalData) {
+      if (!row) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "AP")
+        .input("detail_id", sql.Int, row.detail_id)
+        .input("info_request_id", sql.Int, row.info_request_id)
+        .input("keyfield", sql.NVarChar, "")
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("EmployeeId", sql.NVarChar, row.EmployeeId)
+        .input("request_status", sql.NVarChar, row.request_status) // Approved / Rejected
+        .input("document_Name", sql.NVarChar, "")
+        .input("document_files", sql.VarBinary, null)
+        .input("created_by", sql.NVarChar, row.created_by)
+        .input("modified_by", sql.NVarChar, row.modified_by)
+        .query(` EXEC sp_ess_employee_document_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
+        @request_status, @document_Name, @document_files, @created_by, @modified_by, '', '', '' `);
+    }
+
+    res.status(200).json("Request processed successfully (Approved/Rejected)");
+  } catch (error) {
+    console.log(error.message);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh on 24-20-26
+
+// Code added by Dinesh Gokul on 24-20-26
+const DocumentRequestHdr = async (req, res) => {
+  const headerData = req.body.headerData;
+
+  if (!headerData || !headerData.length) {
+    return res.status(400).json("Invalid or empty header data.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    let insertedId = null;
+
+    for (const insertRow of headerData) {
+      if (!insertRow) continue;
+
+      const result = await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("info_request_id", sql.Int, 0) // :white_check_mark: DB generate pannum
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(`EXEC sp_ess_employee_document_request_hdr
+          @mode, @info_request_id, @company_code, @EmployeeId, '',
+          @purpose, @request_status, @created_by, ''`);
+
+      insertedId = result.recordset[0].info_request_id;
+    }
+
+    // FRONTEND ku ID return
+    res.status(200).json([{ info_request_id: insertedId }]);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul on 24-20-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -47478,5 +47653,9 @@ module.exports = {
   FamilyRequestHdr,
   GetFamilyRequestDetails,
   ApproveFamilyRequest,
-  FamilyRequestDetails
+  FamilyRequestDetails,
+  DocumentRequestDetails,
+  GetDocumentsRequestDetails,
+  ApproveDocumentRequest,
+  DocumentRequestHdr
 };

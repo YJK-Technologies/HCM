@@ -1351,5 +1351,9 @@ router.post("/FamilyRequestHdr",dataController.FamilyRequestHdr)
 router.post("/GetFamilyRequestDetails",dataController.GetFamilyRequestDetails)
 router.post("/ApproveFamilyRequest",dataController.ApproveFamilyRequest)
 router.post("/FamilyRequestDetails",dataController.FamilyRequestDetails)
+router.post("/DocumentRequestDetails",dataController.DocumentRequestDetails)
+router.post("/GetDocumentsRequestDetails",dataController.GetDocumentsRequestDetails)
+router.post("/ApproveDocumentRequest",dataController.ApproveDocumentRequest)
+router.post("/DocumentRequestHdr",dataController.DocumentRequestHdr)
 
 module.exports = router;
