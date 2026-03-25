@@ -749,6 +749,7 @@ const Dashboard = () => {
       let empData = [];
       let familyChangeData = [];
       let academicData = [];
+      let documentData = [];  
 
       /* ---------- Leave ---------- */
       try {
@@ -826,7 +827,7 @@ const Dashboard = () => {
       /* ---------- Employee Family Change ---------- */
       try {
         const res = await fetch(
-          `${config.apiBaseUrl}/DashboardFamilyDetailChange`,
+          `${config.apiBaseUrl}/GetFamilyRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -854,6 +855,23 @@ const Dashboard = () => {
       } catch (err) {
         console.log("Academic API failed");
       }
+
+      /* ---------- Documents ---------- */
+      try {
+        const res = await fetch(
+          `${config.apiBaseUrl}/GetDocumentsRequestDetails`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          }
+        );
+      
+        if (res.ok) documentData = await res.json();
+      } catch (err) {
+        console.log("Document API failed");
+      }
+
       /* ---------- Leave ---------- */
       const formattedLeave = leaveData
         .filter((r) => r.LeaveStatus === "Pending")
@@ -963,6 +981,29 @@ const Dashboard = () => {
       });
 
       const formattedAcademic = Object.values(groupedAcademic);
+
+      /* ---------- Documents Group ---------- */
+      const groupedDocuments = {};
+
+      documentData.forEach((row) => {
+        if (!groupedDocuments[row.info_request_id]) {
+          groupedDocuments[row.info_request_id] = {
+            type: "Document",
+            id: row.info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Document Details",
+            status: row.request_status,
+
+            // important for approval
+            rows: [],
+          };
+        }
+
+        groupedDocuments[row.info_request_id].rows.push(row);
+      });
+
+      const formattedDocuments = Object.values(groupedDocuments);
       /* ---------- Merge ---------- */
       const merged = [
         ...formattedLeave,
@@ -972,6 +1013,7 @@ const Dashboard = () => {
         ...formattedEmp,
         ...formattedFamily,
         ...formattedAcademic,
+        ...formattedDocuments,
       ];
 
       setDashboardRequests(merged);
@@ -1030,9 +1072,9 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } else if (type === "Employee Change") {
+      } else if (type === "Employee") {
         /* ---------- Employee Change ---------- */
-        url = `${config.apiBaseUrl}/ApprovalPersonalInfo`;
+        url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
 
         body = {
           Info_request_id: id,
@@ -1040,9 +1082,9 @@ const Dashboard = () => {
           request_status: status,
           approver_id: sessionStorage.getItem("selectedUserCode"),
         };
-      } else if (type === "Family Change") {
+      } else if (type === "Family") {
         /* ---------- Family Change ---------- */
-        url = `${config.apiBaseUrl}/ApprovalFamilyDetail`;
+        url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
 
         body = {
           Info_request_id: id,
@@ -1065,6 +1107,24 @@ const Dashboard = () => {
             company_code,
             EmployeeId: row.EmployeeId,
             request_status: status,
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          })),
+        };
+      } else if (type === "Document") {
+        url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
+            
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Document"
+        );
+      
+        body = {
+          approvalData: selectedRequest.rows.map((row) => ({
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            created_by: sessionStorage.getItem("selectedUserCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };

@@ -116,18 +116,18 @@ function ManualEmployeeInfo({}) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-    if(IDdrop.length > 0 ||
-      genderdrop.length > 0 ||
-      KidsDrop.length > 0 ||
-      titleDrop.length > 0 ||
-      nationalityDrop.length > 0 ||
-      religionDrop.length > 0 ||
-      Marital_StatusDrop.length > 0 ||
-      emergencyContactRelationDrop.length > 0 ||
-      cityDrop.length > 0 ||
-      countryDrop.length > 0 || 
-      stateDrop.length > 0 ||
-      otherDrop.length > 0 ||
+    if(IDdrop.length > 0 &&
+      genderdrop.length > 0 &&
+      KidsDrop.length > 0 &&
+      titleDrop.length > 0 &&
+      nationalityDrop.length > 0 &&
+      religionDrop.length > 0 &&
+      Marital_StatusDrop.length > 0 &&
+      emergencyContactRelationDrop.length > 0 &&
+      cityDrop.length > 0 &&
+      countryDrop.length > 0 &&
+      stateDrop.length > 0 &&
+      otherDrop.length > 0 &&
        employeeId
     ){
       handleRefNo(employeeId);

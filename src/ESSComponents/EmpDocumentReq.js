@@ -29,6 +29,8 @@ function EmpDocumentReq({ }) {
   const [First_Name, setFirst_Name] = useState('');
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
+  const [purpose, setpurpose] = useState("");
+  
 
   const [isSelectDocument, setIsSelectDocument] = useState({});
   const [loading, setLoading] = useState(false);
@@ -110,67 +112,134 @@ function EmpDocumentReq({ }) {
   };
 
   const handleSave = async () => {
-    if (!employeeId) {
-      setError(true);
+    if (!EmployeeId) {
       toast.warning("Error: Missing required fields");
       return;
     }
-    for (const relationGroup of documents) {
-      for (const member of relationGroup.members) {
-        if (!member.documentName || !member.document) {
-          setError(true);
-          toast.warning("Error: Missing required fields");
-          return;
-        }
-      }
-    }
-
-    const employeeData = await Promise.all(
-      documents.flatMap((relationGroup) =>
-        relationGroup.members.map(async (member) => {
-          const fileBase64 = member.document ? await convertToBase64(member.document) : null;
-          console.log(fileBase64)
-          return {
-            EmployeeId: employeeId,
-            document_name: member.documentName,
-            document_files: fileBase64,
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-            created_by: sessionStorage.getItem("selectedUserCode"),
-          };
-        })
-      )
-    );
-    setError(false);
-    setLoading(true)
-
+  
     try {
-      const response = await fetch(`${config.apiBaseUrl}/AddEmpDoc`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employeeData }),
-      });
-      if (response.ok) {
-        toast.success("Data inserted successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+      setLoading(true);
+  
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
+  
+      /* ---------------- HEADER ---------------- */
+      const headerPayload = {
+        company_code,
+        EmployeeId,
+        purpose,
+        request_status: "Pending",
+        created_by,
+      };
+  
+      const headerRes = await fetch(
+        `${config.apiBaseUrl}/DocumentRequestHdr`, // ✅ FIXED
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ headerData: [headerPayload] }),
+        }
+      );
+  
+      if (!headerRes.ok) {
+        const err = await headerRes.json();
+        throw new Error(err.message);
       }
-    } catch (err) {
-      console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
+  
+      const headerResult = await headerRes.json();
+      const info_request_id = headerResult?.[0]?.info_request_id;
+  
+      if (!info_request_id) {
+        throw new Error("info_request_id not returned from backend");
+      }
+  
+      /* ---------------- DETAILS ---------------- */
+      await saveDocumentDetails(info_request_id); // ✅ FIXED
+  
+      toast.success("Document request submitted successfully!", {
+        onClose: () => window.location.reload(),
       });
+  
+    } catch (err) {
+      console.error(err);
+      toast.error("Error: " + err.message);
     } finally {
       setLoading(false);
     }
   };
+const saveDocumentDetails = async (info_request_id) => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
 
-  // const handleDelete = async () => {
+    // 🔥 Flatten documents → members
+    const allRows = documents.flatMap(group => group.members);
+
+    const detailsData = await Promise.all(
+      allRows.map(async (row) => {
+        // ❌ Skip empty rows
+        if (!row.documentName || !row.document) {
+          return null;
+        }
+
+        let base64File = null;
+
+        if (row.document) {
+          if (row.document.size > 2 * 1024 * 1024) {
+            toast.warning(`File "${row.documentName}" exceeds 2MB`);
+            return null;
+          }
+
+          base64File = await convertToBase64(row.document);
+        }
+
+        return {
+          info_request_id,
+          company_code,
+          EmployeeId,
+          request_status: "Pending",
+
+          document_Name: row.documentName,
+          document_files: base64File,
+
+          created_by,
+        };
+      })
+    );
+
+    const filteredData = detailsData.filter(Boolean);
+
+    // ❌ No valid rows
+    if (filteredData.length === 0) {
+      toast.warning("Please upload at least one document");
+      return;
+    }
+
+    const res = await fetch(
+      `${config.apiBaseUrl}/DocumentRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ detailsData: filteredData }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message);
+    }
+
+    console.log("Document details inserted successfully");
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Error inserting document details: " + error.message);
+  }
+};  // const handleDelete = async () => {
   //   if (
   //     !employeeId) {
   //     setError("Please fill all required fields.");
@@ -606,6 +675,24 @@ function EmpDocumentReq({ }) {
                     Document Name<span className="text-danger">*</span>
                   </label>
                 </div>
+              </div>
+
+              <div className="col-md-2">
+              <div className="inputGroup">
+                <input
+                  id="passportNo"
+                  className="exp-input-field form-control"
+                  type="text"
+                  placeholder=""
+                  value={purpose}
+                  onChange={(e) => setpurpose(e.target.value)}
+                  maxLength={30}
+                  autoComplete="off"
+                />
+                <label htmlFor="passportNo" className="exp-form-labels">
+                  Purpose
+                </label>
+              </div>
               </div>
 
               <div className="col-md-2">
