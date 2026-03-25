@@ -59,6 +59,7 @@ function EmpFamPersonalDetail({}) {
   const [isSelectVisa, setIsSelectVisa] = useState({});
   const [loading, setLoading] = useState(false);
   const [purpose, setpurpose] = useState("");
+  const [familyData, setFamilyData] = useState([]);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -68,8 +69,14 @@ function EmpFamPersonalDetail({}) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-    handleEmployeeFamily(employeeId);
-  }, []);
+if(relativedrop.length > 0 &&
+   sexDrop.length > 0 &&
+   nationalityDrop.length > 0 &&
+   booleanDrop.length > 0 
+){
+  handleEmployeeFamily(employeeId);
+} 
+  }, [relativedrop, sexDrop, nationalityDrop, booleanDrop]);
 
   const EmployeeLoan = () => {
     navigate("/ManualEmployeeInfo");
@@ -157,85 +164,120 @@ function EmpFamPersonalDetail({}) {
     { label: 'Documents' }
   ];
 
-  const handleSave = async () => {
-    if (!EmployeeId) {
-      setError(true);
-      toast.warning("Error: Missing required keyfield");
-      return;
-    }
+const handleSave = async () => {
+  if (!EmployeeId) {
+    toast.warning("Error: Missing required fields");
+    return;
+  }
 
-    for (const relationGroup of familyMembers) {
-      for (const member of relationGroup.members) {
-        if (
-          !member.relationName ||
-          !member.name ||
-          !member.dob ||
-          !member.Age
-        ) {
-          setError(true);
-          toast.warning("Error: Missing required fields");
-
-          return;
-        }
-      }
-    }
-
-    const employeeData = familyMembers.flatMap((relationGroup) =>
-      relationGroup.members.map((member) => ({
-        EmployeeId: EmployeeId,
-        Relation: member.relationName,
-        Name: member.name,
-        DOB: member.dob,
-        AGE: member.Age,
-        aadhar_no: member.aadharNo,
-        Sex: member.sex,
-        Nationality: member.nationality,
-        CPR_No: member.CRPNo,
-        CPR_Expiry_Date: member.CRP_ExpiryDate,
-        Passport_No: member.passportNo,
-        purpose: member.purpose || "",
-        request_status: member.request_status || "Pending",
-        Passport_Expiry_Date: member.passportExpiryDate,
-        Visa_Entitled: Number(member.visaEntitled),
-        Visa_Expiry_Date: member.visaExpiryDate,
-        Air_Ticket_Entitled: Number(member.airTicketEntitled),
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        created_by: sessionStorage.getItem("selectedUserCode"),
-      })),
-    );
-    setError(false);
+  try {
     setLoading(true);
 
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/FamilyDetailRequest`, {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    /* ---------------- HEADER ---------------- */
+    const headerPayload = {
+      company_code,
+      EmployeeId,
+      purpose: purpose,
+      request_status: "Pending",
+      created_by,
+    };
+
+    const headerRes = await fetch(
+      `${config.apiBaseUrl}/FamilyRequestHdr`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ employeeData }),
-      });
-      if (response.ok) {
-        toast.success("Data inserted successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {});
+        body: JSON.stringify({ headerData: [headerPayload] }),
       }
-    } catch (err) {
-      console.error("Error delete data:", err);
-      toast.error("Error delete data: " + err.message, {});
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleEmployeeFamily(EmployeeId);
+    if (!headerRes.ok) {
+      const err = await headerRes.json();
+      throw new Error(err.message);
     }
-  };
+
+    const headerResult = await headerRes.json();
+    const info_request_id = headerResult?.[0]?.info_request_id;
+
+    if (!info_request_id) {
+      throw new Error("info_request_id not returned from backend");
+    }
+
+    /* ---------------- DETAILS ---------------- */
+    await saveFamilyDetails(info_request_id);
+
+    toast.success("Family details submitted successfully!", {
+      onClose: () => window.location.reload(),
+    });
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Error: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const saveFamilyDetails = async (info_request_id) => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    // assuming you have multiple family rows (table/grid)
+    const detailsData = familyMembers.flatMap((group) =>
+    group.members.map((row) => ({
+    info_request_id,
+    company_code,
+    EmployeeId,
+    request_status: "Pending",
+
+    Relation: row.relationName,
+    Name: row.name,
+    DOB: row.dob || null,
+    AGE: row.Age || null,
+    aadhar_no: row.aadharNo,
+    Sex: row.sex,
+    Nationality: row.nationality,
+    CPR_No: row.CRPNo,
+    CPR_Expiry_Date: row.CRP_ExpiryDate || null,
+    Passport_No: row.passportNo,
+    Passport_Expiry_Date: row.passportExpiryDate || null,
+    Visa_Entitled: row.visaEntitled || 0,
+    Visa_Expiry_Date: row.visaExpiryDate || null,
+    Air_Ticket_Entitled: row.airTicketEntitled === "1" ? true : false,
+
+    created_by,
+  }))
+  );
+
+    const res = await fetch(
+      `${config.apiBaseUrl}/FamilyRequestDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ detailsData }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message);
+    }
+
+    console.log("Family Details inserted successfully");
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Error inserting family details: " + error.message);
+  }
+};
 
   const formatDate = (dateString) => {
     if (typeof dateString === "string" && dateString) {
@@ -297,7 +339,7 @@ function EmpFamPersonalDetail({}) {
           const formattedvisaExpiryDate = formatDate(Visa_Expiry_Date);
 
           const airTicketValue = Air_Ticket_Entitled === true ? "1" : "0";
-
+          console.log(Visa_Entitled)
           const memberData = {
             relationName: Relation || "",
             selectRelation: Relation
@@ -576,19 +618,6 @@ function EmpFamPersonalDetail({}) {
     setOpen1(false);
   };
 
-  const familyDetails = async (data) => {
-    if (data && data.length > 0) {
-      setSaveButtonVisible(false);
-      setShowAsterisk(false);
-      setIsAcademicDataLoaded(true);
-      const [{ employeeId }] = data;
-
-      handleEmployeeFamily(employeeId);
-    } else {
-      console.log("Data not fetched...!");
-    }
-  };
-
   const handleDateChange = (e, relation, idx) => {
     const selectedDate = e.target.value;
     const today = new Date();
@@ -629,22 +658,6 @@ function EmpFamPersonalDetail({}) {
   //     }
   //   }
   // }, [location.state]);
-
-  useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } =
-      location.state || {};
-
-    if (employeeId) {
-      setEmployeeId(employeeId);
-      setFirst_Name(firstName || "");
-      setdepartment_id(department_id || "");
-      setdesignation_id(designation_id || "");
-    }
-
-    if (employeeId) {
-      handleEmployeeFamily(employeeId);
-    }
-  }, [location.state]);
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -965,7 +978,7 @@ function EmpFamPersonalDetail({}) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <input
-                    type="number"
+                    type="text"
                     className="exp-input-field form-control"
                     value={member.CRPNo}
                     maxLength={30}
@@ -1176,13 +1189,6 @@ function EmpFamPersonalDetail({}) {
           ))}
         </div>
       ))}
-      <div>
-        <FamilyDetails
-          open={open1}
-          handleClose={handleClose}
-          familyDetails={familyDetails}
-        />
-      </div>
     </div>
   );
 }
