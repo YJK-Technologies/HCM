@@ -154,6 +154,16 @@ const MyAgGridComponent = () => {
 
   ];
   const handleSearch = async () => {
+
+    if (StartDate && EndDate) {
+      const start = new Date(StartDate);
+      const end = new Date(EndDate);
+
+      if (start > end) {
+        toast.warning("Start Date cannot be greater than End Date");
+        return;
+      }
+    }
     try {
       setLoading(true);
       // Preparing the body for the POST request

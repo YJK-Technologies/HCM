@@ -437,6 +437,14 @@ const LeaveRequestPage = () => {
               <i className="fa-solid fa-xmark"></i>
             </div>
           </div> */}
+                        {(LeaveStatus === "Pending" || LeaveStatus === "Rejected" || LeaveStatus === "") && (
+                <div className="action-wrapper">
+                  <div className="action-icon save" onClick={handleSave}>
+                    <span className="tooltip">Save</span>
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </div>
+                </div>
+              )}
         </div>
       </div>
       {loading && <LoadingScreen />}
@@ -585,14 +593,7 @@ const LeaveRequestPage = () => {
               <button className="btn btn-secondary" onClick={handleadjustmentbtn}>
                 Applied Leaves
               </button> */}
-              {(LeaveStatus === "Pending" || LeaveStatus === "Rejected" || LeaveStatus === "") && (
-                <div className="search-btn-wrapper">
-                  <div className="icon-btn save" onClick={handleSave}>
-                    <span className="tooltip">Apply</span>
-                    <i class="fa-solid fa-floppy-disk"></i>
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
           <div className="col-md-6">

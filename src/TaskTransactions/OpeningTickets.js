@@ -5,43 +5,45 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
-import '../apps.css';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import "../apps.css";
 import { useNavigate } from "react-router-dom";
 import { publicIpv4 } from "public-ip";
-import Select from 'react-select';
-import LoadingScreen from '../Loading';
-const config = require('../Apiconfig');
+import Select from "react-select";
+import LoadingScreen from "../Loading";
+import * as XLSX from "xlsx-js-style";
 
-function Input({ }) {
+const config = require("../Apiconfig");
+
+function Input({}) {
   const [isCheckedIn, setIsCheckedIn] = useState(
-    sessionStorage.getItem("isCheckedIn") === "true"
+    sessionStorage.getItem("isCheckedIn") === "true",
   );
-  const user_code = sessionStorage.getItem('selectedUserCode');
+  const user_code = sessionStorage.getItem("selectedUserCode");
   const gridApiRef = useRef(null);
   const gridColumnApiRef = useRef(null);
-  const [rowData, setrowData] = useState('');
+  const [rowData, setrowData] = useState("");
   const [deviceDetails, setDeviceDetails] = useState("");
   const [ipAddress, setIpAddress] = useState("");
   const [location, setLocation] = useState("");
   const navigate = useNavigate();
   const [timer, setTimer] = useState("00:00:00");
-  const [searchRowData, setSearchRowData] = useState('');
+  const [searchRowData, setSearchRowData] = useState("");
   const [userDrop, setUserDrop] = useState([]);
   const [statusDrop, setStatusDrop] = useState([]);
   const [priorityDrop, setPriorityDrop] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedPriority, setSelectedPriority] = useState('');
-  const [user, setUser] = useState('');
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState('');
-  const [taskTitle, setTaskTitle] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedPriority, setSelectedPriority] = useState("");
+  const [user, setUser] = useState("");
+  const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [selectedproject, setSelectedproject] = useState("");
-  const [projectID, setprojectID] = useState('');
+  const [projectID, setprojectID] = useState("");
   const [projectDrop, setProjectDrop] = useState([]);
   const [isSelectproject, setIsSelectproject] = useState(false);
   const [isSelectStatus, setIsSelectStatus] = useState(false);
@@ -70,7 +72,7 @@ function Input({ }) {
             (error) => {
               console.error("Error fetching location:", error);
               setLocation("Location unavailable");
-            }
+            },
           );
         } else {
           setLocation("Geolocation not supported");
@@ -88,7 +90,7 @@ function Input({ }) {
       try {
         const body = {
           userID: sessionStorage.getItem("selectedUserCode"),
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
         };
 
         const response = await fetch(`${config.apiBaseUrl}/getDailyTask`, {
@@ -152,34 +154,34 @@ function Input({ }) {
     {
       headerName: "Project ID",
       field: "ProjectID",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
       // minWidth: 200,
       // maxWidth: 200
     },
     {
       headerName: "Project Name",
       field: "ProjectName",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
       // minWidth: 200,
     },
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
       // minWidth: 200,
       // maxWidth: 200
     },
     {
       headerName: "Priority Level",
       field: "PriorityLevel",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
       // minWidth: 150,
       // maxWidth: 150
     },
     {
       headerName: "Description",
       field: "Description",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
       // minWidth: 200,
     },
     {
@@ -211,7 +213,7 @@ function Input({ }) {
           </button>
         );
       },
-    }
+    },
   ];
 
   // Function to handle navigation with row data
@@ -233,8 +235,8 @@ function Input({ }) {
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
     return `${day}-${month}-${year}`;
   };
 
@@ -253,7 +255,9 @@ function Input({ }) {
       ? parseInt(sessionStorage.getItem("elapsedTime"))
       : 0;
 
-    let startTime = parseInt(sessionStorage.getItem("startTime")) || Date.now() - storedElapsedTime * 1000;
+    let startTime =
+      parseInt(sessionStorage.getItem("startTime")) ||
+      Date.now() - storedElapsedTime * 1000;
 
     sessionStorage.setItem("startTime", startTime);
 
@@ -264,7 +268,10 @@ function Input({ }) {
       sessionStorage.setItem("elapsedTime", elapsedTime);
 
       const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, "0");
-      const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, "0");
+      const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(
+        2,
+        "0",
+      );
       const seconds = String(elapsedTime % 60).padStart(2, "0");
 
       setTimer(`${hours}:${minutes}:${seconds}`);
@@ -274,13 +281,8 @@ function Input({ }) {
         sendAutoMail(); // Call your email function
         sessionStorage.setItem("mailSent", "true"); // Ensure it's only sent once
       }
-
     }, 1000);
   };
-
-
-
-
 
   const sendAutoMail = async () => {
     const userEmail = sessionStorage.getItem("userEmailId");
@@ -312,9 +314,6 @@ function Input({ }) {
     sessionStorage.removeItem("startTime");
   };
 
-
-
-
   const handleTime = async () => {
     try {
       const route = isCheckedIn ? "/DailyLogOUT" : "/DailyLogin";
@@ -324,7 +323,7 @@ function Input({ }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userID: sessionStorage.getItem('selectedUserCode'),
+          userID: sessionStorage.getItem("selectedUserCode"),
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
@@ -363,7 +362,10 @@ function Input({ }) {
     if (sessionStorage.getItem("elapsedTime")) {
       const storedTime = parseInt(sessionStorage.getItem("elapsedTime"));
       const hours = String(Math.floor(storedTime / 3600)).padStart(2, "0");
-      const minutes = String(Math.floor((storedTime % 3600) / 60)).padStart(2, "0");
+      const minutes = String(Math.floor((storedTime % 3600) / 60)).padStart(
+        2,
+        "0",
+      );
       const seconds = String(storedTime % 60).padStart(2, "0");
       setTimer(`${hours}:${minutes}:${seconds}`);
     }
@@ -392,36 +394,36 @@ function Input({ }) {
       headerName: "S.No",
       field: "SNo",
       valueGetter: "node.rowIndex + 1",
-      maxWidth: 70
+      maxWidth: 70,
     },
     {
       headerName: "Project ID",
       field: "ProjectID",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
     },
     {
       headerName: "Project Name",
       field: "ProjectName",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Title",
       field: "TaskTitle",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
     },
     {
       headerName: "Start Date",
       field: "StartDate",
-      filter: 'agDateColumnFilter',
+      filter: "agDateColumnFilter",
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
+          const cellDate = new Date(cellValue.split("/").join("-"));
           if (cellDate < filterLocalDateAtMidnight) {
             return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
@@ -434,11 +436,11 @@ function Input({ }) {
     {
       headerName: "End Date",
       field: "EndDate",
-      filter: 'agDateColumnFilter',
+      filter: "agDateColumnFilter",
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
+          const cellDate = new Date(cellValue.split("/").join("-"));
           if (cellDate < filterLocalDateAtMidnight) {
             return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
@@ -451,27 +453,27 @@ function Input({ }) {
     {
       headerName: "User ID",
       field: "userID",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
     },
     {
       headerName: "User Name",
       field: "userName",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Status",
       field: "TaskStatus",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
     },
     {
       headerName: "Priority Level",
       field: "PriorityLevel",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
     },
     {
       headerName: "Description",
       field: "Description",
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
     },
     {
       headerName: "Links",
@@ -500,7 +502,7 @@ function Input({ }) {
       //     </button>
       //   );
       // },
-    }
+    },
   ];
 
   useEffect(() => {
@@ -509,7 +511,6 @@ function Input({ }) {
       .then((val) => setUserDrop(val));
   }, []);
 
-
   // useEffect(() => {
   //   // const company_code = sessionStorage.getItem('selectedCompanyCode');
   //   fetch(`${config.apiBaseUrl}/getTaskUserID`, {
@@ -517,7 +518,7 @@ function Input({ }) {
   //     headers: {
   //       'Content-Type': 'application/json',
   //     },
-  //     body: JSON.stringify({  
+  //     body: JSON.stringify({
   //        company_code: sessionStorage.getItem("selectedCompanyCode"), })
   //   })
 
@@ -527,100 +528,108 @@ function Input({ }) {
   //     }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getPriority`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setPriorityDrop(val));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getTaskstatus`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setStatusDrop(val));
   }, []);
 
-  const company_code = sessionStorage.getItem("selectedCompanyCode")
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
   useEffect(() => {
     if (!company_code) return; // Only run if company_code exists
 
     fetch(`${config.apiBaseUrl}/getProjectDrop`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
         setProjectDrop(data);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleChangeproject = async (selectedProject) => {
     setSelectedproject(selectedProject);
-    setprojectID(selectedProject ? selectedProject.value : '');
-  }
-
+    setprojectID(selectedProject ? selectedProject.value : "");
+  };
 
   const handleChangeUser = async (selectedUser) => {
     setSelectedUser(selectedUser);
-    setUser(selectedUser ? selectedUser.value : '');
+    setUser(selectedUser ? selectedUser.value : "");
   };
 
   const handleChangeStatus = (selectedstatus) => {
     setSelectedStatus(selectedstatus);
-    setStatus(selectedstatus ? selectedstatus.value : '');
+    setStatus(selectedstatus ? selectedstatus.value : "");
   };
 
   const handleChangePriority = (selectedPriorty) => {
     setSelectedPriority(selectedPriorty);
-    setPriority(selectedPriorty ? selectedPriorty.value : '');
+    setPriority(selectedPriorty ? selectedPriorty.value : "");
   };
 
-  const filteredOptionPriority = [{ value: 'All', label: 'All' }, ...priorityDrop.map(option => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }))];
+  const filteredOptionPriority = [
+    { value: "All", label: "All" },
+    ...priorityDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    })),
+  ];
 
   const filteredOptionproject = Array.isArray(projectDrop)
     ? projectDrop.map((option) => ({
-      value: option.ProjectID,
-      label: `${option.ProjectID} - ${option.ProjectName}`
-    }))
+        value: option.ProjectID,
+        label: `${option.ProjectID} - ${option.ProjectName}`,
+      }))
     : [];
 
-  const filteredOptionUser = [{ value: 'All', label: 'All' }, ...(
-    Array.isArray(userDrop) ? userDrop.map(option => ({
-      value: option.user_code,
-      label: `${option.user_code} - ${option.user_name}`,
-    })) : []
-  )];
+  const filteredOptionUser = [
+    { value: "All", label: "All" },
+    ...(Array.isArray(userDrop)
+      ? userDrop.map((option) => ({
+          value: option.user_code,
+          label: `${option.user_code} - ${option.user_name}`,
+        }))
+      : []),
+  ];
 
-  const filteredOptionStatus = [{ value: 'All', label: 'All' }, ...statusDrop.map(option => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }))];
+  const filteredOptionStatus = [
+    { value: "All", label: "All" },
+    ...statusDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    })),
+  ];
 
   useEffect(() => {
     searchHandler();
   }, []);
 
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       searchHandler();
     }
   };
@@ -658,30 +667,165 @@ function Input({ }) {
     } catch (err) {
       console.error(err);
       toast.error("Error fetching search data:", err);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const handleReload = () => {
-    setUser('');
-    setSelectedUser('');
-    setPriority('');
-    setSelectedPriority('');
-    setEndDate('');
-    setStartDate('');
-    setStatus('');
-    setSelectedStatus('');
-    setTaskTitle('');
+    setUser("");
+    setSelectedUser("");
+    setPriority("");
+    setSelectedPriority("");
+    setEndDate("");
+    setStartDate("");
+    setStatus("");
+    setSelectedStatus("");
+    setTaskTitle("");
     setSearchRowData([]);
-  }
+  };
 
   //Code ended by pavun on 18-06-25
+
+  const getCSSVariable = (variable) => {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(variable)
+    .trim() || "#000000";
+};
+
+  const transformTaskData = (data) => {
+    return data.map((row) => ({
+      "Project ID": row.ProjectID || "",
+      "Project Name": row.ProjectName || "",
+      "Task Master ID": row.TaskMasterID || "",
+      "Task Title": row.TaskTitle || "",
+      "Start Date": row.StartDate || "",
+      "End Date": row.EndDate || "",
+      "User ID": row.userID || "",
+      "Task Status": row.TaskStatus || "",
+      "Priority Level": row.PriorityLevel || "",
+      Description: row.Description || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    const exportData = searchRowData?.length > 0 ? searchRowData : rowData;
+
+    if (!exportData || exportData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Task Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformTaskData(exportData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 25 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Task Report");
+
+    XLSX.writeFile(workbook, "Task_Report.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Open Tickets</h1>
@@ -719,7 +863,10 @@ function Input({ }) {
               </div> */}
         </div>
       </div>
-      <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
         <div class="ag-theme-alpine" style={{ height: 300, width: "100%" }}>
           <AgGridReact
             columnDefs={columnDefs}
@@ -738,8 +885,7 @@ function Input({ }) {
             }}
           />
         </div>
-        <div>
-        </div>
+        <div></div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
@@ -747,7 +893,6 @@ function Input({ }) {
           <h6 className="">Search Criteria :</h6>
         </div>
         <div className="row g-3">
-
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -763,14 +908,17 @@ function Input({ }) {
                 onBlur={() => setIsSelectproject(false)}
                 classNamePrefix="react-select"
                 isClearable
-                required title="Please enter the address"
+                required
+                title="Please enter the address"
                 onChange={handleChangeproject}
                 value={selectedproject}
                 options={filteredOptionproject}
                 maxLength={50}
                 onKeyDown={(e) => e.key === "Enter" && handleKeyPress()}
               />
-              <label for="add1" className="floating-label">Project </label>
+              <label for="add1" className="floating-label">
+                Project{" "}
+              </label>
             </div>
           </div>
 
@@ -787,7 +935,9 @@ function Input({ }) {
                 onChange={(e) => setTaskTitle(e.target.value)}
                 maxLength={100}
               />
-              <label for="add2" className="exp-form-labels">Task Title</label>
+              <label for="add2" className="exp-form-labels">
+                Task Title
+              </label>
             </div>
           </div>
 
@@ -811,7 +961,9 @@ function Input({ }) {
                 onChange={handleChangeStatus}
                 options={filteredOptionStatus}
               />
-              <label for="add3" className="floating-label">Task Status</label>
+              <label for="add3" className="floating-label">
+                Task Status
+              </label>
             </div>
           </div>
 
@@ -836,7 +988,9 @@ function Input({ }) {
                 maxLength={30}
                 onKeyDown={handleKeyPress}
               />
-              <label for="add3" className="floating-label">User </label>
+              <label for="add3" className="floating-label">
+                User{" "}
+              </label>
             </div>
           </div>
 
@@ -851,7 +1005,9 @@ function Input({ }) {
                 onKeyDown={handleKeyPress}
                 onChange={(e) => setStartDate(e.target.value)}
               />
-              <label for="sname" class="exp-form-labels">Start Date</label>
+              <label for="sname" class="exp-form-labels">
+                Start Date
+              </label>
             </div>
           </div>
 
@@ -866,7 +1022,9 @@ function Input({ }) {
                 onKeyDown={handleKeyPress}
                 onChange={(e) => setEndDate(e.target.value)}
               />
-              <label for="sname" class="exp-form-labels">End Date</label>
+              <label for="sname" class="exp-form-labels">
+                End Date
+              </label>
             </div>
           </div>
 
@@ -890,7 +1048,9 @@ function Input({ }) {
                 maxLength={15}
                 onKeyDown={handleKeyPress}
               />
-              <label for="tcode" className="floating-label">Priority Level</label>
+              <label for="tcode" className="floating-label">
+                Priority Level
+              </label>
             </div>
           </div>
 
@@ -906,11 +1066,18 @@ function Input({ }) {
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
           </div>
-
         </div>
-        <div className="ag-theme-alpine mt-3" style={{ height: 300, width: '100%' }}>
+        <div
+          className="ag-theme-alpine mt-3"
+          style={{ height: 300, width: "100%" }}
+        >
           <AgGridReact
             columnDefs={searchColumnDefs}
             rowData={searchRowData}
@@ -926,8 +1093,7 @@ function Input({ }) {
             }}
           />
         </div>
-        <div>
-        </div>
+        <div></div>
       </div>
     </div>
   );

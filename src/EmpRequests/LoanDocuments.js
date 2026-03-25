@@ -197,7 +197,7 @@ function LoanDocuments({}) {
     {
       headerName: "Document Type",
       field: "document_type",
-      editable: true,
+      editable: false,
     },
 
     {
