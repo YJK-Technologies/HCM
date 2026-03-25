@@ -511,7 +511,7 @@ function InterviewSchedule({ }) {
   };
 
   const handleSave = async () => {
-    if (!canditatename || !PanelID || !scheduled_datetime || !endYear) {
+    if (!canditatename || !PanelID || !scheduled_datetime || !endYear || !timezone || !InterviewMode || !location) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;

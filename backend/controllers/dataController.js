@@ -40290,10 +40290,10 @@ const Shift_MasterInsert = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "interview_schedule insertd successfully",
+      message: "Shift Master Insert insertd successfully",
     });
   } catch (err) {
-    console.error("Error during interview_schedule insert:", err);
+    console.error("Error during Shift Master Insert insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
@@ -40352,7 +40352,7 @@ const getShiftsearchdata = async (req, res) => {
 const sp_Shift_MasterLoopUpdate = async (req, res) => {
   const sp_Shift_MasterData = req.body.sp_Shift_MasterData;
   if (!sp_Shift_MasterData || !sp_Shift_MasterData.length) {
-    return res.status(400).json("Invalid or empty sp_Shift_MasterData array.");
+    return res.status(400).json("Invalid or empty sp Shift MasterData array.");
   }
   try {
     const pool = await sql.connect(dbConfig);
@@ -40377,9 +40377,9 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
           `EXEC sp_Shift_Master @mode, @Shift_Code, @Shift_Name, @Start_Time, @End_Time, @Shift_Hours, @Is_Night_Shift, @Grace_In_Min, @Grace_Out_Min, @Cross_Midnight, @Status, @keyfield, @company_code, '','', @modified_by,''`,
         );
     }
-    res.status(200).json("Shift_Master data updated successfully");
+    res.status(200).json("Shift Master data updated successfully");
   } catch (err) {
-    console.error("Error in Shift_MasterLoopUpdate:", err);
+    console.error("Error in Shift Master Loop Update:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
@@ -40388,7 +40388,7 @@ const sp_Shift_MasterLoopUpdate = async (req, res) => {
 const sp_Shift_MasterLoopDelete = async (req, res) => {
   const sp_Shift_MasterData = req.body.sp_Shift_MasterData;
   if (!sp_Shift_MasterData || !sp_Shift_MasterData.length) {
-    return res.status(400).json("Invalid or empty sp_Shift_MasterData array.");
+    return res.status(400).json("Invalid or empty sp Shift MasterData array.");
   }
 
   try {
@@ -40403,9 +40403,9 @@ const sp_Shift_MasterLoopDelete = async (req, res) => {
           `EXEC sp_Shift_Master @mode, '', '', '', '', 0, '', 0, 0, '', '', @keyfield, @company_code, '', '', '', ''`,
         );
     }
-    res.status(200).json("sp_Shift_Master data deleted successfully");
+    res.status(200).json("sp Shift Master data deleted successfully");
   } catch (err) {
-    console.error("Error in sp_Shift_MasterLoopDelete:", err);
+    console.error("Error in sp Shift Master Loop Delete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
@@ -41589,7 +41589,7 @@ const ShiftMasterDropDown = async (req, res) => {
       res.status(404).json("Data not found"); // 404 Not Found if no data is found
     }
   } catch (err) {
-    console.error("Error during interview_schedule insert:", err);
+    console.error("Error during interview schedule insert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
@@ -46248,7 +46248,7 @@ const GetDocumentsRequestDetails = async (req, res) => {
 };
 // Code ended by Dinesh Gokul 24-03-2026
 
-// Code added by Dinesh on 20-20-26
+// Code added by Dinesh on 20-3-26
 const ApproveDocumentRequest = async (req, res) => {
   const approvalData = req.body.approvalData;
 
@@ -46288,9 +46288,9 @@ const ApproveDocumentRequest = async (req, res) => {
     });
   }
 };
-// Code ended by Dinesh on 24-20-26
+// Code ended by Dinesh on 24-3-26
 
-// Code added by Dinesh Gokul on 24-20-26
+// Code added by Dinesh Gokul on 24-3-26
 const DocumentRequestHdr = async (req, res) => {
   const headerData = req.body.headerData;
 
@@ -46331,7 +46331,196 @@ const DocumentRequestHdr = async (req, res) => {
     });
   }
 };
-// Code ended by Dinesh Gokul on 24-20-26
+// Code ended by Dinesh Gokul on 24-3-26
+
+//code added by mathubala on 25-03-26
+const EmployeeAssetsInsert = async (req, res) => {
+  const { AllocationID, AssetID, EmployeeID, AllocationDate, ExpectedReturnDate,
+    ActualReturnDate, AllocationStatus, ConditionAtIssue, ConditionAtReturn, ApprovedBy,
+    Remarks, company_code, Keyfield, CreatedBy, CreatedDate, modify_by, modify_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("AllocationID", sql.Int, AllocationID)
+      .input("AssetID", sql.Int, AssetID)
+      .input("EmployeeID", sql.Int, EmployeeID)
+      .input("AllocationDate", sql.DateTime, AllocationDate)
+      .input("ExpectedReturnDate", sql.DateTime, ExpectedReturnDate)
+      .input("ActualReturnDate", sql.DateTime, ActualReturnDate)
+      .input("AllocationStatus", sql.NVarChar, AllocationStatus)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("ConditionAtReturn", sql.NVarChar, ConditionAtReturn)
+      .input("ApprovedBy", sql.NVarChar, ApprovedBy)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Keyfield", sql.NVarChar, Keyfield)
+      .input("CreatedBy", sql.NVarChar, CreatedBy)
+      .input("CreatedDate", sql.DateTime, CreatedDate)
+      .input("modify_by", sql.NVarChar, modify_by)
+      .input("modify_date", sql.DateTime, modify_date)
+      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID,
+         @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+
+    res.status(200).json({ success: true, message: "EmployeeAssets insertd successfully" });
+  } catch (err) {
+    console.error("Error during EmployeeAssets insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const EmployeeAssetsUpdate = async (req, res) => {
+  const { AllocationID, AssetID, EmployeeID, AllocationDate, ExpectedReturnDate, ActualReturnDate, AllocationStatus, ConditionAtIssue, ConditionAtReturn, ApprovedBy, Remarks, company_code, Keyfield, CreatedBy, CreatedDate, modify_by, modify_date } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("AllocationID", sql.Int, AllocationID)
+      .input("AssetID", sql.Int, AssetID)
+      .input("EmployeeID", sql.Int, EmployeeID)
+      .input("AllocationDate", sql.DateTime, AllocationDate)
+      .input("ExpectedReturnDate", sql.DateTime, ExpectedReturnDate)
+      .input("ActualReturnDate", sql.DateTime, ActualReturnDate)
+      .input("AllocationStatus", sql.NVarChar, AllocationStatus)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("ConditionAtReturn", sql.NVarChar, ConditionAtReturn)
+      .input("ApprovedBy", sql.NVarChar, ApprovedBy)
+      .input("Remarks", sql.NVarChar, Remarks)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Keyfield", sql.NVarChar, Keyfield)
+      .input("CreatedBy", sql.NVarChar, CreatedBy)
+      .input("CreatedDate", sql.DateTime, CreatedDate)
+      .input("modify_by", sql.NVarChar, modify_by)
+      .input("modify_date", sql.DateTime, modify_date)
+      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+
+    res.status(200).json({ success: true, message: "EmployeeAssets updated successfully" });
+  } catch (err) {
+    console.error("Error during EmployeeAssets update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+const EmployeeAssetsDelete = async (req, res) => {
+  const { AllocationID, company_code, Keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("AllocationID", sql.Int, AllocationID)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Keyfield", sql.NVarChar, Keyfield)
+      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '','', '', '', '', '', @company_code, @Keyfield, '', '', '', ''`);
+
+    res.status(200).json({ success: true, message: "EmployeeAssets deleted successfully" });
+  } catch (err) {
+    console.error("Error during EmployeeAssets delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+// ---------- HEADER LOOP CRUD ----------
+// Auto-generated EmployeeAssetsLoopInsert API for sp_EmployeeAssets
+
+const EmployeeAssetsLoopInsert = async (req, res) => {
+  const EmployeeAssetsData = req.body.EmployeeAssetsData;
+  if (!EmployeeAssetsData || !EmployeeAssetsData.length) {
+    return res.status(400).json("Invalid or empty EmployeeAssetsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of EmployeeAssetsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "I")
+        .input("AllocationID", sql.Int, item.AllocationID)
+        .input("AssetID", sql.Int, item.AssetID)
+        .input("EmployeeID", sql.Int, item.EmployeeID)
+        .input("AllocationDate", sql.DateTime, item.AllocationDate)
+        .input("ExpectedReturnDate", sql.DateTime, item.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.DateTime, item.ActualReturnDate)
+        .input("AllocationStatus", sql.NVarChar, item.AllocationStatus)
+        .input("ConditionAtIssue", sql.NVarChar, item.ConditionAtIssue)
+        .input("ConditionAtReturn", sql.NVarChar, item.ConditionAtReturn)
+        .input("ApprovedBy", sql.NVarChar, item.ApprovedBy)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Keyfield", sql.NVarChar, item.Keyfield)
+        .input("CreatedBy", sql.NVarChar, item.CreatedBy)
+        .input("CreatedDate", sql.DateTime, item.CreatedDate)
+        .input("modify_by", sql.NVarChar, item.modify_by)
+        .input("modify_date", sql.DateTime, item.modify_date)
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+    }
+    res.status(200).json("EmployeeAssets data inserted successfully");
+  } catch (err) {
+    console.error("Error in EmployeeAssetsLoopInsert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const EmployeeAssetsLoopUpdate = async (req, res) => {
+  const EmployeeAssetsData = req.body.EmployeeAssetsData;
+  if (!EmployeeAssetsData || !EmployeeAssetsData.length) {
+    return res.status(400).json("Invalid or empty EmployeeAssetsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of EmployeeAssetsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("AllocationID", sql.Int, item.AllocationID)
+        .input("AssetID", sql.Int, item.AssetID)
+        .input("EmployeeID", sql.Int, item.EmployeeID)
+        .input("AllocationDate", sql.DateTime, item.AllocationDate)
+        .input("ExpectedReturnDate", sql.DateTime, item.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.DateTime, item.ActualReturnDate)
+        .input("AllocationStatus", sql.NVarChar, item.AllocationStatus)
+        .input("ConditionAtIssue", sql.NVarChar, item.ConditionAtIssue)
+        .input("ConditionAtReturn", sql.NVarChar, item.ConditionAtReturn)
+        .input("ApprovedBy", sql.NVarChar, item.ApprovedBy)
+        .input("Remarks", sql.NVarChar, item.Remarks)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Keyfield", sql.NVarChar, item.Keyfield)
+        .input("CreatedBy", sql.NVarChar, item.CreatedBy)
+        .input("CreatedDate", sql.DateTime, item.CreatedDate)
+        .input("modify_by", sql.NVarChar, item.modify_by)
+        .input("modify_date", sql.DateTime, item.modify_date)
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+    }
+    res.status(200).json("EmployeeAssets data updated successfully");
+  } catch (err) {
+    console.error("Error in EmployeeAssetsLoopUpdate:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const EmployeeAssetsLoopDelete = async (req, res) => {
+  const EmployeeAssetsData = req.body.EmployeeAssetsData;
+  if (!EmployeeAssetsData || !EmployeeAssetsData.length) {
+    return res.status(400).json("Invalid or empty EmployeeAssetsData array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    for (const item of EmployeeAssetsData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "D")
+        .input("AllocationID", sql.Int, item.AllocationID)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("Keyfield", sql.NVarChar, item.Keyfield)
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', ''`);
+    }
+    res.status(200).json("EmployeeAssets data deleted successfully");
+  } catch (err) {
+    console.error("Error in EmployeeAssetsLoopDelete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by mathubala 25-3-26
 
 module.exports = {
   login,
@@ -47657,5 +47846,11 @@ module.exports = {
   DocumentRequestDetails,
   GetDocumentsRequestDetails,
   ApproveDocumentRequest,
-  DocumentRequestHdr
+  DocumentRequestHdr,
+  EmployeeAssetsInsert,
+  EmployeeAssetsUpdate,
+  EmployeeAssetsDelete,
+  EmployeeAssetsLoopInsert,
+  EmployeeAssetsLoopUpdate,
+  EmployeeAssetsLoopDelete
 };
