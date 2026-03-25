@@ -672,7 +672,8 @@ const savePersonalDetails = async (info_request_id) => {
   }, []);
 
   const handleRemoveLogo = () => {
-    setSelectedImage(null);
+    setSelectedImage(null); 
+    setuser_image('')
     if (logo.current) {
       logo.current.value = "";
     }
@@ -810,14 +811,20 @@ const savePersonalDetails = async (info_request_id) => {
         setPassportExpiryDate(formatDate(Passport_Expiry_Date));
         setOtherIdNo(Other_Id_No);
 
-        const imageBlob = new Blob([new Uint8Array(Photos.data)], {
-          type: "image/jpeg",
-        });
-
-        setuser_image(imageBlob);
-
-        const imageUrl = URL.createObjectURL(imageBlob);
-        setSelectedImage(imageUrl);
+        if (Photos && Photos.data) {
+          const imageBlob = new Blob([new Uint8Array(Photos.data)], {
+            type: "image/jpeg",
+          });
+        
+          setuser_image(imageBlob);
+        
+          const imageUrl = URL.createObjectURL(imageBlob);
+          setSelectedImage(imageUrl);
+        } else {
+          // 🔥 No photo case (remove / empty)
+          setuser_image(null);
+          setSelectedImage(null);
+        }
 
         setPan_No(Pan_No);
 

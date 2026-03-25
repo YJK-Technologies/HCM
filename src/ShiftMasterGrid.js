@@ -429,7 +429,7 @@ function ShiftMasterGrid() {
     {
       headerName: "Shift Code",
       field: "Shift_Code",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Shift Name",

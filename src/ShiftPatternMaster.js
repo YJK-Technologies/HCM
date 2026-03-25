@@ -246,7 +246,7 @@ function ShiftPatternMaster() {
     {
       headerName: "Shift Pattern Code",
       field: "Pattern_Code",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Pattern Name",

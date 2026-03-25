@@ -1355,5 +1355,11 @@ router.post("/DocumentRequestDetails",dataController.DocumentRequestDetails)
 router.post("/GetDocumentsRequestDetails",dataController.GetDocumentsRequestDetails)
 router.post("/ApproveDocumentRequest",dataController.ApproveDocumentRequest)
 router.post("/DocumentRequestHdr",dataController.DocumentRequestHdr)
+router.post("/EmployeeAssetsInsert", dataController.EmployeeAssetsInsert)
+router.post("/EmployeeAssetsUpdate", dataController.EmployeeAssetsUpdate)
+router.post("/EmployeeAssetsDelete", dataController.EmployeeAssetsDelete)
+router.post("/EmployeeAssetsLoopInsert", dataController.EmployeeAssetsLoopInsert)
+router.post("/EmployeeAssetsLoopUpdate", dataController.EmployeeAssetsLoopUpdate)
+router.post("/EmployeeAssetsLoopDelete", dataController.EmployeeAssetsLoopDelete)
 
 module.exports = router;

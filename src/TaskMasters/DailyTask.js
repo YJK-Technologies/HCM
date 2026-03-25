@@ -449,7 +449,7 @@ function Input({ }) {
       editable: true   // Format the date for display  
     },
     {
-      headerName: "Daily Task Title",
+      headerName: " Task Title",
       field: "TaskTitle",
       filter: 'agDateColumnFilter',
       //  minWidth: 170,
@@ -1169,7 +1169,7 @@ function Input({ }) {
               <input
                 id="EndDate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=" "
                 autoComplete="off"
                 value={Endtime}
@@ -1187,7 +1187,7 @@ function Input({ }) {
               <input
                 id="EndDate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=" "
                 autoComplete="off"
                 value={buffer}
