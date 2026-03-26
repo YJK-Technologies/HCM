@@ -400,12 +400,12 @@ function Input({ }) {
   };
 
   const handleSave = async () => {
-    setLoading(true);
     if (!user || !project) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
     }
+    setLoading(true);
     try {
       const Header = {
         ProjectID: project,
@@ -442,8 +442,8 @@ function Input({ }) {
   };
 
   const handleSearch = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const body = {
         ProjectID: projectSc,
         ProjectName: Projectname,
@@ -501,8 +501,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to Update the data in the selected rows?",
       async () => {
+        setLoading(true);
         try {
-          setLoading(true);
           const modified_by = sessionStorage.getItem('selectedUserCode');
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
           const response = await fetch(`${config.apiBaseUrl}/updateProjectMapping`, {
@@ -525,6 +525,8 @@ function Input({ }) {
         } catch (error) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
+        } finally {
+          setLoading(false);
         }
       },
       () => {
@@ -537,8 +539,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
+        setLoading(true);
         try {
-          setLoading(true);
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
           const response = await fetch(`${config.apiBaseUrl}/deleteProjectMapping`, {
             method: "POST",
@@ -559,6 +561,8 @@ function Input({ }) {
         } catch (error) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
+        } finally {
+          setLoading(false);
         }
       },
       () => {
