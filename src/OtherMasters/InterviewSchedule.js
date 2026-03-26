@@ -563,6 +563,7 @@ function InterviewSchedule({ }) {
         panel_id: PanelIDSC,
         department_id: department_idSC,
         Interview_Mode: InterviewModeSC,
+        location:locationSC,
         Status: statusSC,
         fromDate: fromDate,
         toDate: toDate,
