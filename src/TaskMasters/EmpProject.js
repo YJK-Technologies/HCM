@@ -430,8 +430,8 @@ function Project({ }) {
   // };
 
   const handleSave = async (e) => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (!ProjectName || !ProjectManager || !ProjectDescription || !StartDate || !EndDate || !PriorityLevel || !status_type || !EstimatedHours) {
         setError(" ");
         toast.warning("Error:Missing Required Fields")
@@ -480,7 +480,7 @@ function Project({ }) {
 
     } catch (error) {
       toast.error("Error inserting data: " + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -489,9 +489,8 @@ function Project({ }) {
         showConfirmationToast(
       "Are you sure you want to Update the data in the selected rows?",
       async () => {
-
-    try {
       setLoading(true);
+    try {
       const modified_by = sessionStorage.getItem('selectedUserCode');
       const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.ProjectID === row.ProjectID) : [editedData];
       console.log(selectedRowsData)
@@ -513,11 +512,13 @@ function Project({ }) {
         return;
       } else {
         const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
+        toast.warning(errorResponse.message || "Failed to Updated selected data");
       }
     } catch (error) {
       console.error("Error saving data:", error);
       toast.error("Error Updating Data: " + error.message);
+    } finally {
+      setLoading(false);
     }
       },
       () => {
@@ -532,8 +533,8 @@ function Project({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
+      setLoading(true);
         try {
-          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteProject`, {
             method: "POST",
             headers: {
@@ -554,6 +555,8 @@ function Project({ }) {
         } catch (error) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
       },
       () => {

@@ -450,7 +450,7 @@ function InterviewDecision({ }) {
   };
 
   const handleSave = async () => {
-    if (!canditatename || !JobID || !decided_by || !endYear) {
+    if (!canditatename || !JobID || !decided_by || !endYear || !decided_on || !remarks ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -984,7 +984,7 @@ function InterviewDecision({ }) {
                 value={decided_on}
                 onChange={(e) => setdecided_on((e.target.value))}
               />
-              <label for="sname" className="exp-form-labels">Decided On</label>
+              <label for="sname" className={`exp-form-labels ${error && !decided_on ? 'text-danger' : ''}`}>Decided On<span className="text-danger">*</span></label>
             </div>
           </div>
         </div>
