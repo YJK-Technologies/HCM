@@ -57,21 +57,24 @@ function EmpDocumentReq({ }) {
   };
 
   const AcademicDet = () => {
-    navigate("/AcademicDetReq", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AcademicDetReq");
   };
 
   const Insurance1 = () => {
-    navigate("/EmpFamPersonalDetail", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/EmpFamPersonalDetail");
   };
 
   const Documents = () => {
-    navigate("/EmpDocumentReq", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/EmpDocumentReq");
   };
 
   const EmployeeLoan = () => {
-    navigate("/ManualEmployeeInfo", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/ManualEmployeeInfo");
   };
 
+  const EmployeeAssets = () => {
+    navigate("/EmpAssetsRequest");
+  };
 
   const [activeTab, setActiveTab] = useState('Documents');
   const handleTabClick = (tabLabel) => {
@@ -90,7 +93,11 @@ function EmpDocumentReq({ }) {
         case 'Documents':
           Documents();
           break;
-      default:
+      case "Assets":
+        EmployeeAssets();
+        break;
+
+          default:
         break;
     }
   };
@@ -99,7 +106,8 @@ function EmpDocumentReq({ }) {
     { label: 'Personal Details' },
     { label: 'Family' },
     { label: 'Academic Details' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: "Assets" },
   ];
 
   const convertToBase64 = (file) => {
