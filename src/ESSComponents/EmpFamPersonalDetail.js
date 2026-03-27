@@ -91,8 +91,9 @@ if(relativedrop.length > 0 &&
     navigate("/EmpDocumentReq");
   };
 
-
-
+  const EmployeeAssets = () => {
+    navigate("/EmpAssetsRequest");
+  };
 
   const addRow = (relation) => {
     setFamilyMembers((prev) =>
@@ -152,6 +153,8 @@ if(relativedrop.length > 0 &&
       case 'Documents':
         Documents();
         break;
+      case "Assets":
+        EmployeeAssets();
       default:
         break;
     }
@@ -161,7 +164,8 @@ if(relativedrop.length > 0 &&
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: "Assets" },
   ];
 
 const handleSave = async () => {

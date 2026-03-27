@@ -123,6 +123,7 @@ import AcademicDetReq from "./ESSComponents/AcademicDetailsRequest.js"
 import LeaveRequest from "./EmpRequests/LeaveRequest.js"
 import RequestReport from "./ESSDashboard/RequestReport.js"
 import EmpDocumentReq from "./ESSComponents/EmpDocumentReq.js"
+import EmpAssetsRequest from "./ESSComponents/EmpAssetsRequest.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -322,6 +323,7 @@ function Main() {
     { path: "/AcademicDetReq", component: <AcademicDetReq /> },
     { path: "/RequestReport", component: <RequestReport /> },
     { path: "/EmpDocumentReq", component: <EmpDocumentReq /> },
+    { path: "/EmpAssetsRequest", component: <EmpAssetsRequest /> },
 
   
   ];

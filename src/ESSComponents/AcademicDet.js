@@ -100,6 +100,7 @@ function Input({}) {
 
   const handleSave = async () => {
     if (!EmployeeId) {
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
