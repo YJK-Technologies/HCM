@@ -348,6 +348,10 @@ const savePersonalDetails = async (info_request_id) => {
     navigate("/ManualEmployeeInfo");
   };
 
+  const EmployeeAssets = () => {
+    navigate("/EmpAssetsRequest");
+  };
+
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
@@ -364,6 +368,9 @@ const savePersonalDetails = async (info_request_id) => {
         case 'Documents':
           Documents();
           break;
+      case "Assets":
+        EmployeeAssets();
+        break;
       default:
         break;
     }
@@ -374,7 +381,9 @@ const savePersonalDetails = async (info_request_id) => {
     // { label: 'Academic Details' },
     { label: 'Family' },
     { label: 'Academic Details' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: "Assets" },
+
   ];
 
   const handleGradeID = (selectedgradeid) => {

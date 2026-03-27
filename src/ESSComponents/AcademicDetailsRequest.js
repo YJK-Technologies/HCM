@@ -520,7 +520,9 @@ const convertToBase64 = (file) => {
     const Documents = () => {
     navigate("/EmpDocumentReq");
   };
-
+  const EmployeeAssets = () => {
+    navigate("/EmpAssetsRequest");
+  };
 
   const [activeTab, setActiveTab] = useState("Academic Details");
   const handleTabClick = (tabLabel) => {
@@ -539,7 +541,10 @@ const convertToBase64 = (file) => {
       case 'Documents':
         Documents();
         break;
-      default:
+      case "Assets":
+        EmployeeAssets();
+        break;
+        default:
         break;
     }
   };
@@ -548,8 +553,8 @@ const convertToBase64 = (file) => {
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
-    { label: 'Documents' }
-
+    { label: 'Documents' },
+    { label: "Assets" },
   ];
 
   const reloadGridData = () => {
