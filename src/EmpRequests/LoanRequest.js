@@ -91,19 +91,19 @@ function LoanRequest({ }) {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setLoanTypeIdDrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    // useEffect(() => {
+    //     const company_code = sessionStorage.getItem('selectedCompanyCode');
+    //     fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({ company_code })
+    //     })
+    //         .then((data) => data.json())
+    //         .then((val) => setLoanTypeIdDrop(val))
+    //         .catch((error) => console.error('Error fetching data:', error));
+    // }, []);
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -134,6 +134,21 @@ function LoanRequest({ }) {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
+    useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, { // match backend route name
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Company_Code }),
+    })
+        .then((res) => res.json())
+        .then((data) => setLoanTypeIdDrop(data))
+        .catch((error) => console.error("Error fetching loan types:", error));
+}, []);
+
     const filteredOptionEmpId = Array.isArray(empIdDrop)
         ? empIdDrop.map((option) => ({
             value: option?.EmployeeId,
@@ -141,10 +156,17 @@ function LoanRequest({ }) {
         }))
         : [];
 
+    // const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
+    //     ? loanTypeIdDrop.map((option) => ({
+    //         value: option?.attributedetails_name,
+    //         label: option?.attributedetails_name,
+    //     }))
+    //     : [];
+
     const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
         ? loanTypeIdDrop.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
+            value: option.Loan_Type_ID,
+            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
         }))
         : [];
 
@@ -199,7 +221,7 @@ function LoanRequest({ }) {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+        fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -249,8 +271,8 @@ function LoanRequest({ }) {
 
     const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
         ? loanTypeIdDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
+            value: option.Loan_Type_ID,
+            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
         }))
         : [];
 
@@ -313,20 +335,25 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLoanTypes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
+      const Company_Code = sessionStorage.getItem('selectedCompanyCode');
+    
+      fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Company_Code })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const loanTypeOptions = data.map((option) => ({
+            value: option.Loan_Type_ID,           // adjust based on your DB column
+            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
+          }));
+      
+          setLoanTypeIdDropGrid(loanTypeOptions);
         })
-            .then((data) => data.json())
-            .then((val) => {
-                const visaType = val.map(option => option.attributedetails_name);
-                setLoanTypeIdDropGrid(visaType);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
+        .catch((error) => console.error('Error fetching loan types:', error));
     }, []);
 
     useEffect(() => {
@@ -449,9 +476,16 @@ function LoanRequest({ }) {
             editable: true,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
+            // cellEditorParams: {
+            //     values: loanTypeIdDropGrid,
+            // },
             cellEditorParams: {
-                values: loanTypeIdDropGrid,
-            },
+            values: loanTypeIdDropGrid.map(d => d.value),
+          },
+          valueFormatter: (params) => {
+            const dept = loanTypeIdDropGrid.find(d => d.value === params.value);
+            return dept ? dept.label : params.value;
+      },
         },
         {
             headerName: "Loan Amount",
