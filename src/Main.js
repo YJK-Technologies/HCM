@@ -124,6 +124,7 @@ import LeaveRequest from "./EmpRequests/LeaveRequest.js"
 import RequestReport from "./ESSDashboard/RequestReport.js"
 import EmpDocumentReq from "./ESSComponents/EmpDocumentReq.js"
 import EmpAssetsRequest from "./ESSComponents/EmpAssetsRequest.js"
+import LoanSummaryReports from "./LoanSummaryReports.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -324,6 +325,7 @@ function Main() {
     { path: "/RequestReport", component: <RequestReport /> },
     { path: "/EmpDocumentReq", component: <EmpDocumentReq /> },
     { path: "/EmpAssetsRequest", component: <EmpAssetsRequest /> },
+    { path: "/LoanSummaryReports", component: <LoanSummaryReports /> },
 
   
   ];
