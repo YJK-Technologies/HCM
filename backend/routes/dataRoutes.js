@@ -1362,5 +1362,7 @@ router.post("/EmployeeAssetsLoopInsert", dataController.EmployeeAssetsLoopInsert
 router.post("/EmployeeAssetsLoopUpdate", dataController.EmployeeAssetsLoopUpdate)
 router.post("/EmployeeAssetsLoopDelete", dataController.EmployeeAssetsLoopDelete)
 router.post("/LoanTypeIdDropDown",dataController.LoanTypeIdDropDown)
+router.post("/GetLoanSummaryReport",dataController.GetLoanSummaryReport)
+router.post("/GetPendingApprovalsReport",dataController.GetPendingApprovalsReport)
 
 module.exports = router;
