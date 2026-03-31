@@ -125,6 +125,8 @@ import RequestReport from "./ESSDashboard/RequestReport.js"
 import EmpDocumentReq from "./ESSComponents/EmpDocumentReq.js"
 import EmpAssetsRequest from "./ESSComponents/EmpAssetsRequest.js"
 import LoanSummaryReports from "./LoanSummaryReports.js"
+import PendingApprovalsReport from "./PendingApprovalsReport.js"
+import LoanDisbursementRepo from "./LoanDisbursementReport.js"
 
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
@@ -326,6 +328,8 @@ function Main() {
     { path: "/EmpDocumentReq", component: <EmpDocumentReq /> },
     { path: "/EmpAssetsRequest", component: <EmpAssetsRequest /> },
     { path: "/LoanSummaryReports", component: <LoanSummaryReports /> },
+    { path: "/PendingApprovalsRepo", component: <PendingApprovalsReport /> },
+    { path: "/LoanDisbursementRepo", component: <LoanDisbursementRepo /> },
 
   
   ];
