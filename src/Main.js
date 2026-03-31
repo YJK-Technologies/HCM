@@ -127,7 +127,9 @@ import EmpAssetsRequest from "./ESSComponents/EmpAssetsRequest.js"
 import LoanSummaryReports from "./LoanSummaryReports.js"
 import PendingApprovalsReport from "./PendingApprovalsReport.js"
 import LoanDisbursementRepo from "./LoanDisbursementReport.js"
-
+import OverdueLoansReport from "./OverdueLoansReport.js"
+import RepaymentScheduleReport from "./RepaymentScheduleReport.js"
+import EmployeeAssets from './ESSComponents/EmployeeAssets.js';
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
@@ -330,6 +332,9 @@ function Main() {
     { path: "/LoanSummaryReports", component: <LoanSummaryReports /> },
     { path: "/PendingApprovalsRepo", component: <PendingApprovalsReport /> },
     { path: "/LoanDisbursementRepo", component: <LoanDisbursementRepo /> },
+    { path: "/OverdueLoansReport", component: <OverdueLoansReport /> },
+    { path: "/RepaymentScheduleR", component: <RepaymentScheduleReport /> },
+    { path: "/EmployeeAssets", component: <EmployeeAssets /> }
 
   
   ];
