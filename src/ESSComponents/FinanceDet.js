@@ -113,6 +113,10 @@ function Input({ }) {
     navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
 
+  const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  };
+
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
@@ -146,6 +150,10 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
+case 'EmployeeAssets':
+        EmployeeAssets();
+        break;
+
       default:
         break;
     }
@@ -159,7 +167,8 @@ function Input({ }) {
     { label: 'Identity Documents' },
     { label: 'Academic Details' },
     { label: 'Family' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: 'EmployeeAssets' }
   ];
 
   useEffect(() => {
