@@ -46548,6 +46548,119 @@ const LoanTypeIdDropDown = async (req, res) => {
 };
 //code ended by sakthi 28-03-26
 
+//code added by sakthi 30-03-26
+const GetLoanSummaryReport = async (req, res) => {
+  const {
+    company_code,
+    request_number,
+    EmployeeId,
+    First_Name,
+    Last_Name,
+    Loan_Type_Name,
+    loan_amount,
+    repayment_months,
+    monthly_installment,
+    request_status,
+    from_date,
+    to_date,
+  } = req.body;
+
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("request_number", sql.NVarChar, request_number || "")
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("First_Name", sql.NVarChar, First_Name || "")
+      .input("Last_Name", sql.NVarChar, Last_Name || "")
+      .input("Loan_Type_Name", sql.NVarChar, Loan_Type_Name || "")
+      .input("request_status", sql.NVarChar, request_status || "")
+      .input("loan_amount", sql.Decimal(10, 2), loan_amount ? Number(loan_amount) : 0)
+      .input("repayment_months", sql.Int, repayment_months ? Number(repayment_months) : 0)
+      .input("monthly_installment", sql.Decimal(10, 2), monthly_installment ? Number(monthly_installment) : 0)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_Loan_Summary_Report @mode, @request_number, @EmployeeId, @First_Name, @Last_Name, @Loan_Type_Name, @loan_amount, @repayment_months, @monthly_installment, 
+        @request_status, @from_date, @to_date, @company_code, '', '', '', '', '' `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Summary Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by sakthi 30-03-26
+
+//code added by sakthi 30-03-26
+const GetPendingApprovalsReport = async (req, res) => {
+  const {
+    company_code,
+    request_number,
+    EmployeeId,
+    First_Name,
+    Last_Name,
+    Loan_Type_Name,
+    approval_level,
+    approval_status,
+    approval_date,
+    from_date,
+    to_date,
+  } = req.body;
+
+  // Mandatory check
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("request_number", sql.NVarChar, request_number || "")
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("First_Name", sql.NVarChar, First_Name || "")
+      .input("Last_Name", sql.NVarChar, Last_Name || "")
+      .input("Loan_Type_Name", sql.NVarChar, Loan_Type_Name || "")
+      .input("approval_level", sql.Int, approval_level ? Number(approval_level) : 0)
+      .input("approval_status", sql.NVarChar, approval_status || "")
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_Pending_Approvals_Report @mode, @request_number, @EmployeeId, @First_Name, @Last_Name, @Loan_Type_Name, @approval_level, 
+          @approval_status, '', @from_date, @to_date, @company_code, '', '', '', '', ''`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Pending Approvals Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by sakthi 30-03-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -47879,5 +47992,7 @@ module.exports = {
   EmployeeAssetsLoopInsert,
   EmployeeAssetsLoopUpdate,
   EmployeeAssetsLoopDelete,
-  LoanTypeIdDropDown
+  LoanTypeIdDropDown,
+  GetLoanSummaryReport,
+  GetPendingApprovalsReport
 };

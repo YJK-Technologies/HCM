@@ -15,7 +15,7 @@ import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
-function LoanSummaryReports() {
+function LoanDisbursementRepo() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,8 @@ function LoanSummaryReports() {
   const [EmployeeID, setEmployeeID] = useState("");
   const [First_Name, setFirst_Name] = useState("");
   const [Last_Name, setLast_Name] = useState("");
-  const [loan_amount, setloan_amount] = useState("");
+  const [approval_level, setapproval_level] = useState("");
+  const [approval_date, setapproval_date] = useState("");
   const [repayment_months, setrepayment_months] = useState("");
   const [monthly_installment, setmonthly_installment] = useState("");
   const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState("");
@@ -40,6 +41,11 @@ function LoanSummaryReports() {
   const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
   const [reqStatusSc, setReqStatusSc] = useState('');
   const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+  const [selectedStatusSC, setselectedStatusSC] = useState("");
+  const [statusDropSC, setstatusDropSC] = useState([]);
+  const [statusDropAG, setstatusDropAG] = useState([]);
+  const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
+  const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -121,60 +127,106 @@ function LoanSummaryReports() {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
-  const handleSearch = async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/GetLoanSummaryReport`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-
-            // Text filters
-            request_number: requestNumber?.trim() || "",
-            EmployeeId: EmployeeID?.trim() || "",
-            First_Name: First_Name?.trim() || "",
-            Last_Name: Last_Name?.trim() || "",
-            Loan_Type_Name: loanTypeNameSc?.trim() || "",
-            request_status: reqStatusSc || "",
-
-            // Numeric filters
-            loan_amount: loan_amount ? Number(loan_amount) : 0,
-            repayment_months: repayment_months ? Number(repayment_months) : 0,
-            monthly_installment: monthly_installment
-              ? Number(monthly_installment)
-              : 0,
-
-            // Date filters
-            from_date: FromDate || null,
-            to_date: ToDate || null,
-          }),
-        },
-      );
-
-      if (response.ok) {
-        const searchData = await response.json();
-        setRowData(searchData);
-        console.log("Loan summary fetched successfully");
-      } else if (response.status === 404) {
-        toast.warning("Data not found");
-        setRowData([]);
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Search failed");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Error fetching data: " + error.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleStatusSC = (SelectedStatus) => {
+    setselectedStatusSC(SelectedStatus);
+    setApprovalStatusSC(SelectedStatus ? SelectedStatus.value : "");
   };
+
+  const filterOptionStatusSC = Array.isArray(statusDropSC)
+    ? statusDropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+      }))
+    : [];
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setstatusDropSC(val));
+  }, []);
+
+    const filterOptionStatusAG = Array.isArray(statusDropAG)
+    ? statusDropAG.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+      }))
+    : [];
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const emp = val.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setstatusDropAG(emp);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+const handleSearch = async () => {
+  setLoading(true);
+
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/GetPendingApprovalsReport`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+          request_number: requestNumber?.trim() || "",
+          EmployeeId: EmployeeID?.trim() || "",
+          First_Name: First_Name?.trim() || "",
+          Last_Name: Last_Name?.trim() || "",
+          Loan_Type_Name: loanTypeNameSc?.trim() || "",
+          approval_level: approval_level ? Number(approval_level) : 0,
+          approval_status: ApprovalStatusSC || "",
+        //   approval_date: approval_date || null,
+          from_date: FromDate || "",
+          to_date: ToDate || "",
+        }),
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      setRowData(data);
+      console.log("Pending approvals fetched successfully");
+    } else if (response.status === 404) {
+      toast.warning("Data not found");
+      setRowData([]);
+    } else {
+      const errorResponse = await response.json();
+      toast.warning(errorResponse.message || "Search failed");
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    toast.error("Error fetching data: " + error.message);
+  } finally {
+    setLoading(false);
+  }
+};  
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -199,12 +251,12 @@ function LoanSummaryReports() {
     },
     {
       headerName: "First Name",
-      field: "First_Name",
+      field: "first_name",
       editable: false,
     },
     {
       headerName: "Last Name",
-      field: "Last_Name",
+      field: "last_name",
       editable: false,
     },
     {
@@ -213,32 +265,13 @@ function LoanSummaryReports() {
       editable: false,
     },
     {
-      headerName: "Loan Amount",
-      field: "loan_amount",
+      headerName: "Approval Level",
+      field: "approval_level",
       editable: false,
     },
     {
-      headerName: "Monthly Installment",
-      field: "monthly_installment",
-      editable: false,
-    },
-    {
-      headerName: "Repayment Months",
-      field: "repayment_months",
-      editable: false,
-    },
-    {
-      headerName: "Request Status",
-      field: "request_status",
-      editable: false,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-          values: reqStatusDropGrid,
-      },
-    },
-    {
-      headerName: "Created Date",
-      field: "created_date",
+      headerName: "Approval Date",
+      field: "approval_date",
       editable: false,
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
@@ -251,9 +284,19 @@ function LoanSummaryReports() {
           }
           return 0;
         },
+      },    },
+    {
+      headerName: "Approval Status",
+      field: "approval_status",
+      editable: false,
+      cellEditorParams: {
+        values: statusDropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const status = statusDropAG.find((d) => d.value === params.value);
+        return status ? status.label : params.value;
       },
     },
-
     {
       headerName: "Keyfield",
       field: "keyfield",
@@ -291,7 +334,7 @@ const generateReport = () => {
   reportWindow.document.write(`
     <html>
     <head>
-      <title>Loan Summary Report</title>
+      <title>Pending Approvals Report</title>
       <style>
         body { font-family: Arial; padding: 20px; }
         table { width: 100%; border-collapse: collapse; }
@@ -301,7 +344,7 @@ const generateReport = () => {
     </head>
     <body>
 
-      <h2 style="text-align:center;">Loan Summary Report</h2>
+      <h2 style="text-align:center;">Pending Approvals Report</h2>
       <p>Total Records: ${selectedRows.length}</p>
 
       <table>
@@ -312,11 +355,9 @@ const generateReport = () => {
             <th>First Name</th>
             <th>Last Name</th>
             <th>Loan Type</th>
-            <th>Amount</th>
-            <th>Installment</th>
-            <th>Months</th>
+            <th>Approval Level</th>
+            <th>Approval Date</th>
             <th>Status</th>
-            <th>Created Date</th>
           </tr>
         </thead>
         <tbody>
@@ -327,14 +368,12 @@ const generateReport = () => {
       <tr>
         <td>${row.request_number}</td>
         <td>${row.EmployeeId}</td>
-        <td>${row.First_Name}</td>
-        <td>${row.Last_Name}</td>
+        <td>${row.first_name}</td>
+        <td>${row.last_name}</td>
         <td>${row.loan_type_name}</td>
-        <td>${row.loan_amount}</td>
-        <td>${row.monthly_installment}</td>
-        <td>${row.repayment_months}</td>
-        <td>${row.request_status}</td>
-        <td>${formatDate(row.created_date)}</td>
+        <td>${row.approval_level}</td>
+        <td>${formatDate(row.approval_date)}</td>
+        <td>${row.approval_status}</td>
       </tr>
     `);
   });
@@ -349,7 +388,6 @@ const generateReport = () => {
 
   reportWindow.document.close();
 };
-
   const reloadGridData = () => {
     window.location.reload();
   };
@@ -384,27 +422,23 @@ const exportToPDF = () => {
     "First Name",
     "Last Name",
     "Loan Type",
-    "Amount",
-    "Installment",
-    "Months",
-    "Status",
-    "Created Date"
+    "Approval Level",
+    "Approval Date",
+    "Status"
   ]];
 
   const body = dataSource.map(row => [
     row.request_number,
     row.EmployeeId,
-    row.First_Name,
-    row.Last_Name,
+    row.first_name,
+    row.last_name,
     row.loan_type_name,
-    row.loan_amount,
-    row.monthly_installment,
-    row.repayment_months,
-    row.request_status,
-    formatDate(row.created_date)
+    row.approval_level,
+    formatDate(row.approval_date),
+    row.approval_status
   ]);
 
-  doc.text("Loan Summary Report", 40, 40);
+  doc.text("Pending Approvals Report", 40, 40);
 
   autoTable(doc, {
     startY: 60,
@@ -412,9 +446,8 @@ const exportToPDF = () => {
     body: body,
   });
 
-  doc.save("Loan_Summary_Report.pdf");
+  doc.save("Pending_Approvals_Report.pdf");
 };
-
   const transformRowData = (data) => {
     return data.map((row) => ({
       "Candidate Name": row.candidate_name || "",
@@ -433,7 +466,6 @@ const handleExportToExcel = () => {
 
   const selectedRows = gridApiRef.current.getSelectedRows();
 
-  // ✅ Use selected rows OR fallback to all data
   const dataSource =
     selectedRows.length > 0 ? selectedRows : rowData;
 
@@ -445,24 +477,25 @@ const handleExportToExcel = () => {
   const transformedData = dataSource.map((row) => ({
     "Request No": row.request_number,
     "Employee ID": row.EmployeeId,
-    "First Name": row.First_Name,
-    "Last Name": row.Last_Name,
+    "First Name": row.first_name,
+    "Last Name": row.last_name,
     "Loan Type": row.loan_type_name,
-    "Loan Amount": row.loan_amount,
-    "Monthly Installment": row.monthly_installment,
-    "Repayment Months": row.repayment_months,
-    "Status": row.request_status,
-    "Created Date": formatDate(row.created_date),
+    "Approval Level": row.approval_level,
+    "Approval Date": formatDate(row.approval_date),
+    "Status": row.approval_status,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(transformedData);
   const workbook = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Summary");
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Pending Approvals"
+  );
 
-  XLSX.writeFile(workbook, "Loan_Summary_Report.xlsx");
+  XLSX.writeFile(workbook, "Pending_Approvals_Report.xlsx");
 };
-
 return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
@@ -473,7 +506,7 @@ return (
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Loan Summary Reports</h1>
+          <h1 className="page-title">Pending Approvals Report</h1>
 
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>
@@ -540,7 +573,7 @@ return (
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-              
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -676,48 +709,11 @@ return (
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={loan_amount}
-                onChange={(e) => setloan_amount(e.target.value)}
+                value={approval_level}
+                onChange={(e) => setapproval_level(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
-                Loan Amount
-              </label>
-            </div>
-          </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Company Contribution"
-                autoComplete="off"
-                value={monthly_installment}
-                onChange={(e) => setmonthly_installment(e.target.value)}
-              />
-              <label for="sname" className="exp-form-labels">
-                Monthly Installment
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Company Contribution"
-                autoComplete="off"
-                value={repayment_months}
-                onChange={(e) => setrepayment_months(e.target.value)}
-              />
-              <label for="sname" className="exp-form-labels">
-                Repayment Months
+                Approval Level
               </label>
             </div>
           </div>
@@ -725,24 +721,40 @@ return (
           {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedReqStatusSc ? "has-value" : ""} 
-              ${isSelectedReqStatusSc ? "is-focused" : ""}`}
-              title="Please enter the Request Status"
+                ${selectedStatusSC ? "has-value" : ""} 
+                ${isSearchStatusSC ? "is-focused" : ""}`}
+                title="Please select the Approval Status"
             >
               <Select
-                id="country"
-                type="text"
+                id="Select_slots"
+                value={selectedStatusSC}
+                onChange={handleStatusSC}
+                options={filterOptionStatusSC}
+                placeholder=" "
+                onFocus={() => setIsSearchStatusSC(true)}
+                onBlur={() => setIsSearchStatusSC(false)}
                 classNamePrefix="react-select"
-                placeholder=""
-                onFocus={() => setIsSelectedReqStatusSc(true)}
-                onBlur={() => setIsSelectedReqStatusSc(false)}
                 isClearable
-                value={selectedReqStatusSc}
-                onChange={handleChangeReqStatusSc}
-                options={filteredOptionReqStatusSc}
               />
-              <label for="sname" className={`floating-label`}>
-                Request Status
+              <label className="floating-label">Approval Status</label>
+            </div>
+          </div> */}
+
+          {/* <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={approval_date}
+                onChange={(e) => setapproval_date(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Approval Date
               </label>
             </div>
           </div> */}
@@ -808,4 +820,4 @@ return (
   );
 }
 
-export default LoanSummaryReports;
+export default LoanDisbursementRepo;
