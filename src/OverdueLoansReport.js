@@ -15,7 +15,7 @@ import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
 
-function LoanDisbursementRepo() {
+function OverdueLoansReport() {
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ function LoanDisbursementRepo() {
   const [monthly_installment, setmonthly_installment] = useState("");
   const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState("");
   const [loanTypeNameSc, setLoanTypeNameSc] = useState("");
-  // const [loanTypeNameDropSc, setLoanTypeNameDropSc] = useState([]);
+  const [loanTypeNameDropSc, setLoanTypeNameDropSc] = useState([]);
   const [isSelectedLoanTypeNameSc, setIsSelectedLoanTypeNameSc] = useState(false);
   const [selectedReqStatusSc, setSelectedReqStatusSc] = useState("");
   const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
@@ -46,11 +46,9 @@ function LoanDisbursementRepo() {
   const [statusDropAG, setstatusDropAG] = useState([]);
   const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
   const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
-  const [RequestStatusDropSc, setRequestStatusDropSc] = useState([]);
-  const [RequestStatusSC, setRequestStatusSC] = useState("");
-  const [selectedRequestStatusSc, setselectedRequestStatusSc] = useState("");
-  const [ReqStatusValSc, setReqStatusValSc] = useState("");
-  const [isSelectedRequestStatusSc, setisSelectedRequestStatusSc] = useState(false);
+
+  const [InstallmentNumber, setInstallmentNumber] = useState("");
+  const [selectedInstallmentNumberSc, setselectedInstallmentNumberSc] = useState("");
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -65,22 +63,15 @@ function LoanDisbursementRepo() {
     );
   };
 
-  const handleChangeReqStutusSc = (selectedLoanTypeNameSc) => {
-    setSelectedLoanTypeNameSc(selectedLoanTypeNameSc);
-    setLoanTypeNameSc(
-      selectedLoanTypeNameSc ? selectedLoanTypeNameSc.value : "",
+  const handleChangeInstallmentNumberSc = (selectedInstallmentNumberSc) => {
+    setselectedInstallmentNumberSc(selectedInstallmentNumberSc);
+    setInstallmentNumber(
+      selectedInstallmentNumberSc ? selectedInstallmentNumberSc.value : "",
     );
   };
 
-  const handleChangeRequestStatusSc = (selectedRequestStatusSc) => {
-    setselectedRequestStatusSc(selectedRequestStatusSc);
-    setReqStatusValSc(
-      selectedRequestStatusSc ? selectedRequestStatusSc.value : "",
-    );
-  };
-
-  const filteredOptionRequestStatusSc = Array.isArray(RequestStatusDropSc)
-    ? RequestStatusDropSc.map((option) => ({
+  const filteredOptionLoanTypeSc = Array.isArray(loanTypeNameDropSc)
+    ? loanTypeNameDropSc.map((option) => ({
         value: option?.attributedetails_name,
         label: option?.attributedetails_name,
       }))
@@ -88,7 +79,7 @@ function LoanDisbursementRepo() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/getRequestStatus`, {
+    fetch(`${config.apiBaseUrl}/getLoanTypes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +87,7 @@ function LoanDisbursementRepo() {
       body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
-      .then((val) => setRequestStatusDropSc(val))
+      .then((val) => setLoanTypeNameDropSc(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -147,16 +138,6 @@ function LoanDisbursementRepo() {
     }, []);
 
   const handleStatusSC = (SelectedStatus) => {
-    setselectedStatusSC(SelectedStatus);
-    setApprovalStatusSC(SelectedStatus ? SelectedStatus.value : "");
-  };
-  const handleReqStatusSC = (SelectedStatus) => {
-    setselectedStatusSC(SelectedStatus);
-    setRequestStatusSC(SelectedStatus ? SelectedStatus.value : "");
-  };
-  
-
-  const RequestStatusDropSC = (SelectedStatus) => {
     setselectedStatusSC(SelectedStatus);
     setApprovalStatusSC(SelectedStatus ? SelectedStatus.value : "");
   };
@@ -215,7 +196,7 @@ const handleSearch = async () => {
 
   try {
     const response = await fetch(
-      `${config.apiBaseUrl}/GetLoanDisbursementReport`,
+      `${config.apiBaseUrl}/GetOverdueLoansReport`,
       {
         method: "POST",
         headers: {
@@ -228,12 +209,12 @@ const handleSearch = async () => {
           EmployeeId: EmployeeID?.trim() || "",
           First_Name: First_Name?.trim() || "",
           Last_Name: Last_Name?.trim() || "",
-          // Loan_Type_Name: loanTypeNameSc?.trim() || "",
-          // approval_level: approval_level ? Number(approval_level) : 0,
-          request_status: selectedRequestStatusSc?.value || "",
+          installment_number: InstallmentNumber?.trim() || "",
+        //   approval_level: approval_level ? Number(approval_level) : 0,
+        //   approval_status: ApprovalStatusSC || "",
         //   approval_date: approval_date || null,
-          // from_date: FromDate || "",
-          // to_date: ToDate || "",
+          from_date: FromDate || "",
+          to_date: ToDate || "",
         }),
       }
     );
@@ -289,53 +270,31 @@ const handleSearch = async () => {
       editable: false,
     },
     {
-      headerName: "Loan Amount",
-      field: "loan_amount",
+      headerName: "Installment Number",
+      field: "installment_number",
       editable: false,
     },
     {
-      headerName: "Paid Amount",
-      field: "total_paid", 
+      headerName: "Installment Date",
+      field: "installment_date",
       editable: false,
-    },
+      valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      },    },
     {
-      headerName: "Request Status",
-      field: "request_status",
+      headerName: "Total Installment",
+      field: "total_installment",
       editable: false,
     },
-    // {
-    //   headerName: "Approval Level",
-    //   field: "approval_level",
-    //   editable: false,
-    // },
-    // {
-    //   headerName: "Approval Date",
-    //   field: "approval_date",
-    //   editable: false,
-    //   valueFormatter: (params) => formatDate(params.value),
-    //   filterParams: {
-    //     comparator: (filterLocalDateAtMidnight, cellValue) => {
-    //       const cellDate = new Date(cellValue.split("/").join("-"));
-    //       if (cellDate < filterLocalDateAtMidnight) {
-    //         return -1;
-    //       } else if (cellDate > filterLocalDateAtMidnight) {
-    //         return 1;
-    //       }
-    //       return 0;
-    //     },
-    //   },    },
-    // {
-    //   headerName: "Approval Status",
-    //   field: "approval_status",
-    //   editable: false,
-    //   cellEditorParams: {
-    //     values: statusDropAG.map((d) => d.value),
-    //   },
-    //   valueFormatter: (params) => {
-    //     const status = statusDropAG.find((d) => d.value === params.value);
-    //     return status ? status.label : params.value;
-    //   },
-    // },
     {
       headerName: "Keyfield",
       field: "keyfield",
@@ -373,7 +332,7 @@ const generateReport = () => {
   reportWindow.document.write(`
     <html>
     <head>
-      <title>Loan Disbursement Report</title>
+      <title>Overdue Loans Report</title>
       <style>
         body { font-family: Arial; padding: 20px; }
         table { width: 100%; border-collapse: collapse; }
@@ -383,7 +342,7 @@ const generateReport = () => {
     </head>
     <body>
 
-      <h2 style="text-align:center;">Loan Disbursement Report</h2>
+      <h2 style="text-align:center;">Overdue Loans Report</h2>
       <p>Total Records: ${selectedRows.length}</p>
 
       <table>
@@ -393,9 +352,9 @@ const generateReport = () => {
             <th>Employee ID</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Loan Amount</th>
-            <th>Paid Amount</th>
-            <th>Request Status</th>
+            <th>Installment Number</th>
+            <th>Installment Date</th>
+            <th>Total Installment</th>
           </tr>
         </thead>
         <tbody>
@@ -408,9 +367,9 @@ const generateReport = () => {
         <td>${row.EmployeeId}</td>
         <td>${row.first_name}</td>
         <td>${row.last_name}</td>
-        <td>${row.loan_amount}</td>
-        <td>${row.paid_amount}</td>
-        <td>${row.request_status}</td>
+        <td>${row.installment_number}</td>
+        <td>${formatDate(row.installment_date)}</td>
+        <td>${row.total_installment}</td>
       </tr>
     `);
   });
@@ -458,9 +417,9 @@ const exportToPDF = () => {
     "Employee ID",
     "First Name",
     "Last Name",
-    "Loan Amount",
-    "Paid Amount",
-    "Request Status"
+    "Installment Number",
+    "Installment Date",
+    "Total Installment"
   ]];
 
   const body = dataSource.map(row => [
@@ -468,12 +427,12 @@ const exportToPDF = () => {
     row.EmployeeId,
     row.first_name,
     row.last_name,
-    row.loan_amount,
-    row.paid_amount,
-    row.request_status
+    row.installment_number,
+    formatDate(row.installment_date),
+    row.total_installment
   ]);
 
-  doc.text("Loan Disbursement Report", 40, 40);
+  doc.text("Overdue Loans Report", 40, 40);
 
   autoTable(doc, {
     startY: 60,
@@ -481,7 +440,7 @@ const exportToPDF = () => {
     body: body,
   });
 
-  doc.save("Loan Disbursement_Report.pdf");
+  doc.save("Overdue_Loans_Report.pdf");
 };
   const transformRowData = (data) => {
     return data.map((row) => ({
@@ -514,9 +473,9 @@ const handleExportToExcel = () => {
     "Employee ID": row.EmployeeId,
     "First Name": row.first_name,
     "Last Name": row.last_name,
-    "Loan Amount": row.loan_amount,
-    "Paid Amount": row.paid_amount,
-    "Request Status": row.request_status,
+    "Installment Number": row.installment_number,
+    "Installment Date": formatDate(row.installment_date),
+    "Total Installment": row.total_installment,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(transformedData);
@@ -525,10 +484,10 @@ const handleExportToExcel = () => {
   XLSX.utils.book_append_sheet(
     workbook,
     worksheet,
-    "Loan Disbursement"
+    "Overdue Loans"
   );
 
-  XLSX.writeFile(workbook, "Loan_Disbursement_Report.xlsx");
+  XLSX.writeFile(workbook, "Overdue_Loans_Report.xlsx");
 };
 return (
     <div className="container-fluid Topnav-screen">
@@ -540,7 +499,7 @@ return (
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Loan Disbursement Report</h1>
+          <h1 className="page-title">Overdue Loans Report</h1>
 
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>
@@ -687,8 +646,8 @@ return (
           {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                  ${selectedRequestStatusSc ? "has-value" : ""} 
-                  ${isSelectedRequestStatusSc ? "is-focused" : ""}`}
+                  ${selectedLoanTypeNameSc ? "has-value" : ""} 
+                  ${isSelectedLoanTypeNameSc ? "is-focused" : ""}`}
               title="Please enter the Loan Type Name"
             >
               <Select
@@ -696,16 +655,16 @@ return (
                 type="text"
                 classNamePrefix="react-select"
                 placeholder=""
-                onFocus={() => setisSelectedRequestStatusSc(true)}
-                onBlur={() => setisSelectedRequestStatusSc(false)}
+                onFocus={() => setIsSelectedLoanTypeNameSc(true)}
+                onBlur={() => setIsSelectedLoanTypeNameSc(false)}
                 isClearable
                 maxLength={100}
-                value={selectedRequestStatusSc}
-                onChange={handleChangeRequestStatusSc}
-                options={filteredOptionRequestStatusSc}
+                value={selectedLoanTypeNameSc}
+                onChange={handleChangeLoanTypeSc}
+                options={filteredOptionLoanTypeSc}
               />
               <label for="sname" className={`floating-label`}>
-                Request Status
+                Loan Type Name
               </label>
             </div>
           </div> */}
@@ -733,7 +692,7 @@ return (
             </div>
           </div> */}
 
-          {/* <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -743,14 +702,14 @@ return (
                 required
                 title="Please Enter the Company Contribution"
                 autoComplete="off"
-                value={approval_level}
-                onChange={(e) => setapproval_level(e.target.value)}
+                value={InstallmentNumber}
+                onChange={(e) => setInstallmentNumber(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
-                Approval Level
+                Installment Number
               </label>
             </div>
-          </div> */}
+          </div>
 
           {/* <div className="col-md-2">
             <div
@@ -793,7 +752,7 @@ return (
             </div>
           </div> */}
 
-          {/* <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 type="date"
@@ -815,7 +774,7 @@ return (
               />
               <label className="exp-form-labels">To Date</label>
             </div>
-          </div> */}
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -854,4 +813,4 @@ return (
   );
 }
 
-export default LoanDisbursementRepo;
+export default OverdueLoansReport;
