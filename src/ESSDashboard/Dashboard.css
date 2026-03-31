@@ -501,7 +501,7 @@
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  max-height: 420px;
+  /* max-height: 420px; */
   /* padding-bottom: 80px; */
 }
 
@@ -1465,8 +1465,6 @@
   color: #64748b;
   font-size: 0.85rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 120px;
   /* Adjust based on your column width */
 }
@@ -2163,4 +2161,616 @@
 .grid-approve-btn, .grid-reject-btn {
     display: inline-flex; 
     position: relative; /* Sometimes helps browser hit-testing */
+}
+
+.leave-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 10px 0;
+  max-height: 340px; /* Adjust this height based on your layout needs */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.leave-status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 16px;
+  transition: transform 0.2s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.leave-status-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Circular Chart Styles */
+.leave-progress-wrapper {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 12px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease 0s;
+}
+
+/* Dynamic Colors based on Leave Type */
+.stroke-casual-leave { stroke: #4e73df; }
+.stroke-sick-leave { stroke: #1cc88a; }
+.stroke-earned-leave { stroke: #f6c23e; }
+/* Default fallback */
+.circle { stroke: #6e707e; }
+
+.percentage {
+  fill: #333;
+  font-family: sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+/* Typography */
+.leave-info-text {
+  text-align: center;
+}
+
+.leave-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 2px;
+}
+
+.leave-total-sub {
+  font-size: 11px;
+  color: #b2bec3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Modern Button */
+.btn-apply-modern {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-apply-modern:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.leave-grid-container::-webkit-scrollbar {
+  width: 5px;
+}
+
+.leave-grid-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.leave-grid-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.leave-grid-container::-webkit-scrollbar-thumb:hover {
+  background: #764ba2; 
+}
+
+.birthday-carousel-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 15px;
+  padding: 10px 5px 10px 5px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+.birthday-carousel-container::-webkit-scrollbar {
+  display: none; 
+}
+
+.birthday-slide {
+  min-width: 100%;
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+
+.birthday-card-inner {
+  position: relative;
+  background: linear-gradient(145deg, #ffffff, #f3f4f7);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.birthday-accent-circle {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  border-radius: 50%;
+  opacity: 0.4;
+  z-index: 1;
+}
+
+.profile-image-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  z-index: 2;
+}
+
+.birthday-img-modern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.birthday-icon-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.emp-name-text {
+  font-weight: 700;
+  color: #2d3436;
+  font-size: 1.1rem;
+}
+
+.emp-dept-sub {
+  font-size: 0.85rem;
+  color: #636e72;
+}
+
+.wish-badge {
+  display: inline-block;
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.no-birthday-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 100%;
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+.birthday-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+}
+
+.emp-name-text {
+  font-weight: 700;
+  color: #2d3436 !important; 
+  font-size: 1.1rem !important;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.emp-dept-sub {
+  font-size: 0.85rem;
+  color: #636e72;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.nav-btn {
+  background: #f1f3f5;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-btn:hover {
+  background: #764ba2;
+  color: white;
+}
+
+.birthday-nav-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: #dfe6e9;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #764ba2;
+  width: 14px;
+  border-radius: 10px;
+}
+
+.birthday-carousel-container {
+  display: flex;
+  overflow-x: hidden; 
+  scroll-behavior: smooth;
+  width: 100%;
+}
+
+.birthday-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  padding: 5px;
+}
+
+.birthday-card-wrapper {
+    position: relative;
+    padding-bottom: 50px !important;
+}
+
+.birthday-accent-circle-bottom {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    border-radius: 50%;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.birthday-card-inner {
+    position: relative;
+    overflow: hidden; 
+    background: #fff;
+    border-radius: 20px;
+    padding: 10px 20px;
+}
+
+.birthday-nav-controls-bottom {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    z-index: 10;
+}
+
+.nav-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: 0.3s;
+}
+
+.nav-btn:hover {
+    background: #764ba2;
+    color: white;
+}
+
+/* Container Logic */
+.joinee-carousel-container {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  width: 100%;
+}
+
+.joinee-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  padding: 10px;
+}
+
+/* Glass Card Effect */
+.joinee-glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 25px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image with Ring */
+.joinee-image-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  padding: 5px;
+  border: 2px dashed #6366f1; /* Modern dashed border */
+  border-radius: 50%;
+}
+
+.joinee-img-modern {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.new-tag-badge {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  background: #6366f1;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+/* Typography */
+.joinee-name {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
+
+.joinee-dept-id {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 15px;
+}
+
+.welcome-footer {
+  font-size: 12px;
+  color: #10b981; /* Success Green */
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Bottom Actions */
+.joinee-nav-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+
+.joinee-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.joinee-nav-btn:hover {
+  background: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
+
+/* Indicator Dots */
+.joinee-nav-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.joinee-dot {
+  width: 5px;
+  height: 5px;
+  background: #cbd5e1;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.joinee-dot.active {
+  background: #6366f1;
+  width: 12px;
+  border-radius: 10px;
+}
+
+/* Container and Wrapper */
+.joinees-card-wrapper {
+    position: relative;
+    padding-bottom: 50px !important; 
+    background: #fff;
+}
+
+.joinee-card-inner {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+/* Dual Accents (Indigo Theme) */
+.joinee-accent-circle-top {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 85px;
+    height: 85px;
+    background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+    border-radius: 50%;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+.joinee-accent-circle-bottom {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 85px;
+    height: 85px;
+    background: linear-gradient(135deg, #818cf8 0%, #e0e7ff 100%);
+    border-radius: 50%;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+/* Profile Styling */
+.joinee-img-modern {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.15);
+    z-index: 2;
+}
+
+.joinee-icon-badge {
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+    background: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 3;
+}
+
+/* Typography & Badges */
+.joinee-details {
+    text-align: center;
+    z-index: 2;
+}
+
+.welcome-badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Nav Controls Positioning */
+.joinee-nav-controls-bottom {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    z-index: 10;
+}
+
+/* Use the same dot/button logic for visual consistency */
+.joinee-nav-dots .dot {
+    width: 6px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.joinee-nav-dots .dot.active {
+    background: #6366f1;
+    width: 14px;
+    border-radius: 10px;
 }

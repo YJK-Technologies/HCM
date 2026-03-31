@@ -57,6 +57,72 @@ const Dashboard = (payslip) => {
 
   const [isShiftCalendarVisible, setIsShiftCalendarVisible] = useState(true);
   const [currentShiftDate, setCurrentShiftDate] = useState(new Date());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndexJoinee, setCurrentIndexJoinee] = useState(0);
+  const carouselRef = useRef(null);
+  const joineeCarouselRef = useRef(null);
+
+  useEffect(() => {
+    if (upcomingBirthdays.length > 0) {
+      const timer = setInterval(() => {
+        handleNext();
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [currentIndex, upcomingBirthdays]);
+
+  const handleNext = () => {
+    if (carouselRef.current) {
+      const nextIndex = (currentIndex + 1) % upcomingBirthdays.length;
+      setCurrentIndex(nextIndex);
+      carouselRef.current.scrollTo({
+        left: carouselRef.current.offsetWidth * nextIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handlePrev = () => {
+    if (carouselRef.current) {
+      const prevIndex = (currentIndex - 1 + upcomingBirthdays.length) % upcomingBirthdays.length;
+      setCurrentIndex(prevIndex);
+      carouselRef.current.scrollTo({
+        left: carouselRef.current.offsetWidth * prevIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (NewJoinees.length > 0) {
+      const timer = setInterval(() => {
+        handleJoineeNext();
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [currentIndexJoinee, NewJoinees]);
+
+  const handleJoineeNext = () => {
+    if (joineeCarouselRef.current) {
+      const nextIndex = (currentIndexJoinee + 1) % NewJoinees.length;
+      setCurrentIndexJoinee(nextIndex);
+      joineeCarouselRef.current.scrollTo({
+        left: joineeCarouselRef.current.offsetWidth * nextIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleJoineePrev = () => {
+    if (joineeCarouselRef.current) {
+      const prevIndex = (currentIndexJoinee - 1 + NewJoinees.length) % NewJoinees.length;
+      setCurrentIndexJoinee(prevIndex);
+      joineeCarouselRef.current.scrollTo({
+        left: joineeCarouselRef.current.offsetWidth * prevIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Filter shifts from existing Ag-Grid rowData for the calendar cells
   const getShiftDetailsForDay = (day) => {
@@ -1695,93 +1761,97 @@ const Dashboard = (payslip) => {
       <div className="dashboard-row spacing-mt-2">
 
         <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
-            <div className="display-flex flex-between-center flex-wrap">
-              <h6 className="card-title-heading">New Joinees</h6>
+          <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
+            <div className="display-flex flex-between-center mb-3">
+              <h6 className="card-title-heading mb-0">New Joinees</h6>
             </div>
-            <div id="newJoineesCarousel" style={{ height: "250px" }} className="app-carousel carousel-slide" data-bs-ride="carousel">
-              <div className="carousel-inner-custom" >
-                {NewJoinees.length > 0 ? (
-                  NewJoinees.map((joinee, index) => (
-                    <div
-                      key={joinee.id}
-                      className={`carousel-item-custom ${index === 0 ? "active-state" : ""}`}
-                    >
-                      <div className="joinee-profile-card text-align-center">
-                        <img
-                          src={joinee.Photos}
-                          width={110}
-                          height={110}
-                          alt={`${joinee.EmployeeId}`}
-                          className="display-block-custom margin-x-auto rounded-custom"
-                        />
-                        <p className="app-badge rounded-pill-custom badge-info-color font-size-6 spacing-mt-2">
-                          {joinee.department_ID} - {joinee.EmployeeId}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-align-center text-muted-color spacing-mt-3">No new joinees</p>
-                )}
-              </div>
-              {NewJoinees.length > 1 && (
-                <div className="carousel-nav-container">
-                  <button
-                    className="carousel-control-prev-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="prev"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
-                    </svg>
-                  </button>
-                  <button
-                    className="carousel-control-next-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="next"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
 
-        <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full" >
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading">Upcoming Birthdays</h6>
-            </div>
-            <div className="birthday-list-container" style={{ height: "250px" }}>
-              {upcomingBirthdays.length > 0 ? (
-                upcomingBirthdays.map((person) => (
-                  <div key={person.id} className="birthday-profile-item">
-                    <div className="display-flex justify-center spacing-mt-2">
-                      <div className="">
-                        <img
-                          src={person.Photos}
-                          width={110}
-                          height={110}
-                          className="image-rounded-20"
-                          alt={person.Plainimg}
-                        />
+            <div className="joinee-carousel-container" ref={joineeCarouselRef}>
+              {NewJoinees.length > 0 ? (
+                NewJoinees.map((joinee, index) => (
+                  <div key={index} className="joinee-slide">
+                    <div className="joinee-card-inner">
+                      <div className="joinee-accent-circle-top"></div>
+                      <div className="joinee-accent-circle-bottom"></div>
+
+                      <div className="profile-image-wrapper">
+                        <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                        <div className="joinee-icon-badge">✨</div>
                       </div>
-                    </div>
-                    <div className="grid-col-12 spacing-mt-2">
-                      <h3 className="text-color-dark">{person.EmployeeName}</h3>
-                      <p className="app-badge spacing-p-1 text-bg-warning font-size-6">🎉🎂🎉🎂</p>
+
+                      <div className="joinee-details mt-3">
+                        <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
+                        <p className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</p>
+                        <div className="welcome-badge">Welcome Onboard! 🤝</div>
+                      </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-align-center text-muted-color spacing-mt-3">No Upcoming Birthdays</p>
+                <div className="no-birthday-view">
+                  <div className="empty-icon">👥</div>
+                  <p className="text-muted-color">No new joinees this month</p>
+                </div>
               )}
+            </div>
+
+            {NewJoinees.length > 1 && (
+              <div className="joinee-nav-controls-bottom">
+                <button className="nav-btn" onClick={handleJoineePrev}>❮</button>
+                <div className="joinee-nav-dots">
+                  {NewJoinees.map((_, i) => (
+                    <span key={i} className={`dot ${currentIndexJoinee === i ? 'active' : ''}`}></span>
+                  ))}
+                </div>
+                <button className="nav-btn" onClick={handleJoineeNext}>❯</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid-col-lg-3">
+          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
+            <div className="display-flex flex-between-center mb-3">
+              <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
+            </div>
+
+            <div className="birthday-carousel-container" ref={carouselRef}>
+              {upcomingBirthdays.length > 0 ? (
+                upcomingBirthdays.map((person, index) => (
+                  <div key={index} className="birthday-slide">
+                    <div className="birthday-card-inner">
+                      <div className="birthday-accent-circle"></div>
+                      <div className="birthday-accent-circle-bottom"></div>
+
+                      <div className="profile-image-wrapper">
+                        <img src={person.Photos} className="birthday-img-modern" alt="profile" />
+                        <div className="birthday-icon-badge">🎂</div>
+                      </div>
+
+                      <div className="birthday-details mt-3">
+                        <h6 className="emp-name-text">{person.EmployeeName}</h6>
+                        <p className="emp-dept-sub">{person.Department || 'Team Member'}</p>
+                        <div className="wish-badge">Happy Birthday! 🎈</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-birthday-view">
+                  <div className="empty-icon">🎉</div>
+                  <p className="text-muted-color">No birthdays this week</p>
+                </div>
+              )}
+            </div>
+
+            <div className="birthday-nav-controls-bottom">
+              <button className="nav-btn" onClick={handlePrev}>❮</button>
+              <div className="birthday-nav-dots">
+                {upcomingBirthdays.map((_, i) => (
+                  <span key={i} className={`dot ${currentIndex === i ? 'active' : ''}`}></span>
+                ))}
+              </div>
+              <button className="nav-btn" onClick={handleNext}>❯</button>
             </div>
           </div>
         </div>
@@ -1789,29 +1859,45 @@ const Dashboard = (payslip) => {
         <div className="grid-col-lg-6">
           <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
             <div className="d-flex justify-content-between align-items-center">
-              <h6 className="card-title-heading">Leave Balance</h6>
-              <div className="d-flex justify-content-end ">
-                <button className="apply-leave-btn border-none p-1" onClick={handleLeave} style={{ fontSize: "12px" }}>Apply Leave</button>
+              <div>
+                <h6 className="card-title-heading mb-0">Leave Balance</h6>
               </div>
+              <button className="btn-apply-modern" onClick={handleLeave}>
+                Apply Leave
+              </button>
             </div>
-            <div className="leave-data-grid-row">
+
+            <div className="leave-grid-container">
               {leaveData.length > 0 ? (
-                leaveData.map((leave, index) => (
-                  <div key={index} className="leave-item-col mt-2">
-                    <div className="leave-type-card h-100">
-                      <div className={`leave-icon-base fs-6 leave-icon ${leave.leavetype} rounded-5`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-capsule" viewBox="0 0 16 16">
-                          <path d="M1.828 8.9 8.9 1.827a4 4 0 1 1 5.657 5.657l-7.07 7.071A4 4 0 1 1 1.827 8.9Zm9.128.771 2.893-2.893a3 3 0 1 0-4.243-4.242L6.713 5.429z" />
+                leaveData.map((leave, index) => {
+                  const percentage = (leave.availableleave / leave.totalleave) * 100;
+                  const strokeDasharray = `${percentage}, 100`;
+
+                  return (
+                    <div key={index} className="leave-status-item">
+                      <div className="leave-progress-wrapper">
+                        <svg viewBox="0 0 36 36" className="circular-chart">
+                          <path className="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, '-')}`}
+                            strokeDasharray={strokeDasharray}
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <text x="18" y="20.35" className="percentage">{leave.availableleave}</text>
                         </svg>
                       </div>
-                      <h6 className="fw-bolder fs-7 mt-4 mb-0">{leave.leavetype}</h6>
-                      <h6 className="fs-7 text-dark ms-0 text-muted-color">Total Leave: {leave.totalleave}</h6>
-                      <h6 className="fs-7 text-primary font-weight-bold">Available: {leave.availableleave}</h6>
+                      <div className="leave-info-text">
+                        <span className="leave-label">{leave.LeaveId}</span>
+                        <span className="leave-total-sub">of {leave.totalleave} Days</span>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
-                <p>No leave data available.</p>
+                <div className="text-center py-4 w-100">
+                  <p className="text-muted">No leave data available.</p>
+                </div>
               )}
             </div>
           </div>
