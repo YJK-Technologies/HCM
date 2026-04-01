@@ -333,7 +333,7 @@ function Main() {
     { path: "/PendingApprovalsRepo", component: <PendingApprovalsReport /> },
     { path: "/LoanDisbursementRepo", component: <LoanDisbursementRepo /> },
     { path: "/OverdueLoansReport", component: <OverdueLoansReport /> },
-    { path: "/RepaymentScheduleR", component: <RepaymentScheduleReport /> },
+    { path: "/RepaymentScheduleRep", component: <RepaymentScheduleReport /> },
     { path: "/EmployeeAssets", component: <EmployeeAssets /> }
 
   
