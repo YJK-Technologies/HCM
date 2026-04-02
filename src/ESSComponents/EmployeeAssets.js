@@ -13,7 +13,6 @@ import EmployeeAssetsPopup from "./EmployeeAssetsPopup";
 import { DateTimeField } from "@mui/x-date-pickers";
 const config = require('../Apiconfig');
 
-
 function EmployeeAssets({ }) {
   const [loading, setLoading] = useState(false);
   const [EmployeeID, setEmployeeID] = useState("");
@@ -30,7 +29,6 @@ function EmployeeAssets({ }) {
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [actualReturnDate, setActualReturnDate] = useState('');
   const [statusdrop, setStatusdrop] = useState([]);
-
 
   const [Assetvalue, setAssetvalue] = useState([{
     relation: 'Assetvalue', members: [{
@@ -170,102 +168,165 @@ function EmployeeAssets({ }) {
     );
   };
 
- 
+  // const handleSave = async () => {
+
+  //     if (!EmployeeID) {
+  //       setError(true);
+  //       toast.warning("Error: Missing required keyfield")
+  //       return;
+  //     }
+
+  //     for (const relationGroup of Assetvalue) {
+  //       for (const member of relationGroup.members) {
+  //         if (!member.AssetID  || !member.AllocationDate || !member.AllocationStatus) {
+  //           setError(true);
+  //           toast.warning("Error: Missing required fields")
+
+  //           return;
+  //         }
+  //       }
+  //     }
+
+  //     const employeeData = Assetvalue.flatMap((relationGroup) =>
+  //       relationGroup.members.map((member) => ({
+  //         AssetID: member.AssetID,
+  //         EmployeeID: member.EmployeeID,
+  //         AllocationDate: member.AllocationDate,
+  //         ExpectedReturnDate: member.ExpectedReturnDate,
+  //         ActualReturnDate: member.ActualReturnDate,
+  //         AllocationStatus: member.AllocationStatus,
+  //         ConditionAtIssue: member.ConditionAtIssue,
+  //         ConditionAtReturn: member.ConditionAtReturn,
+  //         ApprovedBy: member.ApprovedBy,
+  //         Remarks: member.Remarks,
+  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //         CreatedBy: sessionStorage.getItem("selectedUserCode")
+  //       }))
+  //     );
+  //     setError(false);
+  //     setLoading(true)
+
+  //     try {
+  //       const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopInsert`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ employeeData }),
+  //       });
+  //       if (response.ok) {
+  //         toast.success("Data inserted successfully!", {
+  //           onClose: () => window.location.reload(),
+  //         });
+  //       } else {
+  //         const errorResponse = await response.json();
+  //         console.error(errorResponse.message);
+  //         toast.warning(errorResponse.message, {
+  //         })
+  //       }
+  //     } catch (err) {
+  //       console.error("Error delete data:", err);
+  //       toast.error('Error delete data: ' + err.message, {
+  //       });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
   const handleSave = async () => {
-      if (!EmployeeID || !EmployeeID.trim()) {
-        setError(true);
-        toast.warning("Employee ID is required");
-        return;
-      }
-  
-      for (const relationGroup of Assetvalue) {
-        for (const member of relationGroup.members) {
-  
-          // Trim values before validation
-          const AssetID = member.AssetID?.trim();
-          const AllocationDate = member.AllocationDate;
-          const Status = member.Status?.trim();
-  
-          if (!AssetID || !AllocationDate || !Status) {
-            setError(true);
-            toast.warning("Please fill all required fields");
-            return;
-          }
-  
-          // Convert to Date objects
-          const allocDate = new Date(AllocationDate);
-          const expectedDate = member.ExpectedReturnDate ? new Date(member.ExpectedReturnDate) : null;
-          const actualDate = member.ActualReturnDate ? new Date(member.ActualReturnDate) : null;
-  
-          if (expectedDate && expectedDate < allocDate) {
-            toast.warning("Expected Return Date must be after Allocation Date");
-            return;
-          }
-  
-          if (actualDate && actualDate < allocDate) {
-            toast.warning("Actual Return Date must be after Allocation Date");
-            return;
-          }
+    if (!EmployeeID || !EmployeeID.trim()) {
+      setError(true);
+      toast.warning("Employee ID is required");
+      return;
+    }
+
+    for (const relationGroup of Assetvalue) {
+      for (const member of relationGroup.members) {
+
+        // Trim values before validation
+        const AssetID = member.AssetID?.trim();
+        const AllocationDate = member.AllocationDate;
+        const Status = member.Status?.trim();
+
+        if (!AssetID || !AllocationDate || !Status) {
+          setError(true);
+          toast.warning("Please fill all required fields");
+          return;
+        }
+
+        // Convert to Date objects
+        const allocDate = new Date(AllocationDate);
+        const expectedDate = member.ExpectedReturnDate ? new Date(member.ExpectedReturnDate) : null;
+        const actualDate = member.ActualReturnDate ? new Date(member.ActualReturnDate) : null;
+
+        if (expectedDate && expectedDate < allocDate) {
+          toast.warning("Expected Return Date must be after Allocation Date");
+          return;
+        }
+
+        if (actualDate && actualDate < allocDate) {
+          toast.warning("Actual Return Date must be after Allocation Date");
+          return;
         }
       }
-  
-      setError(false);
-      setLoading(true);
-  
-      const employeeData = Assetvalue.flatMap((relationGroup) =>
-        relationGroup.members.map((member) => ({
-          AssetID: member.AssetID?.trim(),
-          EmployeeID: employeeID.trim(),
-          AllocationDate: member.AllocationDate,
-          ExpectedReturnDate: member.ExpectedReturnDate || null,
-          ActualReturnDate: member.ActualReturnDate || null,
-          AllocationStatus: member.Status?.trim(),
-          ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
-          ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
-          ApprovedBy: member.ApprovedBy?.trim() || "",
-          Remarks: member.Remarks?.trim() || "",
-          company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
-          CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
-  
-        }))
+    }
+
+    setError(false);
+    setLoading(true);
+
+    const employeeData = Assetvalue.flatMap((relationGroup) =>
+      relationGroup.members.map((member) => ({
+        AssetID: member.AssetID?.trim(),
+        EmployeeID: employeeID.trim(),
+        AllocationDate: member.AllocationDate,
+        ExpectedReturnDate: member.ExpectedReturnDate || null,
+        ActualReturnDate: member.ActualReturnDate || null,
+        AllocationStatus: member.Status?.trim(),
+        ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
+        ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
+        ApprovedBy: member.ApprovedBy?.trim() || "",
+        Remarks: member.Remarks?.trim() || "",
+        company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
+        CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
+
+      }))
+    );
+
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ EmployeeAssetsData: employeeData }), // ✅ match backend
+        }
       );
-  
-      try {
-        const response = await fetch(
-          `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ EmployeeAssetsData: employeeData }), // ✅ match backend
-          }
-        );
-  
-        const result = await response.json();
-  
-        if (response.ok) {
-          toast.success("Data saved successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        } else {
-          console.error(result.message);
-          toast.warning(result.message || "Failed to save data");
-        }
-  
-      } catch (err) {
-        console.error("Error saving data:", err);
-        toast.error("Error saving data: " + err.message);
-      } finally {
-        setLoading(false);
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success("Data saved successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        console.error(result.message);
+        toast.warning(result.message || "Failed to save data");
       }
-    };
-  
-    const reloadGridData = () => {
-      window.location.reload();
-    };
-  
+
+    } catch (err) {
+      console.error("Error saving data:", err);
+      toast.error("Error saving data: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reloadGridData = () => {
+    window.location.reload();
+  };
+
   const filteredOptionStatus = statusdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -283,6 +344,7 @@ function EmployeeAssets({ }) {
       .then((data) => data.json())
       .then((val) => setStatusdrop(val));
   }, []);
+
 
   const handleChangeStatus = (selectedStatus, relation, index) => {
     setAssetvalue((prevDocuments) =>
@@ -305,7 +367,6 @@ function EmployeeAssets({ }) {
     );
   };
 
-
   const RelationInputChange = (relation, index, field, value) => {
     setAssetvalue((prev) =>
       prev.map((item) =>
@@ -320,88 +381,84 @@ function EmployeeAssets({ }) {
       )
     );
   };
- const handleEmployeeAssets = async (code) => {
-  try {
-    const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        Id: code,
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    });
+  const handleEmployeeAssets = async (code) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      });
 
-    if (response.ok) {
-      setSaveButtonVisible(false);
-      setShowAsterisk(false);
+      if (response.ok) {
+        setSaveButtonVisible(false);
+        setShowAsterisk(false);
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!data || data.length === 0) {
-        toast.warning("No asset data found");
-        return;
+        const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
+
+        setdepartment_id(department_id);
+        setdesignation_id(designation_id);
+        setFirst_Name(First_Name);
+        setEmployeeId(EmployeeId);
+
+     
+        const mappedAssets = [
+          {
+            relation: "Assetvalue",
+            members: data.map((item) => ({
+              AssetID: item.AssetID || "",
+              AllocationDate: formatDate(item.AllocationDate),
+              ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
+              ActualReturnDate: formatDate(item.ActualReturnDate),
+              AllocationStatus: item.AllocationStatus || "",
+              ConditionAtIssue: item.ConditionAtIssue || "",
+              ConditionAtReturn: item.ConditionAtReturn || "",
+              ApprovedBy: item.ApprovedBy || "",
+              Remarks: item.Remarks || "",
+              keyfield: item.keyfield || "",
+            })),
+          },
+        ];
+
+        setAssetvalue(mappedAssets);
+
+      } else if (response.status === 404) {
+        toast.warning("Data not found");
+
+        setAssetvalue([
+          {
+            relation: "Assetvalue",
+            members: [
+              {
+                AssetID: "",
+                AllocationDate: "",
+                ExpectedReturnDate: "",
+                ActualReturnDate: "",
+                AllocationStatus: "",
+                ConditionAtIssue: "",
+                ConditionAtReturn: "",
+                ApprovedBy: "",
+                Remarks: "",
+                keyfield: "",
+              },
+            ],
+          },
+        ]);
+      } else {
+        const err = await response.json();
+        toast.warning(err.message || "Error fetching data");
       }
-
-      const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
-
-      setdepartment_id(department_id);
-      setdesignation_id(designation_id);
-      setFirst_Name(First_Name);
-      setEmployeeId(EmployeeId);
-
-      const mappedAssets = [
-        {
-          relation: "Assetvalue",
-          members: data.map((item) => ({
-            AssetID: item.AssetID || "",
-            AllocationDate: formatDate(item.AllocationDate),
-            ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
-            ActualReturnDate: formatDate(item.ActualReturnDate),
-            AllocationStatus: item.AllocationStatus || "",
-            ConditionAtIssue: item.ConditionAtIssue || "",
-            ConditionAtReturn: item.ConditionAtReturn || "",
-            ApprovedBy: item.ApprovedBy || "",
-            Remarks: item.Remarks || "",
-            keyfield: item.keyfield || "",
-          })),
-        },
-      ];
-
-      setAssetvalue(mappedAssets);
-
-    } else if (response.status === 404) {
-      toast.warning("Data not found");
-
-      setAssetvalue([
-        {
-          relation: "Assetvalue",
-          members: [
-            {
-              AssetID: "",
-              AllocationDate: "",
-              ExpectedReturnDate: "",
-              ActualReturnDate: "",
-              AllocationStatus: "",
-              ConditionAtIssue: "",
-              ConditionAtReturn: "",
-              ApprovedBy: "",
-              Remarks: "",
-              keyfield: "",
-            },
-          ],
-        },
-      ]);
-    } else {
-      const err = await response.json();
-      toast.warning(err.message || "Error fetching asset data");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error: " + error.message);
     }
-  } catch (error) {
-    console.error(error);
-    toast.error("Error: " + error.message);
-  }
-};
+  };
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -432,7 +489,7 @@ function EmployeeAssets({ }) {
     setOpen(false);
   };
 
-  const handleDateChange = (relation, index, field, value) => {
+    const handleDateChange = (relation, index, field, value) => {
     setAssetvalue((prev) =>
       prev.map((item) =>
         item.relation === relation
@@ -669,8 +726,8 @@ function EmployeeAssets({ }) {
                     className="exp-input-field form-control"
                     autoComplete="off"
                     value={member.ExpectedReturnDate}
-
-                    onChange={(e) => {
+                 
+                     onChange={(e) => {
                       const value = e.target.value;
 
                       if (
@@ -694,29 +751,14 @@ function EmployeeAssets({ }) {
                 </div>
               </div>
 
-
-
-              {/* Actual Return */}
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="date"
-                    name="ActualReturnDate"
-                    className="exp-input-field form-control"
-                    value={member.ActualReturnDate}
-                    max={new Date().toISOString().split("T")[0]} // Restrict future dates
-                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
-                  />
-                  <label for="cno" className={`exp-form-labels ${error && !member.ActualReturnDate ? 'text-danger' : ''}`}>ActualReturnDate{showAsterisk && <span className="text-danger">*</span>}</label>
-                </div>
-              </div>
+             
 
               {/* Status */}
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${member.selectedStatus ? "has-value" : ""}
-                               ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
+               ${member.selectedStatus ? "has-value" : ""}
+                  ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
                 >
                   <Select
                     placeholder=" "
@@ -781,9 +823,9 @@ function EmployeeAssets({ }) {
                     className="exp-input-field form-control"
                     placeholder=" "
                     value={member.ApprovedBy}
-                    pattern="[A-Za-z]+"
-                    maxLength={100}
-                    onChange={(e) => {
+                     pattern="[A-Za-z]+"
+                     maxLength={100}
+                     onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ApprovedBy', onlyLetters);
                     }}
