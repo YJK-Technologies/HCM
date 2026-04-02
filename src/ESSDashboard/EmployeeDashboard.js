@@ -274,29 +274,29 @@ const Dashboard = (payslip) => {
   //   setShiftToDate(formatDate(sunday));
   // }, []);
 
-  useEffect(() => {
-    const today = new Date();
+useEffect(() => {
+  const today = new Date();
 
-    // First day of current month
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Last day of current month
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
+  const from = formatDate(firstDay);
+  const to = formatDate(lastDay);
 
-    setShiftFromDate(formatDate(firstDay));
-    setShiftToDate(formatDate(lastDay));
-  }, []);
+  setShiftFromDate(from);
+  setShiftToDate(to);
 
-  useEffect(() => {
-    handleEmpShiftReportSearch();
-  }, [])
+  // 👉 Call API with correct values
+  handleEmpShiftReportSearch(from, to);
+
+}, []);
 
   const {
     Location_name,
@@ -478,7 +478,7 @@ const Dashboard = (payslip) => {
     }
   };
 
-  const handleEmpShiftReportSearch = async () => {
+  const handleEmpShiftReportSearch = async (fromDate, toDate) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
         method: "POST",
@@ -486,8 +486,8 @@ const Dashboard = (payslip) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          From_Date: shiftFromDate,
-          To_Date: shiftToDate,
+          From_Date: fromDate || shiftFromDate,
+          To_Date: toDate || shiftToDate,
           Employee_ID: sessionStorage.getItem('selectedUserCode'),
           company_code: sessionStorage.getItem('selectedCompanyCode')
         }),
@@ -1508,7 +1508,7 @@ const Dashboard = (payslip) => {
 
               <button
                 className="btn btn-sm btn-primary"
-                onClick={handleEmpShiftReportSearch}
+                onClick={() => handleEmpShiftReportSearch()}
                 style={{ height: "35px", width: "40px" }}
                 title="Search"
               >
