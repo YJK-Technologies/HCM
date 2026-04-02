@@ -84,6 +84,8 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
     editable: true,
   },
 
+<<<<<<< HEAD
+=======
      {
     headerName: "Allocation Date",
     field: "AllocationDate",
@@ -104,6 +106,7 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
     filter: 'agTextColumnFilter',
     editable: true,
   },
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 
   {
     headerName: "Actural Return Date",
