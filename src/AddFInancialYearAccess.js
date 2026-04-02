@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select'
 import { ToastContainer, toast } from 'react-toastify';
-
+import LoadingScreen from './Loading';
 
 function StdAccInput({ }) {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ function StdAccInput({ }) {
   const [loading, setLoading] = useState(false);
   const [base_accgroup_code, setbase_accgroup_code] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('base');
   const [selectBaseacc, setselectedbaseacc] = useState('');
   const StartYear = useRef(null)
@@ -44,8 +44,9 @@ function StdAccInput({ }) {
     setStartYear("");
     setEndYear("");
     setTransactionType("");
+    setSelectedTransaction("");
     setLockType("");
-
+    setSelectedLockType("");
   };
 
 
@@ -154,85 +155,6 @@ function StdAccInput({ }) {
       .then((val) => setLockdrop(val));
   }, []);
 
-
-
-  //  useEffect(() => {
-  //    const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //    fetch(`${config.apiBaseUrl}/status`, {
-  //      method: 'POST',
-  //      headers: {
-  //        'Content-Type': 'application/json',
-  //      },
-  //      body: JSON.stringify({ company_code })
-  //    })
-  //      .then((data) => data.json())
-  //      .then((val) => setStatusdrop(val))
-  //      .catch((error) => console.error('Error fetching data:', error));
-  //  }, []);
-
-
-  //  useEffect(() => {
-  //    fetch(`${config.apiBaseUrl}/getbasaccode`)
-  //      .then((data) => data.json())
-  //      .then((val) => setbaseaccdrop(val));
-  //  }, []);
-
-
-  // //  useEffect(() => {
-  // //    const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  // //    fetch(`${config.apiBaseUrl}/delPer`, {
-  // //      method: 'POST',
-  // //      headers: {
-  // //        'Content-Type': 'application/json',
-  // //      },
-  // //      body: JSON.stringify({ company_code })
-  // //    })
-  // //      .then((data) => data.json())
-  // //      .then((val) => setdeletedrop(val))
-  // //      .catch((error) => console.error('Error fetching data:', error));
-  // //  }, []);
-
-
-  // //  const filteredOptionbaseacc = baseaccdrop.map((option) => ({
-  // //    value: option.base_accgroup_code,
-  // //    label: option.base_accgroup_code,
-  // //  }));
-
-  // //  const filteredOptionStatus = statusdrop.map((option) => ({
-  // //    value: option.attributedetails_name,
-  // //    label: option.attributedetails_name,
-  // //  }));
-
-  // //  const filteredOptionDelete = Array.isArray(deletedrop) ? deletedrop.map((option) => ({
-  // //    value: option.attributedetails_name,
-  // //    label: option.attributedetails_name,
-  // //  })) : [];
-
-
-  // //  const handleChangeStatus = (selectedStatus) => {
-  // //    setSelectedStatus(selectedStatus);
-  // //    setstatus(selectedStatus ? selectedStatus.value : '');
-  // //    setError(false);
-  // //  };
-
-  // //  const handleChangebaseacc = (selectedbaseacc) => {
-  // //    setselectedbaseacc(selectedbaseacc);
-  // //    setbase_accgroup_code(selectedbaseacc ? selectedbaseacc.value : '');
-  // //    setError(false);
-  // //  };
-
-  // //  const handleChangeDelete = (selectedDelete) => {
-  // //    setSelectedDelete(selectedDelete);
-  // //    setdeletePermission(selectedDelete ? selectedDelete.value : '');
-  // //    setError(false);
-  //  //};
-
-  const handleNavigateToForm = () => {
-    navigate("/AddBaseAccount", { selectedRows }); // Pass selectedRows as props to the Input component
-  };
-
   const handleInsert = async () => {
     if (
       !startYear ||
@@ -240,7 +162,7 @@ function StdAccInput({ }) {
       !TransactionType ||
       !LockType
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -248,17 +170,20 @@ function StdAccInput({ }) {
     const end = new Date(endYear);
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      setError(true);
       toast.warning("Please enter valid date values for Start Year and End Year.");
       return;
     }
 
     if (start > end) {
+      setError(true);
       toast.warning("Start Year cannot be greater than End Year.");
       return;
     }
-    //   if (validateInputs()) {
-    try {
+    setError(false);
+    setLoading(true);
 
+    try {
       const response = await fetch(`${config.apiBaseUrl}/AddFinacnialyearlockscreen`, {
         method: "POST",
         headers: {
@@ -271,26 +196,23 @@ function StdAccInput({ }) {
           transaction_type: TransactionType,
           locked: LockType,
           created_by: sessionStorage.getItem('selectedUserCode')
-
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message)
-
-      } else {
-        console.error("Failed to insert data");
-        // Show generic error message using SweetAlert
-        toast.error('Failed to insert data')
+        toast.warning(errorResponse.message, {
+        });
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      // Show error message using SweetAlert
       toast.error('Error inserting data: ' + error.message)
     }
   };
@@ -301,13 +223,29 @@ function StdAccInput({ }) {
       !endYear ||
       !TransactionType ||
       !LockType
-    )
-      // {
-      //     setError(" ");
+    ){
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
 
-      //     return;
-      //   }
-      setLoading(true);
+    const start = new Date(startYear);
+    const end = new Date(endYear);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      setError(true);
+      toast.warning("Please enter valid date values for Start Year and End Year.");
+      return;
+    }
+
+    if (start > end) {
+      setError(true);
+      toast.warning("Start Year cannot be greater than End Year.");
+      return;
+    }
+
+     setError(false);
+     setLoading(true);
 
     try {
       const response = await fetch(`${config.apiBaseUrl}/UpdateFinacnialyearlock`, {
@@ -326,29 +264,24 @@ function StdAccInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+         toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
-
-
-
 
   const handleNavigate = () => {
     navigate("/FinancialYearAccess");
@@ -357,17 +290,15 @@ function StdAccInput({ }) {
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
-      // Check if the value has changed and handle the search logic
       if (hasValueChanged) {
-        await handleKeyDownStatus(e); // Trigger the search function
-        setHasValueChanged(false); // Reset the flag after the search
+        await handleKeyDownStatus(e); 
+        setHasValueChanged(false); 
       }
 
-      // Move to the next field if the current field has a valid value
       if (value) {
         nextFieldRef.current.focus();
       } else {
-        e.preventDefault(); // Prevent moving to the next field if the value is empty
+        e.preventDefault(); 
       }
     }
   };
@@ -381,6 +312,7 @@ function StdAccInput({ }) {
   return (
 
     <div class="container-fluid Topnav-screen ">
+      {loading && <LoadingScreen />}
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">

@@ -82,6 +82,12 @@ const columnDefs = [
     filter: 'agTextColumnFilter',
     editable: false,
   },
+  {
+    headerName: "Employee Type",
+    field: "Employee_Type",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
 ];
 
 const gridOptions = {
@@ -127,6 +133,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
             manager: item.manager,
             shift: item.shift,
             status: item.status,
+            Employee_Type: item.Employee_Type,
             // First_Name: item.First_Name,
             // Photos: item.Photos ? arrayBufferToBase64(item.Photos.data) : null,
 
@@ -170,14 +177,17 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const handleConfirm = () => {
     const selectedData = selectedRows.map(row => ({
       EmployeeId: row.EmployeeId,
-      Department: row.department_ID,
-      Designation: row.designation_ID,
+      department_ID: row.department_ID,
+      designation_ID: row.designation_ID,
       DOJ: row.DOJ,
       DOL: row.DOL,
       manager: row.manager,
       shift: row.shift,
       status: row.status,
-      first_name: row.first_name
+      First_name: row.first_name,
+      Section: row.Section,
+      Work_Location: row.Work_Location,
+      Employee_Type: row.Employee_Type
     }));
     CompanyDetails(selectedData);
     handleClose();
@@ -216,6 +226,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       placeholder=" "
                       autoComplete="off"
                       value={EmployeeId}
+                      maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -230,6 +241,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       autoComplete="off"
                       className="exp-input-field form-control"
                       value={Name}
+                      maxLength={100}
                       onChange={(e) => setname(e.target.value)}
                     />
                     <label className="exp-form-labels">Employee Name</label>
@@ -243,6 +255,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={100}
                       value={Department}
                       onChange={(e) => setDepartment(e.target.value)}
                     />
@@ -258,6 +271,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       autoComplete="off"
                       placeholder=" "
                       value={Designation}
+                      maxLength={100}
                       onChange={(e) => setDesignation(e.target.value)}
                     />
                     <label className="exp-form-labels">Designation</label>

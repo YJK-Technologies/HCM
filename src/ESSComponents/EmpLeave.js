@@ -8,6 +8,7 @@ import Select from 'react-select'
 import { showConfirmationToast } from '../ToastConfirmation';
 import { AgGridReact } from "ag-grid-react";
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -49,6 +50,17 @@ function Input({ }) {
   const [isSelecttypes, setIsSelecttypes] = useState(false);
   const [isSelectAL, setIsSelectAL] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const searchClearInputFields = () => {
+    setLeaveid("");
+    setFilterCode("");
+    setselectedtype("");
+    settype("");
+    setSelectedaccrual("");
+    setaccrual("");
+    setExceedleave("");
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
@@ -431,8 +443,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -460,8 +472,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -498,8 +510,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -512,7 +524,137 @@ function Input({ }) {
   };
 
   const reloadData = () => {
-    setrowData([])
+    setrowData([]);
+    searchClearInputFields();
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Leave ID": row.LeaveId || "",
+      "Description": row.Description || "",
+      "Code": row.code || "",
+      "Type": row.Type || "",
+      "Accural": row.Accural || "",
+      "Total Days to be Credit": row.TotalDaystoBeCredit || "",
+      "Carry Forward": row.carryForward || "",
+      "Exceed Leave": row.Exceed_Leave || "",
+      "Leave Reason": row.LeaveReason || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Leave Type Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leave Type");
+
+    XLSX.writeFile(workbook, "Leave_Type_Search_Report.xlsx");
   };
 
   return (
@@ -546,11 +688,11 @@ function Input({ }) {
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-                {saveButtonVisible && (
+              {saveButtonVisible && (
                 <li className="dropdown-item" onClick={handleSave}>
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
-                 )}
+              )}
               {/* )} */}
 
               <li className="dropdown-item" onClick={reloadGridData}>
@@ -827,6 +969,11 @@ function Input({ }) {
               <div className="icon-btn reload" onClick={reloadData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

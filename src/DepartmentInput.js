@@ -6,14 +6,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLocation } from 'react-router-dom';
 import LoadingScreen from './Loading';
+import Select from 'react-select';
 const config = require("./Apiconfig");
-
-
 
 function DepartmentInput({ }) {
   const [departmentCode, setDepartmentCode] = useState("");
   const [departmenntName, setDepartmenntName] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const Location = useRef(null);
   const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState([]);
@@ -26,6 +25,35 @@ function DepartmentInput({ }) {
   const code = useRef(null);
   const Name = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
+  const [statusdrop, setStatusdrop] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [status, setStatus] = useState("");
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : '');
+  };
 
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
@@ -34,6 +62,8 @@ function DepartmentInput({ }) {
   const clearInputFields = () => {
     setDepartmentCode("");
     setDepartmenntName("");
+    setSelectedStatus("");
+    setStatus("");
   };
 
   useEffect(() => {
@@ -42,6 +72,11 @@ function DepartmentInput({ }) {
       setDepartmentCode(selectedRow.dept_id || "");
       setDepartmenntName(selectedRow.dept_name || "");
       setkey_field(selectedRow.key_field || "");
+      setStatus(selectedRow.Status || "");
+      setSelectedStatus({
+        label: selectedRow.Status,
+        value: selectedRow.Status,
+      });
 
     } else if (mode === "create") {
       clearInputFields();
@@ -49,11 +84,12 @@ function DepartmentInput({ }) {
   }, [mode, selectedRow, isUpdated]);
 
   const handleInsert = async () => {
-    if (!departmentCode || !departmenntName) {
-      setError(" ");
+    if (!departmentCode || !departmenntName || !status) {
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -66,32 +102,26 @@ function DepartmentInput({ }) {
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           dept_id: departmentCode,
           dept_name: departmenntName,
+          Status: status,
           created_by: sessionStorage.getItem("selectedUserCode"),
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
-        });
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
-        console.error("A department with this code or name already exists. Kindly enter an alternative.");
-        toast.error('A department with this code or name already exists. Kindly enter an alternative.', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
-    }
-    finally {
+      toast.error('Error inserting data: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -130,10 +160,12 @@ function DepartmentInput({ }) {
   };
 
   const handleUpdate = async () => {
-    if (!departmentCode || !departmenntName) {
-      setError(" ");
+    if (!departmentCode || !departmenntName || !status) {
+      setError(true);
+      toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -146,21 +178,23 @@ function DepartmentInput({ }) {
           dept_id: departmentCode,
           dept_name: departmenntName,
           key_field,
+          Status: status,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
           created_by,
           modified_by,
         }),
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
@@ -241,6 +275,38 @@ function DepartmentInput({ }) {
                   <label for="cno" className={`exp-form-labels ${error && !departmenntName ? 'text-danger' : ''}`}>Department Name<span className="text-danger">*</span></label>
                 </div>
               </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="status"
+                    value={selectedStatus}
+                    onChange={handleChangeStatus}
+                    options={filteredOptionStatus}
+                    classNamePrefix="react-select"
+                    placeholder=" "
+                    onFocus={() => setIsSelectStatus(true)}
+                    onBlur={() => setIsSelectStatus(false)}
+                    isClearable
+                    data-tip="Please select a payment type"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        if (mode === "create") {
+                          handleInsert();
+                        } else {
+                          handleUpdate();
+                        }
+                      }
+                    }}
+                  />
+                  <label for="locno" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
+                </div>
+              </div>
+
               <div class="col-12">
                 <div className="search-btn-wrapper">
                   {mode === "create" ? (
@@ -259,12 +325,9 @@ function DepartmentInput({ }) {
 
             </div>
           </div>
-
-
-
         </div>
       </div>
-  
+
     </div>
   );
 }

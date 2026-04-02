@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -10,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { showConfirmationToast } from './ToastConfirmation';
 import LoadingScreen from './Loading';
+import Select from 'react-select';
 const config = require("./Apiconfig");
 
 function Department() {
@@ -25,6 +26,11 @@ function Department() {
   const [modifiedBy, setModifiedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
+  const [statusdrop, setStatusdrop] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [status, setStatus] = useState("");
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -34,6 +40,48 @@ function Department() {
 
   const reloadGridData = () => {
     window.location.reload();
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    }).then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : '');
   };
 
   const handleSearch = async () => {
@@ -48,7 +96,7 @@ function Department() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ dept_id, dept_name, company_code }), // Send  as search criteria
+          body: JSON.stringify({ dept_id, dept_name, Status: status, company_code }), // Send  as search criteria
         }
       );
       if (response.ok) {
@@ -66,7 +114,6 @@ function Department() {
     } finally {
       setLoading(false);
     }
-
   };
 
   const columnDefs = [
@@ -107,6 +154,17 @@ function Department() {
       },
     },
     {
+      headerName: "Status",
+      field: "Status",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      // minWidth: 150,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusgriddrop
+      },
+    },
+    {
       headerName: "Keyfield",
       field: "key_field",
       cellStyle: { textAlign: "center" },
@@ -128,6 +186,12 @@ function Department() {
     setGridApi(params.api);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
   const generateReport = () => {
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
@@ -136,77 +200,149 @@ function Department() {
     };
 
     const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
       return {
-        "Department Code": row.dept_id,
-        "Department Name": row.dept_name,
+        "Department Code": formatValue(row.dept_id),
+        "Department Name": formatValue(row.dept_name),
+        "Status": formatValue(row.Status),
       };
     });
 
+
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
-    reportWindow.document.write("<html><head><title>Department</title>");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write("<html><head><title>Department Report</title>");
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
       body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-      }
-      h1 {
-          color: maroon;
-          text-align: center;
-          font-size: 24px;
-          margin-bottom: 30px;
-          text-decoration: underline;
-      }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #ddd;
-          vertical-align: top;
-      }
-      th {
-          background-color: maroon;
-          color: white;
-          font-weight: bold;
-      }
-      td {
-          background-color: #fdd9b5;
-      }
-      tr:nth-child(even) td {
-          background-color: #fff0e1;
-      }
-      .report-button {
-          display: block;
-          width: 150px;
-          margin: 20px auto;
-          padding: 10px;
-          background-color: maroon;
-          color: white;
-          border: none;
-          cursor: pointer;
-          font-size: 16px;
-          text-align: center;
-          border-radius: 5px;
-      }
-      .report-button:hover {
-          background-color: darkred;
-      }
-      @media print {
-          .report-button {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: ${fontColor};
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: ${tableHeaderBg};
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: ${tableHeaderBg};
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: ${rowAltColor};
+          }
+  
+          tr:hover {
+            background-color: ${hoverColor};
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: ${headerGradientStart};
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            opacity: 0.85;
+          }
+  
+          @media print {
+            .print-btn {
               display: none;
+            }
+            body {
+              background: white;
+            }
           }
-          body {
-              margin: 0;
-              padding: 0;
-          }
-      }
     `);
     reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u>Department</u></h1>");
+    reportWindow.document.write(`<div class="header">
+    <img src="${logoUrl}" class="logo" />
+    <div class="title-section">
+      <h2>Department Report</h2>
+    </div>
+    </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+    <strong>Total Records: ${selectedRows.length}</strong>
+    <span style="float:right;">
+      Printed Date: ${new Date().toLocaleDateString()}
+    </span>
+  </div>`);
+    // reportWindow.document.write("<h1><u>Department Report</u></h1>");
 
     // Create table with headers
     reportWindow.document.write("<table><thead><tr>");
@@ -226,9 +362,11 @@ function Department() {
 
     reportWindow.document.write("</tbody></table>");
 
-    reportWindow.document.write(
-      '<button class="report-button" onclick="window.print()">Print</button>'
-    );
+    reportWindow.document.write(`
+  <div style="text-align:center;">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+`);
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
@@ -277,13 +415,14 @@ function Department() {
         setLoading(true);
         try {
           const modified_by = sessionStorage.getItem('selectedUserCode');
-          // Filter the editedData state to include only the selected rows
+          const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const response = await fetch(`${config.apiBaseUrl}/UpdateDepartment`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "modified-by": modified_by
+              "modified-by": modified_by,
+              "company_code": company_code,
             },
             body: JSON.stringify({ editedData: selectedRowsData }), // Send only the selected rows for saving
           });
@@ -303,7 +442,6 @@ function Department() {
         } finally {
           setLoading(false);
         }
-
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -354,7 +492,6 @@ function Department() {
         } finally {
           setLoading(false);
         }
-
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -501,6 +638,27 @@ function Department() {
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <label for="lname" className="exp-form-labels">Department Name</label>
+              </div>
+            </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectStatus(true)}
+                  onBlur={() => setIsSelectStatus(false)}
+                />
+                <label class="floating-label">Status</label>
               </div>
             </div>
 

@@ -214,7 +214,7 @@ function Project({ }) {
       }
     },
     {
-      headerName: "Task Status",
+      headerName: "Status",
       field: "TaskStatus",
       filter: 'agNumberColumnFilter',
       // minWidth: 130,
@@ -430,8 +430,8 @@ function Project({ }) {
   // };
 
   const handleSave = async (e) => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (!ProjectName || !ProjectManager || !ProjectDescription || !StartDate || !EndDate || !PriorityLevel || !status_type || !EstimatedHours) {
         setError(" ");
         toast.warning("Error:Missing Required Fields")
@@ -480,12 +480,16 @@ function Project({ }) {
 
     } catch (error) {
       toast.error("Error inserting data: " + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const saveEditedData = async () => {
+        showConfirmationToast(
+      "Are you sure you want to Update the data in the selected rows?",
+      async () => {
+      setLoading(true);
     try {
       const modified_by = sessionStorage.getItem('selectedUserCode');
       const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.ProjectID === row.ProjectID) : [editedData];
@@ -508,12 +512,19 @@ function Project({ }) {
         return;
       } else {
         const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
+        toast.warning(errorResponse.message || "Failed to Updated selected data");
       }
     } catch (error) {
       console.error("Error saving data:", error);
       toast.error("Error Updating Data: " + error.message);
+    } finally {
+      setLoading(false);
     }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
   };
 
   const deleteSelectedRows = async (rowData) => {
@@ -522,6 +533,7 @@ function Project({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
+      setLoading(true);
         try {
           const response = await fetch(`${config.apiBaseUrl}/deleteProject`, {
             method: "POST",
@@ -543,6 +555,8 @@ function Project({ }) {
         } catch (error) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
       },
       () => {
@@ -625,7 +639,7 @@ function Project({ }) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   };
 
   return (
@@ -690,7 +704,7 @@ function Project({ }) {
                 maxLength={50}
                 readOnly
               />
-              <label className="exp-form-labels">Project</label>
+              <label className="exp-form-labels">Project ID</label>
             </div>
           </div>
 
@@ -744,10 +758,15 @@ function Project({ }) {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=" "
+                maxLength={5}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 autoComplete="off"
                 value={EstimatedHours}
-                onChange={(e) => setEstimatedHours(e.target.value)}
-                maxLength={100}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setEstimatedHours(value);
+                }}
               />
               <label for="add3" className={`exp-form-labels ${error && !EstimatedHours ? 'text-danger' : ''}`}>
                 Estimated Hours<span className="text-danger">*</span>
@@ -880,7 +899,7 @@ function Project({ }) {
                 maxLength={50}
               />
               <label htmlFor="EmployeeId" className="exp-form-labels">
-                Project
+                Project ID
               </label>
             </div>
           </div>

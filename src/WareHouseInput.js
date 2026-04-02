@@ -17,7 +17,7 @@ function WareHouseInput({ }) {
   const [location_no, setLocation_No] = useState("");
   const [statusdrop, setStatusdrop] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [locationnodrop, setLocationdrop] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -44,25 +44,29 @@ function WareHouseInput({ }) {
     setWarehouse_Name("");
     setSelectedLocation("");
     setSelectedStatus("");
+    setStatus("");
+    setLocation_No("");
   };
 
   useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
+    if (mode === "update" && selectedRow ) {
       setSelectedLocation({
         label: selectedRow.location_no,
         value: selectedRow.location_no,
       });
+      setLocation_No(selectedRow.location_no || "");
       setSelectedStatus({
         label: selectedRow.status,
         value: selectedRow.status,
       });
+      setStatus(selectedRow.status || "");
       setWarehouse_Code(selectedRow.warehouse_code || "");
       setWarehouse_Name(selectedRow.warehouse_name || "");
 
     } else if (mode === "create") {
       clearInputFields();
     }
-  }, [mode, selectedRow, isUpdated]);
+  }, [mode, selectedRow]);
 
 
 
@@ -116,14 +120,14 @@ function WareHouseInput({ }) {
       !warehouse_name ||
       !status ||
       !location_no
-
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
-    //   if (validateInputs()) {
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/AddWareHousedata`, {
         method: "POST",
@@ -139,32 +143,23 @@ function WareHouseInput({ }) {
           created_by: sessionStorage.getItem('selectedUserCode')
         }),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(), // Reloads the page after the toast closes
-          });
-        }, 1000);
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
-    }
-    finally {
+      toast.error('Error inserting data: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -207,9 +202,11 @@ function WareHouseInput({ }) {
       !selectedStatus ||
       !selectedLocation
     ) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -228,24 +225,23 @@ function WareHouseInput({ }) {
           modified_by,
         }),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data Updated successfully");
-        setIsUpdated(true);
-        clearInputFields();
-        toast.success("Data Updated successfully!")
-      } else if (response.status === 400) {
+        toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
+        });
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };

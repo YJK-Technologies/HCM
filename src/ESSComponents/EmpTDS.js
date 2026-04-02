@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { AgGridReact } from "ag-grid-react";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -38,9 +39,9 @@ function Input({ }) {
   const [Employee_Salarys, setEmployee_Salarys] = useState(0);
   const [Taxable_Amounts, setTaxable_Amounts] = useState(0);
   const [Taxable_Amount, setTaxable_Amount] = useState(0);
-  const [Start_Years, setStart_Years] = useState(FirstDate);
-  const [End_Years, setEnd_Years] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [Start_Years, setStart_Years] = useState('');
+  const [End_Years, setEnd_Years] = useState('');
+  const [error, setError] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
   const [rowData, setRowData] = useState([]);
@@ -49,6 +50,13 @@ function Input({ }) {
   const gridColumnApiRef = useRef(null);
   const [activeTab, setActiveTab] = useState("TDS")
   const [loading, setLoading] = useState(false);
+
+  const searchClearInputFields = () => {
+    setStart_Years("");
+    setEnd_Years("");
+    setEmployee_Salarys(0);
+    setTaxable_Amounts(0);
+  };
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -130,7 +138,7 @@ function Input({ }) {
       },
     },
     {
-      headerName: "Key Field ",
+      headerName: "Key Field",
       field: "keyfield",
       editable: false,
       hide: true
@@ -182,10 +190,11 @@ function Input({ }) {
 
   const handleInsert = async () => {
     if (!Start_Year || !End_Year || !Employee_Salary || !Taxable_Amount) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true)
 
     try {
@@ -204,13 +213,11 @@ function Input({ }) {
         }),
 
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(), // Reloads the page after the toast closes
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -225,12 +232,11 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
-
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -256,8 +262,8 @@ function Input({ }) {
           console.error("Error update rows:", error);
           toast.error('Error update Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -267,11 +273,11 @@ function Input({ }) {
 
 
   const handleDelete = async (rowData) => {
-    setLoading(true)
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true)
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { deletedData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -297,8 +303,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -308,6 +314,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const tabs = [
@@ -315,7 +322,7 @@ function Input({ }) {
     { label: 'Bonus' },
     { label: 'PF Contribution' },
     { label: 'Professional Tax' },
-    { label: 'Loan Type' },
+    // { label: 'Loan Type' },
     { label: 'TDS' },
   ];
 
@@ -338,9 +345,9 @@ function Input({ }) {
       case 'Professional Tax':
         EmpProfessionalTax();
         break;
-      case 'Loan Type':
-        EmpLoanType();
-        break;
+      // case 'Loan Type':
+      //   EmpLoanType();
+      //   break;
       case 'TDS':
         EmpTDS();
         break;
@@ -369,103 +376,227 @@ function Input({ }) {
     navigate("/PayslipEmpProTax");
   };
 
-  const EmpLoanType = () => {
-    navigate("/PayslipEmpLoanType");
-  };
+  // const EmpLoanType = () => {
+  //   navigate("/PayslipEmpLoanType");
+  // };
 
   const EmpTDS = () => {
     navigate("/PayslipEmpTDS");
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Start Year": row.Start_Year || "",
+      "End Year": row.End_Year || "",
+      "Employee Salary": row.Employee_Salary || "",
+      "Taxable Amount": row.Taxable_Amount || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "TDS Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "TDS");
+
+    XLSX.writeFile(workbook, "TDS_Search_Report.xlsx");
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-          <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-              <h1 className="page-title">TDS</h1>
+          <h1 className="page-title">TDS</h1>
           <div className="action-wrapper">
             <div onClick={handleInsert} className="action-icon add">
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
           </div>
-            </div>
-          </div>
+        </div>
+      </div>
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      id="date"
-                      class="exp-input-field form-control"
-                      type="date"
-                      placeholder=""
-                      required title="Please Choose the Start Year"
-                      value={Start_Year}
-                      onChange={(e) => setStart_Year(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !Start_Year ? 'text-danger' : ''}`}>
-                          Start Year<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="date"
-                      class="exp-input-field form-control"
-                      type="date"
-                      required title="Please Choose the End Year"
-                      placeholder=""
-                      value={End_Year}
-                      onChange={(e) => setEnd_Year(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !End_Year ? 'text-danger' : ''}`}>
-                          End Year<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="fdate"
-                      class="exp-input-field form-control"
-                      type="text"
-                      placeholder=""
-                      required title="Please Enter the Employee Salary"
-                      value={Employee_Salary}
-                      onChange={(e) => setEmployee_Salary(e.target.value)}
-                    />
-                        <label for="sname" className={`exp-form-labels ${error && !Employee_Salary ? 'text-danger' : ''}`}>
-                          Employee Salary<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-                    <input
-                      id="fdate"
-                      class="exp-input-field form-control"
-                      type="text"
-                      placeholder=""
-                      required title="Please Enter the Taxable Amount"
-                      value={Taxable_Amount}
-                      onChange={(e) => setTaxable_Amount(e.target.value)}
-                    />
-                        <label for="add1" className={`exp-form-labels ${error && !Taxable_Amount ? 'text-danger' : ''}`}>
-                          Taxable Amount<span className="text-danger">*</span>
-                        </label>
-                  </div>
-                </div>
-
-              </div>
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                value={Start_Year}
+                onChange={(e) => setStart_Year(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Start_Year ? 'text-danger' : ''}`}>
+                Start Year<span className="text-danger">*</span>
+              </label>
             </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="date"
+                class="exp-input-field form-control"
+                type="date"
+                required title="Please Choose the End Year"
+                placeholder=""
+                value={End_Year}
+                onChange={(e) => setEnd_Year(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !End_Year ? 'text-danger' : ''}`}>
+                End Year<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required title="Please Enter the Employee Salary"
+                value={Employee_Salary}
+                onChange={(e) => setEmployee_Salary(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !Employee_Salary ? 'text-danger' : ''}`}>
+                Employee Salary<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required title="Please Enter the Taxable Amount"
+                value={Taxable_Amount}
+                onChange={(e) => setTaxable_Amount(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels ${error && !Taxable_Amount ? 'text-danger' : ''}`}>
+                Taxable Amount<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="header-flex">
@@ -475,53 +606,53 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      type="date"
-                      className="exp-input-field form-control"
-                      required title="Please Choose the Start Year"
-                      value={Start_Years}
-                      onChange={(e) => setStart_Years(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Start Year</label>
-                  </div>
-                </div>
+              <input
+                type="date"
+                className="exp-input-field form-control"
+                required title="Please Choose the Start Year"
+                value={Start_Years}
+                onChange={(e) => setStart_Years(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Start Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input
-                      required title="Please Choose the End Year"
-                      type="date"
-                      className="exp-input-field form-control"
-                      value={End_Years}
-                      onChange={(e) => setEnd_Years(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">End Year</label>
-                  </div>
-                </div>
+              <input
+                required title="Please Choose the End Year"
+                type="date"
+                className="exp-input-field form-control"
+                value={End_Years}
+                onChange={(e) => setEnd_Years(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">End Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input type="Number"
-                      className="exp-input-field form-control"
-                      required title="Please Enter the Employee Salary"
-                      value={Employee_Salarys}
-                      onChange={(e) => setEmployee_Salarys(Number(e.target.value))}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Employee Salary</label>
-                  </div>
-                </div>
+              <input type="Number"
+                className="exp-input-field form-control"
+                required title="Please Enter the Employee Salary"
+                value={Employee_Salarys}
+                onChange={(e) => setEmployee_Salarys(Number(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Employee Salary</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                    <input type="Number"
-                      className="exp-input-field form-control"
-                      required title="Please Enter the Taxable Amount"
-                      value={Taxable_Amounts}
-                      onChange={(e) => setTaxable_Amounts(Number(e.target.value))}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
-                        <label for="sname" className="exp-form-labels">Taxable Amount</label>
-                  </div>
-                </div>
+              <input type="Number"
+                className="exp-input-field form-control"
+                required title="Please Enter the Taxable Amount"
+                value={Taxable_Amounts}
+                onChange={(e) => setTaxable_Amounts(Number(e.target.value))}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+              <label for="sname" className="exp-form-labels">Taxable Amount</label>
+            </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -535,29 +666,34 @@ function Input({ }) {
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
           </div>
 
-              </div>
-              </div>
+        </div>
+      </div>
 
 
       <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
         <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                <AgGridReact
-                  rowData={rowData}
-                  columnDefs={columnDefs}
-                  rowSelection="multiple"
-                  pagination={true}
-                  paginationAutoPageSize={true}
-                  gridOptions={gridOptions}
-                  onGridReady={(params) => {
-                    gridApiRef.current = params.api;
-                    gridColumnApiRef.current = params.columnApi;
-                  }}
-                />
-              </div>
-            </div>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            rowSelection="multiple"
+            pagination={true}
+            paginationAutoPageSize={true}
+            gridOptions={gridOptions}
+            onGridReady={(params) => {
+              gridApiRef.current = params.api;
+              gridColumnApiRef.current = params.columnApi;
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

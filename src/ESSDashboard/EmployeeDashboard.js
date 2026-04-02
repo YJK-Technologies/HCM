@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
-import { Line } from "react-chartjs-2";
+import * as XLSX from "xlsx-js-style";
 import config from '../Apiconfig';
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
@@ -32,6 +32,7 @@ const Dashboard = (payslip) => {
   const Today = new Date().toISOString().split("T")[0];
   const [isCalendarVisible, setIsCalendarVisible] = useState(true);
   const [rowData, setRowData] = useState('');
+  const [rempShiftRowData, setEmpShiftRowData] = useState('');
   const [NewJoinees, setNewJoinees] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [startdate, setstartdate] = useState(Today);
@@ -47,6 +48,255 @@ const Dashboard = (payslip) => {
   const [holidayRowData, setHolidayRowData] = useState([]);
   const [payslipData, setPayslipData] = useState({});
 
+  const [shiftFromDate, setShiftFromDate] = useState('');
+  const [shiftToDate, setShiftToDate] = useState('');
+  const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
+  const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
+  const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
+
+  const [isShiftCalendarVisible, setIsShiftCalendarVisible] = useState(true);
+  const [currentShiftDate, setCurrentShiftDate] = useState(new Date());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndexJoinee, setCurrentIndexJoinee] = useState(0);
+  const carouselRef = useRef(null);
+  const joineeCarouselRef = useRef(null);
+
+  useEffect(() => {
+    if (upcomingBirthdays.length > 0) {
+      const timer = setInterval(() => {
+        handleNext();
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [currentIndex, upcomingBirthdays]);
+
+  const handleNext = () => {
+    if (carouselRef.current) {
+      const nextIndex = (currentIndex + 1) % upcomingBirthdays.length;
+      setCurrentIndex(nextIndex);
+      carouselRef.current.scrollTo({
+        left: carouselRef.current.offsetWidth * nextIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handlePrev = () => {
+    if (carouselRef.current) {
+      const prevIndex = (currentIndex - 1 + upcomingBirthdays.length) % upcomingBirthdays.length;
+      setCurrentIndex(prevIndex);
+      carouselRef.current.scrollTo({
+        left: carouselRef.current.offsetWidth * prevIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (NewJoinees.length > 0) {
+      const timer = setInterval(() => {
+        handleJoineeNext();
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [currentIndexJoinee, NewJoinees]);
+
+  const handleJoineeNext = () => {
+    if (joineeCarouselRef.current) {
+      const nextIndex = (currentIndexJoinee + 1) % NewJoinees.length;
+      setCurrentIndexJoinee(nextIndex);
+      joineeCarouselRef.current.scrollTo({
+        left: joineeCarouselRef.current.offsetWidth * nextIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleJoineePrev = () => {
+    if (joineeCarouselRef.current) {
+      const prevIndex = (currentIndexJoinee - 1 + NewJoinees.length) % NewJoinees.length;
+      setCurrentIndexJoinee(prevIndex);
+      joineeCarouselRef.current.scrollTo({
+        left: joineeCarouselRef.current.offsetWidth * prevIndex,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Filter shifts from existing Ag-Grid rowData for the calendar cells
+  const getShiftDetailsForDay = (day) => {
+    if (!day) return null;
+
+    // Format the date to match your API response format (YYYY-MM-DD)
+    const formattedDate = `${currentShiftDate.getFullYear()}-${String(currentShiftDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    // rempShiftRowData-la irunthu antha date-kku mela shift irukkannu check pannum
+    return rempShiftRowData && Array.isArray(rempShiftRowData)
+      ? rempShiftRowData.find(s => s.Date === formattedDate)
+      : null;
+  };
+
+  const shiftConfig = {
+    S1: {
+      label: "Morning Shift",
+      icon: "fa-sun",
+      color: "#f59e0b"
+    },
+    S2: {
+      label: "General Shift",
+      icon: "fa-briefcase",
+      color: "#3b82f6"
+    },
+    S3: {
+      label: "Evening Shift",
+      icon: "fa-cloud-sun",
+      color: "#8b5cf6"
+    },
+    S4: {
+      label: "Night Shift",
+      icon: "fa-moon",
+      color: "#1e293b"
+    },
+    S5: {
+      label: "Split Shift",
+      icon: "fa-clock",
+      color: "#10b981"
+    },
+    S6: {
+      label: "Week Off",
+      icon: "fa-couch",
+      color: "#ef4444"
+    }
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmployeeIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setDepartmentDrop(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftPatternIdOption = data.map((option) => ({
+          value: option.Pattern_Code,
+          label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+        }));
+        setShiftPatternIdDropGrid(shiftPatternIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftOption = data.map((option) => ({
+          value: option.Shift_Code,
+          label: `${option.Shift_Code} - ${option.Shift_Name}`,
+        }));
+        setShiftIdDropGrid(shiftOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  // useEffect(() => {
+  //   const today = new Date();
+
+  //   // Get current day (0 = Sunday, 1 = Monday ...)
+  //   const day = today.getDay();
+
+  //   // Calculate Monday
+  //   const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
+  //   const monday = new Date(today.setDate(diffToMonday));
+
+  //   // Calculate Sunday
+  //   const sunday = new Date(monday);
+  //   sunday.setDate(monday.getDate() + 6);
+
+  //   const formatDate = (date) => date.toISOString().split("T")[0];
+
+  //   setShiftFromDate(formatDate(monday));
+  //   setShiftToDate(formatDate(sunday));
+  // }, []);
+
+  useEffect(() => {
+    const today = new Date();
+
+    // First day of current month
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    // Last day of current month
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    setShiftFromDate(formatDate(firstDay));
+    setShiftToDate(formatDate(lastDay));
+  }, []);
+
+  useEffect(() => {
+    handleEmpShiftReportSearch();
+  }, [])
 
   const {
     Location_name,
@@ -179,46 +429,18 @@ const Dashboard = (payslip) => {
       .then((val) => setLeaveData(val));
   }, []);
 
-const reloadGridData = async () => {
-  try {
-    const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        start_date: startdate,
-        end_date: enddate,
-        userid: sessionStorage.getItem("selectedUserCode"),
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-
-      const newRows = data.map((item) => ({
-        work_date: formatDates(item.work_date),
-        First_CheckIn: item.First_CheckIn,
-        Last_CheckOut: item.Last_CheckOut,
-        total_worked_hours: item.total_worked_hours,
-        Total_login_Hours: item.Total_login_Hours,
-      }));
-
-      setRowData(newRows);
-      toast.success("Grid refreshed successfully");
-    } else {
-      setRowData([]);
-      toast.warning("No data found");
-    }
-  } catch (error) {
-    console.error("Error reloading grid:", error);
-    toast.error("Failed to reload grid");
-  }
-};
-
+  const reloadGridData = async () => {
+    setRowData([]);
+    setstartdate("");
+    setenddate("");
+  };
 
   const handleSearch = async () => {
+    if (new Date(startdate) > new Date(enddate)) {
+      toast.warning("Start Date cannot be greater than End Date");
+      return;
+    }
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/ESSEmployeeDashboard`, {
         method: "POST",
@@ -249,6 +471,38 @@ const reloadGridData = async () => {
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data: " + error.message);
+    }
+  };
+
+  const handleEmpShiftReportSearch = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          From_Date: shiftFromDate,
+          To_Date: shiftToDate,
+          Employee_ID: sessionStorage.getItem('selectedUserCode'),
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        const searchData = await response.json();
+        setEmpShiftRowData(searchData);
+      } else if (response.status === 404) {
+        setEmpShiftRowData([]);
+        toast.warning("Data not found");
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to fetch data");
+        setEmpShiftRowData([]);
       }
     } catch (error) {
       console.error("Error fetching search data:", error);
@@ -317,6 +571,81 @@ const reloadGridData = async () => {
       sortable: true,
       filter: true,
       cellStyle: { textAlign: "left" }
+    },
+  ];
+
+  const empShiftCols = [
+    {
+      headerName: "Date",
+      field: "Date",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift",
+      field: "Shift_Code",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Employee ID",
+      field: "Employee_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employeeIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Department",
+      field: "dept_id",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: departmentDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = departmentDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Designation",
+      field: "desgination_id",
+      minWidth: 130
+    },
+    {
+      headerName: "Shift Pattern",
+      field: "Shift_Pattern_ID",
+      minWidth: 130,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: shiftPatternIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+    },
+    {
+      headerName: "Start Time",
+      field: "Start_Time",
+      minWidth: 100
+    },
+    {
+      headerName: "End Time",
+      field: "End_Time",
+      minWidth: 100
     },
   ];
 
@@ -527,7 +856,7 @@ const reloadGridData = async () => {
 
 
   const handleLeave = () => {
-    navigate('/LeaveReq')
+    navigate('/ApplyLeave')
   }
 
   const fetchBirthdaysinfo = async () => {
@@ -808,6 +1137,296 @@ const reloadGridData = async () => {
     newWindow.close();
   };
 
+  const handleEmpShiftReload = () => {
+    setEmpShiftRowData([]);
+    setShiftFromDate("");
+    setShiftToDate("");
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const shiftObj = shiftIdDropGrid.find(
+        (d) => d.value === row.Shift_Code
+      );
+
+      const shiftName = shiftObj
+        ? shiftObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const empObj = employeeIdDropGrid.find(
+        (d) => d.value === row.Employee_ID
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const depObj = departmentDrop.find(
+        (d) => d.value === row.dept_id
+      );
+
+      const depName = depObj
+        ? depObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const spObj = shiftPatternIdDropGrid.find(
+        (d) => d.value === row.Shift_Pattern_ID
+      );
+
+      const spName = spObj
+        ? spObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Date": row.Date || "",
+        "Shift": `${row.Shift_Code} - ${shiftName}` || "",
+        "Employee ID": `${row.Employee_ID} - ${empName}` || "",
+        "Department": `${row.dept_id} -${depName}` || "",
+        "Designation": row.desgination_id || "",
+        "Shift Pattern": `${row.Shift_Pattern_ID} - ${spName}` || "",
+        "Start Time": row.Start_Time || "",
+        "End Time": row.End_Time || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rempShiftRowData || rempShiftRowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Shift Routine Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rempShiftRowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shift Routine");
+
+    XLSX.writeFile(workbook, "Shift_Routine_Search_Report.xlsx");
+  };
+
+  const transformEmpRowData = (data) => {
+    return data.map((row) => {
+
+      return {
+        "Date": row.work_date || "",
+        "Check In": row.First_CheckIn || "",
+        "Check Out": row.Last_CheckOut || "",
+        "Total Worked Hours": row.total_worked_hours || "",
+        "Total Login  Hours": row.Total_login_Hours || "",
+      };
+    });
+  };
+
+  const handleExportToExcelEmp = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Employee Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformEmpRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Employee");
+
+    XLSX.writeFile(workbook, "Employee_Search_Report.xlsx");
+  };
+
   return (
     <div className="container-fluid  Topnav-screen pb-2">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
@@ -848,49 +1467,192 @@ const reloadGridData = async () => {
         </div>
       </div>
 
-      <div className="info-card-row">
+      <div className="info-card-row dashboard-row">
 
-        <div className="leave-balance-container mt-3">
-          <div className="dashboard-card-base leave-balance-card rounded-4 shadow-lg">
-            <div className="d-flex justify-content-between align-items-center">
-              <h6 className="card-title-heading">Leave Balance</h6>
-              <div className="d-flex justify-content-end ">
-                <button className="apply-leave-btn border-none p-1" onClick={handleLeave} style={{ fontSize: "12px" }}>Apply Leave</button>
-              </div>
+        <div className="leave-balance-container mt-2">
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+
+            <div className="d-flex justify-content-between align-items-center spacing-mb-2">
+              <h6 className="card-title-heading mb-0">Shift Routine</h6>
+              <button
+                className="btn btn-sm btn-outline-primary border-none"
+                onClick={() => setIsShiftCalendarVisible(!isShiftCalendarVisible)}
+                title={isShiftCalendarVisible ? "Switch to Grid View" : "Switch to Calendar View"}
+              >
+                {isShiftCalendarVisible ? <i className="fa-solid fa-table"></i> : <i className="fa-solid fa-calendar-days"></i>}
+              </button>
             </div>
-            <div className="leave-data-grid-row">
-              {leaveData.length > 0 ? (
-                leaveData.map((leave, index) => (
-                  <div key={index} className="leave-item-col mt-3">
-                    <div className="leave-type-card h-100">
-                      <div className={`leave-icon-base fs-6 leave-icon ${leave.leavetype} rounded-5`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-capsule" viewBox="0 0 16 16">
-                          <path d="M1.828 8.9 8.9 1.827a4 4 0 1 1 5.657 5.657l-7.07 7.071A4 4 0 1 1 1.827 8.9Zm9.128.771 2.893-2.893a3 3 0 1 0-4.243-4.242L6.713 5.429z" />
-                        </svg>
-                      </div>
-                      <h6 className="fw-bolder fs-7 mt-4 mb-0">{leave.leavetype}</h6>
-                      <h6 className="fs-7 text-dark ms-0 text-muted-color">Total Leave: {leave.totalleave}</h6>
-                      <h6 className="fs-7 text-primary font-weight-bold">Available: {leave.availableleave}</h6>
-                    </div>
+
+            <div className="d-flex flex-row align-items-center gap-2 spacing-mb-3">
+              <div className="inputGroup flex-grow-1">
+                <input
+                  id="shiftStart"
+                  className="exp-input-field form-control"
+                  type="date"
+                  value={shiftFromDate}
+                  onChange={(e) => setShiftFromDate(e.target.value)}
+                />
+                <label className="exp-form-labels">From Date</label>
+              </div>
+
+              <div className="inputGroup flex-grow-1">
+                <input
+                  id="shiftEnd"
+                  className="exp-input-field form-control"
+                  type="date"
+                  value={shiftToDate}
+                  onChange={(e) => setShiftToDate(e.target.value)}
+                />
+                <label className="exp-form-labels">To Date</label>
+              </div>
+
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleEmpShiftReportSearch}
+                style={{ height: "35px", width: "40px" }}
+                title="Search"
+              >
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleEmpShiftReload}
+                style={{ height: "35px", width: "40px" }}
+                title="Grid Reload"
+              >
+                <i className="fa-solid fa-rotate-right"></i>
+              </button>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleExportToExcel}
+                style={{ height: "35px", width: "40px" }}
+                title="Export Excel"
+              >
+                <i className="fa-solid fa-file-excel"></i>
+              </button>
+            </div>
+
+            <div className="shift-content-area" style={{ height: "320px" }}>
+              {isShiftCalendarVisible ? (
+                <div className="calendar-container">
+                  <div className="calendar-nav">
+                    <button
+                      className="cal-nav-btn"
+                      onClick={() =>
+                        setCurrentShiftDate(
+                          new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() - 1, 1)
+                        )
+                      }
+                    >
+                      &lt;
+                    </button>
+
+                    <span className="calendar-title">
+                      {currentShiftDate.toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+
+                    <button
+                      className="cal-nav-btn"
+                      onClick={() =>
+                        setCurrentShiftDate(
+                          new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() + 1, 1)
+                        )
+                      }
+                    >
+                      &gt;
+                    </button>
                   </div>
-                ))
+
+                  <div className="calendar-grid-header">
+                    {["S", "M", "T", "W", "T", "F", "S"].map(day => <div key={day} className="grid-head-cell">{day}</div>)}
+                  </div>
+
+                  <div className="calendar-grid-body">
+
+                    {Array.from(
+                      { length: new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth(), 1).getDay() },
+                      () => ""
+                    )
+                      .concat(
+                        Array.from(
+                          { length: new Date(currentShiftDate.getFullYear(), currentShiftDate.getMonth() + 1, 0).getDate() },
+                          (_, i) => i + 1
+                        )
+                      )
+                      .map((day, index) => {
+
+                        const shiftInfo = getShiftDetailsForDay(day);
+                        const shift = shiftInfo ? shiftConfig[shiftInfo.Shift_Code] : null;
+
+                        return (
+                          // <div
+                          //   key={index}
+                          //   className={`cal-day-cell ${day ? "active-day" : ""}`}
+                          //   style={{
+                          //     backgroundColor: shift ? `${shift.color}15` : ""
+                          //   }}
+                          // >
+
+                          <div
+                            key={index}
+                            className={`cal-day-cell ${day ? "active-day" : ""}`}
+                            style={{
+                              backgroundColor: shift ? `${shift.color}15` : ""
+                            }}
+                            title={
+                              shiftInfo
+                                ? `${shift.label}\n${shiftInfo.Start_Time} - ${shiftInfo.End_Time}`
+                                : ""
+                            }
+                          >
+
+                            <span className="day-num">{day}</span>
+
+                            {shift && (
+                              <div
+                                className="shift-icon"
+                                title={shift.label}
+                                style={{ color: shift.color }}
+                              >
+                                <i className={`fa-solid ${shift.icon}`}></i>
+                              </div>
+                            )}
+
+                          </div>
+                        );
+
+                      })}
+
+                  </div>
+                </div>
               ) : (
-                <p>No leave data available.</p>
+                <div className="ag-theme-alpine" style={{ height: "100%", width: "100%" }}>
+                  <AgGridReact
+                    columnDefs={empShiftCols}
+                    rowData={rempShiftRowData}
+                    rowHeight={30}
+                    pagination={true}
+                    paginationAutoPageSize={true}
+                  />
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="payslip-analysis-container mt-3">
-          <div className="dashboard-card-base payslip-analysis-card rounded-4 shadow-lg h-100">
+        <div className="payslip-analysis-container mt-2">
+          <div className="dashboard-card-base payslip-analysis-card rounded shadow-lg h-100">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start mt-0">
                 <div className="d-flex justify-content-start">
-                  <h6 className="card-title-heading">Payslip Analysis</h6>
+                  <h6 className="card-title-heading">Payslip Generate</h6>
                 </div>
               </div>
 
-              <div className="grid-col-md-3 mt-4">
+              <div className="col-md-12 mt-4">
                 <div className="inputGroup">
                   <input
                     type="month"
@@ -917,17 +1679,18 @@ const reloadGridData = async () => {
           </div>
         </div>
 
-        <div className="holiday-calendar-container mt-3">
-          <div className="dashboard-card-base alloted-holidays-card rounded-4 shadow-lg p-0 h-100">
+        <div className="holiday-calendar-container mt-2">
+          <div className="dashboard-card-base alloted-holidays-card rounded shadow-lg p-0 h-100">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between mb-1" style={{ maxHeight: "100px", paddingBottom: "10px" }}>
                 <div className="d-flex justify-content-start">
-                  <h6 className="card-title-heading">Alloted Holidays</h6>
+                  <h6 className="card-title-heading">Allotted Holidays</h6>
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
                     className="calendar-toggle-btn"
                     onClick={() => setIsCalendarVisible(!isCalendarVisible)}
+                    title={isCalendarVisible ? "Switch to Grid View" : "Switch to Calendar View"}
                   >
                     {isCalendarVisible ? <i className="fa-solid fa-calendar"></i> : <i className="fa-solid fa-table"></i>}
                   </button>
@@ -995,121 +1758,161 @@ const reloadGridData = async () => {
 
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
 
         <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded-xl app-shadow-lg height-full">
-            <div className="display-flex flex-between-center flex-wrap">
-              <h6 className="card-title-heading">New Joinees</h6>
+          <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
+            <div className="display-flex flex-between-center mb-3">
+              <h6 className="card-title-heading mb-0">New Joinees</h6>
             </div>
-            <div id="newJoineesCarousel" style={{ height: "250px" }} className="app-carousel carousel-slide" data-bs-ride="carousel">
-              <div className="carousel-inner-custom" >
-                {NewJoinees.length > 0 ? (
-                  NewJoinees.map((joinee, index) => (
-                    <div
-                      key={joinee.id}
-                      className={`carousel-item-custom ${index === 0 ? "active-state" : ""}`}
-                    >
-                      <div className="joinee-profile-card text-align-center">
-                        <img
-                          src={joinee.Photos}
-                          width={110}
-                          height={110}
-                          alt={`${joinee.EmployeeId}`}
-                          className="display-block-custom margin-x-auto rounded-custom"
-                        />
-                        <p className="app-badge rounded-pill-custom badge-info-color font-size-6 spacing-mt-2">
-                          {joinee.department_ID} - {joinee.EmployeeId}
-                        </p>
+
+            <div className="joinee-carousel-container" ref={joineeCarouselRef}>
+              {NewJoinees.length > 0 ? (
+                NewJoinees.map((joinee, index) => (
+                  <div key={index} className="joinee-slide">
+                    <div className="joinee-card-inner">
+                      <div className="joinee-accent-circle-top"></div>
+                      <div className="joinee-accent-circle-bottom"></div>
+
+                      <div className="profile-image-wrapper">
+                        <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                        <div className="joinee-icon-badge">✨</div>
+                      </div>
+
+                      <div className="joinee-details mt-3">
+                        <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
+                        <p className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</p>
+                        <div className="welcome-badge">Welcome Onboard! 🤝</div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-align-center text-muted-color spacing-mt-3">No new joinees</p>
-                )}
+                  </div>
+                ))
+              ) : (
+                <div className="no-birthday-view">
+                  <div className="empty-icon">👥</div>
+                  <p className="text-muted-color">No new joinees this month</p>
+                </div>
+              )}
+            </div>
+
+            {NewJoinees.length > 1 && (
+              <div className="joinee-nav-controls-bottom">
+                <button className="nav-btn" onClick={handleJoineePrev}>❮</button>
+                <div className="joinee-nav-dots">
+                  {NewJoinees.map((_, i) => (
+                    <span key={i} className={`dot ${currentIndexJoinee === i ? 'active' : ''}`}></span>
+                  ))}
+                </div>
+                <button className="nav-btn" onClick={handleJoineeNext}>❯</button>
               </div>
-              {NewJoinees.length > 1 && (
-                <div className="carousel-nav-container">
-                  <button
-                    className="carousel-control-prev-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="prev"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-left-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
-                    </svg>
-                  </button>
-                  <button
-                    className="carousel-control-next-custom"
-                    type="button"
-                    data-bs-target="#newJoineesCarousel"
-                    data-bs-slide="next"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-caret-right-fill text-color-dark" viewBox="0 0 16 16">
-                      <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-                    </svg>
-                  </button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid-col-lg-3">
+          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
+            <div className="display-flex flex-between-center mb-3">
+              <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
+            </div>
+
+            <div className="birthday-carousel-container" ref={carouselRef}>
+              {upcomingBirthdays.length > 0 ? (
+                upcomingBirthdays.map((person, index) => (
+                  <div key={index} className="birthday-slide">
+                    <div className="birthday-card-inner">
+                      <div className="birthday-accent-circle"></div>
+                      <div className="birthday-accent-circle-bottom"></div>
+
+                      <div className="profile-image-wrapper">
+                        <img src={person.Photos} className="birthday-img-modern" alt="profile" />
+                        <div className="birthday-icon-badge">🎂</div>
+                      </div>
+
+                      <div className="birthday-details mt-3">
+                        <h6 className="emp-name-text">{person.EmployeeName}</h6>
+                        <p className="emp-dept-sub">{person.Department || 'Team Member'}</p>
+                        <div className="wish-badge">Happy Birthday! 🎈</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-birthday-view">
+                  <div className="empty-icon">🎉</div>
+                  <p className="text-muted-color">No birthdays this week</p>
+                </div>
+              )}
+            </div>
+
+            <div className="birthday-nav-controls-bottom">
+              <button className="nav-btn" onClick={handlePrev}>❮</button>
+              <div className="birthday-nav-dots">
+                {upcomingBirthdays.map((_, i) => (
+                  <span key={i} className={`dot ${currentIndex === i ? 'active' : ''}`}></span>
+                ))}
+              </div>
+              <button className="nav-btn" onClick={handleNext}>❯</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid-col-lg-6">
+          <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="card-title-heading mb-0">Leave Balance</h6>
+              </div>
+              <button className="btn-apply-modern" onClick={handleLeave}>
+                Apply Leave
+              </button>
+            </div>
+
+            <div className="leave-grid-container">
+              {leaveData.length > 0 ? (
+                leaveData.map((leave, index) => {
+                  const percentage = (leave.availableleave / leave.totalleave) * 100;
+                  const strokeDasharray = `${percentage}, 100`;
+
+                  return (
+                    <div key={index} className="leave-status-item">
+                      <div className="leave-progress-wrapper">
+                        <svg viewBox="0 0 36 36" className="circular-chart">
+                          <path className="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, '-')}`}
+                            strokeDasharray={strokeDasharray}
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <text x="18" y="20.35" className="percentage">{leave.availableleave}</text>
+                        </svg>
+                      </div>
+                      <div className="leave-info-text">
+                        <span className="leave-label">{leave.LeaveId}</span>
+                        <span className="leave-total-sub">of {leave.totalleave} Days</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-4 w-100">
+                  <p className="text-muted">No leave data available.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded-xl app-shadow-lg height-full" >
-            <div className="display-flex flex-between-center">
-              <h6 className="card-title-heading">Upcoming Birthdays</h6>
-            </div>
-            <div className="birthday-list-container" style={{ height: "250px" }}>
-              {upcomingBirthdays.length > 0 ? (
-                upcomingBirthdays.map((person) => (
-                  <div key={person.id} className="birthday-profile-item">
-                    <div className="display-flex justify-center spacing-mt-2">
-                      <div className="">
-                        <img
-                          src={person.Photos}
-                          width={110}
-                          height={110}
-                          className="image-rounded-20"
-                          alt={person.Plainimg}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid-col-12 spacing-mt-2">
-                      <h3 className="text-color-dark">{person.EmployeeName}</h3>
-                      <p className="app-badge spacing-p-1 text-bg-warning font-size-6">🎉🎂🎉🎂</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-align-center text-muted-color spacing-mt-3">No Upcoming Birthdays</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid-col-lg-6">
-          <div className="app-card-base rounded-xl birthday-card-wrapper app-shadow-lg height-full">
-            <div className="d-flex justify-content-between align-items-center">
-              <h6 className="card-title-heading spacing-mb-2">Productivity</h6>
-            </div>
-            <div className="productivity-chart-container" style={{ width: "100%", height: "315px", padding: "20px" }}>
-              <Line data={chartData} options={chartOptions} />
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <div className="dashboard-row spacing-mt-3">
+      <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
-          <div className="birthday-card-wrapper rounded-xl app-shadow-lg height-full">
-            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Search Criteria</h6>
+          <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
+            <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">Employee Search Criteria</h6>
 
             <div className="dashboard-row mb-2-me-1">
 
-              <div className="grid-col-md-4">
+              <div className="grid-col-md-3">
                 <div className="inputGroup">
                   <input
                     id="startdate"
@@ -1125,7 +1928,7 @@ const reloadGridData = async () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-4">
+              <div className="grid-col-md-3">
                 <div className="inputGroup">
                   <input
                     id="enddate"
@@ -1147,27 +1950,34 @@ const reloadGridData = async () => {
                     <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
+
                   <div className="icon-btn reload" onClick={reloadGridData}>
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+
+                  <div className="icon-btn excel" onClick={handleExportToExcel}>
+                    <span className="tooltip">Excel</span>
+                    <i className="fa-solid fa-file-excel"></i>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme spacing-mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={Employeecol}
                   rowData={rowData}
                   suppressLoadingOverlay={true}
+                  pagination={true}
+                  paginationAutoPageSize={true}
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
-
 
       {/* Modal for Preview */}
       {showModal && payslipData && (

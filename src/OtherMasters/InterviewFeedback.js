@@ -9,35 +9,17 @@ import TabButtons from '../ESSComponents/Tabs';
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
-const getFinancialYearDates = () => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
-  console.log(currentMonth)
-  let startYear, endYear;
-
-  if (currentMonth < 4) {
-    startYear = currentYear - 1;
-    endYear = currentYear;
-  } else {
-
-    startYear = currentYear;
-    endYear = currentYear + 1;
-  }
-
-  const FirstDate = `${startYear}-04-01`;
-  const LastDate = `${endYear}-03-31`;
-
-  return { FirstDate, LastDate };
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; // YYYY-MM-DD
 };
-const { FirstDate, LastDate } = getFinancialYearDates();
 
 function InterviewFeedback({ }) {
   const [rowData, setRowData] = useState([]);
-  const [submitted_on, setsubmitted_on] = useState(FirstDate);
+  const [submitted_on, setsubmitted_on] = useState(getTodayDate());
   const [error, setError] = useState("");
   const [rating, setrating] = useState("");
   const [comments, setcomments] = useState("");
@@ -52,6 +34,8 @@ function InterviewFeedback({ }) {
   const [isselectedfeedback_id, setIsfeedback_id] = useState("");
   const [scheduleidDrop, setscheduleidDrop] = useState([]);
   const [feedback_idDrop, setfeedback_idDrop] = useState([]);
+  const [RecommendationDrop, setRecommendationDrop] = useState([]);
+  const [recommendationDrop, setRecommendationdrop] = useState([]);
 
   const [activeTab, setActiveTab] = useState("Interview Feedback")
   const [loading, setLoading] = useState(false);
@@ -59,44 +43,71 @@ function InterviewFeedback({ }) {
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selectedfeedback_id, setselectedfeedback_id] = useState("");
   const [feedback_id, setfeedback_id] = useState("");
-   const [selectedEmployeeID, setselectedEmployeeID] = useState("");
-    const [EmployeeID, setEmployeeID] = useState("");
-    const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
-    const [EmployeeIDSC, setEmployeeIDSC] = useState("");
-    const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
-    const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
-    const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
+  const [selectedEmployeeID, setselectedEmployeeID] = useState("");
+  const [EmployeeID, setEmployeeID] = useState("");
+  const [selectedEmployeeIDSC, setselectedEmployeeIDSC] = useState("");
+  const [EmployeeIDSC, setEmployeeIDSC] = useState("");
+  const [EmployeeIDdrop, setEmployeeIDdrop] = useState([]);
+  const [isSelectEmployeeID, setisSelectEmployeeID] = useState(false);
+  const [isSelectEmployeeIDSC, setisSelectEmployeeIDSC] = useState(false);
+  const [selectedRecommendation, setselectedRecommendation] = useState("");
+  const [Recommendation, setRecommendation] = useState("");
+  const [selectedRecommendationSC, setselectedRecommendationSC] = useState("");
+  const [RecommendationSC, setRecommendationSC] = useState("");
+  const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
+  const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
+  const [employeeDrop, setEmployeeDrop] = useState([]);
+
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselectedfeedback_id("");
+    setfeedback_id("");
+    setselectedscheduleidSC("");
+    setscheduleidSC("");
+    setselectedEmployeeIDSC("");
+    setEmployeeIDSC("");
+    setselectedRecommendationSC("");
+    setRecommendationSC("");
+    setcommentsSC("");
   };
 
-
-   const handlefeedback_id = (selectedDPT) => {
+  const handlefeedback_id = (selectedDPT) => {
     setselectedfeedback_id(selectedDPT);
     setfeedback_id(selectedDPT ? selectedDPT.value : '');
   };
-   const filteredOptionfeedback_id = feedback_idDrop.map(option => ({
+  const filteredOptionfeedback_id = feedback_idDrop.map(option => ({
     value: option.feedback_id,
     label: option.feedback_id,
   }));
+  const handleRecommendation = (selectedDPT) => {
+    setselectedRecommendation(selectedDPT);
+    setRecommendation(selectedDPT ? selectedDPT.value : '');
+  };
+  const handleRecommendationSC = (selectedDPT) => {
+    setselectedRecommendationSC(selectedDPT);
+    setRecommendationSC(selectedDPT ? selectedDPT.value : '');
+  };
+  const filteredOptionRecommendation = RecommendationDrop.map(option => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
 
-      const handleEmployeeID = (selectedDPT) => {
+  const handleEmployeeID = (selectedDPT) => {
     setselectedEmployeeID(selectedDPT);
     setEmployeeID(selectedDPT ? selectedDPT.value : '');
   };
-     const handleEmployeeIDSC = (selectedDPT) => {
+  const handleEmployeeIDSC = (selectedDPT) => {
     setselectedEmployeeIDSC(selectedDPT);
     setEmployeeIDSC(selectedDPT ? selectedDPT.value : '');
   };
 
-   const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
+  const filteredOptionEmployeeID = EmployeeIDdrop.map(option => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`
   }));
@@ -118,34 +129,81 @@ function InterviewFeedback({ }) {
     label: option.schedule_id,
   }));
 
-   useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-    
-        const fetchDept = async () => {
-          try {
-            const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ company_code }),
-            });
-    
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-    
-            const val = await response.json();
-            setEmployeeIDdrop(val);
-          } catch (error) {
-            console.error('Error fetching departments:', error);
-          }
-        };
-    
-        if (company_code) {
-          fetchDept();
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/Employee_ID`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      }, []);
+
+        const val = await response.json();
+        setEmployeeIDdrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/Recommendation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const val = await response.json();
+        setRecommendationDrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Recommendation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const recommendation = data.map(option => option.attributedetails_name);
+        setRecommendationdrop(recommendation);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
 
   useEffect(() => {
@@ -221,6 +279,27 @@ function InterviewFeedback({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Employee_ID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employee = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmployeeDrop(employee);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
       await handleSearch();
@@ -270,7 +349,15 @@ function InterviewFeedback({ }) {
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employeeDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Rating",
@@ -283,21 +370,18 @@ function InterviewFeedback({ }) {
       editable: true
     },
     {
+      headerName: "Recommendation",
+      field: "Recommendation",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: recommendationDrop,
+      },
+    },
+    {
       headerName: "Submitted On",
       field: "submitted_on",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Keyfield",
@@ -314,7 +398,7 @@ function InterviewFeedback({ }) {
   };
 
   const handleSave = async () => {
-    if (!scheduleid || !EmployeeID || !rating || !submitted_on) {
+    if (!scheduleid || !EmployeeID || !rating || !submitted_on || !Recommendation) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -327,6 +411,7 @@ function InterviewFeedback({ }) {
         rating: rating,
         comments: comments,
         submitted_on: submitted_on,
+        Recommendation: Recommendation,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
@@ -338,13 +423,11 @@ function InterviewFeedback({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -363,8 +446,11 @@ function InterviewFeedback({ }) {
         schedule_id: scheduleidSC,
         feedback_id: feedback_id,
         employee_id: EmployeeIDSC,
+        Recommendation: RecommendationSC,
         rating: Number.rating,
         comments: commentsSC,
+        fromDate: fromDate,
+        toDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -383,6 +469,7 @@ function InterviewFeedback({ }) {
           employee_id: matchedItem.employee_id,
           rating: matchedItem.rating,
           comments: matchedItem.comments,
+          Recommendation: matchedItem.Recommendation,
           submitted_on: matchedItem.submitted_on,
           keyfield: matchedItem.keyfield,
         }));
@@ -405,15 +492,16 @@ function InterviewFeedback({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -451,11 +539,11 @@ function InterviewFeedback({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_feedbackData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -491,10 +579,10 @@ function InterviewFeedback({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -504,7 +592,7 @@ function InterviewFeedback({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
       case 'Job Master':
@@ -513,7 +601,7 @@ function InterviewFeedback({ }) {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -557,6 +645,142 @@ function InterviewFeedback({ }) {
 
   const InterviewDecision = () => {
     navigate("/InterviewDecision");
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const empObj = employeeDrop.find(
+        (d) => d.value === row.employee_id
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+      "Schedule ID": row.schedule_id || "",
+      "Employee ID": `${row.employee_id} - ${empName}` || "",
+      "Rating": row.rating || "",
+      "Comments": row.comments || "",
+      "Recommendation": row.Recommendation || "",
+      "Submitted On": row.submitted_on || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Interview Feedback Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Feedback");
+
+    XLSX.writeFile(workbook, "Interview_Feedback_Search_Report.xlsx");
   };
 
   return (
@@ -658,6 +882,29 @@ function InterviewFeedback({ }) {
             </div>
           </div>
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedRecommendation ? "has-value" : ""} 
+              ${isSelectRecommendation ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectRecommendation(true)}
+                onBlur={() => setisSelectRecommendation(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedRecommendation}
+                onChange={handleRecommendation}
+                options={filteredOptionRecommendation}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedRecommendation ? 'text-danger' : ''}`}>
+                Recommendation {showAsterisk && <span className="text-danger">*</span>}
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -701,6 +948,40 @@ function InterviewFeedback({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Submitted From</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Submitted To</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div
@@ -750,7 +1031,7 @@ function InterviewFeedback({ }) {
             </div>
           </div>
 
-         <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedEmployeeIDSC ? "has-value" : ""} 
@@ -774,6 +1055,29 @@ function InterviewFeedback({ }) {
             </div>
           </div>
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedRecommendationSC ? "has-value" : ""} 
+              ${isSelectRecommendationSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisSelectRecommendationSC(true)}
+                onBlur={() => setisSelectRecommendationSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedRecommendationSC}
+                onChange={handleRecommendationSC}
+                options={filteredOptionRecommendation}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Recommendation
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -789,8 +1093,6 @@ function InterviewFeedback({ }) {
             </div>
           </div>
 
-
-
           {/* Search + Reload Buttons */}
           <div className="col-12">
             <div className="search-btn-wrapper">
@@ -802,6 +1104,11 @@ function InterviewFeedback({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

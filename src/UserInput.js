@@ -30,7 +30,7 @@ function UserInput({ }) {
   const [roleDrop, setRoleDrop] = useState([]);
   const [Genderdrop, setGenderdrop] = useState([]);
   const [Loginoroutdrop, setLoginoroutdrop] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [user_images, setuser_image] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
@@ -68,11 +68,16 @@ function UserInput({ }) {
     setFirst_name("");
     setLast_name("");
     setSelectedStatus("");
+    setUser_status("");
     setSelectedRole("");
+    setRole("");
     setSelectedLog("");
+    setLog_in_out("");
     setSelectedGender("");
+    setGender("");
     setEmail_id("");
     setDob("");
+    setUser_password("");
     setSelectedImage("");
     if (ImagE.current) {
       ImagE.current.value = null;
@@ -308,7 +313,7 @@ function UserInput({ }) {
       !email_id ||
       !dob
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
@@ -317,6 +322,7 @@ function UserInput({ }) {
       toast.warning("Invalid email format.");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -345,16 +351,16 @@ function UserInput({ }) {
       });
 
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data');
       }
     } catch (error) {
       console.error("Error inserting data:", error);
@@ -424,7 +430,7 @@ function UserInput({ }) {
       !selectedStatus ||
       !dob
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Please fill all required fields.");
       return;
     }
@@ -433,6 +439,7 @@ function UserInput({ }) {
       toast.warning("Invalid email format.");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -462,15 +469,15 @@ function UserInput({ }) {
 
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to Update data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
@@ -479,6 +486,15 @@ function UserInput({ }) {
       setLoading(false);
     }
   };
+
+  const today = new Date();
+  const maxDob = new Date(
+    today.getFullYear() - 18,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
 
   return (
     <div class="container-fluid Topnav-screen">
@@ -553,7 +569,7 @@ function UserInput({ }) {
                 ref={firstname}
                 onKeyDown={(e) => handleKeyDown(e, lastname, firstname)}
               />
-              <label for="state" class="exp-form-labels" className={`${error && !first_name ? 'text-danger' : ''}`}>First Name<span className="text-danger">*</span></label>
+              <label for="state" className={`exp-form-labels ${error && !first_name ? 'text-danger' : ''}`}>First Name<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -697,6 +713,7 @@ function UserInput({ }) {
                 autoComplete="off"
                 placeholder=" "
                 required
+                max={maxDob}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
                 ref={Dob}

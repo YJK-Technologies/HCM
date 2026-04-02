@@ -27,6 +27,15 @@ function IntermediaryHdrInput({ open, handleClose }) {
   const statusRef = useRef(null);
   const delRef = useRef(null);
 
+    const clearInputFields = () => {
+    setCode("");
+    setDetails("");
+    setStatus("");
+    setSelectedStatus("");
+    setDeletePermission("");
+    setSelectedDelete("");
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -75,10 +84,11 @@ function IntermediaryHdrInput({ open, handleClose }) {
 
   const handleInsert = async () => {
   if (!Code || !Details || !status || !deletePermission) {
+    setError(true);
     toast.warning("Missing Required Fields");
     return;
   }
-
+  setError(false);
   setLoading(true);
   try {
     const res = await fetch(`${config.apiBaseUrl}/AddIntermediaryheaderData`, {
@@ -94,10 +104,10 @@ function IntermediaryHdrInput({ open, handleClose }) {
       }),
     });
 
-    if (res.status === 200) {
+    if (res.ok) {
       toast.success("Data inserted successfully!", {
-        onClose: () => window.location.reload(),
-      });
+          onClose: () => clearInputFields(),
+        });
     } else {
       const err = await res.json();
       toast.error(err.message || "Failed to insert data");
@@ -170,7 +180,7 @@ if (!open) return null;
                 ref={nameRef}
               />
               <label className={`exp-form-labels ${error && !Details ? 'text-danger' : ''}`}>
-                Name <span className="text-danger">*</span>
+                Name<span className="text-danger">*</span>
               </label>
             </div>
             </div>

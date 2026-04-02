@@ -13,6 +13,10 @@ import EmployeeAssetsPopup from "./EmployeeAssetsPopup";
 import { DateTimeField } from "@mui/x-date-pickers";
 const config = require('../Apiconfig');
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 function EmployeeAssets({ }) {
   const [loading, setLoading] = useState(false);
   const [EmployeeID, setEmployeeID] = useState("");
@@ -29,7 +33,11 @@ function EmployeeAssets({ }) {
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [actualReturnDate, setActualReturnDate] = useState('');
   const [statusdrop, setStatusdrop] = useState([]);
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 
   const [Assetvalue, setAssetvalue] = useState([{
     relation: 'Assetvalue', members: [{
@@ -169,6 +177,7 @@ function EmployeeAssets({ }) {
     );
   };
 
+<<<<<<< HEAD
   // const handleSave = async () => {
 
   //     if (!EmployeeID) {
@@ -325,6 +334,159 @@ function EmployeeAssets({ }) {
   };
 
   const reloadGridData = () => {
+=======
+// const handleSave = async () => {
+
+//     if (!EmployeeID) {
+//       setError(true);
+//       toast.warning("Error: Missing required keyfield")
+//       return;
+//     }
+
+//     for (const relationGroup of Assetvalue) {
+//       for (const member of relationGroup.members) {
+//         if (!member.AssetID  || !member.AllocationDate || !member.AllocationStatus) {
+//           setError(true);
+//           toast.warning("Error: Missing required fields")
+
+//           return;
+//         }
+//       }
+//     }
+
+//     const employeeData = Assetvalue.flatMap((relationGroup) =>
+//       relationGroup.members.map((member) => ({
+//         AssetID: member.AssetID,
+//         EmployeeID: member.EmployeeID,
+//         AllocationDate: member.AllocationDate,
+//         ExpectedReturnDate: member.ExpectedReturnDate,
+//         ActualReturnDate: member.ActualReturnDate,
+//         AllocationStatus: member.AllocationStatus,
+//         ConditionAtIssue: member.ConditionAtIssue,
+//         ConditionAtReturn: member.ConditionAtReturn,
+//         ApprovedBy: member.ApprovedBy,
+//         Remarks: member.Remarks,
+//         company_code: sessionStorage.getItem("selectedCompanyCode"),
+//         CreatedBy: sessionStorage.getItem("selectedUserCode")
+//       }))
+//     );
+//     setError(false);
+//     setLoading(true)
+
+//     try {
+//       const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopInsert`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ employeeData }),
+//       });
+//       if (response.ok) {
+//         toast.success("Data inserted successfully!", {
+//           onClose: () => window.location.reload(),
+//         });
+//       } else {
+//         const errorResponse = await response.json();
+//         console.error(errorResponse.message);
+//         toast.warning(errorResponse.message, {
+//         })
+//       }
+//     } catch (err) {
+//       console.error("Error delete data:", err);
+//       toast.error('Error delete data: ' + err.message, {
+//       });
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+const handleSave = async () => {
+  if (!EmployeeID) {
+    setError(true);
+    toast.warning("Employee ID is required");
+    return;
+  }
+
+  for (const relationGroup of Assetvalue) {
+    for (const member of relationGroup.members) {
+
+      if (!member.AssetID || !member.AllocationDate || !member.Status) {
+        setError(true);
+        toast.warning("Please fill all required fields");
+        return;
+      }
+
+      
+      if (
+        member.ExpectedReturnDate &&
+        member.ExpectedReturnDate < member.AllocationDate
+      ) {
+        toast.warning("Expected Return Date must be after Allocation Date");
+        return;
+      }
+
+      if (
+        member.ActualReturnDate &&
+        member.ActualReturnDate < member.AllocationDate
+      ) {
+        toast.warning("Actual Return Date must be after Allocation Date");
+        return;
+      }
+    }
+  }
+
+  setError(false);
+  setLoading(true);
+
+  const employeeData = Assetvalue.flatMap((relationGroup) =>
+    relationGroup.members.map((member) => ({
+      AssetID: member.AssetID,
+      EmployeeID: EmployeeID, 
+      AllocationDate: member.AllocationDate,
+      ExpectedReturnDate: member.ExpectedReturnDate || null,
+      ActualReturnDate: member.ActualReturnDate || null,
+      AllocationStatus: member.Status, 
+      ConditionAtIssue: member.ConditionAtIssue,
+      ConditionAtReturn: member.ConditionAtReturn,
+      ApprovedBy: member.ApprovedBy,
+      Remarks: member.Remarks,
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      CreatedBy: sessionStorage.getItem("selectedUserCode"),
+    }))
+  );
+
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ employeeData }),
+      }
+    );
+
+    if (response.ok) {
+      toast.success("Data saved successfully!", {
+        onClose: () => window.location.reload(),
+      });
+   } else {
+           const errorResponse = await response.json();
+           console.error(errorResponse.message);
+           toast.warning(errorResponse.message, {
+           })
+         }
+       } catch (err) {
+         console.error("Error delete data:", err);
+         toast.error('Error delete data: ' + err.message, {
+         });
+       } finally {
+         setLoading(false);
+       }
+     };
+   const reloadGridData = () => {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     window.location.reload();
   };
 
@@ -333,8 +495,13 @@ function EmployeeAssets({ }) {
     label: option.attributedetails_name,
   }));
 
+<<<<<<< HEAD
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/status`, {
+=======
+useEffect(() => {
+     fetch(`${config.apiBaseUrl}/status`, {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -346,6 +513,7 @@ function EmployeeAssets({ }) {
       .then((val) => setStatusdrop(val));
   }, []);
 
+<<<<<<< HEAD
 
   const handleChangeStatus = (selectedStatus, relation, index) => {
     setAssetvalue((prevDocuments) =>
@@ -368,6 +536,32 @@ function EmployeeAssets({ }) {
     );
   };
 
+=======
+    const handleChangeStatus = (selectedStatus, relation, index) => {
+    setAssetvalue((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  Status: selectedStatus
+                    ? selectedStatus.value
+                    : "",
+                  selectedStatus: selectedStatus,
+                }
+                : member
+            ),
+          }
+          : doc
+      )
+    );
+  };
+
+  
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
   const RelationInputChange = (relation, index, field, value) => {
     setAssetvalue((prev) =>
       prev.map((item) =>
@@ -383,6 +577,7 @@ function EmployeeAssets({ }) {
     );
   };
   const handleEmployeeAssets = async (code) => {
+<<<<<<< HEAD
     try {
       const response = await fetch(`${config.apiBaseUrl}/getEmployeeFamily`, {
         method: "POST",
@@ -475,20 +670,121 @@ function EmployeeAssets({ }) {
   };
 
   const handleKeyPress = (e) => {
+=======
+  try {
+    const response = await fetch(`${config.apiBaseUrl}/getEmployeeFamily`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Id: code,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    });
+
+    if (response.ok) {
+      setSaveButtonVisible(false);
+      setShowAsterisk(false);
+
+      const data = await response.json();
+
+      const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
+
+      setdepartment_id(department_id);
+      setdesignation_id(designation_id);
+      setFirst_Name(First_Name);
+      setEmployeeId(EmployeeId);
+
+      // ✅ MAP DATA TO Assetvalue
+      const mappedAssets = [
+        {
+          relation: "Assetvalue",
+          members: data.map((item) => ({
+            AssetID: item.AssetID || "",
+            AllocationDate: formatDate(item.AllocationDate),
+            ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
+            ActualReturnDate: formatDate(item.ActualReturnDate),
+            AllocationStatus: item.AllocationStatus || "",
+            ConditionAtIssue: item.ConditionAtIssue || "",
+            ConditionAtReturn: item.ConditionAtReturn || "",
+            ApprovedBy: item.ApprovedBy || "",
+            Remarks: item.Remarks || "",
+            keyfield: item.keyfield || "",
+          })),
+        },
+      ];
+
+      setAssetvalue(mappedAssets);
+
+    } else if (response.status === 404) {
+      toast.warning("Data not found");
+
+      setAssetvalue([
+        {
+          relation: "Assetvalue",
+          members: [
+            {
+              AssetID: "",
+              AllocationDate: "",
+              ExpectedReturnDate: "",
+              ActualReturnDate: "",
+              AllocationStatus: "",
+              ConditionAtIssue: "",
+              ConditionAtReturn: "",
+              ApprovedBy: "",
+              Remarks: "",
+              keyfield: "",
+            },
+          ],
+        },
+      ]);
+    } else {
+      const err = await response.json();
+      toast.warning(err.message || "Error fetching data");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Error: " + error.message);
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return "";
+
+  const d = new Date(date);
+
+  // Convert to YYYY-MM-DD (required for input type="date")
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+   const handleKeyPress = (e) => {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     if (e.key === 'Enter') {
       handleEmployeeAssets(EmployeeID)
     }
   };
 
+<<<<<<< HEAD
   const [open, setOpen] = React.useState(false);
 
   const handleEmployeeInfo = () => {
+=======
+const [open, setOpen] = React.useState(false);
+
+ const handleEmployeeInfo = () => {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
+<<<<<<< HEAD
 
     const handleDateChange = (relation, index, field, value) => {
     setAssetvalue((prev) =>
@@ -518,6 +814,47 @@ function EmployeeAssets({ }) {
   //       console.log("Data not fetched...!");
   //     }
   //   };
+=======
+  
+const handleDateChange = (e, relation, idx) => {
+  const { name, value } = e.target;
+  const today = new Date().toISOString().split("T")[0];
+
+  if (value > today) {
+    toast.warning("Future dates are not allowed!");
+    return;
+  }
+
+  const member = Assetvalue.find(r => r.relation === relation).members[idx];
+
+
+  if (name === "ExpectedReturnDate" && member.AllocationDate && value < member.AllocationDate) {
+    toast.warning("Expected Return Date must be after Allocation Date");
+    return;
+  }
+
+  if (name === "ActualReturnDate" && member.AllocationDate && value < member.AllocationDate) {
+    toast.warning("Actual Return Date must be after Allocation Date");
+    return;
+  }
+
+  RelationInputChange(relation, idx, name, value);
+};
+
+// const EmployeeAssetsPopup = async (data) => {
+//     if (data && data.length > 0) {
+//       setSaveButtonVisible(false);
+//       setShowAsterisk(false);
+//       setIsAcademicDataLoaded(true);
+//       const [{ employeeId }] = data;
+
+//       handleEmployeeAssets(employeeId);
+
+//     } else {
+//       console.log("Data not fetched...!");
+//     }
+//   };
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -537,7 +874,11 @@ function EmployeeAssets({ }) {
               </div>
             )}
             <div className="action-icon print"
+<<<<<<< HEAD
               onClick={reloadGridData}
+=======
+           onClick={reloadGridData}
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
             >
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -553,7 +894,11 @@ function EmployeeAssets({ }) {
 
               {saveButtonVisible && ['add', 'all permission'].some(p => EmpAssetsPermissions.includes(p)) && (
                 <li className="dropdown-item"
+<<<<<<< HEAD
                   onClick={handleSave}
+=======
+                onClick={handleSave}
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                 >
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
@@ -584,9 +929,15 @@ function EmployeeAssets({ }) {
                 value={EmployeeID}
                 onChange={(e) => setEmployeeID(e.target.value)}
                 maxLength={18}
+<<<<<<< HEAD
                 onKeyPress={handleKeyPress}
               />
               <label className="exp-form-labels">Employee ID</label>
+=======
+              onKeyPress={handleKeyPress}
+              />
+               <label className="exp-form-labels">Employee ID</label>
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
               <span className="select-add-btn" title="Employee Help"
                 onClick={handleEmployeeInfo}>
                 <i className="fa fa-search"></i>
@@ -669,21 +1020,35 @@ function EmployeeAssets({ }) {
                     type="number"
                     className="exp-input-field form-control"
                     value={member.AssetID}
+<<<<<<< HEAD
                     maxLength={12}
+=======
+                  maxLength={12}
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                     placeholder=" "
                     autoComplete="off"
                     inputMode="numeric"
                     pattern="[0-9]*"
+<<<<<<< HEAD
                     onChange={(e) => {
                       const value = e.target.value;
                       if (/^\d*$/.test(value)) {
                         RelationInputChange(relationGroup.relation, index, 'AssetID', value);
                       }
                     }} />
+=======
+             onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        RelationInputChange(relationGroup.relation, index, 'AssetID', value);
+                      }   
+                            }}        />
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                   <label for="cno" className={`exp-form-labels ${error && !member.AssetID ? 'text-danger' : ''}`}>AssetID{showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
+<<<<<<< HEAD
               <div className="col-md-2">
                 <div className="inputGroup">
                   <input
@@ -715,6 +1080,20 @@ function EmployeeAssets({ }) {
                   />
 
                   <label htmlFor="cno" className={`exp-form-labels ${error && !member.AllocationDate ? 'text-danger' : ''}`}>AllocationDate{showAsterisk && <span className="text-danger">*</span>}</label>
+=======
+               <div className="col-md-2">
+                <div className="inputGroup">
+                <input
+  type="date"
+  className="exp-input-field form-control"
+  name="AllocationDate"   
+  value={member.AllocationDate}
+  max={new Date().toISOString().split("T")[0]}
+  onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+/>
+                  
+                  <label for="cno" className={`exp-form-labels ${error && !member.AllocationDate ? 'text-danger' : ''}`}>AllocationDate{showAsterisk && <span className="text-danger">*</span>}</label>
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                 </div>
               </div>
 
@@ -723,6 +1102,7 @@ function EmployeeAssets({ }) {
                 <div className="inputGroup">
                   <input
                     type="date"
+<<<<<<< HEAD
                     name="ExpectedReturnDate"
                     className="exp-input-field form-control"
                     autoComplete="off"
@@ -747,11 +1127,19 @@ function EmployeeAssets({ }) {
                       );
                     }}
                     required
+=======
+                    name="ExpectedReturnDate"   
+                    className="exp-input-field form-control"
+                    value={member.ExpectedReturnDate}
+               max={new Date().toISOString().split("T")[0]}
+               onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                   />
                   <label for="cno" className={`exp-form-labels ${error && !member.ExpectedReturnDate ? 'text-danger' : ''}`}>ExpectedReturnDate{showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
+<<<<<<< HEAD
              
 
               {/* Status */}
@@ -768,13 +1156,49 @@ function EmployeeAssets({ }) {
                     classNamePrefix="react-select"
                     isClearable
                     value={member.selectedStatus}
+=======
+              {/* Actual Return */}
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                     name="ActualReturnDate"   
+                    className="exp-input-field form-control"
+                    value={member.ActualReturnDate}
+                      max={new Date().toISOString().split("T")[0]} // Restrict future dates
+                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+                  />               
+                  <label for="cno" className={`exp-form-labels ${error && !member.ActualReturnDate ? 'text-danger' : ''}`}>ActualReturnDate{showAsterisk && <span className="text-danger">*</span>}</label>
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="col-md-2">
+                <div  
+                className={`inputGroup selectGroup 
+                  ${member.selectStatus ? "has-value" : ""} 
+                  ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
+                >
+                   <Select
+                     placeholder=" "
+                    onFocus={() => setIsSelectAllocationStatus((prev) => ({ ...prev, [index]: true }))}
+                    onBlur={() => setIsSelectAllocationStatus((prev) => ({ ...prev, [index]: false }))}
+                    classNamePrefix="react-select"
+                    value={member.selectStatus}
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                     options={filteredOptionStatus}
                     maxLength={50}
                     onChange={(selectAllocationStatus) =>
                       handleChangeStatus(selectAllocationStatus, relationGroup.relation, index)
+<<<<<<< HEAD
 
                     } />
                   <label for="cno" className={`floating-label ${error && !!member.Status ? 'text-danger' : ''}`}>Allocation Status</label>
+=======
+                 
+                         }     />
+                   <label for="cno" className={`floating-label ${error && !member.Status ? 'text-danger' : ''}`}>Allocation Status</label>
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                 </div>
               </div>
 
@@ -784,11 +1208,19 @@ function EmployeeAssets({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+<<<<<<< HEAD
                     placeholder=" "
                     value={member.ConditionAtIssue}
                     pattern="[A-Za-z]+"
                     maxLength={50}
                     onChange={(e) => {
+=======
+                     placeholder=" "
+                    value={member.ConditionAtIssue}
+                    pattern="[A-Za-z]+"
+                    maxLength={50}
+                     onChange={(e) => {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ConditionAtIssue', onlyLetters);
                     }}
@@ -803,6 +1235,7 @@ function EmployeeAssets({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+<<<<<<< HEAD
                     placeholder=" "
                     value={member.ConditionAtReturn}
                     pattern="[A-Za-z]+"
@@ -811,6 +1244,16 @@ function EmployeeAssets({ }) {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ConditionAtReturn', onlyLetters);
                     }} />
+=======
+                     placeholder=" "
+                    value={member.ConditionAtReturn}
+                     pattern="[A-Za-z]+"
+                     maxLength={50}
+                     onChange={(e) => {
+                      const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      RelationInputChange(relationGroup.relation, index, 'ConditionAtReturn', onlyLetters);
+                    }}                  />
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                   <label className="exp-form-labels">Condition at Return</label>
                 </div>
               </div>
@@ -821,6 +1264,7 @@ function EmployeeAssets({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+<<<<<<< HEAD
                     placeholder=" "
                     value={member.ApprovedBy}
                     pattern="[A-Za-z]+"
@@ -830,6 +1274,17 @@ function EmployeeAssets({ }) {
                       RelationInputChange(relationGroup.relation, index, 'ApprovedBy', onlyLetters);
                     }}
                   />
+=======
+                     placeholder=" "
+                    value={member.ApprovedBy}
+                     pattern="[A-Za-z]+"
+                     maxLength={100}
+                     onChange={(e) => {
+                      const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      RelationInputChange(relationGroup.relation, index, 'ApprovedBy', onlyLetters);
+                    }}                 
+                    />                
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                   <label className="exp-form-labels">Approved By</label>
                 </div>
               </div>
@@ -843,6 +1298,7 @@ function EmployeeAssets({ }) {
                     placeholder=" "
                     value={member.Remarks}
                     pattern="[A-Za-z]+"
+<<<<<<< HEAD
                     maxLength={100}
                     onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
@@ -850,6 +1306,15 @@ function EmployeeAssets({ }) {
                     }}
                   />
 
+=======
+                     maxLength={100}
+                     onChange={(e) => {
+                      const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      RelationInputChange(relationGroup.relation, index, 'Remarks', onlyLetters);                 
+                     }}
+                     />
+                  
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
                   <label className="exp-form-labels">Remarks</label>
                 </div>
               </div>
@@ -861,8 +1326,13 @@ function EmployeeAssets({ }) {
 
       )
       )}
+<<<<<<< HEAD
       <EmployeeAssetsPopup open={open} handleClose={handleClose} EmployeeAssetsPopup={EmployeeAssetsPopup} />
 
+=======
+              <EmployeeAssetsPopup open={open} handleClose={handleClose} EmployeeAssetsPopup={EmployeeAssetsPopup} />
+      
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 
     </div>
   )

@@ -2,53 +2,183 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NewSideBar.css";
 import logo from './main.png'
-
 import {
-  BsPeopleFill,
-  BsWrenchAdjustable,
-  BsPersonVcard,
+  BsBuilding,
+  BsDiagram3,
+  BsGeoAlt,
+  BsShieldLock,
+  BsPerson,
+  BsPersonBadge,
+  BsPersonLinesFill,
+  BsCalendarCheck,
+  BsBank,
+  BsUpcScan,
+  BsQrCodeScan,
+  BsBriefcase,
+  BsAward,
+  BsPeople,
+  BsCashStack,
+  BsFileEarmarkText,
+  BsClockHistory,
+  BsGlobe,
+  BsClock,
+  BsCalendar3,
+  BsGraphUp,
+  BsSpeedometer2,
+  BsGraphUpArrow,
+  BsKanban,
+  BsListTask,
+  BsGear,
+  BsSliders,
+  BsBell,
+  BsSun,
+  BsClipboardCheck,
+  BsBarChartSteps,
+  BsFileBarGraph,
+  BsPersonCheck,
+  BsBarChartLine,
   BsCalendarEvent,
   BsChevronDown,
+  BsPersonVcard,
+  BsWrenchAdjustable,
+  BsPeopleFill,
+  BsArrowRepeat,
+  BsPersonPlus,
 } from "react-icons/bs";
+import {
+  MdOutlineEventNote,
+  MdOutlineRateReview,
+  MdOutlinePersonSearch,
+  MdOutlineAnalytics,
+  MdOutlineGavel,
+  MdOutlineGroupAdd,
+  MdOutlineEventAvailable,
+  MdOutlineSchedule,
+  MdTravelExplore,
+  MdFlightTakeoff,
+  MdPayments,
+  MdCalendarMonth,
+  MdOutlineAccountBalance,
+} from "react-icons/md";
+import { 
+  HiOutlineUserGroup
+} from "react-icons/hi";
+import { RiMoneyDollarCircleLine } from "react-icons/ri";
+import { TbClockCheck, TbHistory } from "react-icons/tb";
+import { FiDatabase } from "react-icons/fi";
+import {
+  AiOutlinePercentage,
+  AiOutlineFileDone,
+} from "react-icons/ai";
+import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
 
-// Helper function to normalize paths (ensure leading slash is present and no trailing slash)
+
+
 const cleanPath = (path) => {
-    if (!path) return '';
-    // Ensure path starts with /
-    let cleaned = path.startsWith('/') ? path : '/' + path;
-    // Remove trailing slash if present
-    return cleaned.endsWith('/') ? cleaned.slice(0, -1) : cleaned;
+  if (!path) return '';
+  let cleaned = path.startsWith('/') ? path : '/' + path;
+  return cleaned.endsWith('/') ? cleaned.slice(0, -1) : cleaned;
 };
 
-// Recursive function to filter the menu structure based on permissions
 const filterMenuByPermission = (menuItems, allowedPaths) => {
   return menuItems.reduce((acc, item) => {
     let newItem = { ...item };
 
     if (item.subMenus) {
-      // 1. If it's a dropdown, recursively filter its submenus
       const filteredSubMenus = filterMenuByPermission(item.subMenus, allowedPaths);
 
       if (filteredSubMenus.length > 0) {
-        // Only keep the parent dropdown if it still has active children
         newItem.subMenus = filteredSubMenus;
         acc.push(newItem);
       }
     } else if (item.path) {
-      // 2. If it's a link (leaf node), check permission based on its path
       const itemPath = cleanPath(item.path);
-      
-      // Check if the normalized path is in the list of allowed paths
+
       if (allowedPaths.includes(itemPath)) {
         acc.push(newItem);
       }
-    } 
-    // Ignore items that are just structural labels without a path/submenus (if not filtered by the recursive call).
+    }
 
     return acc;
   }, []);
 };
 
+export const leafIconMap = {
+  // --- ADMIN ---
+  Company: BsBuilding,
+  "Company Mapping": BsDiagram3,
+  Location: BsGeoAlt,
+  Role: BsShieldLock,
+  "Role Mapping": BsPersonLinesFill,
+  "Role Rights": BsClipboardCheck,
+  User: BsPerson,
+
+  // --- MASTERS ---
+  Attribute: BsListTask,
+  "Print Templates": BsFileEarmarkText,
+  "Bank Account": BsBank,
+  "Barcode Generator": BsUpcScan,
+  "Barcode Scanner": BsQrCodeScan,
+  Department: BsBriefcase,
+  "Designation Info": BsAward,
+  Intermediary: BsPeople,
+  "Number Series": BsBarChartSteps,
+  Warehouse: BsBuilding,
+  "Financial Year Access": BsCalendarCheck,
+
+  // --- HCM ---
+  "Employee Information": BsPersonCheck,
+  "Employee Personal Details": BsPersonBadge,
+  "Department Dashboard": BsBarChartLine,
+  "Admin Dashboard": BsSpeedometer2,
+  "Employee Dashboard": BsFileBarGraph,
+  "Salary Process": BsCashStack,
+  "Payslip Master": AiOutlineFileDone,
+  "Country Master": BsGlobe,
+  "Time Zone Master": BsClock,
+  "Shift Master": BsClockHistory,
+  Grade: BsAward,
+  Leave: BsCalendar3,
+  Loan: BsCashStack,
+  Announcement: BsBell,
+  "Employee Holiday": BsSun,
+  "Settings": BsGear,
+  "Generate Shift": BsArrowRepeat,
+  "Visa Requests": MdTravelExplore,
+  "Loan Request": FaHandHoldingUsd,
+  "Leave Request": FaCalendarAlt,
+  "Loan Approvals": FaCheckCircle,
+  "Loan Documents": FaFileAlt,
+  "Travel Request": MdFlightTakeoff,
+  "Loan Repayment Schedule": MdCalendarMonth,
+  "Loan Payment": MdPayments,
+  "Loan Type": MdOutlineAccountBalance,
+  "Loan Status History": TbHistory,
+
+  // --- INTERVIEW ---
+  "Interview Master": BsPeople,
+  "Interview Dashboard": BsGraphUp,
+  "Interview Schedule Report": MdOutlineEventNote,
+  "Interview Feedback Report": MdOutlineRateReview,
+  "Candidate Interview Report": MdOutlinePersonSearch,
+  "Panel Performance Report": MdOutlineAnalytics,
+  "Hiring Decision Report": MdOutlineGavel,
+  "Total Candidates Applied": MdOutlineGroupAdd,
+  "Total Interviews Scheduled": MdOutlineEventAvailable,
+  "Interview Completion Rate": AiOutlinePercentage,
+
+  // --- PMS ---
+  Project: BsKanban,
+  "Project Mapping": BsDiagram3,
+  Task: BsListTask,
+  "Setting Screen": BsSliders,
+  "Open Tickets": BsClipboardCheck,
+  "Task Update": BsClockHistory,
+  "Task Hours & Time Tracking": BsClock,
+  "Project Progress": BsGraphUpArrow,
+  "Project Chart Report": BsFileBarGraph,
+  "Shift Summary Report": MdOutlineSchedule,
+};
 
 const menuData = [
   {
@@ -58,11 +188,9 @@ const menuData = [
     subMenus: [
       { label: "Company", path: "/Company" },
       { label: "Company Mapping", path: "/CompanyMapping" },
-      { label: "Country Master", path: "/CountryMaster" },
-      { label: "Time Zone Master", path: "/TimeZoneGrid" },
       { label: "Location", path: "/Location" },
       { label: "Role", path: "/Role" },
-      { label: "Role Mapping", path: "/UserRoleMapping"},
+      { label: "Role Mapping", path: "/UserRoleMapping" },
       { label: "Role Rights", path: "/UserRights" },
       { label: "User", path: "/User" },
     ],
@@ -83,37 +211,74 @@ const menuData = [
       { label: "Number Series", path: "/NumberSeries" },
       { label: "Warehouse", path: "/Warehouse" },
       { label: "Financial Year Access", path: "/FinancialYearAccess" },
+      { label: "Country Master", path: "/CountryMaster" },
+      { label: "Time Zone Master", path: "/TimeZoneGrid" },
     ],
   },
   {
-    label: "HCM",
-    icon: BsPersonVcard,
+    label: "ESS",
+    icon: HiOutlineUserGroup,
     isDropdown: true,
     subMenus: [
-      { label: "Admin Dashboard", path: "/ESSDashboard" },
-      { label: "Employee Dashboard", path: "/EmployeeDashboard" },
-      { label: "Employee Info", path: "/AddEmployeeInfo" },
-      { label: "Salary Process", path: "/salarypath" },
-      { label: "Payslip Master", path: "/PayslipSalaryDays" },
-     
       {
-        label: "Masters",
+        label: "Dashboard",
+        isDropdown: true,
+        subMenus: [
+          { label: "Admin Dashboard", path: "/ESSDashboard" },
+          { label: "Employee Dashboard", path: "/EmployeeDashboard" },
+          { label: "Department Dashboard", path: "/DepartmentDashboard" },
+        ],
+      },
+      {
+        label: "Employee",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Information", path: "/AddEmployeeInfo" },
+          { label: "Employee Personal Details", path: "/ManualEmployeeInfo" },
+        ],
+      },
+      {
+        label: "Requests",
+        isDropdown: true,
+        subMenus: [
+          { label: "Leave Request", path: "/LeaveRequest" },
+          { label: "Visa Requests", path: "/VisaRequest" },
+          { label: "Travel Request", path: "/TravelRequest" },
+        ],
+      },
+      {
+        label: "Others",
         isDropdown: true,
         subMenus: [
           { label: "Grade", path: "/EmployeeGrade" },
           { label: "Leave", path: "/EmpLeave" },
-          { label: "Loan", path: "/EmployeeLoan" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
-          { label: "Setting Screen", path: "/WeekOff" },
-          { label: "Interview Master", path: "/CandidateMaster" }
+          { label: "Settings", path: "/WeekOff" },
         ],
       },
     ],
   },
   {
-    label: "PMS",
-    icon: BsCalendarEvent,
+    label: "Payroll",
+    icon: RiMoneyDollarCircleLine,
+    isDropdown: true,
+    subMenus: [
+      { label: "Payslip Master", path: "/PayslipSalaryDays" },
+      { label: "Salary Process", path: "/salarypath" },
+      { label: "Loan", path: "/EmployeeLoan" },
+      { label: "Loan Type", path: "/LoanType" },
+      { label: "Loan Documents", path: "/LoanDocuments" },
+      { label: "Loan Request", path: "/LoanRequest" },
+      { label: "Loan Approvals", path: "/LoanApprovals" },
+      { label: "Loan Payment", path: "/LoanPayment" },
+      { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+      { label: "Loan Status History", path: "/LoanStatusHistory" },
+    ],
+  },
+  {
+    label: "Attendance",
+    icon: TbClockCheck,
     isDropdown: true,
     subMenus: [
       {
@@ -123,6 +288,7 @@ const menuData = [
           { label: "Project", path: "/Project" },
           { label: "Project Mapping", path: "/ProjectMapping" },
           { label: "Task", path: "/Task" },
+          { label: "Shift Master", path: "/ShiftMasterGrid" },
           { label: "Setting Screen", path: "/PMSsettings" },
         ],
       },
@@ -132,6 +298,7 @@ const menuData = [
         subMenus: [
           { label: "Open Tickets", path: "/OpenTickets" },
           { label: "Task Update", path: "/ProjectDetails" },
+          { label: "Generate Shift", path: "/GenerateShift" },
         ],
       },
       {
@@ -141,10 +308,28 @@ const menuData = [
           { label: "Task Hours & Time Tracking", path: "/TaskHours" },
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
+          { label: "Shift Summary Report", path: "/ShiftSumRep" },
         ],
       },
     ],
-  }
+  },
+  {
+    label: "Recruitment",
+    icon: BsPersonPlus,
+    isDropdown: true,
+    subMenus: [
+      { label: "Interview Master", path: "/JobMaster" },
+      { label: "Interview Dashboard", path: "/InterviewDashboard" },
+      { label: "Interview Schedule Report", path: "/InterviewScheduleRep" },
+      { label: "Interview Feedback Report", path: "/InterviewFeedbackRep" },
+      { label: "Candidate Interview Report", path: "/CandidateInterviewRe" },
+      { label: "Panel Performance Report", path: "/PanelPerformanceRepo" },
+      { label: "Hiring Decision Report", path: "/HiringDecisionReport" },
+      { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
+      { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
+      { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
+    ],
+  },
 ];
 
 const secondaryMenuData = [
@@ -161,11 +346,11 @@ const Sidebar = () => {
     try {
       const permissionsJSON = sessionStorage.getItem("permissions");
       const permissions = permissionsJSON ? JSON.parse(permissionsJSON) : [];
-      
+
       return Array.isArray(permissions)
         ? permissions.map((permission) =>
-            permission.screen_type ? cleanPath(permission.screen_type) : ''
-          ).filter(path => path.length > 0) 
+          permission.screen_type ? cleanPath(permission.screen_type) : ''
+        ).filter(path => path.length > 0)
         : [];
     } catch (e) {
       console.error("Failed to parse permissions from sessionStorage:", e);
@@ -174,8 +359,8 @@ const Sidebar = () => {
   }, []);
 
   const filteredMenuData = useMemo(() => {
-    if (allowedPaths.length === 0) return []; 
-    
+    if (allowedPaths.length === 0) return [];
+
     return filterMenuByPermission(menuData, allowedPaths);
   }, [allowedPaths]);
 
@@ -212,7 +397,10 @@ const Sidebar = () => {
         className={`nav-item ${isOpen ? "open" : ""} ${isActive || isSubActive ? "active" : ""}`}
       >
         {item.isDropdown ? (
-          <div className="nav-link" onClick={() => toggleDropdown(keyPrefix)}>
+          <div
+            className={`nav-link ${item.isDropdown && keyPrefix.includes('-') ? 'submenu-parent-link' : ''}`}
+            onClick={() => toggleDropdown(keyPrefix)}
+          >
             {Icon && <Icon className="menu-icon" size={18} />}
             <span className="nav-label">{item.label}</span>
             <BsChevronDown className={`dropdown-arrow ${isOpen ? "rotated" : ""}`} />
@@ -229,6 +417,7 @@ const Sidebar = () => {
             {/* Render filtered submenus */}
             {item.subMenus.map((sub, i) => {
               const subKey = `${keyPrefix}-${i}`;
+              const LeafIcon = leafIconMap[sub.label];
               return sub.isDropdown
                 ? renderMenuItem(sub, subKey)
                 : (
@@ -237,6 +426,7 @@ const Sidebar = () => {
                       to={sub.path}
                       className={`dropdown-item text-wrap ${cleanPath(location.pathname) === cleanPath(sub.path) ? "active" : ""}`}
                     >
+                      {LeafIcon && <LeafIcon className="menu-icon me-2" size={14} />}
                       {sub.label}
                     </Link>
                   </li>
@@ -271,7 +461,7 @@ const Sidebar = () => {
               src={logo}
               alt="Logo"
               style={{
-                width: "100%", 
+                width: "100%",
                 height: "100%",
                 objectFit: "contain",
               }}

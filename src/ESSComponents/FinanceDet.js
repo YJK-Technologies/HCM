@@ -17,7 +17,7 @@ function Input({ }) {
   const [payscale, setPayscale] = useState("");
   const [PFNo, setPFNo] = useState("");
   const [salaryMonth, setSalaryMonth] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [salaryTypeDrop, setSalaryTypeDrop] = useState([]);
   const [PayscaleDrop, setPayscaleDrop] = useState([]);
   const [selectedSalaryType, setSelectedSalaryType] = useState('');
@@ -113,6 +113,10 @@ function Input({ }) {
     navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
 
+  const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  };
+
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
@@ -146,6 +150,10 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
+case 'EmployeeAssets':
+        EmployeeAssets();
+        break;
+
       default:
         break;
     }
@@ -159,7 +167,8 @@ function Input({ }) {
     { label: 'Identity Documents' },
     { label: 'Academic Details' },
     { label: 'Family' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: 'EmployeeAssets' }
   ];
 
   useEffect(() => {
@@ -183,11 +192,12 @@ function Input({ }) {
 
   const handleSave = async () => {
     if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
+    setError(false);
+    setLoading(true);
 
     try {
       const Header = {
@@ -208,13 +218,11 @@ function Input({ }) {
         body: JSON.stringify(Header),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-           // onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -286,16 +294,17 @@ function Input({ }) {
 
   const handleDelete = async () => {
     if (!EmployeeId || !PFNo) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
-
+    setError(false);
+    
     showConfirmationToast(
       "Are you sure you want to Delete the data ?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             PFNo: PFNo,
@@ -312,11 +321,9 @@ function Input({ }) {
 
           if (response.status === 200) {
             console.log("Data deleted successfully");
-            setTimeout(() => {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -326,8 +333,8 @@ function Input({ }) {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -337,16 +344,17 @@ function Input({ }) {
 
   const handleUpdate = async () => {
     if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
-
+    setError(false);
+    
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
             salaryType: salaryType,
@@ -366,11 +374,9 @@ function Input({ }) {
           });
 
           if (response.ok) {
-            setTimeout(() => {
-              toast.success("Data updated successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -380,8 +386,8 @@ function Input({ }) {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -405,121 +411,121 @@ function Input({ }) {
 
   const finaceDetails = async (data) => {
 
-  // 🔴 1. Handle NO DATA case FIRST
-  if (!data || data.length === 0) {
-    toast.warning("Financial details not found for this employee");
+    // 🔴 1. Handle NO DATA case FIRST
+    if (!data || data.length === 0) {
+      toast.warning("Financial details not found for this employee");
 
-    setSaveButtonVisible(true);
-    setUpdateButtonVisible(false);
-    setShowAsterisk(true);
+      setSaveButtonVisible(true);
+      setUpdateButtonVisible(false);
+      setShowAsterisk(true);
 
-    // Clear states if needed
-    setEmployeeId("");
-    setFirst_Name("");
-    setdepartment_id("");
-    setdesignation_id("");
-    setPFNo("");
-    setSalaryMonth("");
-    setSalaryType("");
-    setPayscale("");
-    setSelectedSalaryType(null);
-    setselectedPayscale(null);
-
-    return; // 🔥 STOP execution
-  }
-
-  // 🔴 2. Data exists
-  setSaveButtonVisible(false);
-  setUpdateButtonVisible(true);
-  setShowAsterisk(false);
-
-  const [{
-    employeeId,
-    salaryType,
-    first_name,
-    Department,
-    Designation,
-    Payscale,
-    PFNo,
-    salaryMonth
-  }] = data;
-
-  console.log("Finance Data:", data);
-
-  // 🔴 3. Employee ID
-  const employeeIdRef = document.getElementById("EmployeeId");
-  if (employeeIdRef) {
-    employeeIdRef.value = employeeId || "";
-    setEmployeeId(employeeId || "");
-  }
-
-  // 🔴 4. Employee Name
-  const firstnameRef = document.getElementById("EmployeelabelName");
-  if (firstnameRef) {
-    firstnameRef.value = first_name || "";
-    setFirst_Name(first_name || "");
-  }
-
-  // 🔴 5. Department
-  const deptRef = document.getElementById("Departmentlabel");
-  if (deptRef) {
-    deptRef.value = Department || "";
-    setdepartment_id(Department || "");
-  }
-
-  // 🔴 6. Designation
-  const desigRef = document.getElementById("designationLabel");
-  if (desigRef) {
-    desigRef.value = Designation || "";
-    setdesignation_id(Designation || "");
-  }
-
-  // 🔴 7. PF Number
-  const pfRef = document.getElementById("PFNo");
-  if (pfRef) {
-    pfRef.value = PFNo || "";
-    setPFNo(PFNo || "");
-  }
-
-  // 🔴 8. Salary Month
-  const salaryMonthRef = document.getElementById("salaryMonth");
-  if (salaryMonthRef) {
-    salaryMonthRef.value = salaryMonth || "";
-    setSalaryMonth(salaryMonth || "");
-  }
-
-  // 🔴 9. Salary Type (SAFE)
-  const salaryTypeRef = document.getElementById("salaryType");
-  if (salaryTypeRef && salaryType) {
-    const selectedSalaryType = filteredOptionSalaryType.find(
-      option => option.value === salaryType
-    );
-
-    if (selectedSalaryType) {
-      setSelectedSalaryType(selectedSalaryType);
-      setSalaryType(selectedSalaryType.value);
-    } else {
-      setSelectedSalaryType(null);
+      // Clear states if needed
+      setEmployeeId("");
+      setFirst_Name("");
+      setdepartment_id("");
+      setdesignation_id("");
+      setPFNo("");
+      setSalaryMonth("");
       setSalaryType("");
-    }
-  }
-
-  // 🔴 10. Payscale (SAFE)
-  const payScaleRef = document.getElementById("payScale");
-  if (payScaleRef && Payscale) {
-    const selectedPayscale = filteredOptionPayscale.find(
-      option => option.value === Payscale
-    );
-
-    if (selectedPayscale) {
-      setselectedPayscale(selectedPayscale);
-      setPayscale(selectedPayscale.value);
-    } else {
-      setselectedPayscale(null);
       setPayscale("");
+      setSelectedSalaryType(null);
+      setselectedPayscale(null);
+
+      return; // 🔥 STOP execution
     }
-  }
-};
+
+    // 🔴 2. Data exists
+    setSaveButtonVisible(false);
+    setUpdateButtonVisible(true);
+    setShowAsterisk(false);
+
+    const [{
+      employeeId,
+      salaryType,
+      first_name,
+      Department,
+      Designation,
+      Payscale,
+      PFNo,
+      salaryMonth
+    }] = data;
+
+    console.log("Finance Data:", data);
+
+    // 🔴 3. Employee ID
+    const employeeIdRef = document.getElementById("EmployeeId");
+    if (employeeIdRef) {
+      employeeIdRef.value = employeeId || "";
+      setEmployeeId(employeeId || "");
+    }
+
+    // 🔴 4. Employee Name
+    const firstnameRef = document.getElementById("EmployeelabelName");
+    if (firstnameRef) {
+      firstnameRef.value = first_name || "";
+      setFirst_Name(first_name || "");
+    }
+
+    // 🔴 5. Department
+    const deptRef = document.getElementById("Departmentlabel");
+    if (deptRef) {
+      deptRef.value = Department || "";
+      setdepartment_id(Department || "");
+    }
+
+    // 🔴 6. Designation
+    const desigRef = document.getElementById("designationLabel");
+    if (desigRef) {
+      desigRef.value = Designation || "";
+      setdesignation_id(Designation || "");
+    }
+
+    // 🔴 7. PF Number
+    const pfRef = document.getElementById("PFNo");
+    if (pfRef) {
+      pfRef.value = PFNo || "";
+      setPFNo(PFNo || "");
+    }
+
+    // 🔴 8. Salary Month
+    const salaryMonthRef = document.getElementById("salaryMonth");
+    if (salaryMonthRef) {
+      salaryMonthRef.value = salaryMonth || "";
+      setSalaryMonth(salaryMonth || "");
+    }
+
+    // 🔴 9. Salary Type (SAFE)
+    const salaryTypeRef = document.getElementById("salaryType");
+    if (salaryTypeRef && salaryType) {
+      const selectedSalaryType = filteredOptionSalaryType.find(
+        option => option.value === salaryType
+      );
+
+      if (selectedSalaryType) {
+        setSelectedSalaryType(selectedSalaryType);
+        setSalaryType(selectedSalaryType.value);
+      } else {
+        setSelectedSalaryType(null);
+        setSalaryType("");
+      }
+    }
+
+    // 🔴 10. Payscale (SAFE)
+    const payScaleRef = document.getElementById("payScale");
+    if (payScaleRef && Payscale) {
+      const selectedPayscale = filteredOptionPayscale.find(
+        option => option.value === Payscale
+      );
+
+      if (selectedPayscale) {
+        setselectedPayscale(selectedPayscale);
+        setPayscale(selectedPayscale.value);
+      } else {
+        setselectedPayscale(null);
+        setPayscale("");
+      }
+    }
+  };
 
 
   const handleSalaryChange = (e) => {

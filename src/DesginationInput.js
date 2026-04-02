@@ -22,7 +22,7 @@ function DesginationInput({ }) {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selecteddept, setSelecteddept] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const departmentid = useRef(null);
   const desgid = useRef(null);
   const desg = useRef(null);
@@ -66,7 +66,6 @@ function DesginationInput({ }) {
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : '');
-    setError(false);
   };
 
 
@@ -108,7 +107,6 @@ function DesginationInput({ }) {
   const handleChangedept = (selecteddept) => {
     setSelecteddept(selecteddept);
     setdept_id(selecteddept ? selecteddept.value : '');
-    setError(false);
   };
 
 
@@ -116,10 +114,11 @@ function DesginationInput({ }) {
 
   const handleInsert = async () => {
     if (!dept_id || !desgination_id || !desgination || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -135,38 +134,24 @@ function DesginationInput({ }) {
           desgination,
           status,
           created_by: sessionStorage.getItem('selectedUserCode')
-
-          /* created_by,
-          created_date,
-          modfied_by,
-          modfied_date,*/
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
-        });
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
+       toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
-        console.error("Failed to insert data");
-        // Show generic error message using SweetAlert
-        toast.error('Failed to insert data', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      // Show error message using SweetAlert
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
-    }
-    finally {
+      toast.error('Error inserting data: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -175,9 +160,11 @@ function DesginationInput({ }) {
     setdesgination_id("");
     setdesgination("");
     setSelecteddept("");
+    setdept_id("");
     setSelectedStatus("");
-
+    setStatus("");
   }
+
   useEffect(() => {
     if (mode === "update" && selectedRow && !isUpdated) {
       setdesgination_id(selectedRow.desgination_id || "");
@@ -194,8 +181,6 @@ function DesginationInput({ }) {
         value: selectedRow.status,
       });
 
-
-
     } else if (mode === "create") {
       clearInputFields();
     }
@@ -209,9 +194,11 @@ function DesginationInput({ }) {
       !selectedStatus
 
     ) {
-      setError(" ");
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -232,21 +219,20 @@ function DesginationInput({ }) {
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
-      } else if (response.status === 400) {
+      } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
       }
     } catch (error) {
       console.error("Error Update data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -354,7 +340,7 @@ function DesginationInput({ }) {
                     ref={desg}
                     onKeyDown={(e) => handleKeyDown(e, Status, desg)}
                   />
-                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Desgination<span className="text-danger">*</span></label>
+                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Desgination Name<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -387,9 +373,7 @@ function DesginationInput({ }) {
                     }}
                   />
                   <label for="locno" className={`floating-label ${error && !status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
-
                 </div>
-
               </div>
 
               <div class="col-12">

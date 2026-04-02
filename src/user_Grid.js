@@ -376,20 +376,19 @@ function UserGrid() {
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: loggriddrop,
-        maxLength: 150,
       },
     },
-    {
-      headerName: "User Type",
-      field: "user_type",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        maxLength: 50,
-        values: usergriddrop,
-      },
-    },
+    // {
+    //   headerName: "User Type",
+    //   field: "user_type",
+    //   editable: true,
+    //   cellStyle: { textAlign: "left" },
+    //   cellEditor: "agSelectCellEditor",
+    //   cellEditorParams: {
+    //     maxLength: 50,
+    //     values: usergriddrop,
+    //   },
+    // },
     {
       headerName: "Email",
       field: "email_id",
@@ -407,13 +406,34 @@ function UserGrid() {
       field: "dob",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // Return an empty string if the value is null or undefined
-        const date = new Date(params.value);
-        const day = date.getDate().toString().padStart(2, "0"); // Get day (padStart ensures double-digit format)
-        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Get month (+1 because months are zero-indexed)
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`; // Return formatted date string with day, month, and year
+      valueSetter: (params) => {
+        if (!params.newValue) return false;
+
+        const selectedDate = new Date(params.newValue);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const maxDob = new Date(
+          today.getFullYear() - 18,
+          today.getMonth(),
+          today.getDate()
+        );
+        maxDob.setHours(0, 0, 0, 0);
+
+        if (selectedDate > today) {
+          toast.warning("Future dates are not allowed for DOB");
+          return false;
+        }
+
+        if (selectedDate > maxDob) {
+          toast.warning("Age must be 18 years or above");
+          return false;
+        }
+
+        params.data.dob = params.newValue;
+        return true;
       },
     },
     {
@@ -439,6 +459,12 @@ function UserGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
   const generateReport = () => {
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
@@ -461,71 +487,139 @@ function UserGrid() {
       };
     });
 
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
-    reportWindow.document.write("<html><head><title>User</title>");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write("<html><head><title>User Report</title>");
     reportWindow.document.write("<style>");
     reportWindow.document.write(`
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                }
-                h1 {
-                    color: maroon;
-                    text-align: center;
-                    font-size: 24px;
-                    margin-bottom: 30px;
-                    text-decoration: underline;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                }
-                th, td {
-                    padding: 10px;
-                    text-align: left;
-                    border: 1px solid #ddd;
-                    vertical-align: top;
-                }
-                th {
-                    background-color: maroon;
-                    color: white;
-                    font-weight: bold;
-                }
-                td {
-                    background-color: #fdd9b5;
-                }
-                tr:nth-child(even) td {
-                    background-color: #fff0e1;
-                }
-                .report-button {
-                    display: block;
-                    width: 150px;
-                    margin: 20px auto;
-                    padding: 10px;
-                    background-color: maroon;
-                    color: white;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 16px;
-                    text-align: center;
-                    border-radius: 5px;
-                }
-                .report-button:hover {
-                    background-color: darkred;
-                }
-                @media print {
-                    .report-button {
-                        display: none;
-                    }
-                    body {
-                        margin: 0;
-                        padding: 0;
-                    }
-                }
-              `);
+      body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: ${fontColor};
+          }
+  
+          .header {
+            display: flex;
+            align-items: center;
+            background: ${tableHeaderBg};
+            padding: 15px 20px;
+            color: white;
+            border-radius: 8px;
+          }
+          
+          .logo {
+            height: 60px;
+          }
+          
+          .title-section {
+            flex: 1;
+            text-align: center;
+          }
+        
+          .title-section h2 {
+            margin: 0;
+          }
+  
+          .sub-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+          }
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+  
+          th {
+            background-color: ${tableHeaderBg};
+            color: white;
+            padding: 10px;
+            text-align: left;
+          }
+  
+          td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+          }
+  
+          tr:nth-child(even) {
+            background-color: ${rowAltColor};
+          }
+  
+          tr:hover {
+            background-color: ${hoverColor};
+          }
+  
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+          }
+  
+          .print-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: ${headerGradientStart};
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+  
+          .print-btn:hover {
+            opacity: 0.85;
+          }
+  
+          @media print {
+            .print-btn {
+              display: none;
+            }
+            body {
+              background: white;
+            }
+          }
+       `);
     reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write("<h1><u>User Information</u></h1>");
+    reportWindow.document.write(`<div class="header">
+    <img src="${logoUrl}" class="logo" />
+    <div class="title-section">
+      <h2>User Report</h2>
+    </div>
+    </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+    <strong>Total Records: ${selectedRows.length}</strong>
+    <span style="float:right;">
+      Printed Date: ${new Date().toLocaleDateString()}
+    </span>
+  </div>`);
+    // reportWindow.document.write("<h1><u>User Report</u></h1>");
 
     // Create table with headers
     reportWindow.document.write("<table><thead><tr>");
@@ -544,10 +638,11 @@ function UserGrid() {
     });
 
     reportWindow.document.write("</tbody></table>");
-
-    reportWindow.document.write(
-      '<button class="report-button" title="Print" onclick="window.print()">Print</button>'
-    );
+    reportWindow.document.write(`
+  <div style="text-align:center;">
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+`);
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
@@ -742,174 +837,174 @@ function UserGrid() {
 
   return (
     <div className="container-fluid Topnav-screen">
-        {loading && <LoadingScreen />}
-        <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      {loading && <LoadingScreen />}
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
-          <div className="header-flex">
-              <h1 className="page-title">User</h1>
-            <div className="action-wrapper desktop-actions">
-              {["add", "all permission"].some((permission) => userPermission.includes(permission)) && (
-                <div className="action-icon add" onClick={handleNavigateToForm}>
-                  <span className="tooltip">Add</span>
-                  <i class="fa-solid fa-user-plus"></i>
-                </div>
-              )}
-              {["delete", "all permission"].some((permission) => userPermission.includes(permission)) && (
-                <div className="action-icon delete" onClick={deleteSelectedRows}>
-                  <span className="tooltip">Delete</span>
-                  <i class="fa-solid fa-user-minus"></i>
-                </div>
-              )}
-              {["update", "all permission"].some((permission) => userPermission.includes(permission)) && (
-                <div className="action-icon update" onClick={saveEditedData}>
-                  <span className="tooltip">Update</span>
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </div>
-              )}
-              {["all permission", "view"].some((permission) => userPermission.includes(permission)) && (
-                <div className="action-icon print"onClick={generateReport}>
-                  <span className="tooltip">Print</span>
-                  <i class="fa-solid fa-print"></i>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Dropdown */}
-            <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                {['add', 'all permission'].some(p => userPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigateToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                  </li>
-                )}
-
-                {['delete', 'all permission'].some(p => userPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
-                )}
-
-                {['update', 'all permission'].some(p => userPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
-
-                {['all permission', 'view'].some(p => userPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
-                  </li>
-                )}
-
-              </ul>
-            </div>
-
+        <div className="header-flex">
+          <h1 className="page-title">User</h1>
+          <div className="action-wrapper desktop-actions">
+            {["add", "all permission"].some((permission) => userPermission.includes(permission)) && (
+              <div className="action-icon add" onClick={handleNavigateToForm}>
+                <span className="tooltip">Add</span>
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+            )}
+            {["delete", "all permission"].some((permission) => userPermission.includes(permission)) && (
+              <div className="action-icon delete" onClick={deleteSelectedRows}>
+                <span className="tooltip">Delete</span>
+                <i class="fa-solid fa-user-minus"></i>
+              </div>
+            )}
+            {["update", "all permission"].some((permission) => userPermission.includes(permission)) && (
+              <div className="action-icon update" onClick={saveEditedData}>
+                <span className="tooltip">Update</span>
+                <i class="fa-solid fa-pen-to-square"></i>
+              </div>
+            )}
+            {["all permission", "view"].some((permission) => userPermission.includes(permission)) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i class="fa-solid fa-print"></i>
+              </div>
+            )}
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {['add', 'all permission'].some(p => userPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={handleNavigateToForm}>
+                  <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                </li>
+              )}
+
+              {['delete', 'all permission'].some(p => userPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={deleteSelectedRows}>
+                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                </li>
+              )}
+
+              {['update', 'all permission'].some(p => userPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={saveEditedData}>
+                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                </li>
+              )}
+
+              {['all permission', 'view'].some(p => userPermission.includes(p)) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print fs-4"></i>
+                </li>
+              )}
+
+            </ul>
+          </div>
+
         </div>
+      </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-            <div className="col-md-2">
-              <div class="inputGroup">
-                <input
-                  id="usercode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required
-                  title="Please fill the user code here"
-                  value={user_code}
-                  onChange={(e) => setuser_code(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="usercode" class="exp-form-labels">User Code</label>
-              </div>
+          <div className="col-md-2">
+            <div class="inputGroup">
+              <input
+                id="usercode"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please fill the user code here"
+                value={user_code}
+                onChange={(e) => setuser_code(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                maxLength={18}
+              />
+              <label for="usercode" class="exp-form-labels">User Code</label>
             </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="username"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required
-                  title="Please fill the user name here"
-                  value={user_name}
-                  onChange={(e) => setuser_name(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={250}
-                />
-                <label for="username" class="exp-form-labels">User Name</label>
-              </div>
+              <input
+                id="username"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please fill the user name here"
+                value={user_name}
+                onChange={(e) => setuser_name(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                maxLength={250}
+              />
+              <label for="username" class="exp-form-labels">User Name</label>
             </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="firstname"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required
-                  title="Please fill the first name here"
-                  value={first_name}
-                  onChange={(e) => setfirst_name(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={250}
-                />
-                <label for="firstname" class="exp-form-labels">First Name</label>
-              </div>
+              <input
+                id="firstname"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please fill the first name here"
+                value={first_name}
+                onChange={(e) => setfirst_name(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                maxLength={250}
+              />
+              <label for="firstname" class="exp-form-labels">First Name</label>
             </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="lastname"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required
-                  title="Please fill the last name here"
-                  value={last_name}
-                  onChange={(e) => setlast_name(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  maxLength={250}
-                />
-                <label for="lastname" class="exp-form-labels">Last Name</label>
-              </div>
+              <input
+                id="lastname"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please fill the last name here"
+                value={last_name}
+                onChange={(e) => setlast_name(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                maxLength={250}
+              />
+              <label for="lastname" class="exp-form-labels">Last Name</label>
             </div>
-            
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
             >
-                <Select
-                  id="status"
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  onKeyDown={handleKeyDownStatus}
-                  options={filteredOptionStatus}
+              <Select
+                id="status"
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                onKeyDown={handleKeyDownStatus}
+                options={filteredOptionStatus}
                 classNamePrefix="react-select"
                 placeholder=" "
                 onFocus={() => setIsSelectFocused(true)}
                 onBlur={() => setIsSelectFocused(false)}
                 isClearable
-                />
-                <label for="usts" class="floating-label">User Status</label>
-              </div>
+              />
+              <label for="usts" class="floating-label">User Status</label>
             </div>
+          </div>
 
-            {/* <div className="col-md-2 form-group">
+          {/* <div className="col-md-2 form-group">
               <div class="exp-form-floating">
                 <label for="utype" class="exp-form-labels">
                   User Type
@@ -930,40 +1025,40 @@ function UserGrid() {
 
           <div className="col-md-2">
             <div className="inputGroup">
-                <input
-                  id="dob"
-                  className="exp-input-field form-control"
-                  type="date"
-                  placeholder=""
-                  required
-                  title="Please fill the DOB here"
-                  value={dob}
-                  onChange={(e) => setdob(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-                <label for="dob" class="exp-form-labels">DOB</label>
-              </div>
+              <input
+                id="dob"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please fill the DOB here"
+                value={dob}
+                onChange={(e) => setdob(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <label for="dob" class="exp-form-labels">DOB</label>
             </div>
+          </div>
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedGender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
             >                <Select
-                  id="gender"
-                  isClearable
-                  value={selectedGender}
-                  onChange={handleChangeGender}
-                  onKeyDown={handleKeyDownStatus}
-                  options={filteredOptionGender}
+                id="gender"
+                isClearable
+                value={selectedGender}
+                onChange={handleChangeGender}
+                onKeyDown={handleKeyDownStatus}
+                options={filteredOptionGender}
                 classNamePrefix="react-select"
                 placeholder=""
                 onFocus={() => setIsSelectGender(true)}
                 onBlur={() => setIsSelectGender(false)}
-                />
-                <label for="gender" class="floating-label">Gender</label>
-              </div>
+              />
+              <label for="gender" class="floating-label">Gender</label>
             </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -980,24 +1075,24 @@ function UserGrid() {
             </div>
           </div>
 
-          </div>
-          </div>
+        </div>
+      </div>
 
       <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div class="ag-theme-alpine" style={{ height: 390, width: "100%" }}>
-            <AgGridReact
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              onGridReady={onGridReady}
-              onCellValueChanged={onCellValueChanged}
-              rowSelection="multiple"
-              onSelectionChanged={onSelectionChanged}
-              pagination={true}
-              onRowSelected={onRowSelected}
-            />
-          </div>
+        <div class="ag-theme-alpine" style={{ height: 390, width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            onGridReady={onGridReady}
+            onCellValueChanged={onCellValueChanged}
+            rowSelection="multiple"
+            onSelectionChanged={onSelectionChanged}
+            pagination={true}
+            onRowSelected={onRowSelected}
+          />
         </div>
+      </div>
       {/* <div className="shadow-lg p-2 bg-body-tertiary rounded mt-2 mb-2">
         <div className="row ms-2">
           <div className="d-flex justify-content-start">

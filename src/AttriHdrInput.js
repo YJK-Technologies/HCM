@@ -19,6 +19,13 @@ function AttriHdrInput({ open, handleClose }) {
   const Name = useRef(null);
   const Status = useRef(null);
 
+  const clearInputFields = () => {
+    setAttributeheader_Code("");
+    setAttributeheader_Name("");
+    setStatus("");
+    setSelectedStatus("");
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -44,11 +51,11 @@ function AttriHdrInput({ open, handleClose }) {
 
   const handleInsert = async () => {
     if (!attributeheader_code || !attributeheader_name || !status) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
-
+    setError(false);
     setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/addattriData`, {
@@ -63,9 +70,9 @@ function AttriHdrInput({ open, handleClose }) {
         }),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         toast.success("Data inserted successfully!", {
-          onClose: () => window.location.reload(),
+          onClose: () => clearInputFields(),
         });
       } else {
         const errorResponse = await response.json();
@@ -101,75 +108,75 @@ function AttriHdrInput({ open, handleClose }) {
           </div>
 
           <div className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
-<div className="row">
-            <div className="col-md-3">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  autoComplete="off"
-                  placeholder=" "
-                  value={attributeheader_code}
-                  onChange={(e) => setAttributeheader_Code(e.target.value)}
-                  maxLength={100}
-                  ref={code}
-                />
-                <label className={`exp-form-labels ${error && !attributeheader_code ? 'text-danger' : ''}`}>
-                  Code<span className="text-danger">*</span>
-                </label>
+            <div className="row">
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    className="exp-input-field form-control"
+                    type="text"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={attributeheader_code}
+                    onChange={(e) => setAttributeheader_Code(e.target.value)}
+                    maxLength={100}
+                    ref={code}
+                  />
+                  <label className={`exp-form-labels ${error && !attributeheader_code ? 'text-danger' : ''}`}>
+                    Code<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3">
-              <div className="inputGroup">
-                <input
-                  className="exp-input-field form-control"
-                  type="text"
-                  autoComplete="off"
-                  placeholder=" "
-                  value={attributeheader_name}
-                  onChange={(e) => setAttributeheader_Name(e.target.value)}
-                  maxLength={250}
-                  ref={Name}
-                />
-                <label className={`exp-form-labels ${error && !attributeheader_name ? 'text-danger' : ''}`}>
-                  Name<span className="text-danger">*</span>
-                </label>
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    className="exp-input-field form-control"
+                    type="text"
+                    autoComplete="off"
+                    placeholder=" "
+                    value={attributeheader_name}
+                    onChange={(e) => setAttributeheader_Name(e.target.value)}
+                    maxLength={250}
+                    ref={Name}
+                  />
+                  <label className={`exp-form-labels ${error && !attributeheader_name ? 'text-danger' : ''}`}>
+                    Name<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3">
-              <div
-                className={`inputGroup selectGroup 
+              <div className="col-md-3">
+                <div
+                  className={`inputGroup selectGroup 
                 ${selectedStatus ? "has-value" : ""} 
                 ${isSelectStatus ? "is-focused" : ""}`}
-              >
-                <Select
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  placeholder=" "
-                  onFocus={() => setIsSelectStatus(true)}
-                  onBlur={() => setIsSelectStatus(false)}
-                  classNamePrefix="react-select"
-                  isClearable
-                  ref={Status}
-                />
-                <label className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
-                  Status<span className="text-danger">*</span>
-                </label>
+                >
+                  <Select
+                    value={selectedStatus}
+                    onChange={handleChangeStatus}
+                    options={filteredOptionStatus}
+                    placeholder=" "
+                    onFocus={() => setIsSelectStatus(true)}
+                    onBlur={() => setIsSelectStatus(false)}
+                    classNamePrefix="react-select"
+                    isClearable
+                    ref={Status}
+                  />
+                  <label className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
+                    Status<span className="text-danger">*</span>
+                  </label>
+                </div>
               </div>
-            </div>
 
-            <div class="col-12">
-              <div className="search-btn-wrapper">
-                <div className="icon-btn save" onClick={handleInsert}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
+              <div class="col-12">
+                <div className="search-btn-wrapper">
+                  <div className="icon-btn save" onClick={handleInsert}>
+                    <span className="tooltip">Save</span>
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </div>
                 </div>
               </div>
             </div>
-</div>
           </div>
         </div>
       </div>

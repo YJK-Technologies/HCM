@@ -9,7 +9,7 @@ import TabButtons from '../ESSComponents/Tabs';
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -77,8 +77,12 @@ function InterviewSchedule({ }) {
   const [selectedInterviewModeSC, setselectedInterviewModeSC] = useState("");
   const [InterviewModeSC, setInterviewModeSC] = useState("");
   const [isSelectInterviewModeSC, setisSelectInterviewModeSC] = useState(false);
-
-
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [Paneldrop, setPaneldrop] = useState([]);
+  const [candidatedrop, setcandidatedrop] = useState([]);
+  const [interviewmodeDrop, setInterviewmodeDrop] = useState([]);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const [activeTab, setActiveTab] = useState("Interview schedule")
   const [loading, setLoading] = useState(false);
@@ -86,14 +90,21 @@ function InterviewSchedule({ }) {
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setselectedscheduleidSC("");
+    setscheduleidSC("");
+    setSelectedcandidatenameSC("");
+    set_candidatenameSC("");
+    setselectedPanelIDSC("");
+    setPanelIDSC("");
+    setselectedInterviewModeSC("");
+    setInterviewModeSC("");
+    setlocationSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
-
 
   const handleInterviewMode = (selectedDPT) => {
     setselectedInterviewMode(selectedDPT);
@@ -109,6 +120,62 @@ function InterviewSchedule({ }) {
     label: option.attributedetails_name
   }));
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/InterviewStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/InterviewPanelData`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => ({
+          value: option.panel_id,
+          label: `${option.panel_id} - ${option.panel_name}`,
+        }));
+        setPaneldrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/CanditateID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map((option) => ({
+          value: option.candidate_id,
+          label: `${option.candidate_id} - ${option.candidate_name}`,
+        }));
+        setcandidatedrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -137,6 +204,24 @@ function InterviewSchedule({ }) {
     if (company_code) {
       fetchDept();
     }
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/InterviewMode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const interviewMode = data.map(option => option.attributedetails_name);
+        setInterviewmodeDrop(interviewMode);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const handlescandidate_name = (selectedDPT) => {
@@ -334,34 +419,48 @@ function InterviewSchedule({ }) {
     {
       headerName: "Schedule ID",
       field: "schedule_id",
+      editable: false,
+    },
+    {
+      headerName: "Candidate ID",
+      field: "candidate_id",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: candidatedrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = candidatedrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
       editable: true
     },
     {
-      headerName: "Candidate_id ID",
-      field: "candidate_id",
-      editable: true
+      headerName: "Candidate Email",
+      field: "email",
+      editable: false,
+    },
+    {
+      headerName: "Candidate Phone No",
+      field: "phone",
+      editable: false,
     },
     {
       headerName: "Panel ID",
       field: "panel_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: Paneldrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = Paneldrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Schedule Date",
       field: "scheduled_datetime",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Time Zone",
@@ -374,9 +473,13 @@ function InterviewSchedule({ }) {
       editable: true
     },
     {
-      headerName: "Time Zone",
-      field: "timezone",
-      editable: true
+      headerName: "Interview Mode",
+      field: "Interview_Mode",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: interviewmodeDrop
+      },
     },
     {
       headerName: "Meeting Link",
@@ -386,6 +489,11 @@ function InterviewSchedule({ }) {
     {
       headerName: "Status",
       field: "Status",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusgriddrop,
+      },
       editable: true
     },
     {
@@ -403,7 +511,7 @@ function InterviewSchedule({ }) {
   };
 
   const handleSave = async () => {
-    if (!canditatename || !PanelID || !scheduled_datetime || !endYear) {
+    if (!canditatename || !PanelID || !scheduled_datetime || !endYear || !timezone || !InterviewMode || !location) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -430,13 +538,11 @@ function InterviewSchedule({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -457,7 +563,10 @@ function InterviewSchedule({ }) {
         panel_id: PanelIDSC,
         department_id: department_idSC,
         Interview_Mode: InterviewModeSC,
-        status: statusSC,
+        location:locationSC,
+        Status: statusSC,
+        fromDate: fromDate,
+        toDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -482,6 +591,9 @@ function InterviewSchedule({ }) {
           meeting_link: matchedItem.meeting_link,
           Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
+          Interview_Mode: matchedItem.Interview_Mode,
+          email: matchedItem.email,
+          phone: matchedItem.phone,
         }));
         setRowData(newRows);
       } else if (response.status === 404) {
@@ -502,15 +614,16 @@ function InterviewSchedule({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -548,11 +661,11 @@ function InterviewSchedule({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_scheduleData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -588,10 +701,10 @@ function InterviewSchedule({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -601,7 +714,7 @@ function InterviewSchedule({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
       case 'Job Master':
@@ -610,7 +723,7 @@ function InterviewSchedule({ }) {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -653,6 +766,155 @@ function InterviewSchedule({ }) {
 
   const InterviewDecision = () => {
     navigate("/InterviewDecision");
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const canObj = candidatedrop.find(
+        (d) => d.value === row.candidate_id
+      );
+
+      const canName = canObj
+        ? canObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const panObj = Paneldrop.find(
+        (d) => d.value === row.panel_id
+      );
+
+      const panName = panObj
+        ? panObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Schedule ID": row.schedule_id || "",
+        "Candidate ID": `${row.candidate_id} - ${canName}` || "",
+        "Candidate Email": row.email || "",
+        "Candidate Phone No": row.phone || "",
+        "Panel ID": `${row.panel_id} - ${panName}` || "",
+        "Schedule Date": row.scheduled_datetime || "",
+        "Time Zone": row.timezone || "",
+        "Location": row.location || "",
+        "Interview Mode": row.Interview_Mode || "",
+        "Meeting Link": row.meeting_link || "",
+        "Status": row.Status || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Interview Schedule Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Schedule");
+
+    XLSX.writeFile(workbook, "Interview_Schedule_Search_Report.xlsx");
   };
 
   return (
@@ -738,6 +1000,22 @@ function InterviewSchedule({ }) {
             </div>
           </div>
           <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="time"
+                placeholder=""
+                title="Please Enter the Company Contribution"
+                required
+                autoComplete="off"
+                value={timezone}
+                onChange={(e) => settimezone((e.target.value))}
+              />
+              <label for="sname" className={`exp-form-labels ${error && !timezone ? 'text-danger' : ''}`}>Time Zone<span className="text-danger">*</span></label>
+            </div>
+          </div>
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedInterviewMode ? "has-value" : ""} 
@@ -789,25 +1067,10 @@ function InterviewSchedule({ }) {
                 value={meeting_link}
                 onChange={(e) => setmeeting_link((e.target.value))}
               />
-              <label for="sname" className={`exp-form-labels ${error && !meeting_link ? 'text-danger' : ''}`}>Meeting Link<span className="text-danger">*</span></label>
+              <label for="sname" className={`exp-form-labels`}>Meeting Link</label>
             </div>
           </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="time"
-                placeholder=""
-                title="Please Enter the Company Contribution"
-                required
-                autoComplete="off"
-                value={timezone}
-                onChange={(e) => settimezone((e.target.value))}
-              />
-              <label for="sname" className={`exp-form-labels ${error && !timezone ? 'text-danger' : ''}`}>Time Zone<span className="text-danger">*</span></label>
-            </div>
-          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
@@ -836,6 +1099,40 @@ function InterviewSchedule({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Schedule From</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                title="Please Enter the Employee PF"
+                required
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate((e.target.value))}
+              />
+              <label for="add1" className={`exp-form-labels`}>Schedule To</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div
@@ -925,8 +1222,8 @@ function InterviewSchedule({ }) {
                 onChange={handleInterviewModeSC}
                 options={filteredOptionInterviewMode}
               />
-              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedInterviewModeSC ? 'text-danger' : ''}`}>
-                Interview Mode{showAsterisk && <span className="text-danger">*</span>}
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Interview Mode
               </label>
             </div>
           </div>
@@ -978,6 +1275,11 @@ function InterviewSchedule({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

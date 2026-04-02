@@ -8,6 +8,7 @@ import TabButtons from "./Tabs";
 import Bankaccdetpopup from "./bankaccdetpopup";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import Select from "react-select";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -28,6 +29,33 @@ function Input({ }) {
   const [First_Name, setFirst_Name] = useState('');
   const logo = useRef(null)
   const [loading, setLoading] = useState(false);
+  const [accountTypeDrop, setAccountTypeDrop] = useState([]);
+  const [selectedAccountType, setSelectedAccountType] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [isSelectAccountType, setIsSelectAccountType] = useState(false);
+  const [isSelectWPSEnabled, setIsSelectWPSEnabled] = useState(false);
+  const [isSelectIsPrimaryAccount, setIsSelectIsPrimaryAccount] = useState(false);
+  const [isSelectIsActive, setIsSelectIsActive] = useState(false);
+  const [isSelectIsDelete, setIsSelectIsDelete] = useState(false);
+  const [bankCity, setBankCity] = useState('');
+  const [bankCountry, setBankCountry] = useState('');
+  const [salaryCurrency, setSalaryCurrency] = useState('');
+  const [booleanDrop, setBooleanDrop] = useState([]);
+  const [selectedWPSEnabled, setSelectedWPSEnabled] = useState('');
+  const [WPSEnabled, setWPSEnabled] = useState('');
+  const [WPSMemberId, setWPSMemberId] = useState('');
+  const [selectedIsPrimaryAccount, setSelectedIsPrimaryAccount] = useState('');
+  const [isPrimaryAccount, setIsPrimaryAccount] = useState('');
+  const [selectedIsActive, setSelectedIsActive] = useState('');
+  const [isActive, setIsActive] = useState('');
+  const [selectedIsDelete, setSelectedIsDelete] = useState('');
+  const [isDelete, setIsDelete] = useState('');
+  const [sNo, setSNo] = useState('');
+
+  const [currencyDrop, setCurrencyDrop] = useState([]);
+  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -35,8 +63,35 @@ function Input({ }) {
     .filter(permission => permission.screen_type === 'BankAccDet')
     .map(permission => permission.permission_type.toLowerCase());
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCurrency = Array.isArray(currencyDrop)
+    ? currencyDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCurrency = (selectedCurrency) => {
+    setSelectedCurrency(selectedCurrency);
+    setSalaryCurrency(selectedCurrency ? selectedCurrency.value : "");
+  };
 
   const NavigatecomDet = () => {
     navigate("/CompanyDetails", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
@@ -64,6 +119,10 @@ function Input({ }) {
 
   const Documents = () => {
     navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  };
+
+   const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
 
   const EmployeeLoan = () => {
@@ -99,6 +158,10 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
+     case 'EmployeeAssets':
+        EmployeeAssets();
+        break;
+
       default:
         break;
     }
@@ -112,8 +175,69 @@ function Input({ }) {
     { label: 'Identity Documents' },
     { label: 'Academic Details' },
     { label: 'Family' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: 'EmployeeAssets' }
   ];
+
+  const handleChangeAccountType = (selectedAccountType) => {
+    setSelectedAccountType(selectedAccountType);
+    setAccountType(selectedAccountType ? selectedAccountType.value : '');
+  };
+
+  const filteredOptionAccountType = accountTypeDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+
+    fetch(`${config.apiBaseUrl}/getAccountType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setAccountTypeDrop(val));
+  }, []);
+
+  const handleChangeWPSEnabled = (selectedWPSEnabled) => {
+    setSelectedWPSEnabled(selectedWPSEnabled);
+    setWPSEnabled(selectedWPSEnabled ? selectedWPSEnabled.value : '');
+  };
+
+  const handleChangeIsPrimaryAccount = (selectedIsPrimaryAccount) => {
+    setSelectedIsPrimaryAccount(selectedIsPrimaryAccount);
+    setIsPrimaryAccount(selectedIsPrimaryAccount ? selectedIsPrimaryAccount.value : '');
+  };
+
+  const handleChangeIsActive = (selectedIsActive) => {
+    setSelectedIsActive(selectedIsActive);
+    setIsActive(selectedIsActive ? selectedIsActive.value : '');
+  };
+
+  const handleChangeIsDelete = (selectedIsDelete) => {
+    setSelectedIsDelete(selectedIsDelete);
+    setIsDelete(selectedIsDelete ? selectedIsDelete.value : '');
+  };
+
+  const filteredOptionBoolean = booleanDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setBooleanDrop(val));
+  }, []);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -130,11 +254,12 @@ function Input({ }) {
   };
 
   const handleInsert = async () => {
-    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code) {
-      setError(" ");
+    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true)
 
     try {
@@ -145,6 +270,16 @@ function Input({ }) {
       formData.append("bankName", bankName);
       formData.append("branchName", branchName);
       formData.append("IFSC_Code", IFSC_Code);
+      formData.append("Account_Type", accountType);
+      formData.append("Bank_City", bankCity);
+      formData.append("Bank_Country", bankCountry);
+      formData.append("Salary_Currency", salaryCurrency);
+      formData.append("WPS_Enabled", WPSEnabled);
+      formData.append("WPS_Member_Id", WPSMemberId);
+      formData.append("Is_Primary_Account", isPrimaryAccount);
+      formData.append("Is_Active", isActive);
+      formData.append("Is_Deleted", isDelete);
+      formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
@@ -157,13 +292,11 @@ function Input({ }) {
         body: formData,
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -178,18 +311,20 @@ function Input({ }) {
   };
 
   const handleDelete = async () => {
-    if (!Account_NO) {
-      setError(" ");
+    if (!Account_NO || !EmployeeId) {
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
+    setError(false);
 
     showConfirmationToast(
       "Are you sure you want to Delete the data?",
       async () => {
         try {
+          setLoading(true);
           const Header = {
+            EmployeeId: EmployeeId,
             Account_NO: Account_NO,
             company_code: sessionStorage.getItem("selectedCompanyCode")
           };
@@ -202,13 +337,11 @@ function Input({ }) {
             body: JSON.stringify(Header),
           });
 
-          if (response.status === 200) {
+          if (response.ok) {
             console.log("Data deleted successfully");
-            setTimeout(() => {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
-            }, 1000);
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -218,8 +351,8 @@ function Input({ }) {
           console.error("Error inserting data:", error);
           toast.error('Error inserting data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -248,7 +381,9 @@ function Input({ }) {
       if (response.ok) {
         const searchData = await response.json();
 
-        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName, IFSC_Code, branchName, Bankbook_img }] = searchData;
+        const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
+          IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
+          Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = searchData;
 
         setAccountHolderName(AccountHolderName);
         setAccountNumber(Account_NO)
@@ -259,13 +394,27 @@ function Input({ }) {
         setIFSCCode(IFSC_Code);
         setBankName(bankName);
         setBranchName(branchName);
+        setBankCity(Bank_City);
+        setBankCountry(Bank_Country);
+        // setSalaryCurrency(Salary_Currency);
+        setWPSMemberId(WPS_Member_Id);
+        setSNo(S_NO);
+
+        const selectedCurrency = filteredOptionCurrency.find(option => option.value === Salary_Currency);
+        setSelectedCurrency(selectedCurrency);
+        setSalaryCurrency(selectedCurrency?.value || null);
+
+        setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
+        setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
+        setBooleanSelect(Is_Active, setSelectedIsActive, setIsActive);
+        setBooleanSelect(Is_Deleted, setSelectedIsDelete, setIsDelete);
+
         setUpdateButtonVisible(true);
 
         setSaveButtonVisible(false);
+
         const imageBlob = new Blob([new Uint8Array(Bankbook_img.data)], { type: 'image/jpeg' });
-
         setPassBookImg(imageBlob);
-
         const imageUrl = URL.createObjectURL(imageBlob);
         setSelectedImage(imageUrl);
 
@@ -291,24 +440,15 @@ function Input({ }) {
 
 
   const handleUpdate = async () => {
-    if (
-      !EmployeeId ||
-      !Account_NO ||
-      !AccountHolderName ||
-      !bankName ||
-      !branchName ||
-      !IFSC_Code
-
-    ) {
-      setError("Please fill all required fields.");
+    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
       return;
     }
-    setLoading(true)
-    // if (!validateEmail(Email)) {
-    //   setError("Please enter a valid email address");
-    //   return;
-    // }
+    setError(false);
+
     try {
+      setLoading(true)
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
       formData.append("Account_NO", Account_NO);
@@ -316,6 +456,15 @@ function Input({ }) {
       formData.append("bankName", bankName);
       formData.append("branchName", branchName);
       formData.append("IFSC_Code", IFSC_Code);
+      formData.append("Bank_City", bankCity);
+      formData.append("Bank_Country", bankCountry);
+      formData.append("Salary_Currency", salaryCurrency);
+      formData.append("WPS_Enabled", WPSEnabled);
+      formData.append("WPS_Member_Id", WPSMemberId);
+      formData.append("Is_Primary_Account", isPrimaryAccount);
+      formData.append("Is_Active", isActive);
+      formData.append("Is_Deleted", isDelete);
+      formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
 
@@ -328,30 +477,19 @@ function Input({ }) {
         body: formData,
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data updated successfully");
-        setTimeout(() => {
-          toast.success("Data updated successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-
+        toast.success("Data updated successfully!", {
+          onClose: () => window.location.reload(),
         });
       } else {
-        console.error("Failed to insert data");
-        toast.error('Failed to insert data', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
+      toast.error('Error inserting data: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -370,90 +508,83 @@ function Input({ }) {
     window.location.reload();
   };
 
+  const base64ToBlob = (base64, contentType = 'image/jpeg') => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+  };
+
+  const setBooleanSelect = (
+    backendValue,
+    setSelectedFn,
+    setValueFn
+  ) => {
+    if (backendValue === null || backendValue === undefined) {
+      setSelectedFn(null);
+      setValueFn(null);
+      return;
+    }
+
+    const value = backendValue === true ? "1" : "0";
+
+    const selectedOption = filteredOptionBoolean.find(
+      option => option.value === value
+    );
+
+    setSelectedFn(selectedOption || null);
+    setValueFn(value);
+  };
+
   const Employeebankdetails = async (data) => {
 
     if (data && data.length > 0) {
       setSaveButtonVisible(false);
       setUpdateButtonVisible(true);
-      const [{ EmployeeId, Account_NO, first_name, department_ID, designation_ID, AccountHolderName, IFSC_Code, bankName, branchName }] = data;
+      const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
+        IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
+        Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = data;
 
-      console.log(data);
-      setSelectedImage(`data:image/jpeg;base64,${data[0].Bankbook_img}`);
-
-      const employeeId = document.getElementById('EmployeeId');
-      if (employeeId) {
-        employeeId.value = EmployeeId;
-        setEmployeeId(EmployeeId);
-      } else {
-        console.error('EmployeeId  not found');
+      if (Bankbook_img) {
+        const imageBlob = base64ToBlob(Bankbook_img);
+        setPassBookImg(imageBlob);
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setSelectedImage(imageUrl);
       }
 
-      const firstname = document.getElementById('EmployeelabelName');
-      if (firstname) {
-        firstname.value = first_name;
-        setFirst_Name(first_name);
-      } else {
-        console.error('EmployeeId  not found');
-      }
-      const DPT = document.getElementById('Departmentlabel');
-      if (DPT) {
-        DPT.value = department_ID;
-        setdepartment_id(department_ID);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+      setAccountHolderName(AccountHolderName);
+      setAccountNumber(Account_NO)
+      setdepartment_id(department_id);
+      setdesignation_id(designation_id);
+      setFirst_Name(First_Name);
+      setEmployeeId(EmployeeId);
+      setIFSCCode(IFSC_Code);
+      setBankName(bankName);
+      setBranchName(branchName);
+      setBankCity(Bank_City);
+      setBankCountry(Bank_Country);
+      // setSalaryCurrency(Salary_Currency);
+      setWPSMemberId(WPS_Member_Id);
+      setSNo(S_NO);
 
-      const Desig = document.getElementById('designationLabel');
-      if (Desig) {
-        Desig.value = designation_ID;
-        setdesignation_id(designation_ID);
-      } else {
-        console.error('EmployeeId  not found');
-      }
+      const selectedCurrency = filteredOptionCurrency.find(option => option.value === Salary_Currency);
+        setSelectedCurrency(selectedCurrency);
+        setSalaryCurrency(selectedCurrency?.value || null);
 
-
-      const accounno = document.getElementById('Account_NO');
-      if (accounno) {
-        accounno.value = Account_NO;
-        setAccountNumber(Account_NO);
-      } else {
-        console.error('Account_NO not found');
-      }
-
-      const accountholder = document.getElementById('AccountHolderName');
-      if (accountholder) {
-        accountholder.value = AccountHolderName;
-        setAccountHolderName(AccountHolderName);
-      } else {
-        console.error('AccountHolderName not found');
-      }
-      const IFSCCode = document.getElementById('IFSC_Code');
-      if (IFSCCode) {
-        IFSCCode.value = IFSC_Code;
-        setIFSCCode(IFSC_Code);
-      } else {
-        console.error('IFSC_Code  not found');
-      }
-      const bankname = document.getElementById('bankName');
-      if (bankname) {
-        bankname.value = bankName;
-        setBankName(bankName);
-      } else {
-        console.error('bankName not found');
-      }
-
-      const branchname = document.getElementById('branchName');
-      if (branchname) {
-        branchname.value = branchName;
-        setBranchName(branchName);
-      } else {
-        console.error('branchName not found');
-      }
+      setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
+      setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
+      setBooleanSelect(Is_Active, setSelectedIsActive, setIsActive);
+      setBooleanSelect(Is_Deleted, setSelectedIsDelete, setIsDelete);
 
     } else {
       console.log("Data not fetched...!");
     }
-    console.log(data);
+    console.log(data)
   };
 
   const EmployeeInfo = async (data) => {
@@ -512,10 +643,10 @@ function Input({ }) {
       setdesignation_id(designation_id || "");
     }
 
-    if (employeeId) {
+    if (employeeId && currencyDrop.length > 0) {
       handleRefNo(employeeId);
     }
-  }, [location.state]);
+  }, [location.state,currencyDrop]);
 
   const handleRemoveLogo = () => {
     setSelectedImage(null);
@@ -607,6 +738,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={EmployeeId}
+                maxLength={100}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
@@ -658,12 +790,28 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
+                id="sNo"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=" "
+                autoComplete="off"
+                value={sNo}
+                onChange={(e) => setSNo(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>SNo</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
                 id="cno"
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
                 value={AccountHolderName}
+                maxLength={200}
                 onChange={(e) => setAccountHolderName(e.target.value)}
               />
               <label for="cno" className={`exp-form-labels ${error && !AccountHolderName ? 'text-danger' : ''}`}>Account Holder Name<span className="text-danger">*</span> </label>
@@ -680,6 +828,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={Account_NO}
+                maxLength={50}
                 onChange={(e) => setAccountNumber(e.target.value)}
               />
               <label for="cname" className={`exp-form-labels ${error && !Account_NO ? 'text-danger' : ''}`}>Account Number<span className="text-danger">*</span></label>
@@ -695,6 +844,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={IFSC_Code}
+                maxLength={11}
                 onChange={(e) => setIFSCCode(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels ${error && !IFSC_Code ? 'text-danger' : ''}`}>IFSC Code<span className="text-danger">*</span></label>
@@ -710,6 +860,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={bankName}
+                maxLength={100}
                 onChange={(e) => setBankName(e.target.value)}
               />
               <label for="sname" className={`exp-form-labels ${error && !bankName ? 'text-danger' : ''}`}>Bank Name
@@ -727,15 +878,228 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 value={branchName}
+                maxLength={100}
                 onChange={(e) => setBranchName(e.target.value)}
               />
-              <label for="add1" className={`${error && !branchName ? 'text-danger' : ''}`}>Branch Name<span className="text-danger">*</span></label>
+              <label for="add1" className={`exp-form-labels ${error && !branchName ? 'text-danger' : ''}`}>Branch Name<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedAccountType ? "has-value" : ""} 
+              ${isSelectAccountType ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectAccountType(true)}
+                onBlur={() => setIsSelectAccountType(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedAccountType}
+                onChange={handleChangeAccountType}
+                options={filteredOptionAccountType}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Account Type
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="bankCity"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={bankCity}
+                maxLength={50}
+                onChange={(e) => setBankCity(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Bank City</label>
             </div>
           </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container">
+              <input
+                id="bankCountry"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={bankCountry}
+                maxLength={50}
+                onChange={(e) => setBankCountry(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Bank Country</label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="salaryCurrency"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={salaryCurrency}
+                maxLength={3}
+                onChange={(e) => setSalaryCurrency(e.target.value)}
+              />
+              <label for="add1" className={`exp-form-labels`}>Salary Currency</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCurrency ? "has-value" : ""} 
+              ${isSelectedCurrency ? "is-focused" : ""}`}
+              title="Please select the Salary Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCurrency(true)}
+                onBlur={() => setIsSelectedCurrency(false)}
+                isClearable
+                value={selectedCurrency}
+                onChange={handleChangeCurrency}
+                options={filteredOptionCurrency}
+              />
+              <label for="sname" className={`floating-label`}>Salary Currency</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedWPSEnabled ? "has-value" : ""} 
+              ${isSelectWPSEnabled ? "is-focused" : ""}`}
+            >
+              <Select
+                id="WPSEnabled"
+                placeholder=" "
+                onFocus={() => setIsSelectWPSEnabled(true)}
+                onBlur={() => setIsSelectWPSEnabled(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedWPSEnabled}
+                onChange={handleChangeWPSEnabled}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                WPS Enabled
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="WPSMemberId"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=" "
+                autoComplete="off"
+                value={WPSMemberId}
+                maxLength={20}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setWPSMemberId(value);
+                  }
+                }}
+              />
+              <label for="add1" className={`exp-form-labels`}>WPS Member Id</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsPrimaryAccount ? "has-value" : ""} 
+              ${isSelectIsPrimaryAccount ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsPrimaryAccount"
+                placeholder=" "
+                onFocus={() => setIsSelectIsPrimaryAccount(true)}
+                onBlur={() => setIsSelectIsPrimaryAccount(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsPrimaryAccount}
+                onChange={handleChangeIsPrimaryAccount}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Primary Account
+              </label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsActive ? "has-value" : ""} 
+              ${isSelectIsActive ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsActive"
+                placeholder=" "
+                onFocus={() => setIsSelectIsActive(true)}
+                onBlur={() => setIsSelectIsActive(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsActive}
+                onChange={handleChangeIsActive}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Active
+              </label>
+            </div>
+          </div> */}
+
+          {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsDelete ? "has-value" : ""} 
+              ${isSelectIsDelete ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsDelete"
+                placeholder=" "
+                onFocus={() => setIsSelectIsDelete(true)}
+                onBlur={() => setIsSelectIsDelete(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsDelete}
+                onChange={handleChangeIsDelete}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Delete
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <div className={`image-upload-container ${error && !passBookImg ? "image-error" : ""}`}>
                 {selectedImg ? (
                   <div className="image-preview-box">
                     <img

@@ -16,7 +16,7 @@ import { EditorState, SelectionState } from "draft-js";
 import { Modifier } from "draft-js";
 import * as XLSX from "xlsx";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { useLocation } from "react-router-dom";  
+import { useLocation } from "react-router-dom";
 import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
@@ -956,7 +956,7 @@ const AccountInformation = () => {
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data: " + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -1417,10 +1417,10 @@ const AccountInformation = () => {
             </div>
           </div>
         </div>
-        </div>
+      </div>
 
-<div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-          <h5 className="">Search Criteria :</h5>
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <h5 className="">Search Criteria :</h5>
         <div className="row g-3">
 
           <div className="col-md-2">
@@ -1528,9 +1528,9 @@ const AccountInformation = () => {
             headerHeight={27}
           />
         </div>
-        </div>
+      </div>
 
-        <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
           <div className="col-md-2">
             <div className="exp-form-floating">
@@ -1762,7 +1762,7 @@ const AccountInformation = () => {
                 onBlur={() => setIsSelectUser(false)}
                 isClearable
               />
-              <label for="sname" className={` floating-label ${error && !usercode ? 'text-danger' : ''}`}>User Code <span className="text-danger">*</span></label>
+              <label for="sname" className={` floating-label ${error && !usercode ? 'text-danger' : ''}`}>User Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1816,6 +1816,7 @@ const AccountInformation = () => {
               <Select
                 id="PriorityLevel"
                 type="text"
+                classNamePrefix="react-select"
                 placeholder=" "
                 onFocus={() => setIsSelectPL(true)}
                 onBlur={() => setIsSelectPL(false)}
@@ -1824,7 +1825,7 @@ const AccountInformation = () => {
                 onChange={handleChangePriorityLevel}
                 options={filteredOptionPriorityLevel}
               />
-              <label for="tcode" className={` floating-label ${error && !selectedPriortyLeavel ? 'text-danger' : ''}`}>Priority Level <span className="text-danger">*</span></label>
+              <label for="tcode" className={` floating-label ${error && !selectedPriortyLeavel ? 'text-danger' : ''}`}>Priority Level<span className="text-danger">*</span></label>
             </div>
           </div>
           <div className="d-flex align-items-center justify-content-between col-md-6">
@@ -1961,14 +1962,14 @@ const AccountInformation = () => {
           <h5>Task History :</h5>
           <div className="d-flex justify-content-end me-2">
 
-          <div className="action-wrapper">
-            <div className="action-icon print" onClick={handleExport}>
-              <span className="tooltip">Excel</span>
-              <i class="fa-solid fa-file-excel"></i>
+            <div className="action-wrapper">
+              <div className="icon-btn excel" onClick={handleExport}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
-          </div>
 
-        </div>
+          </div>
         </div>
 
         {taskDetails.map((task, taskIndex) => (
@@ -1976,94 +1977,94 @@ const AccountInformation = () => {
             {taskIndex !== 0 && <hr />}
 
             <div className="col-md-4">
-               <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className="partyName">
-                <strong>Task Date:</strong> {task.taskDate}
-              </label>
-            </div>
-            </div>
+              <div className="exp-form-floating">
+                <div className="info-label-container">
+                  <label className="partyName">
+                    <strong>Task Date:</strong> {task.taskDate}
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="col-md-4">
               <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className=" partyName">
-                <strong>Task Master ID:</strong> {task.taskMasterID}
-              </label>
-            </div>
-            </div>
-            </div>
-
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className=" partyName">
-                <strong>Daily Task Title:</strong> {task.dailyTaskTitle}
-              </label>
-            </div>
-            </div>
-            </div>
-
-            <div className="col-md-4">
-               <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className=" partyName">
-                <strong>User ID:</strong> {task.userId}
-              </label>
-            </div>
-            </div>
-            </div>
-
-            <div className="col-md-4">
-               <div className="exp-form-floating">
-              <div className="info-label-container">
-               <label className=" partyName">
-                <strong>User Name:</strong> {task.userName}
-              </label>
-            </div>
-            </div>
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>Task Master ID:</strong> {task.taskMasterID}
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="col-md-4">
               <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className=" partyName">
-                <strong>Hours Taken:</strong> {task.hoursTaken}
-              </label>
-            </div>
-            </div>
-            </div>
-
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-              <div className="info-label-container">
-               <label className=" partyName">
-                <strong>Priority Level:</strong> {task.PriorityLevel}
-              </label>
-            </div>
-            </div>
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>Daily Task Title:</strong> {task.dailyTaskTitle}
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="col-md-4">
               <div className="exp-form-floating">
-              <div className="info-label-container">
-              <label className=" partyName">
-                <strong>Task Status:</strong> {task.TaskStauts}
-              </label>
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>User ID:</strong> {task.userId}
+                  </label>
+                </div>
+              </div>
             </div>
+
+            <div className="col-md-4">
+              <div className="exp-form-floating">
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>User Name:</strong> {task.userName}
+                  </label>
+                </div>
+              </div>
             </div>
+
+            <div className="col-md-4">
+              <div className="exp-form-floating">
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>Hours Taken:</strong> {task.hoursTaken}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="exp-form-floating">
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>Priority Level:</strong> {task.PriorityLevel}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="exp-form-floating">
+                <div className="info-label-container">
+                  <label className=" partyName">
+                    <strong>Task Status:</strong> {task.TaskStauts}
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div>
               <div className="col-md-4 form-group mb-3">
                 <div className="exp-form-floating">
-              <div className="info-label-container">
-                <label className=" partyName">
-                  <strong> File:</strong>
-                </label>
-              </div>
-            </div>
+                  <div className="info-label-container">
+                    <label className=" partyName">
+                      <strong> File:</strong>
+                    </label>
+                  </div>
+                </div>
                 <div>
                   {taskFiles[taskIndex] ? (
                     taskFiles[taskIndex].type === "pdf" ? (
@@ -2093,7 +2094,7 @@ const AccountInformation = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="col-md-3">
                 <div className="exp-form-floating">
                   <div className="info-label-container">

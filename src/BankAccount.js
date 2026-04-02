@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./input.css";
-//import "./exp.css";
 import Select from 'react-select';
 import "bootstrap/dist/css/bootstrap.min.css";
-import * as icons from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,7 +40,7 @@ function BankAccInput({ }) {
   const [selectedState, setselectedState] = useState('');
   const [selectedCountry, setselectedCountry] = useState('');
   const [baseaccdrop, setbaseaccdrop] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [StdAccGrpdrop, setStdAccGrpdrop] = useState([]);
   const [selectedUserAcc, setSelectedUserAcc] = useState('');
   const [selectedUserCode, setSelectedUserCode] = useState("");
@@ -118,6 +116,69 @@ function BankAccInput({ }) {
   };
 
   useEffect(() => {
+    if (mode === "update" && selectedRow && Userdrop) {
+      setaccount_code(selectedRow.account_code || "");
+      setuser_accgroup_code(selectedRow.user_accgroup_code || "");
+      setaccount_name(selectedRow.account_name || "");
+      setaccount_number(selectedRow.account_number || "");
+      setIFSC_code(selectedRow.IFSC_code || "");
+      setbase_accgroup_code(selectedRow.base_accgroup_code || "");
+      setstandard_accgroup_code(selectedRow.standard_accgroup_code || "");
+      setacc_area_code(selectedRow.acc_area_code || "");
+      setSelectedCity({
+        label: selectedRow.acc_area_code,
+        value: selectedRow.acc_area_code,
+      });
+      setacc_country_code(selectedRow.acc_country_code || "");
+      setselectedCountry({
+        label: selectedRow.acc_country_code,
+        value: selectedRow.acc_country_code,
+      });
+      setacc_state_code(selectedRow.acc_state_code || "");
+      setselectedState({
+        label: selectedRow.acc_state_code,
+        value: selectedRow.acc_state_code,
+      });
+      setDefaultBank(selectedRow.default_bank || "");
+      setselectedDefaultBank({
+        label: selectedRow.default_bank,
+        value: selectedRow.default_bank,
+      });
+      setaccount_type(selectedRow.Account_type || "");
+      setselectedAcctype({
+        label: selectedRow.Account_type,
+        value: selectedRow.Account_type,
+      });
+      const matchedUser = filteredOptionUser.find(
+        (option) => option.value === selectedRow.user_accgroup_code
+      );
+      setSelectedUser(matchedUser || "");
+      setSelectedUserCode(selectedRow.user_accgroup_code || "");
+      setDefaultBank(selectedRow.default_bank)
+      setacc_state_code(selectedRow.acc_state_code)
+      setacc_country_code(selectedRow.acc_country_code)
+      setacc_area_code(selectedRow.acc_area_code)
+      setaccount_type(selectedRow.Account_type || "");
+      setbranch(selectedRow.branch || "");
+      setacc_addr_1(selectedRow.acc_addr_1 || "");
+      setacc_addr_2(selectedRow.acc_addr_2 || "");
+      setacc_addr_3(selectedRow.acc_addr_3 || "");
+      setacc_addr_4(selectedRow.acc_addr_4 || "");
+
+      if (selectedRow.bank_paymentQRCode && selectedRow.bank_paymentQRCode.data) {
+        const base64Image = arrayBufferToBase64(selectedRow.bank_paymentQRCode.data);
+        const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'Images.jpg');
+        setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
+        setQRImage(file)
+      } else {
+        setSelectedImage(null);
+      }
+    } else if (mode === "create") {
+      clearInputFields();
+    }
+  }, [mode, selectedRow, Userdrop]);
+
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
     fetch(`${config.apiBaseUrl}/getUsercodenameBank`, {
@@ -181,64 +242,6 @@ function BankAccInput({ }) {
     const fileBlob = new Blob([uint8Array], { type: mime[1] });
     return new File([fileBlob], fileName, { type: mime[1] });
   };
-
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated && Userdrop) {
-      setaccount_code(selectedRow.account_code || "");
-      setuser_accgroup_code(selectedRow.user_accgroup_code || "");
-      setaccount_name(selectedRow.account_name || "");
-      setaccount_number(selectedRow.account_number || "");
-      setIFSC_code(selectedRow.IFSC_code || "");
-      setbase_accgroup_code(selectedRow.base_accgroup_code || "");
-      setstandard_accgroup_code(selectedRow.standard_accgroup_code || "");
-      setSelectedCity({
-        label: selectedRow.acc_area_code,
-        value: selectedRow.acc_area_code,
-      });
-      setselectedCountry({
-        label: selectedRow.acc_country_code,
-        value: selectedRow.acc_country_code,
-      });
-      setselectedState({
-        label: selectedRow.acc_state_code,
-        value: selectedRow.acc_state_code,
-      });
-      setselectedDefaultBank({
-        label: selectedRow.default_bank,
-        value: selectedRow.default_bank,
-      });
-      setselectedAcctype({
-        label: selectedRow.Account_type,
-        value: selectedRow.Account_type,
-      });
-      const matchedUser = filteredOptionUser.find(
-        (option) => option.value === selectedRow.user_accgroup_code
-      );
-      setSelectedUser(matchedUser || "");
-      console.log(selectedUser)
-      setDefaultBank(selectedRow.default_bank)
-      setacc_state_code(selectedRow.acc_state_code)
-      setacc_country_code(selectedRow.acc_country_code)
-      setacc_area_code(selectedRow.acc_area_code)
-      setaccount_type(selectedRow.Account_type || "");
-      setbranch(selectedRow.branch || "");
-      setacc_addr_1(selectedRow.acc_addr_1 || "");
-      setacc_addr_2(selectedRow.acc_addr_2 || "");
-      setacc_addr_3(selectedRow.acc_addr_3 || "");
-      setacc_addr_4(selectedRow.acc_addr_4 || "");
-
-      if (selectedRow.bank_paymentQRCode && selectedRow.bank_paymentQRCode.data) {
-        const base64Image = arrayBufferToBase64(selectedRow.bank_paymentQRCode.data);
-        const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'Images.jpg');
-        setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
-        setQRImage(file)
-      } else {
-        setSelectedImage(null);
-      }
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated, Userdrop]);
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getStdAccGrp`)
@@ -389,10 +392,11 @@ function BankAccInput({ }) {
 
   const handleInsert = async () => {
     if (!account_code) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
     try {
       // Create a new FormData instance
@@ -432,13 +436,12 @@ function BankAccInput({ }) {
         // const [{GeneratedAccountCode}] = searchData;
         // setaccount_code(GeneratedAccountCode);
 
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => {
-              clearInputFields();
-            }
-          });
-        }, 1000);
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -456,9 +459,10 @@ function BankAccInput({ }) {
 
   const handleUpdate = async () => {
     if (!account_code) {
-      setError(" ");
+      setError(true);
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -495,9 +499,12 @@ function BankAccInput({ }) {
 
       if (response.ok) {
         console.log("Data Updated successfully");
-        setIsUpdated(true);
-        clearInputFields();
-        toast.success("Data Updated successfully!");
+        toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
+        });
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
@@ -656,7 +663,7 @@ function BankAccInput({ }) {
                     readOnly={mode === "update"}
                     onKeyDown={(e) => handleKeyDown(e, User, Accountant)}
                   />
-                  <label className={`floating-label ${error && !account_code ? 'text-danger' : ''}`}>Accountant code<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant code<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -794,7 +801,7 @@ function BankAccInput({ }) {
                     ref={Address1}
                     onKeyDown={(e) => handleKeyDown(e, Address2, Address1)}
                   />
-                  <label className={`floating-label ${error && !acc_addr_1 ? 'text-danger' : ''}`}>Address 1<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !acc_addr_1 ? 'text-danger' : ''}`}>Address 1<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -812,7 +819,7 @@ function BankAccInput({ }) {
                     ref={Address2}
                     onKeyDown={(e) => handleKeyDown(e, Address3, Address2)}
                   />
-                  <label className={`floating-label ${error && !acc_addr_2 ? 'text-danger' : ''}`}>Address 2<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !acc_addr_2 ? 'text-danger' : ''}`}>Address 2<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -830,7 +837,7 @@ function BankAccInput({ }) {
                     ref={Address3}
                     onKeyDown={(e) => handleKeyDown(e, Address4, Address3)}
                   />
-                  <label className={`floating-label ${error && !acc_addr_3 ? 'text-danger' : ''}`}>Address 3<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !acc_addr_3 ? 'text-danger' : ''}`}>Address 3<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -848,7 +855,7 @@ function BankAccInput({ }) {
                     ref={Address4}
                     onKeyDown={(e) => handleKeyDown(e, City, Address4)}
                   />
-                  <label className={`floating-label ${error && !acc_addr_4 ? 'text-danger' : ''}`}>Address 4<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !acc_addr_4 ? 'text-danger' : ''}`}>Address 4<span className="text-danger">*</span></label>
                 </div>
               </div>
 

@@ -147,7 +147,7 @@ function Input({ }) {
   const [selectedUser, setSelectedEmployeeID] = useState([]);
   const [userDrop, setUserDrop] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [isSelectedUser, setIsSelectedUser] = useState(false);
 
   const location = useLocation();
@@ -279,11 +279,12 @@ useEffect(() => {
   const handleGeneratePayslip = async (e) => {
     try {
       if (!SalaryDate) {
-        setError(' ');
+        setError(true);
         toast.warning("Error: Missing Required Fields");
         return;
       }
       e.preventDefault();
+      setError(false);
       setIsLoading(true);
 
       const data = {
@@ -365,7 +366,7 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
-  console.log(isSalaryPath)
+  
   return (
       <div class="container-fluid Topnav-screen ">
           <ToastContainer position="top-right" className="toast-design" theme="colored" />

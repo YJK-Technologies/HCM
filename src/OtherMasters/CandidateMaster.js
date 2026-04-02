@@ -13,30 +13,37 @@ import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 function CandidateMaster() {
 
   const [phone, setphone] = useState("");
-  const [applied_job_id, setapplied_job_id] = useState("");
-  const [applied_job_idSC, setapplied_job_idSC] = useState("");
-  const [department_id, setdepartment_id] = useState("");
+  const [Education, setEducation] = useState("");
+  const [Experience, setExperience] = useState("");
+  const [Related_experience, setRelated_experience] = useState("");
+  const [EducationSC, setEducationSC] = useState("");
+  const [ExperienceSC, setExperienceSC] = useState("");
+  const [JobDescriptionSC, setJobDescriptionSC] = useState("");
+  const [Related_experienceSC, setRelated_experienceSC] = useState("");
+  const [Job_description, setJob_description] = useState("");
   const [email, setemail] = useState("");
   const [emailSC, setemailSC] = useState("");
   const [phoneSC, setphoneSC] = useState("");
   const [candidate_name, setcandidate_name] = useState("");
-  const [candidate_nameSC, setcandidate_nameSC] = useState("");
   const [error, setError] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [activeTab, setActiveTab] = useState("Candiate Master")
+  const [activeTab, setActiveTab] = useState("Candidate Master")
   const [loading, setLoading] = useState(false);
-  const [isSelectDepartment, setIsSelectDepartment] = useState(false);
-  const [selecteddpt, setselecteddept] = useState("");
-  const [DPTdrop, setDPTdrop] = useState([]);
-  const [dpt, setdpt] = useState("");
+  const [isselectedJobID, setisselectedJobID] = useState(false);
+  const [isselectedJobIDSC, setisselectedJobIDSC] = useState(false);
+  const [selectedJobID, setselectedJobID] = useState("");
+  const [selectedJobIDSC, setselectedJobIDSC] = useState("");
+  const [JobID, setJobID] = useState("");
+  const [JobIDSC, setJobIDSC] = useState("");
+  const [Jobdrop, setJobdrop] = useState([]);
+  const [JobDrop, setJobDrop] = useState([]);
   const [showAsterisk, setShowAsterisk] = useState(true);
-  const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
-  const [selecteddptSC, setselecteddeptSC] = useState("");
   const [dptSC, setdptSC] = useState("");
   const [selectedcandidate_name, setSelectedcandidatename] = useState("");
   const [canditatename, set_candidatename] = useState("");
@@ -46,36 +53,42 @@ function CandidateMaster() {
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [documents, setDocuments] = useState('');
-  const [member, setMember] = useState({
-    documentUrl: null,
-    documentBase64: null,
-  });
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  const searchClearInputFields = () => {
+    setFromDate("");
+    setToDate("");
+    setSelectedcandidatename("");
+    set_candidatename("");
+    setemailSC("");
+    setphoneSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setEducationSC("");
+    setExperienceSC("");
+    setRelated_experienceSC("");
+    setJobDescriptionSC("");
+  };
+
   const cv = useRef(null)
 
 
   const navigate = useNavigate();
 
-
-  const handleDPTSC = (selectedDPT) => {
-    setselecteddeptSC(selectedDPT);
-    setdptSC(selectedDPT ? selectedDPT.value : '');
+  const handleJobID = (selectedDPT) => {
+    setselectedJobID(selectedDPT);
+    setJobID(selectedDPT ? selectedDPT.value : '');
   };
 
-  const filteredOptionDPtSC = DPTdrop.map(option => ({
-    value: option.dept_id,
-    label: `${option.dept_id} - ${option.dept_name}`
-  }));
-
-
-  const handleDPT = (selectedDPT) => {
-    setselecteddept(selectedDPT);
-    setdpt(selectedDPT ? selectedDPT.value : '');
+  const handleJobIDSC = (selectedDPT) => {
+    setselectedJobIDSC(selectedDPT);
+    setJobIDSC(selectedDPT ? selectedDPT.value : '');
   };
 
-  const filteredOptionDPt = DPTdrop.map(option => ({
-    value: option.dept_id,
-    label: `${option.dept_id} - ${option.dept_name}`
+  const filteredOptionJobID = Jobdrop.map(option => ({
+    value: option.job_id,
+    label: `${option.job_id} - ${option.job_title}`
   }));
 
   const handlescandidate_name = (selectedDPT) => {
@@ -84,7 +97,7 @@ function CandidateMaster() {
   };
 
   const filteredOptioncandidate_name = canditatenameDrop.map(option => ({
-    value: option.candidate_id,
+    value: option.candidate_name,
     label: `${option.candidate_id} - ${option.candidate_name}`
   }));
 
@@ -120,9 +133,30 @@ function CandidateMaster() {
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
+    fetch(`${config.apiBaseUrl}/JobMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const jobs = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id} - ${option.job_title}`,
+        }));
+        setJobDrop(jobs);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
     const fetchDept = async () => {
       try {
-        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+        const response = await fetch(`${config.apiBaseUrl}/JobMaster`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -135,7 +169,7 @@ function CandidateMaster() {
         }
 
         const val = await response.json();
-        setDPTdrop(val);
+        setJobdrop(val);
       } catch (error) {
         console.error('Error fetching departments:', error);
       }
@@ -153,8 +187,13 @@ function CandidateMaster() {
         candidate_name: canditatename,
         email: emailSC,
         phone: phoneSC,
-        department_id: dptSC,
-        applied_job_id: applied_job_idSC,
+        applied_job_id: JobIDSC,
+        Education: EducationSC,
+        Experience: ExperienceSC,
+        Job_description: JobDescriptionSC,
+        Related_experience: Related_experienceSC,
+        fromDate: fromDate,
+        toDate: toDate,
         company_code: sessionStorage.getItem("selectedCompanyCode")
       };
 
@@ -171,10 +210,15 @@ function CandidateMaster() {
         const newRows = fetchedData.map((matchedItem) => ({
           candidate_id: matchedItem.candidate_id,
           email: matchedItem.email,
+          Canditate_CV: matchedItem.Canditate_CV,
           phone: matchedItem.phone,
+          created_date: matchedItem.created_date,
           candidate_name: matchedItem.candidate_name,
           applied_job_id: matchedItem.applied_job_id,
-          department_id: matchedItem.department_id,
+          Education: matchedItem.Education,
+          Experience: matchedItem.Experience,
+          Related_experience: matchedItem.Related_experience,
+          Job_description: matchedItem.Job_description,
           keyfield: matchedItem.keyfield,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }));
@@ -242,11 +286,11 @@ function CandidateMaster() {
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -284,11 +328,11 @@ function CandidateMaster() {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -325,7 +369,37 @@ function CandidateMaster() {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
+
+  const CVLinkRenderer = (props) => {
+    if (!props.value?.data) {
+      return <span>No CV</span>;
+    }
+
+    const openCV = () => {
+      const byteArray = new Uint8Array(props.value.data);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      props.context.openPdf(url);
+    };
+
+    return (
+      <span
+        style={{
+          color: "#0d6efd",
+          cursor: "pointer",
+          textDecoration: "underline",
+          fontWeight: 500,
+        }}
+        onClick={openCV}
+      >
+        View CV
+      </span>
+    );
+  };
+
 
   const columnDefs = [
     {
@@ -362,7 +436,12 @@ function CandidateMaster() {
       },
     },
     {
-      headerName: "Candidate Id",
+      headerName: "Applied Date",
+      field: "created_date",
+      editable: false,
+    },
+    {
+      headerName: "Candidate ID",
       field: "candidate_id",
       editable: false,
     },
@@ -385,14 +464,43 @@ function CandidateMaster() {
       headerName: "Applied Job ID",
       field: "applied_job_id",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: JobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = JobDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
-      headerName: "Department ID",
-      field: "department_id",
+      headerName: "Education",
+      field: "Education",
       editable: true,
     },
     {
-      headerName: "Keyfield ",
+      headerName: "Experience",
+      field: "Experience",
+      editable: true,
+    },
+    {
+      headerName: "Related Experience",
+      field: "Related_experience",
+      editable: true,
+    },
+    {
+      headerName: "Job Description",
+      field: "Job_description",
+      editable: true,
+    },
+
+    {
+      headerName: "Candidate CV",
+      field: "Canditate_CV",
+      cellRenderer: CVLinkRenderer,
+    },
+    {
+      headerName: "Keyfield",
       field: "keyfield",
       editable: false,
       hide: true
@@ -400,10 +508,10 @@ function CandidateMaster() {
   ]
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -412,7 +520,7 @@ function CandidateMaster() {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
       case 'Job Master':
@@ -421,7 +529,7 @@ function CandidateMaster() {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -471,9 +579,29 @@ function CandidateMaster() {
 
 
   const handleSave = async () => {
-    if (!candidate_name) {
+    if (
+      !candidate_name ||
+      !email ||
+      !phone ||
+      !JobID ||
+      !Education ||
+      !Experience ||
+      !Related_experience ||
+      !Job_description
+    ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.warning("Please enter a valid Email address");
+      return;
+    }
+
+    if (phone.length !== 10) {
+      toast.warning("Phone number must be 10 digits");
       return;
     }
 
@@ -482,24 +610,17 @@ function CandidateMaster() {
     try {
       const formData = new FormData();
 
-      // Text fields
-      formData.append("candidate_name", candidate_name);
-      formData.append("email", email);
+      formData.append("candidate_name", candidate_name.trim());
+      formData.append("email", email.trim());
       formData.append("phone", phone);
-      formData.append("applied_job_id", applied_job_id);
-      formData.append("department_id", department_id);
-      formData.append(
-        "company_code",
-        sessionStorage.getItem("selectedCompanyCode")
-      );
-      formData.append(
-        "created_by",
-        sessionStorage.getItem("selectedUserCode")
-      );
-
-      if (candidate_CV) {
-        formData.append("Canditate_CV", candidate_CV);
-      }
+      formData.append("applied_job_id", JobID);
+      formData.append("Education", Education);
+      formData.append("Experience", Experience);
+      formData.append("Related_experience", Related_experience);
+      formData.append("Job_description", Job_description);
+      formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
+      formData.append("Canditate_CV", candidate_CV);
 
       const response = await fetch(`${config.apiBaseUrl}/candidate_masterInsert`,
         {
@@ -508,10 +629,10 @@ function CandidateMaster() {
         }
       );
 
-      console.log("Response Status:", response.status);
-
       if (response.ok) {
-        toast.success("Data inserted successfully!");
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert data");
@@ -524,12 +645,145 @@ function CandidateMaster() {
     }
   };
 
-  // const handleRowSelection = (row) => {
-  //   setFromDate(formatDate(row.FromDate)); // Ensure correct format
-  //   setToDate(formatDate(row.ToDate));
-  //   setEligibledays(row.Salary_Days);
-  //   // setSelectedRow(row);
-  // };
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const jobObj = JobDrop.find(
+        (d) => d.value === row.applied_job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+        "Applied Date": row.created_date || "",
+        "Candidate ID": row.candidate_id || "",
+        "Candidate Name": row.candidate_name || "",
+        "Email": row.email || "",
+        "Phone": row.phone || "",
+        "Applied Job ID": `${row.applied_job_id} - ${jobName}` || "",
+        "Education": row.Education || "",
+        "Experience": row.Experience || "",
+        "Related Experience": row.Related_experience || "",
+        "Job Description": row.Job_description || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Candidate Master Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidate Master");
+
+    XLSX.writeFile(workbook, "Candidate_Master_Search_Report.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -537,7 +791,7 @@ function CandidateMaster() {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Interview Masters </h1>
+          <h1 className="page-title">Candidate Master</h1>
           <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
@@ -551,7 +805,6 @@ function CandidateMaster() {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -562,6 +815,7 @@ function CandidateMaster() {
                 required title="Please Enter the Eligibility Salary Days"
                 autoComplete="off"
                 value={candidate_name}
+                maxLength={50}
                 onChange={(e) => setcandidate_name((e.target.value))}
               />
               <label for="sname" className={` exp-form-labels ${error && !candidate_name ? 'text-danger' : ''}`}>Candidate Name<span className="text-danger">*</span></label>
@@ -570,71 +824,174 @@ function CandidateMaster() {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
+                id="email"
+                className="exp-input-field form-control"
+                type="email"
                 placeholder=""
-                required title="Please Enter the Eligibility Salary Days"
+                required
+                title="Please Enter a Valid Email Address"
                 autoComplete="off"
                 value={email}
-                onChange={(e) => setemail((e.target.value))}
+                maxLength={30}
+                onChange={(e) => setemail(e.target.value.trim())}
               />
-              <label for="sname" className={`exp-form-labels ${error && !email ? 'text-danger' : ''}`}>Email<span className="text-danger">*</span></label>
+              <label
+                htmlFor="email"
+                className={`exp-form-labels ${error && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+                  ? 'text-danger'
+                  : ''
+                  }`}
+              >
+                Email<span className="text-danger">*</span>
+              </label>
             </div>
+
+            {error && email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (
+              <small className="text-danger">Please enter a valid email address</small>
+            )}
           </div>
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Eligibility Salary Days"
+                required
+                title="Please Enter the Eligibility Salary Days"
                 autoComplete="off"
                 value={phone}
-                onChange={(e) => setphone((e.target.value))}
+                maxLength={13}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  setphone(value);
+                }}
               />
-              <label for="sname" className={` exp-form-labels ${error && !phone ? 'text-danger' : ''}`}>Phone<span className="text-danger">*</span></label>
-            </div>
-          </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Eligibility Salary Days"
-                autoComplete="off"
-                value={applied_job_id}
-                onChange={(e) => setapplied_job_id((e.target.value))}
-              />
-              <label for="sname" className={` exp-form-labels ${error && !applied_job_id ? 'text-danger' : ''}`}>Applied Job ID<span className="text-danger">*</span></label>
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !phone ? 'text-danger' : ''}`}
+              >
+                Phone<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selecteddpt ? "has-value" : ""} 
-              ${isSelectDepartment ? "is-focused" : ""}`}
+              ${selectedJobID ? "has-value" : ""} 
+              ${isselectedJobID ? "is-focused" : ""}`}
             >
               <Select
                 id="department"
                 placeholder=" "
-                onFocus={() => setIsSelectDepartment(true)}
-                onBlur={() => setIsSelectDepartment(false)}
+                onFocus={() => setisselectedJobID(true)}
+                onBlur={() => setisselectedJobID(false)}
                 classNamePrefix="react-select"
                 isClearable
                 type="text"
-                value={selecteddpt}
-                onChange={handleDPT}
-                options={filteredOptionDPt}
+                value={selectedJobID}
+                onChange={handleJobID}
+                options={filteredOptionJobID}
               />
-              <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Department ID{showAsterisk && <span className="text-danger">*</span>}
+              <label htmlFor="selecteddpt" className={`floating-label ${error && !selectedJobID ? 'text-danger' : ''}`}>
+                Applied Job ID{showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Education}
+                maxLength={100}
+                onChange={(e) => { setEducation(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !Education ? 'text-danger' : ''}`}
+              >
+                Education<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Experience}
+                maxLength={100}
+                onChange={(e) => { setExperience(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !Experience ? 'text-danger' : ''}`}
+              >
+                Experience<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Related_experience}
+                maxLength={100}
+                onChange={(e) => { setRelated_experience(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !Related_experience ? 'text-danger' : ''}`}
+              >
+                Related Experience<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Job_description}
+                maxLength={100}
+                onChange={(e) => { setJob_description(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels ${error && !Job_description ? 'text-danger' : ''}`}
+              >
+                Job Description<span className="text-danger">*</span>
+              </label>
+            </div>
+          </div>
+
+
           <div className="col-md-2">
             <div className="inputGroup">
               <div className="image-upload-container">
@@ -684,6 +1041,46 @@ function CandidateMaster() {
         <div className="row g-3">
 
           <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={fromDate}
+                maxLength={100}
+                onChange={(e) => { setFromDate(e.target.value); }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Applied From
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={toDate}
+                maxLength={100}
+                onChange={(e) => { setToDate(e.target.value); }}
+              />
+              <label htmlFor="fdate" className={`exp-form-labels`}>
+                Applied To
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedcandidate_name ? "has-value" : ""} 
@@ -716,6 +1113,7 @@ function CandidateMaster() {
                 required title="Please Enter the Eligibility Salary Days"
                 autoComplete="off"
                 value={emailSC}
+                maxLength={30}
                 onChange={(e) => setemailSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
@@ -729,32 +1127,133 @@ function CandidateMaster() {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Eligibility Salary Days"
                 autoComplete="off"
                 value={phoneSC}
-                onChange={(e) => setphoneSC(e.target.value)}
+                maxLength={13}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  setphoneSC(value);
+                }}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <label for="sname" className="exp-form-labels">Phone</label>
             </div>
           </div>
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedJobIDSC ? "has-value" : ""} 
+              ${isselectedJobIDSC ? "is-focused" : ""}`}
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setisselectedJobIDSC(true)}
+                onBlur={() => setisselectedJobIDSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedJobIDSC}
+                onChange={handleJobIDSC}
+                options={filteredOptionJobID}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Applied Job ID
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
-                class="exp-input-field form-control"
-                type="Number"
+                className="exp-input-field form-control"
+                type="text"
                 placeholder=""
-                required title="Please Enter the Eligibility Salary Days"
+                required
+                title="Please Enter the Applied Job ID"
                 autoComplete="off"
-                value={applied_job_idSC}
-                onChange={(e) => setapplied_job_idSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                value={EducationSC}
+                maxLength={100}
+                onChange={(e) => { setEducationSC(e.target.value); }}
               />
-              <label for="sname" className="exp-form-labels">Applied Job ID</label>
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels`}
+              >
+                Education
+              </label>
             </div>
           </div>
           <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={ExperienceSC}
+                maxLength={100}
+                onChange={(e) => { setExperienceSC(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels`}
+              >
+                Experience
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={Related_experienceSC}
+                maxLength={100}
+                onChange={(e) => { setRelated_experienceSC(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels`}
+              >
+                Related Experience
+              </label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Applied Job ID"
+                autoComplete="off"
+                value={JobDescriptionSC}
+                maxLength={100}
+                onChange={(e) => { setJobDescriptionSC(e.target.value); }}
+              />
+              <label
+                htmlFor="fdate"
+                className={`exp-form-labels`}
+              >
+                Job Description
+              </label>
+            </div>
+          </div>
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selecteddptSC ? "has-value" : ""} 
@@ -776,7 +1275,7 @@ function CandidateMaster() {
                 Department ID
               </label>
             </div>
-          </div>
+          </div> */}
 
           {/* Search + Reload Buttons */}
           <div className="col-12">
@@ -790,8 +1289,50 @@ function CandidateMaster() {
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
           </div>
+
+          {isModalOpen && (
+            <div
+              className="modal fade show d-block"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                  <div className="shadow-lg p-1 bg-light main-header-box">
+                    <div className="header-flex">
+                      <h1 className="custom-modal-title">Candidate CV</h1>
+
+                      <div className="action-wrapper">
+                        <div className="action-icon delete" onClick={() => {
+                          URL.revokeObjectURL(currentPdfUrl);
+                          setIsModalOpen(false);
+                        }}>
+                          <span className="tooltip">Close</span>
+                          <i className="fa-solid fa-xmark"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-body" style={{ height: "500px" }}>
+                    <iframe
+                      src={currentPdfUrl}
+                      title="CV Preview"
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
 
         </div>
       </div>
@@ -805,6 +1346,9 @@ function CandidateMaster() {
             // onRowClicked={(event) => handleRowSelection(event.data)}
             pagination={true}
             paginationAutoPageSize={true}
+            context={{
+              openPdf: handlePdfClick,
+            }}
           />
         </div>
       </div>

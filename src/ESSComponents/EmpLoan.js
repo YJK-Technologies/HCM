@@ -5,12 +5,12 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
-import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Select from 'react-select'
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -45,13 +45,67 @@ function Input({ }) {
   const [loandrop, setloandrop] = useState([]);
   const [selectedLoan, setSelectedLoan] = useState("");
   const [selectedloan, setselectedloan] = useState("");
-  const [rowData, setRowData] = useState('');
+  const [rowData, setRowData] = useState([]);
   const [isSelectedloanID, setIsSelectedloanID] = useState(false);
   const [isSelectedABY, setIsSelectABY] = useState(false);
   const [isSelectloanid, setIsSelectloanid] = useState(false);
   const [isSelectapprovedby, setIsSelectapprovedby] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [approvedByGropGrid, setApprovedByGropGrid] = useState([]);
+  const [loanIdDropGrid, setLoanIdDropGrid] = useState([]);
 
+  const searchClearInputFields = () => {
+    setEmployeeID("");
+    setLoanid("");
+    setselectedloan("");
+    setapprovedby("");
+    setselectedapprovedby("");
+    setloanEligibleamount("");
+    setEffectivedate("");
+    setEnddate("");
+    setHowmanymonth("");
+    setEMIamount("");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getTeamManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const approvedByOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId}-${option.manager}`,
+        }));
+        setApprovedByGropGrid(approvedByOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getLoanID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const loanIdOption = data.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setLoanIdDropGrid(loanIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const columnDefs = [
     {
@@ -87,7 +141,7 @@ function Input({ }) {
       },
     },
     {
-      headerName: "Employee Id",
+      headerName: "Employee ID",
       field: "EmployeeId",
       filter: 'agTextColumnFilter',
       editable: false,
@@ -95,14 +149,28 @@ function Input({ }) {
     {
       headerName: "Loan ID",
       field: "loanID",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
       editable: true,
+      cellEditorParams: {
+        values: loanIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = loanIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Approved By",
       field: "ApprovedBy",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
       editable: true,
+      cellEditorParams: {
+        values: approvedByGropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = approvedByGropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Loan Eligible Amount",
@@ -114,36 +182,12 @@ function Input({ }) {
       headerName: "Effective Date",
       field: "EffetiveDate",
       filter: 'agDateColumnFilter',
-      editable: true,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+      editable: false,
     },
     {
       headerName: "End Date",
       field: "EndDate",
       filter: 'agDateColumnFilter',
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "How Many Months",
@@ -168,6 +212,23 @@ function Input({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
+
+    const effective = new Date(EffectiveDate);
+    const end = new Date(EndDate);
+
+    if (effective > end) {
+      toast.warning("End Date must be greater than or equal to Effective Date");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (effective < today) {
+      toast.warning("Effective Date cannot be in the past");
+      return;
+    }
+
     setLoading(true);
     try {
       const data = {
@@ -215,8 +276,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -244,8 +305,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -260,8 +321,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeLoan`, {
             method: "POST",
             headers: {
@@ -284,8 +345,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -377,6 +438,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const formatDate = (isoDateString) => {
@@ -388,6 +450,15 @@ function Input({ }) {
   };
 
   const handleSearch = async () => {
+    if (EffetiveDate && Enddate) {
+      const effective = new Date(EffetiveDate);
+      const end = new Date(Enddate);
+
+      if (effective > end) {
+        toast.warning("End Date must be greater than or equal to Effective Date");
+        return;
+      }
+    }
     setLoading(true);
     try {
       const body = {
@@ -439,11 +510,138 @@ function Input({ }) {
     }
   };
 
-    const onGridReady = (params) => {
+  const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Employee ID": row.EmployeeId || "",
+      "Loan ID": row.loanID || "",
+      "Approved By": row.ApprovedBy || "",
+      "Loan Eligible Amount": row.LoanEligibleAmount || "",
+      "Effective Date": row.EffetiveDate || "",
+      "End Date": row.EndDate || "",
+      "How Many Months": row.HowManyMonth || "",
+      "EMI Amount": row.EMIAmount || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Loan Details Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Details");
+
+    XLSX.writeFile(workbook, "Loan_Details_Search_Report.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -476,11 +674,11 @@ function Input({ }) {
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-                {saveButtonVisible && (
+              {saveButtonVisible && (
                 <li className="dropdown-item" onClick={handleSave}>
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
-                )}
+              )}
               {/* )} */}
 
               <li className="dropdown-item" onClick={handleReload}>
@@ -585,7 +783,7 @@ function Input({ }) {
                 onChange={(e) => setEffectiveDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !EffectiveDate ? 'text-danger' : ''}`}>Effective Date{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !EffectiveDate ? 'text-danger' : ''}`}>Effective From Date{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -601,7 +799,7 @@ function Input({ }) {
                 onChange={(e) => setEndDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>End Date{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>Effective End Date{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -788,6 +986,11 @@ function Input({ }) {
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -801,7 +1004,7 @@ function Input({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
-             onGridReady={onGridReady}
+            onGridReady={onGridReady}
           />
         </div>
       </div>

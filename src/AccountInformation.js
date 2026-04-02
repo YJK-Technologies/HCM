@@ -225,7 +225,7 @@ const AccountInformation = () => {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
-              <h1 className="page-title">List Of Companies</h1>
+              <h1 className="page-title">List of Companies</h1>
 
             <div className="action-wrapper">
               <div className="action-icon add" onClick={() => handleSave(selectedData)} >

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import TabButtons from './Tabs.js';
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -37,7 +38,7 @@ function Input({ }) {
   const [rowData, setRowData] = useState([]);
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [companyContribution, setCompanyContribution] = useState("");
   const [employeePF, setEmployeePF] = useState("");
   const [Start_Year, setStart_Year] = useState(FirstDate);
@@ -47,6 +48,13 @@ function Input({ }) {
   const [activeTab, setActiveTab] = useState("PF Contribution")
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setCompany_Fund(0);
+    setEmployee_Fund(0);
+  };
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -126,10 +134,12 @@ function Input({ }) {
 
   const handleSave = async () => {
     if (!companyContribution || !employeePF || !startYear || !endYear) {
-      setError(" ");
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
+    setLoading(true);
 
     try {
       const Header = {
@@ -150,11 +160,9 @@ function Input({ }) {
       });
       if (response.status === 200) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -167,6 +175,14 @@ function Input({ }) {
   };
 
   const handleSearch = async () => {
+    const start = new Date(Start_Year);
+    const end = new Date(End_Year);
+
+    if (start > end) {
+      toast.warning("Start Year should not be greater than End Year");
+      return;
+    }
+
     setLoading(true);
     try {
       const body = {
@@ -213,15 +229,16 @@ function Input({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -249,8 +266,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -259,11 +276,11 @@ function Input({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -289,8 +306,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
@@ -303,7 +320,7 @@ function Input({ }) {
     { label: 'Bonus' },
     { label: 'PF Contribution' },
     { label: 'Professional Tax' },
-    { label: 'Loan Type' },
+    // { label: 'Loan Type' },
     { label: 'TDS' },
   ];
 
@@ -326,9 +343,9 @@ function Input({ }) {
       case 'Professional Tax':
         EmpProfessionalTax();
         break;
-      case 'Loan Type':
-        EmpLoanType();
-        break;
+      // case 'Loan Type':
+      //   EmpLoanType();
+      //   break;
       case 'TDS':
         EmpTDS();
         break;
@@ -357,12 +374,136 @@ function Input({ }) {
     navigate("/PayslipEmpProTax");
   };
 
-  const EmpLoanType = () => {
-    navigate("/PayslipEmpLoanType");
-  };
+  // const EmpLoanType = () => {
+  //   navigate("/PayslipEmpLoanType");
+  // };
 
   const EmpTDS = () => {
     navigate("/PayslipEmpTDS");
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Start Year": row.Start_Year || "",
+      "End Year": row.End_Year || "",
+      "Company Contribution": row.Company_Fund || "",
+      "Employee PF": row.Employee_Fund || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "PF Contribution Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "PF Contribution");
+
+    XLSX.writeFile(workbook, "PF_Contribution_Search_Report.xlsx");
   };
 
   return (
@@ -423,7 +564,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 title="Please Enter the Company Contribution"
                 required
@@ -440,7 +581,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
-                type="text"
+                type="number"
                 placeholder=""
                 title="Please Enter the Employee PF"
                 required
@@ -537,6 +678,11 @@ function Input({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

@@ -154,6 +154,16 @@ const MyAgGridComponent = () => {
 
   ];
   const handleSearch = async () => {
+
+    if (StartDate && EndDate) {
+      const start = new Date(StartDate);
+      const end = new Date(EndDate);
+
+      if (start > end) {
+        toast.warning("Start Date cannot be greater than End Date");
+        return;
+      }
+    }
     try {
       setLoading(true);
       // Preparing the body for the POST request
@@ -436,10 +446,10 @@ const MyAgGridComponent = () => {
           <h1 className="page-title">Project Progress</h1>
 
             <div className="action-wrapper">
-              <div className="action-icon print" onClick={handleExportToExcel}>
-                 <span className="tooltip">Excel</span>
-                <i class="fa-solid fa-file-excel"></i>
-              </div>
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+              <span className="tooltip">Excel</span>
+              <i className="fa-solid fa-file-excel"></i>
+            </div>
             </div>
 
         </div>

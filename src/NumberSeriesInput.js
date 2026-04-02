@@ -29,7 +29,7 @@ function NumberSeriesInput({ }) {
   const [selectedBoolean, setselectedBoolean] = useState('');
   const [status, setStatus] = useState("");
   const [number_prefix, setNumber_prefix] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
   const startyear = useRef(null);
   const screentype = useRef(null);
@@ -47,15 +47,12 @@ function NumberSeriesInput({ }) {
   const [isSelectedStatus, setIsSelectStatus] = useState(false);
   const [isSelectedBoolean, setIsSelectBoolean] = useState(false);
 
-
-
-  console.log(selectedRows);
-  console.log(selectedRows);
   const modified_by = sessionStorage.getItem("selectedUserCode");
-
+  
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
-
+  
+  console.log(selectedRow);
 
   const clearInputFields = () => {
     setStart_Year("");
@@ -64,10 +61,12 @@ function NumberSeriesInput({ }) {
     setRunning_No("");
     setEnd_No("");
     setScreen_Type("");
-    setStatus(null);
-    setNumber_prefix(null);
+    setStatus("");
+    setNumber_prefix("");
     secomtext("");
-
+    setselectedscreentype("");
+    setselectedStatus("");
+    setselectedBoolean("");
   }
 
   useEffect(() => {
@@ -90,16 +89,13 @@ function NumberSeriesInput({ }) {
 
       setselectedStatus({
         label: selectedRow.Status,
-        value: selectedRow.status,
+        value: selectedRow.Status,
       });
-      setStatus(selectedRow.status || '')
 
       setselectedBoolean({
         label: selectedRow.number_prefix,
         value: selectedRow.number_prefix,
       });
-      setNumber_prefix(selectedRow.number_prefix || '')
-
 
     } else if (mode === "create") {
       clearInputFields();
@@ -109,19 +105,18 @@ function NumberSeriesInput({ }) {
 
   const handleUpdate = async () => {
     if (
-
       !Start_Year ||
       !End_Year ||
       !Start_No ||
       !Running_No ||
       !End_No ||
       !comtext
-
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -146,29 +141,25 @@ function NumberSeriesInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data updated successfully", {
-          onClose: () => clearInputFields()
+        toast.success("Data inserted successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       }
-      else if (response.status === 400) {
+      else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
       }
-      else {
-        console.error("Failed to insert data");
-        toast.error("Failed to Update data");
-      }
     } catch (error) {
       console.error("Error Update data:", error);
       toast.error('Error inserting data: ' + error.message);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -278,10 +269,11 @@ function NumberSeriesInput({ }) {
     if (
       !Screen_Type
     ) {
-      setError(" ");
+      setError(true);
       toast.warning("Missing Required Fields");
       return;
     }
+    setError(false);
     setLoading(true);
 
     try {
@@ -305,34 +297,25 @@ function NumberSeriesInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted Successfully", {
-          onClose: () => clearInputFields()
-        });
-
-      } else if (response.status === 400) {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        //setError(errorResponse.error);
-        toast.warning(errorResponse.message, {
-
+         toast.success("Data updated successfully", {
+          onClose: () => {
+            clearInputFields();
+            setError(false)
+          }
         });
       } else {
-        console.error("Failed to insert data");
-        // Show generic error message using SweetAlert
-        toast.error('Failed to insert data', {
-
-        });
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      // Show error message using SweetAlert
-      toast.error('Error inserting data: ' + error.message, {
-
-      });
+      toast.error('Error inserting data: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
+
   const handleNavigate = () => {
     navigate("/NumberSeries"); // Pass selectedRows as props to the Input component
   };
@@ -425,7 +408,7 @@ function NumberSeriesInput({ }) {
                     ref={startyear}
                     onKeyDown={(e) => handleKeyDown(e, endyear, startyear)}
                   />
-                  <label className={`exp-form-label ${error && !Start_Year ? 'text-danger' : ''}`}>Start Year<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !Start_Year ? 'text-danger' : ''}`}>Start Year<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -445,7 +428,7 @@ function NumberSeriesInput({ }) {
                     ref={endyear}
                     onKeyDown={(e) => handleKeyDown(e, strtno, endyear)}
                   />
-                  <label className={`exp-form-label ${error && !End_Year ? 'text-danger' : ''}`}>End Year<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !End_Year ? 'text-danger' : ''}`}>End Year<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -464,7 +447,7 @@ function NumberSeriesInput({ }) {
                     ref={strtno}
                     onKeyDown={(e) => handleKeyDown(e, runno, strtno)}
                   />
-                  <label className={`exp-form-label ${error && !Start_No ? 'text-danger' : ''}`}>Start No<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !Start_No ? 'text-danger' : ''}`}>Start No<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -483,7 +466,7 @@ function NumberSeriesInput({ }) {
                     ref={runno}
                     onKeyDown={(e) => handleKeyDown(e, endno, runno)}
                   />
-                  <label className={`exp-form-label ${error && !Running_No ? 'text-danger' : ''}`}>Running No<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !Running_No ? 'text-danger' : ''}`}>Running No<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -502,7 +485,7 @@ function NumberSeriesInput({ }) {
                     ref={endno}
                     onKeyDown={(e) => handleKeyDown(e, text, endno)}
                   />
-                  <label className={`exp-form-label ${error && !End_No ? 'text-danger' : ''}`}>End No <span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !End_No ? 'text-danger' : ''}`}>End No<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -520,7 +503,7 @@ function NumberSeriesInput({ }) {
                     ref={text}
                     onKeyDown={(e) => handleKeyDown(e, Status, text)}
                   />
-                  <label className={`exp-form-label ${error && !comtext ? 'text-danger' : ''}`}>Text <span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !comtext ? 'text-danger' : ''}`}>Text<span className="text-danger">*</span></label>
                 </div>
               </div>
 

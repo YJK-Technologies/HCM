@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import TabButtons from './Tabs.js';
-import Select from 'react-select';
+import TabButtons from "./Tabs.js";
+import Select from "react-select";
 import { AgGridReact } from "ag-grid-react";
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
-const config = require('../Apiconfig');
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
+import * as XLSX from "xlsx-js-style";
+const config = require("../Apiconfig");
 
 const getFinancialYearDates = () => {
   const now = new Date();
@@ -34,8 +35,7 @@ const getFinancialYearDates = () => {
 
 const { FirstDate, LastDate } = getFinancialYearDates();
 
-function Input({ }) {
-
+function Input({}) {
   const [rowData, setRowData] = useState([]);
   const [annualBonus, setAnnualBonus] = useState("");
   const [referralBonus, setReferralBonus] = useState("");
@@ -45,56 +45,98 @@ function Input({ }) {
   const [discretionaryBonus, setDiscretionaryBonus] = useState("");
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const [IDdrop, setIDdrop] = useState([]);
+  const [IDdropAG, setIDdropAG] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [grade, setGrade] = useState("");
   const [Start_Year, setStart_Year] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
   const [Annual_bonus, setAnnual_bonus] = useState(0);
   const [Referral_bonus, setReferral_bonus] = useState(0);
-  const [activeTab, setActiveTab] = useState("Bonus")
+  const [activeTab, setActiveTab] = useState("Bonus");
   const [isSelectedGrade, setIsSelectedGrade] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setStart_Year("");
+    setEnd_Year("");
+    setAnnual_bonus(0);
+    setReferral_bonus(0);
+  };
+
+    useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+  
+      const fetchDept = async () => {
+        try {
+          const response = await fetch(`${config.apiBaseUrl}/getID`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+          });
+  
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+  
+          const val = await response.json();
+          setIDdrop(val);
+        } catch (error) {
+          console.error("Error fetching departments:", error);
+        }
+      };
+  
+      if (company_code) {
+        fetchDept();
+      }
+    }, []);
+
   useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
     fetch(`${config.apiBaseUrl}/getID`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setIDdrop(data); // Store the fetched gender options in state
-        }
+        const grade = data.map((option) => ({
+          value: option.GradeID,
+          label: `${option.GradeID}`,
+        }));
+        setIDdropAG(grade);
       })
-      .catch((error) => {
-        console.error('Error fetching gender data:', error);
-      });
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error),
+      );
   }, []);
 
   const filteredOptionGrade = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
-      value: option.GradeID,
-      label: option.GradeID,
-    }))
+        value: option.GradeID,
+        label: option.GradeID,
+      }))
     : [];
 
   const handleChangeGrade = (selectedGrade) => {
     setSelectedGrade(selectedGrade);
-    setGrade(selectedGrade ? selectedGrade.value : '');
+    setGrade(selectedGrade ? selectedGrade.value : "");
   };
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -108,13 +150,16 @@ function Input({ }) {
         const showIcons = isWideEnough;
 
         return (
-          <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
             {showIcons && (
               <>
                 <span
                   className="icon mx-2"
                   onClick={() => handleUpdate(params.data, params.node.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
                 </span>
@@ -122,7 +167,7 @@ function Input({ }) {
                 <span
                   className="icon mx-2"
                   onClick={() => handleDelete(params.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-solid fa-trash"></i>
                 </span>
@@ -133,11 +178,12 @@ function Input({ }) {
       },
     },
     {
-      headerName: "Start Year", field: "Start_Year",
+      headerName: "Start Year",
+      field: "Start_Year",
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
+          const cellDate = new Date(cellValue.split("/").join("-"));
           if (cellDate < filterLocalDateAtMidnight) {
             return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
@@ -148,11 +194,12 @@ function Input({ }) {
       },
     },
     {
-      headerName: "End Year", field: "End_Year",
+      headerName: "End Year",
+      field: "End_Year",
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
+          const cellDate = new Date(cellValue.split("/").join("-"));
           if (cellDate < filterLocalDateAtMidnight) {
             return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
@@ -165,44 +212,52 @@ function Input({ }) {
     {
       headerName: "Grade ID",
       field: "GradeID",
-      editable: true
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: IDdropAG.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const grade = IDdropAG.find((d) => d.value == params.value);
+        return grade ? grade.label : params.value;
+      },
     },
     {
       headerName: "Annual Bonus",
       field: "Annual_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Referral Bonus",
       field: "Referral_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Retention Bonus",
       field: "Retention_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Holiday Bonus",
       field: "Holiday_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Performance Bonus",
       field: "Performance_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Discretionary Bonus",
       field: "Discretionary_bonus",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Keyfield",
       field: "keyfield",
-      hide: true
+      hide: true,
     },
-  ]
+  ];
 
   const gridOptions = {
     pagination: true,
@@ -210,12 +265,23 @@ function Input({ }) {
   };
 
   const handleSave = async () => {
-    if (!annualBonus || !referralBonus || !retentionBonus || !holidayBonus || !performanceBonus || !discretionaryBonus || !startYear || !endYear) {
-      setError(" ");
+    if (
+      !annualBonus ||
+      !referralBonus ||
+      !retentionBonus ||
+      !holidayBonus ||
+      !performanceBonus ||
+      !discretionaryBonus ||
+      !startYear ||
+      !endYear
+    ) {
+      setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
+    setError(false);
     setLoading(true);
+
     try {
       const Header = {
         GradeID: grade,
@@ -227,8 +293,8 @@ function Input({ }) {
         Discretionary_bonus: discretionaryBonus,
         Start_Year: startYear,
         End_Year: endYear,
-        company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode')
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        created_by: sessionStorage.getItem("selectedUserCode"),
       };
       const response = await fetch(`${config.apiBaseUrl}/AddBonusDetails`, {
         method: "POST",
@@ -237,13 +303,11 @@ function Input({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -251,7 +315,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -312,27 +376,30 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+            editedData: Array.isArray(rowData) ? rowData : [rowData],
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/UpdBonusDetails`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
+              company_code: company_code,
+              "modified-by": modified_by,
             },
-            body: JSON.stringify(dataToSend)
+            body: JSON.stringify(dataToSend),
           });
 
           if (response.ok) {
@@ -341,38 +408,42 @@ function Input({ }) {
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
           }
         } catch (error) {
           console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          toast.error("Error Deleting Data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
-      }
+      },
     );
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+            editedData: Array.isArray(rowData) ? rowData : [rowData],
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/DelBonusDetails`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code
+              company_code: company_code,
             },
-            body: JSON.stringify(dataToSend)
+            body: JSON.stringify(dataToSend),
           });
 
           if (response.ok) {
@@ -381,53 +452,55 @@ function Input({ }) {
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
           }
         } catch (error) {
           console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          toast.error("Error Deleting Data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
   const tabs = [
-    { label: 'Salary Eligibility Days' },
-    { label: 'Bonus' },
-    { label: 'PF Contribution' },
-    { label: 'Professional Tax' },
-    { label: 'Loan Type' },
-    { label: 'TDS' },
+    { label: "Salary Eligibility Days" },
+    { label: "Bonus" },
+    { label: "PF Contribution" },
+    { label: "Professional Tax" },
+    // { label: 'Loan Type' },
+    { label: "TDS" },
   ];
 
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'EmployeeAllowance':
+      case "EmployeeAllowance":
         NavigateEmployeeAllowance();
         break;
-      case 'Salary Eligibility Days':
+      case "Salary Eligibility Days":
         FinancialYear();
         break;
-      case 'Bonus':
+      case "Bonus":
         EmployeeBonus();
         break;
-      case 'PF Contribution':
+      case "PF Contribution":
         EmpPFCompany();
         break;
-      case 'Professional Tax':
+      case "Professional Tax":
         EmpProfessionalTax();
         break;
-      case 'Loan Type':
-        EmpLoanType();
-        break;
-      case 'TDS':
+      // case 'Loan Type':
+      //   EmpLoanType();
+      //   break;
+      case "TDS":
         EmpTDS();
         break;
       default:
@@ -455,18 +528,150 @@ function Input({ }) {
     navigate("/PayslipEmpProTax");
   };
 
-  const EmpLoanType = () => {
-    navigate("/PayslipEmpLoanType");
-  };
+  // const EmpLoanType = () => {
+  //   navigate("/PayslipEmpLoanType");
+  // };
 
   const EmpTDS = () => {
     navigate("/PayslipEmpTDS");
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Start Year": row.Start_Year || "",
+      "End Year": row.End_Year || "",
+      "Grade ID": row.GradeID || "",
+      "Annual Bonus": row.Annual_bonus || "",
+      "Referral Bonus": row.Referral_bonus || "",
+      "Retention Bonus": row.Retention_bonus || "",
+      "Holiday Bonus": row.Holiday_bonus || "",
+      "Performance Bonus": row.Performance_bonus || "",
+      "Discretionary Bonus": row.Discretionary_bonus || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Bonus Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bonus");
+
+    XLSX.writeFile(workbook, "Bonus_Search_Report.xlsx");
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Bonus</h1>
@@ -478,10 +683,13 @@ function Input({ }) {
           </div>
         </div>
       </div>
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -489,12 +697,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Date"
                 placeholder=""
-                required title="Please Choose the Start Year"
+                required
+                title="Please Choose the Start Year"
                 autoComplete="off"
                 value={startYear}
                 onChange={(e) => setStartYear(e.target.value)}
               />
-              <label For="city" className={` exp-form-labels ${error && !startYear ? 'text-danger' : ''}`}>Start Year<span className="text-danger">*</span></label>
+              <label
+                For="city"
+                className={` exp-form-labels ${error && !startYear ? "text-danger" : ""}`}
+              >
+                Start Year<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -505,12 +719,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Date"
                 placeholder=""
-                required title="Please Choose the End Year"
+                required
+                title="Please Choose the End Year"
                 autoComplete="off"
                 value={endYear}
                 onChange={(e) => setEndYear(e.target.value)}
               />
-              <label For="city" className={` exp-form-labels ${error && !endYear ? 'text-danger' : ''}`}>End Year<span className="text-danger">*</span></label>
+              <label
+                For="city"
+                className={` exp-form-labels ${error && !endYear ? "text-danger" : ""}`}
+              >
+                End Year<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -531,7 +751,11 @@ function Input({ }) {
                 onChange={handleChangeGrade}
                 options={filteredOptionGrade}
               />
-              <label className={`floating-label ${error && !grade ? 'text-danger' : ''}`}>Grade ID<span className="text-danger">*</span></label>
+              <label
+                className={`floating-label ${error && !grade ? "text-danger" : ""}`}
+              >
+                Grade ID<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -542,12 +766,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Annual Bonus"
+                required
+                title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={annualBonus}
                 onChange={(e) => setAnnualBonus(Number(e.target.value))}
               />
-              <label for="sname" className={`exp-form-labels ${error && !annualBonus ? 'text-danger' : ''}`}>Annual Bonus<span className="text-danger">*</span></label>
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !annualBonus ? "text-danger" : ""}`}
+              >
+                Annual Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -558,12 +788,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Referral Bonus"
+                required
+                title="Please Enter the Referral Bonus"
                 autoComplete="off"
                 value={referralBonus}
                 onChange={(e) => setReferralBonus(Number(e.target.value))}
               />
-              <label for="add1" className={`exp-form-labels ${error && !referralBonus ? 'text-danger' : ''}`}>Referral Bonus<span className="text-danger">*</span></label>
+              <label
+                for="add1"
+                className={`exp-form-labels ${error && !referralBonus ? "text-danger" : ""}`}
+              >
+                Referral Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -574,12 +810,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Retention Bonus"
+                required
+                title="Please Enter the Retention Bonus"
                 autoComplete="off"
                 value={retentionBonus}
                 onChange={(e) => setRetentionBonus(Number(e.target.value))}
               />
-              <label for="add1" className={`exp-form-labels ${error && !retentionBonus ? 'text-danger' : ''}`}>Retention Bonus<span className="text-danger">*</span></label>
+              <label
+                for="add1"
+                className={`exp-form-labels ${error && !retentionBonus ? "text-danger" : ""}`}
+              >
+                Retention Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -590,12 +832,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Holiday Bonus"
+                required
+                title="Please Enter the Holiday Bonus"
                 autoComplete="off"
                 value={holidayBonus}
                 onChange={(e) => setHolidayBonus(Number(e.target.value))}
               />
-              <label for="add2" className={`exp-form-labels ${error && !holidayBonus ? 'text-danger' : ''}`}>Holiday Bonus<span className="text-danger">*</span></label>
+              <label
+                for="add2"
+                className={`exp-form-labels ${error && !holidayBonus ? "text-danger" : ""}`}
+              >
+                Holiday Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -606,12 +854,18 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Performance Bonus"
+                required
+                title="Please Enter the Performance Bonus"
                 autoComplete="off"
                 value={performanceBonus}
                 onChange={(e) => setPerformanceBonus(Number(e.target.value))}
               />
-              <label for="add3" className={`exp-form-labels ${error && !performanceBonus ? 'text-danger' : ''}`}>Performance Bonus<span className="text-danger">*</span></label>
+              <label
+                for="add3"
+                className={`exp-form-labels ${error && !performanceBonus ? "text-danger" : ""}`}
+              >
+                Performance Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -622,15 +876,20 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Discretionary Bonus"
+                required
+                title="Please Enter the Discretionary Bonus"
                 autoComplete="off"
                 value={discretionaryBonus}
                 onChange={(e) => setDiscretionaryBonus(Number(e.target.value))}
               />
-              <label For="city" className={`exp-form-labels ${error && !discretionaryBonus ? 'text-danger' : ''}`}>Discretionary Bonus<span className="text-danger">*</span></label>
+              <label
+                For="city"
+                className={`exp-form-labels ${error && !discretionaryBonus ? "text-danger" : ""}`}
+              >
+                Discretionary Bonus<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -639,7 +898,6 @@ function Input({ }) {
           <h6 className="">Search Criteria:</h6>
         </div>
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -647,12 +905,15 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Date"
                 placeholder=""
-                required title="Please Choose the Year"
+                required
+                title="Please Choose the Year"
                 autoComplete="off"
                 value={Start_Year}
                 onChange={(e) => setStart_Year(e.target.value)}
               />
-              <label For="city" className="exp-form-labels">Start Year</label>
+              <label For="city" className="exp-form-labels">
+                Start Year
+              </label>
             </div>
           </div>
 
@@ -663,12 +924,15 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Date"
                 placeholder=""
-                required title="Please Choose the Year"
+                required
+                title="Please Choose the Year"
                 autoComplete="off"
                 value={End_Year}
                 onChange={(e) => setEnd_Year(e.target.value)}
               />
-              <label For="city" className="exp-form-labels">End Year</label>
+              <label For="city" className="exp-form-labels">
+                End Year
+              </label>
             </div>
           </div>
 
@@ -679,12 +943,15 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please enter the Annual Bonus"
+                required
+                title="Please enter the Annual Bonus"
                 autoComplete="off"
                 value={Annual_bonus}
                 onChange={(e) => setAnnual_bonus(Number(e.target.value))}
               />
-              <label for="sname" className="exp-form-labels">Annual Bonus</label>
+              <label for="sname" className="exp-form-labels">
+                Annual Bonus
+              </label>
             </div>
           </div>
 
@@ -695,12 +962,15 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please enter the Referral Bonus"
+                required
+                title="Please enter the Referral Bonus"
                 autoComplete="off"
                 value={Referral_bonus}
                 onChange={(e) => setReferral_bonus(Number(e.target.value))}
               />
-              <label for="add1" className="exp-form-labels">Referral Bonus</label>
+              <label for="add1" className="exp-form-labels">
+                Referral Bonus
+              </label>
             </div>
           </div>
 
@@ -716,24 +986,30 @@ function Input({ }) {
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            columnDefs={columnDefs}
+            rowData={rowData}
+            pagination={true}
+            paginationAutoPageSize={true}
+            gridOptions={gridOptions}
+          />
         </div>
-
-        <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-            <AgGridReact
-              columnDefs={columnDefs}
-              rowData={rowData}
-              pagination={true}
-              paginationAutoPageSize={true}
-              gridOptions={gridOptions}
-            />
-          </div>
-        </div>
-
-
+      </div>
     </div>
   );
 }

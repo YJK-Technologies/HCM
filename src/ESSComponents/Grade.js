@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,8 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import * as XLSX from "xlsx-js-style";
+import Select from "react-select";
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -54,9 +56,109 @@ function Input({ }) {
   const [ctccurrency, setCurrency] = useState('');
   const [minimumtakesalary, setMinimumSalary] = useState('');
 
+  const [currencyCTCDrop, setCurrencyCTCDrop] = useState([]);
+  const [currencyCTCDropGrid, setCurrencyCTCDropGrid] = useState([]);
+  const [selectedCTCCurrency, setSelectedCTCCurrency] = useState('');
+  const [isSelectedCTCCurrency, setIsSelectedCTCCurrency] = useState(false);
+
+  const [currencyCTCDropSc, setCurrencyCTCDropSc] = useState([]);
+  const [selectedCTCCurrencySc, setSelectedCTCCurrencySc] = useState('');
+  const [isSelectedCTCCurrencySc, setIsSelectedCTCCurrencySc] = useState(false);
+
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const searchClearInputFields = () => {
+    setGradeID("");
+    setGradeName("");
+    setSalaryrrangeFrom("");
+    setSalaryrangeTo("");
+    setBasic("");
+    setHRA("");
+    setConveyance("");
+    setMedical("");
+    setSpecial_Allowance("");
+    setCompany_Pf_Contribution("");
+    setBonus_Arrears("");
+    setOther_Allowance("");
+    setLeaveDeduction("");
+    setotherDeductions("");
+    setCtcCurrency("");
+    setMinimumTakeSalary("");
+    setSelectedCTCCurrency("");
+    setSelectedCTCCurrencySc("");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyCTCDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCTCCurrency = Array.isArray(currencyCTCDrop)
+    ? currencyCTCDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCTCCurrency = (selectedCTCCurrency) => {
+    setSelectedCTCCurrency(selectedCTCCurrency);
+    setCurrency(selectedCTCCurrency ? selectedCTCCurrency.value : "");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyCTCDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionCTCCurrencySc = Array.isArray(currencyCTCDropSc)
+    ? currencyCTCDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCTCCurrencySc = (selectedCTCCurrencySc) => {
+    setSelectedCTCCurrencySc(selectedCTCCurrencySc);
+    setCtcCurrency(selectedCTCCurrencySc ? selectedCTCCurrencySc.value : "");
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        setCurrencyCTCDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/EmployeeGrade", { state: { mode: "update", selectedRow } });
@@ -68,6 +170,7 @@ function Input({ }) {
 
   const reloadGridData = () => {
     setrowData([]);
+    searchClearInputFields();
   };
 
   const columnDefs = [
@@ -207,7 +310,10 @@ function Input({ }) {
     {
       headerName: "CTC Currency",
       field: "ctc_currency",
-      filter: 'agTextColumnFilter',
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: currencyCTCDropGrid,
+      },
       editable: true
     },
     {
@@ -352,8 +458,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -381,8 +487,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error('Error Deleting Data: ' + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -397,8 +503,8 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-        setLoading(true);
         try {
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteGrade`, {
             method: "POST",
             headers: {
@@ -422,8 +528,8 @@ function Input({ }) {
           console.error("Error deleting rows:", error);
           toast.error("Error deleting data: " + error.message);
         } finally {
-      setLoading(false);
-    }
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data delete cancelled.");
@@ -451,12 +557,141 @@ function Input({ }) {
     setGridColumnApi(params.columnApi);
   };
 
-  // const onSelectionChanged = () => {
-  //   const selectedNodes = gridApi.getSelectedNodes();
-  //   const selectedData = selectedNodes.map((node) => node.data);
-  //   setSelectedRows(selectedData);
-  // };
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
 
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Grade ID": row.GradeID || "",
+      "Grade Name": row.GradeName || "",
+      "Salary Range From": row.salary_range_from || "",
+      "Salary Range To": row.salary_range_to || "",
+      "Basic": row.Basic || "",
+      "HRA": row.HRA || "",
+      "Conveyance": row.Conveyance || "",
+      "Medical": row.Medical || "",
+      "Special Allowance": row.Special_Allowance || "",
+      "Company PF Contribution": row.Company_Pf_Contribution || "",
+      "Bonus/Arrears": row.Bonus_Arrears || "",
+      "Other Allowance": row.Other_Allowance || "",
+      "Leave Deductions": row.LeaveDeduction || "",
+      "Other Deductions": row.otherDeductions || "",
+      "CTC Currency": row.ctc_currency || "",
+      "Minimum Take Salary": row.minimum_take_salary || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Grade Details Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Grade Details");
+
+    XLSX.writeFile(workbook, "Grade_Details_Search_Report.xlsx");
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -467,16 +702,16 @@ function Input({ }) {
           <h1 className="page-title">Add Grade Details</h1>
 
           <div className="action-wrapper desktop-actions">
-              {saveButtonVisible && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
-              <div className="action-icon print" onClick={handleReload}>
-                <span className="tooltip">Reload</span>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+            {saveButtonVisible && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
               </div>
+            )}
+            <div className="action-icon print" onClick={handleReload}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
+            </div>
           </div>
 
           {/* Mobile Dropdown */}
@@ -494,7 +729,7 @@ function Input({ }) {
                 </li>
               )}
               {/*})}*/}
-              
+
               <li className="dropdown-item" onClick={handleReload}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
@@ -519,7 +754,7 @@ function Input({ }) {
                 // onKeyPress={handleKeyPress}
                 maxLength={50}
               />
-              <label for="cname" className={` exp-form-labels ${error && !Gradeid ? 'text-danger' : ''}`}>Grade ID{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label for="cname" className={` exp-form-labels ${error && !Gradeid ? 'text-danger' : ''}`}>Grade ID<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -535,7 +770,7 @@ function Input({ }) {
                 onChange={(e) => setGradename(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Gradename ? 'text-danger' : ''}`}>  Grade Name {showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !Gradename ? 'text-danger' : ''}`}>  Grade Name<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -550,7 +785,7 @@ function Input({ }) {
                 value={salaryrrangefrom}
                 onChange={(e) => setsalaryrrangefrom(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !salaryrrangefrom ? 'text-danger' : ''}`}>Salary Range From{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !salaryrrangefrom ? 'text-danger' : ''}`}>Salary Range From<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -565,7 +800,7 @@ function Input({ }) {
                 value={salaryrangeto}
                 onChange={(e) => setsalaryrangeto(e.target.value)}
               />
-              <label className={`exp-form-labels ${error && !salaryrangeto ? 'text-danger' : ''}`}>Salary Range To{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !salaryrangeto ? 'text-danger' : ''}`}>Salary Range To<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -580,7 +815,7 @@ function Input({ }) {
                 value={basic}
                 onChange={(e) => setbasic(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !basic ? 'text-danger' : ''}`}>Basic{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !basic ? 'text-danger' : ''}`}>Basic<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -596,7 +831,7 @@ function Input({ }) {
                 onChange={(e) => setHra(e.target.value)}
                 maxLength={250}
               />
-              <label className={`exp-form-labels ${error && !Hra ? 'text-danger' : ''}`}>HRA{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`exp-form-labels ${error && !Hra ? 'text-danger' : ''}`}>HRA<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -642,7 +877,7 @@ function Input({ }) {
                 value={SpecialAllowance}
                 onChange={(e) => setSpecialAllowance(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !SpecialAllowance ? 'text-danger' : ''}`}>Special Allowance{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !SpecialAllowance ? 'text-danger' : ''}`}>Special Allowance<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -657,7 +892,7 @@ function Input({ }) {
                 value={CompanyPfContribution}
                 onChange={(e) => setCompanyPfContribution(e.target.value)}
               />
-              <label className={` exp-form-labels ${error && !CompanyPfContribution ? 'text-danger' : ''}`}>  Company PF Contribution{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !CompanyPfContribution ? 'text-danger' : ''}`}>  Company PF Contribution<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -722,7 +957,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -734,7 +969,30 @@ function Input({ }) {
                 onChange={(e) => setCurrency(e.target.value)}
                 maxLength={10}
               />
-              <label className={` exp-form-labels ${error && !ctccurrency ? 'text-danger' : ''}`}> CTC Currency{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={` exp-form-labels ${error && !ctccurrency ? 'text-danger' : ''}`}> CTC Currency<span className="text-danger">*</span></label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCTCCurrency ? "has-value" : ""} 
+              ${isSelectedCTCCurrency ? "is-focused" : ""}`}
+              title="Please select the CTC Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCTCCurrency(true)}
+                onBlur={() => setIsSelectedCTCCurrency(false)}
+                isClearable
+                value={selectedCTCCurrency}
+                onChange={handleChangeCTCCurrency}
+                options={filteredOptionCTCCurrency}
+              />
+              <label for="sname" className={`floating-label ${error && !ctccurrency ? 'text-danger' : ''}`}>CTC Currency<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -989,7 +1247,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="ctc_currency"
@@ -1002,6 +1260,29 @@ function Input({ }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label className="exp-form-labels">  CTC Currency</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedCTCCurrencySc ? "has-value" : ""} 
+              ${isSelectedCTCCurrencySc ? "is-focused" : ""}`}
+              title="Please select the CTC Currency"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedCTCCurrencySc(true)}
+                onBlur={() => setIsSelectedCTCCurrencySc(false)}
+                isClearable
+                value={selectedCTCCurrencySc}
+                onChange={handleChangeCTCCurrencySc}
+                options={filteredOptionCTCCurrencySc}
+              />
+              <label for="sname" className={`floating-label`}>CTC Currency</label>
             </div>
           </div>
 
@@ -1032,6 +1313,11 @@ function Input({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>

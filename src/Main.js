@@ -79,7 +79,7 @@ import EmpPFCompany from './ESSComponents/EmployeePFCompany.js'
 import EmpProfessionalTax from './ESSComponents/EmpProfessionalTax.js'
 import EmpTDS from './ESSComponents/EmpTDS.js'
 import AddFinancialYearAccess from './AddFInancialYearAccess.js'
-import LeaveReq from './ESSDashboard/LeaveRequest.js'
+import ApplyLeave from './ESSDashboard/ApplyLeave.js'
 import CandidateMaster from "./OtherMasters/CandidateMaster.js";
 import JobMaster from "./OtherMasters/JobMaster.js";
 import InterviewPanel from "./OtherMasters/InterviewPanel.js";
@@ -87,12 +87,51 @@ import InterviewPanelMem from "./OtherMasters/InterviewPanelmembers.js";
 import InterviewSchedule from "./OtherMasters/InterviewSchedule.js";
 import InterviewFeedback from "./OtherMasters/InterviewFeedback.js";
 import InterviewDecision from "./OtherMasters/InterviewDecision.js";
-import CountryMaster from "./CountryMasterGrid.js";
+import CountryMaster from "./NewCountryMasterGrid.js";
 import AddCountryMaster from "./AddCountryMaster.js";
 import AddTimeZoneMaster from "./AddTimeZoneMaster.js";
-import TimeZoneGrid from "./TimeZoneMasterGrid.js";
-
+import TimeZoneGrid from "./TimeZoneMaster.js";
+import ShiftMasterGrid from "./ShiftMasterGrid.js";
+import ShiftTypeMaster from "./ShiftTypeMaster.js";
+import ShiftPatternMaster from "./ShiftPatternMaster.js";
+import ShiftPatternDetails from "./ShiftPatternDetails.js";
+import EmployeeTypeMaster from "./EmployeeTypeMaster.js";
+import EmployeeShiftMapping from "./EmployeeShiftMapping.js";
+import InterviewScheduleReport from "./InterviewScheduleReport.js";
+import InterviewFeedbackReport from "./InterviewFeedbackReport.js";
+import CandidateInterviewReport from "./CandidateInterviewReport.js";
+import PanelPerformanceReport from "./PanelPerformanceReport.js";
+import HiringDecisionReport from "./HiringDecisionReport.js";
+import TotalCandidatesApplied from "./TotalCandidatesApplied.js";
+import TotalInterviewsScheduled from "./TotalInterviewsScheduled.js";
+import InterviewCompletionRate from "./InterviewCompletionRate.js";
+import InterviewDashboard from "./InterviewDashboard.js";
+import DepartmentDashboard from "./DepartmentDashboard.js";
+import ShiftSumRep from "./ShiftSumRep.js";
+import VisaRequest from "./EmpRequests/VisaRequest.js"
+import TravelRequest from "./EmpRequests/TravelRequest.js"
+import LoanRequest from "./EmpRequests/LoanRequest.js"
+import LoanStatusHistory from "./EmpRequests/LoanStatusHistory.js"
+import LoanApprovals from "./EmpRequests/LoanApprovals.js"
+import LoanDocuments from "./EmpRequests/LoanDocuments.js"
+import LoanPayment from "./EmpRequests/LoanPayment.js"
+import LoanSchedule from "./EmpRequests/LoanSchedule.js"
+import LoanType from "./EmpRequests/LoanType.js"
+import ManualEmployeeInfo from "./ESSComponents/ManualEmployeeInfo.js"
+import EmpFamPersonalDetail from "./ESSComponents/EmpFamPersonalDetail.js"
+import AcademicDetReq from "./ESSComponents/AcademicDetailsRequest.js"
+import LeaveRequest from "./EmpRequests/LeaveRequest.js"
+import RequestReport from "./ESSDashboard/RequestReport.js"
+import EmpDocumentReq from "./ESSComponents/EmpDocumentReq.js"
+import EmpAssetsRequest from "./ESSComponents/EmpAssetsRequest.js"
+import LoanSummaryReports from "./LoanSummaryReports.js"
+import PendingApprovalsReport from "./PendingApprovalsReport.js"
+import LoanDisbursementRepo from "./LoanDisbursementReport.js"
+import OverdueLoansReport from "./OverdueLoansReport.js"
+import RepaymentScheduleReport from "./RepaymentScheduleReport.js"
+import EmployeeAssets from './ESSComponents/EmployeeAssets.js';
 import { ToastContainer } from "react-toastify";
+import GenerateShift from "./ShiftMaster/GenerateShift.js";
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -136,6 +175,34 @@ function Main() {
   //   // alert("right click is disable")
   // }
   // create by pavun on 7 may 2024 use: To block the view page source  End
+
+  // useEffect(() => {
+  //   const disableCopy = (e) => e.preventDefault();
+
+  //   document.addEventListener("copy", disableCopy);
+  //   document.addEventListener("cut", disableCopy);
+  //   document.addEventListener("contextmenu", disableCopy);
+
+  //   return () => {
+  //     document.removeEventListener("copy", disableCopy);
+  //     document.removeEventListener("cut", disableCopy);
+  //     document.removeEventListener("contextmenu", disableCopy);
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     if (
+  //       (e.ctrlKey || e.metaKey) &&
+  //       ["a", "c", "x", "v"].includes(e.key.toLowerCase())
+  //     ) {
+  //       e.preventDefault();
+  //     }
+  //   };
+
+  //   document.addEventListener("keydown", handleKeyDown);
+  //   return () => document.removeEventListener("keydown", handleKeyDown);
+  // }, []);
 
   const routes = [
     { path: "/", component: <Home /> },
@@ -214,9 +281,9 @@ function Main() {
     { path: "/PFContribution", component: <EmpPFCompany /> },
     { path: "/PayslipEmpProTax", component: <EmpProfessionalTax /> },
     { path: "/PayslipEmpTDS", component: <EmpTDS /> },
-    { path: "/AddFYA", component: <AddFinancialYearAccess/>},
-    { path: "/LeaveReq", component: <LeaveReq/>},
-    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath"/> },
+    { path: "/AddFYA", component: <AddFinancialYearAccess /> },
+    { path: "/ApplyLeave", component: <ApplyLeave /> },
+    { path: "/salarypath", component: <ESSDailyAtten mode="salarypath" /> },
     { path: "/CandidateMaster", component: <CandidateMaster /> },
     { path: "/JobMaster", component: <JobMaster /> },
     { path: "/InterviewPanel", component: <InterviewPanel /> },
@@ -228,12 +295,51 @@ function Main() {
     { path: "/AddCountryMaster", component: <AddCountryMaster /> },
     { path: "/AddTimeZoneMaster", component: <AddTimeZoneMaster /> },
     { path: "/TimeZoneGrid", component: <TimeZoneGrid /> },
-    
+    { path: "/ShiftMasterGrid", component: <ShiftMasterGrid /> },
+    { path: "/ShiftTypeMaster", component: <ShiftTypeMaster /> },
+    { path: "/ShiftPatternMaster", component: <ShiftPatternMaster /> },
+    { path: "/ShiftPatternDetails", component: <ShiftPatternDetails /> },
+    { path: "/EmployeeTypeMaster", component: <EmployeeTypeMaster /> },
+    { path: "/EmployeeShiftMapping", component: <EmployeeShiftMapping /> },
+    { path: "/InterviewScheduleRep", component: <InterviewScheduleReport /> },
+    { path: "/InterviewFeedbackRep", component: <InterviewFeedbackReport /> },
+    { path: "/CandidateInterviewRe", component: <CandidateInterviewReport /> },
+    { path: "/PanelPerformanceRepo", component: <PanelPerformanceReport /> },
+    { path: "/HiringDecisionReport", component: <HiringDecisionReport /> },
+    { path: "/TotalCandidatesAppli", component: <TotalCandidatesApplied /> },
+    { path: "/TotalInterviewsSched", component: <TotalInterviewsScheduled /> },
+    { path: "/InterviewCompletionR", component: <InterviewCompletionRate /> },
+    { path: "/InterviewDashboard", component: <InterviewDashboard /> },
+    { path: "/GenerateShift", component: <GenerateShift /> },
+    { path: "/DepartmentDashboard", component: <DepartmentDashboard /> },
+    { path: "/ShiftSumRep", component: <ShiftSumRep /> },
+    { path: "/VisaRequest", component: <VisaRequest /> },
+    { path: "/TravelRequest", component: <TravelRequest /> },
+    { path: "/LoanRequest", component: <LoanRequest /> },
+    { path: "/LoanStatusHistory", component: <LoanStatusHistory /> },
+    { path: "/LoanApprovals", component: <LoanApprovals /> },
+    { path: "/LoanDocuments", component: <LoanDocuments /> },
+    { path: "/LoanPayment", component: <LoanPayment /> },
+    { path: "/LoanSchedule", component: <LoanSchedule /> },
+    { path: "/LoanType", component: <LoanType /> },
+    { path: "/ManualEmployeeInfo", component: <ManualEmployeeInfo /> },
+    { path: "/LeaveRequest", component: <LeaveRequest /> },
+    { path: "/EmpFamPersonalDetail", component: <EmpFamPersonalDetail /> },
+    { path: "/AcademicDetReq", component: <AcademicDetReq /> },
+    { path: "/RequestReport", component: <RequestReport /> },
+    { path: "/EmpDocumentReq", component: <EmpDocumentReq /> },
+    { path: "/EmpAssetsRequest", component: <EmpAssetsRequest /> },
+    { path: "/LoanSummaryReports", component: <LoanSummaryReports /> },
+    { path: "/PendingApprovalsRepo", component: <PendingApprovalsReport /> },
+    { path: "/LoanDisbursementRepo", component: <LoanDisbursementRepo /> },
+    { path: "/OverdueLoansReport", component: <OverdueLoansReport /> },
+    { path: "/RepaymentScheduleRep", component: <RepaymentScheduleReport /> },
+    { path: "/EmployeeAssets", component: <EmployeeAssets /> }
 
-
+  
   ];
 
-  return (
+  return ( 
     <Router>
       <PathLogger />
       <ToastContainer />
@@ -244,7 +350,7 @@ function Main() {
         <Route
           path="/AccountInformation"
           element={
-            <div>
+            <div className="no-select">
               <Topbar />
               <div className="layout-container">
                 <SideBar className="sidebar" />
@@ -271,7 +377,7 @@ function Main() {
                 key={path}
                 path={path}
                 element={
-                  <div>
+                  <div className="no-select">
                     <Topbar />
                     <div className="layout-container">
                       <SideBar className="sidebar" />
@@ -286,7 +392,7 @@ function Main() {
               key={path}
               path={path}
               element={
-                <div>
+                <div className="no-select">
                   <SideBar className="sidebar" />
                   <Topbar />
                   <div className="layout-container">

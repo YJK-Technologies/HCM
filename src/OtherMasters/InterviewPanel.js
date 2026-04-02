@@ -9,7 +9,7 @@ import TabButtons from '../ESSComponents/Tabs';
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from "react-select";
-
+import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -42,7 +42,7 @@ function InterviewPanel({ }) {
   const [error, setError] = useState("");
   const [panel_name, setpanel_name] = useState("");
   const [panel_nameSC, setpanel_nameSC] = useState("");
-  
+
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedStatusSC, setSelectedStatusSC] = useState(null);
   const [status, setstatus] = useState("");
@@ -63,21 +63,25 @@ function InterviewPanel({ }) {
   const [JobID, setJobID] = useState("");
   const [selectedJobIDSC, setselectedJobIDSC] = useState("");
   const [JobIDSC, setJobIDSC] = useState("");
-  const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
   const [dptSC, setdptSC] = useState("");
   const [activeTab, setActiveTab] = useState("Interview Panel")
   const [loading, setLoading] = useState(false);
   const [statusdrop, setStatusdrop] = useState([]);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [Dptdrop, setDptdrop] = useState([]);
+  const [jobDrop, setJobDrop] = useState([]);
 
   const navigate = useNavigate();
 
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const searchClearInputFields = () => {
+    setpanel_nameSC("");
+    setselectedJobIDSC("");
+    setJobIDSC("");
+    setselecteddeptSC("");
+    setdptSC("");
+    setSelectedStatusSC("");
+    setstatusSC("");
   };
 
 
@@ -110,6 +114,68 @@ function InterviewPanel({ }) {
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`
   }));
+
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/JobMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const job = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id} - ${option.job_title}`,
+        }));
+        setJobDrop(job);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/DeptID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Merge dept_id and dept_name
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+
+        setDptdrop(deptOptions);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
 
 
   useEffect(() => {
@@ -250,16 +316,37 @@ function InterviewPanel({ }) {
     {
       headerName: "Job ID",
       field: "job_id",
-      editable: false
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: jobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = jobDrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Department ID",
       field: "department_id",
-      editable: true
+      width: 250,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: Dptdrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = Dptdrop.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Status",
-      field: "STATUS",
+      cellEditor: "agSelectCellEditor",
+      field: "Status",
+      cellEditorParams: {
+        values: statusgriddrop,
+      },
       editable: true
     },
     {
@@ -300,13 +387,11 @@ function InterviewPanel({ }) {
         },
         body: JSON.stringify(Header),
       });
-      if (response.status === 200) {
+      if (response.ok) {
         console.log("Data inserted successfully");
-        setTimeout(() => {
-          toast.success("Data inserted successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        }, 1000);
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -325,7 +410,7 @@ function InterviewPanel({ }) {
         panel_name: panel_nameSC,
         job_id: JobIDSC,
         department_id: dptSC,
-        status: statusSC,
+        Status: statusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -343,7 +428,7 @@ function InterviewPanel({ }) {
           panel_name: matchedItem.panel_name,
           job_id: matchedItem.job_id,
           department_id: matchedItem.department_id,
-          STATUS: matchedItem.STATUS,
+          Status: matchedItem.Status,
           keyfield: matchedItem.keyfield,
         }));
         setRowData(newRows);
@@ -365,15 +450,16 @@ function InterviewPanel({ }) {
   };
 
   const reloadGridData = () => {
-    setRowData([])
+    setRowData([]);
+    searchClearInputFields();
   };
 
   const handleUpdate = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
@@ -411,11 +497,11 @@ function InterviewPanel({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    setLoading(true);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
       async () => {
         try {
+          setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
 
           const dataToSend = { interview_panelData: Array.isArray(rowData) ? rowData : [rowData] };
@@ -451,10 +537,10 @@ function InterviewPanel({ }) {
   };
 
   const tabs = [
-    { label: 'Candiate Master' },
     { label: 'Job Master' },
+    { label: 'Candidate Master' },
     { label: 'Interview Panel' },
-    { label: 'Interview Panel Members' },
+    { label: 'Panel Members' },
     { label: 'Interview schedule' },
     { label: 'Interview Feedback' },
     { label: 'Interview Decision' }
@@ -464,7 +550,7 @@ function InterviewPanel({ }) {
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
-      case 'Candiate Master':
+      case 'Candidate Master':
         CandidateMaster();
         break;
 
@@ -474,7 +560,7 @@ function InterviewPanel({ }) {
       case 'Interview Panel':
         InterviewPanel();
         break;
-      case 'Interview Panel Members':
+      case 'Panel Members':
         InterviewPanelMembers();
         break;
 
@@ -521,6 +607,148 @@ function InterviewPanel({ }) {
     navigate("/InterviewDecision");
   };
 
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row) => {
+      const jobObj = jobDrop.find(
+        (d) => d.value === row.job_id
+      );
+
+      const jobName = jobObj
+        ? jobObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      const deptObj = Dptdrop.find(
+        (d) => d.value === row.department_id
+      );
+
+      const deptName = deptObj
+        ? deptObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
+      return {
+      "Panel Name": row.panel_name || "",
+      "Job ID": `${row.job_id} - ${jobName}` || "",
+      "Department ID": `${row.department_id} - ${deptName}` || "",
+      "Status": row.Status || "",
+      };
+    });
+  };
+
+  const handleExportToExcel = () => {
+    if (!rowData || rowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Interview Panel Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Panel");
+
+    XLSX.writeFile(workbook, "Interview_Panel_Search_Report.xlsx");
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -557,7 +785,7 @@ function InterviewPanel({ }) {
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedJobID ? "has-value" : ""} 
@@ -576,7 +804,7 @@ function InterviewPanel({ }) {
                 options={filteredOptionJobID}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Job ID{showAsterisk && <span className="text-danger">*</span>}
+                Job ID{<span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -599,7 +827,7 @@ function InterviewPanel({ }) {
                 options={filteredOptionDPt}
               />
               <label htmlFor="selecteddpt" className={`floating-label ${error && !dpt ? 'text-danger' : ''}`}>
-                Department ID{showAsterisk && <span className="text-danger">*</span>}
+                Department ID{<span className="text-danger">*</span>}
               </label>
             </div>
           </div>
@@ -620,7 +848,9 @@ function InterviewPanel({ }) {
                 onFocus={() => setIsSelectFocused(true)}
                 onBlur={() => setIsSelectFocused(false)}
               />
-              <label for="status" class="floating-label">Status</label>
+              <label for="status" class={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>Status{<span className="text-danger">*</span>}
+
+              </label>
             </div>
           </div>
         </div>
@@ -728,6 +958,11 @@ function InterviewPanel({ }) {
               <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>
