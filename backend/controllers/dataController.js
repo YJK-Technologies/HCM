@@ -46850,6 +46850,36 @@ const GetRepaymentScheduleReport = async (req, res) => {
   }
 };
 //code ended by Dinesh Gokul 31-03-26
+
+//code added by mathu 01-04-2026
+
+const getAssetSearchCretria = async (req, res) => {
+  const { EmployeeID, AssetID, ConditionAtIssue, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+       .input("AssetID", sql.BigInt, AssetID)
+      .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_EmployeeAssets @mode,'',@AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//code ended by mathu 01-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -48187,6 +48217,7 @@ module.exports = {
   GetLoanDisbursementReport,
   getRequestStatus,
   GetOverdueLoansReport,
-  GetRepaymentScheduleReport
+  GetRepaymentScheduleReport,
+  getAssetSearchCretria
 
 };

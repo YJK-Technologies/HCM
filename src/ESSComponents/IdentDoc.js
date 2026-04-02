@@ -417,7 +417,11 @@ function Input({ }) {
     });
   };
 
+<<<<<<< HEAD
+  const EmployeeAssets = () => {
+=======
     const EmployeeAssets = () => {
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     navigate("/EmployeeAssets", {
       state: {
         employeeId: EmployeeId,
@@ -667,7 +671,11 @@ function Input({ }) {
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
       async () => {
@@ -743,7 +751,11 @@ function Input({ }) {
       documentNo: member.documentNo,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
     showConfirmationToast(
       "Are you sure you want to Delete the data in the row ?",
       async () => {

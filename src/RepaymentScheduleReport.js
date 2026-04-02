@@ -32,10 +32,12 @@ function RepaymentScheduleReport() {
   const [approval_date, setapproval_date] = useState("");
   const [repayment_months, setrepayment_months] = useState("");
   const [monthly_installment, setmonthly_installment] = useState("");
-  const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState("");
+  const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState(""); 
+
   const [loanTypeNameSc, setLoanTypeNameSc] = useState("");
   const [loanTypeNameDropSc, setLoanTypeNameDropSc] = useState([]);
   const [isSelectedLoanTypeNameSc, setIsSelectedLoanTypeNameSc] = useState(false);
+  
   const [selectedReqStatusSc, setSelectedReqStatusSc] = useState("");
   const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
   const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
@@ -46,6 +48,12 @@ function RepaymentScheduleReport() {
   const [statusDropAG, setstatusDropAG] = useState([]);
   const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
   const [ApprovalStatusSC, setApprovalStatusSC] = useState("");
+
+  const [installment_number, setinstallment_number] = useState("");
+  const [PaymentStatusSc, setPaymentStatusSc] = useState("");
+  const [selectedPaymentStatusSc, setselectedPaymentStatusSc] = useState("");
+  const [isselectedPaymentStatusSc, setIsselectedPaymentStatusSc] = useState(false);
+  const [PaymentStatusDropSc, setPaymentStatusDropSc] = useState([]);
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -60,6 +68,13 @@ function RepaymentScheduleReport() {
     );
   };
 
+  const handleChangePaymentStatusSc = (selectedPaymentStatusSc) => {
+    setselectedPaymentStatusSc(selectedPaymentStatusSc);
+    setPaymentStatusSc(
+      selectedPaymentStatusSc ? selectedPaymentStatusSc.value : "",
+    );
+  };
+
   const filteredOptionLoanTypeSc = Array.isArray(loanTypeNameDropSc)
     ? loanTypeNameDropSc.map((option) => ({
         value: option?.attributedetails_name,
@@ -67,9 +82,16 @@ function RepaymentScheduleReport() {
       }))
     : [];
 
+  const filteredOptionPaymentStatusSc = Array.isArray(PaymentStatusDropSc)
+    ? PaymentStatusDropSc.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      }))
+    : [];
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+    fetch(`${config.apiBaseUrl}/getPaymentStatus`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +99,7 @@ function RepaymentScheduleReport() {
       body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
-      .then((val) => setLoanTypeNameDropSc(val))
+      .then((val) => setPaymentStatusDropSc(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -186,7 +208,7 @@ const handleSearch = async () => {
 
   try {
     const response = await fetch(
-      `${config.apiBaseUrl}/GetPendingApprovalsReport`,
+      `${config.apiBaseUrl}/GetRepaymentScheduleReport`,
       {
         method: "POST",
         headers: {
@@ -199,9 +221,8 @@ const handleSearch = async () => {
           EmployeeId: EmployeeID?.trim() || "",
           First_Name: First_Name?.trim() || "",
           Last_Name: Last_Name?.trim() || "",
-          Loan_Type_Name: loanTypeNameSc?.trim() || "",
-          approval_level: approval_level ? Number(approval_level) : 0,
-          approval_status: ApprovalStatusSC || "",
+          installment_number: installment_number ? Number(installment_number) : 0,
+          payment_status: PaymentStatusSc || "",
         //   approval_date: approval_date || null,
           from_date: FromDate || "",
           to_date: ToDate || "",
@@ -260,18 +281,13 @@ const handleSearch = async () => {
       editable: false,
     },
     {
-      headerName: "Loan Type Name",
-      field: "loan_type_name",
+      headerName: "Installment Number",
+      field: "installment_number",
       editable: false,
     },
     {
-      headerName: "Approval Level",
-      field: "approval_level",
-      editable: false,
-    },
-    {
-      headerName: "Approval Date",
-      field: "approval_date",
+      headerName: "Installment Date",
+      field: "installment_date",
       editable: false,
       valueFormatter: (params) => formatDate(params.value),
       filterParams: {
@@ -286,8 +302,23 @@ const handleSearch = async () => {
         },
       },    },
     {
-      headerName: "Approval Status",
-      field: "approval_status",
+      headerName: "Principal Amount",
+      field: "principal_amount",
+      editable: false,
+    },
+    {
+      headerName: "Interest Amount",
+      field: "interest_amount",
+      editable: false,
+    },
+    {
+      headerName: "Total Installment",
+      field: "total_installment",
+      editable: false,
+    },
+    {
+      headerName: "Payment Status",
+      field: "payment_status",
       editable: false,
       cellEditorParams: {
         values: statusDropAG.map((d) => d.value),
@@ -334,7 +365,7 @@ const generateReport = () => {
   reportWindow.document.write(`
     <html>
     <head>
-      <title>Pending Approvals Report</title>
+      <title>Repayment Schedule Report</title>
       <style>
         body { font-family: Arial; padding: 20px; }
         table { width: 100%; border-collapse: collapse; }
@@ -344,7 +375,7 @@ const generateReport = () => {
     </head>
     <body>
 
-      <h2 style="text-align:center;">Pending Approvals Report</h2>
+      <h2 style="text-align:center;">Repayment Schedule Report</h2>
       <p>Total Records: ${selectedRows.length}</p>
 
       <table>
@@ -354,10 +385,12 @@ const generateReport = () => {
             <th>Employee ID</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Loan Type</th>
-            <th>Approval Level</th>
-            <th>Approval Date</th>
-            <th>Status</th>
+            <th>Installment Number</th>
+            <th>Installment Date</th>
+            <th>Principal Amount</th>
+            <th>Interest Amount</th>
+            <th>Total Installment</th>
+            <th>Payment Status</th>
           </tr>
         </thead>
         <tbody>
@@ -370,10 +403,12 @@ const generateReport = () => {
         <td>${row.EmployeeId}</td>
         <td>${row.first_name}</td>
         <td>${row.last_name}</td>
-        <td>${row.loan_type_name}</td>
-        <td>${row.approval_level}</td>
-        <td>${formatDate(row.approval_date)}</td>
-        <td>${row.approval_status}</td>
+        <td>${row.installment_number}</td>
+        <td>${formatDate(row.installment_date)}</td>
+        <td>${row.principal_amount}</td>
+        <td>${row.interest_amount}</td>
+        <td>${row.total_installment}</td>
+        <td>${row.payment_status}</td>
       </tr>
     `);
   });
@@ -421,10 +456,12 @@ const exportToPDF = () => {
     "Employee ID",
     "First Name",
     "Last Name",
-    "Loan Type",
-    "Approval Level",
-    "Approval Date",
-    "Status"
+    "Installment Number",
+    "Installment Date",
+    "Principal Amount",
+    "Interest Amount",
+    "Total Installment",
+    "Payment Status"
   ]];
 
   const body = dataSource.map(row => [
@@ -432,13 +469,15 @@ const exportToPDF = () => {
     row.EmployeeId,
     row.first_name,
     row.last_name,
-    row.loan_type_name,
-    row.approval_level,
-    formatDate(row.approval_date),
-    row.approval_status
+    row.installment_number,
+    formatDate(row.installment_date),
+    row.principal_amount,
+    row.interest_amount,
+    row.total_installment,
+    row.payment_status
   ]);
 
-  doc.text("Pending Approvals Report", 40, 40);
+  doc.text("Repayment Schedule Report", 40, 40);
 
   autoTable(doc, {
     startY: 60,
@@ -446,7 +485,7 @@ const exportToPDF = () => {
     body: body,
   });
 
-  doc.save("Pending_Approvals_Report.pdf");
+  doc.save("Repayment_Schedule_Report.pdf");
 };
   const transformRowData = (data) => {
     return data.map((row) => ({
@@ -479,10 +518,12 @@ const handleExportToExcel = () => {
     "Employee ID": row.EmployeeId,
     "First Name": row.first_name,
     "Last Name": row.last_name,
-    "Loan Type": row.loan_type_name,
-    "Approval Level": row.approval_level,
-    "Approval Date": formatDate(row.approval_date),
-    "Status": row.approval_status,
+    "Installment Number": row.installment_number,
+    "Installment Date": formatDate(row.installment_date),
+    "Principal Amount": row.principal_amount,
+    "Interest Amount": row.interest_amount,
+    "Total Installment": row.total_installment,
+    "Payment Status": row.payment_status,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(transformedData);
@@ -491,10 +532,10 @@ const handleExportToExcel = () => {
   XLSX.utils.book_append_sheet(
     workbook,
     worksheet,
-    "Pending Approvals"
+    "Repayment Schedule"
   );
 
-  XLSX.writeFile(workbook, "Pending_Approvals_Report.xlsx");
+  XLSX.writeFile(workbook, "Repayment_Schedule_Report.xlsx");
 };
 return (
     <div className="container-fluid Topnav-screen">
@@ -506,7 +547,7 @@ return (
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Pending Approvals Report</h1>
+          <h1 className="page-title">Repayment Schedule Report</h1>
 
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>
@@ -651,27 +692,46 @@ return (
           </div>
 
           <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                title="Please Enter the Company Contribution"
+                autoComplete="off"
+                value={installment_number}
+                onChange={(e) => setinstallment_number(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                Installment Number
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                  ${selectedLoanTypeNameSc ? "has-value" : ""} 
-                  ${isSelectedLoanTypeNameSc ? "is-focused" : ""}`}
-              title="Please enter the Loan Type Name"
+                  ${selectedPaymentStatusSc ? "has-value" : ""} 
+                  ${isselectedPaymentStatusSc ? "is-focused" : ""}`}
+              title="Please enter the Payment Status"
             >
               <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
                 placeholder=""
-                onFocus={() => setIsSelectedLoanTypeNameSc(true)}
-                onBlur={() => setIsSelectedLoanTypeNameSc(false)}
+                onFocus={() => setIsselectedPaymentStatusSc(true)}
+                onBlur={() => setIsselectedPaymentStatusSc(false)}
                 isClearable
                 maxLength={100}
-                value={selectedLoanTypeNameSc}
-                onChange={handleChangeLoanTypeSc}
-                options={filteredOptionLoanTypeSc}
+                value={selectedPaymentStatusSc}
+                onChange={handleChangePaymentStatusSc}
+                options={filteredOptionPaymentStatusSc}
               />
               <label for="sname" className={`floating-label`}>
-                Loan Type Name
+                Payment Status
               </label>
             </div>
           </div>
@@ -699,24 +759,7 @@ return (
             </div>
           </div> */}
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Company Contribution"
-                autoComplete="off"
-                value={approval_level}
-                onChange={(e) => setapproval_level(e.target.value)}
-              />
-              <label for="sname" className="exp-form-labels">
-                Approval Level
-              </label>
-            </div>
-          </div>
+          
 
           {/* <div className="col-md-2">
             <div
