@@ -45521,10 +45521,10 @@ const AcademicRequestDetails = async (req, res) => {
         .input("academicYear", sql.Date, insertRow.academicYear)
         .input("document", sql.VarBinary, document)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(`EXEC sp_ess_employee_academic_request_dtls 
+        .query(`EXEC sp_ess_employee_academic_request_dtls_tesy 
           @mode, @detail_id, @info_request_id, '', @company_code, 
           @EmployeeId, @request_status, @academicName, @major, 
-          @institution, @academicYear, @document, @created_by, '', '', ''`);
+          @institution, @academicYear, @document, @created_by, '', '', '', ''`);
     }
 
     res.status(200).json("Details inserted successfully");
@@ -45565,7 +45565,7 @@ const GetAcademicRequestDetails = async (req, res) => {
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
       .query(
-        ` EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', @column_name, @from_date, @to_date`,
+        ` EXEC sp_ess_employee_academic_request_dtls_tesy 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name, @from_date, @to_date`,
       );
 
     if (result.recordset.length > 0) {
@@ -45608,9 +45608,10 @@ const ApproveAcademicRequest = async (req, res) => {
         .input("institution", sql.NVarChar, "")
         .input("academicYear", sql.Date, null)
         .input("document", sql.VarBinary, null)
-        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
-        .query(` EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, '', '', '' `);
+        .input("created_by", sql.NVarChar, row.created_by)
+        .input("modified_by", sql.NVarChar, row.modified_by)
+        .query(` EXEC sp_ess_employee_academic_request_dtls_tesy @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
+        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, @modified_by, '', '', '' `);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
