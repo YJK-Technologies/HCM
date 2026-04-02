@@ -23,12 +23,13 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
            setLoading(true)
            try {
        
-             const response = await fetch(`${config.apiBaseUrl}/getFamilyDetailsSearchCretria`, {
+             const response = await fetch(`${config.apiBaseUrl}/getAssetSearchCretria`, {
                method: "POST",
                headers: {
                  "Content-Type": "application/json"
                },
-               body: JSON.stringify({ EmployeeId, AssetID,  ConditionAtIssue, company_code: sessionStorage.getItem("selectedCompanyCode") })
+               body: JSON.stringify({ AssetID:AssetID,EmployeeID:EmployeeId, ConditionAtIssue:ConditionAtIssue, 
+                company_code: sessionStorage.getItem("selectedCompanyCode") })
              });
              if (response.ok) {
                const searchData = await response.json();
@@ -84,8 +85,6 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
     editable: true,
   },
 
-<<<<<<< HEAD
-=======
      {
     headerName: "Allocation Date",
     field: "AllocationDate",
@@ -106,7 +105,6 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
     filter: 'agTextColumnFilter',
     editable: true,
   },
->>>>>>> 4b020e27d34d002744bbf244a21e868c6634cdbc
 
   {
     headerName: "Actural Return Date",

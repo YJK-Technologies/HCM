@@ -46866,7 +46866,31 @@ const getAssetSearchCretria = async (req, res) => {
       .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'',@AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getEmployeeAssets = async (req, res) => {
+  const { Id, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AC")
+      .input("Id", sql.NVarChar, Id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_employee_getdata @mode,@Id,@company_code,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48218,6 +48242,7 @@ module.exports = {
   getRequestStatus,
   GetOverdueLoansReport,
   GetRepaymentScheduleReport,
-  getAssetSearchCretria
+  getAssetSearchCretria,
+  getEmployeeAssets
 
 };
