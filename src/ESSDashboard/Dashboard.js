@@ -2598,19 +2598,9 @@ const Dashboard = () => {
             </div>
 
             <div className="grid-col-lg-6 spacing-mt-2">
-              <div className="app-card-base joinees-card rounded app-shadow-lg height-full">
+              <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
                 <div className="display-flex flex-between-center mb-3">
                   <h6 className="card-title-heading mb-0">New Joinees</h6>
-                  {NewJoinees.length > 1 && (
-                    <div className="joinee-nav-dots">
-                      {NewJoinees.map((_, i) => (
-                        <span
-                          key={i}
-                          className={`joinee-dot ${currentIndexJoinee === i ? "active" : ""}`}
-                        ></span>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div
@@ -2620,52 +2610,40 @@ const Dashboard = () => {
                   {NewJoinees.length > 0 ? (
                     NewJoinees.map((joinee, index) => (
                       <div key={index} className="joinee-slide">
-                        <div className="joinee-glass-card">
-                          <div className="joinee-image-ring">
-                            <img
-                              src={joinee.Photos}
-                              className="joinee-img-modern"
-                              alt={joinee.EmployeeId}
-                            />
-                            <div className="new-tag-badge">NEW</div>
+                        <div className="joinee-card-inner">
+                          <div className="joinee-accent-circle-top"></div>
+                          <div className="joinee-accent-circle-bottom"></div>
+
+                          <div className="profile-image-wrapper">
+                            <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                            <div className="joinee-icon-badge">✨</div>
                           </div>
 
-                          <div className="joinee-info mt-3 text-center">
-                            <h6 className="joinee-name">
-                              {joinee.EmployeeName || "New Member"}
-                            </h6>
-                            <p className="joinee-dept-id">
-                              {joinee.department_ID} • {joinee.EmployeeId}
-                            </p>
-                            <div className="welcome-footer">
-                              Joined Recently
-                            </div>
+                          <div className="joinee-details mt-3">
+                            <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
+                            <p className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</p>
+                            <div className="welcome-badge">Welcome Onboard! 🤝</div>
                           </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="no-data-placeholder">
-                      <p className="text-muted">No new joinees this month</p>
+                    <div className="no-birthday-view">
+                      <div className="empty-icon">👥</div>
+                      <p className="text-muted-color">No new joinees this month</p>
                     </div>
                   )}
                 </div>
 
-                {/* Professional Navigation Buttons */}
                 {NewJoinees.length > 1 && (
-                  <div className="joinee-nav-actions">
-                    <button
-                      className="joinee-nav-btn prev"
-                      onClick={handleJoineePrev}
-                    >
-                      <i className="bi bi-chevron-left"></i>
-                    </button>
-                    <button
-                      className="joinee-nav-btn next"
-                      onClick={handleJoineeNext}
-                    >
-                      <i className="bi bi-chevron-right"></i>
-                    </button>
+                  <div className="joinee-nav-controls-bottom">
+                    <button className="nav-btn" onClick={handleJoineePrev}>❮</button>
+                    <div className="joinee-nav-dots">
+                      {NewJoinees.map((_, i) => (
+                        <span key={i} className={`dot ${currentIndexJoinee === i ? 'active' : ''}`}></span>
+                      ))}
+                    </div>
+                    <button className="nav-btn" onClick={handleJoineeNext}>❯</button>
                   </div>
                 )}
               </div>
