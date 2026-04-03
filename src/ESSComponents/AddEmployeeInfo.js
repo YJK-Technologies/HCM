@@ -254,9 +254,7 @@ function Input({ }) {
 
   const handleUpdate = async () => {
     if (
-
       !First_Name ||
-      !Middle_Name ||
       !Last_Name ||
       !Father_Name ||
       !Mother_Name ||
@@ -265,13 +263,13 @@ function Input({ }) {
       !Email ||
       !Phone1 ||
       !Phone2 ||
+      !address1 ||
       !address2 ||
       !address3 ||
       !permanantAddress ||
-      !reference_Name ||
       !pan_No ||
       !Aadhaar_no ||
-      !marital_Status ||
+      !selectedmartial ||
       !kids ||
       !Grade_id ||
       !title ||

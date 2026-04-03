@@ -840,6 +840,14 @@ function RequestReport({}) {
     );
   };
 
+  const formatDate = (isoDateString) => {
+    const date = new Date(isoDateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -2203,6 +2211,7 @@ function RequestReport({}) {
                 EmployeeId: row.EmployeeId,
                 request_status: status,
                 created_by: sessionStorage.getItem("selectedUserCode"),
+                modified_by: sessionStorage.getItem("selectedUserCode"),
               },
             ],
           }),
@@ -2333,6 +2342,18 @@ const handleAcademicReset = () => {
       headerName: "Created Date",
       field: "created_date",
       cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      }, 
     },
     {
       headerName: "Detail ID",
@@ -2548,6 +2569,7 @@ const handlePersonalApproval = async (row, isApproved) => {
               EmployeeId: row.EmployeeId,
               request_status: status,
               created_by: sessionStorage.getItem("selectedUserCode"),
+              modified_by: sessionStorage.getItem("selectedUserCode"),
             },
           ],
         }),
@@ -2648,7 +2670,19 @@ const personalColumnDefs = [
   {
     headerName: "Created Date",
     field: "created_date",
-    cellStyle: { textAlign: "center" },
+    cellStyle: { textAlign: "center" }
+    ,valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      }, 
   },
   {
     headerName: "Detail ID",
@@ -2862,6 +2896,18 @@ const personalColumnDefs = [
     headerName: "Created Date",
     field: "created_date",
     cellStyle: { textAlign: "center" },
+    valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      }, 
 
   },
 
@@ -3067,6 +3113,18 @@ const documentColumnDefs = [
     headerName: "Created Date",
     field: "created_date",
     cellStyle: { textAlign: "center" },
+    valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      }, 
   },
 ];
 
