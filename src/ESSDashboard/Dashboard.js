@@ -5,16 +5,7 @@ import { Doughnut, Bar } from "react-chartjs-2";
 import { getElementAtEvent } from "react-chartjs-2";
 import Vector from "./Team.png";
 import Select from "react-select";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip as ChartTooltip,
-  Legend as ChartLegend,
-  Title,
-  ArcElement,
-} from "chart.js";
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip as ChartTooltip,Legend as ChartLegend, Title, ArcElement,} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -24,14 +15,7 @@ import config from "../Apiconfig";
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, } from "recharts";
 
 ChartJS.register(
   BarElement,
@@ -82,8 +66,7 @@ const Dashboard = () => {
   const [ipAddress, setIpAddress] = useState("");
   const [location, setLocation] = useState("");
   const [totalActiveEmployees, setTotalActiveEmployees] = useState(0);
-  const [formattedTotalActiveEmployees, setFormattedTotalActiveEmployees] =
-    useState("0");
+  const [formattedTotalActiveEmployees, setFormattedTotalActiveEmployees] =useState("0");
   const [TotalNetEarnings, setTotalNetEarnings] = useState(0);
   const [formatedTotalEarnings, setformatedTotalEarnings] = useState("0");
   const [FormatedTotalPayslip, setFormatedTotalPayslip] = useState("0");
@@ -2408,6 +2391,7 @@ const Dashboard = () => {
               <div className="graph-line"></div>
             </div>
           </div>
+          
         </div>
       </div>
 

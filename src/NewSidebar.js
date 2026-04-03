@@ -257,6 +257,17 @@ const menuData = [
           { label: "Settings", path: "/WeekOff" },
         ],
       },
+      {
+        label: "Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Loan Summary Report", path: "/LoanSummaryReports" },
+          { label: "Pending Approvals Report", path: "/PendingApprovalsRepo" },
+          { label: "Loan Disbursement Report", path: "/LoanDisbursementRepo" },
+          { label: "Overdue Loans Report", path: "/OverdueLoansReport" },
+          { label: "Repayment Schedule Report", path: "/RepaymentScheduleRep" },
+        ],
+      },
     ],
   },
   {
