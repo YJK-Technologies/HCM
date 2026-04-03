@@ -274,29 +274,29 @@ const Dashboard = (payslip) => {
   //   setShiftToDate(formatDate(sunday));
   // }, []);
 
-useEffect(() => {
-  const today = new Date();
+  useEffect(() => {
+    const today = new Date();
 
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
 
-  const from = formatDate(firstDay);
-  const to = formatDate(lastDay);
+    const from = formatDate(firstDay);
+    const to = formatDate(lastDay);
 
-  setShiftFromDate(from);
-  setShiftToDate(to);
+    setShiftFromDate(from);
+    setShiftToDate(to);
 
-  // 👉 Call API with correct values
-  handleEmpShiftReportSearch(from, to);
+    // 👉 Call API with correct values
+    handleEmpShiftReportSearch(from, to);
 
-}, []);
+  }, []);
 
   const {
     Location_name,
@@ -1475,7 +1475,7 @@ useEffect(() => {
             <div className="d-flex justify-content-between align-items-center spacing-mb-2">
               <h6 className="card-title-heading mb-0">Shift Routine</h6>
               <button
-                className="btn btn-sm btn-outline-primary border-none"
+                className="btn btn-sm text-white border-none"
                 onClick={() => setIsShiftCalendarVisible(!isShiftCalendarVisible)}
                 title={isShiftCalendarVisible ? "Switch to Grid View" : "Switch to Calendar View"}
               >
@@ -1644,36 +1644,44 @@ useEffect(() => {
         </div>
 
         <div className="payslip-analysis-container mt-2">
-          <div className="dashboard-card-base payslip-analysis-card rounded shadow-lg h-100">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-start mt-0">
-                <div className="d-flex justify-content-start">
-                  <h6 className="card-title-heading">Payslip Generate</h6>
+          <div className="app-card-base payslip-gen-card rounded app-shadow-lg height-full border-0 position-relative overflow-hidden">
+            <div className="payslip-bg-accent"></div>
+
+            <div className="card-body position-relative z-index-2">
+              <div className="d-flex align-items-center mb-4">
+                {/* <div className="payslip-icon-box me-3">
+                  <i className="bi bi-file-earmark-medical-fill"></i>
+                </div> */}
+                <div>
+                  <h6 className="card-title-heading mb-0">Payslip Generate</h6>
+                  <small className="text-muted">Download your monthly earnings</small>
                 </div>
               </div>
 
-              <div className="col-md-12 mt-4">
-                <div className="inputGroup">
+              <div className="payslip-form-wrapper">
+                <div className="modern-input-group mb-4">
                   <input
                     type="month"
-                    className="exp-input-field form-control"
-                    autoComplete="off"
-                    placeholder=" "
+                    className="modern-month-input"
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
+                    required
                   />
-                  <label className="exp-form-labels">Select Period</label>
+                  <label className="modern-label">Select Payroll Period</label>
                 </div>
-              </div>
 
-              <div className="me-3">
-                {selectedPeriod && (
-                  <div className="p-1">
-                    <button className="btn btn-primary" onClick={handlePreview}>
-                      <i className="bi bi-printer ms-1"></i> Preview
+                <div className="action-container">
+                  {selectedPeriod ? (
+                    <button className="btn-payslip-primary" onClick={handlePreview}>
+                      <i className="bi bi-file-pdf me-2"></i> Generate & Preview
                     </button>
-                  </div>
-                )}
+                  ) : (
+                    <div className="payslip-helper-text">
+                      <i className="bi bi-info-circle me-1"></i>
+                      Please select a month to continue
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
