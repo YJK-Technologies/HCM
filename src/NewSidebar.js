@@ -44,6 +44,8 @@ import {
   BsPeopleFill,
   BsArrowRepeat,
   BsPersonPlus,
+  BsBoxSeam
+
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -143,6 +145,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Settings": BsGear,
+  "Assets ": BsBoxSeam,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
@@ -250,15 +253,21 @@ const menuData = [
         label: "Others",
         isDropdown: true,
         subMenus: [
+         
           { label: "Grade", path: "/EmployeeGrade" },
           { label: "Leave", path: "/EmpLeave" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
           { label: "Settings", path: "/WeekOff" },
+         { label: "Assets", path: "/Assets" },
         ],
       },
+       
+      
+      
     ],
   },
+  
   {
     label: "Payroll",
     icon: RiMoneyDollarCircleLine,
@@ -328,6 +337,7 @@ const menuData = [
       { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
       { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
       { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
+      
     ],
   },
 ];
