@@ -181,7 +181,7 @@
 }
 
 .grid-col-md-3 {
-  width: 15%;
+  width: 25%;
 }
 
 .grid-col-md-4 {
@@ -325,6 +325,18 @@
 
 .card-gradient-indigo {
   background: linear-gradient(135deg, #4b0082, #6a00cd);
+}
+
+.card-gradient-green {
+  background: linear-gradient(135deg, #00c853, #009624);
+}
+
+.card-gradient-orange {
+  background: linear-gradient(135deg, #ff8c00, #ff5e00);
+}
+
+.card-gradient-teal {
+  background: linear-gradient(135deg, #00bfa5, #00695c);
 }
 
 .card-pulse-image {
