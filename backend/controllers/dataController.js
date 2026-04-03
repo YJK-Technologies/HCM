@@ -46438,7 +46438,7 @@ const EmployeeAssetsLoopInsert = async (req, res) => {
         .input("mode", sql.NVarChar, "I")
         .input("AllocationID", sql.Int, item.AllocationID)
         .input("AssetID", sql.Int, item.AssetID)
-        .input("EmployeeID", sql.Int, item.EmployeeID)
+        .input("EmployeeID", sql.NVarChar, item.EmployeeID)
         .input("AllocationDate", sql.DateTime, item.AllocationDate)
         .input("ExpectedReturnDate", sql.DateTime, item.ExpectedReturnDate)
         .input("ActualReturnDate", sql.DateTime, item.ActualReturnDate)
@@ -46867,7 +46867,7 @@ const getAssetSearchCretria = async (req, res) => {
       .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','',''`
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
