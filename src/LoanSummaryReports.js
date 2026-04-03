@@ -473,7 +473,7 @@ return (
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Loan Summary Reports</h1>
+          <h1 className="page-title">Loan Summary Report</h1>
 
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>

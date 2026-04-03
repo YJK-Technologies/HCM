@@ -134,6 +134,35 @@ const Dashboard = () => {
   const carouselRef = useRef(null);
   const joineeCarouselRef = useRef(null);
 
+  const [dashboard, setDashboard] = useState({});
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+  const fetchDashboardData = async () => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const response = await fetch(
+        `${config.apiBaseUrl}/GetDashboardAttendanceSummary`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        },
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setDashboard(data);
+      } else {
+        console.error("No data found");
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard:", error);
+    }
+  };
+
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -149,18 +178,20 @@ const Dashboard = () => {
       setCurrentIndex(nextIndex);
       carouselRef.current.scrollTo({
         left: carouselRef.current.offsetWidth * nextIndex,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
 
   const handlePrev = () => {
     if (carouselRef.current) {
-      const prevIndex = (currentIndex - 1 + upcomingBirthdays.length) % upcomingBirthdays.length;
+      const prevIndex =
+        (currentIndex - 1 + upcomingBirthdays.length) %
+        upcomingBirthdays.length;
       setCurrentIndex(prevIndex);
       carouselRef.current.scrollTo({
         left: carouselRef.current.offsetWidth * prevIndex,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -180,18 +211,19 @@ const Dashboard = () => {
       setCurrentIndexJoinee(nextIndex);
       joineeCarouselRef.current.scrollTo({
         left: joineeCarouselRef.current.offsetWidth * nextIndex,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
 
   const handleJoineePrev = () => {
     if (joineeCarouselRef.current) {
-      const prevIndex = (currentIndexJoinee - 1 + NewJoinees.length) % NewJoinees.length;
+      const prevIndex =
+        (currentIndexJoinee - 1 + NewJoinees.length) % NewJoinees.length;
       setCurrentIndexJoinee(prevIndex);
       joineeCarouselRef.current.scrollTo({
         left: joineeCarouselRef.current.offsetWidth * prevIndex,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -930,7 +962,7 @@ const Dashboard = () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ company_code }),
-          }
+          },
         );
 
         if (res.ok) documentData = await res.json();
@@ -1180,7 +1212,7 @@ const Dashboard = () => {
         url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
 
         const selectedRequest = dashboardRequests.find(
-          (r) => r.id === id && r.type === "Document"
+          (r) => r.id === id && r.type === "Document",
         );
 
         body = {
@@ -2362,7 +2394,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-layout mt-2">
+      {/* <div className="dashboard-layout mt-2">
         <div className="dashboard-row">
           <div className="grid-col-md-4">
             <div className="info-card-base rounded card-gradient-blue">
@@ -2406,6 +2438,63 @@ const Dashboard = () => {
                 {FormatedTotalPayslip}
               </div>
               <div className="graph-line"></div>
+            </div>
+          </div>
+          
+        </div>
+      </div> */}
+
+      <div className="dashboard-layout mt-2">
+        <div className="dashboard-row">
+          {/* Total Employees */}
+          <div className="grid-col-md-3">
+            <div className="info-card-base rounded card-gradient-blue">
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Total Employees
+              </div>
+              <div className="text-color-white font-size-4 display-flex spacing-mt-">
+                {dashboard.TotalEmployees || 0}
+              </div>
+            </div>
+          </div>
+
+          {/* Present Today */}
+          <div className="grid-col-md-3">
+            <div className="info-card-base rounded card-gradient-pink">
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Total Present Today
+              </div>
+              <div className="text-color-white font-size-4 display-flex spacing-mt-2">
+                {dashboard.PresentToday || 0}
+              </div>
+            </div>
+          </div>
+
+          {/* Absent Today */}
+          <div className="grid-col-md-3">
+            <div className="info-card-base rounded card-gradient-indigo">
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Total Absent Today
+              </div>
+              <div className="text-color-white font-size-4 display-flex spacing-mt-2">
+                {dashboard.AbsentToday || 0}
+              </div>
+            </div>
+          </div>
+
+          {/* Late Arrivals */}
+          <div className="grid-col-md-3">
+            <div className="info-card-base rounded card-gradient-teal">
+              <img src={Circle} className="card-pulse-image" alt="" />
+              <div className="text-color-white font-weight-bold">
+                Late Arrivals
+              </div>
+              <div className="text-color-white font-size-4 display-flex spacing-mt-2">
+                {dashboard.LateArrivals || 0}
+              </div>
             </div>
           </div>
         </div>
@@ -2484,7 +2573,7 @@ const Dashboard = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={90}
-                      // label={({ name, value }) => `${name} (${value})`}
+                        // label={({ name, value }) => `${name} (${value})`}
                       >
                         {shiftData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -2515,13 +2604,19 @@ const Dashboard = () => {
                   {NewJoinees.length > 1 && (
                     <div className="joinee-nav-dots">
                       {NewJoinees.map((_, i) => (
-                        <span key={i} className={`joinee-dot ${currentIndexJoinee === i ? 'active' : ''}`}></span>
+                        <span
+                          key={i}
+                          className={`joinee-dot ${currentIndexJoinee === i ? "active" : ""}`}
+                        ></span>
                       ))}
                     </div>
                   )}
                 </div>
 
-                <div className="joinee-carousel-container" ref={joineeCarouselRef}>
+                <div
+                  className="joinee-carousel-container"
+                  ref={joineeCarouselRef}
+                >
                   {NewJoinees.length > 0 ? (
                     NewJoinees.map((joinee, index) => (
                       <div key={index} className="joinee-slide">
@@ -2536,8 +2631,12 @@ const Dashboard = () => {
                           </div>
 
                           <div className="joinee-info mt-3 text-center">
-                            <h6 className="joinee-name">{joinee.EmployeeName || 'New Member'}</h6>
-                            <p className="joinee-dept-id">{joinee.department_ID} • {joinee.EmployeeId}</p>
+                            <h6 className="joinee-name">
+                              {joinee.EmployeeName || "New Member"}
+                            </h6>
+                            <p className="joinee-dept-id">
+                              {joinee.department_ID} • {joinee.EmployeeId}
+                            </p>
                             <div className="welcome-footer">
                               Joined Recently
                             </div>
@@ -2555,10 +2654,16 @@ const Dashboard = () => {
                 {/* Professional Navigation Buttons */}
                 {NewJoinees.length > 1 && (
                   <div className="joinee-nav-actions">
-                    <button className="joinee-nav-btn prev" onClick={handleJoineePrev}>
+                    <button
+                      className="joinee-nav-btn prev"
+                      onClick={handleJoineePrev}
+                    >
                       <i className="bi bi-chevron-left"></i>
                     </button>
-                    <button className="joinee-nav-btn next" onClick={handleJoineeNext}>
+                    <button
+                      className="joinee-nav-btn next"
+                      onClick={handleJoineeNext}
+                    >
                       <i className="bi bi-chevron-right"></i>
                     </button>
                   </div>
@@ -2569,7 +2674,9 @@ const Dashboard = () => {
             <div className="grid-col-lg-6 spacing-mt-2">
               <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
                 <div className="display-flex flex-between-center mb-3">
-                  <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
+                  <h6 className="card-title-heading mb-0">
+                    Upcoming Birthdays
+                  </h6>
                 </div>
 
                 <div className="birthday-carousel-container" ref={carouselRef}>
@@ -2581,13 +2688,21 @@ const Dashboard = () => {
                           <div className="birthday-accent-circle-bottom"></div>
 
                           <div className="profile-image-wrapper">
-                            <img src={person.Photos} className="birthday-img-modern" alt="profile" />
+                            <img
+                              src={person.Photos}
+                              className="birthday-img-modern"
+                              alt="profile"
+                            />
                             <div className="birthday-icon-badge">🎂</div>
                           </div>
 
                           <div className="birthday-details mt-3">
-                            <h6 className="emp-name-text">{person.EmployeeName}</h6>
-                            <p className="emp-dept-sub">{person.Department || 'Team Member'}</p>
+                            <h6 className="emp-name-text">
+                              {person.EmployeeName}
+                            </h6>
+                            <p className="emp-dept-sub">
+                              {person.Department || "Team Member"}
+                            </p>
                             <div className="wish-badge">Happy Birthday! 🎈</div>
                           </div>
                         </div>
@@ -2602,13 +2717,20 @@ const Dashboard = () => {
                 </div>
 
                 <div className="birthday-nav-controls-bottom">
-                  <button className="nav-btn" onClick={handlePrev}>❮</button>
+                  <button className="nav-btn" onClick={handlePrev}>
+                    ❮
+                  </button>
                   <div className="birthday-nav-dots">
                     {upcomingBirthdays.map((_, i) => (
-                      <span key={i} className={`dot ${currentIndex === i ? 'active' : ''}`}></span>
+                      <span
+                        key={i}
+                        className={`dot ${currentIndex === i ? "active" : ""}`}
+                      ></span>
                     ))}
                   </div>
-                  <button className="nav-btn" onClick={handleNext}>❯</button>
+                  <button className="nav-btn" onClick={handleNext}>
+                    ❯
+                  </button>
                 </div>
               </div>
             </div>

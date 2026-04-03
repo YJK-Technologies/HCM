@@ -259,12 +259,20 @@ const menuData = [
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
           { label: "Settings", path: "/WeekOff" },
-         { label: "Assets", path: "/Assets" },
+          { label: "Assets", path: "/Assets" },
         ],
       },
-       
-      
-      
+      {
+        label: "Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Loan Summary Report", path: "/LoanSummaryReports" },
+          { label: "Pending Approvals Report", path: "/PendingApprovalsRepo" },
+          { label: "Loan Disbursement Report", path: "/LoanDisbursementRepo" },
+          { label: "Overdue Loans Report", path: "/OverdueLoansReport" },
+          { label: "Repayment Schedule Report", path: "/RepaymentScheduleRep" },
+        ],
+      },
     ],
   },
   
