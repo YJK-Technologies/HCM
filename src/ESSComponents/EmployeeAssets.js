@@ -29,7 +29,6 @@ function EmployeeAssets({ }) {
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [actualReturnDate, setActualReturnDate] = useState('');
   const [statusdrop, setStatusdrop] = useState([]);
-  
 
   const [Assetvalue, setAssetvalue] = useState([{
     relation: 'Assetvalue', members: [{
@@ -169,157 +168,162 @@ function EmployeeAssets({ }) {
     );
   };
 
-// const handleSave = async () => {
+  // const handleSave = async () => {
 
-//     if (!EmployeeID) {
-//       setError(true);
-//       toast.warning("Error: Missing required keyfield")
-//       return;
-//     }
+  //     if (!EmployeeID) {
+  //       setError(true);
+  //       toast.warning("Error: Missing required keyfield")
+  //       return;
+  //     }
 
-//     for (const relationGroup of Assetvalue) {
-//       for (const member of relationGroup.members) {
-//         if (!member.AssetID  || !member.AllocationDate || !member.AllocationStatus) {
-//           setError(true);
-//           toast.warning("Error: Missing required fields")
+  //     for (const relationGroup of Assetvalue) {
+  //       for (const member of relationGroup.members) {
+  //         if (!member.AssetID  || !member.AllocationDate || !member.AllocationStatus) {
+  //           setError(true);
+  //           toast.warning("Error: Missing required fields")
 
-//           return;
-//         }
-//       }
-//     }
+  //           return;
+  //         }
+  //       }
+  //     }
 
-//     const employeeData = Assetvalue.flatMap((relationGroup) =>
-//       relationGroup.members.map((member) => ({
-//         AssetID: member.AssetID,
-//         EmployeeID: member.EmployeeID,
-//         AllocationDate: member.AllocationDate,
-//         ExpectedReturnDate: member.ExpectedReturnDate,
-//         ActualReturnDate: member.ActualReturnDate,
-//         AllocationStatus: member.AllocationStatus,
-//         ConditionAtIssue: member.ConditionAtIssue,
-//         ConditionAtReturn: member.ConditionAtReturn,
-//         ApprovedBy: member.ApprovedBy,
-//         Remarks: member.Remarks,
-//         company_code: sessionStorage.getItem("selectedCompanyCode"),
-//         CreatedBy: sessionStorage.getItem("selectedUserCode")
-//       }))
-//     );
-//     setError(false);
-//     setLoading(true)
+  //     const employeeData = Assetvalue.flatMap((relationGroup) =>
+  //       relationGroup.members.map((member) => ({
+  //         AssetID: member.AssetID,
+  //         EmployeeID: member.EmployeeID,
+  //         AllocationDate: member.AllocationDate,
+  //         ExpectedReturnDate: member.ExpectedReturnDate,
+  //         ActualReturnDate: member.ActualReturnDate,
+  //         AllocationStatus: member.AllocationStatus,
+  //         ConditionAtIssue: member.ConditionAtIssue,
+  //         ConditionAtReturn: member.ConditionAtReturn,
+  //         ApprovedBy: member.ApprovedBy,
+  //         Remarks: member.Remarks,
+  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //         CreatedBy: sessionStorage.getItem("selectedUserCode")
+  //       }))
+  //     );
+  //     setError(false);
+  //     setLoading(true)
 
-//     try {
-//       const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopInsert`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ employeeData }),
-//       });
-//       if (response.ok) {
-//         toast.success("Data inserted successfully!", {
-//           onClose: () => window.location.reload(),
-//         });
-//       } else {
-//         const errorResponse = await response.json();
-//         console.error(errorResponse.message);
-//         toast.warning(errorResponse.message, {
-//         })
-//       }
-//     } catch (err) {
-//       console.error("Error delete data:", err);
-//       toast.error('Error delete data: ' + err.message, {
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  //     try {
+  //       const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopInsert`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ employeeData }),
+  //       });
+  //       if (response.ok) {
+  //         toast.success("Data inserted successfully!", {
+  //           onClose: () => window.location.reload(),
+  //         });
+  //       } else {
+  //         const errorResponse = await response.json();
+  //         console.error(errorResponse.message);
+  //         toast.warning(errorResponse.message, {
+  //         })
+  //       }
+  //     } catch (err) {
+  //       console.error("Error delete data:", err);
+  //       toast.error('Error delete data: ' + err.message, {
+  //       });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-const handleSave = async () => {
-  if (!EmployeeID) {
-    setError(true);
-    toast.warning("Employee ID is required");
-    return;
-  }
+  const handleSave = async () => {
+    if (!EmployeeID || !EmployeeID.trim()) {
+      setError(true);
+      toast.warning("Employee ID is required");
+      return;
+    }
 
-  for (const relationGroup of Assetvalue) {
-    for (const member of relationGroup.members) {
+    for (const relationGroup of Assetvalue) {
+      for (const member of relationGroup.members) {
 
-      if (!member.AssetID || !member.AllocationDate || !member.Status) {
-        setError(true);
-        toast.warning("Please fill all required fields");
-        return;
-      }
+        // Trim values before validation
+        const AssetID = member.AssetID?.trim();
+        const AllocationDate = member.AllocationDate;
+        const Status = member.Status?.trim();
 
-      
-      if (
-        member.ExpectedReturnDate &&
-        member.ExpectedReturnDate < member.AllocationDate
-      ) {
-        toast.warning("Expected Return Date must be after Allocation Date");
-        return;
-      }
+        if (!AssetID || !AllocationDate || !Status) {
+          setError(true);
+          toast.warning("Please fill all required fields");
+          return;
+        }
 
-      if (
-        member.ActualReturnDate &&
-        member.ActualReturnDate < member.AllocationDate
-      ) {
-        toast.warning("Actual Return Date must be after Allocation Date");
-        return;
+        // Convert to Date objects
+        const allocDate = new Date(AllocationDate);
+        const expectedDate = member.ExpectedReturnDate ? new Date(member.ExpectedReturnDate) : null;
+        const actualDate = member.ActualReturnDate ? new Date(member.ActualReturnDate) : null;
+
+        if (expectedDate && expectedDate < allocDate) {
+          toast.warning("Expected Return Date must be after Allocation Date");
+          return;
+        }
+
+        if (actualDate && actualDate < allocDate) {
+          toast.warning("Actual Return Date must be after Allocation Date");
+          return;
+        }
       }
     }
-  }
 
-  setError(false);
-  setLoading(true);
+    setError(false);
+    setLoading(true);
 
-  const employeeData = Assetvalue.flatMap((relationGroup) =>
-    relationGroup.members.map((member) => ({
-      AssetID: member.AssetID,
-      EmployeeID: EmployeeID, 
-      AllocationDate: member.AllocationDate,
-      ExpectedReturnDate: member.ExpectedReturnDate || null,
-      ActualReturnDate: member.ActualReturnDate || null,
-      AllocationStatus: member.Status, 
-      ConditionAtIssue: member.ConditionAtIssue,
-      ConditionAtReturn: member.ConditionAtReturn,
-      ApprovedBy: member.ApprovedBy,
-      Remarks: member.Remarks,
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      CreatedBy: sessionStorage.getItem("selectedUserCode"),
-    }))
-  );
+    const employeeData = Assetvalue.flatMap((relationGroup) =>
+      relationGroup.members.map((member) => ({
+        AssetID: member.AssetID?.trim(),
+        EmployeeID: employeeID.trim(),
+        AllocationDate: member.AllocationDate,
+        ExpectedReturnDate: member.ExpectedReturnDate || null,
+        ActualReturnDate: member.ActualReturnDate || null,
+        AllocationStatus: member.Status?.trim(),
+        ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
+        ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
+        ApprovedBy: member.ApprovedBy?.trim() || "",
+        Remarks: member.Remarks?.trim() || "",
+        company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
+        CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
 
-  try {
-    const response = await fetch(
-      `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employeeData }),
-      }
+      }))
     );
 
-    if (response.ok) {
-      toast.success("Data saved successfully!", {
-        onClose: () => window.location.reload(),
-      });
-   } else {
-           const errorResponse = await response.json();
-           console.error(errorResponse.message);
-           toast.warning(errorResponse.message, {
-           })
-         }
-       } catch (err) {
-         console.error("Error delete data:", err);
-         toast.error('Error delete data: ' + err.message, {
-         });
-       } finally {
-         setLoading(false);
-       }
-     };
-   const reloadGridData = () => {
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ EmployeeAssetsData: employeeData }), // ✅ match backend
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success("Data saved successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        console.error(result.message);
+        toast.warning(result.message || "Failed to save data");
+      }
+
+    } catch (err) {
+      console.error("Error saving data:", err);
+      toast.error("Error saving data: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reloadGridData = () => {
     window.location.reload();
   };
 
@@ -328,8 +332,8 @@ const handleSave = async () => {
     label: option.attributedetails_name,
   }));
 
-useEffect(() => {
-     fetch(`${config.apiBaseUrl}/status`, {
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -341,30 +345,28 @@ useEffect(() => {
       .then((val) => setStatusdrop(val));
   }, []);
 
-    const handleChangeStatus = (selectedStatus, relation, index) => {
+
+  const handleChangeStatus = (selectedStatus, relation, index) => {
     setAssetvalue((prevDocuments) =>
-      prevDocuments.map((doc) =>
-        doc.relation === relation
-          ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  Status: selectedStatus
-                    ? selectedStatus.value
-                    : "",
-                  selectedStatus: selectedStatus,
-                }
-                : member
-            ),
-          }
-          : doc
-      )
+      prevDocuments.map((doc) => {
+        if (doc.relation !== relation) return doc;
+
+        return {
+          ...doc,
+          members: doc.members.map((member, i) => {
+            if (i !== index) return member;
+
+            return {
+              ...member,
+              Status: selectedStatus?.value || "",
+              selectedStatus: selectedStatus || null,
+            };
+          }),
+        };
+      })
     );
   };
 
-  
   const RelationInputChange = (relation, index, field, value) => {
     setAssetvalue((prev) =>
       prev.map((item) =>
@@ -380,151 +382,141 @@ useEffect(() => {
     );
   };
   const handleEmployeeAssets = async (code) => {
-  try {
-    const response = await fetch(`${config.apiBaseUrl}/getEmployeeFamily`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        Id: code,
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    });
-
-    if (response.ok) {
-      setSaveButtonVisible(false);
-      setShowAsterisk(false);
-
-      const data = await response.json();
-
-      const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
-
-      setdepartment_id(department_id);
-      setdesignation_id(designation_id);
-      setFirst_Name(First_Name);
-      setEmployeeId(EmployeeId);
-
-      // ✅ MAP DATA TO Assetvalue
-      const mappedAssets = [
-        {
-          relation: "Assetvalue",
-          members: data.map((item) => ({
-            AssetID: item.AssetID || "",
-            AllocationDate: formatDate(item.AllocationDate),
-            ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
-            ActualReturnDate: formatDate(item.ActualReturnDate),
-            AllocationStatus: item.AllocationStatus || "",
-            ConditionAtIssue: item.ConditionAtIssue || "",
-            ConditionAtReturn: item.ConditionAtReturn || "",
-            ApprovedBy: item.ApprovedBy || "",
-            Remarks: item.Remarks || "",
-            keyfield: item.keyfield || "",
-          })),
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ];
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      });
 
-      setAssetvalue(mappedAssets);
+      if (response.ok) {
+        setSaveButtonVisible(false);
+        setShowAsterisk(false);
 
-    } else if (response.status === 404) {
-      toast.warning("Data not found");
+        const data = await response.json();
 
-      setAssetvalue([
-        {
-          relation: "Assetvalue",
-          members: [
-            {
-              AssetID: "",
-              AllocationDate: "",
-              ExpectedReturnDate: "",
-              ActualReturnDate: "",
-              AllocationStatus: "",
-              ConditionAtIssue: "",
-              ConditionAtReturn: "",
-              ApprovedBy: "",
-              Remarks: "",
-              keyfield: "",
-            },
-          ],
-        },
-      ]);
-    } else {
-      const err = await response.json();
-      toast.warning(err.message || "Error fetching data");
+        const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
+
+        setdepartment_id(department_id);
+        setdesignation_id(designation_id);
+        setFirst_Name(First_Name);
+        setEmployeeId(EmployeeId);
+
+     
+        const mappedAssets = [
+          {
+            relation: "Assetvalue",
+            members: data.map((item) => ({
+              AssetID: item.AssetID || "",
+              AllocationDate: formatDate(item.AllocationDate),
+              ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
+              ActualReturnDate: formatDate(item.ActualReturnDate),
+              AllocationStatus: item.AllocationStatus || "",
+              ConditionAtIssue: item.ConditionAtIssue || "",
+              ConditionAtReturn: item.ConditionAtReturn || "",
+              ApprovedBy: item.ApprovedBy || "",
+              Remarks: item.Remarks || "",
+              keyfield: item.keyfield || "",
+            })),
+          },
+        ];
+
+        setAssetvalue(mappedAssets);
+
+      } else if (response.status === 404) {
+        toast.warning("Data not found");
+
+        setAssetvalue([
+          {
+            relation: "Assetvalue",
+            members: [
+              {
+                AssetID: "",
+                AllocationDate: "",
+                ExpectedReturnDate: "",
+                ActualReturnDate: "",
+                AllocationStatus: "",
+                ConditionAtIssue: "",
+                ConditionAtReturn: "",
+                ApprovedBy: "",
+                Remarks: "",
+                keyfield: "",
+              },
+            ],
+          },
+        ]);
+      } else {
+        const err = await response.json();
+        toast.warning(err.message || "Error fetching data");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error: " + error.message);
     }
-  } catch (error) {
-    console.error(error);
-    toast.error("Error: " + error.message);
-  }
-};
+  };
 
-const formatDate = (date) => {
-  if (!date) return "";
+  const formatDate = (date) => {
+    if (!date) return "";
 
-  const d = new Date(date);
+    const d = new Date(date);
 
-  // Convert to YYYY-MM-DD (required for input type="date")
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+    // Convert to YYYY-MM-DD (required for input type="date")
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
-};
+    return `${year}-${month}-${day}`;
+  };
 
-   const handleKeyPress = (e) => {
+  const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleEmployeeAssets(EmployeeID)
     }
   };
 
-const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
 
- const handleEmployeeInfo = () => {
+  const handleEmployeeInfo = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
-  
-const handleDateChange = (e, relation, idx) => {
-  const { name, value } = e.target;
-  const today = new Date().toISOString().split("T")[0];
 
-  if (value > today) {
-    toast.warning("Future dates are not allowed!");
-    return;
-  }
+    const handleDateChange = (relation, index, field, value) => {
+    setAssetvalue((prev) =>
+      prev.map((item) =>
+        item.relation === relation
+          ? {
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member
+            ),
+          }
+          : item
+      )
+    );
+  };
 
-  const member = Assetvalue.find(r => r.relation === relation).members[idx];
+  // const EmployeeAssetsPopup = async (data) => {
+  //     if (data && data.length > 0) {
+  //       setSaveButtonVisible(false);
+  //       setShowAsterisk(false);
+  //       setIsAcademicDataLoaded(true);
+  //       const [{ employeeId }] = data;
 
+  //       handleEmployeeAssets(employeeId);
 
-  if (name === "ExpectedReturnDate" && member.AllocationDate && value < member.AllocationDate) {
-    toast.warning("Expected Return Date must be after Allocation Date");
-    return;
-  }
-
-  if (name === "ActualReturnDate" && member.AllocationDate && value < member.AllocationDate) {
-    toast.warning("Actual Return Date must be after Allocation Date");
-    return;
-  }
-
-  RelationInputChange(relation, idx, name, value);
-};
-
-// const EmployeeAssetsPopup = async (data) => {
-//     if (data && data.length > 0) {
-//       setSaveButtonVisible(false);
-//       setShowAsterisk(false);
-//       setIsAcademicDataLoaded(true);
-//       const [{ employeeId }] = data;
-
-//       handleEmployeeAssets(employeeId);
-
-//     } else {
-//       console.log("Data not fetched...!");
-//     }
-//   };
+  //     } else {
+  //       console.log("Data not fetched...!");
+  //     }
+  //   };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -544,7 +536,7 @@ const handleDateChange = (e, relation, idx) => {
               </div>
             )}
             <div className="action-icon print"
-           onClick={reloadGridData}
+              onClick={reloadGridData}
             >
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -560,7 +552,7 @@ const handleDateChange = (e, relation, idx) => {
 
               {saveButtonVisible && ['add', 'all permission'].some(p => EmpAssetsPermissions.includes(p)) && (
                 <li className="dropdown-item"
-                onClick={handleSave}
+                  onClick={handleSave}
                 >
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
@@ -591,9 +583,9 @@ const handleDateChange = (e, relation, idx) => {
                 value={EmployeeID}
                 onChange={(e) => setEmployeeID(e.target.value)}
                 maxLength={18}
-              onKeyPress={handleKeyPress}
+                onKeyPress={handleKeyPress}
               />
-               <label className="exp-form-labels">Employee ID</label>
+              <label className="exp-form-labels">Employee ID</label>
               <span className="select-add-btn" title="Employee Help"
                 onClick={handleEmployeeInfo}>
                 <i className="fa fa-search"></i>
@@ -676,33 +668,52 @@ const handleDateChange = (e, relation, idx) => {
                     type="number"
                     className="exp-input-field form-control"
                     value={member.AssetID}
-                  maxLength={12}
+                    maxLength={12}
                     placeholder=" "
                     autoComplete="off"
                     inputMode="numeric"
                     pattern="[0-9]*"
-             onChange={(e) => {
+                    onChange={(e) => {
                       const value = e.target.value;
                       if (/^\d*$/.test(value)) {
                         RelationInputChange(relationGroup.relation, index, 'AssetID', value);
-                      }   
-                            }}        />
+                      }
+                    }} />
                   <label for="cno" className={`exp-form-labels ${error && !member.AssetID ? 'text-danger' : ''}`}>AssetID{showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
-               <div className="col-md-2">
+              <div className="col-md-2">
                 <div className="inputGroup">
-                <input
-  type="date"
-  className="exp-input-field form-control"
-  name="AllocationDate"   
-  value={member.AllocationDate}
-  max={new Date().toISOString().split("T")[0]}
-  onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
-/>
-                  
-                  <label for="cno" className={`exp-form-labels ${error && !member.AllocationDate ? 'text-danger' : ''}`}>AllocationDate{showAsterisk && <span className="text-danger">*</span>}</label>
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    name="AllocationDate"
+                    autoComplete="off"
+                    value={member.AllocationDate}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      if (
+                        member.ExpectedReturnDate &&
+                        new Date(value) >= new Date(member.ExpectedReturnDate)
+                      ) {
+                        toast.error("Issue Date must be less than Expiry Date");
+                        return;
+                      }
+
+                      handleDateChange(
+                        relationGroup.relation,
+                        index,
+                        "AllocationDate",
+                        value
+                      );
+                    }}
+                    required
+                  />
+
+                  <label htmlFor="cno" className={`exp-form-labels ${error && !member.AllocationDate ? 'text-danger' : ''}`}>AllocationDate{showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
@@ -711,53 +722,61 @@ const handleDateChange = (e, relation, idx) => {
                 <div className="inputGroup">
                   <input
                     type="date"
-                    name="ExpectedReturnDate"   
+                    name="ExpectedReturnDate"
                     className="exp-input-field form-control"
+                    autoComplete="off"
                     value={member.ExpectedReturnDate}
-               max={new Date().toISOString().split("T")[0]}
-               onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
+                 
+                     onChange={(e) => {
+                      const value = e.target.value;
+
+                      if (
+                        member.AllocationDate &&
+                        new Date(value) <= new Date(member.AllocationDate)
+                      ) {
+                        toast.error("Issue Date must be less than Expiry Date");
+                        return;
+                      }
+
+                      handleDateChange(
+                        relationGroup.relation,
+                        index,
+                        "ExpectedReturnDate",
+                        value
+                      );
+                    }}
+                    required
                   />
                   <label for="cno" className={`exp-form-labels ${error && !member.ExpectedReturnDate ? 'text-danger' : ''}`}>ExpectedReturnDate{showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
-              {/* Actual Return */}
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="date"
-                     name="ActualReturnDate"   
-                    className="exp-input-field form-control"
-                    value={member.ActualReturnDate}
-                      max={new Date().toISOString().split("T")[0]} // Restrict future dates
-                    onChange={(e) => handleDateChange(e, relationGroup.relation, index)}
-                  />               
-                  <label for="cno" className={`exp-form-labels ${error && !member.ActualReturnDate ? 'text-danger' : ''}`}>ActualReturnDate{showAsterisk && <span className="text-danger">*</span>}</label>
-                </div>
-              </div>
+             
 
               {/* Status */}
               <div className="col-md-2">
-                <div  
-                className={`inputGroup selectGroup 
-                  ${member.selectStatus ? "has-value" : ""} 
+                <div
+                  className={`inputGroup selectGroup 
+               ${member.selectedStatus ? "has-value" : ""}
                   ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
                 >
-                   <Select
-                     placeholder=" "
+                  <Select
+                    placeholder=" "
                     onFocus={() => setIsSelectAllocationStatus((prev) => ({ ...prev, [index]: true }))}
                     onBlur={() => setIsSelectAllocationStatus((prev) => ({ ...prev, [index]: false }))}
                     classNamePrefix="react-select"
-                    value={member.selectStatus}
+                    isClearable
+                    value={member.selectedStatus}
                     options={filteredOptionStatus}
                     maxLength={50}
                     onChange={(selectAllocationStatus) =>
                       handleChangeStatus(selectAllocationStatus, relationGroup.relation, index)
-                 
-                         }     />
-                   <label for="cno" className={`floating-label ${error && !member.Status ? 'text-danger' : ''}`}>Allocation Status</label>
+
+                    } />
+                  <label for="cno" className={`floating-label ${error && !!member.Status ? 'text-danger' : ''}`}>Allocation Status</label>
                 </div>
               </div>
+
 
               {/* Condition Issue */}
               <div className="col-md-2">
@@ -765,11 +784,11 @@ const handleDateChange = (e, relation, idx) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                     placeholder=" "
+                    placeholder=" "
                     value={member.ConditionAtIssue}
                     pattern="[A-Za-z]+"
                     maxLength={50}
-                     onChange={(e) => {
+                    onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ConditionAtIssue', onlyLetters);
                     }}
@@ -784,14 +803,14 @@ const handleDateChange = (e, relation, idx) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                     placeholder=" "
+                    placeholder=" "
                     value={member.ConditionAtReturn}
-                     pattern="[A-Za-z]+"
-                     maxLength={50}
-                     onChange={(e) => {
+                    pattern="[A-Za-z]+"
+                    maxLength={50}
+                    onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ConditionAtReturn', onlyLetters);
-                    }}                  />
+                    }} />
                   <label className="exp-form-labels">Condition at Return</label>
                 </div>
               </div>
@@ -802,15 +821,15 @@ const handleDateChange = (e, relation, idx) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                     placeholder=" "
+                    placeholder=" "
                     value={member.ApprovedBy}
                      pattern="[A-Za-z]+"
                      maxLength={100}
                      onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
                       RelationInputChange(relationGroup.relation, index, 'ApprovedBy', onlyLetters);
-                    }}                 
-                    />                
+                    }}
+                  />
                   <label className="exp-form-labels">Approved By</label>
                 </div>
               </div>
@@ -824,13 +843,13 @@ const handleDateChange = (e, relation, idx) => {
                     placeholder=" "
                     value={member.Remarks}
                     pattern="[A-Za-z]+"
-                     maxLength={100}
-                     onChange={(e) => {
+                    maxLength={100}
+                    onChange={(e) => {
                       const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, '');
-                      RelationInputChange(relationGroup.relation, index, 'Remarks', onlyLetters);                 
-                     }}
-                     />
-                  
+                      RelationInputChange(relationGroup.relation, index, 'Remarks', onlyLetters);
+                    }}
+                  />
+
                   <label className="exp-form-labels">Remarks</label>
                 </div>
               </div>
@@ -842,8 +861,8 @@ const handleDateChange = (e, relation, idx) => {
 
       )
       )}
-              <EmployeeAssetsPopup open={open} handleClose={handleClose} EmployeeAssetsPopup={EmployeeAssetsPopup} />
-      
+      <EmployeeAssetsPopup open={open} handleClose={handleClose} EmployeeAssetsPopup={EmployeeAssetsPopup} />
+
 
     </div>
   )
