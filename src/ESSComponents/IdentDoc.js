@@ -417,6 +417,17 @@ function Input({ }) {
     });
   };
 
+    const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
+  };
+
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", {
       state: {
@@ -456,6 +467,10 @@ function Input({ }) {
       case "Documents":
         Documents();
         break;
+      case 'EmployeeAssets':
+        EmployeeAssets();
+        break;
+
       default:
         break;
     }
@@ -470,6 +485,7 @@ function Input({ }) {
     { label: "Academic Details" },
     { label: "Family" },
     { label: "Documents" },
+    { label: 'EmployeeAssets' }
   ];
 
   // const handleInputChange = (index, field, value) => {

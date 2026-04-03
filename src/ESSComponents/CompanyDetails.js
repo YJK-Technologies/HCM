@@ -468,6 +468,9 @@ function Input() {
       case 'Documents':
         navigate("/Documents", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
         break;
+         case 'EmployeeAssets':
+        navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
+        break;
       default:
         break;
     }
@@ -539,7 +542,8 @@ function Input() {
     { label: 'Identity Documents' },
     { label: 'Academic Details' },
     { label: 'Family' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+    { label: 'EmployeeAssets' }
   ];
 
   const handleKeyPress = (e) => {

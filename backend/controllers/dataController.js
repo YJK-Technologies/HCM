@@ -46661,6 +46661,225 @@ const GetPendingApprovalsReport = async (req, res) => {
 };
 //code ended by sakthi 30-03-26
 
+//code added by Dinesh Gokul 31-03-26
+const GetLoanDisbursementReport = async (req, res) => {
+  const {
+    company_code,
+    request_number,
+    EmployeeId,
+    First_Name,
+    Last_Name,
+    loan_amount,
+    paid_amount,
+    request_status,
+    from_date,
+    to_date,
+  } = req.body;
+
+  // Mandatory check
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("request_number", sql.NVarChar, request_number || "")
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("First_Name", sql.NVarChar, First_Name || "")
+      .input("Last_Name", sql.NVarChar, Last_Name || "")
+      .input("loan_amount", sql.Int, loan_amount ? Number(loan_amount) : 0)
+      .input("paid_amount", sql.Int, paid_amount ? Number(paid_amount) : 0)
+      .input("request_status", sql.NVarChar, request_status || "")
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_Loan_Disbursement_Report @mode, @request_number, @EmployeeId, @First_Name, @Last_Name, @loan_amount, @paid_amount, 
+          @request_status, @from_date, @to_date, @company_code, '', '', '', '', ''`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Disbursement Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Dinesh Gokul 31-03-26
+
+//code added by Dinesh Gokul 31-03-26
+const getRequestStatus = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Request Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Dinesh Gokul 31-03-26
+
+//code added by Dinesh Gokul 31-03-26
+const GetOverdueLoansReport = async (req, res) => {
+  const {
+    company_code,
+    request_number,
+    EmployeeId,
+    First_Name,
+    Last_Name,
+    installment_number,
+    installment_date,
+    total_installment,
+    from_date,
+    to_date,
+  } = req.body;
+
+  // Mandatory check
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("request_number", sql.NVarChar, request_number || "")
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("First_Name", sql.NVarChar, First_Name || "")
+      .input("Last_Name", sql.NVarChar, Last_Name || "")
+      .input("installment_number", sql.Int, installment_number ? Number(installment_number) : 0)
+      .input("installment_date", sql.Date, installment_date || null)
+      .input("total_installment", sql.Int, total_installment ? Number(total_installment) : 0)
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_Overdue_Loans_Report @mode, @request_number, @EmployeeId, @First_Name, @Last_Name, @installment_number, @installment_date, 
+          @total_installment, @from_date, @to_date, @company_code, '', '', '', '', ''`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Overdue Loans Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Dinesh Gokul 31-03-26
+
+//code added by Dinesh Gokul 31-03-26
+const GetRepaymentScheduleReport = async (req, res) => {
+  const {
+    company_code,
+    request_number,
+    EmployeeId,
+    First_Name,
+    Last_Name,
+    installment_number,
+    installment_date,
+    principal_amount,
+    interest_amount,
+    total_installment,
+    payment_status,
+    from_date,
+    to_date,
+  } = req.body;
+
+  // Mandatory check
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("request_number", sql.NVarChar, request_number || "")
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("First_Name", sql.NVarChar, First_Name || "")
+      .input("Last_Name", sql.NVarChar, Last_Name || "")
+      .input("installment_number", sql.Int, installment_number ? Number(installment_number) : 0)
+      .input("installment_date", sql.Date, installment_date || null)
+      .input("principal_amount", sql.Int, principal_amount ? Number(principal_amount) : 0)
+      .input("interest_amount", sql.Int, interest_amount ? Number(interest_amount) : 0)
+      .input("total_installment", sql.Int, total_installment ? Number(total_installment) : 0)
+      .input("payment_status", sql.NVarChar, payment_status || "")
+      .input("from_date", sql.Date, from_date || null)
+      .input("to_date", sql.Date, to_date || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(` EXEC sp_Repayment_Schedule_Report @mode, @request_number, @EmployeeId, @First_Name, @Last_Name, @installment_number, @installment_date, @principal_amount, @interest_amount,
+          @total_installment, @payment_status, @from_date, @to_date, @company_code, '', '', '', '', ''`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Overdue Loans Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Dinesh Gokul 31-03-26
+
+//code added by mathu 01-04-2026
+
+const getAssetSearchCretria = async (req, res) => {
+  const { EmployeeID, AssetID, ConditionAtIssue, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+       .input("AssetID", sql.BigInt, AssetID)
+      .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_EmployeeAssets @mode,'',@AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//code ended by mathu 01-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -47994,5 +48213,11 @@ module.exports = {
   EmployeeAssetsLoopDelete,
   LoanTypeIdDropDown,
   GetLoanSummaryReport,
-  GetPendingApprovalsReport
+  GetPendingApprovalsReport,
+  GetLoanDisbursementReport,
+  getRequestStatus,
+  GetOverdueLoansReport,
+  GetRepaymentScheduleReport,
+  getAssetSearchCretria
+
 };

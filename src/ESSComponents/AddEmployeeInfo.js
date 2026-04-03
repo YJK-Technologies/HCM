@@ -254,9 +254,7 @@ function Input({ }) {
 
   const handleUpdate = async () => {
     if (
-
       !First_Name ||
-      !Middle_Name ||
       !Last_Name ||
       !Father_Name ||
       !Mother_Name ||
@@ -265,13 +263,13 @@ function Input({ }) {
       !Email ||
       !Phone1 ||
       !Phone2 ||
+      !address1 ||
       !address2 ||
       !address3 ||
       !permanantAddress ||
-      !reference_Name ||
       !pan_No ||
       !Aadhaar_no ||
-      !marital_Status ||
+      !selectedmartial ||
       !kids ||
       !Grade_id ||
       !title ||
@@ -409,6 +407,10 @@ function Input({ }) {
   const Documents = () => {
     navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
+  const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  };
+  
 
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
@@ -442,6 +444,9 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
+        case 'EmployeeAssets':
+        EmployeeAssets();
+        break;
       default:
         break;
     }
@@ -455,7 +460,8 @@ function Input({ }) {
     { label: 'Identity Documents' },
     { label: 'Academic Details' },
     { label: 'Family' },
-    { label: 'Documents' }
+    { label: 'Documents' },
+   { label: 'EmployeeAssets' }
   ];
 
   const handleGradeID = (selectedgradeid) => {
