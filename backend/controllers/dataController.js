@@ -45524,7 +45524,7 @@ const AcademicRequestDetails = async (req, res) => {
         .query(`EXEC sp_ess_employee_academic_request_dtls 
           @mode, @detail_id, @info_request_id, '', @company_code, 
           @EmployeeId, @request_status, @academicName, @major, 
-          @institution, @academicYear, @document, @created_by, '', '', ''`);
+          @institution, @academicYear, @document, @created_by, '', '', '', ''`);
     }
 
     res.status(200).json("Details inserted successfully");
@@ -45565,7 +45565,7 @@ const GetAcademicRequestDetails = async (req, res) => {
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
       .query(
-        ` EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', @column_name, @from_date, @to_date`,
+        ` EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name, @from_date, @to_date`,
       );
 
     if (result.recordset.length > 0) {
@@ -45608,9 +45608,10 @@ const ApproveAcademicRequest = async (req, res) => {
         .input("institution", sql.NVarChar, "")
         .input("academicYear", sql.Date, null)
         .input("document", sql.VarBinary, null)
-        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
+        .input("created_by", sql.NVarChar, row.created_by)
+        .input("modified_by", sql.NVarChar, row.modified_by)
         .query(` EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, '', '', '' `);
+        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, @modified_by, '', '', '' `);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
@@ -46850,6 +46851,60 @@ const GetRepaymentScheduleReport = async (req, res) => {
   }
 };
 //code ended by Dinesh Gokul 31-03-26
+
+//code added by mathu 01-04-2026
+
+const getAssetSearchCretria = async (req, res) => {
+  const { EmployeeID, AssetID, ConditionAtIssue, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+       .input("AssetID", sql.BigInt, AssetID)
+      .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','','',''`
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getEmployeeAssets = async (req, res) => {
+  const { Id, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AC")
+      .input("Id", sql.NVarChar, Id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_employee_getdata @mode,@Id,@company_code,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//code ended by mathu 01-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -48187,6 +48242,8 @@ module.exports = {
   GetLoanDisbursementReport,
   getRequestStatus,
   GetOverdueLoansReport,
-  GetRepaymentScheduleReport
+  GetRepaymentScheduleReport,
+  getAssetSearchCretria,
+  getEmployeeAssets
 
 };

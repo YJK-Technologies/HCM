@@ -210,7 +210,7 @@ const handleSave = async () => {
       EmployeeId,
       purpose: Academic[0]?.members[0]?.purpose,
       request_status: "Pending",
-      created_by,
+      created_by
     };
 
     const headerRes = await fetch(

@@ -23,12 +23,13 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
            setLoading(true)
            try {
        
-             const response = await fetch(`${config.apiBaseUrl}/getFamilyDetailsSearchCretria`, {
+             const response = await fetch(`${config.apiBaseUrl}/getAssetSearchCretria`, {
                method: "POST",
                headers: {
                  "Content-Type": "application/json"
                },
-               body: JSON.stringify({ EmployeeId, AssetID,  ConditionAtIssue, company_code: sessionStorage.getItem("selectedCompanyCode") })
+               body: JSON.stringify({ AssetID:AssetID,EmployeeID:EmployeeId, ConditionAtIssue:ConditionAtIssue, 
+                company_code: sessionStorage.getItem("selectedCompanyCode") })
              });
              if (response.ok) {
                const searchData = await response.json();
