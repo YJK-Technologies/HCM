@@ -155,6 +155,16 @@ const ApplyLeave = () => {
       .then((val) => setrowData(val));
   }, []);
 
+  const calculateLeaveDays = (from, to) => {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    const diffTime = toDate - fromDate;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1;
+
+    return diffDays;
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -167,6 +177,26 @@ const ApplyLeave = () => {
       !AlternativeReponsablePerson) {
       setError(true);
       toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    const appliedDays = calculateLeaveDays(FromDate, ToDate);
+
+    const selectedLeaveBalance = rowData.find(
+      (item) => item.leavetype === LeaveType
+    );
+
+    if (!selectedLeaveBalance) {
+      toast.error("Leave type not found in balance");
+      return;
+    }
+
+    const available = selectedLeaveBalance.availableleave;
+
+    if (appliedDays > available) {
+      toast.warning(
+        `Only ${available} leave(s) available. You are applying ${appliedDays} days`
+      );
       return;
     }
 

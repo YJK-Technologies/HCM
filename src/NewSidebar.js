@@ -71,6 +71,7 @@ import { FiDatabase } from "react-icons/fi";
 import {
   AiOutlinePercentage,
   AiOutlineFileDone,
+  AiOutlineDashboard
 } from "react-icons/ai";
 import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
 
@@ -157,6 +158,7 @@ export const leafIconMap = {
   "Loan Payment": MdPayments,
   "Loan Type": MdOutlineAccountBalance,
   "Loan Status History": TbHistory,
+  "Loan Dashboard": AiOutlineDashboard,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -283,6 +285,7 @@ const menuData = [
     subMenus: [
       { label: "Payslip Master", path: "/PayslipSalaryDays" },
       { label: "Salary Process", path: "/salarypath" },
+      { label: "Loan Dashboard", path: "/LoanDashboard" },
       { label: "Loan", path: "/EmployeeLoan" },
       { label: "Loan Type", path: "/LoanType" },
       { label: "Loan Documents", path: "/LoanDocuments" },

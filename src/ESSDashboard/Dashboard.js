@@ -2789,7 +2789,7 @@ const Dashboard = () => {
             {/* Scrollable List Container */}
             <div
               className="custom-list-container"
-              style={{ height: "1090px", overflowY: "auto" }}
+              style={{ height: "1000px", overflowY: "auto" }}
             >
               {dashboardRequests.length > 0 ? (
                 dashboardRequests.map((req, index) => (
