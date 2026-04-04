@@ -46905,6 +46905,37 @@ const getEmployeeAssets = async (req, res) => {
 };
 
 //code ended by mathu 01-04-2026
+
+//code added by sakthi 03-04-2026
+const GetDashboardAttendanceSummary = async (req, res) => {
+  const { company_code } = req.body;
+
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC sp_ess_admin_dashboard 
+        'EA', @company_code, '', '', '', '', '', '', '', '', '', '', ''
+      `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset[0]); // single row
+    } else {
+      res.status(404).json("No data found");
+    }
+  } catch (err) {
+    console.error("Error fetching Dashboard Summary:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi 03-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -48244,6 +48275,7 @@ module.exports = {
   GetOverdueLoansReport,
   GetRepaymentScheduleReport,
   getAssetSearchCretria,
-  getEmployeeAssets
+  getEmployeeAssets,
+  GetDashboardAttendanceSummary
 
 };
