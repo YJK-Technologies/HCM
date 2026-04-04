@@ -1370,5 +1370,6 @@ router.post("/GetOverdueLoansReport", dataController.GetOverdueLoansReport)
 router.post("/GetRepaymentScheduleReport", dataController.GetRepaymentScheduleReport)
 router.post("/getAssetSearchCretria", dataController.getAssetSearchCretria)
 router.post("/getEmployeeAssets",dataController.getEmployeeAssets)
+router.post("/GetDashboardAttendanceSummary",dataController.GetDashboardAttendanceSummary)
 
 module.exports = router;

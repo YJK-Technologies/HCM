@@ -317,6 +317,8 @@ function Input({ }) {
       return;
     }
 
+    console.log("member", member)
+
     if (!member) {
       setError(true);
       toast.warning("Error: Missing required fields");
@@ -887,7 +889,7 @@ function Input({ }) {
           {relationGroup.members.map((member, index) => (
             <div key={index} className="row g-3">
 
-              <div className="col-md-1">
+              {/* <div className="col-md-1">
                 <div className="inputGroup">
                   <button type="button" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
                     <i className="fa-solid fa-circle-plus"></i>
@@ -898,7 +900,7 @@ function Input({ }) {
                     </button>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               <div className="col-md-2">
                 <div

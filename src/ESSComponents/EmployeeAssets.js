@@ -395,18 +395,19 @@ function EmployeeAssets({ }) {
       });
 
       if (response.ok) {
-        setSaveButtonVisible(false);
-        setShowAsterisk(false);
+      const data = await response.json();
 
-        const data = await response.json();
+      if (!data || data.length === 0) {
+        toast.warning("No asset data found");
 
-        const [{ EmployeeId, department_id, designation_id, First_Name }] = data;
-
-        setdepartment_id(department_id);
-        setdesignation_id(designation_id);
-        setFirst_Name(First_Name);
-        setEmployeeId(EmployeeId);
-
+        setAssetvalue([
+          {
+            relation: "Assetvalue",
+            members: [setAssetvalue()],
+          },
+        ]);
+        return;
+      }
      
         const mappedAssets = [
           {
@@ -751,6 +752,21 @@ function EmployeeAssets({ }) {
                 </div>
               </div>
 
+            {/* Actual ReturnDate */}
+              <div className="col-md-2">
+                             <div className="inputGroup">
+                               <input
+                                 type="date"
+                                 className="exp-input-field form-control"
+                                 value={member. ActualReturnDate}
+                                 maxLength={18}
+                                 placeholder=" "
+                                 autoComplete="off"
+                                 onChange={(e) => RelationInputChange(relationGroup.relation, index, 'ActualReturnDate', e.target.value)}
+                               />
+                               <label for="cno" className="exp-form-labels"> ActualReturnDate</label>
+                             </div>
+                           </div>
              
 
               {/* Status */}
