@@ -45463,7 +45463,7 @@ const AcademicRequestHdr = async (req, res) => {
       const result = await pool
         .request()
         .input("mode", sql.NVarChar, "I")
-        .input("info_request_id", sql.Int, 0) // ✅ DB generate pannum
+        .input("info_request_id", sql.Int, 0) 
         .input("company_code", sql.NVarChar, insertRow.company_code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("purpose", sql.NVarChar, insertRow.purpose)
@@ -46920,10 +46920,7 @@ const GetDashboardAttendanceSummary = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`
-        EXEC sp_ess_admin_dashboard 
-        'EA', @company_code, '', '', '', '', '', '', '', '', '', '', ''
-      `);
+      .query(` EXEC sp_ess_admin_dashboard 'EA', @company_code, '', '', '', '', '', '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset[0]); // single row
