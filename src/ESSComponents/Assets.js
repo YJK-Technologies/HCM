@@ -13,6 +13,7 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
 import Select from "react-select";
+
 const config = require('../Apiconfig');
 
 
@@ -381,76 +382,134 @@ const transformRowData = (data) => {
       .trim();
   };
 
-  // const handleSearch = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const body = {
-  //         GradeID: GradeID,
-  //         GradeName: GradeName,
-  //         Basic: parseFloat(Basic),
-  //         HRA: parseFloat(HRA),
-  //         Conveyance: parseFloat(Conveyance),
-  //         Medical: parseFloat(Medical),
-  //         Special_Allowance: parseFloat(Special_Allowance),
-  //         Company_Pf_Contribution: parseFloat(Company_Pf_Contribution),
-  //         Bonus_Arrears: parseFloat(Bonus_Arrears),
-  //         OtherAllowance: parseFloat(Other_Allowance),
-  //         LeaveDeduction: parseFloat(LeaveDeduction),
-  //         otherDeductions: parseFloat(otherDeductions),
-  //         ctc_currency: ctc_currency,
-  //         salary_range_from: parseFloat(SalaryrrangeFrom),
-  //         salary_range_to: parseFloat(SalaryrangeTo),
-  //         minimum_take_salary: parseFloat(minimum_take_salary),
-  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
-  //       }
-  //       const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json"
-  //         },
-  //         body: JSON.stringify(body) // Send company_no and company_name as search criteria
-  //       });
-  //       if (response.ok) {
-  //         const fetchedData = await response.json();
-  //         const newRows = fetchedData.map((matchedItem) => ({
+  const handleSearch = async () => {
+      setLoading(true);
+      try {
+        const body = {
+          AssetID: AssetID,
+          AssetCode: AssetCode,
+          AssetName: AssetName,
+          AssetCategory:AssetCategory,
+          SerialNumber:parseFloat (SerialNumber),
+          Barcode: Barcode,
+          Brand: Brand,
+          Model: Model,
+          PurchaseDate: PurchaseDate,
+          PurchaseCost: PurchaseCost,
+          CurrencyCode: CurrencyCode,
+          VendorName: VendorName,
+          WarrantyStart: WarrantyStart,
+          WarrantyEnd: WarrantyEnd,
+          AssetStatus: AssetStatus,
+          Location: Location,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }
+        const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body) // Send company_no and company_name as search criteria
+        });
+        if (response.ok) {
+          const fetchedData = await response.json();
+          const newRows = fetchedData.map((matchedItem) => ({
   
   
-  //           GradeID: matchedItem.GradeID,
-  //           GradeName: matchedItem.GradeName,
-  //           Basic: matchedItem.Basic,
-  //           HRA: matchedItem.HRA,
-  //           Conveyance: matchedItem.Conveyance,
-  //           Medical: matchedItem.Medical,
-  //           Special_Allowance: matchedItem.Special_Allowance,
-  //           Company_Pf_Contribution: matchedItem.Company_Pf_Contribution,
-  //           Bonus_Arrears: matchedItem.Bonus_Arrears,
-  //           Other_Allowance: matchedItem.Other_Allowance,
-  //           LeaveDeduction: matchedItem.LeaveDeduction,
-  //           otherDeductions: matchedItem.otherDeductions,
-  //           salary_range_from: matchedItem.salary_range_from,
-  //           salary_range_to: matchedItem.salary_range_to,
-  //           ctc_currency: matchedItem.ctc_currency,
-  //           minimum_take_salary: matchedItem.minimum_take_salary,
-  //         }));
-  //         setrowData(newRows);
-  //       } else if (response.status === 404) {
-  //         console.log("Data Not found");
-  //         toast.warning("Data Not found");
-  //         setrowData([]);
-  //       } else {
-  //         const errorResponse = await response.json();
-  //         toast.warning(errorResponse.message || "Failed to insert sales data");
-  //         console.error(errorResponse.details || errorResponse.message);
-  //         setrowData([]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching search data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+            AssetID: matchedItem.AssetID,
+            AssetCode: matchedItem.AssetCode,
+            AssetName: matchedItem.AssetName,
+            AssetCategory: matchedItem.AssetCategory,
+            SerialNumber: matchedItem.SerialNumber,
+            Barcode: matchedItem.Barcode,
+            Brand: matchedItem.Brand,
+            Model: matchedItem.Model,
+            PurchaseDate: matchedItem.PurchaseDate,
+            PurchaseCost: matchedItem.PurchaseCost,
+            CurrencyCode: matchedItem.CurrencyCode,
+            VendorName: matchedItem.VendorName,
+            WarrantyStart: matchedItem.WarrantyStart,
+            WarrantyEnd: matchedItem.WarrantyEnd,
+            AssetStatus: matchedItem.AssetStatus,
+             Location: matchedItem.Location,
+            minimum_take_salary: matchedItem.minimum_take_salary,
+          }));
+          setrowData(newRows);
+        } else if (response.status === 404) {
+          console.log("Data Not found");
+          toast.warning("Data Not found");
+          setrowData([]);
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Failed to insert sales data");
+          console.error(errorResponse.details || errorResponse.message);
+          setrowData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching search data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
   
+const handleSave = async () => {
+    if (!AssetID || !AssetCode || !AssetName || !AssetCategory || 
+      !SerialNumber) {
+      setError(" ");
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+    setLoading(true);
+    try {
 
+      const Header = {
+          AssetID: AssetID,
+          AssetCode: AssetCode,
+          AssetName: AssetName,
+          AssetCategory:AssetCategory,
+          SerialNumber:parseFloat (SerialNumber),
+          Barcode: Barcode,
+          Brand: Brand,
+          Model: Model,
+          PurchaseDate: PurchaseDate,
+          PurchaseCost: PurchaseCost,
+          CurrencyCode: CurrencyCode,
+          VendorName: VendorName,
+          WarrantyStart:WarrantyStart,
+          WarrantyEnd:WarrantyEnd,
+          AssetStatus: AssetStatus,
+        Location: Location,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        company_code: sessionStorage.getItem('selectedCompanyCode'),
+        created_by: sessionStorage.getItem('selectedUserCode')
+      };
+
+      const response = await fetch(`${config.apiBaseUrl}/addGrade`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(Header),
+      });
+      if (response.status === 200) {
+        console.log("Data inserted successfully");
+        setTimeout(() => {
+          toast.success("Data inserted successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        }, 1000);
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to insert sales data");
+        console.error(errorResponse.details || errorResponse.message);
+      }
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error('Error inserting data: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     return(
        <div class="container-fluid Topnav-screen ">
@@ -463,7 +522,7 @@ const transformRowData = (data) => {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && (
               <div className="action-icon add" 
-              //onClick={handleSave}
+              onClick={handleSave}
               >
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -817,7 +876,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade ID"
                 value={AssetID}
                 onChange={(e) => setAssetID(e.target.value)}
-              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={50}
               />
              <label className="exp-form-labels">Asset ID</label>
@@ -834,7 +893,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetCode}
                 onChange={(e) => setAssetCode(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
@@ -852,7 +911,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetName}
                 onChange={(e) => setAssetName(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Name</label>
@@ -868,7 +927,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetCategory}
                 onChange={(e) => setAssetCategory(e.target.value)}
-                //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Category</label>
@@ -884,7 +943,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={SerialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Serial Number</label>
@@ -900,7 +959,7 @@ const transformRowData = (data) => {
                 placeholder=""
                 required title="Please Enter the Grade Name"
                 value={Barcode}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Bar Code</label>
@@ -917,7 +976,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Brand}
                 onChange={(e) => setBrand(e.target.value)}
-              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Brand</label>
@@ -934,7 +993,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Model}
                 onChange={(e) => setModel(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Model</label>
@@ -950,7 +1009,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={PurchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Purchase Date</label>
@@ -968,7 +1027,7 @@ const transformRowData = (data) => {
                 value={PurchaseCost}
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
               />
               <label className="exp-form-labels">Purchase Cost</label>
@@ -985,7 +1044,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={CurrencyCode}
                 onChange={(e) => setCurrencyCode(e.target.value)}
-                  //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Currency Code</label>
@@ -1002,7 +1061,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={VendorName}
                 onChange={(e) => setVendorName(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Vendor Name</label>
@@ -1019,7 +1078,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyStart}
                 onChange={(e) => setWarrantyStart(e.target.value)}
-                //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty Start</label>
@@ -1036,7 +1095,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyEnd}
                 onChange={(e) => setWarrantyEnd(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty End</label>
@@ -1053,7 +1112,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetStatus}
                 onChange={(e) => setAssetStatus(e.target.value)}
-              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
@@ -1072,7 +1131,7 @@ const transformRowData = (data) => {
                 value={Location}
                 onChange={(e) => setLocation(e.target.value)}
                 maxLength={100}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
               />
               <label className="exp-form-labels">Location</label>
@@ -1089,7 +1148,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Country}
                 onChange={(e) => setCountry(e.target.value)}
-                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
@@ -1109,7 +1168,7 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Status}
                 onChange={(e) => setStatus(e.target.value)}
-              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
@@ -1119,7 +1178,7 @@ const transformRowData = (data) => {
   <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" 
-              // onClick={handleSearch}
+              onClick={handleSearch}
               >
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
