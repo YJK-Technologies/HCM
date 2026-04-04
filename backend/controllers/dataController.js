@@ -45463,7 +45463,7 @@ const AcademicRequestHdr = async (req, res) => {
       const result = await pool
         .request()
         .input("mode", sql.NVarChar, "I")
-        .input("info_request_id", sql.Int, 0) // ✅ DB generate pannum
+        .input("info_request_id", sql.Int, 0) 
         .input("company_code", sql.NVarChar, insertRow.company_code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("purpose", sql.NVarChar, insertRow.purpose)
@@ -46920,10 +46920,7 @@ const GetDashboardAttendanceSummary = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`
-        EXEC sp_ess_admin_dashboard 
-        'EA', @company_code, '', '', '', '', '', '', '', '', '', '', ''
-      `);
+      .query(` EXEC sp_ess_admin_dashboard 'EA', @company_code, '', '', '', '', '', '', '', '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset[0]); // single row
@@ -46936,6 +46933,99 @@ const GetDashboardAttendanceSummary = async (req, res) => {
   }
 };
 //code ended by sakthi 03-04-2026
+
+//code added by pavun 04-04-2026
+const LoanTypeDistribution = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_dashboard 'LTD', @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); 
+    } else {
+      res.status(404).json("No data found");
+    }
+  } catch (err) {
+    console.error("Error fetching Dashboard Summary:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DepartmentLoanAmount = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_dashboard 'DL', @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); 
+    } else {
+      res.status(404).json("No data found");
+    }
+  } catch (err) {
+    console.error("Error fetching Dashboard Summary:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const LoanStatusTrend = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_dashboard 'LS', @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); 
+    } else {
+      res.status(404).json("No data found");
+    }
+  } catch (err) {
+    console.error("Error fetching Dashboard Summary:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const OverduevsPaid = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_loan_dashboard 'OD', @company_code`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); 
+    } else {
+      res.status(404).json("No data found");
+    }
+  } catch (err) {
+    console.error("Error fetching Dashboard Summary:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by pavun 04-04-2026
+
+
+
 module.exports = {
   login,
   forgetPassword,
@@ -48276,6 +48366,10 @@ module.exports = {
   GetRepaymentScheduleReport,
   getAssetSearchCretria,
   getEmployeeAssets,
-  GetDashboardAttendanceSummary
+  GetDashboardAttendanceSummary,
+  LoanTypeDistribution,
+  DepartmentLoanAmount,
+  LoanStatusTrend,
+  OverduevsPaid
 
 };

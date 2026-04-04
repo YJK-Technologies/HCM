@@ -1882,7 +1882,7 @@ const Dashboard = (payslip) => {
                   const strokeDasharray = `${percentage}, 100`;
 
                   return (
-                    <div key={index} className="leave-status-item">
+                    <div key={index} className="leave-status-item" title={leave.leavetype} >
                       <div className="leave-progress-wrapper">
                         <svg viewBox="0 0 36 36" className="circular-chart">
                           <path className="circle-bg"
