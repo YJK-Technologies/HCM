@@ -101,8 +101,8 @@ const [error, setError] = useState('');
       },
     },
     {
-      headerName: "Grade ID",
-      field: "GradeID",
+      headerName: "Asset ID",
+      field: "AssetID",
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 50,
@@ -125,18 +125,104 @@ const [error, setError] = useState('');
       },
     },
     {
-      headerName: "Grade Name",
-      field: "GradeName",
+      headerName: "Asset Code",
+      field: "AssetCode",
       filter: 'agTextColumnFilter',
       editable: true
     },
     {
-      headerName: "Salary Range From",
-      field: "salary_range_from",
+      headerName: "Asset Name",
+      field: "AssetName",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+    {
+      headerName: "Serial Number",
+      field: "SerialNumber",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+    {
+      headerName: "Barcode",
+      field: "Barcode",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+    {
+      headerName: "Brand",
+      field: "Brand",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+    {
+      headerName: "Model",
+      field: "Model",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+ {
+      headerName: "Purchase Date",
+      field: "PurchaseDate",
       filter: 'agTextColumnFilter',
       editable: true
     },
 
+     {
+      headerName: "Purchase Cost",
+      field: "PurchaseCost",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+     {
+      headerName: "Currency Code",
+      field: "CurrencyCode",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+     {
+      headerName: "Vendor Name",
+      field: "VendorName",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+     {
+      headerName: "Warranty Start",
+      field: "WarrantyStart",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+
+     {
+      headerName: "Warranty End",
+      field: "WarrantyEnd",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+
+     {
+      headerName: "Asset Status",
+      field: "AssetStatus",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+     {
+      headerName: "Location",
+      field: "Location",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+        {
+      headerName: "Country",
+      field: "Country",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+        {
+      headerName: "Status",
+      field: "Status",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
   ]
 
    const handleNavigateWithRowData = (selectedRow) => {
@@ -295,6 +381,75 @@ const transformRowData = (data) => {
       .trim();
   };
 
+  // const handleSearch = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const body = {
+  //         GradeID: GradeID,
+  //         GradeName: GradeName,
+  //         Basic: parseFloat(Basic),
+  //         HRA: parseFloat(HRA),
+  //         Conveyance: parseFloat(Conveyance),
+  //         Medical: parseFloat(Medical),
+  //         Special_Allowance: parseFloat(Special_Allowance),
+  //         Company_Pf_Contribution: parseFloat(Company_Pf_Contribution),
+  //         Bonus_Arrears: parseFloat(Bonus_Arrears),
+  //         OtherAllowance: parseFloat(Other_Allowance),
+  //         LeaveDeduction: parseFloat(LeaveDeduction),
+  //         otherDeductions: parseFloat(otherDeductions),
+  //         ctc_currency: ctc_currency,
+  //         salary_range_from: parseFloat(SalaryrrangeFrom),
+  //         salary_range_to: parseFloat(SalaryrangeTo),
+  //         minimum_take_salary: parseFloat(minimum_take_salary),
+  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //       }
+  //       const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json"
+  //         },
+  //         body: JSON.stringify(body) // Send company_no and company_name as search criteria
+  //       });
+  //       if (response.ok) {
+  //         const fetchedData = await response.json();
+  //         const newRows = fetchedData.map((matchedItem) => ({
+  
+  
+  //           GradeID: matchedItem.GradeID,
+  //           GradeName: matchedItem.GradeName,
+  //           Basic: matchedItem.Basic,
+  //           HRA: matchedItem.HRA,
+  //           Conveyance: matchedItem.Conveyance,
+  //           Medical: matchedItem.Medical,
+  //           Special_Allowance: matchedItem.Special_Allowance,
+  //           Company_Pf_Contribution: matchedItem.Company_Pf_Contribution,
+  //           Bonus_Arrears: matchedItem.Bonus_Arrears,
+  //           Other_Allowance: matchedItem.Other_Allowance,
+  //           LeaveDeduction: matchedItem.LeaveDeduction,
+  //           otherDeductions: matchedItem.otherDeductions,
+  //           salary_range_from: matchedItem.salary_range_from,
+  //           salary_range_to: matchedItem.salary_range_to,
+  //           ctc_currency: matchedItem.ctc_currency,
+  //           minimum_take_salary: matchedItem.minimum_take_salary,
+  //         }));
+  //         setrowData(newRows);
+  //       } else if (response.status === 404) {
+  //         console.log("Data Not found");
+  //         toast.warning("Data Not found");
+  //         setrowData([]);
+  //       } else {
+  //         const errorResponse = await response.json();
+  //         toast.warning(errorResponse.message || "Failed to insert sales data");
+  //         console.error(errorResponse.details || errorResponse.message);
+  //         setrowData([]);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching search data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  
 
 
     return(
@@ -662,10 +817,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade ID"
                 value={AssetID}
                 onChange={(e) => setAssetID(e.target.value)}
-                // onKeyPress={handleKeyPress}
+              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={50}
               />
-              <label for="cname" className={` exp-form-labels ${error && !AssetID ? 'text-danger' : ''}`}>AssetID <span className="text-danger">*</span></label>
+             <label className="exp-form-labels">Asset ID</label>
             </div>
           </div>
 
@@ -679,9 +834,11 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetCode}
                 onChange={(e) => setAssetCode(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetCode ? 'text-danger' : ''}`}> AssetCode<span className="text-danger">*</span></label>
+               <label className="exp-form-labels">Asset Code</label>
             </div>
           </div>
 
@@ -695,9 +852,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetName}
                 onChange={(e) => setAssetName(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetName ? 'text-danger' : ''}`}> Asset Name<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Asset Name</label>
             </div>
           </div>
            <div className="col-md-2">
@@ -710,9 +868,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetCategory}
                 onChange={(e) => setAssetCategory(e.target.value)}
+                //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetCategory ? 'text-danger' : ''}`}> Asset Category<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Asset Category</label>
             </div>
           </div>
           <div className="col-md-2">
@@ -725,9 +884,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={SerialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !SerialNumber ? 'text-danger' : ''}`}> Asset Category<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Serial Number</label>
             </div>
           </div>
 
@@ -740,10 +900,10 @@ const transformRowData = (data) => {
                 placeholder=""
                 required title="Please Enter the Grade Name"
                 value={Barcode}
-                onChange={(e) => setBarcode(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Barcode ? 'text-danger' : ''}`}> Barcode<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Bar Code</label>
             </div>
           </div>
 
@@ -757,9 +917,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Brand}
                 onChange={(e) => setBrand(e.target.value)}
+              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Brand ? 'text-danger' : ''}`}> Brand<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Brand</label>
             </div>
           </div>
 
@@ -773,9 +934,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Model}
                 onChange={(e) => setModel(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Model ? 'text-danger' : ''}`}> Model<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Model</label>
             </div>
           </div>
              <div className="col-md-2">
@@ -788,9 +950,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={PurchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !PurchaseDate ? 'text-danger' : ''}`}> PurchaseDate<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Purchase Date</label>
             </div>
           </div>
           
@@ -805,8 +968,10 @@ const transformRowData = (data) => {
                 value={PurchaseCost}
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
               />
-              <label className={` exp-form-labels ${error && !PurchaseCost ? 'text-danger' : ''}`}> PurchaseCost<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Purchase Cost</label>
             </div>
           </div>
 
@@ -820,9 +985,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={CurrencyCode}
                 onChange={(e) => setCurrencyCode(e.target.value)}
+                  //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !CurrencyCode ? 'text-danger' : ''}`}> CurrencyCode<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Currency Code</label>
             </div>
           </div>
 
@@ -836,9 +1002,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={VendorName}
                 onChange={(e) => setVendorName(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !VendorName ? 'text-danger' : ''}`}> VendorName<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Vendor Name</label>
             </div>
           </div>
 
@@ -852,9 +1019,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyStart}
                 onChange={(e) => setWarrantyStart(e.target.value)}
+                //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !WarrantyStart ? 'text-danger' : ''}`}> Warranty Start<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Warranty Start</label>
             </div>
           </div>
 
@@ -868,9 +1036,10 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyEnd}
                 onChange={(e) => setWarrantyEnd(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !WarrantyEnd ? 'text-danger' : ''}`}> Warranty End<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Warranty End</label>
             </div>
           </div>
 
@@ -884,9 +1053,11 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={AssetStatus}
                 onChange={(e) => setAssetStatus(e.target.value)}
+              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetStatus ? 'text-danger' : ''}`}> Asset Status<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Asset Status</label>
             </div>
           </div>
 
@@ -901,8 +1072,10 @@ const transformRowData = (data) => {
                 value={Location}
                 onChange={(e) => setLocation(e.target.value)}
                 maxLength={100}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
               />
-              <label className={` exp-form-labels ${error && !Location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Location</label>
             </div>
           </div>
 
@@ -916,9 +1089,11 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Country}
                 onChange={(e) => setCountry(e.target.value)}
+                // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Country ? 'text-danger' : ''}`}>Country<span className="text-danger">*</span></label>
+              <label className="exp-form-labels">Country</label>
             </div>
           </div>
 
@@ -934,9 +1109,11 @@ const transformRowData = (data) => {
                 required title="Please Enter the Grade Name"
                 value={Status}
                 onChange={(e) => setStatus(e.target.value)}
+              //  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
+             <label className="exp-form-labels">Status</label>
             </div>
           </div>
   <div className="col-12">
