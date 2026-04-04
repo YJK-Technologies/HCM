@@ -105,99 +105,78 @@ function Input({}) {
       return;
     }
 
+    // 🔹 Validation
+    for (const group of Academic) {
+      for (const member of group.members) {
+        if (
+          !member.academicName ||
+          !member.major ||
+          !member.institution ||
+          !member.academicYear
+        ) {
+          setError(true);
+          toast.warning("Error: Missing required fields");
+          return;
+        }
+      }
+    }
+
     try {
       setLoading(true);
 
       const company_code = sessionStorage.getItem("selectedCompanyCode");
       const created_by = sessionStorage.getItem("selectedUserCode");
 
-      // ================= HEADER =================
-      const headerPayload = {
-        company_code,
-        EmployeeId,
-        purpose: Academic[0]?.members[0]?.purpose,
-        request_status: "Pending",
-        created_by,
-      };
+      // 🔥 Prepare Payload (like Identity module)
+      const employeeData = await Promise.all(
+        Academic.flatMap((group) =>
+          group.members.map(async (member) => {
+            const fileBase64 = member.document
+              ? await convertToBase64(member.document)
+              : null;
 
-      const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+            return {
+              EmployeeId: EmployeeId,
+              academicName: member.academicName,
+              major: member.major,
+              institution: member.institution,
+              academicYear: member.academicYear,
+              document: fileBase64,
+              company_code,
+              created_by,
+            };
+          }),
+        ),
+      );
+
+      setError(false);
+
+      // 🔹 API Call
+      const response = await fetch(
+        `${config.apiBaseUrl}/addEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employeeData }),
         },
-        body: JSON.stringify({ headerData: [headerPayload] }),
-      });
+      );
 
-      const headerResult = await headerRes.json();
-
-      console.log("HEADER RESPONSE:", headerResult);
-
-      if (!Array.isArray(headerResult) || !headerResult[0]) {
-        throw new Error("Invalid header response");
+      if (response.ok) {
+        toast.success("Data inserted successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
       }
-
-      const info_request_id = headerResult[0].info_request_id;
-
-      // ================= DETAILS =================
-      await saveAcademicDetails(info_request_id);
-
-      toast.success("Data inserted successfully!", {
-        onClose: () => window.location.reload(),
-      });
-    } catch (err) {
-      console.error(err);
-      toast.error("Error: " + err.message);
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const saveAcademicDetails = async (info_request_id) => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
-
-    const detailsData = await Promise.all(
-      Academic.flatMap((group) =>
-        group.members.map(async (member) => {
-          let fileBase64 = null;
-
-          if (member.document) {
-            if (member.document.size > 1 * 1024 * 1024) {
-              toast.warning("File size exceeds 1MB");
-              return null;
-            }
-            fileBase64 = await convertToBase64(member.document);
-          }
-
-          return {
-            info_request_id,
-            company_code,
-            EmployeeId,
-            request_status: "Pending",
-            academicName: member.academicName,
-            major: member.major,
-            institution: member.institution,
-            academicYear: member.academicYear,
-            document: fileBase64,
-            created_by,
-          };
-        }),
-      ),
-    );
-
-    const filtered = detailsData.filter(Boolean);
-
-    const res = await fetch(`${config.apiBaseUrl}/AcademicRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ detailsData: filtered }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message);
     }
   };
 
@@ -485,7 +464,6 @@ function Input({}) {
     });
   };
 
-
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", {
       state: {
@@ -529,7 +507,6 @@ function Input({}) {
       case "EmployeeAssets":
         EmployeeAssets();
         break;
- 
 
       default:
         break;
@@ -545,7 +522,7 @@ function Input({}) {
     { label: "Academic Details" },
     { label: "Family" },
     { label: "Documents" },
-    { label: 'EmployeeAssets' }
+    { label: "EmployeeAssets" },
   ];
 
   const reloadGridData = () => {
@@ -879,15 +856,14 @@ function Input({}) {
           <h1 className="page-title">Academic Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                academicPermissions.includes(permission),
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {["add", "all permission"].some((permission) =>
+              academicPermissions.includes(permission),
+            ) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -903,14 +879,13 @@ function Input({}) {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  academicPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {["add", "all permission"].some((p) =>
+                academicPermissions.includes(p),
+              ) && (
+                <li className="dropdown-item" onClick={handleSave}>
+                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                </li>
+              )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -1175,7 +1150,7 @@ function Input({}) {
               </div>
 
               <div className="col-md-1 ">
-                {isAcademicDataLoaded && (
+                {member.keyfield && (
                   <div className="inputGroup">
                     {["update", "all permission"].some((permission) =>
                       academicPermissions.includes(permission),
@@ -1186,9 +1161,9 @@ function Input({}) {
                         title="Update"
                         onClick={() =>
                           handleUpdate(relationGroup.relation, index)
-                        } // Pass the specific row data
+                        }
                       >
-                        <i className="fa-solid fa-floppy-disk"></i>
+                        <i className="fa-solid fa-pen-to-square"></i>
                       </button>
                     )}
                     {["delete", "all permission"].some((permission) =>
