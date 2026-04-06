@@ -133,6 +133,7 @@ import EmployeeAssets from './ESSComponents/EmployeeAssets.js';
 import { ToastContainer } from "react-toastify";
 import GenerateShift from "./ShiftMaster/GenerateShift.js";
 import Assets from "./ESSComponents/Assets.js";
+import LoanDashboard from './ESSDashboard/LoanDashboard.js';
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -336,7 +337,8 @@ function Main() {
     { path: "/OverdueLoansReport", component: <OverdueLoansReport /> },
     { path: "/RepaymentScheduleRep", component: <RepaymentScheduleReport /> },
     { path: "/EmployeeAssets", component: <EmployeeAssets /> },
-    { path: "/Assets", component: <Assets /> }
+    { path: "/Assets", component: <Assets /> },
+    { path: "/LoanDashboard", component: <LoanDashboard /> },
 
   
   ];

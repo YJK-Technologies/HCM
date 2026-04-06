@@ -2,31 +2,38 @@ import React, { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { useLocation } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import TabButtons from "./Tabs";
-import PdfPreview from './PdfPreviewHelp';
-import Select from 'react-select';
+import PdfPreview from "./PdfPreviewHelp";
+import Select from "react-select";
 import DocumentPopup from "./DocumentPopup.js";
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
-const config = require('../Apiconfig');
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
+const config = require("../Apiconfig");
 
-function Input({ }) {
+function Input({}) {
   const [employeeId, setEmployeeId] = useState("");
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
+  const [documents, setDocuments] = useState([
+    {
+      relation: "documents",
+      members: [
+        { documentName: "", document: null, documentUrl: "", keyfield: "" },
+      ],
+    },
+  ]);
   const [documentNameDrop, setDocumentNameDrop] = useState([]);
   const [documentUrl, setDocumentUrl] = useState({});
   const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [deleteError, setDeleteError] = useState("");
   const location = useLocation();
-  const [First_Name, setFirst_Name] = useState('');
+  const [First_Name, setFirst_Name] = useState("");
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
 
@@ -34,14 +41,14 @@ function Input({ }) {
   const [loading, setLoading] = useState(false);
 
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const documentsPermissions = permissions
-    .filter(permission => permission.screen_type === 'Documents')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "Documents")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
-    setIsModalOpen(true);  // Show the modal
+    setIsModalOpen(true); // Show the modal
   };
 
   const handleCloseModal = () => {
@@ -50,89 +57,151 @@ function Input({ }) {
   };
 
   const NavigatecomDet = () => {
-    navigate("/CompanyDetails", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/CompanyDetails", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const FinanceDet = () => {
-    navigate("/FinanceDet", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/FinanceDet", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const BankAccDet = () => {
-    navigate("/BankAccDet", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/BankAccDet", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const IdentDoc = () => {
-    navigate("/IdentDoc", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/IdentDoc", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const AcademicDet = () => {
-    navigate("/AcademicDet", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AcademicDet", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Insurance1 = () => {
-    navigate("/Family", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Family", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Documents = () => {
-    navigate("/Documents", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Documents", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
-    const EmployeeAssets = () => {
-    navigate("/EmployeeAssets", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+  const EmployeeAssets = () => {
+    navigate("/EmployeeAssets", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const EmployeeLoan = () => {
-    navigate("/AddEmployeeInfo", { state: { employeeId: employeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AddEmployeeInfo", {
+      state: {
+        employeeId: employeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
-
-  const [activeTab, setActiveTab] = useState('Documents');
+  const [activeTab, setActiveTab] = useState("Documents");
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'Personal Details':
+      case "Personal Details":
         EmployeeLoan();
         break;
-      case 'Company Details':
+      case "Company Details":
         NavigatecomDet();
         break;
-      case 'Financial Details':
+      case "Financial Details":
         FinanceDet();
         break;
-      case 'Bank Account Details':
+      case "Bank Account Details":
         BankAccDet();
         break;
-      case 'Identity Documents':
+      case "Identity Documents":
         IdentDoc();
         break;
-      case 'Academic Details':
+      case "Academic Details":
         AcademicDet();
         break;
-      case 'Family':
+      case "Family":
         Insurance1();
         break;
-      case 'Documents':
+      case "Documents":
         Documents();
         break;
-       case 'EmployeeAssets':
+      case "EmployeeAssets":
         EmployeeAssets();
-        break;  
+        break;
       default:
         break;
     }
   };
 
   const tabs = [
-    { label: 'Personal Details' },
-    { label: 'Company Details' },
-    { label: 'Financial Details' },
-    { label: 'Bank Account Details' },
-    { label: 'Identity Documents' },
-    { label: 'Academic Details' },
-    { label: 'Family' },
-    { label: 'Documents' },
-    { label: 'EmployeeAssets' }
+    { label: "Personal Details" },
+    { label: "Company Details" },
+    { label: "Financial Details" },
+    { label: "Bank Account Details" },
+    { label: "Identity Documents" },
+    { label: "Academic Details" },
+    { label: "Family" },
+    { label: "Documents" },
+    { label: "EmployeeAssets" },
   ];
 
   const convertToBase64 = (file) => {
@@ -163,8 +232,10 @@ function Input({ }) {
     const employeeData = await Promise.all(
       documents.flatMap((relationGroup) =>
         relationGroup.members.map(async (member) => {
-          const fileBase64 = member.document ? await convertToBase64(member.document) : null;
-          console.log(fileBase64)
+          const fileBase64 = member.document
+            ? await convertToBase64(member.document)
+            : null;
+          console.log(fileBase64);
           return {
             EmployeeId: employeeId,
             document_name: member.documentName,
@@ -172,11 +243,11 @@ function Input({ }) {
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
           };
-        })
-      )
+        }),
+      ),
     );
     setError(false);
-    setLoading(true)
+    setLoading(true);
 
     try {
       const response = await fetch(`${config.apiBaseUrl}/AddEmpDoc`, {
@@ -193,13 +264,11 @@ function Input({ }) {
       } else {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {
-        })
+        toast.warning(errorResponse.message, {});
       }
     } catch (err) {
       console.error("Error delete data:", err);
-      toast.error('Error delete data: ' + err.message, {
-      });
+      toast.error("Error delete data: " + err.message, {});
     } finally {
       setLoading(false);
     }
@@ -246,12 +315,16 @@ function Input({ }) {
   // };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleRefNo(employeeId)
+    if (e.key === "Enter") {
+      handleRefNo(employeeId);
     }
   };
 
-  const convertBufferToBlobUrlAndFile = (buffer, fileName = "document.pdf", mimeType = "application/pdf") => {
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf",
+  ) => {
     if (buffer && buffer.type === "Buffer") {
       const byteArray = new Uint8Array(buffer.data);
       const blob = new Blob([byteArray], { type: mimeType });
@@ -267,14 +340,18 @@ function Input({ }) {
       const response = await fetch(`${config.apiBaseUrl}/getempdoc`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), })
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       if (response.ok) {
         const searchData = await response.json();
-        const [{ employee_id, department_id, designation_id, First_Name }] = searchData;
+        const [{ employee_id, department_id, designation_id, First_Name }] =
+          searchData;
         setdepartment_id(department_id);
         setdesignation_id(designation_id);
         setFirst_Name(First_Name);
@@ -284,12 +361,13 @@ function Input({ }) {
         const updatedDocument = searchData.reduce((acc, item) => {
           const { document_name, document_files, keyfield } = item;
 
-          console.log(document_files)
+          console.log(document_files);
           let documentUrl = null;
           let documentFile = null;
 
           if (document_files) {
-            const { blobUrl, file } = convertBufferToBlobUrlAndFile(document_files);
+            const { blobUrl, file } =
+              convertBufferToBlobUrlAndFile(document_files);
             if (blobUrl) {
               documentUrl = blobUrl;
             }
@@ -299,7 +377,7 @@ function Input({ }) {
             }
           }
 
-          console.log(documentUrl)
+          console.log(documentUrl);
 
           const memberData = {
             documentName: document_name || "",
@@ -308,17 +386,19 @@ function Input({ }) {
               : null,
             documentUrl: documentUrl,
             document: documentFile,
-            keyfield: keyfield
+            keyfield: keyfield,
           };
 
-          const existingRelation = acc.find(group => group.relation === document_name);
+          const existingRelation = acc.find(
+            (group) => group.relation === document_name,
+          );
 
           if (existingRelation) {
             existingRelation.members.push(memberData);
           } else {
             acc.push({
               relation: document_name,
-              members: [memberData]
+              members: [memberData],
             });
           }
           return acc;
@@ -327,16 +407,18 @@ function Input({ }) {
         setDocuments(updatedDocument);
         setEmployeeId(employee_id);
       } else if (response.status === 404) {
-        toast.warning('Data not found');
+        toast.warning("Data not found");
         setDocuments([
           {
-            relation: 'documents',
-            members: [{
-              documentName: '',
-              document: null,
-              documentUrl: ''
-            }]
-          }
+            relation: "documents",
+            members: [
+              {
+                documentName: "",
+                document: null,
+                documentUrl: "",
+              },
+            ],
+          },
         ]);
       } else {
         const errorResponse = await response.json();
@@ -345,7 +427,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
 
@@ -357,9 +439,21 @@ function Input({ }) {
     setDocuments((prev) =>
       prev.map((item) =>
         item.relation === relation
-          ? { ...item, members: [...item.members, { documentType: '', documentNo: '', issueDate: '', expiryDate: '' }] }
-          : item
-      )
+          ? {
+              ...item,
+              members: [
+                ...item.members,
+                {
+                  documentType: "",
+                  documentNo: "",
+                  issueDate: "",
+                  expiryDate: "",
+                  keyfield: ""
+                },
+              ],
+            }
+          : item,
+      ),
     );
   };
 
@@ -368,8 +462,8 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? { ...item, members: item.members.filter((_, i) => i !== index) }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -378,21 +472,21 @@ function Input({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  documentName: selectDocumentName
-                    ? selectDocumentName.value
-                    : "",
-                  selectDocumentName: selectDocumentName,
-                }
-                : member
-            ),
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      documentName: selectDocumentName
+                        ? selectDocumentName.value
+                        : "",
+                      selectDocumentName: selectDocumentName,
+                    }
+                  : member,
+              ),
+            }
+          : doc,
+      ),
     );
   };
 
@@ -402,19 +496,17 @@ function Input({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
-
       .then((data) => data.json())
       .then((val) => setDocumentNameDrop(val));
   }, []);
 
   const filteredOptionDocumentName = Array.isArray(documentNameDrop)
     ? documentNameDrop.map((option) => ({
-      value: option.attributedetails_name,
-      label: option.attributedetails_name,
-    }))
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
     : [];
 
   // const handleFileChange = (event, index) => {
@@ -441,26 +533,26 @@ function Input({ }) {
 
   const handleFileChange = (event, relation, index) => {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
+    if (file && file.type === "application/pdf") {
       const fileUrl = URL.createObjectURL(file);
 
       setDocuments((prevDocuments) =>
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                    ...member,
-                    document: file,
-                    documentUrl: fileUrl,
-                  }
-                  : member
-              ),
-            }
-            : doc
-        )
+                ...doc,
+                members: doc.members.map((member, i) =>
+                  i === index
+                    ? {
+                        ...member,
+                        document: file,
+                        documentUrl: fileUrl,
+                      }
+                    : member,
+                ),
+              }
+            : doc,
+        ),
       );
 
       setDocumentUrl((prev) => ({
@@ -468,19 +560,20 @@ function Input({ }) {
         [index]: fileUrl,
       }));
     } else {
-      toast.warning('Please upload a valid PDF file.');
-      event.target.value = '';
+      toast.warning("Please upload a valid PDF file.");
+      event.target.value = "";
     }
   };
 
-
   const handleUpdate = async (relationName, index) => {
-    const relationGroup = documents.find(group => group.relation === relationName);
+    const relationGroup = documents.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -496,7 +589,9 @@ function Input({ }) {
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
 
     const editedData = {
       EmployeeId: employeeId,
@@ -504,10 +599,10 @@ function Input({ }) {
       document_files: fileBase64,
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem("selectedCompanyCode")
+      modified_by: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
       async () => {
@@ -528,30 +623,30 @@ function Input({ }) {
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
-            toast.warning(errorResponse.message, {
-            })
+            toast.warning(errorResponse.message, {});
           }
         } catch (err) {
           console.error("Error delete data:", err);
-          toast.error('Error delete data: ' + err.message, {
-          });
+          toast.error("Error delete data: " + err.message, {});
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data updated cancelled.");
-      }
+      },
     );
   };
 
   const handleDelete = async (relationName, index) => {
-    const relationGroup = documents.find(group => group.relation === relationName);
+    const relationGroup = documents.find(
+      (group) => group.relation === relationName,
+    );
     const member = relationGroup ? relationGroup.members[index] : null;
 
     if (!member.keyfield) {
       setError(true);
-      toast.warning("Error: Missing required keyfield")
+      toast.warning("Error: Missing required keyfield");
       return;
     }
 
@@ -561,19 +656,21 @@ function Input({ }) {
       return;
     }
 
-    const fileBase64 = member.document ? await convertToBase64(member.document) : null;
+    const fileBase64 = member.document
+      ? await convertToBase64(member.document)
+      : null;
     console.log(fileBase64);
 
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
-    
+
     showConfirmationToast(
       "Are you sure you want to Delete the data in the row ?",
       async () => {
         try {
-          setLoading(true)
+          setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/delempdoc`, {
             method: "POST",
             headers: {
@@ -583,26 +680,24 @@ function Input({ }) {
           });
 
           if (response.ok) {
-              toast.success("Data deleted successfully!", {
-                onClose: () => window.location.reload(),
-              });
+            toast.success("Data deleted successfully!", {
+              onClose: () => window.location.reload(),
+            });
           } else {
             const errorResponse = await response.json();
             console.error(errorResponse.message);
-            toast.warning(errorResponse.message, {
-            })
+            toast.warning(errorResponse.message, {});
           }
         } catch (err) {
           console.error("Error delete data:", err);
-          toast.error('Error delete data: ' + err.message, {
-          });
+          toast.error("Error delete data: " + err.message, {});
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
@@ -648,7 +743,8 @@ function Input({ }) {
   // }, [location.state]);
 
   useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+    const { employeeId, firstName, department_id, designation_id } =
+      location.state || {};
 
     if (employeeId) {
       setEmployeeId(employeeId);
@@ -657,41 +753,42 @@ function Input({ }) {
       setdesignation_id(designation_id || "");
     }
 
-    if (
-      employeeId &&
-      documentNameDrop?.length > 0
-    ) {
+    if (employeeId && documentNameDrop?.length > 0) {
       handleRefNo(employeeId);
     }
   }, [location.state, documentNameDrop]);
 
   const handleRemovePdf = (relation, index) => {
-    setDocuments(prev =>
-      prev.map(doc =>
+    setDocuments((prev) =>
+      prev.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((m, i) =>
-              i === index
-                ? { ...m, document: null, documentUrl: "" }
-                : m
-            )
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((m, i) =>
+                i === index ? { ...m, document: null, documentUrl: "" } : m,
+              ),
+            }
+          : doc,
+      ),
     );
   };
 
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Documents</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && ['add', 'all permission'].some(permission => documentsPermissions.includes(permission)) && (
+            {["add", "all permission"].some((permission) =>
+              documentsPermissions.includes(permission),
+            ) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -704,31 +801,33 @@ function Input({ }) {
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              {saveButtonVisible && ['add', 'all permission'].some(p => documentsPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
+              {saveButtonVisible &&
+                ["add", "all permission"].some((p) =>
+                  documentsPermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  </li>
+                )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
-
             </ul>
           </div>
-
         </div>
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -740,8 +839,17 @@ function Input({ }) {
                 onChange={(e) => setEmployeeId(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
-              <label for="cno" className={`exp-form-labels ${error && !employeeId ? 'text-danger' : ''}`}>Employee ID<span className="text-danger">*</span></label>
-              <span className="select-add-btn" title="Documents Help" onClick={handleEmployeeInfo}>
+              <label
+                for="cno"
+                className={`exp-form-labels ${error && !employeeId ? "text-danger" : ""}`}
+              >
+                Employee ID<span className="text-danger">*</span>
+              </label>
+              <span
+                className="select-add-btn"
+                title="Documents Help"
+                onClick={handleEmployeeInfo}
+              >
                 <i className="fa fa-search"></i>
               </span>
             </div>
@@ -750,17 +858,17 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='FirstNamelabel' className="partyName">
+                <label id="FirstNamelabel" className="partyName">
                   <strong>Employee Name:</strong> {First_Name}
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="col-md-2" style={{ marginRight: "20px", }}>
+          <div className="col-md-2" style={{ marginRight: "20px" }}>
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='Departmentlabel' className="partyName">
+                <label id="Departmentlabel" className="partyName">
                   <strong>Department:</strong> {department_id}
                 </label>
               </div>
@@ -770,30 +878,47 @@ function Input({ }) {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='designationLabel' className="partyName">
+                <label id="designationLabel" className="partyName">
                   <strong>Designation:</strong> {designation_id}
                 </label>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
 
       {documents.map((relationGroup, relationIndex) => (
-        <div key={relationIndex} className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
+        <div
+          key={relationIndex}
+          className="shadow-lg p-2 bg-light rounded mt-2 container-form-box"
+        >
           {relationGroup.members.map((member, index) => (
             <div key={index} className="row g-3">
-
               <div className="col-md-1">
                 <div className="inputGroup">
-                  <button type="button" onClick={() => handleAddRow(relationGroup.relation)} className="btn btn-primary" title="Add Row">
+                  <button
+                    type="button"
+                    onClick={() => handleAddRow(relationGroup.relation)}
+                    className="btn btn-primary"
+                    title="Add Row"
+                  >
                     <i className="fa-solid fa-circle-plus"></i>
                   </button>
                   {relationGroup.members.length > 1 && (
-                    <button type="button" onClick={() => handleDeleteRow(relationGroup.relation, index)} className="btn btn-danger" title="Delete Row">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDeleteRow(relationGroup.relation, index)
+                      }
+                      className="btn btn-danger"
+                      title="Delete Row"
+                    >
                       <i className="fa-regular fa-trash-can"></i>
                     </button>
                   )}
@@ -809,19 +934,36 @@ function Input({ }) {
                   <Select
                     id={`cname-${index}`}
                     placeholder=" "
-                    onFocus={() => setIsSelectDocument((prev) => ({ ...prev, [index]: true }))}
-                    onBlur={() => setIsSelectDocument((prev) => ({ ...prev, [index]: false }))}
+                    onFocus={() =>
+                      setIsSelectDocument((prev) => ({
+                        ...prev,
+                        [index]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectDocument((prev) => ({
+                        ...prev,
+                        [index]: false,
+                      }))
+                    }
                     classNamePrefix="react-select"
                     isClearable
                     type="text"
                     value={member.selectDocumentName}
                     maxLength={50}
                     onChange={(selectDocumentName) =>
-                      handleChangeDocumentName(selectDocumentName, relationGroup.relation, index)
+                      handleChangeDocumentName(
+                        selectDocumentName,
+                        relationGroup.relation,
+                        index,
+                      )
                     }
                     options={filteredOptionDocumentName}
                   />
-                  <label htmlFor={`cname-${index}`} className={`floating-label ${error && !member.documentName ? 'text-danger' : ''}`}>
+                  <label
+                    htmlFor={`cname-${index}`}
+                    className={`floating-label ${error && !member.documentName ? "text-danger" : ""}`}
+                  >
                     Document Name<span className="text-danger">*</span>
                   </label>
                 </div>
@@ -830,7 +972,6 @@ function Input({ }) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className="image-upload-container">
-
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"
@@ -877,24 +1018,32 @@ function Input({ }) {
               </div>
 
               <div className="col-md-1">
-                {isAcademicDataLoaded && (
+                {member.keyfield && (
                   <div className="inputGroup">
-                    {['update', 'all permission'].some(permission => documentsPermissions.includes(permission)) && (
+                    {["update", "all permission"].some((permission) =>
+                      documentsPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-success"
                         title="Update"
-                        onClick={() => handleUpdate(relationGroup.relation, index)} // Pass the specific row data
+                        onClick={() =>
+                          handleUpdate(relationGroup.relation, index)
+                        }
                       >
-                        <i className="fa-solid fa-floppy-disk"></i>
+                        <i className="fa-solid fa-pen-to-square"></i>
                       </button>
                     )}
-                    {['delete', 'all permission'].some(permission => documentsPermissions.includes(permission)) && (
+                    {["delete", "all permission"].some((permission) =>
+                      documentsPermissions.includes(permission),
+                    ) && (
                       <button
                         type="button"
                         className="btn btn-danger"
                         title="Delete"
-                        onClick={() => handleDelete(relationGroup.relation, index)}
+                        onClick={() =>
+                          handleDelete(relationGroup.relation, index)
+                        }
                       >
                         <i className="fa-solid fa-trash"></i>
                       </button>
@@ -907,8 +1056,16 @@ function Input({ }) {
         </div>
       ))}
       <div>
-        <DocumentPopup open={open} handleClose={handleClose} EmployeeInfo={EmployeeInfo} />
-        <PdfPreview open={isModalOpen} pdfUrl={currentPdfUrl} handleClose={handleCloseModal} />
+        <DocumentPopup
+          open={open}
+          handleClose={handleClose}
+          EmployeeInfo={EmployeeInfo}
+        />
+        <PdfPreview
+          open={isModalOpen}
+          pdfUrl={currentPdfUrl}
+          handleClose={handleCloseModal}
+        />
       </div>
     </div>
   );

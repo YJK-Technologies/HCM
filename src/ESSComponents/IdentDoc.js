@@ -12,7 +12,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function Input({ }) {
+function Input({}) {
   const [EmployeeId, setEmployeeId] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
   const [error, setError] = useState(false);
@@ -82,9 +82,9 @@ function Input({ }) {
 
   const filteredOptionDocumentType = Array.isArray(documentTypeDrop)
     ? documentTypeDrop.map((option) => ({
-      value: option.attributedetails_name,
-      label: option.attributedetails_name,
-    }))
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
     : [];
 
   const handleChangeDocumentType = (selectedDocumentType, relation, index) => {
@@ -92,21 +92,21 @@ function Input({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  documentType: selectedDocumentType
-                    ? selectedDocumentType.value
-                    : "",
-                  selectDocumentType: selectedDocumentType,
-                }
-                : member
-            ),
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      documentType: selectedDocumentType
+                        ? selectedDocumentType.value
+                        : "",
+                      selectDocumentType: selectedDocumentType,
+                    }
+                  : member,
+              ),
+            }
+          : doc,
+      ),
     );
   };
 
@@ -129,7 +129,7 @@ function Input({ }) {
   const convertBufferToBlobUrlAndFile = (
     buffer,
     fileName = "document.pdf",
-    mimeType = "application/pdf"
+    mimeType = "application/pdf",
   ) => {
     if (buffer && buffer.type === "Buffer") {
       const byteArray = new Uint8Array(buffer.data);
@@ -155,7 +155,7 @@ function Input({ }) {
             Id: code,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -168,8 +168,14 @@ function Input({ }) {
         setdesignation_id(designation_id);
         setFirst_Name(First_Name);
         const updatedFamilyMembers = searchData.reduce((acc, item) => {
-          const { documentType, documentNo, issueDate, expiryDate, document } =
-            item;
+          const {
+            documentType,
+            documentNo,
+            issueDate,
+            expiryDate,
+            document,
+            keyfield,
+          } = item;
 
           const formattedIssueDate = formatDate(issueDate);
           const formattedExpiryDate = formatDate(expiryDate);
@@ -198,10 +204,11 @@ function Input({ }) {
             expiryDate: formattedExpiryDate || "",
             documentUrl: documentUrl,
             document: documentFile,
+            keyfield: keyfield || documentNo, //  IMPORTANT
           };
 
           const existingRelation = acc.find(
-            (group) => group.relation === documentType
+            (group) => group.relation === documentType,
           );
 
           if (existingRelation) {
@@ -259,7 +266,6 @@ function Input({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
-
     for (const relationGroup of documents) {
       for (const member of relationGroup.members) {
         // Required fields check (already exists)
@@ -273,7 +279,6 @@ function Input({ }) {
           toast.warning("Error: Missing required fields");
           return;
         }
-
         // 🚫 Date validation
         if (!isIssueDateValid(member.issueDate, member.expiryDate)) {
           toast.warning("Issue Date must be less than Expiry Date");
@@ -299,20 +304,21 @@ function Input({ }) {
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
           };
-        })
-      )
+        }),
+      ),
     );
     setError(false);
     setLoading(true);
     try {
-      const response = await fetch(`${config.apiBaseUrl}/addEmployeeIdentityDocument`,
+      const response = await fetch(
+        `${config.apiBaseUrl}/addEmployeeIdentityDocument`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ employeeData }),
-        }
+        },
       );
       if (response.ok) {
         toast.success("Data inserted successfully!", {
@@ -325,7 +331,7 @@ function Input({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -417,7 +423,7 @@ function Input({ }) {
     });
   };
 
-    const EmployeeAssets = () => {
+  const EmployeeAssets = () => {
     navigate("/EmployeeAssets", {
       state: {
         employeeId: EmployeeId,
@@ -467,7 +473,7 @@ function Input({ }) {
       case "Documents":
         Documents();
         break;
-      case 'EmployeeAssets':
+      case "EmployeeAssets":
         EmployeeAssets();
         break;
 
@@ -485,7 +491,7 @@ function Input({ }) {
     { label: "Academic Details" },
     { label: "Family" },
     { label: "Documents" },
-    { label: 'EmployeeAssets' }
+    { label: "EmployeeAssets" },
   ];
 
   // const handleInputChange = (index, field, value) => {
@@ -499,13 +505,13 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: item.members.map((member, i) =>
-              i === index ? { ...member, [field]: value } : member
-            ),
-          }
-          : item
-      )
+              ...item,
+              members: item.members.map((member, i) =>
+                i === index ? { ...member, [field]: value } : member,
+              ),
+            }
+          : item,
+      ),
     );
   };
 
@@ -514,19 +520,22 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: [
-              ...item.members,
-              {
-                documentType: "",
-                documentNo: "",
-                issueDate: "",
-                expiryDate: "",
-              },
-            ],
-          }
-          : item
-      )
+              ...item,
+              members: [
+                ...item.members,
+                {
+                  documentType: "",
+                  documentNo: "",
+                  issueDate: "",
+                  expiryDate: "",
+                  document: null,
+                  documentUrl: "",
+                  keyfield: "",
+                },
+              ],
+            }
+          : item,
+      ),
     );
   };
 
@@ -535,8 +544,8 @@ function Input({ }) {
       prev.map((item) =>
         item.relation === relation
           ? { ...item, members: item.members.filter((_, i) => i !== index) }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -585,19 +594,19 @@ function Input({ }) {
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                    ...member,
-                    document: file,
-                    documentUrl: fileUrl,
-                  }
-                  : member
-              ),
-            }
-            : doc
-        )
+                ...doc,
+                members: doc.members.map((member, i) =>
+                  i === index
+                    ? {
+                        ...member,
+                        document: file,
+                        documentUrl: fileUrl,
+                      }
+                    : member,
+                ),
+              }
+            : doc,
+        ),
       );
 
       setDocumentUrl((prev) => ({
@@ -620,12 +629,12 @@ function Input({ }) {
 
   const handleUpdate = async (relationName, index) => {
     const relationGroup = documents.find(
-      (group) => group.relation === relationName
+      (group) => group.relation === relationName,
     );
     const member = relationGroup ? relationGroup.members[index] : null;
 
-    if (!member.documentNo) {
-      setDeleteError(" ");
+    if (!member.keyfield) {
+      setError(true);
       toast.warning("Error: Missing required keyfield");
       return;
     }
@@ -634,7 +643,6 @@ function Input({ }) {
       setError(true);
       return;
     }
-
     if (
       !member.documentType ||
       !member.documentNo ||
@@ -645,8 +653,6 @@ function Input({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
-
-
     // 🚫 Date validation (PASTE HERE)
     if (!isIssueDateValid(member.issueDate, member.expiryDate)) {
       toast.error("Issue Date must be less than Expiry Date");
@@ -658,16 +664,17 @@ function Input({ }) {
     console.log(fileBase64);
 
     const editedData = {
+      keyfield: member.keyfield, 
       EmployeeId: EmployeeId,
       documentType: member.documentType,
-      documentNo: member.documentNo,
+      documentNo: member.documentNo, 
       issueDate: member.issueDate,
       expiryDate: member.expiryDate,
       document: fileBase64,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to update the data in the row ?",
       async () => {
@@ -681,7 +688,7 @@ function Input({ }) {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ editedData: [editedData] }),
-            }
+            },
           );
 
           if (response.ok) {
@@ -702,13 +709,13 @@ function Input({ }) {
       },
       () => {
         toast.info("Data updated cancelled.");
-      }
+      },
     );
   };
 
   const handleDelete = async (relationName, index) => {
     const relationGroup = documents.find(
-      (group) => group.relation === relationName
+      (group) => group.relation === relationName,
     );
     const member = relationGroup ? relationGroup.members[index] : null;
 
@@ -743,13 +750,14 @@ function Input({ }) {
       documentNo: member.documentNo,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
     };
-    
+
     showConfirmationToast(
       "Are you sure you want to Delete the data in the row ?",
       async () => {
         try {
           setLoading(true);
-          const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
+          const response = await fetch(
+            `${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
             {
               method: "POST",
               headers: {
@@ -758,7 +766,7 @@ function Input({ }) {
               body: JSON.stringify({
                 documentNoToDelete: [documentNoToDelete],
               }),
-            }
+            },
           );
 
           if (response.ok) {
@@ -779,7 +787,7 @@ function Input({ }) {
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
@@ -826,13 +834,13 @@ function Input({ }) {
       prev.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((m, i) =>
-              i === index ? { ...m, document: null, documentUrl: "" } : m
-            ),
-          }
-          : doc
-      )
+              ...doc,
+              members: doc.members.map((m, i) =>
+                i === index ? { ...m, document: null, documentUrl: "" } : m,
+              ),
+            }
+          : doc,
+      ),
     );
   };
 
@@ -849,15 +857,14 @@ function Input({ }) {
           <h1 className="page-title">Identity Documents</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                identityPermissions.includes(permission)
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {["add", "all permission"].some((permission) =>
+              identityPermissions.includes(permission),
+            ) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -873,14 +880,13 @@ function Input({ }) {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  identityPermissions.includes(p)
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {["add", "all permission"].some((p) =>
+                identityPermissions.includes(p),
+              ) && (
+                <li className="dropdown-item" onClick={handleSave}>
+                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                </li>
+              )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -907,8 +913,9 @@ function Input({ }) {
               />
               <label
                 for="cno"
-                className={`exp-form-labels ${error && !EmployeeId ? "text-danger" : ""
-                  }`}
+                className={`exp-form-labels ${
+                  error && !EmployeeId ? "text-danger" : ""
+                }`}
               >
                 Employee ID<span className="text-danger">*</span>
               </label>
@@ -1021,15 +1028,16 @@ function Input({ }) {
                       handleChangeDocumentType(
                         selectedDocumentType,
                         relationGroup.relation,
-                        index
+                        index,
                       )
                     }
                     options={filteredOptionDocumentType}
                   />
                   <label
                     htmlFor={`cname-${index}`}
-                    className={`floating-label ${error && !member.documentType ? "text-danger" : ""
-                      }`}
+                    className={`floating-label ${
+                      error && !member.documentType ? "text-danger" : ""
+                    }`}
                   >
                     Doc Type<span className="text-danger">*</span>
                   </label>
@@ -1051,14 +1059,15 @@ function Input({ }) {
                         relationGroup.relation,
                         index,
                         "documentNo",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${error && !member.documentNo ? "text-danger" : ""
-                      }`}
+                    className={`exp-form-labels ${
+                      error && !member.documentNo ? "text-danger" : ""
+                    }`}
                   >
                     Doc No<span className="text-danger">*</span>
                   </label>
@@ -1089,15 +1098,16 @@ function Input({ }) {
                         relationGroup.relation,
                         index,
                         "issueDate",
-                        value
+                        value,
                       );
                     }}
                     required
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${error && !member.issueDate ? "text-danger" : ""
-                      }`}
+                    className={`exp-form-labels ${
+                      error && !member.issueDate ? "text-danger" : ""
+                    }`}
                   >
                     Issue Date<span className="text-danger">*</span>
                   </label>
@@ -1119,7 +1129,7 @@ function Input({ }) {
                         new Date(value) <= new Date(member.issueDate)
                       ) {
                         toast.error(
-                          "Expiry Date must be greater than Issue Date"
+                          "Expiry Date must be greater than Issue Date",
                         );
                         return;
                       }
@@ -1128,7 +1138,7 @@ function Input({ }) {
                         relationGroup.relation,
                         index,
                         "expiryDate",
-                        value
+                        value,
                       );
                     }}
                     required
@@ -1137,8 +1147,9 @@ function Input({ }) {
                   />
                   <label
                     htmlFor={`add2-${index}`}
-                    className={`exp-form-labels ${error && !member.expiryDate ? "text-danger" : ""
-                      }`}
+                    className={`exp-form-labels ${
+                      error && !member.expiryDate ? "text-danger" : ""
+                    }`}
                   >
                     Expiry Date<span className="text-danger">*</span>
                   </label>
@@ -1194,36 +1205,36 @@ function Input({ }) {
               </div>
 
               <div className="col-md-1">
-                {isAcademicDataLoaded && (
+                {member.keyfield && (
                   <div className="inputGroup">
                     {["update", "all permission"].some((permission) =>
-                      identityPermissions.includes(permission)
+                      identityPermissions.includes(permission),
                     ) && (
-                        <button
-                          type="button"
-                          className="btn btn-success"
-                          title="Update"
-                          onClick={() =>
-                            handleUpdate(relationGroup.relation, index)
-                          } // Pass the specific row data
-                        >
-                          <i className="fa-solid fa-floppy-disk"></i>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        title="Update"
+                        onClick={() =>
+                          handleUpdate(relationGroup.relation, index)
+                        }
+                      >
+                        <i className="fa-solid fa-pen-to-square"></i>
+                      </button>
+                    )}
                     {["delete", "all permission"].some((permission) =>
-                      identityPermissions.includes(permission)
+                      identityPermissions.includes(permission),
                     ) && (
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          title="Delete"
-                          onClick={() =>
-                            handleDelete(relationGroup.relation, index)
-                          }
-                        >
-                          <i className="fa-solid fa-trash"></i>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        title="Delete"
+                        onClick={() =>
+                          handleDelete(relationGroup.relation, index)
+                        }
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
