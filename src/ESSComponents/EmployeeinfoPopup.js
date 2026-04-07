@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -7,6 +7,7 @@ import 'ag-grid-autocomplete-editor/dist/main.css';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
+import Select from 'react-select';
 
 const config = require('../Apiconfig');
 
@@ -182,6 +183,50 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
   const [DOB, setDOB] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [isSelectGender, setIsSelectGender] = useState(false);
+  const [Gender, setGender] = useState("");
+  const [genderdrop, setgenderdrop] = useState([]);
+  const [selectedGender, setselectedGender] = useState("");
+
+
+  const [address, setaddress] = useState("");
+  const [Phone, setPhone] = useState("");
+  const [designation_id, setdesignation_id] = useState("");
+  const [department_id, setdepartment_id] = useState("");
+
+
+  const filteredOptiongender = genderdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const Handlegender = (selectedgender) => {
+    setGender(selectedgender);
+    setselectedGender(selectedgender ? selectedgender.value : '');
+
+  };
+
+  useEffect(() => {
+      fetch(`${config.apiBaseUrl}/gender`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+  
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setgenderdrop(data); // Store the fetched gender options in state
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching gender data:', error);
+        });
+    }, []);
+
+
   const handleSearch = async () => {
      setLoading(true);
     try {
@@ -190,8 +235,9 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB, company_code: sessionStorage.getItem('selectedCompanyCode') })
+        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB,  Gender: selectedGender, address, Phone, designation_id, department_id, company_code: sessionStorage.getItem('selectedCompanyCode') })
       });
+      console.log("Payload:", {Gender,selectedGender});
       if (response.ok) {
         const searchData = await response.json();
 
@@ -221,6 +267,10 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
             selectedmartial: item.Marital_Status,
             selectedkids: item.Kids,
             selectedgradeid: item.Grade_id,
+            address: item.address,
+            Phone: item.Phone,
+            designation_id: item.designation_id,
+            department_id: item.department_id,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
           }))
         );
@@ -403,6 +453,103 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     <label className="exp-form-labels">Last Name</label>
                   </div>
                 </div>
+
+                <div className="form-block col-md-3">
+                            <div
+                              className={`inputGroup selectGroup 
+                              ${Gender ? "has-value" : ""} 
+                              ${isSelectGender ? "is-focused" : ""}`}
+                            >
+                              <Select
+                                inputId="gender"
+                                name="gender"
+                                type="text"
+                                placeholder=" "
+                                onFocus={() => setIsSelectGender(true)}
+                                onBlur={() => setIsSelectGender(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                                value={Gender}
+                                options={filteredOptiongender}
+                                onChange={Handlegender}
+                                maxLength={10}
+                                autoComplete="off"
+                              />
+                              <label htmlFor="gender" className={`floating-label`}>Gender</label>
+                            </div>
+                          </div>
+
+                          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="permanantAddress"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={address}
+                onChange={(e) => setaddress(e.target.value)}
+                autoComplete="off"
+                maxLength={300}
+              />
+              <label htmlFor="permanantAddress" className={`exp-form-labels`}>Address</label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="Phone"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                value={Phone}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 13) {
+                    setPhone(value);
+                  }
+                }}
+                maxLength={13}
+                autoComplete="off"
+              />
+              <label htmlFor="Phone" className={`exp-form-labels`}>Phone No</label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="ReferenceName"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={designation_id}
+                onChange={(e) => setdesignation_id(e.target.value)}
+                autoComplete="off"
+                maxLength={100}
+              />
+              {/* <label htmlFor="ReferenceName" className="exp-form-labels">Reference Name</label> */}
+              <label for="ReferenceName" className={`exp-form-labels`}>Designation ID</label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="ReferenceName"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={department_id}
+                onChange={(e) => setdepartment_id(e.target.value)}
+                autoComplete="off"
+                maxLength={100}
+              />
+              {/* <label htmlFor="ReferenceName" className="exp-form-labels">Reference Name</label> */}
+              <label for="ReferenceName" className={`exp-form-labels`}>Department ID</label>
+            </div>
+          </div>
 
                 <div className="form-block col-12">
                   <div className="search-btn-wrapper">
