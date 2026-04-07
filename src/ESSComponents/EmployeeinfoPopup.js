@@ -187,11 +187,13 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
   const [Gender, setGender] = useState("");
   const [genderdrop, setgenderdrop] = useState([]);
   const [selectedGender, setselectedGender] = useState("");
-  const [showAsterisk, setShowAsterisk] = useState(true);
-  const [error, setError] = useState(false);
-  const [permanantAddress, setPermanantAddress] = useState("");
-  const [Phone1, setPhone1] = useState("");
-  const [reference_Name, setReference_Name] = useState("");
+
+
+  const [address, setaddress] = useState("");
+  const [Phone, setPhone] = useState("");
+  const [designation_id, setdesignation_id] = useState("");
+  const [department_id, setdepartment_id] = useState("");
+
 
   const filteredOptiongender = genderdrop.map((option) => ({
     value: option.attributedetails_name,
@@ -233,8 +235,9 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB, Gender,company_code: sessionStorage.getItem('selectedCompanyCode') })
+        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB,  Gender: selectedGender, address, Phone, designation_id, department_id, company_code: sessionStorage.getItem('selectedCompanyCode') })
       });
+      console.log("Payload:", {Gender,selectedGender});
       if (response.ok) {
         const searchData = await response.json();
 
@@ -249,7 +252,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
             Last_Name: item.Last_Name,
             Mother_Name: item.mother_name,
             DOB: item.DOB,
-            Gender: item.Gender,
+            selectedGender: item.Gender,
             Email: item.email,
             Phone1: item.phone1,
             Phone2: item.phone2,
@@ -264,6 +267,10 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
             selectedmartial: item.Marital_Status,
             selectedkids: item.Kids,
             selectedgradeid: item.Grade_id,
+            address: item.address,
+            Phone: item.Phone,
+            designation_id: item.designation_id,
+            department_id: item.department_id,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
           }))
         );
@@ -479,8 +486,8 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                value={permanantAddress}
-                onChange={(e) => setPermanantAddress(e.target.value)}
+                value={address}
+                onChange={(e) => setaddress(e.target.value)}
                 autoComplete="off"
                 maxLength={300}
               />
@@ -496,11 +503,11 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                 type="number"
                 placeholder=""
                 required
-                value={Phone1}
+                value={Phone}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value.length <= 13) {
-                    setPhone1(value);
+                    setPhone(value);
                   }
                 }}
                 maxLength={13}
@@ -517,8 +524,8 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                value={reference_Name}
-                onChange={(e) => setReference_Name(e.target.value)}
+                value={designation_id}
+                onChange={(e) => setdesignation_id(e.target.value)}
                 autoComplete="off"
                 maxLength={100}
               />
@@ -534,8 +541,8 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                value={reference_Name}
-                onChange={(e) => setReference_Name(e.target.value)}
+                value={department_id}
+                onChange={(e) => setdepartment_id(e.target.value)}
                 autoComplete="off"
                 maxLength={100}
               />
