@@ -20,38 +20,318 @@ const config = require('../Apiconfig');
 
 function Assets({ }) {
 
-const [loading, setLoading] = useState(false);
- const [saveButtonVisible, setSaveButtonVisible] = useState(true);
- const [AssetID, setAssetID] = useState('');
-const [AssetCode, setAssetCode] = useState('');
-const [AssetName, setAssetName] = useState('');
-const [AssetCategory, setAssetCategory] = useState('');
-const [SerialNumber, setSerialNumber] = useState('');
-const [Barcode, setBarcode] = useState('');
-const [Brand, setBrand] = useState('');
-const [Model, setModel] = useState('');
-const [PurchaseDate, setPurchaseDate] = useState('');
-const [PurchaseCost, setPurchaseCost] = useState('');
-const [CurrencyCode, setCurrencyCode] = useState('');
-const [VendorName, setVendorName] = useState('');
-const [WarrantyStart, setWarrantyStart] = useState('');
-const [WarrantyEnd, setWarrantyEnd] = useState('');
-const [AssetStatus, setAssetStatus] = useState('');
-const [Location, setLocation] = useState('');
-const [Country, setCountry] = useState('');
-const [Status, setStatus] = useState(true);
-const [error, setError] = useState('');
- const [rowData, setrowData] = useState([]);
-   const [gridColumnApi, setGridColumnApi] = useState(null);
-     const [gridApi, setGridApi] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saveButtonVisible, setSaveButtonVisible] = useState(true);
+  const [AssetID, setAssetID] = useState('');
+  const [Asset_Code, setAsset_Code] = useState('');
+  const [AssetName, setAssetName] = useState('');
+  const [AssetCategory, setAssetCategory] = useState('');
+  const [SerialNumber, setSerialNumber] = useState('');
+  const [Bar_code, setBar_code] = useState('');
+  const [Brand, setBrand] = useState('');
+  const [Model, setModel] = useState('');
+  const [PurchaseDate, setPurchaseDate] = useState('');
+  const [PurchaseCost, setPurchaseCost] = useState('');
+  const [CurrencyCode, setCurrencyCode] = useState('');
+  const [VendorName, setVendorName] = useState('');
+  const [WarrantyStart, setWarrantyStart] = useState('');
+  const [WarrantyEnd, setWarrantyEnd] = useState('');
+  const [AssetStatus, setAssetStatus] = useState('');
+  const [Location, setLocation] = useState('');
+  const [Country, setCountry] = useState('');
+  const [Status, setStatus] = useState('');
+  const [error, setError] = useState('');
+  const [rowData, setrowData] = useState([]);
+  const [gridColumnApi, setGridColumnApi] = useState(null);
+  const [gridApi, setGridApi] = useState(null);
+  const [isSelectCountry, setIsSelectCountry] = useState(false);
+  const [selectedCountry, setselectedCountry] = useState("");
+  const [Countrydrop, setCountrydrop] = useState([]);
+  const [CountrydropSC, setCountrydropSC] = useState([]);
+  const [selectedCountrySC, setselectedCountrySC] = useState("");
+  const [isSelectCountrySC, setIsSelectCountrySC] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+  const [selectedCurrencySc, setSelectedCurrencySc] = useState('');
+  const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
+  const [currencyDrop, setCurrencyDrop] = useState([]);
+  const [currencyDropSc, setCurrencyDropSc] = useState([]);
+  const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
+  const [isSearchStatus, setIsSearchStatus] = useState(false);
+  const [isSearchStatusSC, setIsSearchStatusSC] = useState(false);
+  const [statusDrop, setstatusDrop] = useState([]);
+  const [statusDropSC, setstatusDropSC] = useState([]);
+  const [selectedStatusSC, setselectedStatusSC] = useState("");
+  const [isSelectedStatus, setIsSelectedStatus] = useState(false);
+  //status
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [StatusDrop, setStatusDrop] = useState([]);
+  const [statusdrop, setstatusdrop] = useState([]);
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  const [status, setstatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [isSelectstatus, setIsSelectstatus] = useState(false);
+  const [selectedstatus, setselectedStatus] = useState('');
 
-     const searchClearInputFields = () => {
+
+
+
+
+
+  const handleStatus = (SelectedStatus) => {
+    setselectedStatus(SelectedStatus);
+    setAssetStatus(SelectedStatus ? SelectedStatus.value : "");
+  };
+  const filterOptionStatus = Array.isArray(statusDrop)
+    ? statusDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
+
+
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setstatusDrop(val));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setstatusDropSC(val));
+  }, []);
+
+
+  //Assetstatus- search start
+
+  const handlechangestatusSC = (SelectedStatus) => {
+    setselectedStatusSC(SelectedStatus);
+    setStatus(SelectedStatus ? SelectedStatus.value : "");
+  };
+
+  const filterOptionStatusSC = Array.isArray(statusDropSC)
+    ? statusDropSC.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setstatusDropSC(val));
+  }, []);
+
+  //Assetstatus- search end
+
+  //country
+
+  const handleCountryChange = (selectedCountry) => {
+    setselectedCountry(selectedCountry);
+    setCountry(selectedCountry ? selectedCountry.value : '');
+  };
+  const filteredOptionCountry = Countrydrop.map(option => ({
+    value: option.Country_Code,
+    label: `${option.Country_Code} - ${option.Country_Name}`
+  }));
+
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+  //  End - country 
+
+  //country- search start
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setCountrydropSC(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const filteredOptionCountrySC = CountrydropSC.map(option => ({
+    value: option.Country_Code,
+    label: `${option.Country_Code} - ${option.Country_Name}`
+  }));
+
+  const handleCountryChangeSC = (selectedCountrySC) => {
+    setselectedCountrySC(selectedCountrySC);
+    setCountry(selectedCountrySC ? selectedCountrySC.value : '');
+  };
+
+  //country- search End
+
+  //currency-
+
+  const handleChangeCurrency = (selectedCurrency) => {
+    setSelectedCurrency(selectedCurrency);
+    setCurrencyCode(selectedCurrency ? selectedCurrency.value : "");
+  };
+
+  const filteredOptionCurrency = Array.isArray(currencyDrop)
+    ? currencyDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  //end -currency
+
+  //currency -search
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+
+  const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
+    ? currencyDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const handleChangeCurrencySc = (selectedCurrencySc) => {
+    setSelectedCurrencySc(selectedCurrencySc);
+    setCurrencyCode(selectedCurrencySc ? selectedCurrencySc.value : "");
+  };
+
+  //End currency 
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        setStatusDrop(val)
+        setstatusdrop(val)
+
+      });
+  }, []);
+
+  const filteredOptionStatus = StatusDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const filteredoptionstatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  const handleChangeStatus = (Status) => {
+    setSelectedStatus(Status);
+    setStatus(Status ? Status.value : '');
+  };
+
+  const handlechangestatus = (status) => {
+    setSelectedStatus(status);
+    setstatus(status ? status.value : '');
+  };
+
+
+
+  const searchClearInputFields = () => {
     setAssetID("");
-    setAssetCode("");
+    setAsset_Code("");
     setAssetName("");
     setAssetCategory("");
     setSerialNumber("");
-    setBarcode("");
+    setBar_code("");
     setBrand("");
     setModel("");
     setPurchaseDate("");
@@ -66,9 +346,9 @@ const [error, setError] = useState('');
     setStatus("");
   };
 
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
-      const columnDefs = [
+  const columnDefs = [
     {
       headerName: "Actions",
       field: "actions",
@@ -82,7 +362,7 @@ const [error, setError] = useState('');
               <>
                 <span
                   className="icon mx-2"
-                  // onClick={() => saveEditedData(params.data, params.node.data)}
+                  onClick={() => saveEditedData(params.data, params.node.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
@@ -90,7 +370,7 @@ const [error, setError] = useState('');
 
                 <span
                   className="icon mx-2"
-                  // onClick={() => deleteSelectedRows(params.data)}
+                  onClick={() => deleteSelectedRows(params.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-solid fa-trash"></i>
@@ -113,7 +393,7 @@ const [error, setError] = useState('');
         const handleClick = () => {
           handleNavigateWithRowData(params.data);
         };
-      
+
 
         return (
           <span
@@ -127,7 +407,7 @@ const [error, setError] = useState('');
     },
     {
       headerName: "Asset Code",
-      field: "AssetCode",
+      field: "Asset_Code",
       filter: 'agTextColumnFilter',
       editable: true
     },
@@ -137,6 +417,14 @@ const [error, setError] = useState('');
       filter: 'agTextColumnFilter',
       editable: true
     },
+
+    {
+      headerName: "Asset Category",
+      field: "AssetCategory",
+      filter: 'agTextColumnFilter',
+      editable: true
+    },
+
     {
       headerName: "Serial Number",
       field: "SerialNumber",
@@ -145,7 +433,7 @@ const [error, setError] = useState('');
     },
     {
       headerName: "Barcode",
-      field: "Barcode",
+      field: "Bar_code",
       filter: 'agTextColumnFilter',
       editable: true
     },
@@ -161,64 +449,67 @@ const [error, setError] = useState('');
       filter: 'agTextColumnFilter',
       editable: true
     },
- {
+    {
       headerName: "Purchase Date",
       field: "PurchaseDate",
       filter: 'agTextColumnFilter',
       editable: true
     },
 
-     {
+    {
       headerName: "Purchase Cost",
       field: "PurchaseCost",
       filter: 'agTextColumnFilter',
       editable: true
     },
-     {
+    {
       headerName: "Currency Code",
       field: "CurrencyCode",
       filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
+      cellEditorParams: {
+        values: currencyDropGrid,
+      },
     },
-     {
+    {
       headerName: "Vendor Name",
       field: "VendorName",
       filter: 'agTextColumnFilter',
       editable: true
     },
-     {
+    {
       headerName: "Warranty Start",
       field: "WarrantyStart",
       filter: 'agTextColumnFilter',
       editable: true
     },
 
-     {
+    {
       headerName: "Warranty End",
       field: "WarrantyEnd",
       filter: 'agTextColumnFilter',
       editable: true
     },
 
-     {
+    {
       headerName: "Asset Status",
       field: "AssetStatus",
       filter: 'agTextColumnFilter',
       editable: true
     },
-     {
+    {
       headerName: "Location",
       field: "Location",
       filter: 'agTextColumnFilter',
       editable: true
     },
-        {
+    {
       headerName: "Country",
       field: "Country",
       filter: 'agTextColumnFilter',
       editable: true
     },
-        {
+    {
       headerName: "Status",
       field: "Status",
       filter: 'agTextColumnFilter',
@@ -226,7 +517,7 @@ const [error, setError] = useState('');
     },
   ]
 
-   const handleNavigateWithRowData = (selectedRow) => {
+  const handleNavigateWithRowData = (selectedRow) => {
     navigate("/Assets", { state: { mode: "update", selectedRow } });
   };
 
@@ -234,12 +525,12 @@ const [error, setError] = useState('');
     pagination: true,
   };
 
-    const onGridReady = (params) => {
+  const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
   };
 
-    const reloadGridData = () => {
+  const reloadGridData = () => {
     setrowData([]);
     searchClearInputFields();
   };
@@ -252,7 +543,7 @@ const [error, setError] = useState('');
       return;
     }
 
-    const screenName = "Grade Details Search Report";
+    const screenName = "Asset Details Search Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
 
     /* ================= THEME COLORS ================= */
@@ -355,106 +646,124 @@ const [error, setError] = useState('');
     XLSX.writeFile(workbook, "Asset_Details_Search_Report.xlsx");
   };
 
-const transformRowData = (data) => {
+  const transformRowData = (data) => {
     return data.map((row) => ({
-      "Grade ID": row.GradeID || "",
-      "Grade Name": row.GradeName || "",
-      "Salary Range From": row.salary_range_from || "",
-      "Salary Range To": row.salary_range_to || "",
-      "Basic": row.Basic || "",
-      "HRA": row.HRA || "",
-      "Conveyance": row.Conveyance || "",
-      "Medical": row.Medical || "",
-      "Special Allowance": row.Special_Allowance || "",
-      "Company PF Contribution": row.Company_Pf_Contribution || "",
-      "Bonus/Arrears": row.Bonus_Arrears || "",
-      "Other Allowance": row.Other_Allowance || "",
-      "Leave Deductions": row.LeaveDeduction || "",
-      "Other Deductions": row.otherDeductions || "",
-      "CTC Currency": row.ctc_currency || "",
-      "Minimum Take Salary": row.minimum_take_salary || "",
+      "Asset ID": row.AssetID || "",
+      "Asset Code": row.Asset_Code || "",
+      "Asset Name": row.AssetName || "",
+      "Asset Category": row.AssetCategory || "",
+      "Serial Number": row.SerialNumber || "",
+      "Bar code": row.Bar_code || "",
+      "Brand": row.Brand || "",
+      "Model": row.Model || "",
+      "Purchase Date": row.PurchaseDate || "",
+      "Purchase Cost": row.PurchaseCost || "",
+      "Currency Code": row.CurrencyCode || "",
+      " VendorName": row.VendorName || "",
+      "Warranty Start": row.WarrantyStart || "",
+      "Warranty End": row.WarrantyEnd || "",
+      "AssetStatus": row.AssetStatus || "",
+      "Location": row.Location || "",
+      "company_code": row.company_code || "",
+      "Country": row.Country || "",
+      "Status": row.Status || "",
+
     }));
   };
 
-    const getCSSVariable = (variableName) => {
+  const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
       .trim();
   };
 
+
+  const handleReload = () => {
+    window.location.reload();
+  }
+
   const handleSearch = async () => {
-      setLoading(true);
-      try {
-        const body = {
-          AssetID: AssetID,
-          AssetCode: AssetCode,
-          AssetName: AssetName,
-          AssetCategory:AssetCategory,
-          SerialNumber:parseFloat (SerialNumber),
-          Barcode: Barcode,
-          Brand: Brand,
-          Model: Model,
-          PurchaseDate: PurchaseDate,
-          PurchaseCost: PurchaseCost,
-          CurrencyCode: CurrencyCode,
-          VendorName: VendorName,
-          WarrantyStart: WarrantyStart,
-          WarrantyEnd: WarrantyEnd,
-          AssetStatus: AssetStatus,
-          Location: Location,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }
-        const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body) // Send company_no and company_name as search criteria
-        });
-        if (response.ok) {
-          const fetchedData = await response.json();
-          const newRows = fetchedData.map((matchedItem) => ({
-  
-  
-            AssetID: matchedItem.AssetID,
-            AssetCode: matchedItem.AssetCode,
-            AssetName: matchedItem.AssetName,
-            AssetCategory: matchedItem.AssetCategory,
-            SerialNumber: matchedItem.SerialNumber,
-            Barcode: matchedItem.Barcode,
-            Brand: matchedItem.Brand,
-            Model: matchedItem.Model,
-            PurchaseDate: matchedItem.PurchaseDate,
-            PurchaseCost: matchedItem.PurchaseCost,
-            CurrencyCode: matchedItem.CurrencyCode,
-            VendorName: matchedItem.VendorName,
-            WarrantyStart: matchedItem.WarrantyStart,
-            WarrantyEnd: matchedItem.WarrantyEnd,
-            AssetStatus: matchedItem.AssetStatus,
-             Location: matchedItem.Location,
-            minimum_take_salary: matchedItem.minimum_take_salary,
-          }));
-          setrowData(newRows);
-        } else if (response.status === 404) {
-          console.log("Data Not found");
-          toast.warning("Data Not found");
-          setrowData([]);
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Failed to insert sales data");
-          console.error(errorResponse.details || errorResponse.message);
-          setrowData([]);
-        }
-      } catch (error) {
-        console.error("Error fetching search data:", error);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+
+    try {
+      const body = {
+        AssetID: AssetID ? parseInt(AssetID) : 0,
+        Asset_Code: Asset_Code,
+        AssetName: AssetName,
+        AssetCategory: AssetCategory,
+        SerialNumber: SerialNumber,
+        Bar_code: Bar_code,
+        Brand: Brand,
+        Model: Model,
+        PurchaseDate: PurchaseDate ? PurchaseDate : null,
+        WarrantyStart: WarrantyStart ? WarrantyStart : null,
+        WarrantyEnd: WarrantyEnd ? WarrantyEnd : null,
+        PurchaseCost: PurchaseCost ? parseFloat(PurchaseCost) : 0,
+        CurrencyCode: selectedCurrency,
+        VendorName: VendorName,
+        AssetStatus: AssetStatus,
+        Location: Location,
+        Country: selectedCountry,
+
+        Status: selectedStatus,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_SC`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+
+        const newRows = fetchedData.map((item) => ({
+          AssetID: item.AssetID,
+          Asset_Code: item.Asset_Code,
+          AssetName: item.AssetName,
+          AssetCategory: item.AssetCategory,
+          SerialNumber: item.SerialNumber,
+          Bar_code: item.Bar_code,
+          Brand: item.Brand,
+          Model: item.Model,
+          PurchaseDate: item.PurchaseDate,
+          PurchaseCost: item.PurchaseCost,
+          CurrencyCode: item.CurrencyCode,
+          VendorName: item.VendorName,
+          WarrantyStart: item.WarrantyStart,
+          WarrantyEnd: item.WarrantyEnd,
+          AssetStatus: item.AssetStatus,
+          Location: item.Location,
+          Country: item.Country,
+          Status: item.Status,
+        }));
+
+        setrowData(newRows);
+
+      } else if (response.status === 404) {
+        toast.warning("Data Not found");
+        setrowData([]);
+      } else {
+        const errorResponse = await response.json();
+        toast.error(errorResponse.message || "Something went wrong");
+        setrowData([]);
       }
-    };
-  
-const handleSave = async () => {
-    if (!AssetID || !AssetCode || !AssetName || !AssetCategory || 
-      !SerialNumber) {
+
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!AssetID || !Asset_Code || !AssetName || !AssetCategory ||
+      !SerialNumber || !Bar_code || !Brand || !Model || !PurchaseDate || !PurchaseCost
+      || !CurrencyCode || !VendorName || !WarrantyStart || !WarrantyEnd || !Location) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -463,28 +772,28 @@ const handleSave = async () => {
     try {
 
       const Header = {
-          AssetID: AssetID,
-          AssetCode: AssetCode,
-          AssetName: AssetName,
-          AssetCategory:AssetCategory,
-          SerialNumber:parseFloat (SerialNumber),
-          Barcode: Barcode,
-          Brand: Brand,
-          Model: Model,
-          PurchaseDate: PurchaseDate,
-          PurchaseCost: PurchaseCost,
-          CurrencyCode: CurrencyCode,
-          VendorName: VendorName,
-          WarrantyStart:WarrantyStart,
-          WarrantyEnd:WarrantyEnd,
-          AssetStatus: AssetStatus,
+        AssetID: AssetID,
+        Asset_Code: Asset_Code,
+        AssetName: AssetName,
+        AssetCategory: AssetCategory,
+        SerialNumber: parseFloat(SerialNumber),
+        Bar_code: Bar_code,
+        Brand: Brand,
+        Model: Model,
+        PurchaseDate: PurchaseDate,
+        PurchaseCost: PurchaseCost,
+        CurrencyCode: CurrencyCode,
+        VendorName: VendorName,
+        WarrantyStart: WarrantyStart,
+        WarrantyEnd: WarrantyEnd,
+        AssetStatus: AssetStatus,
         Location: Location,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode')
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/addGrade`, {
+      const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrInsert`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -511,8 +820,126 @@ const handleSave = async () => {
     }
   };
 
-    return(
-       <div class="container-fluid Topnav-screen ">
+  const saveEditedData = async () => {
+    showConfirmationToast(
+      "Are you sure you want to update the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+
+          const dataToSend = {
+            EmployeeAssets_HdrData: (Array.isArray(rowData) ? rowData : [rowData]).map((row) => ({
+
+              AssetID: row.AssetID || 0,
+              Asset_Code: row.Asset_Code,
+              AssetName: row.AssetName,
+              AssetCategory: row.AssetCategory,
+              SerialNumber: row.SerialNumber,
+              Bar_code: row.Bar_code,
+              Brand: row.Brand,
+              Model: row.Model,
+              PurchaseDate: row.PurchaseDate ? row.PurchaseDate : null,
+              WarrantyStart: row.WarrantyStart ? row.WarrantyStart : null,
+              WarrantyEnd: row.WarrantyEnd ? row.WarrantyEnd : null,
+
+              PurchaseCost: row.PurchaseCost ? parseFloat(row.PurchaseCost) : 0,
+              CurrencyCode: row.CurrencyCode,
+              VendorName: row.VendorName,
+              AssetStatus: row.AssetStatus,
+              Location: row.Location,
+              Country: row.Country,
+              Status: row.Status,
+              company_code: company_code,
+              Keyfield: row.Keyfield,
+              modify_by: modified_by,
+              modify_date: new Date(),
+            })),
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          });
+
+          if (response.ok) {
+            toast.success("Data updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.error(errorResponse.message || "Update failed");
+          }
+
+        } catch (error) {
+          console.error("Error updating rows:", error);
+          toast.error("Error Updating Data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Update cancelled");
+      }
+    );
+  };
+
+
+  const deleteSelectedRows = async (rowData) => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    showConfirmationToast(
+      "Are you sure you want to delete the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const dataToSend = {
+            EmployeeAssets_HdrData: (Array.isArray(rowData) ? rowData : [rowData]).map((row) => ({
+              AssetID: row.AssetID,
+              company_code: company_code,
+            })),
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrLoopDelete`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          });
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.error(errorResponse.message || "Failed to delete data");
+          }
+
+        } catch (error) {
+          console.error("Error deleting rows:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data delete cancelled.");
+      }
+    );
+  };
+
+
+  return (
+    <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
@@ -521,15 +948,15 @@ const handleSave = async () => {
 
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && (
-              <div className="action-icon add" 
-              onClick={handleSave}
+              <div className="action-icon add"
+                onClick={handleSave}
               >
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
-            <div className="action-icon print" 
-            //onClick={handleReload}
+            <div className="action-icon print"
+              onClick={handleReload}
             >
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -546,25 +973,25 @@ const handleSave = async () => {
 
               {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
               {saveButtonVisible && (
-                <li className="dropdown-item" 
-                // onClick={handleSave}
+                <li className="dropdown-item"
+                  onClick={handleSave}
                 >
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
               )}
               {/*})}*/}
 
-              <li className="dropdown-item" 
-            //   onClick={handleReload}
+              <li className="dropdown-item"
+                onClick={handleReload}
               >
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
 
             </ul>
           </div>
-        </div>  
+        </div>
       </div>
-<div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
           <div className="col-md-2">
@@ -592,11 +1019,11 @@ const handleSave = async () => {
                 type="Text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={AssetCode}
-                onChange={(e) => setAssetCode(e.target.value)}
+                value={Asset_Code}
+                onChange={(e) => setAsset_Code(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetCode ? 'text-danger' : ''}`}> AssetCode<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !Asset_Code ? 'text-danger' : ''}`}> AssetCode<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -615,7 +1042,7 @@ const handleSave = async () => {
               <label className={` exp-form-labels ${error && !AssetName ? 'text-danger' : ''}`}> Asset Name<span className="text-danger">*</span></label>
             </div>
           </div>
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Asset Category "
@@ -642,11 +1069,11 @@ const handleSave = async () => {
                 onChange={(e) => setSerialNumber(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !SerialNumber ? 'text-danger' : ''}`}> Asset Category<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !SerialNumber ? 'text-danger' : ''}`}> Serial Number<span className="text-danger">*</span></label>
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -654,15 +1081,15 @@ const handleSave = async () => {
                 type="Text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={Barcode}
-                onChange={(e) => setBarcode(e.target.value)}
+                value={Bar_code}
+                onChange={(e) => setBar_code(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Barcode ? 'text-danger' : ''}`}> Barcode<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !Bar_code ? 'text-danger' : ''}`}> Barcode<span className="text-danger">*</span></label>
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -678,7 +1105,7 @@ const handleSave = async () => {
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -693,7 +1120,7 @@ const handleSave = async () => {
               <label className={` exp-form-labels ${error && !Model ? 'text-danger' : ''}`}> Model<span className="text-danger">*</span></label>
             </div>
           </div>
-             <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -708,13 +1135,13 @@ const handleSave = async () => {
               <label className={` exp-form-labels ${error && !PurchaseDate ? 'text-danger' : ''}`}> PurchaseDate<span className="text-danger">*</span></label>
             </div>
           </div>
-          
-               <div className="col-md-2">
+
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="PurchaseCost"
                 class="exp-input-field form-control"
-                type="date"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
                 value={PurchaseCost}
@@ -725,19 +1152,26 @@ const handleSave = async () => {
             </div>
           </div>
 
-              <div className="col-md-2">
-            <div className="inputGroup">
+          <div className="col-md-2">
+            <div className={`inputGroup selectGroup 
+                            ${selectedCurrency ? "has-value" : ""} 
+                            ${isSelectedCurrency ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
               <Select
                 id="PurchaseCost"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={CurrencyCode}
-                onChange={(e) => setCurrencyCode(e.target.value)}
+                onFocus={() => setIsSelectedCurrency(true)}
+                onBlur={() => setIsSelectedCurrency(false)}
+                value={selectedCurrency}
+                onChange={handleChangeCurrency}
+                options={filteredOptionCurrency}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !CurrencyCode ? 'text-danger' : ''}`}> CurrencyCode<span className="text-danger">*</span></label>
+              <label for="sname" className={`floating-label ${error && !CurrencyCode ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -790,22 +1224,26 @@ const handleSave = async () => {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div className={`inputGroup selectGroup 
+                            ${selectedStatus ? "has-value" : ""} 
+                            ${isSearchStatus ? "is-focused" : ""}`}
+              title="Please select the Approval Status"
+            >
+              <Select
                 id="AssetStatus"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Grade Name"
-                value={AssetStatus}
-                onChange={(e) => setAssetStatus(e.target.value)}
+                value={selectedStatus}
+                onChange={handleStatus}
+                options={filterOptionStatus}
+                placeholder=" "
+                onFocus={() => setIsSearchStatus(true)}
+                onBlur={() => setIsSearchStatus(false)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetStatus ? 'text-danger' : ''}`}> Asset Status<span className="text-danger">*</span></label>
+              <label className={`floating-label ${error && !AssetStatus ? 'text-danger' : ''}`}> Asset Status<span className="text-danger">*</span></label>
             </div>
           </div>
 
-  <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Location"
@@ -821,41 +1259,49 @@ const handleSave = async () => {
             </div>
           </div>
 
- <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+          <div className="col-md-2">
+            <div className={`inputGroup selectGroup 
+              ${selectedCountry ? "has-value" : ""} 
+              ${isSelectCountry ? "is-focused" : ""}`}
+            >
+              <Select
                 id="Country"
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
-                value={Country}
-                onChange={(e) => setCountry(e.target.value)}
+                onFocus={() => setIsSelectCountry(true)}
+                onBlur={() => setIsSelectCountry(false)}
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                options={filteredOptionCountry}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Country ? 'text-danger' : ''}`}>Country<span className="text-danger">*</span></label>
+              <label for="sname" className={`floating-label ${error && !Country ? 'text-danger' : ''}`}>Country<span className="text-danger">*</span></label>
             </div>
           </div>
 
-          
+
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+            >
+              <Select
                 id="Status"
-                class="exp-input-field form-control"
+              
                 type="text"
-                placeholder=""
-                required title="Please Enter the Grade Name"
-                value={Status}
-                onChange={(e) => setStatus(e.target.value)}
-                maxLength={100}
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
               />
-              <label className={` exp-form-labels ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
+              <label for="sname" className={`floating-label ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
             </div>
           </div>
-          </div>
-       </div>
+        </div>
+      </div>
 
 
       <div className="shadow-lg p-3 bg-light rounded  container-form-box mt-2">
@@ -864,7 +1310,7 @@ const handleSave = async () => {
         </div>
 
 
- <div className="row g-3">
+        <div className="row g-3">
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -876,10 +1322,10 @@ const handleSave = async () => {
                 required title="Please Enter the Grade ID"
                 value={AssetID}
                 onChange={(e) => setAssetID(e.target.value)}
-               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={50}
               />
-             <label className="exp-form-labels">Asset ID</label>
+              <label className="exp-form-labels">Asset ID</label>
             </div>
           </div>
 
@@ -891,13 +1337,13 @@ const handleSave = async () => {
                 type="Text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={AssetCode}
-                onChange={(e) => setAssetCode(e.target.value)}
+                value={Asset_Code}
+                onChange={(e) => setAsset_Code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
-               <label className="exp-form-labels">Asset Code</label>
+              <label className="exp-form-labels">Asset Code</label>
             </div>
           </div>
 
@@ -911,13 +1357,13 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={AssetName}
                 onChange={(e) => setAssetName(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Name</label>
             </div>
           </div>
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Asset Category "
@@ -927,7 +1373,7 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={AssetCategory}
                 onChange={(e) => setAssetCategory(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Category</label>
@@ -950,7 +1396,7 @@ const handleSave = async () => {
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -958,7 +1404,7 @@ const handleSave = async () => {
                 type="Text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={Barcode}
+                value={Bar_code}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
@@ -966,7 +1412,7 @@ const handleSave = async () => {
             </div>
           </div>
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -976,14 +1422,14 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={Brand}
                 onChange={(e) => setBrand(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Brand</label>
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -993,13 +1439,13 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={Model}
                 onChange={(e) => setModel(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Model</label>
             </div>
           </div>
-             <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="SerialNumber"
@@ -1015,39 +1461,46 @@ const handleSave = async () => {
               <label className="exp-form-labels">Purchase Date</label>
             </div>
           </div>
-          
-               <div className="col-md-2">
+
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="PurchaseCost"
                 class="exp-input-field form-control"
-                type="date"
+                type="text"
                 placeholder=""
                 required title="Please Enter the Grade Name"
                 value={PurchaseCost}
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
               />
               <label className="exp-form-labels">Purchase Cost</label>
             </div>
           </div>
 
-              <div className="col-md-2">
-            <div className="inputGroup">
+          <div className="col-md-2">
+            <div className={`inputGroup selectGroup 
+                            ${selectedCurrencySc ? "has-value" : ""} 
+                            ${isSelectedCurrencySc ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
               <Select
                 id="PurchaseCost"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
                 required title="Please Enter the Grade Name"
-                value={CurrencyCode}
-                onChange={(e) => setCurrencyCode(e.target.value)}
-                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onFocus={() => setIsSelectedCurrencySc(true)}
+                onBlur={() => setIsSelectedCurrencySc(false)}
+                value={selectedCurrencySc}
+                onChange={handleChangeCurrencySc}
+                options={filteredOptionCurrencySc}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
-              <label className="exp-form-labels">Currency Code</label>
+              <label for="sname" className={`floating-label`}>Currency Code</label>
             </div>
           </div>
 
@@ -1061,7 +1514,7 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={VendorName}
                 onChange={(e) => setVendorName(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Vendor Name</label>
@@ -1078,7 +1531,7 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyStart}
                 onChange={(e) => setWarrantyStart(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty Start</label>
@@ -1095,7 +1548,7 @@ const handleSave = async () => {
                 required title="Please Enter the Grade Name"
                 value={WarrantyEnd}
                 onChange={(e) => setWarrantyEnd(e.target.value)}
-               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty End</label>
@@ -1103,24 +1556,29 @@ const handleSave = async () => {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div className={`inputGroup selectGroup 
+                            ${selectedStatus ? "has-value" : ""} 
+                            ${isSelectedStatus ? "is-focused" : ""}`}
+              title="Please enter the Status"
+            >
+              <Select
                 id="AssetStatus"
-                class="exp-input-field form-control"
                 type="text"
-                placeholder=""
-                required title="Please Enter the Grade Name"
-                value={AssetStatus}
-                onChange={(e) => setAssetStatus(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                value={selectedStatusSC}
+                onChange={handlechangestatusSC}
+                options={filterOptionStatusSC}
+                placeholder=" "
+                onFocus={() => setIsSearchStatusSC(true)}
+                onBlur={() => setIsSearchStatusSC(false)}
+
 
                 maxLength={100}
               />
-              <label className="exp-form-labels">Asset Status</label>
+              <label for="sname" className={`floating-label`}>Asset Status </label>
             </div>
           </div>
 
-  <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Location"
@@ -1138,61 +1596,69 @@ const handleSave = async () => {
             </div>
           </div>
 
- <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+          <div className="col-md-2">
+            <div className={`inputGroup selectGroup 
+              ${selectedCountrySC ? "has-value" : ""} 
+              ${isSelectCountrySC ? "is-focused" : ""}`}
+            >
+              <Select
                 id="Country"
                 class="exp-input-field form-control"
                 type="text"
-                placeholder=""
-                required title="Please Enter the Grade Name"
-                value={Country}
-                onChange={(e) => setCountry(e.target.value)}
+                onFocus={() => setIsSelectCountrySC(true)}
+                onBlur={() => setIsSelectCountrySC(false)}
+                value={selectedCountrySC}
+                onChange={handleCountryChangeSC}
+                options={filteredOptionCountrySC}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
                 maxLength={100}
               />
-              <label className="exp-form-labels">Country</label>
+              <label for="sname" className={`floating-label`}>Country</label>
             </div>
           </div>
 
-          
+
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
+            <div className={`inputGroup selectGroup 
+              ${selectedstatus ? "has-value" : ""} 
+              ${isSelectstatus ? "is-focused" : ""}`}
+            >
+              <Select
                 id="Status"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required title="Please Enter the Grade Name"
-                value={Status}
-                onChange={(e) => setStatus(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
 
-                maxLength={100}
+                value={selectedstatus}
+                onChange={handlechangestatus}
+                options={filteredoptionstatus}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                placeholder=" "
+                onFocus={() => setIsSelectstatus(true)}
+                onBlur={() => setIsSelectstatus(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-             <label className="exp-form-labels">Status</label>
+              <label className="exp-form-labels">Status</label>
             </div>
           </div>
-  <div className="col-12">
+          <div className="col-12">
             <div className="search-btn-wrapper">
-              <div className="icon-btn search" 
-              onClick={handleSearch}
+              <div className="icon-btn search"
+                onClick={handleSearch}
               >
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" 
-              onClick={reloadGridData}
+              <div className="icon-btn reload"
+                onClick={reloadGridData}
               >
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
 
-              <div className="icon-btn excel" 
-               onClick={handleExportToExcel}
+              <div className="icon-btn excel"
+                onClick={handleExportToExcel}
               >
                 <span className="tooltip">Excel</span>
                 <i className="fa-solid fa-file-excel"></i>
@@ -1203,7 +1669,7 @@ const handleSave = async () => {
         </div>
       </div>
 
-        <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+      <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
         <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
           <AgGridReact
             rowData={rowData}
@@ -1221,16 +1687,16 @@ const handleSave = async () => {
       </div>
 
 
-          </div>
-          
+    </div>
 
 
 
 
-          
 
-      
-    )
+
+
+
+  )
 }
 
 export default Assets;
