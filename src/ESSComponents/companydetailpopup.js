@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import * as React from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -10,6 +10,7 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
+import Select from 'react-select';
 const config = require('../Apiconfig');
 
 
@@ -106,6 +107,93 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [selectedmanager, setselectedmanager] = useState('');
+  const [isSelectManager, setIsSelectManager] = useState(false);
+  const [Managerdrop, setManagerdrop] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [status, setStatus] = useState('');
+  const [statusdrop, setStatusdrop] = useState([]);
+  const [from_date, setfrom_date] = useState("");
+  const [to_date, setto_date] = useState("");
+  const [selectedEmpType, setSelectedEmpType] = useState('');
+  const [isSelectEmpType, setIsSelectEmpType] = useState(false);
+  const [empType, setEmpType] = useState('');
+  const [Employee_Type, setEmployee_Type] = useState('');
+  const [empTypeDrop, setEmpTypeDrop] = useState([]);
+
+  const filteredOptionManager = Array.isArray(Managerdrop)
+    ? Managerdrop.map((option) => ({
+      value: option.EmployeeId,
+      label: `${option.EmployeeId}-${option.full_name}`,
+    }))
+    : [];
+
+    const handleChangeCode = (selectedOption) => {
+    setselectedmanager(selectedOption);
+    setManager(selectedOption ? selectedOption.value : '');
+  };
+
+  useEffect(() => {
+      fetch(`${config.apiBaseUrl}/getESSmanager`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((response) => response.json())
+        .then(setManagerdrop)
+        .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
+    const handleStatusChange = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : '');
+  };
+
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val));
+  }, []);
+
+  const handleChangeEmpType = (selectedEmpType) => {
+    setSelectedEmpType(selectedEmpType);
+    setEmpType(selectedEmpType ? selectedEmpType.value : '');
+  };
+
+  const filteredOptionEmpType = empTypeDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getEmployeeType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpTypeDrop(val));
+  }, []);
+
   const handleSearch = async () => {
     setLoading(true)
     try {
@@ -115,7 +203,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          EmployeeId, Department, Designation, manager, Name, company_code: sessionStorage.getItem('selectedCompanyCode')
+          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date, Employee_Type, company_code: sessionStorage.getItem('selectedCompanyCode')
 
         })
       });
@@ -130,9 +218,12 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
             designation_Id: item.Designation,
             DOJ: item.DOJ,
             DOL: item.DOL,
-            manager: item.manager,
+            selectedmanager: item.manager,
             shift: item.shift,
-            status: item.status,
+            selectedstatus: item.status,
+            selectedEmployee_Type: item.Employee_Type,
+            from_date: from_date || null,
+            to_date: to_date || null,
             Employee_Type: item.Employee_Type,
             // First_Name: item.First_Name,
             // Photos: item.Photos ? arrayBufferToBase64(item.Photos.data) : null,
@@ -277,6 +368,114 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     <label className="exp-form-labels">Designation</label>
                   </div>
                 </div>
+
+                <div className="form-block col-md-3">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedmanager ? "has-value" : ""} 
+              ${isSelectManager ? "is-focused" : ""}`}
+            >
+              <Select
+                id="manager"
+                placeholder=" "
+                onFocus={() => setIsSelectManager(true)}
+                onBlur={() => setIsSelectManager(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                name="manager"
+                value={selectedmanager}
+                options={filteredOptionManager}
+                onChange={handleChangeCode}
+                required
+              />
+              <label htmlFor="selectedmanager" className={`floating-label`}>
+                Manager
+              </label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                type="text"
+                placeholder=" "
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+                classNamePrefix="react-select"
+                isClearable
+                value={selectedStatus}
+                onChange={handleStatusChange}
+                options={filteredOptionStatus}
+              />
+              <label htmlFor="Status" className={`floating-label`}>
+                Status
+              </label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="DOJ"
+                className="exp-input-field form-control"
+                type="date"
+                name="DOJ"
+                placeholder=" "
+                value={from_date}
+                onChange={(e) => setfrom_date(e.target.value)}
+                required
+              />
+              <label htmlFor="DOJ" className={`exp-form-labels`}>
+                From Date
+              </label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div className="inputGroup">
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="date"
+                name="DOL"
+                placeholder=" "
+                value={to_date}
+                onChange={(e) => setto_date(e.target.value)}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">To Date</label>
+            </div>
+          </div>
+
+          <div className="form-block col-md-3">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedEmpType ? "has-value" : ""} 
+              ${isSelectEmpType ? "is-focused" : ""}`}
+            >
+              <Select
+                id="shift"
+                type="text"
+                value={selectedEmpType}
+                onChange={handleChangeEmpType}
+                options={filteredOptionEmpType}
+                 placeholder=" "
+                onFocus={() => setIsSelectEmpType(true)}
+                onBlur={() => setIsSelectEmpType(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+          
+            <label htmlFor="selectedshift" className={`floating-label`}>
+              Employee Type
+            </label>
+            </div>
+          </div>
 
                 <div className="form-block col-12">
                   <div className="search-btn-wrapper">

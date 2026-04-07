@@ -25369,7 +25369,7 @@ const getallTITermsandConditions = async (req, res) => {
 };
 
 const EmployeeCompanyISC = async (req, res) => {
-  const { EmployeeId, Department, Designation, Name, manager, company_code, status, from_date, to_date, DOJ, DOL  } =
+  const { EmployeeId, Department, Designation, Name, manager, company_code, status, from_date, to_date, DOJ, DOL, Employee_Type  } =
     req.body;
 
   try {
@@ -25384,12 +25384,13 @@ const EmployeeCompanyISC = async (req, res) => {
       .input("Name", sql.NVarChar, Name)
       .input("company_code", sql.NVarChar, company_code)
       .input("status", sql.NVarChar, status)
-      .input("from_date", sql.Date, from_date)
-      .input("to_date", sql.Date, to_date)
-      .input("DOJ", sql.Date, DOJ)
-      .input("DOL", sql.Date, DOL)
+      .input("Employee_Type", sql.NVarChar, Employee_Type)
+      .input("to_date", sql.Date, to_date ? new Date(to_date) : null)
+      .input("from_date", sql.Date, from_date ? new Date(from_date) : null)
+      .input("DOJ", sql.Date, DOJ ? new Date(DOJ) : null)
+      .input("DOL", sql.Date, DOL ? new Date(DOL) : null)
       .query(
-        `EXEC sp_employee_company_test_DG @mode,@EmployeeId,@department_Id,@designation_Id,@DOJ,@DOL,@manager,'',@status,'',@Name,@company_code,'','','','','',@from_date,@to_date,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_company_test_DG @mode,@EmployeeId,@department_Id,@designation_Id,@DOJ,@DOL,@manager,'',@status,'',@Name,@company_code,'','',@Employee_Type,'','',@from_date,@to_date,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
