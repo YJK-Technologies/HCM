@@ -137,7 +137,7 @@ const handleConfirm = () => {
     AssetID: row.AssetID,
   }));
 
-  onSelectAssets(selectedData);   // ✅ changed
+  onSelectAssets(selectedData);   // changed
   handleClose();
   clearInputs();
   setRowData([]);

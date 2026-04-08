@@ -37,6 +37,18 @@ const columnDefs = [
     editable: false,
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
+    headerName: "Email",
+    field: "email",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
     headerName: "Salary Type",
     field: "salaryType",
     filter: 'agTextColumnFilter',
@@ -87,54 +99,109 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
   const [salaryType, setSalaryType] = useState("");
   const [payScale, setPayScale] = useState("");
   const [salaryPerAnnum, setSalaryPerAnnum] = useState("");
+  const [salary_from, setsalary_from] = useState("");
+  const [salary_to, setsalary_to] = useState("");
 
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
+  const [PFNo, setPFNo] = useState("");
+
   const handleSearch = async () => {
-    setLoading(true)
+    setLoading(true);
+
     try {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      const salaryValue = salaryPerAnnum === "" ? 0 : parseInt(salaryPerAnnum, 10);
-      const response = await fetch(`${config.apiBaseUrl}/getFinancialDetailsSearchCretria`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ EmployeeId, salaryType, Name, Payscale: payScale, salary_month: salaryValue, company_code })
-      });
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      // ✅ Convert salary safely
+      const salaryValue =
+        salaryPerAnnum === "" ? null : parseInt(salaryPerAnnum, 10);
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/getFinancialDetailsSearchCretria`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            EmployeeId,
+            Name,
+            salaryType,
+            Payscale: payScale,
+            PFNo,
+            salary_from: salary_from ? parseFloat(salary_from) : null,
+            salary_to: salary_to ? parseFloat(salary_to) : null,
+            company_code,
+          }),
+        }
+      );
+
       if (response.ok) {
         const searchData = await response.json();
-        setRowData(searchData);
-        console.log("data fetched successfully")
-      } else if (response.status === 404) {
-        toast.warning("Data Not found")
-        setRowData([]);
-        clearInputs([])
-        console.log("Data not found");
-      } else {
+
+        // ✅ Structured mapping (like your second API)
+        const updatedData = searchData.map((item) => ({
+          ...item,
+
+          EmployeeId: item.EmployeeId,
+          Name: item.Name,
+          salaryType: item.salaryType,
+          Payscale: item.Payscale,
+          PFNo: item.PFNo,
+          salary_from: item.salary_from,
+          salary_to: item.salary_to,
+
+          // Optional formatting
+          salaryPerAnnum: item.salary_month
+            ? Number(item.salary_month)
+            : null,
+        }));
+
+        setRowData(updatedData);
+        console.log("data fetched successfully");
+      }
+
+      else if (response.status === 404) {
+        toast.warning("Data Not found");
+        setRowData([]);   // ✅ only clear grid (NOT inputs)
+      }
+
+      else {
         const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
+        toast.warning(errorResponse.message || "Something went wrong");
         setRowData([]);
       }
+
     } catch (error) {
-      console.error("Error deleting rows:", error);
-      toast.error('Error Deleting Data: ' + error.message);
+      console.error("Error fetching search data:", error);
+      toast.error("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleClosePopup = () => {
+    clearInputs();     // ✅ clear all inputs
+    setRowData([]);    // ✅ clear grid
+    handleClose();     // ✅ close popup
+  };
+
   const handleReload = () => {
-    clearInputs([])
-    setRowData([])
+    clearInputs();
+    setRowData([]);
   };
 
   const clearInputs = () => {
     setEmployeeId("");
+    setname("");              // ✅ Name
     setSalaryType("");
     setPayScale("");
     setSalaryPerAnnum("");
+
+    setPFNo("");              // ✅ PF No
+    setsalary_from("");       // ✅ salary range from
+    setsalary_to("");         // ✅ salary range to
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -156,16 +223,14 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
     }));
 
     finaceDetails(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
+    handleClosePopup();
   }
 
   return (
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -174,7 +239,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   <h1 className="custom-modal-title">Financial Details Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
@@ -191,6 +256,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={18}
                       className="exp-input-field form-control"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -206,6 +272,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={225}
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
@@ -221,6 +288,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={50}
                       className="exp-input-field form-control"
                       value={salaryType}
                       onChange={(e) => setSalaryType(e.target.value)}
@@ -236,6 +304,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      maxLength={50}
                       className="exp-input-field form-control"
                       value={payScale}
                       onChange={(e) => setPayScale(e.target.value)}
@@ -245,7 +314,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3">
+                {/* <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
                       type="text"
@@ -257,6 +326,64 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Per Annum</label>
+                  </div>
+                </div> */}
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      class="exp-input-field form-control"
+                      type="text"
+                      id="PFNo"
+                      placeholder=" "
+                      autoComplete="off"
+                      value={PFNo}
+                      onChange={(e) => setPFNo(e.target.value)}
+                      maxLength={100}
+                    />
+                    <label for="sname" className={`exp-form-labels`}>PF No</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      type="number"
+                      autoComplete="off"
+                      placeholder=" "
+                      className="exp-input-field form-control"
+                      value={salary_from}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 18) {
+                          setsalary_from(value);
+                        }
+                      }}
+                      maxLength={18}
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+                    <label className="exp-form-labels">Salary Range From</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      type="number"
+                      autoComplete="off"
+                      placeholder=" "
+                      className="exp-input-field form-control"
+                      value={salary_to}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 18) {
+                          setsalary_to(value);
+                        }
+                      }}
+                      maxLength={18}
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+                    <label className="exp-form-labels">Salary Range To</label>
                   </div>
                 </div>
 

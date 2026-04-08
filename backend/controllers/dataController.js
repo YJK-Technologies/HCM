@@ -25858,7 +25858,7 @@ const TermsTI = async (req, res) => {
 
 //CODE ADDED BY PAVUN 27-12-2024
 const getFinancialDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, Name, salaryType, Payscale, salary_month, company_code } =
+  const { EmployeeId, Name, salaryType, Payscale, salary_month, company_code, PFNo, salary_from, salary_to } =
     req.body;
 
   try {
@@ -25872,8 +25872,11 @@ const getFinancialDetailsSearchCretria = async (req, res) => {
       .input("Payscale", sql.NVarChar, Payscale)
       .input("salary_month", sql.Decimal(14, 2), salary_month)
       .input("company_code", sql.NVarChar, company_code)
+      .input("PFNo", sql.NVarChar, PFNo)
+      .input("salary_from", sql.Decimal(14, 2), salary_from)
+      .input("salary_to", sql.Decimal(14, 2), salary_to)
       .query(
-        `EXEC sp_salary_details @mode,@EmployeeId,@Name,@salaryType,@Payscale,'',@salary_month,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_salary_details_test_DG @mode,@EmployeeId,@Name,@salaryType,@Payscale, @PFNo,@salary_month,'',@company_code,'','',@salary_from,@salary_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25920,6 +25923,8 @@ const getEmpBankDetailsSC = async (req, res) => {
     AccountHolderName,
     bankName,
     Name,
+    branchName,
+    IFSC_Code,
     company_code,
   } = req.body;
 
@@ -25937,8 +25942,10 @@ const getEmpBankDetailsSC = async (req, res) => {
       .input("bankName", sql.NVarChar, bankName)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
+      .input("branchName", sql.NVarChar, branchName)
+      .input("IFSC_Code", sql.NVarChar, IFSC_Code)
       .query(
-        `EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,'','','',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_bankdetails_test_DG @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,@branchName,@IFSC_Code,'',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     // Send response
