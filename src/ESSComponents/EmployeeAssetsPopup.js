@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
-export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsPopup }) {
+export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets , EmployeeAssetsPopup }) {
   const [loading, setLoading] = useState(false);
   const [EmployeeId, setEmployeeId] = useState("");
   const [AssetID, setAssetID] = useState("");
@@ -131,18 +131,17 @@ export default function EmployeeAssetsPopup({ open, handleClose, EmployeeAssetsP
   ]
 
 
-  const handleConfirm = () => {
-    const selectedData = selectedRows.map(row => ({
-      EmployeeID: row.EmployeeId,
-      AssetID: row.AssetID,
-    
-    }));
- EmployeeAssetsPopup(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
-  }
+const handleConfirm = () => {
+  const selectedData = selectedRows.map(row => ({
+    EmployeeID: row.EmployeeId,
+    AssetID: row.AssetID,
+  }));
 
+  onSelectAssets(selectedData);   // changed
+  handleClose();
+  clearInputs();
+  setRowData([]);
+};
    
 
    

@@ -47308,7 +47308,37 @@ const AssetIDDropoption= async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-//code Ended by mathu -08-04-2026
+//code Ended by mathu -08-04-2026//code added by Sakthi 08-04-2026
+const getTHRSReport = async (req, res) => {
+  const { start_date, end_date, userid, company_code, Status } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "THRS") 
+      .input("start_date", sql.Date, start_date)
+      .input("end_date", sql.Date, end_date)
+      .input("userid", sql.VarChar, userid)
+      .input("company_code", sql.VarChar, company_code)
+      .input("Status", sql.VarChar, Status)
+      .query(` EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
+
+    if (result.recordset && result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(200).json([]); 
+    }
+  } catch (err) {
+    console.error("THRS Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Sakthi 08-04-2026
+
 
 module.exports = {
   login,
@@ -48655,12 +48685,12 @@ module.exports = {
   DepartmentLoanAmount,
   LoanStatusTrend,
   OverduevsPaid,
+  getTHRSReport,
   EmployeeAssets_HdrInsert,
   EmployeeAssets_HdrLoopInsert,
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
   AssetIDDropoption
-  
 
 };

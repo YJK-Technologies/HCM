@@ -5,7 +5,16 @@ import { Doughnut, Bar } from "react-chartjs-2";
 import { getElementAtEvent } from "react-chartjs-2";
 import Vector from "./Team.png";
 import Select from "react-select";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip as ChartTooltip, Legend as ChartLegend, Title, ArcElement, } from "chart.js";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+  Title,
+  ArcElement,
+} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -15,7 +24,14 @@ import config from "../Apiconfig";
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 ChartJS.register(
   BarElement,
@@ -147,12 +163,130 @@ const Dashboard = () => {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     fetchDashboardData();
     const interval = setInterval(fetchDashboardData, 5000);
     return () => clearInterval(interval);
   }, []);
+  // Task Hour Report Summary
+  const [rowDataTHRS, setRowDataTHRS] = useState([]);
+  const [userDrop, setUserDrop] = useState([]);
+  const [user, setUser] = useState("");
+  const [selectedUser, setSelectedUser] = useState("");
+  const [isSelectUser, setIsSelectUser] = useState(false);
 
+  const filteredOptionUser = Array.isArray(userDrop)
+    ? userDrop.map((option) => ({
+        value: option.user_code,
+        label: `${option.user_code} - ${option.user_name}`,
+      }))
+    : [];
+
+  const handleChangeUser = async (selectedUser) => {
+    setSelectedUser(selectedUser);
+    setUser(selectedUser ? selectedUser.value : "");
+  };
+
+  useEffect(() => {
+    const fetchUserCodes = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/usercode`);
+        const data = await response.json();
+        console.log("Fetched user codes:", data);
+
+        if (response.ok) {
+          const updatedData = [{ user_code: "ALL", user_name: "All" }, ...data];
+          setUserDrop(updatedData);
+
+          const defaultOption = {
+            value: "ALL",
+            label: "All",
+          };
+          setSelectedUser(defaultOption);
+          setUser(defaultOption.value);
+        } else {
+          console.warn("No data found for user codes");
+          setUserDrop([]);
+        }
+      } catch (error) {
+        console.error("Error fetching user codes:", error);
+      }
+    };
+
+    fetchUserCodes();
+  }, []);
+
+
+  const fetchTHRSGridData = async () => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start_date: shiftFromDate || null,
+          end_date: shiftToDate || null,
+          userid: user,
+          company_code,
+          Status: "Active", // important (not ALL)
+        }),
+      });
+
+      const data = await res.json();
+
+      const safeData = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+
+      setRowDataTHRS(safeData);
+    } catch (err) {
+      console.error("THRS Fetch Error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTHRSGridDataAuto();
+  }, []);
+
+const fetchTHRSGridDataAuto = async () => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    // get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+
+    const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        start_date: shiftFromDate || today,
+        end_date: shiftToDate || today,
+        userid: "All",
+        company_code,
+        Status: "Active",
+      }),
+    });
+
+    const data = await res.json();
+
+    const safeData = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+      ? data.data
+      : [];
+
+    setRowDataTHRS(safeData);
+  } catch (err) {
+    console.error("THRS Fetch Error:", err);
+  }
+};
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -1617,6 +1751,29 @@ const Dashboard = () => {
     },
   ];
 
+  // AG Grid columns For Time and Hours
+  const columnDefsTHRS = [
+    { headerName: "User", field: "user_name" },
+  {
+    headerName: "Working Date",
+    field: "work_date",
+    valueFormatter: (params) => {
+      if (!params.value) return "";
+      const date = new Date(params.value);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    },
+  },    { headerName: "Shift code", field: "Shift_Code" },
+    { headerName: "Status", field: "Status" },
+    { headerName: "Total Login Hours", field: "Total_login_Hours" },
+    { headerName: "First CheckIn", field: "First_CheckIn" },
+    { headerName: "Last CheckOut", field: "Last_CheckOut" },
+    { headerName: "Over Time", field: "Overtime" },
+    { headerName: "Under Time", field: "Undertime" },
+  ];
+
   useEffect(() => {
     const timer = setInterval(() => {
       updateTime(new Date());
@@ -2605,14 +2762,24 @@ const Dashboard = () => {
                           <div className="joinee-accent-circle-bottom"></div>
 
                           <div className="profile-image-wrapper">
-                            <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                            <img
+                              src={joinee.Photos}
+                              className="joinee-img-modern"
+                              alt="profile"
+                            />
                             <div className="joinee-icon-badge">✨</div>
                           </div>
 
                           <div className="joinee-details mt-3">
-                            <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
-                            <p className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</p>
-                            <div className="welcome-badge">Welcome Onboard! 🤝</div>
+                            <h6 className="emp-name-text">
+                              {joinee.EmployeeName}
+                            </h6>
+                            <p className="emp-dept-sub">
+                              {joinee.department_ID} • {joinee.EmployeeId}
+                            </p>
+                            <div className="welcome-badge">
+                              Welcome Onboard! 🤝
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -2620,20 +2787,29 @@ const Dashboard = () => {
                   ) : (
                     <div className="no-birthday-view">
                       <div className="empty-icon">👥</div>
-                      <p className="text-muted-color">No new joinees this month</p>
+                      <p className="text-muted-color">
+                        No new joinees this month
+                      </p>
                     </div>
                   )}
                 </div>
 
                 {NewJoinees.length > 1 && (
                   <div className="joinee-nav-controls-bottom">
-                    <button className="nav-btn" onClick={handleJoineePrev}>❮</button>
+                    <button className="nav-btn" onClick={handleJoineePrev}>
+                      ❮
+                    </button>
                     <div className="joinee-nav-dots">
                       {NewJoinees.map((_, i) => (
-                        <span key={i} className={`dot ${currentIndexJoinee === i ? 'active' : ''}`}></span>
+                        <span
+                          key={i}
+                          className={`dot ${currentIndexJoinee === i ? "active" : ""}`}
+                        ></span>
                       ))}
                     </div>
-                    <button className="nav-btn" onClick={handleJoineeNext}>❯</button>
+                    <button className="nav-btn" onClick={handleJoineeNext}>
+                      ❯
+                    </button>
                   </div>
                 )}
               </div>
@@ -2702,66 +2878,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-
-            <div className="grid-col-12 spacing-mt-2">
-              <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
-                {/* Header */}
-                <div className="myteam-header">
-                  <h6 className="card-title-heading spacing-mb-2">My Team</h6>
-
-                  <div className="myteam-actions">
-                    <Select
-                      id="status"
-                      value={SelectedManager}
-                      onChange={handleChangeManager}
-                      options={filteredOptionManager}
-                      className="team-select-wrapper"
-                    />
-
-                    <button
-                      className="shadow-none-custom team-toggle-button"
-                      onClick={() => {
-                        setViewChart(!viewChart);
-                        if (viewChart) {
-                          fetchGridData();
-                        }
-                      }}
-                    >
-                      {viewChart ? "Team List" : "Chart"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                {viewChart ? (
-                  <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
-                    <div className="grid-col-md-8 grid-col-12">
-                      <div
-                        className="chart-container spacing-mt-2"
-                        style={{ height: 250, width: "100%" }}
-                      >
-                        {teamData?.labels?.length > 0 ? (
-                          <Doughnut data={teamData} options={teamOptions} />
-                        ) : (
-                          <div>No data</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl"
-                    style={{ height: 255, width: "100%" }}
-                  >
-                    <AgGridReact
-                      columnDefs={columnDefsList}
-                      rowData={rowDataTeamList}
-                      rowHeight={30}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
 
@@ -2789,7 +2905,7 @@ const Dashboard = () => {
             {/* Scrollable List Container */}
             <div
               className="custom-list-container"
-              style={{ height: "1000px", overflowY: "auto" }}
+              style={{ overflowY: "auto" }}
             >
               {dashboardRequests.length > 0 ? (
                 dashboardRequests.map((req, index) => (
@@ -2894,6 +3010,149 @@ const Dashboard = () => {
                   <p>No Pending Requests</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="dashboard-row row ">
+        <div className="col-6 spacing-mt-2">
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+            {/* Header */}
+            <div className="myteam-header">
+              <h6 className="card-title-heading spacing-mb-2">My Team</h6>
+
+              <div className="myteam-actions">
+                <Select
+                  id="status"
+                  value={SelectedManager}
+                  onChange={handleChangeManager}
+                  options={filteredOptionManager}
+                  className="team-select-wrapper"
+                />
+
+                <button
+                  className="shadow-none-custom team-toggle-button"
+                  onClick={() => {
+                    setViewChart(!viewChart);
+                    if (viewChart) {
+                      fetchGridData();
+                    }
+                  }}
+                >
+                  {viewChart ? "Team List" : "Chart"}
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            {viewChart ? (
+              <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
+                <div className="grid-col-md-8 grid-col-12">
+                  <div
+                    className="chart-container spacing-mt-2"
+                    style={{ height: 250, width: "100%" }}
+                  >
+                    {teamData?.labels?.length > 0 ? (
+                      <Doughnut data={teamData} options={teamOptions} />
+                    ) : (
+                      <div>No data</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl"
+                style={{ height: 255, width: "100%" }}
+              >
+                <AgGridReact
+                  columnDefs={columnDefsList}
+                  rowData={rowDataTeamList}
+                  rowHeight={30}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="col-6 spacing-mt-2">
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+            {/* Header */}
+            <div className="myteam-header">
+              <h6 className="card-title-heading spacing-mb-2">Time Tracking</h6>
+            </div>
+
+            {/* Filters */}
+            <div className="d-flex flex-row align-items-center gap-2 spacing-mb-3 px-2">
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={shiftFromDate}
+                    onChange={(e) => setShiftFromDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">From Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={shiftToDate}
+                    onChange={(e) => setShiftToDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">To Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedUser ? "has-value" : ""} 
+                  ${isSelectUser ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="Approvedby"
+                    value={selectedUser}
+                    onChange={handleChangeUser}
+                    options={filteredOptionUser}
+                    classNamePrefix="react-select"
+                    placeholder=" "
+                    onFocus={() => setIsSelectUser(true)}
+                    onBlur={() => setIsSelectUser(false)}
+                    isClearable
+                  />
+                  <label for="sname" className="floating-label">
+                    User Code
+                  </label>
+                </div>
+              </div>
+
+              {/* Search */}
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={fetchTHRSGridData}
+                style={{ height: "30px", width: "40px" }}
+                title="Search"
+              >
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+
+            </div>
+
+            {/* Grid */}
+            <div
+              className="app-grid-theme ag-theme-alpine spacing-mt-2 rounded-xl"
+              style={{ height: 255, width: "100%" }}
+            >
+              <AgGridReact
+                columnDefs={columnDefsTHRS}
+                rowData={rowDataTHRS}
+                rowHeight={30}
+              />
             </div>
           </div>
         </div>
