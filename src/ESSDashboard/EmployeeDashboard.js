@@ -61,6 +61,7 @@ const Dashboard = (payslip) => {
   const [currentIndexJoinee, setCurrentIndexJoinee] = useState(0);
   const carouselRef = useRef(null);
   const joineeCarouselRef = useRef(null);
+  
 
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
@@ -293,7 +294,6 @@ const Dashboard = (payslip) => {
     setShiftFromDate(from);
     setShiftToDate(to);
 
-    // 👉 Call API with correct values
     handleEmpShiftReportSearch(from, to);
 
   }, []);
@@ -463,6 +463,7 @@ const Dashboard = (payslip) => {
           Last_CheckOut: matchedItem.Last_CheckOut,
           total_worked_hours: matchedItem.total_worked_hours,
           Total_login_Hours: matchedItem.Total_login_Hours,
+          Status: matchedItem.Status,
         }));
         setRowData(newRows);
       } else if (response.status === 404) {
@@ -536,6 +537,25 @@ const Dashboard = (payslip) => {
     },
   ];
 
+
+  const StatusCellRenderer = (params) => {
+    if (params.value === "Compensatory Leave") {
+      return (
+        <div className="status-action-wrapper">
+          <button
+            className="btn-request-premium"
+          // onClick={() => handleRequest(params.data)}
+          >
+            <i className="fa-solid fa-paper-plane"></i>
+            <span>Request</span>
+          </button>
+        </div>
+      );
+    }
+
+    return <span className="status-text-default">{params.value}</span>;
+  };
+
   const Employeecol = [
     {
       headerName: "Date",
@@ -572,7 +592,15 @@ const Dashboard = (payslip) => {
       filter: true,
       cellStyle: { textAlign: "left" }
     },
+    {
+      headerName: "Status",
+      field: "Status",
+      sortable: true,
+      filter: true,
+      cellRenderer: StatusCellRenderer,
+    },
   ];
+
 
   const empShiftCols = [
     {
@@ -1314,6 +1342,7 @@ const Dashboard = (payslip) => {
         "Check Out": row.Last_CheckOut || "",
         "Total Worked Hours": row.total_worked_hours || "",
         "Total Login  Hours": row.Total_login_Hours || "",
+        "Status": row.Status || "",
       };
     });
   };
@@ -1964,7 +1993,7 @@ const Dashboard = (payslip) => {
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
 
-                  <div className="icon-btn excel" onClick={handleExportToExcel}>
+                  <div className="icon-btn excel" onClick={handleExportToExcelEmp}>
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
                   </div>
@@ -1980,6 +2009,17 @@ const Dashboard = (payslip) => {
                   suppressLoadingOverlay={true}
                   pagination={true}
                   paginationAutoPageSize={true}
+                  getRowStyle={(params) => {
+                    if (params.data.Status === "Compensatory Leave") {
+                      const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--ag-header').trim();
+                      return {
+                        backgroundColor: themeColor,
+                        color: '#ffffff',
+                        borderLeft: '5px solid #ffffff' 
+                      };
+                    }
+                    return null;
+                  }}
                 />
               </div>
             </div>

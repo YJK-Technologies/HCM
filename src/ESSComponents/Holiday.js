@@ -403,6 +403,7 @@ function HoliDays() {
           Holiday_Type: holidayTypeSc,
           Is_Paid: isPaidSc,
           Status: statusSc,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });
 
@@ -438,6 +439,7 @@ function HoliDays() {
         Holiday_Type: holidayType,
         Is_Paid: isPaid,
         Status: status,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem('selectedUserCode'),
       };
 
@@ -471,6 +473,7 @@ function HoliDays() {
       async () => {
         try {
 
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
@@ -478,11 +481,13 @@ function HoliDays() {
               ? rowData.map((row) => ({
                 ...row,
                 modified_by,
+                company_code
               }))
               : [
                 {
                   ...rowData,
                   modified_by,
+                  company_code
                 },
               ],
           };
