@@ -46480,7 +46480,7 @@ const EmployeeAssetsLoopInsert = async (req, res) => {
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
         .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID,'', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
     }
     res.status(200).json("EmployeeAssets data inserted successfully");
   } catch (err) {
@@ -46882,7 +46882,7 @@ const GetRepaymentScheduleReport = async (req, res) => {
 //code added by mathu 01-04-2026
 
 const getAssetSearchCretria = async (req, res) => {
-  const { EmployeeID, AssetID, ConditionAtIssue, company_code } = req.body;
+  const { EmployeeID, AssetID, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -46891,10 +46891,9 @@ const getAssetSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
        .input("AssetID", sql.BigInt, AssetID)
       .input("EmployeeID", sql.NVarChar, EmployeeID)
-      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','','','' ,'','',@company_code,'','','','',''`
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47290,7 +47289,30 @@ const EmployeeAssets_HdrLoopDelete = async (req, res) => {
 
 //code Ended by mathu -07-04-2026
 
+//code added by mathu -08-04-2026
+const AssetIDDropoption= async (req, res) => {
+  const { company_code } = req.body;
 
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AI")
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_EmployeeAssets_Hdr @mode,'','','','','','','','','',0,'','','','','','','','',@company_code,'','','','',''
+`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during CRM_Tag insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code Ended by mathu -08-04-2026
 
 module.exports = {
   login,
@@ -48642,6 +48664,7 @@ module.exports = {
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
+  AssetIDDropoption
   
 
 };

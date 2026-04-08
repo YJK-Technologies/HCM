@@ -29,6 +29,13 @@ function EmployeeAssets({ }) {
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [actualReturnDate, setActualReturnDate] = useState('');
   const [statusdrop, setStatusdrop] = useState([]);
+  const [selectedAssetID, setselectedAssetID] = useState("");
+  const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
+    const [AssetIDDrop, setAssetIDDrop] = useState([]);
+  
+
+    
+  
 
   const [Assetvalue, setAssetvalue] = useState([{
     relation: 'Assetvalue', members: [{
@@ -233,95 +240,118 @@ function EmployeeAssets({ }) {
   //     }
   //   };
 
-  const handleSave = async () => {
-    if (!EmployeeID || !EmployeeID.trim()) {
-      setError(true);
-      toast.warning("Employee ID is required");
-      return;
-    }
+ const handleSave = async () => {
+  if (!EmployeeID?.trim()) {
+    setError(true);
+    toast.warning("Employee ID is required");
+    return;
+  }
 
-    for (const relationGroup of Assetvalue) {
-      for (const member of relationGroup.members) {
+  let isValid = true;
 
-        // Trim values before validation
-        const AssetID = member.AssetID?.trim();
-        const AllocationDate = member.AllocationDate;
-        const Status = member.Status?.trim();
+  for (const relationGroup of Assetvalue) {
+    for (const member of relationGroup.members) {
+      const AssetID = member.AssetID?.value;
+      const AllocationDate = member.AllocationDate;
+      const Status = member.selectedStatus?.value;
 
-        if (!AssetID || !AllocationDate || !Status) {
-          setError(true);
-          toast.warning("Please fill all required fields");
-          return;
-        }
+      if (!AssetID || !AllocationDate || !Status) {
+        toast.warning("Please fill all required fields");
+        isValid = false;
+        break;
+      }
 
-        // Convert to Date objects
-        const allocDate = new Date(AllocationDate);
-        const expectedDate = member.ExpectedReturnDate ? new Date(member.ExpectedReturnDate) : null;
-        const actualDate = member.ActualReturnDate ? new Date(member.ActualReturnDate) : null;
+      const allocDate = new Date(AllocationDate);
+      const expectedDate = member.ExpectedReturnDate
+        ? new Date(member.ExpectedReturnDate)
+        : null;
+      const actualDate = member.ActualReturnDate
+        ? new Date(member.ActualReturnDate)
+        : null;
 
-        if (expectedDate && expectedDate < allocDate) {
-          toast.warning("Expected Return Date must be after Allocation Date");
-          return;
-        }
+      if (expectedDate && expectedDate <= allocDate) {
+        toast.warning("Expected Return Date must be after Allocation Date");
+        isValid = false;
+        break;
+      }
 
-        if (actualDate && actualDate < allocDate) {
-          toast.warning("Actual Return Date must be after Allocation Date");
-          return;
-        }
+      if (actualDate && actualDate < allocDate) {
+        toast.warning("Actual Return Date must be after Allocation Date");
+        isValid = false;
+        break;
       }
     }
+    if (!isValid) break;
+  }
 
-    setError(false);
-    setLoading(true);
+  if (!isValid) {
+    setError(true);
+    return;
+  }
 
-    const employeeData = Assetvalue.flatMap((relationGroup) =>
-      relationGroup.members.map((member) => ({
-        AssetID: member.AssetID?.trim(),
-        EmployeeID: employeeID.trim(),
-        AllocationDate: member.AllocationDate,
-        ExpectedReturnDate: member.ExpectedReturnDate || null,
-        ActualReturnDate: member.ActualReturnDate || null,
-        AllocationStatus: member.Status?.trim(),
-        ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
-        ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
-        ApprovedBy: member.ApprovedBy?.trim() || "",
-        Remarks: member.Remarks?.trim() || "",
-        company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
-        CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
+  setError(false);
+  setLoading(true);
 
-      }))
+  const employeeData = Assetvalue.flatMap((relationGroup) =>
+    relationGroup.members.map((member) => ({
+      AssetID: member.AssetID?.value
+        ? parseInt(member.AssetID.value)
+        : null,
+
+      EmployeeID: EmployeeID.trim(),
+
+      AllocationDate: member.AllocationDate
+        ? new Date(member.AllocationDate)
+        : null,
+
+      ExpectedReturnDate: member.ExpectedReturnDate
+        ? new Date(member.ExpectedReturnDate)
+        : null,
+
+      ActualReturnDate: member.ActualReturnDate
+        ? new Date(member.ActualReturnDate)
+        : null,
+
+      AllocationStatus: member.selectedStatus?.value || null,
+
+      ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
+      ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
+      ApprovedBy: member.ApprovedBy?.trim() || "",
+      Remarks: member.Remarks?.trim() || "",
+
+      company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
+      CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
+    }))
+  );
+
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ EmployeeAssetsData: employeeData }),
+      }
     );
 
-    try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ EmployeeAssetsData: employeeData }), // ✅ match backend
-        }
-      );
+    const result = await response.json();
 
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success("Data saved successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        console.error(result.message);
-        toast.warning(result.message || "Failed to save data");
-      }
-
-    } catch (err) {
-      console.error("Error saving data:", err);
-      toast.error("Error saving data: " + err.message);
-    } finally {
-      setLoading(false);
+    if (response.ok) {
+      toast.success("Data saved successfully!", {
+        onClose: () => window.location.reload(),
+      });
+    } else {
+      toast.warning(result.message || "Failed to save data");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error("Error saving data: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const reloadGridData = () => {
     window.location.reload();
@@ -381,20 +411,20 @@ function EmployeeAssets({ }) {
       )
     );
   };
-  const handleEmployeeAssets = async (code) => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Id: code,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      });
+const handleEmployeeAssets = async (code) => {
+  try {
+    const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Id: code,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    });
 
-      if (response.ok) {
+    if (response.ok) {
       const data = await response.json();
 
       if (!data || data.length === 0) {
@@ -403,45 +433,13 @@ function EmployeeAssets({ }) {
         setAssetvalue([
           {
             relation: "Assetvalue",
-            members: [setAssetvalue()],
-          },
-        ]);
-        return;
-      }
-     
-        const mappedAssets = [
-          {
-            relation: "Assetvalue",
-            members: data.map((item) => ({
-              AssetID: item.AssetID || "",
-              AllocationDate: formatDate(item.AllocationDate),
-              ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
-              ActualReturnDate: formatDate(item.ActualReturnDate),
-              AllocationStatus: item.AllocationStatus || "",
-              ConditionAtIssue: item.ConditionAtIssue || "",
-              ConditionAtReturn: item.ConditionAtReturn || "",
-              ApprovedBy: item.ApprovedBy || "",
-              Remarks: item.Remarks || "",
-              keyfield: item.keyfield || "",
-            })),
-          },
-        ];
-
-        setAssetvalue(mappedAssets);
-
-      } else if (response.status === 404) {
-        toast.warning("Data not found");
-
-        setAssetvalue([
-          {
-            relation: "Assetvalue",
             members: [
               {
-                AssetID: "",
+                AssetID: null,
                 AllocationDate: "",
                 ExpectedReturnDate: "",
                 ActualReturnDate: "",
-                AllocationStatus: "",
+                selectedStatus: null,
                 ConditionAtIssue: "",
                 ConditionAtReturn: "",
                 ApprovedBy: "",
@@ -451,16 +449,75 @@ function EmployeeAssets({ }) {
             ],
           },
         ]);
-      } else {
-        const err = await response.json();
-        toast.warning(err.message || "Error fetching data");
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Error: " + error.message);
-    }
-  };
 
+      const mappedAssets = [
+        {
+          relation: "Assetvalue",
+          members: data.map((item) => ({
+            
+            
+            AssetID: item.AssetID
+              ? {
+                  label: item.AssetID,
+                  value: item.AssetID,
+                }
+              : null,
+
+            AllocationDate: formatDate(item.AllocationDate),
+            ExpectedReturnDate: formatDate(item.ExpectedReturnDate),
+            ActualReturnDate: formatDate(item.ActualReturnDate),
+
+            selectedStatus: item.AllocationStatus
+              ? {
+                  label: item.AllocationStatus,
+                  value: item.AllocationStatus,
+                }
+              : null,
+
+            ConditionAtIssue: item.ConditionAtIssue || "",
+            ConditionAtReturn: item.ConditionAtReturn || "",
+            ApprovedBy: item.ApprovedBy || "",
+            Remarks: item.Remarks || "",
+            keyfield: item.keyfield || "",
+          })),
+        },
+      ];
+
+      setAssetvalue(mappedAssets);
+
+    } else if (response.status === 404) {
+      toast.warning("Data not found");
+
+      setAssetvalue([
+        {
+          relation: "Assetvalue",
+          members: [
+            {
+              AssetID: "",
+              AllocationDate: "",
+              ExpectedReturnDate: "",
+              ActualReturnDate: "",
+              selectedStatus: "",
+              ConditionAtIssue: "",
+              ConditionAtReturn: "",
+              ApprovedBy: "",
+              Remarks: "",
+              keyfield: "",
+            },
+          ],
+        },
+      ]);
+    } else {
+      const err = await response.json();
+      toast.warning(err.message || "Error fetching data");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Error: " + error.message);
+  }
+};
   const formatDate = (date) => {
     if (!date) return "";
 
@@ -505,11 +562,55 @@ function EmployeeAssets({ }) {
     );
   };
 
+ const handleAssetID = (selectedAssetID) => {
+  setselectedAssetID(selectedAssetID);
+  setAssetID(selectedAssetID ? selectedAssetID.value : "");
+};
+
+  const filteredOptionAssetID = AssetIDDrop.map((option) => ({
+    value: option.AssetID,
+    label: `${option.AssetID} - ${option.AssetName}`,
+     data: option,
+  }));
+
+  useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+  
+      const fetchAssetId = async () => {
+        try {
+          const response = await fetch(
+            `${config.apiBaseUrl}/AssetIDDropoption`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ company_code }),
+            },
+          );
+  
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+  
+          const val = await response.json();
+          setAssetIDDrop(val);
+        } catch (error) {
+          console.error("Error fetching departments:", error);
+        }
+      };
+  
+      if (company_code) {
+        fetchAssetId();
+      }
+    }, []);
+
+
   // const EmployeeAssetsPopup = async (data) => {
   //     if (data && data.length > 0) {
   //       setSaveButtonVisible(false);
   //       setShowAsterisk(false);
-  //       setIsAcademicDataLoaded(true);
+  //       // setIsAcademicDataLoaded(true);
   //       const [{ employeeId }] = data;
 
   //       handleEmployeeAssets(employeeId);
@@ -664,23 +765,30 @@ function EmployeeAssets({ }) {
               </div>
 
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+                <div className={`inputGroup selectGroup 
+                              ${selectedAssetID ? "has-value" : ""} 
+                              ${isSelectAssetID ? "is-focused" : ""}`}
+                            >
+                              <Select
                     type="number"
-                    className="exp-input-field form-control"
-                    value={member.AssetID}
                     maxLength={12}
                     placeholder=" "
                     autoComplete="off"
                     inputMode="numeric"
-                    pattern="[0-9]*"
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^\d*$/.test(value)) {
-                        RelationInputChange(relationGroup.relation, index, 'AssetID', value);
-                      }
-                    }} />
-                  <label for="cno" className={`exp-form-labels ${error && !member.AssetID ? 'text-danger' : ''}`}>AssetID{showAsterisk && <span className="text-danger">*</span>}</label>
+                    onFocus={() => setIsisSelectAssetID(true)}
+                onBlur={() => setIsisSelectAssetID(false)}
+                   value={member.AssetID}
+               onChange={(selectedOption) =>
+    RelationInputChange(
+      relationGroup.relation,
+      index,
+      "AssetID",
+      selectedOption
+    )
+  }
+  options={filteredOptionAssetID}
+/>
+                  <label htmlFor="selecteddpt"  className={`floating-label ${error && !selectedAssetID ? 'text-danger' : ''}`}>AssetID{ <span className="text-danger">*</span>}</label>
                 </div>
               </div>
 
@@ -789,7 +897,7 @@ function EmployeeAssets({ }) {
                       handleChangeStatus(selectAllocationStatus, relationGroup.relation, index)
 
                     } />
-                  <label for="cno" className={`floating-label ${error && !!member.Status ? 'text-danger' : ''}`}>Allocation Status</label>
+                  <label for="cno" className={`floating-label` }>Allocation Status</label>
                 </div>
               </div>
 
