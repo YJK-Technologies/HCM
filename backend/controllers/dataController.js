@@ -24965,7 +24965,7 @@ const getOverallTAX = async (req, res) => {
 
 //code added by pavun 23-12-2024
 const getAcademicDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, academicName, major, institution, Name, company_code } =
+  const { EmployeeId, academicName, major, institution, Name, company_code, academic_year_from, academic_year_to } =
     req.body;
 
   try {
@@ -24979,8 +24979,10 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("institution", sql.NVarChar, institution)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
+      .input("academic_year_from", sql.Date, academic_year_from)
+      .input("academic_year_to", sql.Date, academic_year_to)
       .query(
-        `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_academic_datails_test_DG @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
