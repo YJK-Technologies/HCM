@@ -26937,6 +26937,7 @@ const addEmployeeHoliday = async (req, res) => {
     Holiday_Type,
     Is_Paid,
     Status,
+    company_code,
     created_by,
   } = req.body;
   let pool;
@@ -26952,10 +26953,9 @@ const addEmployeeHoliday = async (req, res) => {
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(
-        `EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@created_by,'','','',''`,
-      );
+      .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,@created_by,'','','',''`,);
     res.status(200).json("Employee holiday data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -27000,10 +27000,9 @@ const updateEmployeeHoliday = async (req, res) => {
         .input("Is_Paid", sql.NVarChar, updatedRow.Is_Paid)
         .input("Status", sql.NVarChar, updatedRow.Status)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(
-          `EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','','',@modified_by,'','',@keyfield`,
-        );
+        .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,'',@modified_by,'','',@keyfield`,);
     }
 
     res.status(200).json("Employeedata updated successfully");
@@ -27185,6 +27184,7 @@ const getsearchHoliday = async (req, res) => {
     Holiday_Type,
     Is_Paid,
     Status,
+    company_code
   } = req.body;
   try {
     const pool = await connection.connectToDatabase();
@@ -27199,9 +27199,8 @@ const getsearchHoliday = async (req, res) => {
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
-      .query(
-        `EXEC sp_Holiday_Master_test @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,'','','','',''`,
-      );
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Holiday_Master @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,@company_code,'','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -30981,10 +30980,9 @@ const deleteEmployeeHoliday = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(
-          `EXEC sp_Holiday_Master_test @mode,0,'','',0,'','','','','','','','','','',@keyfield`,
-        );
+        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','',@company_code,'','','','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -34042,9 +34040,7 @@ const ESSEmployeeDashboard = async (req, res) => {
       .input("userid", sql.VarChar, userid)
       .input("company_code", sql.VarChar, company_code)
       .input("Status", sql.VarChar, Status)
-      .query(
-        `EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,'', @Status`,
-      );
+      .query(`EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,'', @Status`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -47314,7 +47310,37 @@ const AssetIDDropoption= async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-//code Ended by mathu -08-04-2026
+//code Ended by mathu -08-04-2026//code added by Sakthi 08-04-2026
+const getTHRSReport = async (req, res) => {
+  const { start_date, end_date, userid, company_code, Status } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "THRS") 
+      .input("start_date", sql.Date, start_date)
+      .input("end_date", sql.Date, end_date)
+      .input("userid", sql.VarChar, userid)
+      .input("company_code", sql.VarChar, company_code)
+      .input("Status", sql.VarChar, Status)
+      .query(` EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
+
+    if (result.recordset && result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(200).json([]); 
+    }
+  } catch (err) {
+    console.error("THRS Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Sakthi 08-04-2026
+
 
 module.exports = {
   login,
@@ -48661,12 +48687,12 @@ module.exports = {
   DepartmentLoanAmount,
   LoanStatusTrend,
   OverduevsPaid,
+  getTHRSReport,
   EmployeeAssets_HdrInsert,
   EmployeeAssets_HdrLoopInsert,
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
   AssetIDDropoption
-  
 
 };

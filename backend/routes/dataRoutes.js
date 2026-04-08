@@ -1375,6 +1375,8 @@ router.post("/LoanTypeDistribution",dataController.LoanTypeDistribution)
 router.post("/DepartmentLoanAmount",dataController.DepartmentLoanAmount)
 router.post("/LoanStatusTrend",dataController.LoanStatusTrend)
 router.post("/OverduevsPaid",dataController.OverduevsPaid)
+router.post("/getTHRSReport",dataController.getTHRSReport)
+
 router.post("/EmployeeAssets_HdrInsert",dataController.EmployeeAssets_HdrInsert)
 router.post("/EmployeeAssets_HdrLoopInsert",dataController.EmployeeAssets_HdrLoopInsert)
 router.post("/EmployeeAssets_HdrLoopUpdate",dataController.EmployeeAssets_HdrLoopUpdate)
