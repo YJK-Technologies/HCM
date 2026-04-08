@@ -1382,6 +1382,7 @@ router.post("/EmployeeAssets_HdrLoopInsert",dataController.EmployeeAssets_HdrLoo
 router.post("/EmployeeAssets_HdrLoopUpdate",dataController.EmployeeAssets_HdrLoopUpdate)
 router.post("/EmployeeAssets_SC",dataController.EmployeeAssets_SC)
 router.post("/EmployeeAssets_HdrLoopDelete",dataController.EmployeeAssets_HdrLoopDelete)
+router.post("/AssetIDDropoption", dataController.AssetIDDropoption)
 
 
 
