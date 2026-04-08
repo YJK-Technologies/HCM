@@ -39,6 +39,20 @@ const columnDefs = [
     minWidth: 150,
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    editable: false,
+    cellStyle: { textAlign: "center" },
+    minWidth: 150,
+  },
+  {
+    headerName: "Email",
+    field: "email",
+    editable: false,
+    cellStyle: { textAlign: "center" },
+    minWidth: 150,
+  },
+  {
     headerName: "Account Holder Name",
     field: "AccountHolderName",
     editable: false,
@@ -139,7 +153,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Account_NO, Name, AccountHolderName, bankName, IFSC_Code, Bankbook_img, company_code: sessionStorage.getItem("selectedCompanyCode") })
+        body: JSON.stringify({ EmployeeId, Account_NO, Name, AccountHolderName, bankName, IFSC_Code, Bankbook_img, branchName, company_code: sessionStorage.getItem("selectedCompanyCode") })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -161,7 +175,6 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
       } else if (response.status === 404) {
         toast.warning("Data Not found")
         setRowData([]);
-        clearInputs([])
         console.log("Data not found"); // Log the message for 404 Not Found
       } else {
         const errorResponse = await response.json();
@@ -175,20 +188,27 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
     }
   };
 
+  const handleClosePopup = () => {
+    clearInputs();     // ✅ clear inputs
+    setRowData([]);    // ✅ clear grid
+    setSelectedRows([]); // ✅ clear selection
+    handleClose();     // ✅ close popup
+  };
+
   const handleReload = () => {
-    clearInputs([])
-    setRowData([])
+    clearInputs();
+    setRowData([]);
   };
 
   const clearInputs = () => {
     setEmployeeId("");
+    setname("");                // ✅ Name
     setAccountNumber("");
     setAccountHolderName("");
     setbankName("");
     setBranchName("");
     setIFSCCode("");
     setBankbook_img("");
-
   };
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -223,10 +243,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
 
 
     Employeebankdetails(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
-    setSelectedRows([]);
+    handleClosePopup();
   }
 
 
@@ -235,7 +252,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -244,7 +261,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                   <h1 className="custom-modal-title">Bank Accounts Details Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
@@ -321,15 +338,48 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                 <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
+                      id="IFSC_Code"
+                      class="exp-input-field form-control"
+                      type="text"
+                      placeholder=" "
+                      autoComplete="off"
+                      value={IFSC_Code}
+                      maxLength={11}
+                      onChange={(e) => setIFSCCode(e.target.value)}
+                    />
+                    <label for="sname" className={`exp-form-labels`}>IFSC Code</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
                       type="text"
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={bankName}
+                      maxLength={255}
                       onChange={(e) => setbankName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Bank Name</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      id="branchName"
+                      class="exp-input-field form-control"
+                      type="text"
+                      placeholder=" "
+                      autoComplete="off"
+                      value={branchName}
+                      maxLength={255}
+                      onChange={(e) => setBranchName(e.target.value)}
+                    />
+                    <label for="add1" className={`exp-form-labels`}>Branch Name</label>
                   </div>
                 </div>
 

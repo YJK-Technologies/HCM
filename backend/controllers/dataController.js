@@ -25858,7 +25858,7 @@ const TermsTI = async (req, res) => {
 
 //CODE ADDED BY PAVUN 27-12-2024
 const getFinancialDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, Name, salaryType, Payscale, salary_month, company_code } =
+  const { EmployeeId, Name, salaryType, Payscale, salary_month, company_code, PFNo, salary_from, salary_to } =
     req.body;
 
   try {
@@ -25872,8 +25872,11 @@ const getFinancialDetailsSearchCretria = async (req, res) => {
       .input("Payscale", sql.NVarChar, Payscale)
       .input("salary_month", sql.Decimal(14, 2), salary_month)
       .input("company_code", sql.NVarChar, company_code)
+      .input("PFNo", sql.NVarChar, PFNo)
+      .input("salary_from", sql.Decimal(14, 2), salary_from)
+      .input("salary_to", sql.Decimal(14, 2), salary_to)
       .query(
-        `EXEC sp_salary_details @mode,@EmployeeId,@Name,@salaryType,@Payscale,'',@salary_month,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_salary_details_test_DG @mode,@EmployeeId,@Name,@salaryType,@Payscale, @PFNo,@salary_month,'',@company_code,'','',@salary_from,@salary_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25920,6 +25923,8 @@ const getEmpBankDetailsSC = async (req, res) => {
     AccountHolderName,
     bankName,
     Name,
+    branchName,
+    IFSC_Code,
     company_code,
   } = req.body;
 
@@ -25937,8 +25942,10 @@ const getEmpBankDetailsSC = async (req, res) => {
       .input("bankName", sql.NVarChar, bankName)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
+      .input("branchName", sql.NVarChar, branchName)
+      .input("IFSC_Code", sql.NVarChar, IFSC_Code)
       .query(
-        `EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,'','','',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_bankdetails_test_DG @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,@branchName,@IFSC_Code,'',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     // Send response
@@ -26928,6 +26935,7 @@ const addEmployeeHoliday = async (req, res) => {
     Holiday_Type,
     Is_Paid,
     Status,
+    company_code,
     created_by,
   } = req.body;
   let pool;
@@ -26943,10 +26951,9 @@ const addEmployeeHoliday = async (req, res) => {
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(
-        `EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@created_by,'','','',''`,
-      );
+      .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,@created_by,'','','',''`,);
     res.status(200).json("Employee holiday data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -26991,10 +26998,9 @@ const updateEmployeeHoliday = async (req, res) => {
         .input("Is_Paid", sql.NVarChar, updatedRow.Is_Paid)
         .input("Status", sql.NVarChar, updatedRow.Status)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(
-          `EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','','',@modified_by,'','',@keyfield`,
-        );
+        .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,'',@modified_by,'','',@keyfield`,);
     }
 
     res.status(200).json("Employeedata updated successfully");
@@ -27176,6 +27182,7 @@ const getsearchHoliday = async (req, res) => {
     Holiday_Type,
     Is_Paid,
     Status,
+    company_code
   } = req.body;
   try {
     const pool = await connection.connectToDatabase();
@@ -27190,9 +27197,8 @@ const getsearchHoliday = async (req, res) => {
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
-      .query(
-        `EXEC sp_Holiday_Master_test @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,'','','','',''`,
-      );
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Holiday_Master @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,@company_code,'','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -30972,10 +30978,9 @@ const deleteEmployeeHoliday = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(
-          `EXEC sp_Holiday_Master_test @mode,0,'','',0,'','','','','','','','','','',@keyfield`,
-        );
+        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','',@company_code,'','','','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -34033,9 +34038,7 @@ const ESSEmployeeDashboard = async (req, res) => {
       .input("userid", sql.VarChar, userid)
       .input("company_code", sql.VarChar, company_code)
       .input("Status", sql.VarChar, Status)
-      .query(
-        `EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,'', @Status`,
-      );
+      .query(`EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,'', @Status`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -46473,7 +46476,7 @@ const EmployeeAssetsLoopInsert = async (req, res) => {
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
         .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID,'', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
     }
     res.status(200).json("EmployeeAssets data inserted successfully");
   } catch (err) {
@@ -46875,7 +46878,7 @@ const GetRepaymentScheduleReport = async (req, res) => {
 //code added by mathu 01-04-2026
 
 const getAssetSearchCretria = async (req, res) => {
-  const { EmployeeID, AssetID, ConditionAtIssue, company_code } = req.body;
+  const { EmployeeID, AssetID, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -46884,10 +46887,9 @@ const getAssetSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
        .input("AssetID", sql.BigInt, AssetID)
       .input("EmployeeID", sql.NVarChar, EmployeeID)
-      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'' ,'','',@company_code,'','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','','','' ,'','',@company_code,'','','','',''`
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47283,6 +47285,59 @@ const EmployeeAssets_HdrLoopDelete = async (req, res) => {
 
 //code Ended by mathu -07-04-2026
 
+//code added by mathu -08-04-2026
+const AssetIDDropoption= async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AI")
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_EmployeeAssets_Hdr @mode,'','','','','','','','','',0,'','','','','','','','',@company_code,'','','','',''
+`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during CRM_Tag insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code Ended by mathu -08-04-2026//code added by Sakthi 08-04-2026
+const getTHRSReport = async (req, res) => {
+  const { start_date, end_date, userid, company_code, Status } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "THRS") 
+      .input("start_date", sql.Date, start_date)
+      .input("end_date", sql.Date, end_date)
+      .input("userid", sql.VarChar, userid)
+      .input("company_code", sql.VarChar, company_code)
+      .input("Status", sql.VarChar, Status)
+      .query(` EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
+
+    if (result.recordset && result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(200).json([]); 
+    }
+  } catch (err) {
+    console.error("THRS Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Sakthi 08-04-2026
 
 
 module.exports = {
@@ -48630,11 +48685,12 @@ module.exports = {
   DepartmentLoanAmount,
   LoanStatusTrend,
   OverduevsPaid,
+  getTHRSReport,
   EmployeeAssets_HdrInsert,
   EmployeeAssets_HdrLoopInsert,
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
-  
+  AssetIDDropoption
 
 };
