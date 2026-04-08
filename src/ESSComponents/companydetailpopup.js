@@ -203,7 +203,9 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date, Employee_Type, company_code: sessionStorage.getItem('selectedCompanyCode')
+          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date, 
+          Employee_Type: selectedEmpType ? selectedEmpType.value : null, 
+          company_code: sessionStorage.getItem('selectedCompanyCode')
 
         })
       });
@@ -475,6 +477,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
               Employee Type
             </label>
             </div>
+          
           </div>
 
                 <div className="form-block col-12">
