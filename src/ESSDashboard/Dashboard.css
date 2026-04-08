@@ -671,10 +671,10 @@
 
 /* --- AG Grid Theme --- */
 .app-grid-theme {
-  --ag-foreground-color: #495057;
+  /* --ag-foreground-color: #495057; */
   --ag-header-background-color: #f8f9fa;
   --ag-odd-row-background-color: #ffffff;
-  --ag-row-hover-color: #e9ecef;
+  /* --ag-row-hover-color: #e9ecef; */
   border: none !important;
   margin-top: 8px;
 }
@@ -952,7 +952,6 @@
 
 .leave-item-col {
   padding: 2px;
-  /* width: 25%;  */
   width: 20%;
   flex-grow: 1;
 }
@@ -979,8 +978,6 @@
 }
 
 .leave-icon-base {
-  /* width: 40px;
-    height: 40px; */
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -2180,7 +2177,7 @@
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
   padding: 10px 0;
-  max-height: 340px; /* Adjust this height based on your layout needs */
+  max-height: 340px; 
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -2201,7 +2198,6 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
 
-/* Circular Chart Styles */
 .leave-progress-wrapper {
   width: 70px;
   height: 70px;
@@ -2228,11 +2224,9 @@
   transition: stroke-dasharray 1s ease 0s;
 }
 
-/* Dynamic Colors based on Leave Type */
 .stroke-casual-leave { stroke: #4e73df; }
 .stroke-sick-leave { stroke: #1cc88a; }
 .stroke-earned-leave { stroke: #f6c23e; }
-/* Default fallback */
 .circle { stroke: #6e707e; }
 
 .percentage {
@@ -2243,7 +2237,6 @@
   text-anchor: middle;
 }
 
-/* Typography */
 .leave-info-text {
   text-align: center;
 }
@@ -2263,7 +2256,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Modern Button */
 .btn-apply-modern {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -3062,4 +3054,206 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+
+.status-action-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.btn-request-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: #ffffff; /* Solid white for maximum contrast */
+  color: var(--ag-header); /* Text matches your theme color */
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  border: 1px solid transparent;
+}
+
+/* Icon specific styling */
+.btn-request-premium i {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+/* Hover Effects */
+.btn-request-premium:hover {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #1e293b; /* Darker text on hover */
+}
+
+/* Paper plane animation on hover */
+.btn-request-premium:hover i {
+  transform: translateX(3px) translateY(-2px) scale(1.1);
+}
+
+/* Active / Click state */
+.btn-request-premium:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the text when NOT a button (other statuses) */
+.status-text-default {
+  font-weight: 500;
+  color: #64748b;
+}
+
+.leave-balance-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #edf2f7;
+    transition: box-shadow 0.3s ease;
+}
+
+.card-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-icon {
+    color: #4f46e5;
+    font-size: 1.2rem;
+}
+
+.card-title-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Custom Tooltip Styling */
+.custom-tooltip-box {
+    position: fixed;
+    transform: translate(-50%, -100%);
+    background: #1e293b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    white-space: nowrap;
+}
+
+.custom-tooltip-box::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #1e293b transparent transparent transparent;
+}
+
+/* Grid Layout */
+.leave-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 20px;
+}
+
+.leave-status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+
+.leave-status-item:hover {
+    background: #f8fafc;
+}
+
+/* Circular Chart */
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 70px;
+    max-height: 70px;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #f1f5f9;
+    stroke-width: 3;
+}
+
+.circle {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+    0% { stroke-dasharray: 0 100; }
+}
+
+.percentage-text {
+    fill: #1e293b;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+/* Status Colors */
+.status-color-sl { stroke: #ef4444; } /* Sick Leave - Red */
+.status-color-cl { stroke: #3b82f6; } /* Casual Leave - Blue */
+.status-color-el { stroke: #10b981; } /* Earned Leave - Green */
+
+/* Info Text */
+.leave-info-text {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.leave-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+}
+
+.leave-total-sub {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Empty State */
+.empty-state {
+    grid-column: 1 / -1;
+    padding: 40px;
+    color: #94a3b8;
 }
