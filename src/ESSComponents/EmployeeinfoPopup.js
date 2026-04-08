@@ -279,7 +279,6 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
       } else if (response.status === 404) {
         toast.warning("Data Not found")
         setRowData([]);
-        clearInputs([])
         console.log("Data not found"); // Log the message for 404 Not Found
       } else {
         const errorResponse = await response.json();
@@ -293,17 +292,34 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
     }
   };
 
-  const handleReload = () => {
-    clearInputs([])
-    setRowData([])
-  };
+  const handleClosePopup = () => {
+  clearInputs();     // ✅ clear all inputs
+  setRowData([]);    // ✅ clear grid
+  handleClose();     // ✅ close popup
+};
 
-  const clearInputs = () => {
-    setEmployeeId("");
-    setFirst_Name("");
-    setLast_Name("");
-    setDOB("");
-  };
+  const handleReload = () => {
+  clearInputs();
+  setRowData([]);
+};
+
+const clearInputs = () => {
+  // Text fields
+  setEmployeeId("");
+  setFirst_Name("");
+  setLast_Name("");
+  setDOB("");
+
+  // Select fields
+  setGender(null);          // react-select value
+  setselectedGender("");    // actual value sent to API
+
+  // Other inputs
+  setaddress("");
+  setPhone("");
+  setdesignation_id("");
+  setdepartment_id("");
+};
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -362,9 +378,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
     }));
 
     EmployeeInfo(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
+    handleClosePopup();   // ✅ clean and simple
   }
 
   return (
@@ -380,7 +394,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                   <h1 className="custom-modal-title">Employee Info Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
