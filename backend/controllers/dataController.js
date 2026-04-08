@@ -47024,7 +47024,36 @@ const OverduevsPaid = async (req, res) => {
 };
 //code ended by pavun 04-04-2026
 
+//code added by Sakthi 08-04-2026
+const getTHRSReport = async (req, res) => {
+  const { start_date, end_date, userid, company_code, Status } = req.body;
 
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "THRS") 
+      .input("start_date", sql.Date, start_date)
+      .input("end_date", sql.Date, end_date)
+      .input("userid", sql.VarChar, userid)
+      .input("company_code", sql.VarChar, company_code)
+      .input("Status", sql.VarChar, Status)
+      .query(` EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
+
+    if (result.recordset && result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(200).json([]); 
+    }
+  } catch (err) {
+    console.error("THRS Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Sakthi 08-04-2026
 
 module.exports = {
   login,
@@ -48370,6 +48399,7 @@ module.exports = {
   LoanTypeDistribution,
   DepartmentLoanAmount,
   LoanStatusTrend,
-  OverduevsPaid
+  OverduevsPaid,
+  getTHRSReport
 
 };

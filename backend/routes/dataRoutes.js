@@ -1375,5 +1375,7 @@ router.post("/LoanTypeDistribution",dataController.LoanTypeDistribution)
 router.post("/DepartmentLoanAmount",dataController.DepartmentLoanAmount)
 router.post("/LoanStatusTrend",dataController.LoanStatusTrend)
 router.post("/OverduevsPaid",dataController.OverduevsPaid)
+router.post("/getTHRSReport",dataController.getTHRSReport)
+
 
 module.exports = router;
