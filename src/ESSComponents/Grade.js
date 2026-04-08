@@ -510,7 +510,6 @@ function Input({ }) {
             headers: {
               "Content-Type": "application/json",
               "company_code": company_code,
-
             },
             body: JSON.stringify(GradeIDDelete),
           });
