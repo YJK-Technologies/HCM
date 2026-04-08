@@ -41,6 +41,18 @@ const columnDefs = [
     editable: false,
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
+    headerName: "Email",
+    field: "email",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
     headerName: "Department",
     field: "department_ID",
     filter: 'agTextColumnFilter',
@@ -119,8 +131,8 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const [selectedEmpType, setSelectedEmpType] = useState('');
   const [isSelectEmpType, setIsSelectEmpType] = useState(false);
   const [empType, setEmpType] = useState('');
-  const [Employee_Type, setEmployee_Type] = useState('');
   const [empTypeDrop, setEmpTypeDrop] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
 
   const filteredOptionManager = Array.isArray(Managerdrop)
     ? Managerdrop.map((option) => ({
@@ -223,7 +235,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
             selectedmanager: item.manager,
             shift: item.shift,
             selectedstatus: item.status,
-            selectedEmployee_Type: item.Employee_Type,
+            selectedEmpType: item.selectedEmpType,
             from_date: from_date || null,
             to_date: to_date || null,
             Employee_Type: item.Employee_Type,
@@ -237,7 +249,6 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
       } else if (response.status === 404) {
         toast.warning("Data Not found")
         setRowData([]);
-        clearInputs([])
         console.log("Data not found"); // Log the message for 404 Not Found
       } else {
         console.log("Bad request"); // Log the message for other errors
@@ -249,17 +260,34 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
     }
   };
 
-  const handleReload = () => {
-    clearInputs([])
-    setRowData([])
-  };
+const handleClosePopup = () => {
+  clearInputs();     // ✅ clear all inputs
+  setRowData([]);    // ✅ clear grid
+  handleClose();     // ✅ close parent popup
+};
 
-  const clearInputs = () => {
-    setEmployeeId("");
-    setDepartment("");
-    setDesignation("");
-    setDOJ("");
-  };
+const handleReload = () => {
+  clearInputs();   // ❌ remove []
+  setRowData([]);
+};
+
+const clearInputs = () => {
+  setEmployeeId("");
+  setname("");
+  setDepartment("");
+  setDesignation("");
+
+  setselectedmanager(null);
+  setSelectedStatus(null);
+  setSelectedEmpType(null);
+
+  setManager("");   // ✅ important
+  setStatus("");    // ✅ important
+  setEmpType("");
+
+  setfrom_date("");
+  setto_date("");
+};
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -283,9 +311,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
       Employee_Type: row.Employee_Type
     }));
     CompanyDetails(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
+    handleClosePopup();
   }
 
   return (
@@ -301,7 +327,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                   <h1 className="custom-modal-title">Company Details Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
