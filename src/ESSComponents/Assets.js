@@ -786,7 +786,7 @@ function Assets({ }) {
         VendorName: VendorName,
         WarrantyStart: WarrantyStart,
         WarrantyEnd: WarrantyEnd,
-        AssetStatus: AssetStatus,
+        AssetStatus: 'Allocated',
         Location: Location,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         company_code: sessionStorage.getItem('selectedCompanyCode'),
@@ -1220,26 +1220,6 @@ function Assets({ }) {
                 maxLength={100}
               />
               <label className={` exp-form-labels ${error && !WarrantyEnd ? 'text-danger' : ''}`}> Warranty End<span className="text-danger">*</span></label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
-                            ${selectedStatus ? "has-value" : ""} 
-                            ${isSearchStatus ? "is-focused" : ""}`}
-              title="Please select the Approval Status"
-            >
-              <Select
-                id="AssetStatus"
-                value={selectedStatus}
-                onChange={handleStatus}
-                options={filterOptionStatus}
-                placeholder=" "
-                onFocus={() => setIsSearchStatus(true)}
-                onBlur={() => setIsSearchStatus(false)}
-                maxLength={100}
-              />
-              <label className={`floating-label ${error && !AssetStatus ? 'text-danger' : ''}`}> Asset Status<span className="text-danger">*</span></label>
             </div>
           </div>
 
