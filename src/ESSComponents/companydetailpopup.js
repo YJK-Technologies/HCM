@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
 import Select from 'react-select';
+
 const config = require('../Apiconfig');
 
 
@@ -207,6 +208,10 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   }, []);
 
   const handleSearch = async () => {
+    if (new Date(from_date) > new Date(to_date)) {
+                toast.warning("From Date cannot be greater than To Date");
+                return;
+            }
     setLoading(true)
     try {
       const response = await fetch(`${config.apiBaseUrl}/EmployeeCompanyISC`, {
