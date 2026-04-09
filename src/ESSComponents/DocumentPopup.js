@@ -52,6 +52,18 @@ const columnDefs = [
     cellStyle: { textAlign: "center" },
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    editable: false,
+    cellStyle: { textAlign: "center" },
+  },
+  {
+    headerName: "Employee Last Name",
+    field: "email",
+    editable: false,
+    cellStyle: { textAlign: "center" },
+  },
+  {
     headerName: "Document Name",
     field: "document_name",
     editable: false,
@@ -243,55 +255,88 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
   const [DOB, setDOB] = useState("");
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
 
 
   const handleSearch = async () => {
-    setLoading(true)
+    setLoading(true);
+
     try {
-      const response = await fetch(`${config.apiBaseUrl}/EmployeeDocSC`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ Employee_Id, document_name, Name, company_code: sessionStorage.getItem('selectedCompanyCode') })
-      });
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      const payload = {
+        Employee_Id: Employee_Id || null,
+        document_name: document_name || null,
+        Name: Name || null,
+        company_code,
+      };
+
+      console.log("Payload:", payload);
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/EmployeeDocSC`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
       if (response.ok) {
-        const searchData = await response.json();
+        const data = await response.json();
 
-        const updatedData = await Promise.all(
-          searchData.map(async (item) => ({
-            ...item,
-            EmployeeID: item.EmployeeID,
-            First_Name: item.First_Name,
-            Middle_Name: item.Middle_Name,
-            Photos: item.Photos ? arrayBufferToBase64(item.Photos.data) : null,
+        const updatedData = data.map((item) => ({
+          ...item,
+          EmployeeID: item.EmployeeID,
+          First_Name: item.First_Name,
+          Middle_Name: item.Middle_Name,
+          Last_Name: item.Last_Name,
+          email: item.email,
+          phone1: item.phone1,
+          document_name: item.document_name,
+          department_id: item.department_id,
+          designation_id: item.designation_id,
+          Photos: item.Photos
+            ? arrayBufferToBase64(item.Photos.data)
+            : null,
+        }));
 
-            company_code: sessionStorage.getItem('selectedCompanyCode'),
-          }))
-        );
         setRowData(updatedData);
-        console.log("data fetched successfully")
+
+        if (updatedData.length === 0) {
+          toast.info("No records found");
+        }
+
       } else if (response.status === 404) {
-        toast.warning("Data Not found")
+        toast.warning("Data Not Found");
         setRowData([]);
-        clearInputs([])
-        console.log("Data not found"); // Log the message for 404 Not Found
       } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
+        const error = await response.json();
+        toast.error(error.message || "Something went wrong");
+        setRowData([]);
       }
+
     } catch (error) {
-      console.error("Error deleting rows:", error);
-      toast.error('Error Deleting Data: ' + error.message);
+      console.error("Error:", error);
+      toast.error("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleClosePopup = () => {
+    clearInputs();
+    setRowData([]);
+    setSelectedRows([]);
+    handleClose();
+  };
+
   const handleReload = () => {
-    clearInputs([])
-    setRowData([])
+    clearInputs();
+    setRowData([]);
+    setSelectedRows([]);
   };
 
   const clearInputs = () => {
@@ -299,6 +344,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
     setFirst_Name("");
     setdocument_name("");
     setDOB("");
+    setname("");
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -308,23 +354,27 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
   };
 
   const handleConfirm = () => {
-    const selectedData = selectedRows.map(row => ({
+    if (selectedRows.length === 0) {
+      toast.warning("Please select a row");
+      return;
+    }
+
+    const selectedData = selectedRows.map((row) => ({
       EmployeeId: row.EmployeeID,
       Department: row.department_id,
       Designation: row.designation_id,
     }));
 
     EmployeeInfo(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
-  }
+
+    handleClosePopup(); // ✅ reuse
+  };
 
   return (
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -334,7 +384,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                   <h1 className="custom-modal-title">Documents Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>

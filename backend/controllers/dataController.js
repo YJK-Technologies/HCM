@@ -24584,7 +24584,7 @@ const EmployeePersonalSC = async (req, res) => {
       .input("Phone", sql.NVarChar, Phone)
 
       .input("DOB", sql.NVarChar, DOB)
-      .query(`EXEC sp_employee_personal_test_DG  @mode,@EmployeeId,@First_Name,'',@Last_Name,'','',@DOB, @Gender,'', @phone1, @Phone2, 
+      .query(`EXEC sp_employee_personal  @mode,@EmployeeId,@First_Name,'',@Last_Name,'','',@DOB, @Gender,'', @phone1, @Phone2, 
         @Address1, @Address2, @Address3, @PermanantAddress,'','','','','','','','','',@company_code,'','','','','','',0,0,'','',
         '','','','','','','','','','','','','', @designation_id, @department_id, @address, @Phone,NULL,NULL,NULL,NULL
 `);
@@ -24979,10 +24979,18 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("institution", sql.NVarChar, institution)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
-      .input("academic_year_from", sql.Date, academic_year_from)
-      .input("academic_year_to", sql.Date, academic_year_to)
+      .input(
+        "academic_year_from",
+        sql.Date,
+        academic_year_from ? new Date(academic_year_from) : null
+      )
+      .input(
+        "academic_year_to",
+        sql.Date,
+        academic_year_to ? new Date(academic_year_to) : null
+      )
       .query(
-        `EXEC sp_employee_academic_datails_test_DG @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25392,7 +25400,7 @@ const EmployeeCompanyISC = async (req, res) => {
       .input("DOJ", sql.Date, DOJ ? new Date(DOJ) : null)
       .input("DOL", sql.Date, DOL ? new Date(DOL) : null)
       .query(
-        `EXEC sp_employee_company_test_DG @mode,@EmployeeId,@department_Id,@designation_Id,@DOJ,@DOL,@manager,'',@status,'',@Name,@company_code,'','',@Employee_Type,'','',@from_date,@to_date,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_company @mode,@EmployeeId,@department_Id,@designation_Id,@DOJ,@DOL,@manager,'',@status,'',@Name,@company_code,'','',@Employee_Type,'','',@from_date,@to_date,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25878,7 +25886,7 @@ const getFinancialDetailsSearchCretria = async (req, res) => {
       .input("salary_from", sql.Decimal(14, 2), salary_from)
       .input("salary_to", sql.Decimal(14, 2), salary_to)
       .query(
-        `EXEC sp_salary_details_test_DG @mode,@EmployeeId,@Name,@salaryType,@Payscale, @PFNo,@salary_month,'',@company_code,'','',@salary_from,@salary_to,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_salary_details @mode,@EmployeeId,@Name,@salaryType,@Payscale, @PFNo,@salary_month,'',@company_code,'','',@salary_from,@salary_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25892,7 +25900,7 @@ const getFinancialDetailsSearchCretria = async (req, res) => {
 };
 
 const getFamilyDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, Relation, EmployeeName, company_code } = req.body;
+  const { EmployeeId, Relation, EmployeeName, Name, Sex, agefrom, ageto, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -25901,10 +25909,14 @@ const getFamilyDetailsSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Relation", sql.NVarChar, Relation)
+      .input("Name", sql.NVarChar, Name)
+      .input("Sex", sql.NVarChar, Sex)
+      .input("agefrom", sql.Int, agefrom)
+      .input("ageto", sql.Int, ageto)
       .input("company_code", sql.NVarChar, company_code)
       .input("EmployeeName", sql.NVarChar, EmployeeName)
       .query(
-        `EXEC sp_employee_family @mode,@EmployeeId,@Relation,'',@EmployeeName,'',0,'','',@company_code,'','','','','','',0,'',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_family @mode,@EmployeeId,@Relation,@Name,@EmployeeName,'',0,'','',@company_code,@Sex,'','','','','',0,'',0,'','',@agefrom,@ageto,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25947,7 +25959,7 @@ const getEmpBankDetailsSC = async (req, res) => {
       .input("branchName", sql.NVarChar, branchName)
       .input("IFSC_Code", sql.NVarChar, IFSC_Code)
       .query(
-        `EXEC sp_employee_bankdetails_test_DG @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,@branchName,@IFSC_Code,'',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_bankdetails @mode,@Account_NO,@EmployeeId,'',@Name,@AccountHolderName,@bankName,@branchName,@IFSC_Code,'',@company_code,0,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     // Send response
