@@ -46498,7 +46498,7 @@ const EmployeeAssetsLoopUpdate = async (req, res) => {
         .input("mode", sql.NVarChar, "U")
         .input("AllocationID", sql.Int, item.AllocationID)
         .input("AssetID", sql.Int, item.AssetID)
-        .input("EmployeeID", sql.Int, item.EmployeeID)
+        .input("EmployeeID", sql.NVarChar, item.EmployeeID)
         .input("AllocationDate", sql.DateTime, item.AllocationDate)
         .input("ExpectedReturnDate", sql.DateTime, item.ExpectedReturnDate)
         .input("ActualReturnDate", sql.DateTime, item.ActualReturnDate)
@@ -46536,7 +46536,7 @@ const EmployeeAssetsLoopDelete = async (req, res) => {
         .input("AllocationID", sql.Int, item.AllocationID)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("Keyfield", sql.NVarChar, item.Keyfield)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', ''`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', '','',''`);
     }
     res.status(200).json("EmployeeAssets data deleted successfully");
   } catch (err) {
@@ -47338,6 +47338,26 @@ const getTHRSReport = async (req, res) => {
   }
 };
 //code ended by Sakthi 08-04-2026
+
+//code added by Sakthi 09-04-2026
+const getAllocationStatus = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Allocation Status','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi 09-04-2026
 
 
 module.exports = {
@@ -48691,6 +48711,7 @@ module.exports = {
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
-  AssetIDDropoption
+  AssetIDDropoption,
+  getAllocationStatus
 
 };
