@@ -37,6 +37,18 @@ const columnDefs = [
     editable: false,
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
+    headerName: "Email",
+    field: "email",
+    filter: 'agTextColumnFilter',
+    editable: false,
+  },
+  {
     headerName: "Academic Name",
     field: "academicName",
     editable: false,
@@ -106,6 +118,13 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [academicYearFrom, setAcademicYearFrom] = useState("");
+  const [academicYearTo, setAcademicYearTo] = useState("");
+
+
+
+
+
   const handleSearch = async () => {
     setLoading(true)
     try {
@@ -114,7 +133,12 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, academicName: AcademicName, Name, major: Major, institution: Institution, company_code: sessionStorage.getItem("selectedCompanyCode") })
+        body: JSON.stringify({
+          EmployeeId, academicName: AcademicName, Name, major: Major, institution: Institution,
+          academic_year_from: academicYearFrom || null,
+          academic_year_to: academicYearTo || null,
+          company_code: sessionStorage.getItem("selectedCompanyCode")
+        })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -127,7 +151,9 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
             major: item.major,
             // document: item.document ? arrayBufferToBase64(item.document.data) : null,
             institution: item.institution,
-            academicYear: item.academicYear
+            academicYear: item.academicYear,
+            academic_year_from: item.academic_year_from,
+            academic_year_to: item.academic_year_to
           }))
         );
         setRowData(updatedData);
@@ -135,7 +161,6 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
       } else if (response.status === 404) {
         toast.warning("Data Not found")
         setRowData([]);
-        clearInputs([])
         console.log("Data not found");
       } else {
         const errorResponse = await response.json();
@@ -149,16 +174,27 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
     }
   };
 
+  const handleClosePopup = () => {
+    clearInputs();       // ✅ clear inputs
+    setRowData([]);      // ✅ clear grid
+    setSelectedRows([]); // ✅ clear selection
+    handleClose();       // ✅ close popup
+  };
+
   const handleReload = () => {
-    clearInputs([])
-    setRowData([])
+    clearInputs();
+    setRowData([]);
   };
 
   const clearInputs = () => {
     setEmployeeId("");
+    setname("");                // ✅ Name
     setAcademicName("");
     setMajor("");
     setInstitution("");
+
+    setAcademicYearFrom("");    // ✅ From date
+    setAcademicYearTo("");      // ✅ To date
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -175,16 +211,14 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
     }));
 
     academicDetails(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
+    handleClosePopup();
   }
 
   return (
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -193,7 +227,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                   <h1 className="custom-modal-title">Academic Details Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
@@ -275,6 +309,48 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Institution</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      id="fdate"
+                      className="exp-input-field form-control"
+                      type="date"
+                      placeholder=" "
+                      autoComplete="off"
+                      // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicYear', e.target.value)}
+                      value={academicYearFrom}
+                      onChange={(e) => setAcademicYearFrom(e.target.value)}
+                    />
+                    <label
+                      for="add1"
+                      className={`exp-form-labels`}
+                    >
+                      Academic Year From
+                    </label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      id="fdate"
+                      className="exp-input-field form-control"
+                      type="date"
+                      placeholder=" "
+                      autoComplete="off"
+                      // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'academicYear', e.target.value)}
+                      value={academicYearTo}
+                      onChange={(e) => setAcademicYearTo(e.target.value)}
+                    />
+                    <label
+                      for="add1"
+                      className={`exp-form-labels`}
+                    >
+                      Academic Year To
+                    </label>
                   </div>
                 </div>
 

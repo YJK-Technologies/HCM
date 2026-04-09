@@ -34,6 +34,16 @@ const columnDefs = [
     editable: false,
   },
   {
+    headerName: "Phone Number",
+    field: "phone1",
+    editable: false,
+  },
+  {
+    headerName: "Email",
+    field: "email",
+    editable: false,
+  },
+  {
     headerName: "Document No",
     field: "documentNo",
     editable: false,
@@ -103,57 +113,83 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
-    setLoading(true)
+    setLoading(true);
+
     try {
-      const response = await fetch(`${config.apiBaseUrl}/getIdentityDocumentSearchCretria`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ EmployeeId, documentType, Name, documentNo, company_code: sessionStorage.getItem("selectedCompanyCode") })
-      });
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/getIdentityDocumentSearchCretria`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            EmployeeId,
+            documentType,
+            Name,
+            documentNo,
+            company_code
+          })
+        }
+      );
+
       if (response.ok) {
         const searchData = await response.json();
 
-        const updatedData = await Promise.all(
-          searchData.map(async (item) => ({
-            ...item,
-            EmployeeId: item.EmployeeId,
-            academicName: item.academicName,
-            major: item.major,
-            // document: item.document ? arrayBufferToBase64(item.document.data) : null,
-            institution: item.institution,
-            academicYear: item.academicYear
-          }))
-        );
+        // ✅ Clean structured mapping
+        const updatedData = searchData.map((item) => ({
+          ...item,
+          EmployeeId: item.EmployeeId,
+          documentType: item.documentType,
+          documentNo: item.documentNo,
+          issueDate: item.issueDate,
+          expiryDate: item.expiryDate,
+          department_id: item.department_id,
+          designation_id: item.designation_id,
+        }));
+
         setRowData(updatedData);
-        console.log("data fetched successfully")
-      } else if (response.status === 404) {
-        toast.warning("Data Not found")
-        setRowData([]);
-        clearInputs([])
-        console.log("Data not found"); // Log the message for 404 Not Found
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
+        console.log("Data fetched successfully");
       }
+
+      else if (response.status === 404) {
+        toast.warning("Data Not found");
+        setRowData([]); // ✅ ONLY clear grid
+      }
+
+      else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Something went wrong");
+        setRowData([]);
+      }
+
     } catch (error) {
-      console.error("Error deleting rows:", error);
-      toast.error('Error Deleting Data: ' + error.message);
+      console.error("Error fetching data:", error);
+      toast.error("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleReload = () => {
-    clearInputs([])
-    setRowData([])
+  const handleClosePopup = () => {
+    handleClose();
+    clearInputs();
+    setRowData([]);
+    setSelectedRows([]);
   };
 
+  const handleReload = () => {
+    clearInputs();
+    setRowData([]);
+    setSelectedRows([]);
+  };
   const clearInputs = () => {
     setEmployeeId("");
     setDocumentType("");
     setDocumentNo("");
+    setname("");
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -163,23 +199,31 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
   };
 
   const handleConfirm = () => {
+    if (selectedRows.length === 0) {
+      toast.warning("Please select a row");
+      return;
+    }
+
     const selectedData = selectedRows.map(row => ({
       employeeId: row.EmployeeId,
+      documentType: row.documentType,
+      documentNo: row.documentNo,
+      issueDate: row.issueDate,
+      expiryDate: row.expiryDate,
       Department: row.department_id,
       Designation: row.designation_id,
     }));
 
     identityDocuments(selectedData);
-    handleClose();
-    clearInputs([]);
-    setRowData([]);
-  }
+
+    handleClosePopup(); // ✅ single clean exit
+  };
 
   return (
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -188,7 +232,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                   <h1 className="custom-modal-title">Identity Documents Help</h1>
 
                   <div className="action-wrapper">
-                    <div className="action-icon delete" onClick={handleClose}>
+                    <div className="action-icon delete" onClick={handleClosePopup}>
                       <span className="tooltip">Close</span>
                       <i className="fa-solid fa-xmark"></i>
                     </div>
