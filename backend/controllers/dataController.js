@@ -22676,7 +22676,7 @@ const addLeaveType = async (req, res) => {
     LeaveReason,
     created_by,
     modified_by,
-    tempstr1,
+    EmployeeId,
     tempstr2,
     tempstr3,
     tempstr4,
@@ -22703,7 +22703,7 @@ const addLeaveType = async (req, res) => {
       .input("LeaveReason", sql.VarChar, LeaveReason)
       .input("created_by", sql.VarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
-      .input("tempstr1", sql.VarChar, tempstr1)
+      .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("tempstr2", sql.VarChar, tempstr2)
       .input("tempstr3", sql.VarChar, tempstr3)
       .input("tempstr4", sql.VarChar, tempstr4)
@@ -22711,9 +22711,7 @@ const addLeaveType = async (req, res) => {
       .input("datetime2", sql.VarChar, datetime2)
       .input("datetime3", sql.VarChar, datetime3)
       .input("datetime4", sql.VarChar, datetime4)
-      .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`,
-      );
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -24808,6 +24806,7 @@ const getTeamManager = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
 const DashboardLeaveAuthorization = async (req, res) => {
   const { EmployeeId, LeaveStatus, FromDate } = req.body; // Removed FromDate
   try {
@@ -26891,7 +26890,6 @@ const EmployeeDashboardUpcomingBirthday = async (req, res) => {
 
 const EmployeeDashboardTotalLeave = async (req, res) => {
   const { EmployeeId, company_code } = req.body;
-  let pool;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -31964,16 +31962,15 @@ const getDocument = async (req, res) => {
 
 //code added by mathu-15-04-2025
 const getapplyLeavetype = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, EmployeeId } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',@EmployeeId,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -46982,7 +46979,7 @@ const LoanTypeDistribution = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'LTD', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'LTD', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47006,7 +47003,7 @@ const DepartmentLoanAmount = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'DL', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'DL', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47030,7 +47027,7 @@ const LoanStatusTrend = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'LS', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'LS', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47054,7 +47051,7 @@ const OverduevsPaid = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'OD', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'OD', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47369,6 +47366,122 @@ const getAllocationStatus = async (req, res) => {
   }
 };
 //code ended by Sakthi 09-04-2026
+
+//Code added by Pavun on 09-04-26
+const LeaveCancellation = async (req, res) => {
+  const { EmployeeId, LeaveStatus, FromDate } = req.body; 
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "LC")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("LeaveStatus", sql.NVarChar, LeaveStatus)
+      .input("FromDate", sql.Date, FromDate)
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','', '','', null, null, null, null, null, null, null, null`);
+    res.status(200).json("leave status updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 09-04-26
+
+//Code added by pavun on 10-04-26
+const compOffRequestInsert = async (req, res) => {
+  const { EmployeeId, HolidayDate, HolidayName, LeaveFromDate, LeaveToDate, 
+  Status, LeaveUsed, Reason, RepManager, ResPerson, CompanyCode, CreatedBy} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("HolidayDate", sql.Date, HolidayDate)
+      .input("HolidayName", sql.NVarChar, HolidayName)
+      .input("LeaveFromDate", sql.Date, LeaveFromDate)
+      .input("LeaveToDate", sql.Date, LeaveToDate)
+      .input("Status", sql.VarChar, Status)
+      .input("LeaveUsed", sql.VarChar, LeaveUsed)
+      .input("Reason", sql.VarChar, Reason)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("ResPerson", sql.NVarChar, ResPerson)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("CreatedBy", sql.NVarChar, CreatedBy)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
+      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@CreatedBy,'','',''`);
+
+    res.status(200).json({ success: true, message: "Employee comp off inserted successfully" });
+  } catch (err) {
+    console.error("Error during employee comp off insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DashboardCompOffRequest = async (req, res) => {
+  const { RepManager, CompanyCode } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "CLR")
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DashboardCompOffApproval = async (req, res) => {
+  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode, Keyfield } = req.body; 
+  try {
+    const pool = await connection.connectToDatabase();
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "CA")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Status", sql.NVarChar, Status)
+      .input("HolidayDate", sql.Date, HolidayDate)
+      .input("ApprovedBy", sql.NVarChar, ApprovedBy)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Keyfield", sql.NVarChar, Keyfield)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',
+      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','',''`);
+    res.status(200).json("leave status updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getCompOffDropdown = async (req, res) => {
+  const { EmployeeId, CompanyCode } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "CO")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','',''`);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//Code ended by pavun on 10-04-26
 
 
 module.exports = {
@@ -48723,6 +48836,11 @@ module.exports = {
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
   AssetIDDropoption,
-  getAllocationStatus
+  getAllocationStatus,
+  LeaveCancellation,
+  compOffRequestInsert,
+  DashboardCompOffRequest,
+  DashboardCompOffApproval,
+  getCompOffDropdown
 
 };
