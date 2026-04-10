@@ -1383,6 +1383,10 @@ router.post("/EmployeeAssets_SC",dataController.EmployeeAssets_SC)
 router.post("/EmployeeAssets_HdrLoopDelete",dataController.EmployeeAssets_HdrLoopDelete)
 router.post("/AssetIDDropoption", dataController.AssetIDDropoption)
 router.post("/getAllocationStatus", dataController.getAllocationStatus)
+router.post("/AssetRequestHdr", dataController.AssetRequestHdr)
+router.post("/GetAssetRequestDetails", dataController.GetAssetRequestDetails)
+router.post("/ApproveAssetRequest", dataController.ApproveAssetRequest)
+router.post("/AssetRequestDetails", dataController.AssetRequestDetails)
 
 
 
