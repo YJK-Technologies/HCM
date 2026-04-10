@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,36 +6,43 @@ import Select from 'react-select';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { format } from 'date-fns';
 import LoadingScreen from '../Loading';
 import { XCircle } from 'lucide-react';
 import { showConfirmationToast } from '../ToastConfirmation';
+import { useLocation } from "react-router-dom";
 const config = require('../Apiconfig');
 
 const EmployeeCompOff = () => {
-    const [LeaveType, setLeaveType] = useState("");
     const [FromDate, setFromDate] = useState("");
+    const [HolidayDate, setHolidayDate] = useState("");
+    const [HolidayName, setHolidayName] = useState("");
     const [ToDate, setToDate] = useState("");
     const [Reason, setReason] = useState("");
-    const [Select_slots, setSelect_Slots] = useState("");
     const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
     const [ReportingManager, setReportingManager] = useState("");
-    const [LeaveDrop, setLeaveDrop] = useState([]);
-    const [SelectedLeave, setSelectedLeave] = useState("");
     const navigate = useNavigate();
-    const [SlotDrop, setSlotDrop] = useState([]);
-    const [SelectedSlot, setSelectedSlot] = useState("");
-    const [rowData, setrowData] = useState([]);
     const [error, setError] = useState(false);
     const [Managerdrop, setManagerdrop] = useState([]);
     const [selectedmanager, setselectedmanager] = useState('');
     const gridRef = useRef()
     const [loading, setLoading] = useState(false);
-    const [isSelectLeave, setIsSelectLeave] = useState(false);
-    const [isSelectSlot, setIsSelectSlot] = useState(false);
     const [isSelectManager, setIsSelectManager] = useState(false);
-    const [isSearchLeave, setIsSearchLeave] = useState(false);
-    const [isSearchStatus, setIsSearchStatus] = useState(false);
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state) {
+            const { work_date, holiday_name } = location.state;
+            let formattedDate = "";
+
+            if (work_date) {
+                const parts = work_date.split("-");
+                formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+
+            setHolidayDate(formattedDate || "");
+            setHolidayName(holiday_name || "");
+        }
+    }, [location.state]);
 
     useEffect(() => {
         fetch(`${config.apiBaseUrl}/ESSManager`, {
@@ -52,152 +59,53 @@ const EmployeeCompOff = () => {
             .catch((error) => console.error("Error fetching warehouse:", error));
     }, []);
 
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/getapplyLeavetype`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((data) => data.json())
-            .then((val) => setLeaveDrop(val))
-    }, []);
-
-    const filterOptionLeaveType = LeaveDrop.map((option) => ({
-        value: option.LeaveId,
-        label: option.LeaveId,
-    }));
-
-    const handleLeaveType = (SelectedLeave) => {
-        setSelectedLeave(SelectedLeave);
-        setLeaveType(SelectedLeave ? SelectedLeave.value : '');
-    };
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/getSelectslot`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((data) => data.json())
-            .then((val) => setSlotDrop(val));
-    }, []);
-
-    const filterOptionSelect_Slots = SlotDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
-
-    const handleSelect_Slots = (selectedSlot) => {
-        setSelectedSlot(selectedSlot);
-        setSelect_Slots(selectedSlot ? selectedSlot.value : '');
+    const handleFromDate = (e) => {
+        const selectedDate = e.target.value;
+        setFromDate(selectedDate);
+        setToDate(selectedDate);
     };
 
     const handleToDateChange = (e) => {
-        setToDate(e.target.value);
-        validateDates(FromDate, e.target.value);
-    };
+        const selectedDate = e.target.value;
 
-    const handleFromDate = (e) => {
-        setFromDate(e.target.value);
-        validateDates(ToDate, e.target.value);
-    };
-
-    const validateDates = (FromDate, ToDate) => {
-        if (FromDate && ToDate) {
-            const fromDateObj = new Date(FromDate);
-            const toDateObj = new Date(ToDate);
-
-            if (fromDateObj > toDateObj) {
-                setError(true);
-                toast.warning("From Date should not be after To Date");
-            } else {
-                setError(false);
-            }
+        if (FromDate && selectedDate !== FromDate) {
+            toast.warning("Comp Off allows only single day");
+            setToDate(FromDate); 
+            return;
         }
-    };
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/getEmployeeTotalLeaveBalance`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                EmployeeId: sessionStorage.getItem('selectedUserCode'),
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((data) => data.json())
-            .then((val) => setrowData(val));
-    }, []);
-
-    const calculateLeaveDays = (from, to) => {
-        const fromDate = new Date(from);
-        const toDate = new Date(to);
-
-        const diffTime = toDate - fromDate;
-        const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1;
-
-        return diffDays;
+        setToDate(selectedDate);
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
 
-        if (!LeaveType ||
-            !FromDate ||
-            !ToDate ||
-            !Select_slots ||
+        if (
+            !HolidayDate ||
+            !HolidayName ||
             !Reason ||
-            !ReportingManager ||
-            !AlternativeReponsablePerson) {
+            !ReportingManager) {
             setError(true);
             toast.warning("Error: Missing required fields");
             return;
         }
 
-        const appliedDays = calculateLeaveDays(FromDate, ToDate);
-
-        const selectedLeaveBalance = rowData.find(
-            (item) => item.leavetype === LeaveType
-        );
-
-        if (!selectedLeaveBalance) {
-            toast.error("Leave type not found in balance");
-            return;
-        }
-
-        const available = selectedLeaveBalance.availableleave;
-
-        if (appliedDays > available) {
-            toast.warning(
-                `Only ${available} leave(s) available. You are applying ${appliedDays} days`
-            );
-            return;
-        }
-
         const formData = {
-            LeaveType,
-            FromDate,
-            ToDate,
-            Select_slots,
+            HolidayDate,
+            HolidayName,
+            LeaveFromDate: FromDate ? FromDate : null,
+            LeaveToDate: ToDate ? ToDate : null,
             Reason,
-            ReportingManager,
+            RepManager: ReportingManager,
             EmployeeId: sessionStorage.getItem("selectedUserCode"),
-            company_code: sessionStorage.getItem('selectedCompanyCode'),
-            created_by: sessionStorage.getItem("selectedUserCode"),
-            AlternativeReponsablePerson,
+            CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+            CreatedBy: sessionStorage.getItem("selectedUserCode"),
+            ResPerson: AlternativeReponsablePerson,
         };
         setError(false);
         setLoading(true);
         try {
 
-            const response = await fetch(`${config.apiBaseUrl}/addEmployeeLeave`, {
+            const response = await fetch(`${config.apiBaseUrl}/compOffRequestInsert`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -226,11 +134,6 @@ const EmployeeCompOff = () => {
         }
     };
 
-    const [columnDefs] = useState([
-        { headerName: 'Leave Type', field: 'leavetype', sortable: true, filter: true },
-        { headerName: 'No of Leaves', field: 'creditedleave', sortable: true, filter: true },
-        { headerName: 'No of Available Leaves', field: 'availableleave', sortable: true, filter: true },
-    ]);
 
     const goBack = () => {
         navigate('/EmployeeDashboard');
@@ -247,17 +150,15 @@ const EmployeeCompOff = () => {
     };
 
     const [leaveRowData, setLeaveRowData] = useState([]);
-    const [leaveDrop, setleaveDrop] = useState([]);
-    const [statusDrop, setstatusDrop] = useState([]);
-    const [leaveType, setleaveType] = useState("");
-    const [selectedLeave, setselectedLeave] = useState("");
-    const [selectedStatus, setselectedStatus] = useState("");
-    const [fromDate, setfromDate] = useState("");
-    const [toDate, settoDate] = useState("");
-    const [LeaveStatus, setleaveStatus] = useState("");
+    const [statusDropSc, setStatusDropSc] = useState([]);
+    const [selectedStatusSc, setselectedStatusSc] = useState("");
+    const [FromDateSc, setFromDateSc] = useState("");
+    const [ToDateSc, setToDateSc] = useState("");
+    const [LeaveStatusSc, setLeaveStatusSc] = useState("");
+    const [isSearchStatusSc, setIsSearchStatusSc] = useState(false);
 
     const CancelActionRenderer = (params) => {
-        const { data, api } = params;
+        const { data } = params;
 
         const handleCancel = async () => {
             if (data.LeaveStatus === 'Cancelled') return;
@@ -314,25 +215,16 @@ const EmployeeCompOff = () => {
 
     const leaveColumnDefs = [
         {
-            checkboxSelection: true,
-            headerName: "Leave Type",
-            field: "LeaveType",
-            cellStyle: { textAlign: "center" },
-            editable: false,
-        },
-        {
             headerName: "From Date",
             field: "FromDate",
             editable: false,
             cellStyle: { textAlign: "center" },
-            valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
         },
         {
             headerName: "To Date",
             field: "ToDate",
             editable: false,
             cellStyle: { textAlign: "center" },
-            valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
         },
         {
             headerName: "Leave Status",
@@ -357,8 +249,8 @@ const EmployeeCompOff = () => {
     ];
 
     const handleSearchItem = async () => {
-        const from = new Date(fromDate);
-        const to = new Date(toDate);
+        const from = new Date(FromDateSc);
+        const to = new Date(ToDateSc);
 
         if (from > to) {
             toast.warning("From Date should not be greater than To Date");
@@ -375,10 +267,9 @@ const EmployeeCompOff = () => {
                 body: JSON.stringify({
                     company_code: sessionStorage.getItem('selectedCompanyCode'),
                     EmployeeId: sessionStorage.getItem('selectedUserCode'),
-                    FromDate: fromDate,
-                    ToDate: toDate,
-                    LeaveStatus: LeaveStatus,
-                    LeaveType: leaveType
+                    FromDate: FromDateSc,
+                    ToDate: ToDateSc,
+                    LeaveStatus: LeaveStatusSc,
                 })
             });
             if (response.ok) {
@@ -408,25 +299,10 @@ const EmployeeCompOff = () => {
     };
 
     const clearInputs = () => {
-        setfromDate('');
-        settoDate('');
-        setleaveStatus('');
-        setleaveType('');
+        setFromDateSc('');
+        setToDateSc('');
+        setLeaveStatusSc('');
     };
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/getapplyLeavetype`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((data) => data.json())
-            .then((val) => setleaveDrop(val))
-    }, []);
 
     useEffect(() => {
         fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
@@ -439,27 +315,17 @@ const EmployeeCompOff = () => {
             }),
         })
             .then((data) => data.json())
-            .then((val) => setstatusDrop(val))
+            .then((val) => setStatusDropSc(val))
     }, []);
 
-    const filterOptionLeaves = [{ value: 'All', label: 'All' }, ...leaveDrop.map((option) => ({
-        value: option.LeaveId,
-        label: option.LeaveId,
-    }))];
-
-    const filterOptionStatus = [{ value: 'All', label: 'All' }, ...statusDrop.map((option) => ({
+    const filterOptionStatusSc = [{ value: 'All', label: 'All' }, ...statusDropSc.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }))];
 
-    const handleLeaves = (SelectedLeave) => {
-        setselectedLeave(SelectedLeave);
-        setleaveType(SelectedLeave ? SelectedLeave.value : '');
-    };
-
-    const handleStatus = (SelectedStatus) => {
-        setselectedStatus(SelectedStatus);
-        setleaveStatus(SelectedStatus ? SelectedStatus.value : '');
+    const handleChangeStatusSc = (SelectedStatus) => {
+        setselectedStatusSc(SelectedStatus);
+        setLeaveStatusSc(SelectedStatus ? SelectedStatus.value : '');
     };
 
     const handleConfirm = () => {
@@ -471,14 +337,7 @@ const EmployeeCompOff = () => {
 
         const row = selectedRows[0];
 
-        setSelectedLeave({
-            value: row.LeaveType,
-            label: row.LeaveType,
-        });
-
-        setFromDate(row.FromDate ? format(new Date(row.FromDate), "yyyy-MM-dd") : "");
-        setToDate(row.ToDate ? format(new Date(row.ToDate), "yyyy-MM-dd") : "");
-        setleaveStatus(row.LeaveStatus || "");
+        setLeaveStatusSc(row.LeaveStatus || "");
     };
 
     const defaultColDef = {
@@ -503,47 +362,36 @@ const EmployeeCompOff = () => {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
+
                     <div className="col-md-3">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${SelectedLeave ? "has-value" : ""} 
-                            ${isSelectLeave ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="LeaveType"
-                                value={SelectedLeave}
-                                onChange={handleLeaveType}
-                                options={filterOptionLeaveType}
+                        <div className="inputGroup">
+                            <input
+                                type="date"
+                                className="exp-input-field form-control"
+                                value={HolidayDate}
+                                readOnly
                                 placeholder=" "
-                                onFocus={() => setIsSelectLeave(true)}
-                                onBlur={() => setIsSelectLeave(false)}
-                                classNamePrefix="react-select"
-                                isClearable
+                                autoComplete="off"
                             />
-                            <label className={`floating-label ${error && !LeaveType ? 'text-danger' : ''}`}>
-                                Leave Type<span className="text-danger">*</span>
+                            <label className={`exp-form-labels ${error && !HolidayDate ? 'text-danger' : ''}`}>
+                                Holiday Date<span className="text-danger">*</span>
                             </label>
                         </div>
                     </div>
 
                     <div className="col-md-3">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${SelectedSlot ? "has-value" : ""} 
-                            ${isSelectSlot ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="Select_slots"
-                                value={SelectedSlot}
-                                onChange={handleSelect_Slots}
-                                options={filterOptionSelect_Slots}
+                        <div className="inputGroup">
+                            <input
+                                type="Text"
+                                className="exp-input-field form-control"
+                                value={HolidayName}
+                                readOnly
                                 placeholder=" "
-                                onFocus={() => setIsSelectSlot(true)}
-                                onBlur={() => setIsSelectSlot(false)}
-                                classNamePrefix="react-select"
-                                isClearable
+                                autoComplete="off"
                             />
-                            <label className="floating-label">Select Slot</label>
+                            <label className={`exp-form-labels ${error && !HolidayName ? 'text-danger' : ''}`}>
+                                Holiday Name<span className="text-danger">*</span>
+                            </label>
                         </div>
                     </div>
 
@@ -557,8 +405,8 @@ const EmployeeCompOff = () => {
                                 placeholder=" "
                                 autoComplete="off"
                             />
-                            <label className={`exp-form-labels ${error && !FromDate ? 'text-danger' : ''}`}>
-                                From Date<span className="text-danger">*</span>
+                            <label className={`exp-form-labels`}>
+                                From Date
                             </label>
                         </div>
                     </div>
@@ -570,11 +418,12 @@ const EmployeeCompOff = () => {
                                 className="exp-input-field form-control"
                                 value={ToDate}
                                 onChange={handleToDateChange}
+                                disabled 
                                 placeholder=" "
                                 autoComplete="off"
                             />
-                            <label className={`exp-form-labels ${error && !ToDate ? 'text-danger' : ''}`}>
-                                To Date<span className="text-danger">*</span>
+                            <label className={`exp-form-labels`}>
+                                To Date
                             </label>
                         </div>
                     </div>
@@ -627,14 +476,14 @@ const EmployeeCompOff = () => {
                                 placeholder=" "
                                 autoComplete="off"
                             />
-                            <label className={`exp-form-labels ${error && !AlternativeReponsablePerson ? 'text-danger' : ''}`}>
-                                Responsible Person<span className="text-danger">*</span>
+                            <label className={`exp-form-labels`}>
+                                Responsible Person
                             </label>
                         </div>
                     </div>
 
                     <div class="col-12">
-                        {(LeaveStatus === "Pending" || LeaveStatus === "Rejected" || LeaveStatus === "") && (
+                        {(LeaveStatusSc === "Pending" || LeaveStatusSc === "Rejected" || LeaveStatusSc === "") && (
                             <div className="search-btn-wrapper">
                                 <div className="icon-btn save" onClick={handleSave}>
                                     <span className="tooltip">Apply</span>
@@ -647,7 +496,7 @@ const EmployeeCompOff = () => {
                 </div>
             </div>
 
-            <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+            {/* <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <h5>Search Criteria :</h5>
 
                 <div className="row g-3">
@@ -657,10 +506,10 @@ const EmployeeCompOff = () => {
                             <input
                                 type="date"
                                 className="exp-input-field form-control"
-                                value={fromDate}
+                                value={FromDateSc}
                                 placeholder=" "
                                 autoComplete="off"
-                                onChange={(e) => setfromDate(e.target.value)}
+                                onChange={(e) => setFromDateSc(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
                             />
                             <label className="exp-form-labels">From Date</label>
@@ -672,10 +521,10 @@ const EmployeeCompOff = () => {
                             <input
                                 type="date"
                                 className="exp-input-field form-control"
-                                value={toDate}
+                                value={ToDateSc}
                                 placeholder=" "
                                 autoComplete="off"
-                                onChange={(e) => settoDate(e.target.value)}
+                                onChange={(e) => setToDateSc(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
                             />
                             <label className="exp-form-labels">To Date</label>
@@ -685,39 +534,17 @@ const EmployeeCompOff = () => {
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedLeave ? "has-value" : ""} 
-                            ${isSearchLeave ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="LeaveType"
-                                value={selectedLeave}
-                                onChange={handleLeaves}
-                                options={filterOptionLeaves}
-                                placeholder=" "
-                                onFocus={() => setIsSearchLeave(true)}
-                                onBlur={() => setIsSearchLeave(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
-                            />
-                            <label className="floating-label">Leave Type</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedStatus ? "has-value" : ""} 
-                            ${isSearchStatus ? "is-focused" : ""}`}
+                            ${selectedStatusSc ? "has-value" : ""} 
+                            ${isSearchStatusSc ? "is-focused" : ""}`}
                         >
                             <Select
                                 id="Select_slots"
-                                value={selectedStatus}
-                                onChange={handleStatus}
-                                options={filterOptionStatus}
+                                value={selectedStatusSc}
+                                onChange={handleChangeStatusSc}
+                                options={filterOptionStatusSc}
                                 placeholder=" "
-                                onFocus={() => setIsSearchStatus(true)}
-                                onBlur={() => setIsSearchStatus(false)}
+                                onFocus={() => setIsSearchStatusSc(true)}
+                                onBlur={() => setIsSearchStatusSc(false)}
                                 classNamePrefix="react-select"
                                 isClearable
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchItem()}
@@ -757,7 +584,7 @@ const EmployeeCompOff = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -1384,6 +1384,10 @@ router.post("/EmployeeAssets_HdrLoopDelete",dataController.EmployeeAssets_HdrLoo
 router.post("/AssetIDDropoption", dataController.AssetIDDropoption)
 router.post("/LeaveCancellation", dataController.LeaveCancellation)
 router.post("/getAllocationStatus", dataController.getAllocationStatus)
+router.post("/compOffRequestInsert", dataController.compOffRequestInsert)
+router.post("/DashboardCompOffRequest", dataController.DashboardCompOffRequest)
+router.post("/DashboardCompOffApproval", dataController.DashboardCompOffApproval)
+router.post("/getCompOffDropdown", dataController.getCompOffDropdown)
 
 
 

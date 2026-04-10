@@ -36,6 +36,9 @@ const ApplyLeave = () => {
   const [isSelectManager, setIsSelectManager] = useState(false);
   const [isSearchLeave, setIsSearchLeave] = useState(false);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
+  const [compOffOptions, setCompOffOptions] = useState([]);
+  const [selectedCompOff, setSelectedCompOff] = useState(null);
+  const [isSelectCompOff, setIsSelectCompOff] = useState(false);
 
   // useEffect(() => {
   //   fetch(`${config.apiBaseUrl}/getapplyLeavetype`,{
@@ -73,6 +76,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        EmployeeId: sessionStorage.getItem("selectedUserCode")
       }),
     })
       .then((data) => data.json())
@@ -85,9 +89,36 @@ const ApplyLeave = () => {
   }));
 
 
-  const handleLeaveType = (SelectedLeave) => {
+  const handleLeaveType = async (SelectedLeave) => {
     setSelectedLeave(SelectedLeave);
-    setLeaveType(SelectedLeave ? SelectedLeave.value : '');
+    const value = SelectedLeave ? SelectedLeave.value : '';
+    setLeaveType(value);
+
+    if (value === "Comp Off") {
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/getCompOffDropdown`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            EmployeeId: sessionStorage.getItem("selectedUserCode"),
+            CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
+
+        const data = await res.json();
+
+        const formatted = data.map(item => ({
+          value: item.HolidayDate,
+          // label: `${item.HolidayDate} - ${item.HolidayName}`,
+          label: `${item.HolidayName}`,
+        }));
+
+        setCompOffOptions(formatted);
+
+      } catch (err) {
+        console.error("Comp Off fetch failed");
+      }
+    }
   };
 
   useEffect(() => {
@@ -451,6 +482,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        EmployeeId: sessionStorage.getItem("selectedUserCode")
       }),
     })
       .then((data) => data.json())
@@ -541,8 +573,8 @@ const ApplyLeave = () => {
               <div className="col-md-3">
                 <div
                   className={`inputGroup selectGroup 
-              ${SelectedLeave ? "has-value" : ""} 
-              ${isSelectLeave ? "is-focused" : ""}`}
+                  ${SelectedLeave ? "has-value" : ""} 
+                  ${isSelectLeave ? "is-focused" : ""}`}
                 >
                   <Select
                     id="LeaveType"
@@ -561,11 +593,35 @@ const ApplyLeave = () => {
                 </div>
               </div>
 
+              {LeaveType === "Comp Off" && (
+                <div className="col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+                    ${selectedCompOff ? "has-value" : ""} 
+                    ${isSelectCompOff ? "is-focused" : ""}`}
+                  >
+                    <Select
+                      value={selectedCompOff}
+                      onChange={(option) => setSelectedCompOff(option)}
+                      options={compOffOptions}
+                      placeholder=" "
+                      onFocus={() => setIsSelectCompOff(true)}
+                      onBlur={() => setIsSelectCompOff(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                    />
+                    <label className="floating-label">
+                      Select Comp Off<span className="text-danger">*</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
               <div className="col-md-3">
                 <div
                   className={`inputGroup selectGroup 
-              ${SelectedSlot ? "has-value" : ""} 
-              ${isSelectSlot ? "is-focused" : ""}`}
+                  ${SelectedSlot ? "has-value" : ""} 
+                  ${isSelectSlot ? "is-focused" : ""}`}
                 >
                   <Select
                     id="Select_slots"
@@ -633,8 +689,8 @@ const ApplyLeave = () => {
               <div className="col-md-6">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedmanager ? "has-value" : ""} 
-              ${isSelectManager ? "is-focused" : ""}`}
+                  ${selectedmanager ? "has-value" : ""} 
+                  ${isSelectManager ? "is-focused" : ""}`}
                 >
                   <Select
                     value={selectedmanager}

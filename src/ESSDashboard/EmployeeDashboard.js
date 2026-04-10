@@ -61,7 +61,7 @@ const Dashboard = (payslip) => {
   const [currentIndexJoinee, setCurrentIndexJoinee] = useState(0);
   const carouselRef = useRef(null);
   const joineeCarouselRef = useRef(null);
-  
+
 
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
@@ -457,15 +457,15 @@ const Dashboard = (payslip) => {
 
       if (response.ok) {
         const searchData = await response.json();
-        const newRows = searchData.map((matchedItem) => ({
-          work_date: formatDates(matchedItem.work_date),
-          First_CheckIn: matchedItem.First_CheckIn,
-          Last_CheckOut: matchedItem.Last_CheckOut,
-          total_worked_hours: matchedItem.total_worked_hours,
-          Total_login_Hours: matchedItem.Total_login_Hours,
-          Status: matchedItem.Status,
-        }));
-        setRowData(newRows);
+        // const newRows = searchData.map((matchedItem) => ({
+        //   work_date: formatDates(matchedItem.work_date),
+        //   First_CheckIn: matchedItem.First_CheckIn,
+        //   Last_CheckOut: matchedItem.Last_CheckOut,
+        //   total_worked_hours: matchedItem.total_worked_hours,
+        //   Total_login_Hours: matchedItem.Total_login_Hours,
+        //   Status: matchedItem.Status,
+        // }));
+        setRowData(searchData);
       } else if (response.status === 404) {
         setRowData([]);
         toast.warning("Data not found");
@@ -537,17 +537,36 @@ const Dashboard = (payslip) => {
     },
   ];
 
-
   const StatusCellRenderer = (params) => {
     if (params.value === "Compensatory Leave") {
+      const isPending = params.data.CompOffStatus === "Pending";
+      const isApproved = params.data.CompOffStatus === "Approved";
+      const isDisabled = isPending || isApproved;
+
+      const handleRequest = () => {
+        if (isDisabled) return;
+        navigate("/EmployeeCompOff", {
+          state: {
+            work_date: params.data.work_date,
+            holiday_name: params.data.Holiday_Name
+          }
+        });
+      };
+
+      const btnClass = `btn-comp-off ${isPending ? 'status-pending' : ''} ${isApproved ? 'status-approved' : ''}`;
+
       return (
         <div className="status-action-wrapper">
           <button
-            className="btn-request-premium"
-          // onClick={() => handleRequest(params.data)}
+            className={btnClass}
+            onClick={handleRequest}
+            disabled={isDisabled}
+            title={params.data.CompOffStatus || "Apply for Comp Off"} // Fallback browser tooltip
           >
-            <i className="fa-solid fa-paper-plane"></i>
-            <span>Comp Off</span>
+            <i className={isApproved ? "fa-solid fa-check-double" : "fa-solid fa-paper-plane"}></i>
+            <span>
+              {isPending ? "Pending" : isApproved ? "Approved" : "Comp Off"}
+            </span>
           </button>
         </div>
       );
@@ -2015,7 +2034,6 @@ const Dashboard = (payslip) => {
                       return {
                         backgroundColor: themeColor,
                         color: '#ffffff',
-                        borderLeft: '5px solid #ffffff' 
                       };
                     }
                     return null;
