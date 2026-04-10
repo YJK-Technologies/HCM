@@ -47101,13 +47101,12 @@ const EmployeeAssets_HdrInsert = async (req, res) => {
       .input("Country", sql.NVarChar, Country)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("Keyfield", sql.NVarChar, Keyfield)
       .input("CreatedDate", sql.DateTime, CreatedDate)
       .input("CreatedBy", sql.NVarChar, CreatedBy)
       .input("modify_by", sql.NVarChar, modify_by)
       .input("modify_date", sql.DateTime, modify_date)
       .query(`EXEC sp_EmployeeAssets_Hdr @mode, '', @Asset_Code, @AssetName, @AssetCategory, @SerialNumber, @Bar_code, @Brand, @Model, 
-        @PurchaseDate, @PurchaseCost, @CurrencyCode, @VendorName, @WarrantyStart, @WarrantyEnd, @AssetStatus, @Location, @Country, @Status, @company_code, @Keyfield, @CreatedDate, @CreatedBy, @modify_by, @modify_date`);
+        @PurchaseDate, @PurchaseCost, @CurrencyCode, @VendorName, @WarrantyStart, @WarrantyEnd, @AssetStatus, @Location, @Country, @Status, @company_code, '', @CreatedDate, @CreatedBy, @modify_by, @modify_date`);
 
     res.status(200).json({ success: true, message: "EmployeeAssets_Hdr insertd successfully" });
   } catch (err) {
@@ -47239,20 +47238,18 @@ const EmployeeAssets_SC = async (req, res) => {
       .input("Bar_code", sql.NVarChar, Bar_code)
       .input("Brand", sql.NVarChar, Brand )
       .input("Model", sql.NVarChar, Model)
-      .input("PurchaseDate", sql.Date, PurchaseDate )
+      .input("PurchaseDate", sql.Date, PurchaseDate || null)
       .input("PurchaseCost", sql.Decimal(18, 2), PurchaseCost )
       .input("CurrencyCode", sql.NVarChar, CurrencyCode )
       .input("VendorName", sql.NVarChar, VendorName)
-      .input("WarrantyStart", sql.Date, WarrantyStart)
-      .input("WarrantyEnd", sql.Date, WarrantyEnd)
+      .input("WarrantyStart", sql.Date, WarrantyStart || null)
+      .input("WarrantyEnd", sql.Date, WarrantyEnd || null)
       .input("AssetStatus", sql.NVarChar, AssetStatus)
       .input("Location", sql.NVarChar, Location)
       .input("Country", sql.NVarChar, Country)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-
-      .query(`
-        EXEC sp_EmployeeAssets_Hdr @mode, @AssetID,@Asset_Code, @AssetName,@AssetCategory, @SerialNumber,
+      .query(` EXEC sp_EmployeeAssets_Hdr @mode, @AssetID,@Asset_Code, @AssetName,@AssetCategory, @SerialNumber,
         @Bar_code, @Brand,@Model, @PurchaseDate,@PurchaseCost,@CurrencyCode,
         @VendorName, @WarrantyStart,@WarrantyEnd, @AssetStatus, @Location,@Country,@Status,
         @company_code, '', '', NULL, NULL, NULL
