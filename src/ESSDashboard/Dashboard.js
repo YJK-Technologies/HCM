@@ -168,6 +168,7 @@ const Dashboard = () => {
     const interval = setInterval(fetchDashboardData, 5000);
     return () => clearInterval(interval);
   }, []);
+
   // Task Hour Report Summary
   const [rowDataTHRS, setRowDataTHRS] = useState([]);
   const [userDrop, setUserDrop] = useState([]);
@@ -177,9 +178,9 @@ const Dashboard = () => {
 
   const filteredOptionUser = Array.isArray(userDrop)
     ? userDrop.map((option) => ({
-        value: option.user_code,
-        label: `${option.user_code} - ${option.user_name}`,
-      }))
+      value: option.user_code,
+      label: `${option.user_code} - ${option.user_name}`,
+    }))
     : [];
 
   const handleChangeUser = async (selectedUser) => {
@@ -240,8 +241,8 @@ const Dashboard = () => {
       const safeData = Array.isArray(data)
         ? data
         : Array.isArray(data?.data)
-        ? data.data
-        : [];
+          ? data.data
+          : [];
 
       setRowDataTHRS(safeData);
     } catch (err) {
@@ -253,40 +254,40 @@ const Dashboard = () => {
     fetchTHRSGridDataAuto();
   }, []);
 
-const fetchTHRSGridDataAuto = async () => {
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const fetchTHRSGridDataAuto = async () => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    // get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split("T")[0];
+      // get today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split("T")[0];
 
-    const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        start_date: shiftFromDate || today,
-        end_date: shiftToDate || today,
-        userid: "All",
-        company_code,
-        Status: "Active",
-      }),
-    });
+      const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start_date: shiftFromDate || today,
+          end_date: shiftToDate || today,
+          userid: "All",
+          company_code,
+          Status: "Active",
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    const safeData = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.data)
-      ? data.data
-      : [];
+      const safeData = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : [];
 
-    setRowDataTHRS(safeData);
-  } catch (err) {
-    console.error("THRS Fetch Error:", err);
-  }
-};
+      setRowDataTHRS(safeData);
+    } catch (err) {
+      console.error("THRS Fetch Error:", err);
+    }
+  };
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -972,6 +973,7 @@ const fetchTHRSGridDataAuto = async () => {
       let familyChangeData = [];
       let academicData = [];
       let documentData = [];
+      let compOffData = [];
 
       /* ---------- Leave ---------- */
       try {
@@ -1046,6 +1048,7 @@ const fetchTHRSGridDataAuto = async () => {
       } catch (err) {
         console.log("Employee API failed");
       }
+
       /* ---------- Employee Family Change ---------- */
       try {
         const res = await fetch(
@@ -1092,6 +1095,22 @@ const fetchTHRSGridDataAuto = async () => {
         if (res.ok) documentData = await res.json();
       } catch (err) {
         console.log("Document API failed");
+      }
+
+      /* ---------- Comp Off ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/DashboardCompOffRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            RepManager: user_code,
+            CompanyCode: company_code,
+          }),
+        });
+
+        if (res.ok) compOffData = await res.json();
+      } catch (err) {
+        console.log("Comp Off API failed");
       }
 
       /* ---------- Leave ---------- */
@@ -1143,6 +1162,20 @@ const fetchTHRSGridDataAuto = async () => {
         ToDate: formatDate(row.travel_end_date),
         status: row.request_status,
         days: row.TravelDays,
+      }));
+
+      /* ---------- Comp Off ---------- */
+      const formattedCompOff = compOffData.map((row) => ({
+        type: "Comp Off",
+        id: row.Keyfield,
+        HolidayDate: row.HolidayDate,
+        EmployeeId: row.EmployeeId,
+        EmployeeName: row.EmployeeName,
+        title: row.HolidayName || "Comp Off Request",
+        FromDate: row.LeaveFromDate ? formatDate(row.LeaveFromDate) : null,
+        ToDate: row.LeaveToDate ? formatDate(row.LeaveToDate) : null,
+        status: row.Status,
+        days: row.LeaveDays,
       }));
 
       /* ---------- Employee Change Group ---------- */
@@ -1236,6 +1269,7 @@ const fetchTHRSGridDataAuto = async () => {
         ...formattedFamily,
         ...formattedAcademic,
         ...formattedDocuments,
+        ...formattedCompOff
       ];
 
       setDashboardRequests(merged);
@@ -1246,17 +1280,32 @@ const fetchTHRSGridDataAuto = async () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleApproval = async (type, id, FromDate, isApproved) => {
+  const handleApproval = async (type, id, FromDate, isApproved, extra = {}) => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const approver = sessionStorage.getItem("selectedUserCode");
 
       let url = "";
       let body = {};
 
       const status = isApproved ? "Approved" : "Rejected";
 
+      /* ---------- Comp Off ---------- */
+      if (type === "Comp Off") {
+        url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
+
+        body = {
+          EmployeeId: extra.EmployeeId,
+          Status: status,
+          HolidayDate: extra.HolidayDate, 
+          ApprovedBy: approver,
+          CompanyCode: company_code,
+          Keyfield: id,
+        };
+      }
+
       /* ---------- Leave ---------- */
-      if (type === "Leave") {
+      else if (type === "Leave") {
         const [day, month, year] = FromDate.split("-");
         const backendDate = `${year}-${month}-${day}`;
 
@@ -1754,18 +1803,18 @@ const fetchTHRSGridDataAuto = async () => {
   // AG Grid columns For Time and Hours
   const columnDefsTHRS = [
     { headerName: "User", field: "user_name" },
-  {
-    headerName: "Working Date",
-    field: "work_date",
-    valueFormatter: (params) => {
-      if (!params.value) return "";
-      const date = new Date(params.value);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    },
-  },    { headerName: "Shift code", field: "Shift_Code" },
+    {
+      headerName: "Working Date",
+      field: "work_date",
+      valueFormatter: (params) => {
+        if (!params.value) return "";
+        const date = new Date(params.value);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      },
+    }, { headerName: "Shift code", field: "Shift_Code" },
     { headerName: "Status", field: "Status" },
     { headerName: "Total Login Hours", field: "Total_login_Hours" },
     { headerName: "First CheckIn", field: "First_CheckIn" },
@@ -2720,7 +2769,7 @@ const fetchTHRSGridDataAuto = async () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={90}
-                        // label={({ name, value }) => `${name} (${value})`}
+                      // label={({ name, value }) => `${name} (${value})`}
                       >
                         {shiftData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -2897,7 +2946,7 @@ const fetchTHRSGridDataAuto = async () => {
                   dashboardRequests.filter(
                     (r) => (r.status || "").toLowerCase() === "pending",
                   ).length
-                }{" "}
+                }
                 Pending
               </span>
             </div>
@@ -2980,23 +3029,28 @@ const fetchTHRSGridDataAuto = async () => {
                       <div className="action-button-group">
                         <button
                           className="btn-action-minimal approve"
-                          onClick={() =>
-                            handleApproval(req.type, req.id, req.FromDate, true)
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApproval(req.type, req.id, req.FromDate, true,
+                              {
+                                EmployeeId: req.EmployeeId,
+                                HolidayDate: req.HolidayDate,
+                              });
+                          }}
                         >
                           <i className="fa-solid fa-check"></i>
                         </button>
                         <div className="action-divider"></div>
                         <button
                           className="btn-action-minimal reject"
-                          onClick={() =>
-                            handleApproval(
-                              req.type,
-                              req.id,
-                              req.FromDate,
-                              false,
-                            )
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApproval(req.type, req.id, req.FromDate, false,
+                              {
+                                EmployeeId: req.EmployeeId,
+                                HolidayDate: req.HolidayDate,
+                              });
+                          }}
                         >
                           <i className="fa-solid fa-xmark"></i>
                         </button>

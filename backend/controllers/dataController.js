@@ -22676,7 +22676,7 @@ const addLeaveType = async (req, res) => {
     LeaveReason,
     created_by,
     modified_by,
-    tempstr1,
+    EmployeeId,
     tempstr2,
     tempstr3,
     tempstr4,
@@ -22703,7 +22703,7 @@ const addLeaveType = async (req, res) => {
       .input("LeaveReason", sql.VarChar, LeaveReason)
       .input("created_by", sql.VarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
-      .input("tempstr1", sql.VarChar, tempstr1)
+      .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("tempstr2", sql.VarChar, tempstr2)
       .input("tempstr3", sql.VarChar, tempstr3)
       .input("tempstr4", sql.VarChar, tempstr4)
@@ -22711,9 +22711,7 @@ const addLeaveType = async (req, res) => {
       .input("datetime2", sql.VarChar, datetime2)
       .input("datetime3", sql.VarChar, datetime3)
       .input("datetime4", sql.VarChar, datetime4)
-      .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`,
-      );
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -24808,6 +24806,7 @@ const getTeamManager = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
 const DashboardLeaveAuthorization = async (req, res) => {
   const { EmployeeId, LeaveStatus, FromDate } = req.body; // Removed FromDate
   try {
@@ -26891,7 +26890,6 @@ const EmployeeDashboardUpcomingBirthday = async (req, res) => {
 
 const EmployeeDashboardTotalLeave = async (req, res) => {
   const { EmployeeId, company_code } = req.body;
-  let pool;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -31964,16 +31962,15 @@ const getDocument = async (req, res) => {
 
 //code added by mathu-15-04-2025
 const getapplyLeavetype = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, EmployeeId } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',@EmployeeId,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -46982,7 +46979,7 @@ const LoanTypeDistribution = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'LTD', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'LTD', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47006,7 +47003,7 @@ const DepartmentLoanAmount = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'DL', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'DL', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47030,7 +47027,7 @@ const LoanStatusTrend = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'LS', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'LS', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47054,7 +47051,7 @@ const OverduevsPaid = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard_test 'OD', @company_code,@from_date,@to_date`);
+      .query(`EXEC sp_loan_dashboard 'OD', @company_code,@from_date,@to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
@@ -47104,13 +47101,12 @@ const EmployeeAssets_HdrInsert = async (req, res) => {
       .input("Country", sql.NVarChar, Country)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .input("Keyfield", sql.NVarChar, Keyfield)
       .input("CreatedDate", sql.DateTime, CreatedDate)
       .input("CreatedBy", sql.NVarChar, CreatedBy)
       .input("modify_by", sql.NVarChar, modify_by)
       .input("modify_date", sql.DateTime, modify_date)
       .query(`EXEC sp_EmployeeAssets_Hdr @mode, '', @Asset_Code, @AssetName, @AssetCategory, @SerialNumber, @Bar_code, @Brand, @Model, 
-        @PurchaseDate, @PurchaseCost, @CurrencyCode, @VendorName, @WarrantyStart, @WarrantyEnd, @AssetStatus, @Location, @Country, @Status, @company_code, @Keyfield, @CreatedDate, @CreatedBy, @modify_by, @modify_date`);
+        @PurchaseDate, @PurchaseCost, @CurrencyCode, @VendorName, @WarrantyStart, @WarrantyEnd, @AssetStatus, @Location, @Country, @Status, @company_code, '', @CreatedDate, @CreatedBy, @modify_by, @modify_date`);
 
     res.status(200).json({ success: true, message: "EmployeeAssets_Hdr insertd successfully" });
   } catch (err) {
@@ -47242,20 +47238,18 @@ const EmployeeAssets_SC = async (req, res) => {
       .input("Bar_code", sql.NVarChar, Bar_code)
       .input("Brand", sql.NVarChar, Brand )
       .input("Model", sql.NVarChar, Model)
-      .input("PurchaseDate", sql.Date, PurchaseDate )
+      .input("PurchaseDate", sql.Date, PurchaseDate || null)
       .input("PurchaseCost", sql.Decimal(18, 2), PurchaseCost )
       .input("CurrencyCode", sql.NVarChar, CurrencyCode )
       .input("VendorName", sql.NVarChar, VendorName)
-      .input("WarrantyStart", sql.Date, WarrantyStart)
-      .input("WarrantyEnd", sql.Date, WarrantyEnd)
+      .input("WarrantyStart", sql.Date, WarrantyStart || null)
+      .input("WarrantyEnd", sql.Date, WarrantyEnd || null)
       .input("AssetStatus", sql.NVarChar, AssetStatus)
       .input("Location", sql.NVarChar, Location)
       .input("Country", sql.NVarChar, Country)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-
-      .query(`
-        EXEC sp_EmployeeAssets_Hdr @mode, @AssetID,@Asset_Code, @AssetName,@AssetCategory, @SerialNumber,
+      .query(` EXEC sp_EmployeeAssets_Hdr @mode, @AssetID,@Asset_Code, @AssetName,@AssetCategory, @SerialNumber,
         @Bar_code, @Brand,@Model, @PurchaseDate,@PurchaseCost,@CurrencyCode,
         @VendorName, @WarrantyStart,@WarrantyEnd, @AssetStatus, @Location,@Country,@Status,
         @company_code, '', '', NULL, NULL, NULL
@@ -47372,6 +47366,297 @@ const getAllocationStatus = async (req, res) => {
   }
 };
 //code ended by Sakthi 09-04-2026
+
+//Code added by Pavun on 09-04-26
+const LeaveCancellation = async (req, res) => {
+  const { EmployeeId, LeaveStatus, FromDate } = req.body; 
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "LC")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("LeaveStatus", sql.NVarChar, LeaveStatus)
+      .input("FromDate", sql.Date, FromDate)
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','', '','', null, null, null, null, null, null, null, null`);
+    res.status(200).json("leave status updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 09-04-26
+
+//Code added by pavun on 10-04-26
+const compOffRequestInsert = async (req, res) => {
+  const { EmployeeId, HolidayDate, HolidayName, LeaveFromDate, LeaveToDate, 
+  Status, LeaveUsed, Reason, RepManager, ResPerson, CompanyCode, CreatedBy} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("HolidayDate", sql.Date, HolidayDate)
+      .input("HolidayName", sql.NVarChar, HolidayName)
+      .input("LeaveFromDate", sql.Date, LeaveFromDate)
+      .input("LeaveToDate", sql.Date, LeaveToDate)
+      .input("Status", sql.VarChar, Status)
+      .input("LeaveUsed", sql.VarChar, LeaveUsed)
+      .input("Reason", sql.VarChar, Reason)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("ResPerson", sql.NVarChar, ResPerson)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("CreatedBy", sql.NVarChar, CreatedBy)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
+      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@CreatedBy,'','',''`);
+
+    res.status(200).json({ success: true, message: "Employee comp off inserted successfully" });
+  } catch (err) {
+    console.error("Error during employee comp off insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DashboardCompOffRequest = async (req, res) => {
+  const { RepManager, CompanyCode } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "CLR")
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const DashboardCompOffApproval = async (req, res) => {
+  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode, Keyfield } = req.body; 
+  try {
+    const pool = await connection.connectToDatabase();
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "CA")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Status", sql.NVarChar, Status)
+      .input("HolidayDate", sql.Date, HolidayDate)
+      .input("ApprovedBy", sql.NVarChar, ApprovedBy)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Keyfield", sql.NVarChar, Keyfield)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',
+      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','',''`);
+    res.status(200).json("leave status updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const getCompOffDropdown = async (req, res) => {
+  const { EmployeeId, CompanyCode } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "CO")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','',''`);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//Code ended by pavun on 10-04-26
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const AssetRequestHdr = async (req, res) => {
+  const headerData = req.body.headerData;
+
+  // Validation
+  if (!headerData || !headerData.length) {
+    return res.status(400).json("Invalid or empty header data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    let insertedId = null;
+
+    for (const insertRow of headerData) {
+      if (!insertRow) continue;
+
+      const result = await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("info_request_id", sql.Int, 0) // DB will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(` EXEC sp_ess_employee_family_request_hdr @mode, @info_request_id, @company_code, @EmployeeId, '', @purpose, @request_status, @created_by, '' 
+        `);
+
+      insertedId = result.recordset[0].info_request_id;
+    }
+
+    // Return generated ID to frontend
+    res.status(200).json([{ info_request_id: insertedId }]);
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const GetAssetRequestDetails = async (req, res) => {
+  const {
+    company_code,
+    Info_request_id,
+    EmployeeId,
+    FieldName,
+    FromDate,
+    ToDate,
+  } = req.body;
+  // Validation
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Info_request_id", sql.Int, Info_request_id || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("FieldName", sql.NVarChar, FieldName || "")
+      .input("FromDate", sql.Date, FromDate || null) 
+      .input("ToDate", sql.Date, ToDate || null)
+      .query(` EXEC sp_employee_assets_request_dtls 'SC',0, @info_request_id, '', @EmployeeId, @company_code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate;
+      `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Asset Request Details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const ApproveAssetRequest = async (req, res) => {
+  const approvalData = req.body.approvalData;
+
+  // Validation
+  if (!approvalData || !approvalData.length) {
+    return res.status(400).json("Invalid or empty approval data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of approvalData) {
+      if (!row) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "AP")
+        .input("DetailID", sql.BigInt, row.DetailID)
+        .input("info_request_id", sql.Int, row.info_request_id)
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("EmployeeID", sql.NVarChar, row.EmployeeID)
+        .input("request_status", sql.NVarChar, row.request_status) // Approved / Rejected
+        // Dummy values (not used in AP mode)
+        .input("AssetID", sql.BigInt, row.AssetID)
+        .input("ExpectedReturnDate", sql.Date, row.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.Date, row.ActualReturnDate)
+        .input("Remarks", sql.NVarChar, row.Remarks)
+        .query(` 
+          EXEC sp_employee_assets_request_dtls 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, '', '', '', '', ''`);
+    }
+    res.status(200).json("Request processed successfully (Approved/Rejected)");
+
+  } catch (error) {
+    console.log(error.message);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const AssetRequestDetails = async (req, res) => {
+  const detailsData = req.body.detailsData;
+
+  // Validation
+  if (!detailsData || !detailsData.length) {
+    return res.status(400).json("Invalid or empty details data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of detailsData) {
+      if (!insertRow) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("DetailID", sql.BigInt, insertRow.DetailID || 0)
+        .input("info_request_id", sql.Int, insertRow.info_request_id)
+        .input("keyfield", sql.NVarChar, "") // SP will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        // Asset fields
+        .input("AssetID", sql.BigInt, insertRow.AssetID)
+        .input("ExpectedReturnDate", sql.Date, insertRow.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.Date, insertRow.ActualReturnDate)
+        .input("Remarks", sql.NVarChar, insertRow.Remarks)
+        .input("CreatedBy", sql.NVarChar, insertRow.CreatedBy)
+        .query(`sp_employee_assets_request_dtls 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', ''`);
+    }
+
+    res.status(200).json("Asset request details inserted successfully");
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
 
 
 module.exports = {
@@ -48726,6 +49011,15 @@ module.exports = {
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
   AssetIDDropoption,
-  getAllocationStatus
+  getAllocationStatus,
+  AssetRequestHdr,
+  GetAssetRequestDetails,
+  ApproveAssetRequest,
+  AssetRequestDetails,
+  LeaveCancellation,
+  compOffRequestInsert,
+  DashboardCompOffRequest,
+  DashboardCompOffApproval,
+  getCompOffDropdown
 
 };

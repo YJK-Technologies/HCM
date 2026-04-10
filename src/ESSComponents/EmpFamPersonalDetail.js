@@ -11,7 +11,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function EmpFamPersonalDetail({}) {
+function EmpFamPersonalDetail({ }) {
   const [familyMembers, setFamilyMembers] = useState([
     {
       relation: "familyMembers",
@@ -69,13 +69,13 @@ function EmpFamPersonalDetail({}) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-if(relativedrop.length > 0 &&
-   sexDrop.length > 0 &&
-   nationalityDrop.length > 0 &&
-   booleanDrop.length > 0 
-){
-  handleEmployeeFamily(employeeId);
-} 
+    if (relativedrop.length > 0 &&
+      sexDrop.length > 0 &&
+      nationalityDrop.length > 0 &&
+      booleanDrop.length > 0
+    ) {
+      handleEmployeeFamily(employeeId);
+    }
   }, [relativedrop, sexDrop, nationalityDrop, booleanDrop]);
 
   const EmployeeLoan = () => {
@@ -84,10 +84,10 @@ if(relativedrop.length > 0 &&
   const Insurance1 = () => {
     navigate("/EmpFamPersonalDetail");
   };
-    const AcademicDet = () => {
+  const AcademicDet = () => {
     navigate("/AcademicDetReq");
   };
-      const Documents = () => {
+  const Documents = () => {
     navigate("/EmpDocumentReq");
   };
 
@@ -100,12 +100,12 @@ if(relativedrop.length > 0 &&
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
+            ],
+          }
           : item,
       ),
     );
@@ -126,11 +126,11 @@ if(relativedrop.length > 0 &&
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -168,120 +168,120 @@ if(relativedrop.length > 0 &&
     { label: "Assets" },
   ];
 
-const handleSave = async () => {
-  if (!EmployeeId) {
-    toast.warning("Error: Missing required fields");
-    return;
-  }
+  const handleSave = async () => {
+    if (!EmployeeId) {
+      toast.warning("Error: Missing required fields");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
 
-    /* ---------------- HEADER ---------------- */
-    const headerPayload = {
-      company_code,
-      EmployeeId,
-      purpose: purpose,
-      request_status: "Pending",
-      created_by,
-    };
+      /* ---------------- HEADER ---------------- */
+      const headerPayload = {
+        company_code,
+        EmployeeId,
+        purpose: purpose,
+        request_status: "Pending",
+        created_by,
+      };
 
-    const headerRes = await fetch(
-      `${config.apiBaseUrl}/FamilyRequestHdr`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ headerData: [headerPayload] }),
+      const headerRes = await fetch(
+        `${config.apiBaseUrl}/FamilyRequestHdr`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ headerData: [headerPayload] }),
+        }
+      );
+
+      if (!headerRes.ok) {
+        const err = await headerRes.json();
+        throw new Error(err.message);
       }
-    );
 
-    if (!headerRes.ok) {
-      const err = await headerRes.json();
-      throw new Error(err.message);
-    }
+      const headerResult = await headerRes.json();
+      const info_request_id = headerResult?.[0]?.info_request_id;
 
-    const headerResult = await headerRes.json();
-    const info_request_id = headerResult?.[0]?.info_request_id;
-
-    if (!info_request_id) {
-      throw new Error("info_request_id not returned from backend");
-    }
-
-    /* ---------------- DETAILS ---------------- */
-    await saveFamilyDetails(info_request_id);
-
-    toast.success("Family details submitted successfully!", {
-      onClose: () => window.location.reload(),
-    });
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Error: " + err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const saveFamilyDetails = async (info_request_id) => {
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
-
-    // assuming you have multiple family rows (table/grid)
-    const detailsData = familyMembers.flatMap((group) =>
-    group.members.map((row) => ({
-    info_request_id,
-    company_code,
-    EmployeeId,
-    request_status: "Pending",
-
-    Relation: row.relationName,
-    Name: row.name,
-    DOB: row.dob || null,
-    AGE: row.Age || null,
-    aadhar_no: row.aadharNo,
-    Sex: row.sex,
-    Nationality: row.nationality,
-    CPR_No: row.CRPNo,
-    CPR_Expiry_Date: row.CRP_ExpiryDate || null,
-    Passport_No: row.passportNo,
-    Passport_Expiry_Date: row.passportExpiryDate || null,
-    Visa_Entitled: row.visaEntitled || 0,
-    Visa_Expiry_Date: row.visaExpiryDate || null,
-    Air_Ticket_Entitled: row.airTicketEntitled === "1" ? true : false,
-
-    created_by,
-  }))
-  );
-
-    const res = await fetch(
-      `${config.apiBaseUrl}/FamilyRequestDetails`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ detailsData }),
+      if (!info_request_id) {
+        throw new Error("info_request_id not returned from backend");
       }
-    );
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message);
+      /* ---------------- DETAILS ---------------- */
+      await saveFamilyDetails(info_request_id);
+
+      toast.success("Family details submitted successfully!", {
+        onClose: () => window.location.reload(),
+      });
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Error: " + err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    console.log("Family Details inserted successfully");
+  const saveFamilyDetails = async (info_request_id) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
 
-  } catch (error) {
-    console.error(error);
-    toast.error("Error inserting family details: " + error.message);
-  }
-};
+      // assuming you have multiple family rows (table/grid)
+      const detailsData = familyMembers.flatMap((group) =>
+        group.members.map((row) => ({
+          info_request_id,
+          company_code,
+          EmployeeId,
+          request_status: "Pending",
+
+          Relation: row.relationName,
+          Name: row.name,
+          DOB: row.dob || null,
+          AGE: row.Age || null,
+          aadhar_no: row.aadharNo,
+          Sex: row.sex,
+          Nationality: row.nationality,
+          CPR_No: row.CRPNo,
+          CPR_Expiry_Date: row.CRP_ExpiryDate || null,
+          Passport_No: row.passportNo,
+          Passport_Expiry_Date: row.passportExpiryDate || null,
+          Visa_Entitled: row.visaEntitled || 0,
+          Visa_Expiry_Date: row.visaExpiryDate || null,
+          Air_Ticket_Entitled: row.airTicketEntitled === "1" ? true : false,
+
+          created_by,
+        }))
+      );
+
+      const res = await fetch(
+        `${config.apiBaseUrl}/FamilyRequestDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ detailsData }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+
+      console.log("Family Details inserted successfully");
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Error inserting family details: " + error.message);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (typeof dateString === "string" && dateString) {
@@ -502,19 +502,19 @@ const saveFamilyDetails = async (info_request_id) => {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      relationName: selectedRelation
-                        ? selectedRelation.value
-                        : "",
-                      selectRelation: selectedRelation,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  relationName: selectedRelation
+                    ? selectedRelation.value
+                    : "",
+                  selectRelation: selectedRelation,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -525,19 +525,19 @@ const saveFamilyDetails = async (info_request_id) => {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      airTicketEntitled: selectedAirTicket
-                        ? selectedAirTicket.value
-                        : "",
-                      selectAirTicket: selectedAirTicket,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  airTicketEntitled: selectedAirTicket
+                    ? selectedAirTicket.value
+                    : "",
+                  selectAirTicket: selectedAirTicket,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -548,17 +548,17 @@ const saveFamilyDetails = async (info_request_id) => {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      visaEntitled: selectedVisa ? selectedVisa.value : "",
-                      selectVisa: selectedVisa,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  visaEntitled: selectedVisa ? selectedVisa.value : "",
+                  selectVisa: selectedVisa,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -569,17 +569,17 @@ const saveFamilyDetails = async (info_request_id) => {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      sex: selectedSex ? selectedSex.value : "",
-                      selectSex: selectedSex,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  sex: selectedSex ? selectedSex.value : "",
+                  selectSex: selectedSex,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -590,19 +590,19 @@ const saveFamilyDetails = async (info_request_id) => {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      nationality: selectedNationality
-                        ? selectedNationality.value
-                        : "",
-                      selectNationality: selectedNationality,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  nationality: selectedNationality
+                    ? selectedNationality.value
+                    : "",
+                  selectNationality: selectedNationality,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -861,7 +861,7 @@ const saveFamilyDetails = async (info_request_id) => {
                     readOnly
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
+                  // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
                   />
                   <label
                     for="cno"
@@ -1171,23 +1171,23 @@ const saveFamilyDetails = async (info_request_id) => {
                 </div>
               </div>
 
-            <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="passportNo"
-                className="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                value={purpose}
-                onChange={(e) => setpurpose(e.target.value)}
-                maxLength={30}
-                autoComplete="off"
-              />
-              <label htmlFor="passportNo" className="exp-form-labels">
-                Purpose
-              </label>
-            </div>
-          </div>
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="passportNo"
+                    className="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    value={purpose}
+                    onChange={(e) => setpurpose(e.target.value)}
+                    maxLength={30}
+                    autoComplete="off"
+                  />
+                  <label htmlFor="passportNo" className="exp-form-labels">
+                    Purpose
+                  </label>
+                </div>
+              </div>
 
             </div>
           ))}

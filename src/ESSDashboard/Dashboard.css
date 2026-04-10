@@ -3068,8 +3068,8 @@
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background-color: #ffffff; /* Solid white for maximum contrast */
-  color: var(--ag-header); /* Text matches your theme color */
+  background-color: #ffffff; 
+  color: var(--ag-header); 
   border: none;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -3082,32 +3082,27 @@
   border: 1px solid transparent;
 }
 
-/* Icon specific styling */
 .btn-request-premium i {
   font-size: 0.8rem;
   transition: transform 0.3s ease;
 }
 
-/* Hover Effects */
 .btn-request-premium:hover {
   background-color: #f8fafc;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  color: #1e293b; /* Darker text on hover */
+  color: #1e293b; 
 }
 
-/* Paper plane animation on hover */
 .btn-request-premium:hover i {
   transform: translateX(3px) translateY(-2px) scale(1.1);
 }
 
-/* Active / Click state */
 .btn-request-premium:active {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Style for the text when NOT a button (other statuses) */
 .status-text-default {
   font-weight: 500;
   color: #64748b;
@@ -3256,4 +3251,92 @@
     grid-column: 1 / -1;
     padding: 40px;
     color: #94a3b8;
+}
+
+.icon-cancel-btn {
+  background: transparent;
+  border: none;
+  color: #ff4d4f; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+}
+
+.icon-cancel-btn:hover:not(.disabled) {
+  background-color: #fff1f0;
+  color: #cf1322;
+  transform: scale(1.1);
+}
+
+.icon-cancel-btn:active:not(.disabled) {
+  transform: scale(0.9);
+}
+
+.icon-cancel-btn.disabled {
+  color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-action-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.btn-comp-off {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); /* Premium Blue */
+  color: white;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+}
+
+.btn-comp-off i {
+  font-size: 11px;
+}
+
+.btn-comp-off:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+  filter: brightness(1.1);
+}
+
+.btn-comp-off.status-pending {
+  background: #fef3c7; 
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-comp-off.status-approved {
+  background: #dcfce7; 
+  color: #166534;
+  border: 1px solid #86efac;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.status-text-default {
+  font-weight: 500;
+  color: #4b5563;
 }

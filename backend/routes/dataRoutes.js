@@ -1382,7 +1382,16 @@ router.post("/EmployeeAssets_HdrLoopUpdate",dataController.EmployeeAssets_HdrLoo
 router.post("/EmployeeAssets_SC",dataController.EmployeeAssets_SC)
 router.post("/EmployeeAssets_HdrLoopDelete",dataController.EmployeeAssets_HdrLoopDelete)
 router.post("/AssetIDDropoption", dataController.AssetIDDropoption)
+router.post("/LeaveCancellation", dataController.LeaveCancellation)
 router.post("/getAllocationStatus", dataController.getAllocationStatus)
+router.post("/compOffRequestInsert", dataController.compOffRequestInsert)
+router.post("/DashboardCompOffRequest", dataController.DashboardCompOffRequest)
+router.post("/DashboardCompOffApproval", dataController.DashboardCompOffApproval)
+router.post("/getCompOffDropdown", dataController.getCompOffDropdown)
+router.post("/AssetRequestHdr", dataController.AssetRequestHdr)
+router.post("/GetAssetRequestDetails", dataController.GetAssetRequestDetails)
+router.post("/ApproveAssetRequest", dataController.ApproveAssetRequest)
+router.post("/AssetRequestDetails", dataController.AssetRequestDetails)
 
 
 
