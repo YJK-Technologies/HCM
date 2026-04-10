@@ -37,9 +37,22 @@ const TopBar = () => {
   //   window.history.pushState(null, null, window.location.href);
   // };
 
+  // const performLogout = () => {
+  //   localStorage.clear();
+  //   sessionStorage.clear();
+  //   navigate('/login', { replace: true });
+  //   window.history.pushState(null, null, window.location.href);
+  // };
+
   const performLogout = () => {
+    const theme = localStorage.getItem("theme");
     localStorage.clear();
     sessionStorage.clear();
+
+    if (theme) {
+      localStorage.setItem("theme", theme);
+    }
+
     navigate('/login', { replace: true });
     window.history.pushState(null, null, window.location.href);
   };
@@ -48,10 +61,9 @@ const TopBar = () => {
   const handleLogoutClick = (e) => {
     e.preventDefault(); // Prevent link jump
 
-    showConfirmationToast(
-      "Are you sure you want to logout?",
-      performLogout, // Runs if user clicks 'Yes'
-      () => console.log("Logout cancelled") // Runs if user clicks 'No'
+    showConfirmationToast("Are you sure you want to logout?",
+      performLogout,
+      () => console.log("Logout cancelled")
     );
   };
 

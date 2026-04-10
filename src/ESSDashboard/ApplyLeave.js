@@ -8,6 +8,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { format } from 'date-fns';
 import LoadingScreen from '../Loading';
+import { XCircle } from 'lucide-react';
+import { showConfirmationToast } from '../ToastConfirmation';
 const config = require('../Apiconfig');
 
 const ApplyLeave = () => {
@@ -34,6 +36,9 @@ const ApplyLeave = () => {
   const [isSelectManager, setIsSelectManager] = useState(false);
   const [isSearchLeave, setIsSearchLeave] = useState(false);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
+  const [compOffOptions, setCompOffOptions] = useState([]);
+  const [selectedCompOff, setSelectedCompOff] = useState(null);
+  const [isSelectCompOff, setIsSelectCompOff] = useState(false);
 
   // useEffect(() => {
   //   fetch(`${config.apiBaseUrl}/getapplyLeavetype`,{
@@ -71,6 +76,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        EmployeeId: sessionStorage.getItem("selectedUserCode")
       }),
     })
       .then((data) => data.json())
@@ -83,9 +89,36 @@ const ApplyLeave = () => {
   }));
 
 
-  const handleLeaveType = (SelectedLeave) => {
+  const handleLeaveType = async (SelectedLeave) => {
     setSelectedLeave(SelectedLeave);
-    setLeaveType(SelectedLeave ? SelectedLeave.value : '');
+    const value = SelectedLeave ? SelectedLeave.value : '';
+    setLeaveType(value);
+
+    if (value === "Comp Off") {
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/getCompOffDropdown`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            EmployeeId: sessionStorage.getItem("selectedUserCode"),
+            CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
+
+        const data = await res.json();
+
+        const formatted = data.map(item => ({
+          value: item.HolidayDate,
+          // label: `${item.HolidayDate} - ${item.HolidayName}`,
+          label: `${item.HolidayName}`,
+        }));
+
+        setCompOffOptions(formatted);
+
+      } catch (err) {
+        console.error("Comp Off fetch failed");
+      }
+    }
   };
 
   useEffect(() => {
@@ -262,17 +295,6 @@ const ApplyLeave = () => {
   };
 
   const [open, setOpen] = React.useState(false);
-  const handleadjustmentbtn = () => {
-    setOpen(true);
-  };
-
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const filteredOptionManager = Managerdrop.map((option) => ({
     value: option.EmployeeId,
@@ -293,6 +315,62 @@ const ApplyLeave = () => {
   const [fromDate, setfromDate] = useState("");
   const [toDate, settoDate] = useState("");
   const [LeaveStatus, setleaveStatus] = useState("");
+
+  const CancelActionRenderer = (params) => {
+    const { data, api } = params;
+
+    const handleCancel = async () => {
+      if (data.LeaveStatus === 'Cancelled') return;
+
+      showConfirmationToast("Are you sure you want to cancel this leave request?",
+        async () => {
+
+          try {
+            const response = await fetch(`${config.apiBaseUrl}/LeaveCancellation`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                EmployeeId: sessionStorage.getItem('selectedUserCode'),
+                LeaveStatus: "Cancelled",
+                FromDate: data.FromDate,
+              }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              toast.success("Leave request cancelled successfully!");
+              await handleSearchItem();
+            } else {
+              console.error(result.message);
+              toast.warning(result.message || "Failed to cancel leave");
+            }
+          } catch (err) {
+            console.error(err);
+            toast.error('Error: ' + err.message);
+          }
+        },
+        () => {
+          toast.info("Data updated cancelled.");
+        }
+      );
+    };
+
+    const isCancelled = data.LeaveStatus === 'Cancelled';
+
+    return (
+      <div className="action-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <button
+          onClick={handleCancel}
+          disabled={isCancelled}
+          className={`icon-cancel-btn ${isCancelled ? 'disabled' : ''}`}
+        >
+          <XCircle size={18} strokeWidth={2.5} />
+        </button>
+      </div>
+    );
+  };
 
   const leaveColumnDefs = [
     {
@@ -321,6 +399,20 @@ const ApplyLeave = () => {
       field: "LeaveStatus",
       editable: false,
       cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Action",
+      field: "action",
+      width: 100,
+      cellStyle: { textAlign: "center" },
+      sortable: false,
+      filter: false,
+      cellRenderer: CancelActionRenderer,
+      tooltipValueGetter: (params) => {
+        return params.data.LeaveStatus === 'Cancelled'
+          ? "This request has already been cancelled."
+          : "Click to cancel this leave request.";
+      }
     },
   ];
 
@@ -390,6 +482,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        EmployeeId: sessionStorage.getItem("selectedUserCode")
       }),
     })
       .then((data) => data.json())
@@ -480,8 +573,8 @@ const ApplyLeave = () => {
               <div className="col-md-3">
                 <div
                   className={`inputGroup selectGroup 
-              ${SelectedLeave ? "has-value" : ""} 
-              ${isSelectLeave ? "is-focused" : ""}`}
+                  ${SelectedLeave ? "has-value" : ""} 
+                  ${isSelectLeave ? "is-focused" : ""}`}
                 >
                   <Select
                     id="LeaveType"
@@ -500,11 +593,35 @@ const ApplyLeave = () => {
                 </div>
               </div>
 
+              {LeaveType === "Comp Off" && (
+                <div className="col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+                    ${selectedCompOff ? "has-value" : ""} 
+                    ${isSelectCompOff ? "is-focused" : ""}`}
+                  >
+                    <Select
+                      value={selectedCompOff}
+                      onChange={(option) => setSelectedCompOff(option)}
+                      options={compOffOptions}
+                      placeholder=" "
+                      onFocus={() => setIsSelectCompOff(true)}
+                      onBlur={() => setIsSelectCompOff(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                    />
+                    <label className="floating-label">
+                      Select Comp Off<span className="text-danger">*</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
               <div className="col-md-3">
                 <div
                   className={`inputGroup selectGroup 
-              ${SelectedSlot ? "has-value" : ""} 
-              ${isSelectSlot ? "is-focused" : ""}`}
+                  ${SelectedSlot ? "has-value" : ""} 
+                  ${isSelectSlot ? "is-focused" : ""}`}
                 >
                   <Select
                     id="Select_slots"
@@ -572,8 +689,8 @@ const ApplyLeave = () => {
               <div className="col-md-6">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedmanager ? "has-value" : ""} 
-              ${isSelectManager ? "is-focused" : ""}`}
+                  ${selectedmanager ? "has-value" : ""} 
+                  ${isSelectManager ? "is-focused" : ""}`}
                 >
                   <Select
                     value={selectedmanager}
