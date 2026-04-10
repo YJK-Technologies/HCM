@@ -47339,6 +47339,25 @@ const getTHRSReport = async (req, res) => {
 };
 //code ended by Sakthi 08-04-2026
 
+//Code added by Pavun on 09-04-26
+const LeaveCancellation = async (req, res) => {
+  const { EmployeeId, LeaveStatus, FromDate } = req.body; 
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "LC")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("LeaveStatus", sql.NVarChar, LeaveStatus)
+      .input("FromDate", sql.Date, FromDate)
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','', '','', null, null, null, null, null, null, null, null`);
+    res.status(200).json("leave status updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 09-04-26
 
 module.exports = {
   login,
@@ -48691,6 +48710,7 @@ module.exports = {
   EmployeeAssets_HdrLoopUpdate,
   EmployeeAssets_SC,
   EmployeeAssets_HdrLoopDelete,
-  AssetIDDropoption
+  AssetIDDropoption,
+  LeaveCancellation
 
 };

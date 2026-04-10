@@ -8,6 +8,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { format } from 'date-fns';
 import LoadingScreen from '../Loading';
+import { XCircle } from 'lucide-react';
+import { showConfirmationToast } from '../ToastConfirmation';
 const config = require('../Apiconfig');
 
 const ApplyLeave = () => {
@@ -262,17 +264,6 @@ const ApplyLeave = () => {
   };
 
   const [open, setOpen] = React.useState(false);
-  const handleadjustmentbtn = () => {
-    setOpen(true);
-  };
-
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const filteredOptionManager = Managerdrop.map((option) => ({
     value: option.EmployeeId,
@@ -293,6 +284,62 @@ const ApplyLeave = () => {
   const [fromDate, setfromDate] = useState("");
   const [toDate, settoDate] = useState("");
   const [LeaveStatus, setleaveStatus] = useState("");
+
+  const CancelActionRenderer = (params) => {
+    const { data, api } = params;
+
+    const handleCancel = async () => {
+      if (data.LeaveStatus === 'Cancelled') return;
+
+      showConfirmationToast("Are you sure you want to cancel this leave request?",
+        async () => {
+
+          try {
+            const response = await fetch(`${config.apiBaseUrl}/LeaveCancellation`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                EmployeeId: sessionStorage.getItem('selectedUserCode'),
+                LeaveStatus: "Cancelled",
+                FromDate: data.FromDate,
+              }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              toast.success("Leave request cancelled successfully!");
+              await handleSearchItem();
+            } else {
+              console.error(result.message);
+              toast.warning(result.message || "Failed to cancel leave");
+            }
+          } catch (err) {
+            console.error(err);
+            toast.error('Error: ' + err.message);
+          }
+        },
+        () => {
+          toast.info("Data updated cancelled.");
+        }
+      );
+    };
+
+    const isCancelled = data.LeaveStatus === 'Cancelled';
+
+    return (
+      <div className="action-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <button
+          onClick={handleCancel}
+          disabled={isCancelled}
+          className={`icon-cancel-btn ${isCancelled ? 'disabled' : ''}`}
+        >
+          <XCircle size={18} strokeWidth={2.5} />
+        </button>
+      </div>
+    );
+  };
 
   const leaveColumnDefs = [
     {
@@ -321,6 +368,20 @@ const ApplyLeave = () => {
       field: "LeaveStatus",
       editable: false,
       cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Action",
+      field: "action",
+      width: 100,
+      cellStyle: { textAlign: "center" },
+      sortable: false,
+      filter: false,
+      cellRenderer: CancelActionRenderer,
+      tooltipValueGetter: (params) => {
+        return params.data.LeaveStatus === 'Cancelled'
+          ? "This request has already been cancelled."
+          : "Click to cancel this leave request.";
+      }
     },
   ];
 

@@ -3257,3 +3257,37 @@
     padding: 40px;
     color: #94a3b8;
 }
+
+.icon-cancel-btn {
+  background: transparent;
+  border: none;
+  color: #ff4d4f; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+}
+
+.icon-cancel-btn:hover:not(.disabled) {
+  background-color: #fff1f0;
+  color: #cf1322;
+  transform: scale(1.1);
+}
+
+.icon-cancel-btn:active:not(.disabled) {
+  transform: scale(0.9);
+}
+
+.icon-cancel-btn.disabled {
+  color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

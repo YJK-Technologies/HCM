@@ -547,7 +547,7 @@ const Dashboard = (payslip) => {
           // onClick={() => handleRequest(params.data)}
           >
             <i className="fa-solid fa-paper-plane"></i>
-            <span>Request</span>
+            <span>Comp Off</span>
           </button>
         </div>
       );
