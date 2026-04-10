@@ -1192,7 +1192,7 @@ function Input({}) {
                     for="cno"
                     className={`floating-label ${error && !member.sex ? "text-danger" : ""}`}
                   >
-                    Sex
+                    Gender
                   </label>
                 </div>
               </div>
