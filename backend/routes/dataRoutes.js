@@ -1388,6 +1388,10 @@ router.post("/compOffRequestInsert", dataController.compOffRequestInsert)
 router.post("/DashboardCompOffRequest", dataController.DashboardCompOffRequest)
 router.post("/DashboardCompOffApproval", dataController.DashboardCompOffApproval)
 router.post("/getCompOffDropdown", dataController.getCompOffDropdown)
+router.post("/AssetRequestHdr", dataController.AssetRequestHdr)
+router.post("/GetAssetRequestDetails", dataController.GetAssetRequestDetails)
+router.post("/ApproveAssetRequest", dataController.ApproveAssetRequest)
+router.post("/AssetRequestDetails", dataController.AssetRequestDetails)
 
 
 

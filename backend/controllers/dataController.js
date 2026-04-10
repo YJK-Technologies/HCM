@@ -47483,6 +47483,181 @@ const getCompOffDropdown = async (req, res) => {
 
 //Code ended by pavun on 10-04-26
 
+// Code added by Dinesh Gokul 0n 10-04-2026
+const AssetRequestHdr = async (req, res) => {
+  const headerData = req.body.headerData;
+
+  // Validation
+  if (!headerData || !headerData.length) {
+    return res.status(400).json("Invalid or empty header data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    let insertedId = null;
+
+    for (const insertRow of headerData) {
+      if (!insertRow) continue;
+
+      const result = await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("info_request_id", sql.Int, 0) // DB will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("purpose", sql.NVarChar, insertRow.purpose)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        .input("created_by", sql.NVarChar, insertRow.created_by)
+        .query(` EXEC sp_ess_employee_family_request_hdr @mode, @info_request_id, @company_code, @EmployeeId, '', @purpose, @request_status, @created_by, '' 
+        `);
+
+      insertedId = result.recordset[0].info_request_id;
+    }
+
+    // Return generated ID to frontend
+    res.status(200).json([{ info_request_id: insertedId }]);
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const GetAssetRequestDetails = async (req, res) => {
+  const {
+    company_code,
+    Info_request_id,
+    EmployeeId,
+    FieldName,
+    FromDate,
+    ToDate,
+  } = req.body;
+  // Validation
+  if (!company_code) {
+    return res.status(400).json("company_code is required.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("Info_request_id", sql.Int, Info_request_id || null)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
+      .input("FieldName", sql.NVarChar, FieldName || "")
+      .input("FromDate", sql.Date, FromDate || null) 
+      .input("ToDate", sql.Date, ToDate || null)
+      .query(` EXEC sp_employee_assets_request_dtls 'SC',0, @info_request_id, '', @EmployeeId, @company_code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate;
+      `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Asset Request Details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const ApproveAssetRequest = async (req, res) => {
+  const approvalData = req.body.approvalData;
+
+  // Validation
+  if (!approvalData || !approvalData.length) {
+    return res.status(400).json("Invalid or empty approval data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of approvalData) {
+      if (!row) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "AP")
+        .input("DetailID", sql.BigInt, row.DetailID)
+        .input("info_request_id", sql.Int, row.info_request_id)
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("EmployeeID", sql.NVarChar, row.EmployeeID)
+        .input("request_status", sql.NVarChar, row.request_status) // Approved / Rejected
+        // Dummy values (not used in AP mode)
+        .input("AssetID", sql.BigInt, row.AssetID)
+        .input("ExpectedReturnDate", sql.Date, row.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.Date, row.ActualReturnDate)
+        .input("Remarks", sql.NVarChar, row.Remarks)
+        .query(` 
+          EXEC sp_employee_assets_request_dtls 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, '', '', '', '', ''`);
+    }
+    res.status(200).json("Request processed successfully (Approved/Rejected)");
+
+  } catch (error) {
+    console.log(error.message);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
+// Code added by Dinesh Gokul 0n 10-04-2026
+const AssetRequestDetails = async (req, res) => {
+  const detailsData = req.body.detailsData;
+
+  // Validation
+  if (!detailsData || !detailsData.length) {
+    return res.status(400).json("Invalid or empty details data.");
+  }
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const insertRow of detailsData) {
+      if (!insertRow) continue;
+
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "I")
+        .input("DetailID", sql.BigInt, insertRow.DetailID || 0)
+        .input("info_request_id", sql.Int, insertRow.info_request_id)
+        .input("keyfield", sql.NVarChar, "") // SP will generate
+        .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
+        .input("request_status", sql.NVarChar, insertRow.request_status)
+        // Asset fields
+        .input("AssetID", sql.BigInt, insertRow.AssetID)
+        .input("ExpectedReturnDate", sql.Date, insertRow.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.Date, insertRow.ActualReturnDate)
+        .input("Remarks", sql.NVarChar, insertRow.Remarks)
+        .input("CreatedBy", sql.NVarChar, insertRow.CreatedBy)
+        .query(`sp_employee_assets_request_dtls 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', ''`);
+    }
+
+    res.status(200).json("Asset request details inserted successfully");
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+// Code ended by Dinesh Gokul 0n 10-04-2026
+
 
 module.exports = {
   login,
@@ -48837,6 +49012,10 @@ module.exports = {
   EmployeeAssets_HdrLoopDelete,
   AssetIDDropoption,
   getAllocationStatus,
+  AssetRequestHdr,
+  GetAssetRequestDetails,
+  ApproveAssetRequest,
+  AssetRequestDetails,
   LeaveCancellation,
   compOffRequestInsert,
   DashboardCompOffRequest,
