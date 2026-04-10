@@ -343,78 +343,47 @@ const handleSave = async () => {
     return;
   }
 
-  const parseDate = (dateStr) => {
-    if (!dateStr) return null;
-    const [month, day, year] = dateStr.split("/");
-    return new Date(year, month - 1, day);
-  };
-
-  let isValid = true;
-
-  for (const relationGroup of Assetvalue) {
-    for (const member of relationGroup.members) {
-      const AssetID = member.AssetID?.value;
-      const AllocationDate = member.AllocationDate;
-      const Status = member.selectedStatus?.value;
-
-      if (!AssetID || !AllocationDate || !Status) {
+  // Validate required fields
+  for (const group of Assetvalue) {
+    for (const member of group.members) {
+      if (
+        !member.AssetID ||
+        !member.AllocationDate ||
+        !member.selectedStatus
+      ) {
+        setError(true);
         toast.warning("Please fill all required fields");
-        isValid = false;
-        break;
-      }
-
-      const allocDate = parseDate(member.AllocationDate);
-      const expectedDate = parseDate(member.ExpectedReturnDate);
-      const actualDate = parseDate(member.ActualReturnDate);
-
-      // Expected must be strictly after Allocation
-      if (expectedDate && expectedDate <= allocDate) {
-        toast.warning("Expected Return Date must be after Allocation Date");
-        isValid = false;
-        break;
-      }
-
-      //  Actual must be strictly after Allocation
-      if (actualDate && actualDate <= allocDate) {
-        toast.warning("Actual Return Date must be after Allocation Date");
-        isValid = false;
-        break;
+        return;
       }
     }
-    if (!isValid) break;
   }
 
-  if (!isValid) {
-    setError(true);
-    return;
-  }
+  const parseDate = (date) => (date ? new Date(date) : null);
 
-  setError(false);
-  setLoading(true);
-
-  const employeeData = Assetvalue.flatMap((relationGroup) =>
-    relationGroup.members.map((member) => ({
-      AssetID: member.AssetID?.value
-        ? parseInt(member.AssetID.value)
-        : null,
-
+  const EmployeeAssetsData = Assetvalue.flatMap((group) =>
+    group.members.map((member) => ({
+      AllocationID: 0, // or null (depends on SP)
+      AssetID: member.AssetID?.value || null,
       EmployeeID: EmployeeID.trim(),
-
       AllocationDate: parseDate(member.AllocationDate),
       ExpectedReturnDate: parseDate(member.ExpectedReturnDate),
       ActualReturnDate: parseDate(member.ActualReturnDate),
-
-      AllocationStatus: member.selectedStatus?.value || null,
-
-      ConditionAtIssue: member.ConditionAtIssue?.trim() || "",
-      ConditionAtReturn: member.ConditionAtReturn?.trim() || "",
-      ApprovedBy: member.ApprovedBy?.trim() || "",
-      Remarks: member.Remarks?.trim() || "",
-
-      company_code: sessionStorage.getItem("selectedCompanyCode")?.trim(),
-      CreatedBy: sessionStorage.getItem("selectedUserCode")?.trim(),
-    })),
+      AllocationStatus: member.selectedStatus?.value || "",
+      ConditionAtIssue: member.ConditionAtIssue || "",
+      ConditionAtReturn: member.ConditionAtReturn || "",
+      ApprovedBy: member.ApprovedBy || "",
+      Remarks: member.Remarks || "",
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      Keyfield: "",
+      CreatedBy: sessionStorage.getItem("selectedUserCode"),
+      CreatedDate: new Date(),
+      modify_by: "",
+      modify_date: null,
+    }))
   );
+
+  setError(false);
+  setLoading(true);
 
   try {
     const response = await fetch(
@@ -424,26 +393,25 @@ const handleSave = async () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ EmployeeAssetsData: employeeData }),
-      },
+        body: JSON.stringify({ EmployeeAssetsData }),
+      }
     );
-
-    const result = await response.json();
 
     if (response.ok) {
       toast.success("Data saved successfully!", {
         onClose: () => window.location.reload(),
       });
     } else {
-      toast.warning(result.message || "Failed to save data");
+      const err = await response.json();
+      toast.warning(err.message || "Failed to save data");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Error saving data: " + err.message);
+  } catch (error) {
+    toast.error("Error: " + error.message);
   } finally {
     setLoading(false);
   }
 };
+
   const handleUpdateAsset = async (relation, index) => {
   const relationGroup = Assetvalue.find(
     (group) => group.relation === relation
