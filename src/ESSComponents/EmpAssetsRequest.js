@@ -61,11 +61,11 @@ function EmployeeAssets({}) {
 
     const EmployeeID = sessionStorage.getItem("selectedUserCode");
       useEffect(() => {
-        if (AssetIDDrop.length > 0
+        if (AssetIDDrop.length > 0 && EmployeeID
         ) {
-          handleAssetSelect(EmployeeID);
+          handleEmployeeAssets(EmployeeID);
         }
-      }, [AssetIDDrop]);
+      }, [AssetIDDrop, EmployeeID]);
 
   const AcademicDet = () => {
     navigate("/AcademicDetReq");
