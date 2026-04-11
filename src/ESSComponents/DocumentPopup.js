@@ -58,7 +58,7 @@ const columnDefs = [
     cellStyle: { textAlign: "center" },
   },
   {
-    headerName: "Employee Last Name",
+    headerName: "Email",
     field: "email",
     editable: false,
     cellStyle: { textAlign: "center" },
