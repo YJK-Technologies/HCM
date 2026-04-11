@@ -16,10 +16,7 @@ import Select from "react-select";
 
 const config = require('../Apiconfig');
 
-
-
 function Assets({ }) {
-
   const [loading, setLoading] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [Asset_Code, setAsset_Code] = useState('');

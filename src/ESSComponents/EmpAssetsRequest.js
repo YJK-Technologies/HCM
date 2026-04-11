@@ -251,9 +251,8 @@ function EmployeeAssets({}) {
     }
   };
 
-const handleSave = async () => {
+  const handleSave = async () => {
   if (!EmployeeID?.trim()) {
-    setError(true);
     toast.warning("Employee ID is required");
     return;
   }
@@ -263,172 +262,113 @@ const handleSave = async () => {
     for (const member of group.members) {
       if (
         !member.AssetID ||
-        !member.AllocationDate ||
+        !member.ExpectedReturnDate ||
         !member.selectedStatus
       ) {
-        setError(true);
         toast.warning("Please fill all required fields");
         return;
       }
     }
   }
 
-  const parseDate = (date) => (date ? new Date(date) : null);
-
-  const EmployeeAssetsData = Assetvalue.flatMap((group) =>
-    group.members.map((member) => ({
-      AllocationID: 0, // or null (depends on SP)
-      AssetID: member.AssetID?.value || null,
-      EmployeeID: EmployeeID.trim(),
-      AllocationDate: parseDate(member.AllocationDate),
-      ExpectedReturnDate: parseDate(member.ExpectedReturnDate),
-      ActualReturnDate: parseDate(member.ActualReturnDate),
-      AllocationStatus: member.selectedStatus?.value || "",
-      ConditionAtIssue: member.ConditionAtIssue || "",
-      ConditionAtReturn: member.ConditionAtReturn || "",
-      ApprovedBy: member.ApprovedBy || "",
-      Remarks: member.Remarks || "",
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      Keyfield: "",
-      CreatedBy: sessionStorage.getItem("selectedUserCode"),
-      CreatedDate: new Date(),
-      modify_by: "",
-      modify_date: null,
-    }))
-  );
-
-  setError(false);
-  setLoading(true);
-
   try {
-    const response = await fetch(
-      `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+    setLoading(true);
+
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const created_by = sessionStorage.getItem("selectedUserCode");
+
+    /* ---------------- HEADER ---------------- */
+    const headerPayload = {
+      company_code,
+      EmployeeId: EmployeeID,
+      purpose: "Asset Request", // or bind from UI if needed
+      request_status: "Pending",
+      created_by,
+    };
+
+    const headerRes = await fetch(
+      `${config.apiBaseUrl}/AssetRequestHdr`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ EmployeeAssetsData }),
+        body: JSON.stringify({ headerData: [headerPayload] }),
       }
     );
 
-    if (response.ok) {
-      toast.success("Data saved successfully!", {
-        onClose: () => window.location.reload(),
-      });
-    } else {
-      const err = await response.json();
-      toast.warning(err.message || "Failed to save data");
+    if (!headerRes.ok) {
+      const err = await headerRes.json();
+      throw new Error(err.message);
     }
+
+    const headerResult = await headerRes.json();
+    const info_request_id = headerResult?.[0]?.info_request_id;
+
+    if (!info_request_id) {
+      throw new Error("info_request_id not returned from backend");
+    }
+
+    /* ---------------- DETAILS ---------------- */
+    await saveAssetDetails(info_request_id);
+
+    toast.success("Asset request submitted successfully!", {
+      onClose: () => window.location.reload(),
+    });
+
   } catch (error) {
+    console.error(error);
     toast.error("Error: " + error.message);
   } finally {
     setLoading(false);
   }
-};
-
-  const handleUpdateAsset = async (relation, index) => {
-  const relationGroup = Assetvalue.find(
-    (group) => group.relation === relation
-  );
-
-  const member = relationGroup?.members[index];
-
-  if (!member?.keyfield) {
-    toast.warning("Missing keyfield");
-    return;
-  }
-
-  const editedData = {
-    keyfield: member.keyfield,
-    AssetID: member.AssetID?.value,
-    EmployeeID: EmployeeID,
-    AllocationDate: member.AllocationDate,
-    ExpectedReturnDate: member.ExpectedReturnDate,
-    ActualReturnDate: member.ActualReturnDate,
-    AllocationStatus: member.selectedStatus?.value,
-    ConditionAtIssue: member.ConditionAtIssue,
-    ConditionAtReturn: member.ConditionAtReturn,
-    ApprovedBy: member.ApprovedBy,
-    Remarks: member.Remarks,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
   };
 
-  showConfirmationToast(
-    "Update this row?",
-    async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopUpdate`, {
+  const saveAssetDetails = async (info_request_id) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
+
+      const detailsData = Assetvalue.flatMap((group) =>
+        group.members.map((row) => ({
+          DetailID: 0,
+          info_request_id,
+          company_code,
+          EmployeeId: EmployeeID,
+          request_status: "Pending",
+
+          AssetID: row.AssetID?.value || null,
+          ExpectedReturnDate: row.ExpectedReturnDate || null,
+          ActualReturnDate: row.ActualReturnDate || null,
+          Remarks: row.Remarks || "",
+
+          CreatedBy: created_by,
+        }))
+      );
+
+      const res = await fetch(
+        `${config.apiBaseUrl}/AssetRequestDetails`,
+        {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ EmployeeAssetsData: [editedData] }),
-        });
-
-        if (res.ok) {
-          toast.success("Updated successfully", {
-            onClose: () => window.location.reload(),
-          });
-        } else {
-          const err = await res.json();
-          toast.warning(err.message);
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ detailsData }),
         }
-      } catch (e) {
-        toast.error(e.message);
-      } finally {
-        setLoading(false);
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
       }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      },
-  );
-};
 
-const handleDeleteAsset = async (relation, index) => {
-  const relationGroup = Assetvalue.find(
-    (group) => group.relation === relation
-  );
+      console.log("Asset Details inserted successfully");
 
-  const member = relationGroup?.members[index];
-
-  if (!member?.keyfield) {
-    toast.warning("Missing keyfield");
-    return;
-  }
-
-  const payload = {
-    keyfield: member.keyfield,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
-  };
-
-  showConfirmationToast(
-    "Delete this row?",
-    async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopDelete`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ EmployeeAssetsData: [payload] }),
-        });
-
-        if (res.ok) {
-          toast.success("Deleted successfully", {
-            onClose: () => window.location.reload(),
-          });
-        } else {
-          const err = await res.json();
-          toast.warning(err.message);
-        }
-      } catch (e) {
-        toast.error(e.message);
-      } finally {
-        setLoading(false);
-      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error inserting asset details: " + error.message);
     }
-  );
-};
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -684,19 +624,6 @@ const handleDeleteAsset = async (relation, index) => {
     }
   }, []);
 
-  // const EmployeeAssetsPopup = async (data) => {
-  //     if (data && data.length > 0) {
-  //       setSaveButtonVisible(false);
-  //       setShowAsterisk(false);
-  //       // setIsAcademicDataLoaded(true);
-  //       const [{ employeeId }] = data;
-
-  //       handleEmployeeAssets(employeeId);
-
-  //     } else {
-  //       console.log("Data not fetched...!");
-  //     }
-  //   };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -706,10 +633,7 @@ const handleDeleteAsset = async (relation, index) => {
         className="toast-design"
         theme="colored"
       />
-      <div
-        className="shadow-lg p-1 bg-body-tertiary rounded main-header-box mb-1
-          "
-      >
+      <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box mb-1">
         <div className="header-flex ">
           <h1 className="page-title">Assets</h1>
           <div className="action-wrapper desktop-actions">
@@ -834,46 +758,6 @@ const handleDeleteAsset = async (relation, index) => {
                 </div>
               </div>
 
-              {/* <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="date"
-                    className="exp-input-field form-control"
-                    name="AllocationDate"
-                    autoComplete="off"
-                    value={member.AllocationDate}
-                    max={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => {
-                      const value = e.target.value;
-
-                      if (
-                        member.ExpectedReturnDate &&
-                        new Date(value) >= new Date(member.ExpectedReturnDate)
-                      ) {
-                        toast.error("Issue Date must be less than Expiry Date");
-                        return;
-                      }
-
-                      handleDateChange(
-                        relationGroup.relation,
-                        index,
-                        "AllocationDate",
-                        value,
-                      );
-                    }}
-                    required
-                  />
-
-                  <label
-                    htmlFor="cno"
-                    className={`exp-form-labels ${error && !member.AllocationDate ? "text-danger" : ""}`}
-                  >
-                    AllocationDate
-                    {showAsterisk && <span className="text-danger">*</span>}
-                  </label>
-                </div>
-              </div> */}
-
               {/* Expected Return */}
               <div className="col-md-2">
                 <div className="inputGroup">
@@ -939,133 +823,6 @@ const handleDeleteAsset = async (relation, index) => {
                 </div>
               </div>
 
-              {/* Status */}
-              {/* <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
-               ${member.selectedStatus ? "has-value" : ""}
-                  ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
-                >
-                  <Select
-                    placeholder=" "
-                    onFocus={() =>
-                      setIsSelectAllocationStatus((prev) => ({
-                        ...prev,
-                        [index]: true,
-                      }))
-                    }
-                    onBlur={() =>
-                      setIsSelectAllocationStatus((prev) => ({
-                        ...prev,
-                        [index]: false,
-                      }))
-                    }
-                    classNamePrefix="react-select"
-                    isClearable
-                    value={member.selectedStatus}
-                    options={filteredOptionStatus}
-                    maxLength={50}
-                    onChange={(selectAllocationStatus) =>
-                      handleChangeStatus(
-                        selectAllocationStatus,
-                        relationGroup.relation,
-                        index,
-                      )
-                    }
-                  />
-                  <label for="cno" className={`floating-label`}>
-                    Allocation Status
-                  </label>
-                </div>
-              </div> */}
-
-              {/* Condition Issue */}
-              {/* <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    placeholder=" "
-                    value={member.ConditionAtIssue}
-                    pattern="[A-Za-z]+"
-                    maxLength={50}
-                    onChange={(e) => {
-                      const onlyLetters = e.target.value.replace(
-                        /[^A-Za-z\s]/g,
-                        "",
-                      );
-                      RelationInputChange(
-                        relationGroup.relation,
-                        index,
-                        "ConditionAtIssue",
-                        onlyLetters,
-                      );
-                    }}
-                  />
-                  <label
-                    for="cno"
-                    className={`exp-form-labels ${error && !member.ConditionAtIssue ? "text-danger" : ""}`}
-                  >
-                    ConditionAtIssue
-                    {showAsterisk && <span className="text-danger">*</span>}
-                  </label>
-                </div>
-              </div> */}
-
-              {/* Condition Return */}
-              {/* <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    placeholder=" "
-                    value={member.ConditionAtReturn}
-                    pattern="[A-Za-z]+"
-                    maxLength={50}
-                    onChange={(e) => {
-                      const onlyLetters = e.target.value.replace(
-                        /[^A-Za-z\s]/g,
-                        "",
-                      );
-                      RelationInputChange(
-                        relationGroup.relation,
-                        index,
-                        "ConditionAtReturn",
-                        onlyLetters,
-                      );
-                    }}
-                  />
-                  <label className="exp-form-labels">Condition at Return</label>
-                </div>
-              </div> */}
-
-              {/* Approved By */}
-              {/* <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    placeholder=" "
-                    value={member.ApprovedBy}
-                    pattern="[A-Za-z]+"
-                    maxLength={100}
-                    onChange={(e) => {
-                      const onlyLetters = e.target.value.replace(
-                        /[^A-Za-z\s]/g,
-                        "",
-                      );
-                      RelationInputChange(
-                        relationGroup.relation,
-                        index,
-                        "ApprovedBy",
-                        onlyLetters,
-                      );
-                    }}
-                  />
-                  <label className="exp-form-labels">Approved By</label>
-                </div>
-              </div> */}
-
               {/* Remarks */}
               <div className="col-md-2">
                 <div className="inputGroup">
@@ -1121,33 +878,6 @@ const handleDeleteAsset = async (relation, index) => {
                 </div>
               </div>
 
-              <div className="col-md-1">
-                {member.keyfield && (
-                  <div className="inputGroup">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      title="Update"
-                      onClick={() =>
-                        handleUpdateAsset(relationGroup.relation, index)
-                      }
-                    >
-                      <i className="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      className="btn btn-danger ms-1"
-                      title="Delete"
-                      onClick={() =>
-                        handleDeleteAsset(relationGroup.relation, index)
-                      }
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           ))}
         </div>
@@ -1155,7 +885,7 @@ const handleDeleteAsset = async (relation, index) => {
       <EmployeeAssetsPopup
         open={open}
         handleClose={handleClose}
-        onSelectAssets={handleAssetSelect} // changed
+        onSelectAssets={handleAssetSelect} 
       />
     </div>
   );
