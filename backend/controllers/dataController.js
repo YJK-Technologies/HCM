@@ -46524,7 +46524,7 @@ const EmployeeAssetsLoopUpdate = async (req, res) => {
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
         .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
     }
     res.status(200).json("EmployeeAssets data updated successfully");
   } catch (err) {
@@ -47508,7 +47508,7 @@ const AssetRequestHdr = async (req, res) => {
         .input("purpose", sql.NVarChar, insertRow.purpose)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(` EXEC sp_ess_employee_family_request_hdr @mode, @info_request_id, @company_code, @EmployeeId, '', @purpose, @request_status, @created_by, '' 
+        .query(` EXEC sp_ess_employee_asset_request_hdr @mode, @info_request_id, @company_code, @EmployeeId, '', @purpose, @request_status, @created_by, '' 
         `);
 
       insertedId = result.recordset[0].info_request_id;
@@ -47600,7 +47600,7 @@ const ApproveAssetRequest = async (req, res) => {
         .input("Remarks", sql.NVarChar, row.Remarks)
         .query(` 
           EXEC sp_employee_assets_request_dtls 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, '', '', '', '', ''`);
+          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, '', '', '', '', ''`);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -47644,7 +47644,7 @@ const AssetRequestDetails = async (req, res) => {
         .input("Remarks", sql.NVarChar, insertRow.Remarks)
         .input("CreatedBy", sql.NVarChar, insertRow.CreatedBy)
         .query(`sp_employee_assets_request_dtls 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-@request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', ''`);
+              @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', ''`);
     }
 
     res.status(200).json("Asset request details inserted successfully");

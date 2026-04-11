@@ -424,13 +424,17 @@ const handleSave = async () => {
     return;
   }
 
+  const parseDate = (date) => {
+  return date ? new Date(date) : null;
+};
+
   const editedData = {
-    keyfield: member.keyfield,
+    Keyfield: member.keyfield,
     AssetID: member.AssetID?.value,
     EmployeeID: EmployeeID,
-    AllocationDate: member.AllocationDate,
-    ExpectedReturnDate: member.ExpectedReturnDate,
-    ActualReturnDate: member.ActualReturnDate,
+    AllocationDate: parseDate(member.AllocationDate),
+    ExpectedReturnDate: parseDate(member.ExpectedReturnDate),
+    ActualReturnDate: parseDate(member.ActualReturnDate),
     AllocationStatus: member.selectedStatus?.value,
     ConditionAtIssue: member.ConditionAtIssue,
     ConditionAtReturn: member.ConditionAtReturn,
@@ -1148,7 +1152,7 @@ const handleDeleteAsset = async (relation, index) => {
                     for="cno"
                     className={`exp-form-labels ${error && !member.ConditionAtIssue ? "text-danger" : ""}`}
                   >
-                    ConditionAtIssue
+                    Condition At Issue
                     {showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
