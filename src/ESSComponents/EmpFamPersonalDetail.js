@@ -752,80 +752,79 @@ function EmpFamPersonalDetail({ }) {
               </div>
 
               <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
-                  ${member.selectRelation ? "has-value" : ""} 
-                  ${isSelectRelation[index] ? "is-focused" : ""}`}
-                >
-                  <Select
-                    placeholder=" "
-                    onFocus={() =>
-                      setIsSelectRelation((prev) => ({
-                        ...prev,
-                        [index]: true,
-                      }))
-                    }
-                    onBlur={() =>
-                      setIsSelectRelation((prev) => ({
-                        ...prev,
-                        [index]: false,
-                      }))
-                    }
-                    classNamePrefix="react-select"
-                    isClearable
-                    value={member.selectRelation}
-                    options={filteredOptionrelation}
-                    maxLength={50}
-                    onChange={(selectedRelation) =>
-                      handleChangeRelation(
-                        selectedRelation,
-                        relationGroup.relation,
-                        index,
-                      )
-                    }
-                  />
-                  <label
-                    for="cno"
-                    className={`floating-label ${error && !member.relationName ? "text-danger" : ""}`}
-                  >
-                    Relation
-                    {showAsterisk && <span className="text-danger">*</span>}
-                  </label>
-                </div>
-              </div>
+  <div
+    className={`inputGroup selectGroup 
+      ${member.selectRelation ? "has-value" : ""} 
+      ${isSelectRelation[index] ? "is-focused" : ""}`}
+  >
+    <Select
+      placeholder=" "
+      classNamePrefix="react-select"
+      isClearable
+      value={member.selectRelation}
+      options={filteredOptionrelation}
+      onFocus={() =>
+        setIsSelectRelation((prev) => ({
+          ...prev,
+          [index]: true,
+        }))
+      }
+      onBlur={() =>
+        setIsSelectRelation((prev) => ({
+          ...prev,
+          [index]: false,
+        }))
+      }
+      onChange={(selectedRelation) =>
+        RelationInputChange(
+          relationGroup.relation,
+          index,
+          "selectRelation", // ✅ IMPORTANT (match state)
+          selectedRelation
+        )
+      }
+    />
+
+    <label
+      className={`floating-label ${
+        error && !member.selectRelation ? "text-danger" : ""
+      }`}
+    >
+      Relation <span className="text-danger">*</span>
+    </label>
+  </div>
+</div>
 
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    placeholder=" "
-                    autoComplete="off"
-                    value={member.name}
-                    pattern="[A-Za-z]+"
-                    maxLength={250}
-                    // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'name', e.target.value)}
-                    onChange={(e) => {
-                      const onlyLetters = e.target.value.replace(
-                        /[^A-Za-z\s]/g,
-                        "",
-                      );
-                      RelationInputChange(
-                        relationGroup.relation,
-                        index,
-                        "name",
-                        onlyLetters,
-                      );
-                    }}
-                  />
-                  <label
-                    for="cno"
-                    className={`exp-form-labels ${error && !member.name ? "text-danger" : ""}`}
-                  >
-                    Name{showAsterisk && <span className="text-danger">*</span>}
-                  </label>
-                </div>
-              </div>
+  <div className="inputGroup">
+    <input
+      type="text"
+      className="exp-input-field form-control"
+      placeholder=" "
+      autoComplete="off"
+      value={member.name}
+      pattern="[A-Za-z]+"
+      maxLength={250}
+      onChange={(e) => {
+        const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, "");
+        RelationInputChange(
+          relationGroup.relation,
+          index,
+          "name",
+          onlyLetters
+        );
+      }}
+    />
+
+    <label
+      className={`exp-form-labels ${
+        error && !member.name ? "text-danger" : ""
+      }`}
+    >
+      Name <span className="text-danger">*</span>
+    </label>
+  </div>
+</div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
@@ -841,10 +840,9 @@ function EmpFamPersonalDetail({ }) {
                     }
                   />
                   <label
-                    for="cno"
                     className={`exp-form-labels ${error && !member.dob ? "text-danger" : ""}`}
                   >
-                    DOB{showAsterisk && <span className="text-danger">*</span>}
+                    DOB<span className="text-danger">*</span>
                   </label>
                 </div>
               </div>
@@ -867,7 +865,7 @@ function EmpFamPersonalDetail({ }) {
                     for="cno"
                     className={`exp-form-labels ${error && !member.Age ? "text-danger" : ""}`}
                   >
-                    Age{showAsterisk && <span className="text-danger">*</span>}
+                    Age<span className="text-danger">*</span>
                   </label>
                 </div>
               </div>

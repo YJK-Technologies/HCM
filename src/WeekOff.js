@@ -15,10 +15,15 @@ function WeekOff() {
   const [selectedgenerate, setselectedgenerateid] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [error, setError] = useState("");
+
+  const [birthdayDays, setBirthdayDays] = useState(null);
+  const [joineesDays, setJoineesDays] = useState(null);
+
   const [weekOffData, setWeekOffData] = useState([
     {
       relation: "weekOffData",
-      members: [{ relationName: "", statusName: "", keyfield: "" }],
+      members: [{ relationName: "", statusName: "", keyfield: "", birthdayDays: "",
+    joineesDays: "" }],
     },
   ]);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
@@ -203,15 +208,17 @@ function WeekOff() {
       }
 
       const weekOffArray = weekOffData.flatMap((group) =>
-        group.members.map((member) => ({
-          week_off_days: member.relationName,
-          employee_id: generateid,
-          Status: member.statusName,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Keyfield: member.relationName,
-          created_by: sessionStorage.getItem("selectedUserCode"),
-        }))
-      );
+  group.members.map((member) => ({
+    week_off_days: member.relationName,
+    Status: member.statusName,
+    birthday_days: member.birthdayDays,
+    joinees_days: member.joineesDays,
+    employee_id: generateid,
+    company_code: sessionStorage.getItem("selectedCompanyCode"),
+    Keyfield: member.relationName,
+    created_by: sessionStorage.getItem("selectedUserCode"),
+  }))
+);
 
       const weekOffResponse = await fetch(`${config.apiBaseUrl}/AddWeekOff`, {
         method: "POST",
@@ -419,21 +426,27 @@ function WeekOff() {
         if (!Array.isArray(list) || list.length === 0) return;
 
         const updatedFamilyMembers = [
-          {
-            relation: "WeekOffDays",
-            members: list.map((item) => ({
-              relationName: item.week_off_days || "",
-              keyfield: item.keyfield,
-              selectRelation: item.week_off_days
-                ? { value: item.week_off_days, label: item.week_off_days }
-                : null,
-              statusName: item.Status || "",
-              selectedStatus: item.Status
-                ? { value: item.Status, label: item.Status }
-                : null,
-            })),
-          },
-        ];
+        {
+          relation: "WeekOffDays",
+          members: list.map((item) => ({
+            relationName: item.week_off_days || "",
+            keyfield: item.keyfield,
+          
+            selectRelation: item.week_off_days
+              ? { value: item.week_off_days, label: item.week_off_days }
+              : null,
+          
+            statusName: item.Status || "",
+            selectedStatus: item.Status
+              ? { value: item.Status, label: item.Status }
+              : null,
+          
+            // ✅ ADD THESE TWO
+            birthdayDays: item.upcoming_birthday || "",
+            joineesDays: item.new_joinees || "",
+          })),
+        },
+      ];
 
         setWeekOffData(updatedFamilyMembers);
       });
@@ -499,6 +512,23 @@ function WeekOff() {
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
+
+  const handleInputChange = (relation, index, field, value) => {
+  setWeekOffData((prev) =>
+    prev.map((group) =>
+      group.relation === relation
+        ? {
+            ...group,
+            members: group.members.map((member, i) =>
+              i === index
+                ? { ...member, [field]: value }
+                : member
+            ),
+          }
+        : group
+    )
+  );
+};
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -586,7 +616,7 @@ function WeekOff() {
             <div key={relationIndex} className="row g-3">
 
 
-              <div className="col-md-2">
+              <div className="col-md-1">
                 <div className="inputGroup">
                   <div className="action-buttons-row">
                     {relationGroup.members.length < 3 && (
@@ -661,6 +691,50 @@ function WeekOff() {
                 </div>
               </div>
 
+              <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="text"
+                name="DOL"
+                placeholder=" "
+                value={member.birthdayDays || ""}
+onChange={(e) =>
+  handleInputChange(
+    relationGroup.relation,
+    index,
+    "birthdayDays",
+    e.target.value
+  )
+}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">Upcoming Birthdays</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="DOL"
+                className="exp-input-field form-control"
+                type="text"
+                name="DOL"
+                placeholder=" "
+                value={member.joineesDays || ""}
+onChange={(e) =>
+  handleInputChange(
+    relationGroup.relation,
+    index,
+    "joineesDays",
+    e.target.value
+  )
+}
+              />
+              <label htmlFor="DOL" className="exp-form-labels">New Joinees</label>
+            </div>
+          </div>
+
               <div className="col-md-3">
                 <div className="inputGroup">
                   <div className="action-buttons-row">
@@ -692,6 +766,7 @@ function WeekOff() {
             </div>
           ))}
         </div>
+        
       ))}
 
     </div>
