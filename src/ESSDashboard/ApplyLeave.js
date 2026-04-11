@@ -95,6 +95,10 @@ const ApplyLeave = () => {
     setLeaveType(value);
 
     if (value === "Comp Off") {
+      if (FromDate) {
+        setToDate(FromDate);
+      }
+
       try {
         const res = await fetch(`${config.apiBaseUrl}/getCompOffDropdown`, {
           method: "POST",
@@ -157,8 +161,15 @@ const ApplyLeave = () => {
   };
 
   const handleFromDate = (e) => {
-    setFromDate(e.target.value);
-    validateDates(ToDate, e.target.value);
+    const selectedDate = e.target.value;
+
+    setFromDate(selectedDate);
+
+    if (LeaveType === "Comp Off") {
+      setToDate(selectedDate);
+    } else {
+      validateDates(selectedDate, ToDate);
+    }
   };
 
   const validateDates = (FromDate, ToDate) => {
@@ -167,7 +178,6 @@ const ApplyLeave = () => {
       const toDateObj = new Date(ToDate);
 
       if (fromDateObj > toDateObj) {
-        setError(true);
         toast.warning("From Date should not be after To Date");
       } else {
         setError(false);
@@ -198,6 +208,11 @@ const ApplyLeave = () => {
     return diffDays;
   };
 
+  const formatToBackendDate = (date) => {
+    const [day, month, year] = date.split("-");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -211,6 +226,13 @@ const ApplyLeave = () => {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
+    }
+
+    const fromDateObj = new Date(FromDate);
+    const toDateObj = new Date(ToDate);
+
+    if (fromDateObj > toDateObj) {
+      toast.warning("From Date should not be after To Date");
     }
 
     const appliedDays = calculateLeaveDays(FromDate, ToDate);
@@ -233,6 +255,11 @@ const ApplyLeave = () => {
       return;
     }
 
+    if (LeaveType === "Comp Off" && !selectedCompOff) {
+      toast.warning("Please select Comp Off date");
+      return;
+    }
+
     const formData = {
       LeaveType,
       FromDate,
@@ -244,6 +271,13 @@ const ApplyLeave = () => {
       company_code: sessionStorage.getItem('selectedCompanyCode'),
       created_by: sessionStorage.getItem("selectedUserCode"),
       AlternativeReponsablePerson,
+      HolidayDate: LeaveType === "Comp Off" && selectedCompOff
+        ? formatToBackendDate(selectedCompOff.value)
+        : null,
+
+      HolidayName: LeaveType === "Comp Off" && selectedCompOff
+        ? selectedCompOff.label
+        : null
     };
     setError(false);
     setLoading(true);
@@ -317,7 +351,7 @@ const ApplyLeave = () => {
   const [LeaveStatus, setleaveStatus] = useState("");
 
   const CancelActionRenderer = (params) => {
-    const { data, api } = params;
+    const { data } = params;
 
     const handleCancel = async () => {
       if (data.LeaveStatus === 'Cancelled') return;
@@ -375,6 +409,12 @@ const ApplyLeave = () => {
   const leaveColumnDefs = [
     {
       checkboxSelection: true,
+      headerName: "Request Type",
+      field: "RequestType",
+      cellStyle: { textAlign: "center" },
+      editable: false,
+    },
+    {
       headerName: "Leave Type",
       field: "LeaveType",
       cellStyle: { textAlign: "center" },
@@ -385,19 +425,55 @@ const ApplyLeave = () => {
       field: "FromDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
     },
     {
       headerName: "To Date",
       field: "ToDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
     },
     {
-      headerName: "Leave Status",
+      headerName: "Status",
       field: "LeaveStatus",
       editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Holiday Date",
+      field: "HolidayDate",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
+    },
+    {
+      headerName: "Holiday Name",
+      field: "HolidayName",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Leave Used",
+      field: "LeaveUsed",
+      hide: true,
+      editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Is Leave Applied",
+      field: "IsLeaveApplied",
+      editable: false,
+      hide: true,
       cellStyle: { textAlign: "center" },
     },
     {
@@ -435,8 +511,8 @@ const ApplyLeave = () => {
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
           EmployeeId: sessionStorage.getItem('selectedUserCode'),
-          FromDate: fromDate,
-          ToDate: toDate,
+          FromDate: fromDate ? fromDate : null,
+          ToDate: toDate ? toDate : null,
           LeaveStatus: LeaveStatus,
           LeaveType: leaveType
         })
@@ -523,7 +599,7 @@ const ApplyLeave = () => {
     setleaveStatus(SelectedStatus ? SelectedStatus.value : '');
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const selectedRows = gridRef.current.api.getSelectedRows();
     if (selectedRows.length === 0) {
       toast.warning("Please select a row to load data");
@@ -532,11 +608,44 @@ const ApplyLeave = () => {
 
     const row = selectedRows[0];
 
-    // Update all fields with selected row values
+    if (row.LeaveStatus === "Approved") {
+      toast.error("Leave already approved");
+      return;
+    }
+
     setSelectedLeave({
       value: row.LeaveType,
       label: row.LeaveType,
     });
+
+    setLeaveType(row.LeaveType)
+
+    if (row.LeaveType === "Comp Off") {
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/getCompOffDropdown`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            EmployeeId: sessionStorage.getItem("selectedUserCode"),
+            CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
+
+        const data = await res.json();
+
+        const formatted = data.map(item => ({
+          value: item.HolidayDate,
+          label: `${item.HolidayName}`,
+        }));
+
+        setCompOffOptions(formatted);
+
+      } catch (err) {
+        console.error("Comp Off fetch failed", err);
+      }
+    }
 
     setFromDate(row.FromDate ? format(new Date(row.FromDate), "yyyy-MM-dd") : "");
     setToDate(row.ToDate ? format(new Date(row.ToDate), "yyyy-MM-dd") : "");
@@ -661,6 +770,7 @@ const ApplyLeave = () => {
                     className="exp-input-field form-control"
                     value={ToDate}
                     onChange={handleToDateChange}
+                    disabled={LeaveType === "Comp Off"}
                     placeholder=" "
                     autoComplete="off"
                   />
@@ -732,7 +842,7 @@ const ApplyLeave = () => {
               <button className="btn btn-secondary" onClick={handleadjustmentbtn}>
                 Applied Leaves
               </button> */}
-              {(LeaveStatus === "Pending" || LeaveStatus === "Rejected" || LeaveStatus === "") && (
+              {LeaveStatus !== "Approved" && (
                 <div className="search-btn-wrapper">
                   <div className="icon-btn save" onClick={handleSave}>
                     <span className="tooltip">Apply</span>

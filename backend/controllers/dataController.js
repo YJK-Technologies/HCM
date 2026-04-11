@@ -21667,28 +21667,9 @@ const updateSalaryDetails = async (req, res) => {
 };
 
 const addEmployeeLeave = async (req, res) => {
-  const {
-    EmployeeId,
-    LeaveType,
-    FromDate,
-    ToDate,
-    Duration,
-    ReportingManager,
-    AlternativeReponsablePerson,
-    LeaveStatus,
-    Select_slots,
-    Reason,
-    company_code,
-    created_by,
-    modified_by,
-    tempstr1,
-    tempstr2,
-    tempstr3,
-    tempstr4,
-    datetime1,
-    datetime2,
-    datetime3,
-    datetime4,
+  const { EmployeeId, LeaveType, FromDate, ToDate, Duration, ReportingManager,
+    AlternativeReponsablePerson, LeaveStatus, Select_slots, Reason, company_code,
+    created_by, HolidayDate, HolidayName
   } = req.body;
 
   let Documents = null;
@@ -21700,7 +21681,7 @@ const addEmployeeLeave = async (req, res) => {
   let pool;
   try {
     pool = await sql.connect(dbConfig);
-    const result = await pool
+    await pool
       .request()
       .input("mode", sql.NVarChar, "I") // Insert mode
       .input("EmployeeId", sql.VarChar, EmployeeId)
@@ -21709,28 +21690,17 @@ const addEmployeeLeave = async (req, res) => {
       .input("ToDate", sql.Date, ToDate)
       .input("Duration", sql.VarChar, Duration)
       .input("ReportingManager", sql.VarChar, ReportingManager)
-      .input(
-        "AlternativeReponsablePerson",
-        sql.VarChar,
-        AlternativeReponsablePerson,
-      )
+      .input("AlternativeReponsablePerson", sql.VarChar,AlternativeReponsablePerson,)
       .input("LeaveStatus", sql.VarChar, LeaveStatus)
       .input("Documents", sql.VarBinary, Documents)
       .input("Select_slots", sql.VarChar, Select_slots)
       .input("Reason", sql.VarChar, Reason)
       .input("company_code", sql.VarChar, company_code)
+      .input("HolidayDate", sql.Date, HolidayDate)
+      .input("HolidayName", sql.VarChar, HolidayName)
       .input("created_by", sql.NVarChar, created_by)
-      .input("modified_by", sql.NVarChar, modified_by)
-      .input("tempstr1", sql.NVarChar, tempstr1)
-      .input("tempstr2", sql.NVarChar, tempstr2)
-      .input("tempstr3", sql.NVarChar, tempstr3)
-      .input("tempstr4", sql.NVarChar, tempstr4)
-      .input("datetime1", sql.NVarChar, datetime1)
-      .input("datetime2", sql.NVarChar, datetime2)
-      .input("datetime3", sql.NVarChar, datetime3)
-      .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
-        @LeaveStatus,@Documents,@Select_slots,@Reason,@company_code,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
+      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
+        @LeaveStatus,@Documents,@Select_slots,@Reason,@company_code,@HolidayDate,@HolidayName,@created_by,'','','','','','','','',''`);
     res.status(200).json("Employee leave data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -21744,9 +21714,8 @@ const addEmployeeLeave = async (req, res) => {
 const allEmployeeLeaveData = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      `EXEC sp_employee_Leave 'A','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-    );
+    const result = await sql
+    .query(`EXEC sp_employee_Leave_test 'A','','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -21771,9 +21740,7 @@ const deleteEmployeeLeave = async (req, res) => {
         .request()
         .input("EmployeeId", sql.NVarChar, EmployeeId)
         .input("company_code", sql.NVarChar, company_code)
-        .query(
-          `EXEC sp_employee_Leave 'D',@EmployeeId,'','','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_employee_Leave_test 'D',@EmployeeId,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Employee leave data deleted successfully");
@@ -21806,17 +21773,12 @@ const updateEmployeeLeave = async (req, res) => {
         .input("ToDate", updatedRow.ToDate)
         .input("Duration", updatedRow.Duration)
         .input("ReportingManager", updatedRow.ReportingManager)
-        .input(
-          "AlternativeReponsablePerson",
-          updatedRow.AlternativeReponsablePerson,
-        )
+        .input("AlternativeReponsablePerson",updatedRow.AlternativeReponsablePerson,)
         .input("LeaveStatus", updatedRow.LeaveStatus)
         .input("Reason", updatedRow.Reason)
         .input("company_code", updatedRow.company_code)
         .input("modified_by", updatedRow.modified_by)
-        .query(
-          `EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,@Reason,@Documents,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,NULL,@Reason,@Documents,@company_code,'','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Employee leave data updated successfully");
   } catch (err) {
@@ -23025,9 +22987,7 @@ const getEmployeeLeavesearch = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'','','',@LeaveStatus,'','','',@company_code,'','',null,null,null,null,null,null,null,null`,
-      );
+      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'','','',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24808,7 +24768,7 @@ const getTeamManager = async (req, res) => {
 };
 
 const DashboardLeaveAuthorization = async (req, res) => {
-  const { EmployeeId, LeaveStatus, FromDate } = req.body; // Removed FromDate
+  const { EmployeeId, LeaveStatus, FromDate, company_code } = req.body; // Removed FromDate
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -24817,9 +24777,8 @@ const DashboardLeaveAuthorization = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
-      .query(
-        `EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','', '','', null, null, null, null, null, null, null, null`,
-      );
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_employee_Leave_test @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','','','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -45426,9 +45385,7 @@ const getEmployeeLeaveReport = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
       .input("ReportingManager", sql.NVarChar, ReportingManager)
-      .query(
-        `EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','',null,null,null,null,null,null,null,null`,
-      );
+      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset?.length > 0) {
       res.status(200).json(result.recordset);
@@ -47378,7 +47335,7 @@ const LeaveCancellation = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','', '','', null, null, null, null, null, null, null, null`);
+      .query(`EXEC sp_employee_Leave_test @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','','','', '','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);

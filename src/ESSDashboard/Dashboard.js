@@ -1315,9 +1315,12 @@ const Dashboard = () => {
           EmployeeId: id,
           LeaveStatus: status,
           FromDate: backendDate,
+          company_code: company_code,
         };
-      } else if (type === "Loan") {
-        /* ---------- Loan ---------- */
+      } 
+      
+      /* ---------- Loan ---------- */
+      else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
 
         body = {
@@ -1325,8 +1328,10 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } else if (type === "Visa") {
-        /* ---------- Visa ---------- */
+      } 
+      
+      /* ---------- Visa ---------- */
+      else if (type === "Visa") {
         url = `${config.apiBaseUrl}/ApprovalVisa`;
 
         body = {
@@ -1334,8 +1339,10 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } else if (type === "Travel") {
-        /* ---------- Travel ---------- */
+      } 
+      
+      /* ---------- Travel ---------- */
+      else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
 
         body = {
@@ -1343,8 +1350,10 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } else if (type === "Employee") {
-        /* ---------- Employee Change ---------- */
+      } 
+      
+      /* ---------- Employee Change ---------- */
+      else if (type === "Employee") {
         url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
 
         body = {
@@ -1353,8 +1362,10 @@ const Dashboard = () => {
           request_status: status,
           approver_id: sessionStorage.getItem("selectedUserCode"),
         };
-      } else if (type === "Family") {
-        /* ---------- Family Change ---------- */
+      }
+      
+      /* ---------- Family Change ---------- */
+      else if (type === "Family") {
         url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
 
         body = {
@@ -1364,7 +1375,10 @@ const Dashboard = () => {
           approver_id: sessionStorage.getItem("selectedUserCode"),
           modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      } else if (type === "Academic") {
+      } 
+      
+      /* ---------- Academic Change ---------- */
+      else if (type === "Academic") {
         url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
 
         const selectedRequest = dashboardRequests.find(
@@ -1381,7 +1395,10 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      } else if (type === "Document") {
+      } 
+      
+      /* ---------- Document Change ---------- */
+      else if (type === "Document") {
         url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
 
         const selectedRequest = dashboardRequests.find(
