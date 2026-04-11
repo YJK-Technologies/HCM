@@ -294,8 +294,8 @@ function ShiftMasterGrid() {
   }, []);
 
   const formatTimeForSQL = (time) => {
-    if (!time) return null;       
-    return time.length === 5 ? `${time}:00` : time; 
+    if (!time) return null;
+    return time.length === 5 ? `${time}:00` : time;
   };
 
   const calculateShiftHours = (start, end) => {
@@ -918,6 +918,7 @@ function ShiftMasterGrid() {
                   id="TimeZone_Name"
                   class="exp-input-field form-control"
                   type="text"
+                  maxLength={20}
                   placeholder=" "
                   autoComplete="off"
                   required
@@ -938,6 +939,7 @@ function ShiftMasterGrid() {
                   id="UTC_Offset"
                   class="exp-input-field form-control"
                   type="text"
+                  maxLength={50}
                   placeholder=""
                   autoComplete="off"
                   required
@@ -959,7 +961,7 @@ function ShiftMasterGrid() {
                   type="time"
                   value={Start_Time}
                   onChange={handleStartTimeChange}
-                  maxLength={100}
+                  maxLength={7}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -986,8 +988,13 @@ function ShiftMasterGrid() {
                   className="exp-input-field form-control"
                   type="number"
                   value={Shift_Hours}
-                  onChange={(e) => setShift_Hours(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (/^\d{0,6}$/.test(value)) {
+                      setShift_Hours(value);
+                    }
+                  }}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -1018,10 +1025,13 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   value={Grace_In_Min}
-                  onChange={(e) => setGrace_In_Min(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // only digits
+                    setGrace_In_Min(value);
+                  }}
+                  maxLength={10}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -1032,10 +1042,13 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   value={Grace_Out_Min}
-                  onChange={(e) => setGrace_Out_Min(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // only digits
+                    setGrace_Out_Min(value);
+                  }}
+                  maxLength={10}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -1118,6 +1131,7 @@ function ShiftMasterGrid() {
                   id="TimeZone_Name"
                   class="exp-input-field form-control"
                   type="text"
+                  maxLength={20}
                   placeholder=" "
                   autoComplete="off"
                   required
@@ -1139,6 +1153,7 @@ function ShiftMasterGrid() {
                   id="UTC_Offset"
                   class="exp-input-field form-control"
                   type="text"
+                  maxLength={50}
                   placeholder=""
                   autoComplete="off"
                   required
@@ -1190,8 +1205,13 @@ function ShiftMasterGrid() {
                   className="exp-input-field form-control"
                   type="number"
                   value={Shift_HoursSC}
-                  onChange={(e) => setShift_HoursSC(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (/^\d{0,6}$/.test(value)) {
+                      setShift_HoursSC(value);
+                    }
+                  }}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -1222,10 +1242,13 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   value={Grace_In_MinSC}
-                  onChange={(e) => setGrace_In_MinSC(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // only digits
+                    setGrace_In_MinSC(value);
+                  }}
+                  maxLength={10}
                   autoComplete="off"
                   placeholder=" "
                 />
@@ -1236,10 +1259,13 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                  type="number"
+                  type="text"
                   value={Grace_Out_MinSC}
-                  onChange={(e) => setGrace_Out_MinSC(e.target.value)}
-                  maxLength={100}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // only digits
+                    setGrace_Out_MinSC(value);
+                  }}
+                  maxLength={10}
                   autoComplete="off"
                   placeholder=" "
                 />

@@ -314,12 +314,6 @@ function LoanApprovals({}) {
     },
 
     {
-      headerName: "Approver ID",
-      field: "approver_id",
-      editable: true,
-    },
-
-    {
       headerName: "Approval Level",
       field: "approval_level",
       editable: true,

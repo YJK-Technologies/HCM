@@ -974,6 +974,7 @@ const Dashboard = () => {
       let academicData = [];
       let documentData = [];
       let compOffData = [];
+      let assetData = [];
 
       /* ---------- Leave ---------- */
       try {
@@ -1113,6 +1114,22 @@ const Dashboard = () => {
         console.log("Comp Off API failed");
       }
 
+      /* ---------- Employee Assets ---------- */
+      try {
+        const res = await fetch(
+          `${config.apiBaseUrl}/GetAssetRequestDetails`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code }),
+          },
+        );
+
+        if (res.ok) assetData = await res.json();
+      } catch (err) {
+        console.log("Employee Assets API failed");
+      }
+
       /* ---------- Leave ---------- */
       const formattedLeave = leaveData
         .filter((r) => r.LeaveStatus === "Pending")
@@ -1213,6 +1230,28 @@ const Dashboard = () => {
       });
 
       const formattedFamily = Object.values(groupedFamily);
+      /* ---------- Asset Change Group ---------- */
+      const groupedAsset = {};
+
+      assetData.forEach((row) => {
+        const key = row.info_request_id || row.RequestID;
+      
+        if (!groupedAsset[key]) {
+          groupedAsset[key] = {
+            type: "Asset",
+            id: key,
+            EmployeeId: row.EmployeeID,
+            EmployeeName: row.Employee_Name,
+            title: "Detail Changes",
+            status: row.request_status,
+            rows: [],
+          };
+        }
+      
+        groupedAsset[key].rows.push(row);
+      });
+
+      const formattedAsset = Object.values(groupedAsset);
 
       /* ---------- Academic Group ---------- */
       const groupedAcademic = {};
@@ -1269,7 +1308,8 @@ const Dashboard = () => {
         ...formattedFamily,
         ...formattedAcademic,
         ...formattedDocuments,
-        ...formattedCompOff
+        ...formattedCompOff,
+        ...formattedAsset,
       ];
 
       setDashboardRequests(merged);
@@ -1416,8 +1456,55 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
+      } else if (type === "Asset") {
+        url = `${config.apiBaseUrl}/ApproveAssetRequest`;
+            
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Asset"
+        );
+        const formatToSQLDate = (value) => {
+        if (!value) return null;
+        
+        const date = new Date(value);
+        if (isNaN(date)) return null;
+        
+        return date.toISOString().split("T")[0]; // yyyy-MM-dd
+      };
+      
+        body = {
+          approvalData: selectedRequest.rows.map((row) => {
+            let AssetID = null;
+            let ExpectedReturnDate = null;
+            let ActualReturnDate = null;
+            let Remarks = "";
+          
+            if (row.FieldName === "AssetID") {
+              AssetID = row.NewValue;
+            }
+            if (row.FieldName === "ExpectedReturnDate") {
+              ExpectedReturnDate = formatToSQLDate(row.NewValue);
+            }
+            if (row.FieldName === "ActualReturnDate") {
+              ActualReturnDate = formatToSQLDate(row.NewValue);
+            }
+            if (row.FieldName === "Remarks") {
+              Remarks = row.NewValue;
+            }
+          
+            return {
+              DetailID: row.DetailID,
+              info_request_id: row.RequestID || row.info_request_id,
+              company_code,
+              EmployeeID: row.EmployeeID,
+              request_status: status,
+              AssetID,
+              ExpectedReturnDate,
+              ActualReturnDate,
+              Remarks,
+            };
+          }),
+        };
       }
-
       const response = await fetch(url, {
         method: "POST",
         headers: {
