@@ -740,7 +740,7 @@ function Input({ }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ TaskMasterID: TaskMasterID, ProjectID: projectID, userID: userID, TaskTitle: TaskTitle, StartDate: startdate, EndDate: enddate, TaskStatus: status_typeSC, company_code: sessionStorage.getItem('selectedCompanyCode') }), // Send as search criteria
+        body: JSON.stringify({ TaskMasterID: TaskMasterID, ProjectID: projectID, userID: user, TaskTitle: TaskTitle, StartDate: startdate, EndDate: enddate, TaskStatus: status_typeSC, company_code: sessionStorage.getItem('selectedCompanyCode') }), // Send as search criteria
       });
 
       if (response.ok) {

@@ -2918,6 +2918,188 @@ const personalColumnDefs = [
   },
 ];
 
+//Assets Report Screen Input Field
+// Asset States
+const [assetRowData, setAssetRowData] = useState([]);
+const [assetInfoId, setAssetInfoId] = useState("");
+const [assetEmpId, setAssetEmpId] = useState("");
+const [assetFieldName, setAssetFieldName] = useState("");
+const [assetFromDate, setAssetFromDate] = useState("");
+const [assetToDate, setAssetToDate] = useState("");
+const [loadingAsset, setLoadingAsset] = useState(false);
+
+const fetchAssetData = async () => {
+  try {
+    setLoadingAsset(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: 0,
+        EmployeeId: "",
+        FieldName: "",
+        FromDate: null,
+        ToDate: null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setAssetRowData(data);
+    } else {
+      setAssetRowData([]);
+    }
+  } catch (error) {
+    console.error("Error fetching Asset Data:", error);
+  } finally {
+    setLoadingAsset(false);
+  }
+};
+
+const handleAssetSearch = async () => {
+  if (assetFromDate && assetToDate) {
+    if (new Date(assetFromDate) > new Date(assetToDate)) {
+      toast.warning("From Date should not be greater than To Date");
+      return;
+    }
+  }
+
+  try {
+    setLoadingAsset(true);
+
+    const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Info_request_id: assetInfoId || null,
+        EmployeeId: assetEmpId,
+        FieldName: assetFieldName,
+        FromDate: assetFromDate || null,
+        ToDate: assetToDate || null,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setAssetRowData(data);
+    } else {
+      setAssetRowData([]);
+      toast.warning("No data found");
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingAsset(false);
+  }
+};
+
+const handleAssetReset = () => {
+  setAssetInfoId("");
+  setAssetEmpId("");
+  setAssetFieldName("");
+  setAssetFromDate("");
+  setAssetToDate("");
+  fetchAssetData();
+};
+
+const handleAssetApproval = async (row, isApproved) => {
+  try {
+    const status = isApproved ? "Approved" : "Rejected";
+
+    const response = await fetch(`${config.apiBaseUrl}/ApproveAssetRequest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        approvalData: [
+          {
+            DetailID: row.DetailID,
+            info_request_id: row.info_request_id,
+            company_code: row.company_code,
+            EmployeeID: row.EmployeeID,
+            request_status: status,
+
+            AssetID: row.AssetID,
+            ExpectedReturnDate: row.ExpectedReturnDate,
+            ActualReturnDate: row.ActualReturnDate,
+            Remarks: row.Remarks,
+          },
+        ],
+      }),
+    });
+
+    if (response.ok) {
+      toast.success(`Asset Request ${status}`);
+      fetchAssetData();
+    } else {
+      const err = await response.json();
+      toast.error(err.message || "Failed");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong");
+  }
+};
+
+const assetColumnDefs = [
+  {
+    headerName: "Actions",
+    field: "actions",
+    width: 120,
+    cellRenderer: (params) => {
+      const row = params.data;
+
+      return (
+        <div className="grid-action-buttons">
+          <button
+            className="grid-approve-btn"
+            onClick={() => handleAssetApproval(row, true)}
+          >
+            <i className="fa-solid fa-check"></i>
+          </button>
+
+          <button
+            className="grid-reject-btn"
+            onClick={() => handleAssetApproval(row, false)}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      );
+    },
+  },
+  { headerName: "Detail ID", field: "DetailID", cellStyle: { textAlign: "center" } },
+  { headerName: "Employee ID", field: "EmployeeID", cellStyle: { textAlign: "center" } },
+  { headerName: "Request ID", field: "RequestID", cellStyle: { textAlign: "center" } },
+  { headerName: "Field Name", field: "FieldName", cellStyle: { textAlign: "center" } },
+  { headerName: "Old Value", field: "OldValue", cellStyle: { textAlign: "center" },
+    valueFormatter: (params) => { const value = params.value;
+    if (value && !isNaN(Date.parse(value))) {
+      return formatDate(value);
+    }
+    return value;
+  },},
+{ headerName: "New Value", field: "NewValue", cellStyle: { textAlign: "center" }, 
+  valueFormatter: (params) => { const value = params.value;
+    if (value && !isNaN(Date.parse(value))) {
+      return formatDate(value);
+    }
+    return value;
+  },},
+  { headerName: "Status", field: "request_status", cellStyle: { textAlign: "center" } },
+  { headerName: "Created By", field: "CreatedBy", cellStyle: { textAlign: "center" } },
+  { headerName: "Created Date", field: "CreatedDate", valueFormatter: (params) => formatDate(params.value), },
+];
+
+
 //document Report Screen Input Field
 const [documentRowData, setDocumentRowData] = useState([]);
 
@@ -4745,6 +4927,107 @@ const documentColumnDefs = [
       )}
     </>
 
+<>
+  {requestType === "Asset" && mode === "type" && (
+    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+
+      <div className="header-flex">
+        <h6>Search Criteria:</h6>
+      </div>
+
+      <div className="row g-3">
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="number"
+              className="exp-input-field form-control"
+              value={assetInfoId}
+              onChange={(e) => setAssetInfoId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+            />
+            <label className="exp-form-labels">Request ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="text"
+              className="exp-input-field form-control"
+              value={assetEmpId}
+              onChange={(e) => setAssetEmpId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+            />
+            <label className="exp-form-labels">Employee ID</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="text"
+              className="exp-input-field form-control"
+              value={assetFieldName}
+              onChange={(e) => setAssetFieldName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+            />
+            <label className="exp-form-labels">Field Name</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="date"
+              className="exp-input-field form-control"
+              value={assetFromDate}
+              onChange={(e) => setAssetFromDate(e.target.value)}
+            />
+            <label className="exp-form-labels">From Date</label>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="inputGroup">
+            <input
+              type="date"
+              className="exp-input-field form-control"
+              value={assetToDate}
+              onChange={(e) => setAssetToDate(e.target.value)}
+            />
+            <label className="exp-form-labels">To Date</label>
+          </div>
+        </div>
+
+        <div className="col-12">
+          <div className="search-btn-wrapper">
+            <div className="icon-btn search" onClick={handleAssetSearch}>
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <div className="icon-btn reload" onClick={handleAssetReset}>
+              <i className="fa-solid fa-rotate-right"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )}
+
+  {requestType === "Asset" && (
+    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+      <div className="ag-theme-alpine" style={{ height: 455 }}>
+        <AgGridReact
+          rowData={assetRowData}
+          columnDefs={assetColumnDefs}
+          pagination={true}
+        />
+      </div>
+    </div>
+  )}
+</>
     <>
   {requestType === "Document" && mode === "type" && (
     <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">

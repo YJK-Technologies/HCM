@@ -805,9 +805,9 @@ const convertToBase64 = (file) => {
                     }
                   />
                   <label
-                    className={`exp-form-labels ${error && !member.purpose ? "text-danger" : ""}`}
+                    className={`exp-form-labels`}
                   >
-                    Purpose<span className="text-danger">*</span>
+                    Purpose
                   </label>
                 </div>
               </div>
