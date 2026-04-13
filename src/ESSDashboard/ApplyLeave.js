@@ -219,7 +219,6 @@ const ApplyLeave = () => {
     if (!LeaveType ||
       !FromDate ||
       !ToDate ||
-      !Select_slots ||
       !Reason ||
       !ReportingManager ||
       !AlternativeReponsablePerson) {
@@ -256,7 +255,7 @@ const ApplyLeave = () => {
     }
 
     if (LeaveType === "Comp Off" && !selectedCompOff) {
-      toast.warning("Please select Comp Off date");
+      toast.warning("Please select Comp Off");
       return;
     }
 
@@ -408,7 +407,7 @@ const ApplyLeave = () => {
 
   const leaveColumnDefs = [
     {
-      checkboxSelection: true,
+      // checkboxSelection: true,
       headerName: "Request Type",
       field: "RequestType",
       cellStyle: { textAlign: "center" },
@@ -479,11 +478,46 @@ const ApplyLeave = () => {
     {
       headerName: "Action",
       field: "action",
-      width: 100,
+      width: 160,
       cellStyle: { textAlign: "center" },
       sortable: false,
       filter: false,
-      cellRenderer: CancelActionRenderer,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No") {
+          return (
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => handleConfirm(row)}
+            >
+              Apply
+            </button>
+          );
+        }
+
+        const reapplyStatuses = ["Cancelled", "Rejected"];
+
+        if (
+          row.RequestType === "Leave" &&
+          reapplyStatuses.includes(row.LeaveStatus)
+        ) {
+          return (
+            <button
+              className="btn btn-primary btn-sm w-100"
+              onClick={() => handleConfirm(row)}
+            >
+              Re-Apply
+            </button>
+          );
+        }
+
+        if (row.RequestType === "Leave" && row.LeaveStatus !== "Cancelled") {
+          return <CancelActionRenderer {...params} />;
+        }
+
+        return null;
+      },
       tooltipValueGetter: (params) => {
         return params.data.LeaveStatus === 'Cancelled'
           ? "This request has already been cancelled."
@@ -608,8 +642,13 @@ const ApplyLeave = () => {
 
     const row = selectedRows[0];
 
-    if (row.LeaveStatus === "Approved") {
+    if (row.RequestType === "Leave" && row.LeaveStatus === "Approved") {
       toast.error("Leave already approved");
+      return;
+    }
+
+    if (row.RequestType === "Comp Off" && row.LeaveUsed === "Yes") {
+      toast.error("Comp Off already used");
       return;
     }
 
@@ -646,6 +685,11 @@ const ApplyLeave = () => {
         console.error("Comp Off fetch failed", err);
       }
     }
+
+    setSelectedCompOff({
+      value: formatToBackendDate(row.HolidayDate),
+      label: row.HolidayName,
+    });
 
     setFromDate(row.FromDate ? format(new Date(row.FromDate), "yyyy-MM-dd") : "");
     setToDate(row.ToDate ? format(new Date(row.ToDate), "yyyy-MM-dd") : "");
@@ -719,7 +763,7 @@ const ApplyLeave = () => {
                       classNamePrefix="react-select"
                       isClearable
                     />
-                    <label className="floating-label">
+                    <label className={`floating-label ${error && !selectedCompOff ? 'text-danger' : ''}`}>
                       Select Comp Off<span className="text-danger">*</span>
                     </label>
                   </div>
@@ -842,14 +886,13 @@ const ApplyLeave = () => {
               <button className="btn btn-secondary" onClick={handleadjustmentbtn}>
                 Applied Leaves
               </button> */}
-              {LeaveStatus !== "Approved" && (
-                <div className="search-btn-wrapper">
-                  <div className="icon-btn save" onClick={handleSave}>
-                    <span className="tooltip">Apply</span>
-                    <i class="fa-solid fa-floppy-disk"></i>
-                  </div>
+
+              <div className="search-btn-wrapper">
+                <div className="icon-btn save" onClick={handleSave}>
+                  <span className="tooltip">Apply</span>
+                  <i className="fa-solid fa-floppy-disk"></i>
                 </div>
-              )}
+              </div>
             </div>
           </div>
           <div className="col-md-6">
@@ -870,7 +913,6 @@ const ApplyLeave = () => {
             </div>
           </div>
         </div>
-        {/* <LeavePopup open={open} handleClose={handleClose} handleLeave={handleLeave} /> */}
       </div>
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
@@ -964,10 +1006,10 @@ const ApplyLeave = () => {
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
 
-              <div className="icon-btn save" onClick={handleConfirm}>
+              {/* <div className="icon-btn save" onClick={handleConfirm}>
                 <span className="tooltip">Confirm</span>
                 <i className="fa-solid fa-check"></i>
-              </div>
+              </div> */}
             </div>
           </div>
 
