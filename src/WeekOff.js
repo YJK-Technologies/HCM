@@ -15,15 +15,18 @@ function WeekOff() {
   const [selectedgenerate, setselectedgenerateid] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [error, setError] = useState("");
+  const [showAsterisk, setShowAsterisk] = useState(true);
 
-  const [birthdayDays, setBirthdayDays] = useState(null);
-  const [joineesDays, setJoineesDays] = useState(null);
+  const [upcoming_birthday, setupcoming_birthday] = useState(null);
+  const [new_joinees, setnew_joinees] = useState(null);
 
   const [weekOffData, setWeekOffData] = useState([
     {
       relation: "weekOffData",
-      members: [{ relationName: "", statusName: "", keyfield: "", birthdayDays: "",
-    joineesDays: "" }],
+      members: [{
+        relationName: "", statusName: "", keyfield: "", birthdayDays: "",
+        joineesDays: ""
+      }],
     },
   ]);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
@@ -119,6 +122,8 @@ function WeekOff() {
     try {
       const employeePayload = {
         employee_id: generateid,
+        upcoming_birthday: upcoming_birthday,
+        new_joinees: new_joinees,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         modified_by: sessionStorage.getItem("selectedUserCode"),
 
@@ -183,6 +188,8 @@ function WeekOff() {
     try {
       const employeePayload = {
         employee_id: generateid,
+        upcoming_birthday: upcoming_birthday,
+        new_joinees: new_joinees,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem("selectedUserCode"),
       };
@@ -208,17 +215,17 @@ function WeekOff() {
       }
 
       const weekOffArray = weekOffData.flatMap((group) =>
-  group.members.map((member) => ({
-    week_off_days: member.relationName,
-    Status: member.statusName,
-    birthday_days: member.birthdayDays,
-    joinees_days: member.joineesDays,
-    employee_id: generateid,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
-    Keyfield: member.relationName,
-    created_by: sessionStorage.getItem("selectedUserCode"),
-  }))
-);
+        group.members.map((member) => ({
+          week_off_days: member.relationName,
+          Status: member.statusName,
+          upcoming_birthday: Number(member.birthdayDays) || 0,
+          new_joinees: Number(member.joineesDays) || 0,
+          employee_id: generateid,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Keyfield: member.relationName,
+          created_by: sessionStorage.getItem("selectedUserCode"),
+        }))
+      );
 
       const weekOffResponse = await fetch(`${config.apiBaseUrl}/AddWeekOff`, {
         method: "POST",
@@ -323,6 +330,8 @@ function WeekOff() {
     const editedData = {
       week_off_days: member.relationName,
       Status: member.statusName,
+      upcoming_birthday: Number(member.birthdayDays) || 0,
+      new_joinees: Number(member.joineesDays) || 0,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       keyfield: member.keyfield
     };
@@ -426,27 +435,27 @@ function WeekOff() {
         if (!Array.isArray(list) || list.length === 0) return;
 
         const updatedFamilyMembers = [
-        {
-          relation: "WeekOffDays",
-          members: list.map((item) => ({
-            relationName: item.week_off_days || "",
-            keyfield: item.keyfield,
-          
-            selectRelation: item.week_off_days
-              ? { value: item.week_off_days, label: item.week_off_days }
-              : null,
-          
-            statusName: item.Status || "",
-            selectedStatus: item.Status
-              ? { value: item.Status, label: item.Status }
-              : null,
-          
-            // ✅ ADD THESE TWO
-            birthdayDays: item.upcoming_birthday || "",
-            joineesDays: item.new_joinees || "",
-          })),
-        },
-      ];
+          {
+            relation: "WeekOffDays",
+            members: list.map((item) => ({
+              relationName: item.week_off_days || "",
+              keyfield: item.keyfield,
+
+              selectRelation: item.week_off_days
+                ? { value: item.week_off_days, label: item.week_off_days }
+                : null,
+
+              statusName: item.Status || "",
+              selectedStatus: item.Status
+                ? { value: item.Status, label: item.Status }
+                : null,
+
+              // ✅ ADD THESE TWO
+              birthdayDays: item.upcoming_birthday || "",
+              joineesDays: item.new_joinees || "",
+            })),
+          },
+        ];
 
         setWeekOffData(updatedFamilyMembers);
       });
@@ -466,7 +475,7 @@ function WeekOff() {
 
         if (!Array.isArray(list) || list.length === 0) return;
 
-        const { employee_id } = list[0];
+        const { employee_id, upcoming_birthday, new_joinees } = list[0];
 
         const setDefault = (type, setType, options, setSelected) => {
           if (type) {
@@ -481,6 +490,8 @@ function WeekOff() {
           filteredOptionemployee,
           setselectedgenerateid
         );
+        setupcoming_birthday(upcoming_birthday || 0);
+        setnew_joinees(new_joinees || 0);
       });
   }, [empiddrop, statusdrop]);
 
@@ -514,21 +525,21 @@ function WeekOff() {
   }));
 
   const handleInputChange = (relation, index, field, value) => {
-  setWeekOffData((prev) =>
-    prev.map((group) =>
-      group.relation === relation
-        ? {
+    setWeekOffData((prev) =>
+      prev.map((group) =>
+        group.relation === relation
+          ? {
             ...group,
             members: group.members.map((member, i) =>
               i === index
-                ? { ...member, [field]: value }
+                ? { ...member, [field]: value } // 🔥 IMPORTANT
                 : member
             ),
           }
-        : group
-    )
-  );
-};
+          : group
+      )
+    );
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -593,6 +604,50 @@ function WeekOff() {
               <label className="floating-label" >
                 Employee ID<span className="text-danger">*</span>
               </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Phone"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                value={upcoming_birthday}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 13) {
+                    setupcoming_birthday(value);
+                  }
+                }}
+                maxLength={13}
+                autoComplete="off"
+              />
+              <label htmlFor="Phone" className={`exp-form-labels`}>Upcoming Birthday{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Phone"
+                className="exp-input-field form-control"
+                type="number"
+                placeholder=""
+                required
+                value={new_joinees}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 13) {
+                    setnew_joinees(value);
+                  }
+                }}
+                maxLength={13}
+                autoComplete="off"
+              />
+              <label htmlFor="Phone" className={`exp-form-labels`}>New Joinees{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 
@@ -691,7 +746,7 @@ function WeekOff() {
                 </div>
               </div>
 
-              <div className="col-md-2">
+              {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="DOL"
@@ -733,7 +788,7 @@ onChange={(e) =>
               />
               <label htmlFor="DOL" className="exp-form-labels">New Joinees</label>
             </div>
-          </div>
+          </div> */}
 
               <div className="col-md-3">
                 <div className="inputGroup">
@@ -766,7 +821,7 @@ onChange={(e) =>
             </div>
           ))}
         </div>
-        
+
       ))}
 
     </div>

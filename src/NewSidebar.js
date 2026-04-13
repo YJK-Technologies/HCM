@@ -294,6 +294,15 @@ const menuData = [
       { label: "Loan Payment", path: "/LoanPayment" },
       { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
       { label: "Loan Status History", path: "/LoanStatusHistory" },
+
+      {
+        label: "Others",
+        isDropdown: true,
+        subMenus: [
+         
+          { label: "Settings", path: "/PayrollSettings" },
+        ],
+      },
     ],
   },
   {
@@ -329,6 +338,14 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
+        ],
+      },
+        {
+        label: "Others",
+        isDropdown: true,
+        subMenus: [
+         
+          { label: "Settings", path: "/PMSsettings" },
         ],
       },
     ],

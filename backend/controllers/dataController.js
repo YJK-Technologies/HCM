@@ -21699,7 +21699,7 @@ const addEmployeeLeave = async (req, res) => {
       .input("HolidayDate", sql.Date, HolidayDate)
       .input("HolidayName", sql.VarChar, HolidayName)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
+      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
         @LeaveStatus,@Documents,@Select_slots,@Reason,@company_code,@HolidayDate,@HolidayName,@created_by,'','','','','','','','',''`);
     res.status(200).json("Employee leave data inserted successfully");
   } catch (err) {
@@ -21715,7 +21715,7 @@ const allEmployeeLeaveData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_employee_Leave_test 'A','','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    .query(`EXEC sp_employee_Leave 'A','','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -21740,7 +21740,7 @@ const deleteEmployeeLeave = async (req, res) => {
         .request()
         .input("EmployeeId", sql.NVarChar, EmployeeId)
         .input("company_code", sql.NVarChar, company_code)
-        .query(`EXEC sp_employee_Leave_test 'D',@EmployeeId,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_employee_Leave 'D',@EmployeeId,'','','','','','','','','','',@company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Employee leave data deleted successfully");
@@ -21778,7 +21778,7 @@ const updateEmployeeLeave = async (req, res) => {
         .input("Reason", updatedRow.Reason)
         .input("company_code", updatedRow.company_code)
         .input("modified_by", updatedRow.modified_by)
-        .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,NULL,@Reason,@Documents,@company_code,'','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,NULL,@Reason,@Documents,@company_code,'','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Employee leave data updated successfully");
   } catch (err) {
@@ -22987,7 +22987,7 @@ const getEmployeeLeavesearch = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'','','',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'','','',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24778,7 +24778,7 @@ const DashboardLeaveAuthorization = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave_test @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','','','', null, null, null, null, null, null, null, null`);
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','','','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -33492,8 +33492,8 @@ const AddWeekOff = async (req, res) => {
         .input("company_code", insertRows.company_code)
         .input("Status", insertRows.Status)
         .input("created_by", insertRows.created_by)
-        .input("upcoming_birthday", insertRows.upcoming_birthday)
-        .input("new_joinees", insertRows.new_joinees)
+        .input("tempstr1", insertRows.tempstr1)
+        .input("tempstr2", insertRows.tempstr2)
         .input("tempstr3", insertRows.tempstr3)
         .input("tempstr4", insertRows.tempstr4)
         .input("datetime1", insertRows.datetime1)
@@ -33501,8 +33501,8 @@ const AddWeekOff = async (req, res) => {
         .input("datetime3", insertRows.datetime3)
         .input("datetime4", insertRows.datetime4)
         .query(
-          `EXEC sp_setting_screen_weekoff_test_DG @mode,@week_off_days,@company_code,@Status,'',@created_by,'',
-          @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,'',@created_by,'',
+          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("WeekOff data inserted successfully");
@@ -33620,13 +33620,14 @@ const deleteWeekOff = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     for (const record of keyfieldsToDelete) {
-      const { keyfield } = record;
+      const { keyfield, company_code } = record;
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, keyfield)
+        .input("company_code", sql.NVarChar, company_code)
         .query(
-          `EXEC sp_setting_screen_weekoff @mode,'','','',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,'',@company_code,'',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data deleted successfully");
@@ -33654,10 +33655,9 @@ const updateWeekOff = async (req, res) => {
         .input("Status", updatedRow.Status)
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
-        .input("upcoming_birthday", updatedRow.upcoming_birthday)
-        .input("new_joinees", updatedRow.modified_by)
         .query(
-          `EXEC sp_setting_screen_weekoff_test_DG @mode,@week_off_days,@company_code,@Status,@keyfield,'',@modified_by,@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,@keyfield,
+          '',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data updated successfully");
@@ -33693,8 +33693,8 @@ const AddGenerateEmployee = async (req, res) => {
     company_code,
     Status,
     created_by,
-    tempstr1,
-    tempstr2,
+    upcoming_birthday,
+    new_joinees,
     tempstr3,
     tempstr4,
     datetime1,
@@ -33712,8 +33712,8 @@ const AddGenerateEmployee = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Status", sql.NVarChar, Status)
       .input("created_by", sql.NVarChar, created_by)
-      .input("tempstr1", sql.NVarChar, tempstr1)
-      .input("tempstr2", sql.NVarChar, tempstr2)
+      .input("upcoming_birthday", sql.Int, upcoming_birthday)
+      .input("new_joinees", sql.Int, new_joinees)
       .input("tempstr3", sql.NVarChar, tempstr3)
       .input("tempstr4", sql.NVarChar, tempstr4)
       .input("datetime1", sql.NVarChar, datetime1)
@@ -33721,7 +33721,8 @@ const AddGenerateEmployee = async (req, res) => {
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
       .query(
-        `EXEC sp_setting_generate_employeeid @mode,@employee_id, @company_code,'',@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_generate_employeeid @mode,@employee_id, @company_code,'',@created_by,'',
+        @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -33786,7 +33787,7 @@ const FetchWeekOff = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_setting_screen_weekoff_test_DG 'AA','',@company_code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_weekoff 'AA','',@company_code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     res.json(result.recordset);
   } catch (err) {
@@ -33972,7 +33973,8 @@ const PMSsettingsUpdate = async (req, res) => {
 };
 
 const SettingEmployeeUpdate = async (req, res) => {
-  const { employee_id, company_code, modified_by } = req.body;
+  const { employee_id, company_code, upcoming_birthday,
+    new_joinees,modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
 
@@ -33981,8 +33983,11 @@ const SettingEmployeeUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("upcoming_birthday", sql.Int, upcoming_birthday)
+      .input("new_joinees", sql.Int, new_joinees)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id,@company_code,'','',@modified_by,
+        @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL
 `);
 
     res.status(200).json("Edited data saved successfully");
@@ -45388,7 +45393,7 @@ const getEmployeeLeaveReport = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
       .input("ReportingManager", sql.NVarChar, ReportingManager)
-      .query(`EXEC sp_employee_Leave_test @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','','','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset?.length > 0) {
       res.status(200).json(result.recordset);
@@ -47338,7 +47343,7 @@ const LeaveCancellation = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
-      .query(`EXEC sp_employee_Leave_test @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','','','', '','', null, null, null, null, null, null, null, null`);
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','','','', '','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -47618,6 +47623,202 @@ const AssetRequestDetails = async (req, res) => {
 };
 // Code ended by Dinesh Gokul 0n 10-04-2026
 
+//code added by Sakthi 0n 13-04-2026
+const AddPayrollSetting = async (req, res) => {
+  const { SI_no, salary_from_to_day, OT_Rate, salary_from_day, salary_to_day, effective_from, effective_to, remarks, Status, company_code, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "I")
+      .input("SI_no", sql.Int, SI_no)
+      .input("salary_from_to_day", sql.NVarChar, salary_from_to_day)
+      .input("OT_Rate", sql.Decimal(10,2), OT_Rate)
+      .input("salary_from_day", sql.Int, salary_from_day)
+      .input("salary_to_day", sql.Int, salary_to_day)
+      .input("effective_from", sql.Date, effective_from)
+      .input("effective_to", sql.Date, effective_to)
+      .input("remarks", sql.NVarChar, remarks)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_Payroll_Setting @mode,@SI_no,@salary_from_to_day,@OT_Rate,@salary_from_day,@salary_to_day,@effective_from,@effective_to,@remarks,@Status,@company_code,'', @created_by,'','','';
+`);
+    if (result.rowsAffected && result.rowsAffected[0] > 0) {
+    return res.status(200).json({
+      success: true,
+      message: "Payroll setting inserted successfully"
+    });
+     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+//code ended by Sakthi 0n 13-04-2026
+
+//code added by Sakthi 13-04-2026
+const UpdatePayrollSetting = async (req, res) => {
+  const { SI_no, salary_from_to_day, OT_Rate, salary_from_day, salary_to_day, remarks, Status, company_code, keyfield, modified_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input("mode", sql.NVarChar, "U")
+      .input("SI_no", sql.Int, SI_no)
+      .input("salary_from_to_day", sql.NVarChar, salary_from_to_day)
+      .input("OT_Rate", sql.Decimal(10,2), OT_Rate)
+      .input("salary_from_day", sql.Int, salary_from_day)
+      .input("salary_to_day", sql.Int, salary_to_day)
+      .input("remarks", sql.NVarChar, remarks)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_Payroll_Setting @mode, @SI_no, @salary_from_to_day, @OT_Rate, @salary_from_day, @salary_to_day, '', '', @remarks, @Status, @company_code, @keyfield, '' , '', @modified_by, '';
+`);
+
+    res.status(200).json("Payroll updated successfully");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+//code ended by Sakthi 13-04-2026
+
+//code added by Sakthi 13-04-2026
+const DeletePayrollSetting = async (req, res) => {
+  const { company_code, keyfield } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+      .input("mode", sql.NVarChar, "D")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .query(`EXEC sp_Payroll_Setting @mode, 0, '', 0, 0, 0, '', '', '', '', @company_code, @keyfield, '' , '', '', '';
+`);
+
+    res.status(200).json("Payroll deleted successfully");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+//code ended by Sakthi 13-04-2026
+
+//code added by Sakthi 13-04-2026
+const GetPayrollSettings = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "A")
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Payroll_Setting @mode, 0, '', 0, 0, 0, '', '', '', '', @company_code, '', '' , '', '', '';
+`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi 13-04-2026
+
+//code added by Sakthi 13-04-2026
+const payroll_settingsSearch = async (req, res) => {
+  try {
+    const {
+      SI_no,
+      salary_from_to_day,
+      OT_Rate,
+      salary_from_day,
+      salary_to_day,
+      effective_from,
+      effective_to,
+      remarks,
+      Status,
+      company_code,
+      keyfield,
+    } = req.body;
+
+    const pool = await sql.connect(dbConfig);
+
+    const request = pool.request();
+
+    request.input("mode", sql.NVarChar, "SC");
+    request.input("SI_no", sql.Int, SI_no || null);
+    request.input("salary_from_to_day", sql.NVarChar, salary_from_to_day || null);
+    request.input("OT_Rate", sql.Decimal(10, 2), OT_Rate || null);
+    request.input("salary_from_day", sql.Int, salary_from_day || null);
+    request.input("salary_to_day", sql.Int, salary_to_day || null);
+    request.input( "effective_from", sql.Date, effective_from ? new Date(effective_from) : null );
+    request.input( "effective_to", sql.Date, effective_to ? new Date(effective_to) : null );
+    request.input("remarks", sql.NVarChar, remarks || null);
+    request.input("Status", sql.NVarChar, Status || null);
+    request.input("company_code", sql.NVarChar, company_code || null);
+    request.input("keyfield", sql.NVarChar, keyfield || null);
+
+    const result = await request.query(`
+      EXEC sp_Payroll_Setting  @mode, @SI_no, @salary_from_to_day, @OT_Rate, @salary_from_day, @salary_to_day, @effective_from, @effective_to, 
+      @remarks, @Status, @company_code, @keyfield, '', '', '', '' `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Payroll Settings Search Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Sakthi 13-04-2026
+
+//code added by Sakthi 13-04-2026
+const UpdatePayrollSettings = async (req, res) => {
+  const editedData = req.body.data;
+
+  if (!editedData || !editedData.length) {
+    return res.status(400).json("Invalid or empty data array.");
+  }
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    for (const row of editedData) {
+      await pool.request()
+        .input("mode", sql.NVarChar, "U")
+        .input("SI_no", sql.Int, row.SI_no)
+        .input("salary_from_to_day", sql.NVarChar, row.salary_from_to_day)
+        .input("OT_Rate", sql.Decimal(10, 2), row.OT_Rate)
+        .input("salary_from_day", sql.Int, row.salary_from_day)
+        .input("salary_to_day", sql.Int, row.salary_to_day)
+        .input("remarks", sql.NVarChar, row.remarks)
+        .input("Status", sql.NVarChar, row.Status)
+        .input("company_code", sql.NVarChar, row.company_code)
+        .input("keyfield", sql.NVarChar, row.keyfield)
+        .input("modified_by", sql.NVarChar, sessionStorage.getItem("selectedUserCode"))
+        .query(` EXEC sp_Payroll_Setting @mode, @SI_no, @salary_from_to_day, @OT_Rate, @salary_from_day, @salary_to_day, '', '', 
+          @remarks, @Status, @company_code, @keyfield, '', '', @modified_by, '' `);
+    }
+
+    res.status(200).json("Updated successfully");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+//code ended by Sakthi 13-04-2026
 
 module.exports = {
   login,
@@ -48980,6 +49181,12 @@ module.exports = {
   compOffRequestInsert,
   DashboardCompOffRequest,
   DashboardCompOffApproval,
-  getCompOffDropdown
+  getCompOffDropdown,
+  AddPayrollSetting,
+  UpdatePayrollSetting,
+  DeletePayrollSetting,
+  GetPayrollSettings,
+  payroll_settingsSearch,
+  UpdatePayrollSettings
 
 };
