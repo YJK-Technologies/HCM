@@ -1235,7 +1235,7 @@ const Dashboard = () => {
 
       assetData.forEach((row) => {
         const key = row.info_request_id || row.RequestID;
-      
+
         if (!groupedAsset[key]) {
           groupedAsset[key] = {
             type: "Asset",
@@ -1247,7 +1247,7 @@ const Dashboard = () => {
             rows: [],
           };
         }
-      
+
         groupedAsset[key].rows.push(row);
       });
 
@@ -1337,7 +1337,7 @@ const Dashboard = () => {
         body = {
           EmployeeId: extra.EmployeeId,
           Status: status,
-          HolidayDate: extra.HolidayDate, 
+          HolidayDate: extra.HolidayDate,
           ApprovedBy: approver,
           CompanyCode: company_code,
           Keyfield: id,
@@ -1357,8 +1357,8 @@ const Dashboard = () => {
           FromDate: backendDate,
           company_code: company_code,
         };
-      } 
-      
+      }
+
       /* ---------- Loan ---------- */
       else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
@@ -1368,8 +1368,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Visa ---------- */
       else if (type === "Visa") {
         url = `${config.apiBaseUrl}/ApprovalVisa`;
@@ -1379,8 +1379,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Travel ---------- */
       else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
@@ -1390,8 +1390,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Employee Change ---------- */
       else if (type === "Employee") {
         url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
@@ -1403,7 +1403,7 @@ const Dashboard = () => {
           approver_id: sessionStorage.getItem("selectedUserCode"),
         };
       }
-      
+
       /* ---------- Family Change ---------- */
       else if (type === "Family") {
         url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
@@ -1415,8 +1415,8 @@ const Dashboard = () => {
           approver_id: sessionStorage.getItem("selectedUserCode"),
           modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      } 
-      
+      }
+
       /* ---------- Academic Change ---------- */
       else if (type === "Academic") {
         url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
@@ -1435,8 +1435,8 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      } 
-      
+      }
+
       /* ---------- Document Change ---------- */
       else if (type === "Document") {
         url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
@@ -1458,26 +1458,26 @@ const Dashboard = () => {
         };
       } else if (type === "Asset") {
         url = `${config.apiBaseUrl}/ApproveAssetRequest`;
-            
+
         const selectedRequest = dashboardRequests.find(
           (r) => r.id === id && r.type === "Asset"
         );
         const formatToSQLDate = (value) => {
-        if (!value) return null;
-        
-        const date = new Date(value);
-        if (isNaN(date)) return null;
-        
-        return date.toISOString().split("T")[0]; // yyyy-MM-dd
-      };
-      
+          if (!value) return null;
+
+          const date = new Date(value);
+          if (isNaN(date)) return null;
+
+          return date.toISOString().split("T")[0]; // yyyy-MM-dd
+        };
+
         body = {
           approvalData: selectedRequest.rows.map((row) => {
             let AssetID = null;
             let ExpectedReturnDate = null;
             let ActualReturnDate = null;
             let Remarks = "";
-          
+
             if (row.FieldName === "AssetID") {
               AssetID = row.NewValue;
             }
@@ -1490,7 +1490,7 @@ const Dashboard = () => {
             if (row.FieldName === "Remarks") {
               Remarks = row.NewValue;
             }
-          
+
             return {
               DetailID: row.DetailID,
               info_request_id: row.RequestID || row.info_request_id,

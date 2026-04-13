@@ -129,6 +129,8 @@ function PanelPerformanceReport() {
       headerName: "Panel Name",
       field: "panel_name",
       editable: false,
+      minWidth: 350,   // 👈 increase this value
+      // flex: 2          // 👈 gives more space compared to other columns
     },
     {
       headerName: "Average Rating",
