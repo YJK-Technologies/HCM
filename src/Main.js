@@ -135,6 +135,8 @@ import GenerateShift from "./ShiftMaster/GenerateShift.js";
 import Assets from "./ESSComponents/Assets.js";
 import LoanDashboard from './ESSDashboard/LoanDashboard.js';
 import EmployeeCompOff from './ESSDashboard/EmployeeCompOff.js';
+import PayrollSettings from './PayrollSettings.js';
+import PayrollSettingsAdd from './PayrollSettingsAdd.js';
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -341,6 +343,8 @@ function Main() {
     { path: "/Assets", component: <Assets /> },
     { path: "/LoanDashboard", component: <LoanDashboard /> },
     { path: "/EmployeeCompOff", component: <EmployeeCompOff /> },
+    { path: "/PayrollSettings", component: <PayrollSettings /> },
+    { path: "/PayrollSettingsAdd", component: <PayrollSettingsAdd /> },
 
   
   ];
