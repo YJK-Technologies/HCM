@@ -1235,7 +1235,7 @@ const Dashboard = () => {
 
       assetData.forEach((row) => {
         const key = row.info_request_id || row.RequestID;
-      
+
         if (!groupedAsset[key]) {
           groupedAsset[key] = {
             type: "Asset",
@@ -1247,7 +1247,7 @@ const Dashboard = () => {
             rows: [],
           };
         }
-      
+
         groupedAsset[key].rows.push(row);
       });
 
@@ -1337,7 +1337,7 @@ const Dashboard = () => {
         body = {
           EmployeeId: extra.EmployeeId,
           Status: status,
-          HolidayDate: extra.HolidayDate, 
+          HolidayDate: extra.HolidayDate,
           ApprovedBy: approver,
           CompanyCode: company_code,
           Keyfield: id,
@@ -1357,8 +1357,8 @@ const Dashboard = () => {
           FromDate: backendDate,
           company_code: company_code,
         };
-      } 
-      
+      }
+
       /* ---------- Loan ---------- */
       else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
@@ -1368,8 +1368,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Visa ---------- */
       else if (type === "Visa") {
         url = `${config.apiBaseUrl}/ApprovalVisa`;
@@ -1379,8 +1379,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Travel ---------- */
       else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
@@ -1390,8 +1390,8 @@ const Dashboard = () => {
           company_code,
           request_status: status,
         };
-      } 
-      
+      }
+
       /* ---------- Employee Change ---------- */
       else if (type === "Employee") {
         url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
@@ -1403,7 +1403,7 @@ const Dashboard = () => {
           approver_id: sessionStorage.getItem("selectedUserCode"),
         };
       }
-      
+
       /* ---------- Family Change ---------- */
       else if (type === "Family") {
         url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
@@ -1415,8 +1415,8 @@ const Dashboard = () => {
           approver_id: sessionStorage.getItem("selectedUserCode"),
           modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      } 
-      
+      }
+
       /* ---------- Academic Change ---------- */
       else if (type === "Academic") {
         url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
@@ -1435,8 +1435,8 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      } 
-      
+      }
+
       /* ---------- Document Change ---------- */
       else if (type === "Document") {
         url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
@@ -1458,26 +1458,26 @@ const Dashboard = () => {
         };
       } else if (type === "Asset") {
         url = `${config.apiBaseUrl}/ApproveAssetRequest`;
-            
+
         const selectedRequest = dashboardRequests.find(
           (r) => r.id === id && r.type === "Asset"
         );
         const formatToSQLDate = (value) => {
-        if (!value) return null;
-        
-        const date = new Date(value);
-        if (isNaN(date)) return null;
-        
-        return date.toISOString().split("T")[0]; // yyyy-MM-dd
-      };
-      
+          if (!value) return null;
+
+          const date = new Date(value);
+          if (isNaN(date)) return null;
+
+          return date.toISOString().split("T")[0]; // yyyy-MM-dd
+        };
+
         body = {
           approvalData: selectedRequest.rows.map((row) => {
             let AssetID = null;
             let ExpectedReturnDate = null;
             let ActualReturnDate = null;
             let Remarks = "";
-          
+
             if (row.FieldName === "AssetID") {
               AssetID = row.NewValue;
             }
@@ -1490,7 +1490,7 @@ const Dashboard = () => {
             if (row.FieldName === "Remarks") {
               Remarks = row.NewValue;
             }
-          
+
             return {
               DetailID: row.DetailID,
               info_request_id: row.RequestID || row.info_request_id,
@@ -2903,48 +2903,50 @@ const Dashboard = () => {
                   <h6 className="card-title-heading mb-0">New Joinees</h6>
                 </div>
 
-                <div
-                  className="joinee-carousel-container"
-                  ref={joineeCarouselRef}
-                >
-                  {NewJoinees.length > 0 ? (
-                    NewJoinees.map((joinee, index) => (
-                      <div key={index} className="joinee-slide">
-                        <div className="joinee-card-inner">
-                          <div className="joinee-accent-circle-top"></div>
-                          <div className="joinee-accent-circle-bottom"></div>
+                <div className="fixed-card-content">
+                  <div
+                    className="joinee-carousel-container"
+                    ref={joineeCarouselRef}
+                  >
+                    {NewJoinees.length > 0 ? (
+                      NewJoinees.map((joinee, index) => (
+                        <div key={index} className="joinee-slide">
+                          <div className="joinee-card-inner">
+                            <div className="joinee-accent-circle-top"></div>
+                            <div className="joinee-accent-circle-bottom"></div>
 
-                          <div className="profile-image-wrapper">
-                            <img
-                              src={joinee.Photos}
-                              className="joinee-img-modern"
-                              alt="profile"
-                            />
-                            <div className="joinee-icon-badge">✨</div>
-                          </div>
+                            <div className="profile-image-wrapper">
+                              <img
+                                src={joinee.Photos}
+                                className="joinee-img-modern"
+                                alt="profile"
+                              />
+                              <div className="joinee-icon-badge">✨</div>
+                            </div>
 
-                          <div className="joinee-details mt-3">
-                            <h6 className="emp-name-text">
-                              {joinee.EmployeeName}
-                            </h6>
-                            <p className="emp-dept-sub">
-                              {joinee.department_ID} • {joinee.EmployeeId}
-                            </p>
-                            <div className="welcome-badge">
-                              Welcome Onboard! 🤝
+                            <div className="joinee-details mt-3">
+                              <h6 className="emp-name-text">
+                                {joinee.EmployeeName}
+                              </h6>
+                              <p className="emp-dept-sub">
+                                {joinee.department_ID} • {joinee.EmployeeId}
+                              </p>
+                              <div className="welcome-badge">
+                                Welcome Onboard! 🤝
+                              </div>
                             </div>
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="no-birthday-view">
+                        <div className="empty-icon">👥</div>
+                        <p className="text-muted-color">
+                          No new joinees this month
+                        </p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="no-birthday-view">
-                      <div className="empty-icon">👥</div>
-                      <p className="text-muted-color">
-                        No new joinees this month
-                      </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 {NewJoinees.length > 1 && (
@@ -2976,41 +2978,43 @@ const Dashboard = () => {
                   </h6>
                 </div>
 
-                <div className="birthday-carousel-container" ref={carouselRef}>
-                  {upcomingBirthdays.length > 0 ? (
-                    upcomingBirthdays.map((person, index) => (
-                      <div key={index} className="birthday-slide">
-                        <div className="birthday-card-inner">
-                          <div className="birthday-accent-circle"></div>
-                          <div className="birthday-accent-circle-bottom"></div>
+                <div className="fixed-card-content">
+                  <div className="birthday-carousel-container" ref={carouselRef}>
+                    {upcomingBirthdays.length > 0 ? (
+                      upcomingBirthdays.map((person, index) => (
+                        <div key={index} className="birthday-slide">
+                          <div className="birthday-card-inner">
+                            <div className="birthday-accent-circle"></div>
+                            <div className="birthday-accent-circle-bottom"></div>
 
-                          <div className="profile-image-wrapper">
-                            <img
-                              src={person.Photos}
-                              className="birthday-img-modern"
-                              alt="profile"
-                            />
-                            <div className="birthday-icon-badge">🎂</div>
-                          </div>
+                            <div className="profile-image-wrapper">
+                              <img
+                                src={person.Photos}
+                                className="birthday-img-modern"
+                                alt="profile"
+                              />
+                              <div className="birthday-icon-badge">🎂</div>
+                            </div>
 
-                          <div className="birthday-details mt-3">
-                            <h6 className="emp-name-text">
-                              {person.EmployeeName}
-                            </h6>
-                            <p className="emp-dept-sub">
-                              {person.Department || "Team Member"}
-                            </p>
-                            <div className="wish-badge">Happy Birthday! 🎈</div>
+                            <div className="birthday-details mt-3">
+                              <h6 className="emp-name-text">
+                                {person.EmployeeName}
+                              </h6>
+                              <p className="emp-dept-sub">
+                                {person.Department || "Team Member"}
+                              </p>
+                              <div className="wish-badge">Happy Birthday! 🎈</div>
+                            </div>
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="no-birthday-view">
+                        <div className="empty-icon">🎉</div>
+                        <p className="text-muted-color">No birthdays this week</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="no-birthday-view">
-                      <div className="empty-icon">🎉</div>
-                      <p className="text-muted-color">No birthdays this week</p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <div className="birthday-nav-controls-bottom">
@@ -3037,7 +3041,7 @@ const Dashboard = () => {
         {/* Leave Approval */}
         <div className="grid-col-lg-4">
           <div
-            className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg height-full"
+            className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg"
             style={{ overflow: "hidden" }}
           >
             {/* Header with Count */}
@@ -3057,7 +3061,7 @@ const Dashboard = () => {
 
             {/* Scrollable List Container */}
             <div
-              className="custom-list-container"
+              className="custom-list-container fixed-list-height"
               style={{ overflowY: "auto" }}
             >
               {dashboardRequests.length > 0 ? (
@@ -3065,7 +3069,8 @@ const Dashboard = () => {
                   <div
                     key={index}
                     className="leave-item-modern"
-                    onClick={() =>
+                    onClick={() => {
+                      if (req.type === "Comp Off") return;
                       navigate("/RequestReport", {
                         state: {
                           type: req.type,
@@ -3077,7 +3082,7 @@ const Dashboard = () => {
                           mode: "item",
                         },
                       })
-                    }
+                    }}
                   >
                     {/* LEFT */}
                     <div className="leave-item-left">
@@ -3093,7 +3098,7 @@ const Dashboard = () => {
                           className="leave-type-pill"
                           onClick={(e) => {
                             e.stopPropagation();
-
+                            if (req.type === "Comp Off") return;
                             navigate("/RequestReport", {
                               state: {
                                 type: req.type,

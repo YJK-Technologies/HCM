@@ -601,7 +601,7 @@ function AttriDetGrid() {
 
               {['all permission', 'view'].some(p => attributePermission.includes(p)) && (
                 <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
                 </li>
               )}
 
