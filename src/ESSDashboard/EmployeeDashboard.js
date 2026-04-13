@@ -736,7 +736,7 @@ const Dashboard = (payslip) => {
 
   const fetchNewJoins = async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/EmployeeDashboardNewJoinee`, {
+      const response = await fetch(`${config.apiBaseUrl}/NewJoinee`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -908,7 +908,7 @@ const Dashboard = (payslip) => {
 
   const fetchBirthdaysinfo = async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/EmployeeDashboardUpcomingBirthday`, {
+      const response = await fetch(`${config.apiBaseUrl}/UpcomingBirthday`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

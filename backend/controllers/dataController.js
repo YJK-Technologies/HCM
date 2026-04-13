@@ -33492,8 +33492,8 @@ const AddWeekOff = async (req, res) => {
         .input("company_code", insertRows.company_code)
         .input("Status", insertRows.Status)
         .input("created_by", insertRows.created_by)
-        .input("upcoming_birthday", insertRows.upcoming_birthday)
-        .input("new_joinees", insertRows.new_joinees)
+        .input("tempstr1", insertRows.tempstr1)
+        .input("tempstr2", insertRows.tempstr2)
         .input("tempstr3", insertRows.tempstr3)
         .input("tempstr4", insertRows.tempstr4)
         .input("datetime1", insertRows.datetime1)
@@ -33501,8 +33501,8 @@ const AddWeekOff = async (req, res) => {
         .input("datetime3", insertRows.datetime3)
         .input("datetime4", insertRows.datetime4)
         .query(
-          `EXEC sp_setting_screen_weekoff_test_DG @mode,@week_off_days,@company_code,@Status,'',@created_by,'',
-          @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,'',@created_by,'',
+          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("WeekOff data inserted successfully");
@@ -33620,14 +33620,14 @@ const deleteWeekOff = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     for (const record of keyfieldsToDelete) {
-      const { keyfield } = record;
+      const { keyfield, company_code } = record;
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
         .query(
-          `EXEC sp_setting_screen_weekoff_test_DG @mode,'',@company_code,'',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,'',@company_code,'',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data deleted successfully");
@@ -33655,10 +33655,9 @@ const updateWeekOff = async (req, res) => {
         .input("Status", updatedRow.Status)
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
-        .input("upcoming_birthday", updatedRow.upcoming_birthday)
-        .input("new_joinees", updatedRow.modified_by)
         .query(
-          `EXEC sp_setting_screen_weekoff_test_DG @mode,@week_off_days,@company_code,@Status,@keyfield,'',@modified_by,@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,@keyfield,
+          '',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data updated successfully");
@@ -33694,8 +33693,8 @@ const AddGenerateEmployee = async (req, res) => {
     company_code,
     Status,
     created_by,
-    tempstr1,
-    tempstr2,
+    upcoming_birthday,
+    new_joinees,
     tempstr3,
     tempstr4,
     datetime1,
@@ -33713,8 +33712,8 @@ const AddGenerateEmployee = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Status", sql.NVarChar, Status)
       .input("created_by", sql.NVarChar, created_by)
-      .input("tempstr1", sql.NVarChar, tempstr1)
-      .input("tempstr2", sql.NVarChar, tempstr2)
+      .input("upcoming_birthday", sql.Int, upcoming_birthday)
+      .input("new_joinees", sql.Int, new_joinees)
       .input("tempstr3", sql.NVarChar, tempstr3)
       .input("tempstr4", sql.NVarChar, tempstr4)
       .input("datetime1", sql.NVarChar, datetime1)
@@ -33722,7 +33721,8 @@ const AddGenerateEmployee = async (req, res) => {
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
       .query(
-        `EXEC sp_setting_generate_employeeid @mode,@employee_id, @company_code,'',@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_generate_employeeid @mode,@employee_id, @company_code,'',@created_by,'',
+        @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -33787,7 +33787,7 @@ const FetchWeekOff = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_setting_screen_weekoff_test_DG 'AA','',@company_code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_weekoff 'AA','',@company_code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     res.json(result.recordset);
   } catch (err) {
@@ -33973,7 +33973,8 @@ const PMSsettingsUpdate = async (req, res) => {
 };
 
 const SettingEmployeeUpdate = async (req, res) => {
-  const { employee_id, company_code, modified_by } = req.body;
+  const { employee_id, company_code, upcoming_birthday,
+    new_joinees,modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
 
@@ -33982,8 +33983,11 @@ const SettingEmployeeUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("upcoming_birthday", sql.Int, upcoming_birthday)
+      .input("new_joinees", sql.Int, new_joinees)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id,@company_code,'','',@modified_by,
+        @upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL
 `);
 
     res.status(200).json("Edited data saved successfully");
