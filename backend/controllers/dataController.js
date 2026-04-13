@@ -33666,8 +33666,9 @@ const deleteWeekOff = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, keyfield)
+        .input("company_code", sql.NVarChar, company_code)
         .query(
-          `EXEC sp_setting_screen_weekoff @mode,'','','',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff_test_DG @mode,'',@company_code,'',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data deleted successfully");
