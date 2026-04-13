@@ -1392,7 +1392,12 @@ router.post("/AssetRequestHdr", dataController.AssetRequestHdr)
 router.post("/GetAssetRequestDetails", dataController.GetAssetRequestDetails)
 router.post("/ApproveAssetRequest", dataController.ApproveAssetRequest)
 router.post("/AssetRequestDetails", dataController.AssetRequestDetails)
-
+router.post("/AddPayrollSetting",dataController.AddPayrollSetting)
+router.post("/UpdatePayrollSetting",dataController.UpdatePayrollSetting)
+router.post("/DeletePayrollSetting",dataController.DeletePayrollSetting)
+router.post("/GetPayrollSettings",dataController.GetPayrollSettings)
+router.post("/payroll_settingsSearch",dataController.payroll_settingsSearch)
+router.post("/UpdatePayrollSettings",dataController.UpdatePayrollSettings)
 
 
 module.exports = router;
