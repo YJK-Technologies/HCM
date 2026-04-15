@@ -13,6 +13,8 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
+import Select from "react-select";
+
 const config = require('../Apiconfig');
 
 const getFinancialYearDates = () => {
@@ -50,7 +52,87 @@ function Input() {
   const [rowData, setRowData] = useState([]);
   const [activeTab, setActiveTab] = useState("Salary Eligibility Days")
   const [loading, setLoading] = useState(false);
+
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [Status, setStatus] = useState("");
+  const [statusdrop, setStatusdrop] = useState([]);
+
+  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
+  const [StatusSC, setStatusSC] = useState("");
+  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
+  const [statusdropSC, setStatusdropSC] = useState([]);
+
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+  
   const navigate = useNavigate();
+
+    const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
+  };
+
+    const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+  
+      fetch(`${config.apiBaseUrl}/status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+      })
+        .then((data) => data.json())
+        .then((val) => setStatusdrop(val))
+        .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+  const handleChangeStatusSC = (selectedStatusSC) => {
+    setSelectedStatusSC(selectedStatusSC);
+    setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
+  };
+
+    const filteredOptionStatusSC = statusdropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
 
   const searchClearInputFields = () => {
     setStart_Year("");
@@ -76,6 +158,7 @@ function Input() {
         Start_Year: Start_Year,
         End_Year: End_Year,
         Salary_Days: Salary_Days,
+        Status: StatusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 
@@ -93,6 +176,7 @@ function Input() {
           Start_Year: formatDate(matchedItem.Start_Year),
           End_Year: formatDate(matchedItem.End_Year),
           Salary_Days: matchedItem.Salary_Days,
+          status: matchedItem.status,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }));
         setRowData(newRows);
@@ -274,6 +358,16 @@ function Input() {
       field: "Salary_Days",
       editable: true,
     },
+    {
+      headerName: "Status",
+      field: "status",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusgriddrop,
+      },
+      editable: true,
+    },
+
   ]
 
   const tabs = [
@@ -577,6 +671,27 @@ function Input() {
             </div>
           </div>
 
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectFocused ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocused(true)}
+                  onBlur={() => setIsSelectFocused(false)}
+                />
+                <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
+              </div>
+            </div>
+
         </div>
       </div>
 
@@ -636,6 +751,27 @@ function Input() {
               <label for="sname" className="exp-form-labels">Eligibility Salary Days</label>
             </div>
           </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatusSC ? "has-value" : ""} 
+              ${isSelectFocusedSC ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatusSC}
+                  onChange={handleChangeStatusSC}
+                  options={filteredOptionStatusSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocusedSC(true)}
+                  onBlur={() => setIsSelectFocusedSC(false)}
+                />
+                <label class="floating-label">Status</label>
+              </div>
+            </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">

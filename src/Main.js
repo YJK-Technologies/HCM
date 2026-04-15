@@ -137,6 +137,7 @@ import LoanDashboard from './ESSDashboard/LoanDashboard.js';
 import EmployeeCompOff from './ESSDashboard/EmployeeCompOff.js';
 import PayrollSettings from './PayrollSettings.js';
 import PayrollSettingsAdd from './PayrollSettingsAdd.js';
+import PendingAssReqRep from './PendingAssReqRep.js';
 import CompOffRequest from './EmpRequests/CompOffRequest.js';
 
 function Main() {
@@ -346,6 +347,7 @@ function Main() {
     { path: "/EmployeeCompOff", component: <EmployeeCompOff /> },
     { path: "/PayrollSettings", component: <PayrollSettings /> },
     { path: "/PayrollSettingsAdd", component: <PayrollSettingsAdd /> },
+    { path: "/PendingAssReqRep", component: <PendingAssReqRep /> },
     { path: "/CompOffRequest", component: <CompOffRequest /> },
 
   
