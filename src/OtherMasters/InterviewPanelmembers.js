@@ -286,7 +286,7 @@ function InterviewPanelMem({ }) {
     {
       headerName: "Employee ID",
       field: "employee_id",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Role",

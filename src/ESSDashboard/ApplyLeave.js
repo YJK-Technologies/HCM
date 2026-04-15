@@ -485,7 +485,7 @@ const ApplyLeave = () => {
       cellRenderer: (params) => {
         const row = params.data;
 
-        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No") {
+        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No" && row.LeaveStatus === "Approved" ) {
           return (
             <button
               className="btn btn-success btn-sm"

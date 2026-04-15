@@ -37,15 +37,13 @@ import {
   BsFileBarGraph,
   BsPersonCheck,
   BsBarChartLine,
-  BsCalendarEvent,
   BsChevronDown,
-  BsPersonVcard,
   BsWrenchAdjustable,
   BsPeopleFill,
   BsArrowRepeat,
   BsPersonPlus,
-  BsBoxSeam
-
+  BsBoxSeam,
+  BsCalendarPlus
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -60,14 +58,13 @@ import {
   MdFlightTakeoff,
   MdPayments,
   MdCalendarMonth,
-  MdOutlineAccountBalance,
+  MdOutlineAccountBalance
 } from "react-icons/md";
 import { 
   HiOutlineUserGroup
 } from "react-icons/hi";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { TbClockCheck, TbHistory } from "react-icons/tb";
-import { FiDatabase } from "react-icons/fi";
 import {
   AiOutlinePercentage,
   AiOutlineFileDone,
@@ -159,6 +156,7 @@ export const leafIconMap = {
   "Loan Type": MdOutlineAccountBalance,
   "Loan Status History": TbHistory,
   "Loan Dashboard": AiOutlineDashboard,
+  "Comp Off Request": BsCalendarPlus,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -249,6 +247,7 @@ const menuData = [
           { label: "Leave Request", path: "/LeaveRequest" },
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
+          { label: "Comp Off Request", path: "/CompOffRequest" },
         ],
       },
       {
