@@ -3050,12 +3050,8 @@ const Dashboard = () => {
                 Pending Requests
               </h6>
               <span className="leave-count-badge">
-                {
-                  dashboardRequests.filter(
-                    (r) => (r.status || "").toLowerCase() === "pending",
-                  ).length
-                }
-                Pending
+                {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length}
+                &nbsp;Pending
               </span>
             </div>
 
@@ -3070,7 +3066,6 @@ const Dashboard = () => {
                     key={index}
                     className="leave-item-modern"
                     onClick={() => {
-                      if (req.type === "Comp Off") return;
                       navigate("/RequestReport", {
                         state: {
                           type: req.type,
@@ -3080,6 +3075,7 @@ const Dashboard = () => {
                           employeeId: req.EmployeeId,
                           status: "Pending",
                           mode: "item",
+                          HolidayName: req.title
                         },
                       })
                     }}
@@ -3098,9 +3094,9 @@ const Dashboard = () => {
                           className="leave-type-pill"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (req.type === "Comp Off") return;
                             navigate("/RequestReport", {
                               state: {
+                                employeeId: req.EmployeeId,
                                 type: req.type,
                                 status: "Pending",
                                 mode: "type",
