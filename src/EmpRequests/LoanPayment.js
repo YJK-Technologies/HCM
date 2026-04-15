@@ -263,7 +263,18 @@ function LoanPayment({ }) {
         {
             headerName: "Payment Date",
             field: "payment_date",
-            editable: true
+            editable: true,
+            valueFormatter: (params) => {
+                if (!params.value) return "";
+
+                const date = new Date(params.value);
+
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = date.getFullYear();
+
+                return `${day}-${month}-${year}`;
+            }
         },
         {
             headerName: "Paid Amount",
@@ -703,7 +714,7 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required 
+                                required
                                 autoComplete="off"
                                 value={paymentDate}
                                 title="Please select the Loan Payment Date"
@@ -823,7 +834,7 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required 
+                                required
                                 autoComplete="off"
                                 value={fromDate}
                                 title="Please select the Loan Payment From Date"
@@ -840,7 +851,7 @@ function LoanPayment({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required 
+                                required
                                 autoComplete="off"
                                 value={toDate}
                                 title="Please select the Loan Payment To Date"

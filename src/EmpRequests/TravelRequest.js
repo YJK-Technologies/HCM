@@ -34,7 +34,7 @@ function TravelRequest({ }) {
   const [empIdDrop, setEmpIdDrop] = useState([]);
   const [empId, setEmpId] = useState("");
   const [selectedEmpId, setSelectedEmpId] = useState("");
-  const [travel_type, settravel_type] = useState("");
+  
   const [destination_country_id, setdestination_country_id] = useState("");
   const [destination_city, setdestination_city] = useState("");
   const [purpose_of_travel, setpurpose_of_travel] = useState("");
@@ -42,7 +42,7 @@ function TravelRequest({ }) {
   const [visaTypeDrop, setVisaTypeDrop] = useState([]);
   const [travelStartDate, setTravelStartDate] = useState("");
   const [travelEndDate, setTravelEndDate] = useState("");
-  const [transport_mode, settransport_mode] = useState("");
+  
   const [accommodation_required, setaccommodation_required] = useState("");
   const [estimated_cost, setestimated_cost] = useState("");
   const [Currency_Code, setCurrency_Code] = useState("");
@@ -77,10 +77,9 @@ function TravelRequest({ }) {
   const [request_numberSC, setrequest_numberSC] = useState("");
   const [isSelectDepartmentSC, setIsSelectDepartmentSC] = useState(false);
   const [DPTdropSC, setDPTdropSC] = useState([]);
-  const [travel_typeSC, settravel_typeSC] = useState("");
+  
   const [destination_country_idSC, setdestination_country_idSC] = useState("");
   const [purpose_of_travelSC, setpurpose_of_travelSC] = useState("");
-  const [transport_modeSc, settransport_modeSc] = useState("");
   const [accommodation_requiredSc, setaccommodation_requiredSc] = useState("");
   const [estimated_costSC, setestimated_costSC] = useState("");
   const [Currency_CodeSC, setCurrency_CodeSC] = useState("");
@@ -110,6 +109,30 @@ function TravelRequest({ }) {
   const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
 
   const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
+
+  const [transport_mode, settransport_mode] = useState("");
+  const [transport_modeDrop, settransport_modeDrop] = useState([]);
+  const [selectedtransport_mode, setSelectedtransport_mode] = useState('');
+  const [isSelectedtransport_mode, setIsSelectedtransport_mode] = useState(false);
+  const [transport_modeDropGrid, settransport_modeDropGrid] = useState([]);
+
+  const [transport_modeSc, settransport_modeSc] = useState("");
+  const [transport_modeDropSc, settransport_modeDropSc] = useState([]);
+  const [selectedtransport_modeSc, setSelectedtransport_modeSc] = useState('');
+  const [isSelectedtransport_modeSc, setIsSelectedtransport_modeSc] = useState(false);
+  
+
+  const [travel_type, settravel_type] = useState("");
+  const [travel_typeDrop, settravel_typeDrop] = useState([]);
+  const [selectedtravel_type, setSelectedtravel_type] = useState('');
+  const [isSelectedtravel_type, setIsSelectedtravel_type] = useState(false);
+  const [travel_typeDropGrid, settravel_typeDropGrid] = useState([]);
+
+
+  const [travel_typeSC, settravel_typeSC] = useState("");
+  const [travel_typeDropSc, settravel_typeDropSc] = useState([]);
+  const [selectedtravel_typeSc, setSelectedtravel_typeSc] = useState('');
+  const [isSelectedtravel_typeSc, setIsSelectedtravel_typeSc] = useState(false);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -274,6 +297,36 @@ function TravelRequest({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getVisaType`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => settravel_typeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getTransportMode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => settransport_modeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const filteredOptionEmpId = Array.isArray(empIdDrop)
     ? empIdDrop.map((option) => ({
       value: option.EmployeeId,
@@ -316,6 +369,20 @@ function TravelRequest({ }) {
     }))
     : [];
 
+  const filteredOptiontravel_type = Array.isArray(travel_typeDrop)
+    ? travel_typeDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const filteredOptiontransport_mode = Array.isArray(transport_modeDrop)
+    ? transport_modeDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
   const handleChangeEmpId = (selectedEmpId) => {
     setSelectedEmpId(selectedEmpId);
     setEmpId(selectedEmpId ? selectedEmpId.value : "");
@@ -348,6 +415,16 @@ function TravelRequest({ }) {
   const handleChangeCurrency = (selectedCurrency) => {
     setSelectedCurrency(selectedCurrency);
     setCurrency_Code(selectedCurrency ? selectedCurrency.value : "");
+  };
+
+  const handleChangetravel_type = (selectedtravel_type) => {
+    setSelectedtravel_type(selectedtravel_type);
+    settravel_type(selectedtravel_type ? selectedtravel_type.value : "");
+  };
+
+  const handleChangetransport_mode = (selectedtransport_mode) => {
+    setSelectedtransport_mode(selectedtransport_mode);
+    settransport_mode(selectedtransport_mode ? selectedtransport_mode.value : "");
   };
 
   useEffect(() => {
@@ -441,6 +518,36 @@ function TravelRequest({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getVisaType`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => settravel_typeDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getTransportMode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => settransport_modeDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
     ? empIdDropSc.map((option) => ({
       value: option?.EmployeeId,
@@ -472,6 +579,20 @@ function TravelRequest({ }) {
     }))
     : [];
 
+  const filteredOptiontravel_typeSc = Array.isArray(travel_typeDropSc)
+    ? travel_typeDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const filteredOptiontransport_modeSc = Array.isArray(transport_modeDropSc)
+    ? transport_modeDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
     setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -485,6 +606,16 @@ function TravelRequest({ }) {
   const handleChangeCurrencySc = (selectedCurrencySc) => {
     setSelectedCurrencySc(selectedCurrencySc);
     setCurrency_CodeSC(selectedCurrencySc ? selectedCurrencySc.value : "");
+  };
+
+  const handleChangetravel_typeSc = (selectedtravel_typeSc) => {
+    setSelectedtravel_typeSc(selectedtravel_typeSc);
+    settravel_typeSC(selectedtravel_typeSc ? selectedtravel_typeSc.value : "");
+  };
+
+  const handleChangetransport_modeSc = (selectedtransport_modeSc) => {
+    setSelectedtransport_modeSc(selectedtransport_modeSc);
+    settransport_modeSc(selectedtransport_modeSc ? selectedtransport_modeSc.value : "");
   };
 
   const searchClearInputFields = () => {
@@ -745,6 +876,40 @@ function TravelRequest({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getVisaType`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        settravel_typeDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getTransportMode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        settransport_modeDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -809,6 +974,10 @@ function TravelRequest({ }) {
       headerName: "Travel Type",
       field: "travel_type",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: travel_typeDropGrid,
+      },
     },
 
     {
@@ -853,6 +1022,10 @@ function TravelRequest({ }) {
       headerName: "Transport Mode",
       field: "transport_mode",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: transport_modeDropGrid,
+      },
     },
 
     {
@@ -1467,7 +1640,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1487,6 +1660,29 @@ function TravelRequest({ }) {
               >
                 Travel Type<span className="text-danger">*</span>
               </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtravel_type ? "has-value" : ""} 
+              ${isSelectedtravel_type ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedtravel_type(true)}
+                onBlur={() => setIsSelectedtravel_type(false)}
+                isClearable
+                value={selectedtravel_type}
+                onChange={handleChangetravel_type}
+                options={filteredOptiontravel_type}
+              />
+              <label for="sname" className={`floating-label ${error && !travel_type ? 'text-danger' : ''}`}>Travel Type<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1602,7 +1798,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1622,6 +1818,29 @@ function TravelRequest({ }) {
               >
                 Transport Mode<span className="text-danger">*</span>
               </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtransport_mode ? "has-value" : ""} 
+              ${isSelectedtransport_mode ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedtransport_mode(true)}
+                onBlur={() => setIsSelectedtransport_mode(false)}
+                isClearable
+                value={selectedtransport_mode}
+                onChange={handleChangetransport_mode}
+                options={filteredOptiontransport_mode}
+              />
+              <label for="sname" className={`floating-label ${error && !transport_mode ? 'text-danger' : ''}`}>Transport Mode<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1931,7 +2150,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1948,6 +2167,29 @@ function TravelRequest({ }) {
               <label for="sname" className={`exp-form-labels`}>
                 Travel Type
               </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtravel_typeSc ? "has-value" : ""} 
+              ${isSelectedtravel_typeSc ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedtravel_typeSc(true)}
+                onBlur={() => setIsSelectedtravel_typeSc(false)}
+                isClearable
+                value={selectedtravel_typeSc}
+                onChange={handleChangetravel_typeSc}
+                options={filteredOptiontravel_typeSc}
+              />
+              <label for="sname" className={`floating-label`}>Travel Type</label>
             </div>
           </div>
 
@@ -2048,7 +2290,7 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -2065,6 +2307,29 @@ function TravelRequest({ }) {
               <label for="sname" className={`exp-form-labels`}>
                 Transport Mode
               </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtransport_modeSc ? "has-value" : ""} 
+              ${isSelectedtransport_modeSc ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedtransport_modeSc(true)}
+                onBlur={() => setIsSelectedtransport_modeSc(false)}
+                isClearable
+                value={selectedtransport_modeSc}
+                onChange={handleChangetransport_modeSc}
+                options={filteredOptiontransport_modeSc}
+              />
+              <label for="sname" className={`floating-label`}>Transport Mode</label>
             </div>
           </div>
 

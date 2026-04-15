@@ -1403,6 +1403,7 @@ router.post("/PendingAssetRequests_SC",dataController.PendingAssetRequests_SC)
 router.post("/EmpCompOffList",dataController.EmpCompOffList)
 router.post("/compOffSearchCriteria",dataController.compOffSearchCriteria)
 router.post("/compOffRequestReport",dataController.compOffRequestReport)
+router.post("/getTransportMode",dataController.getTransportMode)
 
 
 module.exports = router;

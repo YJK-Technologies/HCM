@@ -43862,7 +43862,7 @@ const loan_requestsLoopDelete = async (req, res) => {
 const getVisaType = async (req, res) => {
   const { company_code } = req.body;
   try {
-    const pool = await connection.connectToDatabase();
+    const pool = await connection.connectToDatabase();  
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
@@ -44137,8 +44137,9 @@ const loan_documentsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("document_id", sql.Int, item.document_id)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("keyfield", sql.NVarChar, item.keyfield)
         .query(
-          `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', '','','', @company_code, '', '', '', '', ''`,
+          `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', '','','', @company_code, @keyfield, '', '', '', ''`,
         );
     }
     res.status(200).json("loan_documents data deleted successfully");
@@ -47168,7 +47169,7 @@ const EmployeeAssets_HdrLoopUpdate = async (req, res) => {
   }
 };
 
-const EmployeeAssets_SC = async (req, res) => {
+const   EmployeeAssets_SC = async (req, res) => {
   const {
     AssetID,
     Asset_Code,
@@ -47963,6 +47964,26 @@ const compOffRequestReport = async (req, res) => {
   }
 };
 //Code ended by pavun on 15-06-26
+
+//code added by Diesh Gokul on 15-04-26
+const getTransportMode = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'Transport Mode','','', '' ,'','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Diesh Gokul on 15-04-26
 
 module.exports = {
   login,
@@ -49332,6 +49353,7 @@ module.exports = {
   GetPayrollSettings,
   payroll_settingsSearch,
   UpdatePayrollSettings,
+  getTransportMode,
   getdocument_type,
   PendingAssetRequests_SC,
   EmpCompOffList,

@@ -143,7 +143,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Settings": BsGear,
-  "Assets ": BsBoxSeam,
+  "Assets": BsBoxSeam,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
