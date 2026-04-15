@@ -47167,7 +47167,7 @@ const EmployeeAssets_HdrLoopUpdate = async (req, res) => {
   }
 };
 
-const EmployeeAssets_SC = async (req, res) => {
+const   EmployeeAssets_SC = async (req, res) => {
   const {
     AssetID,
     Asset_Code,
