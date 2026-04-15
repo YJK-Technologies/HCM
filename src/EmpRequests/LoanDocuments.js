@@ -654,6 +654,7 @@ function LoanDocuments({}) {
       </div>
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -876,8 +877,8 @@ function LoanDocuments({}) {
                 value={document_idSC}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
-                  setdocument_id(value);
-                }}
+                  setdocument_idSC(value);
+                }}  
               />
               <label for="sname" className={`exp-form-labels`}>
                 Document ID

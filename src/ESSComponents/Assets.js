@@ -419,7 +419,7 @@ function Assets({ }) {
       headerName: "Actions",
       field: "actions",
       headerCheckboxSelection: true,
-      checkboxSelection: true,
+      // checkboxSelection: true,
 
       cellRenderer: (params) => {
         const cellWidth = params.column.getActualWidth();
@@ -518,11 +518,22 @@ function Assets({ }) {
       editable: true
     },
     {
-      headerName: "Purchase Date",
-      field: "PurchaseDate",
-      editable: true,
-      cellStyle: { textAlign: "left" }
-    },
+  headerName: "Purchase Date",
+  field: "PurchaseDate",
+  editable: true,
+  cellStyle: { textAlign: "left" },
+  valueFormatter: (params) => {
+    if (!params.value) return "";
+
+    const date = new Date(params.value);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+},
     {
       headerName: "Purchase Cost",
       field: "PurchaseCost",
@@ -548,13 +559,35 @@ function Assets({ }) {
       headerName: "Warranty Start",
       field: "WarrantyStart",
       editable: true,
-      cellStyle: { textAlign: "left" }
+      cellStyle: { textAlign: "left" },
+      valueFormatter: (params) => {
+    if (!params.value) return "";
+
+    const date = new Date(params.value);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
     },
     {
       headerName: "Warranty End",
       field: "WarrantyEnd",
       editable: true,
-      cellStyle: { textAlign: "left" }
+      cellStyle: { textAlign: "left" },
+      valueFormatter: (params) => {
+    if (!params.value) return "";
+
+    const date = new Date(params.value);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
     },
 
     {

@@ -317,7 +317,7 @@ function ShiftPatternDetails() {
           Shift_Pattern_ID: Shift_Pattern_IDSC || null,
           Pattern_Detail_ID: Pattern_Detail_IDSC || null,
           Day_Sequence: Day_SequenceSC || null,
-          RotationShift_ID_Days: Shift_IDSC || null,
+          Shift_ID: Shift_IDSC || null,
           Is_Off_Day: Is_Off_DaySC || null,
           Company_Code,
         }),

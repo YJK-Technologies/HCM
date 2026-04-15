@@ -1398,6 +1398,7 @@ router.post("/DeletePayrollSetting",dataController.DeletePayrollSetting)
 router.post("/GetPayrollSettings",dataController.GetPayrollSettings)
 router.post("/payroll_settingsSearch",dataController.payroll_settingsSearch)
 router.post("/UpdatePayrollSettings",dataController.UpdatePayrollSettings)
+router.post("/getTransportMode",dataController.getTransportMode)
 
 
 module.exports = router;
