@@ -1398,6 +1398,9 @@ router.post("/DeletePayrollSetting",dataController.DeletePayrollSetting)
 router.post("/GetPayrollSettings",dataController.GetPayrollSettings)
 router.post("/payroll_settingsSearch",dataController.payroll_settingsSearch)
 router.post("/UpdatePayrollSettings",dataController.UpdatePayrollSettings)
+router.post("/EmpCompOffList",dataController.EmpCompOffList)
+router.post("/compOffSearchCriteria",dataController.compOffSearchCriteria)
+router.post("/compOffRequestReport",dataController.compOffRequestReport)
 
 
 module.exports = router;
