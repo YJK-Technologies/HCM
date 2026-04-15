@@ -31744,10 +31744,11 @@ const UpdateSalary = async (req, res) => {
         .input("Start_Year", sql.Date, updatedRow.Start_Year)
         .input("End_Year", sql.Date, updatedRow.End_Year)
         .input("Salary_Days", sql.Int, updatedRow.Salary_Days)
+        .input("status", sql.NVarChar, updatedRow.Status)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_ESS_Salary_days @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,'','',@modified_by,null,null,null,null,null,null,null,null`,
+          `EXEC sp_ESS_Salary_days @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,'',@modified_by,null,null,null,null,null,null,null,null`,
         );
     }
     res.status(200).json("Data Updated Successfully");
@@ -47820,6 +47821,71 @@ const UpdatePayrollSettings = async (req, res) => {
 };
 //code ended by Sakthi 13-04-2026
 
+//code added by Sakthi 15-04-2026
+const getdocument_type = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'document_type','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi 15-04-2026
+
+//code added by Sakthi 15-04-2026
+const PendingAssetRequests_SC = async (req, res) => {
+  const {
+    info_request_id,
+    company_code,
+    EmployeeId,
+    keyfield,
+    purpose,
+    request_status,
+    created_by,
+    created_date,
+    modified_by,
+    modified_date
+  } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "SC")
+      .input("info_request_id", sql.Int, info_request_id || 0)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("keyfield", sql.NVarChar, keyfield)
+      .input("purpose", sql.NVarChar, purpose) 
+      .input("request_status", sql.NVarChar, request_status)
+      .input("created_by", sql.NVarChar, created_by)
+      .input("created_date", sql.DateTime, created_date)
+      .input("modified_by", sql.NVarChar, modified_by)
+      .input("modified_date", sql.DateTime, modified_date)
+      .query(` EXEC sp_Pending_Asset_Requests_Report @mode, @info_request_id, @company_code, @EmployeeId, @keyfield, @purpose, @request_status, @created_by, @created_date, @modified_by, @modified_date `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error in PendingAssetRequests_SC:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi 15-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49187,6 +49253,8 @@ module.exports = {
   DeletePayrollSetting,
   GetPayrollSettings,
   payroll_settingsSearch,
-  UpdatePayrollSettings
+  UpdatePayrollSettings,
+  getdocument_type,
+  PendingAssetRequests_SC
 
 };

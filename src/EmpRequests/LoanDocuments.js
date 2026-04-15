@@ -41,6 +41,16 @@ function LoanDocuments({}) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  const [documentTypeDrop, setDocumentTypeDrop] = useState([]);
+  const [selectedDocumentIdType, setSelectedDocumentIdType] = useState('');
+  const [DocumentIdType, setDocumentIdType] = useState('');
+  const [isSelectDocumentType, setIsSelectDocumentType] = useState(false);
+
+  const [documentTypeDropSC, setDocumentTypeDropSC] = useState([]);
+  const [selectedDocumentIdTypeSC, setSelectedDocumentIdTypeSC] = useState('');
+  const [DocumentIdTypeSC, setDocumentIdTypeSC] = useState('');
+  const [isSelectDocumentTypeSC, setIsSelectDocumentTypeSC] = useState(false);
+  const [DocumentTypeGrid, setDocumentTypeGrid] = useState([]);
 
 
   useEffect(() => {
@@ -91,6 +101,74 @@ function LoanDocuments({}) {
         setLoanReqIdDropAG(loan);
       })
       .catch((error) => console.error("Error fetching loan request:", error));
+  }, []);
+
+    useEffect(() => {
+      fetch(`${config.apiBaseUrl}/getdocument_type`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((data) => data.json())
+        .then((val) => setDocumentTypeDrop(val));
+    }, []);
+
+  const handleChangeDocumentType = (selectedDocumentIdType) => {
+    setSelectedDocumentIdType(selectedDocumentIdType);
+    setDocumentIdType(selectedDocumentIdType ? selectedDocumentIdType.value : '');
+  };  
+
+  const filteredOptionDocumentType = Array.isArray(documentTypeDrop)
+    ? documentTypeDrop.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
+    : [];
+
+    useEffect(() => {
+      fetch(`${config.apiBaseUrl}/getdocument_type`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      })
+        .then((data) => data.json())
+        .then((val) => setDocumentTypeDropSC(val));
+    }, []);
+
+  const handleChangeDocumentTypeSC = (selectedDocumentIdTypeSC) => {
+    setSelectedDocumentIdTypeSC(selectedDocumentIdTypeSC);
+    setDocumentIdTypeSC(selectedDocumentIdTypeSC ? selectedDocumentIdTypeSC.value : '');
+  };  
+
+  const filteredOptionDocumentTypeSC = Array.isArray(documentTypeDropSC)
+    ? documentTypeDropSC.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
+    : [];
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getdocument_type`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const TypeOption = data.map((option) => ({
+          value: option.attributedetails_name,
+          label: `${option.attributedetails_name}`,
+        }));
+        setDocumentTypeGrid(TypeOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const filteredOptionLoanReqIdSC = Array.isArray(loanReqIdDropSC)
@@ -197,7 +275,15 @@ function LoanDocuments({}) {
     {
       headerName: "Document Type",
       field: "document_type",
-      editable: false,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: DocumentTypeGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = DocumentTypeGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
 
     {
@@ -286,7 +372,7 @@ function LoanDocuments({}) {
 
     formData.append("document_id", document_id);
     formData.append("loan_request_id", loanReqId);
-    formData.append("document_type", document_type);
+    formData.append("document_type", DocumentIdType);
     formData.append("file_path", file_path);
     formData.append("uploaded_by", uploaded_by);
     formData.append("uploaded_at", uploaded_at);
@@ -327,7 +413,7 @@ function LoanDocuments({}) {
       const body = {
         document_id: document_idSC ? document_idSC : 0,
         loan_request_id: loanReqIdSC ? loanReqIdSC : 0,
-        document_type: document_typeSC || "",
+        document_type: DocumentIdTypeSC || "",
         file_path: file_pathSC || "",
         uploaded_by: uploaded_bySC || "",
         uploaded_at: uploaded_atSC || "",
@@ -704,24 +790,27 @@ function LoanDocuments({}) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please Enter the Document Type"
-                maxLength={50}
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedDocumentIdType ? "has-value" : ""} 
+              ${isSelectDocumentType ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="documentIdType"
+                name="documentIdType"
+                value={selectedDocumentIdType}
+                onChange={handleChangeDocumentType}
+                options={filteredOptionDocumentType}
                 autoComplete="off"
-                value={document_type}
-                onChange={(e) => setdocument_type(e.target.value)}
+                placeholder=" "
+                onFocus={() => setIsSelectDocumentType(true)}
+                onBlur={() => setIsSelectDocumentType(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label for="sname" className={`exp-form-labels`}>
-                Document Type
-              </label>
+              <label htmlFor="DocumentType" className="floating-label">Document Type</label>
             </div>
-          </div>
+          </div>          
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -908,24 +997,28 @@ function LoanDocuments({}) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                required
-                title="Please Enter the Document Type"
-                maxLength={50}
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedDocumentIdTypeSC ? "has-value" : ""} 
+              ${isSelectDocumentTypeSC ? "is-focused" : ""}`}
+            >
+              <Select
+                inputId="documentIdType"
+                name="documentIdType"
+                value={selectedDocumentIdTypeSC}
+                onChange={handleChangeDocumentTypeSC}
+                options={filteredOptionDocumentTypeSC}
                 autoComplete="off"
-                value={document_typeSC}
-                onChange={(e) => setdocument_typeSC(e.target.value)}
+                placeholder=" "
+                onFocus={() => setIsSelectDocumentTypeSC(true)}
+                onBlur={() => setIsSelectDocumentTypeSC(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label for="sname" className={`exp-form-labels`}>
-                Document Type
-              </label>
+              <label htmlFor="DocumentType" className="floating-label">Document Type</label>
             </div>
-          </div>
+          </div>          
+
 
           <div className="col-md-2">
             <div className="inputGroup">

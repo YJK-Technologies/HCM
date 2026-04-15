@@ -438,11 +438,13 @@ function InterviewSchedule({ }) {
       headerName: "Candidate Email",
       field: "email",
       editable: false,
+      hide: true  
     },
     {
       headerName: "Candidate Phone No",
       field: "phone",
       editable: false,
+      hide: true
     },
     {
       headerName: "Panel ID",
