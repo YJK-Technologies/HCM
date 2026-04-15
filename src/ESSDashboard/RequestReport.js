@@ -12,12 +12,13 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 const config = require("../Apiconfig");
 
-function RequestReport({}) {
+function RequestReport({ }) {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const requestData = location.state || {};
   const [requestType, setRequestType] = useState("");
   const [searchId, setSearchId] = useState("");
+  const [searchEmpId, setSearchEmpId] = useState("");
   const [Status, setStatus] = useState("");
   const [mode, setMode] = useState("");
   const navigate = useNavigate();
@@ -28,42 +29,52 @@ function RequestReport({}) {
       setStatus(requestData.status || "Pending");
       setMode(requestData.mode);
 
+      console.log(requestData)
+
       if (requestData.mode === "item") {
-        setSearchId(requestData.id || requestData.EmployeeId);
+        setSearchId(requestData.id);
+        setSearchEmpId(requestData.employeeId);
         handleSearch(
           requestData.type,
-          requestData.id || requestData.EmployeeId,
+          requestData.employeeId,
+          requestData.id,
           requestData.status,
           requestData.fromDate,
           requestData.toDate,
+          requestData.HolidayName
         );
       }
 
       if (requestData.mode === "type") {
-        setSearchId(requestData.id || requestData.EmployeeId);
+        setSearchId(requestData.id);
+        setSearchEmpId(requestData.employeeId);
         handleSearch(
           requestData.type,
-          requestData.id || requestData.EmployeeId || 0,
+          requestData.employeeId,
+          requestData.id || 0,
           requestData.status,
         );
       }
     }
   }, []);
 
-  const handleSearch = async (type, id, status, fromDate, toDate) => {
-    console.log(id);
+  const handleSearch = async (type, employeeId, id, status, fromDate, toDate, HolidayName) => {
+    console.log(employeeId);
 
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     let url = "";
     let body = {};
     const safeId = id ? id.toString() : "";
+    const safeEmpId = employeeId ? employeeId.toString() : "";
+
+
 
     if (type === "Leave") {
       url = `${config.apiBaseUrl}/getEmployeeLeaveReport`;
 
       body = {
-        EmployeeId: safeId,
+        EmployeeId: safeEmpId,
         LeaveStatus: status,
         FromDate: fromDate,
         ToDate: toDate,
@@ -94,13 +105,23 @@ function RequestReport({}) {
         request_status: status,
         company_code,
       };
-    }  else if (type === "Academic") {
+    } else if (type === "Academic") {
       url = `${config.apiBaseUrl}/GetAcademicRequestDetails`;
 
       body = {
         Info_request_id: safeId,
         request_status: status,
         company_code,
+      };
+    } else if (type === "Comp Off") {
+      url = `${config.apiBaseUrl}/compOffRequestReport`;
+
+      body = {
+        EmployeeId: safeEmpId,
+        Status: status,
+        CompanyCode: company_code,
+        HolidayName,
+        RepManager: sessionStorage.getItem("selectedUserCode"),
       };
     }
 
@@ -128,11 +149,35 @@ function RequestReport({}) {
         setFamilyRowData(data);
       } else if (type === "Document") {
         setDocumentRowData(data);
+      } else if (type === "Comp Off") {
+        setCompOffRowData(data);
       }
     }
   };
 
-  const handleApproval = async (type, id, FromDate, isApproved) => {
+  const getRequestId = (type, row) => {
+    switch (type) {
+      case "Leave":
+        return row.EmployeeId;
+
+      case "Loan":
+        return row.loan_request_id;
+
+      case "Visa":
+        return row.visa_request_id;
+
+      case "Travel":
+        return row.travel_request_id;
+
+      case "Comp Off":
+        return row.Keyfield;
+
+      default:
+        return null;
+    }
+  };
+
+  const handleApproval = async (type, id, row, isApproved) => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -141,7 +186,7 @@ function RequestReport({}) {
       const status = isApproved ? "Approved" : "Rejected";
 
       if (type === "Leave") {
-        const [day, month, year] = FromDate.split("-");
+        const [day, month, year] = row.FromDate.split("-");
         const backendDate = `${year}-${month}-${day}`;
 
         url = `${config.apiBaseUrl}/LeaveAuthorization`;
@@ -149,7 +194,8 @@ function RequestReport({}) {
         body = {
           EmployeeId: id,
           LeaveStatus: status,
-          FromDate: FromDate,
+          FromDate: row.FromDate,
+          company_code: sessionStorage.getItem("selectedCompanyCode")
         };
       } else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
@@ -175,6 +221,17 @@ function RequestReport({}) {
           company_code,
           request_status: status,
         };
+      } else if (type === "Comp Off") {
+        url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
+
+        body = {
+          EmployeeId: row.EmployeeId,
+          Status: status,
+          HolidayDate: row.HolidayDate,
+          ApprovedBy: sessionStorage.getItem("selectedUserCode"),
+          CompanyCode: company_code,
+          Keyfield: id,
+        };
       }
 
       const response = await fetch(url, {
@@ -187,7 +244,7 @@ function RequestReport({}) {
 
       if (response.ok) {
         toast.success(`${type} ${status} successfully`);
-        handleSearch(requestType, searchId, Status);
+        handleSearch(requestType, searchEmpId, searchId, Status);
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to process request");
@@ -272,23 +329,23 @@ function RequestReport({}) {
 
   const filteredOptionEmpIdLoanSc = Array.isArray(empIdLoanDropSc)
     ? empIdLoanDropSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
     ? loanTypeIdDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionCurrencyLoanSc = Array.isArray(currencyDropLoanSc)
     ? currencyDropLoanSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const handleChangeEmpIdLoanSc = (selectedEmpIdSc) => {
@@ -357,11 +414,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  true,
+                  getRequestId(requestType, row),
+                  row,
+                  true
                 )
               }
             >
@@ -373,11 +428,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  false,
+                  getRequestId(requestType, row),
+                  row,
+                  false
                 )
               }
             >
@@ -773,40 +826,40 @@ function RequestReport({}) {
 
   const filteredOptionEmpIdVisaSc = Array.isArray(empIdDropVisaSc)
     ? empIdDropVisaSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   const filteredOptionCountryIdVisaSc = Array.isArray(countryIdDropVisaSc)
     ? countryIdDropVisaSc.map((option) => ({
-        value: option?.Country_Code,
-        label: `${option?.Country_Code} - ${option?.Country_Name}`,
-      }))
+      value: option?.Country_Code,
+      label: `${option?.Country_Code} - ${option?.Country_Name}`,
+    }))
     : [];
 
   const filteredOptionVisaTypeSc = Array.isArray(visaTypeDropSc)
     ? visaTypeDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionPriorityVisaSc = Array.isArray(priorityDropVisaSc)
     ? priorityDropVisaSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionReqStatusVisaSc = Array.isArray(reqStatusDropVisaSc)
     ? [
-        { value: "All", label: "All" },
-        ...reqStatusDropVisaSc.map((option) => ({
-          value: option?.attributedetails_name,
-          label: option?.attributedetails_name,
-        })),
-      ]
+      { value: "All", label: "All" },
+      ...reqStatusDropVisaSc.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      })),
+    ]
     : [{ value: "All", label: "All" }];
 
   const handleChangeEmpIdVisaSc = (selectedEmpIdVisaSc) => {
@@ -925,11 +978,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  true,
+                  getRequestId(requestType, row),   // ✅ correct ID
+                  row,
+                  true
                 )
               }
             >
@@ -941,11 +992,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  false,
+                  getRequestId(requestType, row),   // ✅ correct ID
+                  row,
+                  false
                 )
               }
             >
@@ -1368,37 +1417,37 @@ function RequestReport({}) {
 
   const filteredOptionDepTravel = Array.isArray(DepTravelDropSc)
     ? DepTravelDropSc.map((option) => ({
-        value: option?.dept_id,
-        label: `${option?.dept_id}-${option?.dept_name}`,
-      }))
+      value: option?.dept_id,
+      label: `${option?.dept_id}-${option?.dept_name}`,
+    }))
     : [];
 
   const filteredOptionEmpIdTravel = Array.isArray(empIdTravelDropSc)
     ? empIdTravelDropSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   const filteredOptionManagerTravel = Array.isArray(managerDropTravelSc)
     ? managerDropTravelSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.full_name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.full_name}`,
+    }))
     : [];
 
   const filteredOptionPriorityTravel = Array.isArray(priorityDropTravelSc)
     ? priorityDropTravelSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const filteredOptionCurrencyTravel = Array.isArray(currencyTravelDropSc)
     ? currencyTravelDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const handleChangeDepTravel = (selectedDepTravelSc) => {
@@ -1514,11 +1563,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  true,
+                  getRequestId(requestType, row),   
+                  row,
+                  true
                 )
               }
             >
@@ -1532,11 +1579,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate,
-                  false,
+                  getRequestId(requestType, row),   
+                  row,
+                  false
                 )
               }
             >
@@ -1907,11 +1952,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate || row.EmployeeId,
-                  true,
+                  getRequestId(requestType, row),   
+                  row,
+                  true
                 )
               }
             >
@@ -1925,11 +1968,9 @@ function RequestReport({}) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  row.loan_request_id ||
-                    row.visa_request_id ||
-                    row.travel_request_id,
-                  row.travel_start_date || row.FromDate || row.EmployeeId,
-                  false,
+                  getRequestId(requestType, row),   
+                  row,
+                  false
                 )
               }
             >
@@ -1997,12 +2038,12 @@ function RequestReport({}) {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            EmployeeId: sessionStorage.getItem("selectedUserCode"),
+            EmployeeId: searchEmpId,
             FromDate: leaveFromDate,
             ToDate: leaveToDate,
             LeaveStatus: "Pending",
             LeaveType: leaveType,
-            getEmployeeLeaveReport: sessionStorage.getItem("selectedUserCode"),
+            ReportingManager: sessionStorage.getItem("selectedUserCode"),
           }),
         },
       );
@@ -2152,7 +2193,7 @@ function RequestReport({}) {
   const [academicColumn, setAcademicColumn] = useState("");
   const [academicFromDate, setAcademicFromDate] = useState("");
   const [academicToDate, setAcademicToDate] = useState("");
-  
+
 
   useEffect(() => {
     if (requestType === "Academic") {
@@ -2233,46 +2274,46 @@ function RequestReport({}) {
 
   const handleAcademicSearch = async () => {
     try {
-        setLoadingAcademic(true);
+      setLoadingAcademic(true);
 
-        const response = await fetch(`${config.apiBaseUrl}/GetAcademicRequestDetails`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-                Info_request_id: academicInfoId || 0,
-                EmployeeId: academicEmpId,
-                column_name: academicColumn,
-                from_date: academicFromDate || null,
-                to_date: academicToDate || null
-            })
-        });
+      const response = await fetch(`${config.apiBaseUrl}/GetAcademicRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: academicInfoId || 0,
+          EmployeeId: academicEmpId,
+          column_name: academicColumn,
+          from_date: academicFromDate || null,
+          to_date: academicToDate || null
+        })
+      });
 
-        if (response.ok) {
-            const data = await response.json();
-            setAcademicRowData(data);
-        } else {
-            setAcademicRowData([]);
-            toast.warning("No data found");
-        }
+      if (response.ok) {
+        const data = await response.json();
+        setAcademicRowData(data);
+      } else {
+        setAcademicRowData([]);
+        toast.warning("No data found");
+      }
 
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
-        setLoadingAcademic(false);
+      setLoadingAcademic(false);
     }
-};
+  };
 
-const handleAcademicReset = () => {
+  const handleAcademicReset = () => {
     setAcademicInfoId("");
     setAcademicEmpId("");
     setAcademicColumn("");
     setAcademicFromDate("");
     setAcademicToDate("");
     fetchAcademicData(); // reload all
-};
+  };
 
   const academicColumnDefs = [
     {
@@ -2353,119 +2394,119 @@ const handleAcademicReset = () => {
           }
           return 0;
         },
-      }, 
+      },
     },
     {
       headerName: "Detail ID",
       field: "detail_id",
-      hide:true,
+      hide: true,
       cellStyle: { textAlign: "center" },
     },
   ];
 
-//   const handleExportToExcelAcademic = () => {
-//   if (!academicRowData || academicRowData.length === 0) {
-//     toast.warning("There is no data to export.");
-//     return;
-//   }
+  //   const handleExportToExcelAcademic = () => {
+  //   if (!academicRowData || academicRowData.length === 0) {
+  //     toast.warning("There is no data to export.");
+  //     return;
+  //   }
 
-//   const screenName = "Academic Requests Search Report";
-//   const company = sessionStorage.getItem("selectedCompanyName") || "";
+  //   const screenName = "Academic Requests Search Report";
+  //   const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-//   // Get theme colors
-//   const titleBg = getCSSVariable("--but").replace("#", "");
-//   const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
-//   const fontColor = getCSSVariable("--font-color").replace("#", "");
-//   const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+  //   // Get theme colors
+  //   const titleBg = getCSSVariable("--but").replace("#", "");
+  //   const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+  //   const fontColor = getCSSVariable("--font-color").replace("#", "");
+  //   const altRowBg = getCSSVariable("--ag-row").replace("#", "");
 
-//   // Header rows
-//   const headerData = [
-//     [screenName],
-//     company ? [`Company Name: ${company}`] : [],
-//     [],
-//   ];
+  //   // Header rows
+  //   const headerData = [
+  //     [screenName],
+  //     company ? [`Company Name: ${company}`] : [],
+  //     [],
+  //   ];
 
-//   const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+  //   const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-//   // Transform data for export
-//   const transformedData = academicRowData.map((row) => ({
-//     "Detail ID": row.detail_id || "",
-//     "Request ID": row.info_request_id || "",
-//     "Column Name": row.column_name || "",
-//     "Old Value": row.old_value || "",
-//     "New Value": row.new_value || "",
-//     "Request Status": row.request_status || "",
-//     "Employee ID": row.EmployeeId || "",
-//     "Company Code": row.company_code || "",
-//     "Created By": row.created_by || "",
-//     "Created Date": row.created_date || "",
-//   }));
+  //   // Transform data for export
+  //   const transformedData = academicRowData.map((row) => ({
+  //     "Detail ID": row.detail_id || "",
+  //     "Request ID": row.info_request_id || "",
+  //     "Column Name": row.column_name || "",
+  //     "Old Value": row.old_value || "",
+  //     "New Value": row.new_value || "",
+  //     "Request Status": row.request_status || "",
+  //     "Employee ID": row.EmployeeId || "",
+  //     "Company Code": row.company_code || "",
+  //     "Created By": row.created_by || "",
+  //     "Created Date": row.created_date || "",
+  //   }));
 
-//   XLSX.utils.sheet_add_json(worksheet, transformedData, {
-//     origin: `A${headerData.length + 1}`,
-//   });
+  //   XLSX.utils.sheet_add_json(worksheet, transformedData, {
+  //     origin: `A${headerData.length + 1}`,
+  //   });
 
-//   const range = XLSX.utils.decode_range(worksheet["!ref"]);
-//   const headerRowIndex = headerData.length;
+  //   const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  //   const headerRowIndex = headerData.length;
 
-//   // Style header
-//   worksheet["A1"].s = {
-//     font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-//     fill: { fgColor: { rgb: titleBg } },
-//     alignment: { horizontal: "center", vertical: "center" },
-//   };
+  //   // Style header
+  //   worksheet["A1"].s = {
+  //     font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+  //     fill: { fgColor: { rgb: titleBg } },
+  //     alignment: { horizontal: "center", vertical: "center" },
+  //   };
 
-//   worksheet["!merges"] = [
-//     {
-//       s: { r: 0, c: 0 },
-//       e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
-//     },
-//   ];
+  //   worksheet["!merges"] = [
+  //     {
+  //       s: { r: 0, c: 0 },
+  //       e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+  //     },
+  //   ];
 
-//   const totalColumns = Object.keys(transformedData[0]).length;
+  //   const totalColumns = Object.keys(transformedData[0]).length;
 
-//   // Column header styling
-//   for (let C = 0; C < totalColumns; C++) {
-//     const cell = worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
-//     if (!cell) continue;
-//     cell.s = {
-//       font: { bold: true, color: { rgb: "FFFFFF" } },
-//       fill: { fgColor: { rgb: tableHeaderBg } },
-//       alignment: { horizontal: "center" },
-//       border: {
-//         top: { style: "thin" },
-//         bottom: { style: "thin" },
-//         left: { style: "thin" },
-//         right: { style: "thin" },
-//       },
-//     };
-//   }
+  //   // Column header styling
+  //   for (let C = 0; C < totalColumns; C++) {
+  //     const cell = worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+  //     if (!cell) continue;
+  //     cell.s = {
+  //       font: { bold: true, color: { rgb: "FFFFFF" } },
+  //       fill: { fgColor: { rgb: tableHeaderBg } },
+  //       alignment: { horizontal: "center" },
+  //       border: {
+  //         top: { style: "thin" },
+  //         bottom: { style: "thin" },
+  //         left: { style: "thin" },
+  //         right: { style: "thin" },
+  //       },
+  //     };
+  //   }
 
-//   // Row styling (alternate row color)
-//   for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
-//     for (let C = 0; C < totalColumns; C++) {
-//       const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
-//       if (!cell) continue;
-//       cell.s = {
-//         font: { color: { rgb: fontColor } },
-//         fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
-//         border: {
-//           top: { style: "thin" },
-//           bottom: { style: "thin" },
-//           left: { style: "thin" },
-//           right: { style: "thin" },
-//         },
-//       };
-//     }
-//   }
+  //   // Row styling (alternate row color)
+  //   for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+  //     for (let C = 0; C < totalColumns; C++) {
+  //       const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+  //       if (!cell) continue;
+  //       cell.s = {
+  //         font: { color: { rgb: fontColor } },
+  //         fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+  //         border: {
+  //           top: { style: "thin" },
+  //           bottom: { style: "thin" },
+  //           left: { style: "thin" },
+  //           right: { style: "thin" },
+  //         },
+  //       };
+  //     }
+  //   }
 
-//   worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+  //   worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
-//   const workbook = XLSX.utils.book_new();
-//   XLSX.utils.book_append_sheet(workbook, worksheet, "Academic Requests");
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Academic Requests");
 
-//   XLSX.writeFile(workbook, "Academic_Requests_Search_Report.xlsx");
-// };
+  //   XLSX.writeFile(workbook, "Academic_Requests_Search_Report.xlsx");
+  // };
 
 
   //Employee Report Screen Input Field
@@ -2478,84 +2519,731 @@ const handleAcademicReset = () => {
   const [personalFromDate, setPersonalFromDate] = useState("");
   const [personalToDate, setPersonalToDate] = useState("");
 
-    useEffect(() => {
+  useEffect(() => {
     if (requestType === "Employee") {
       fetchPersonalData();
     }
   }, [requestType]);
 
   const fetchPersonalData = async () => {
-  try {
-    const response = await fetch(
-      `${config.apiBaseUrl}/GetPersonalRequestDetails`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          column_name: "",
-          from_date: null,
-          to_date: null,
-        }),
-      }
-    );
+    try {
+      const response = await fetch(
+        `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            column_name: "",
+            from_date: null,
+            to_date: null,
+          }),
+        }
+      );
 
-    if (response.ok) {
-      const data = await response.json();
-      setPersonalRowData(data);
-    } else {
-      setPersonalRowData([]);
-    }
+      if (response.ok) {
+        const data = await response.json();
+        setPersonalRowData(data);
+      } else {
+        setPersonalRowData([]);
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
   const handlePersonalSearch = async () => {
-  try {
-    setLoadingPersonal(true);
+    try {
+      setLoadingPersonal(true);
 
-    const response = await fetch(
-      `${config.apiBaseUrl}/GetPersonalRequestDetails`,
-      {
+      const response = await fetch(
+        `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Info_request_id: PersonalInfoId || 0,
+            EmployeeId: PersonalEmpId,
+            column_name: personalColumn,
+            from_date: personalFromDate || null,
+            to_date: personalToDate || null,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setPersonalRowData(data);
+      } else {
+        setPersonalRowData([]);
+        toast.warning("No data found");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingPersonal(false);
+    }
+  };
+
+  const handlePersonalApproval = async (row, isApproved) => {
+    try {
+      const status = isApproved ? "Approved" : "Rejected";
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/ApprovePersonalRequest`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            approvalData: [
+              {
+                detail_id: row.detail_id,
+                info_request_id: row.info_request_id,
+                company_code: row.company_code,
+                EmployeeId: row.EmployeeId,
+                request_status: status,
+                created_by: sessionStorage.getItem("selectedUserCode"),
+                modified_by: sessionStorage.getItem("selectedUserCode"),
+              },
+            ],
+          }),
+        }
+      );
+
+      if (response.ok) {
+        toast.success(`Personal Request ${status}`);
+        fetchPersonalData(); // 🔁 reload
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Failed to process request");
+      }
+    } catch (error) {
+      console.error("Approval Error:", error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  const handlePersonalReset = () => {
+    setPersonalColumn("");
+    setPersonalFromDate("");
+    setPersonalEmpId("");
+    setPersonalToDate("");
+    fetchPersonalData(); // 🔁 reload all
+  };
+
+
+
+  const personalColumnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 120,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        return (
+          <div className="grid-action-buttons">
+            <button
+              className="grid-approve-btn"
+              title="Approve"
+              onClick={() => handlePersonalApproval(row, true)}
+            >
+              <i className="fa-solid fa-check"></i>
+            </button>
+
+            <button
+              className="grid-reject-btn"
+              title="Reject"
+              onClick={() => handlePersonalApproval(row, false)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Employee ID",
+      field: "EmployeeId",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Request ID",
+      field: "info_request_id",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Field Name",
+      field: "column_name",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Old Value",
+      field: "old_value",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "New Value",
+      field: "new_value",
+      cellStyle: {
+        textAlign: "center",
+        color: "green",          // 🔥 highlight change
+        fontWeight: "bold",
+      },
+    },
+    {
+      headerName: "Status",
+      field: "request_status",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Created By",
+      field: "created_by",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      cellStyle: { textAlign: "center" }
+      , valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      },
+    },
+    {
+      headerName: "Detail ID",
+      field: "detail_id",
+      hide: true,
+      cellStyle: { textAlign: "center" },
+    },
+  ];
+
+  //family Report Screen Input Field
+  //family States
+  const [familyRowData, setFamilyRowData] = useState([]);
+  const [familyInfoId, setFamilyInfoId] = useState("");
+  const [familyEmpId, setFamilyEmpId] = useState("");
+  const [familyColumn, setFamilyColumn] = useState("");
+  const [familyFromDate, setFamilyFromDate] = useState("");
+  const [familyToDate, setFamilyToDate] = useState("");
+
+  const [loadingFamily, setLoadingFamily] = useState(false);
+
+  useEffect(() => {
+    if (requestType === "Family") {
+      fetchFamilyData();
+    }
+  }, [requestType]);
+
+  const fetchFamilyData = async () => {
+    try {
+      setLoadingFamily(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Info_request_id: PersonalInfoId || 0,
-          EmployeeId: PersonalEmpId,
-          column_name: personalColumn,
-          from_date: personalFromDate || null,
-          to_date: personalToDate || null,
+          Info_request_id: 0,
+          EmployeeId: "",
+          column_name: "",
+          from_date: null,
+          to_date: null,
         }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFamilyRowData(data);
+      } else {
+        setFamilyRowData([]);
       }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      setPersonalRowData(data);
-    } else {
-      setPersonalRowData([]);
-      toast.warning("No data found");
+    } catch (error) {
+      console.error("Error fetching Family Data:", error);
+    } finally {
+      setLoadingFamily(false);
     }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoadingPersonal(false);
-  }
-};
+  };
 
-const handlePersonalApproval = async (row, isApproved) => {
-  try {
-    const status = isApproved ? "Approved" : "Rejected";
+  const handleFamilySearch = async () => {
+    if (familyFromDate && familyToDate) {
+      if (new Date(familyFromDate) > new Date(familyToDate)) {
+        toast.warning("From Date should not be greater than To Date");
+        return;
+      }
+    }
 
-    const response = await fetch(
-      `${config.apiBaseUrl}/ApprovePersonalRequest`,
-      {
+    try {
+      setLoadingFamily(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: familyInfoId || 0,
+          EmployeeId: familyEmpId,
+          column_name: familyColumn,
+          from_date: familyFromDate || null,
+          to_date: familyToDate || null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFamilyRowData(data);
+      } else {
+        setFamilyRowData([]);
+        toast.warning("No data found");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingFamily(false);
+    }
+  };
+
+  const handleFamilyReset = () => {
+    setFamilyInfoId("");
+    setFamilyEmpId("");
+    setFamilyColumn("");
+    setFamilyFromDate("");
+    setFamilyToDate("");
+    fetchFamilyData();
+  };
+
+  const handleFamilyApproval = async (row, isApproved) => {
+    try {
+      const status = isApproved ? "Approved" : "Rejected";
+
+      const response = await fetch(`${config.apiBaseUrl}/ApproveFamilyRequest`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          approvalData: [
+            {
+              detail_id: row.detail_id,
+              info_request_id: row.info_request_id,
+              company_code: row.company_code,
+              EmployeeId: row.EmployeeId,
+              request_status: status,
+              created_by: sessionStorage.getItem("selectedUserCode"),
+            },
+          ],
+        }),
+      });
+
+      if (response.ok) {
+        toast.success(`Family Request ${status}`);
+        fetchFamilyData();
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  const familyColumnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 120,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        return (
+          <div className="grid-action-buttons">
+            <button
+              className="grid-approve-btn"
+              onClick={() => handleFamilyApproval(row, true)}
+            >
+              <i className="fa-solid fa-check"></i>
+            </button>
+
+            <button
+              className="grid-reject-btn"
+              onClick={() => handleFamilyApproval(row, false)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Employee ID",
+      field: "EmployeeId",
+      cellStyle: { textAlign: "center" }
+    },
+    {
+      headerName: "Request ID",
+      field: "info_request_id",
+      cellStyle: { textAlign: "center" }
+    },
+    {
+      headerName: "Field Name",
+      field: "column_name",
+      cellStyle: { textAlign: "center" }
+    },
+
+    {
+      headerName: "Old Value",
+      field: "old_value",
+      cellStyle: { textAlign: "center" },
+    },
+
+    {
+      headerName: "New Value",
+      field: "new_value",
+      cellStyle: { textAlign: "center" },
+    },
+
+    {
+      headerName: "Status",
+      field: "request_status",
+      cellStyle: { textAlign: "center" }
+    },
+    {
+      headerName: "Created By",
+      field: "created_by",
+      cellStyle: { textAlign: "center" }
+    },
+
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => formatDate(params.value),
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const cellDate = new Date(cellValue.split("/").join("-"));
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        },
+      },
+
+    },
+
+    {
+      headerName: "Detail ID",
+      field: "detail_id",
+      hide: true
+    },
+  ];
+
+  //Assets Report Screen Input Field
+  // Asset States
+  const [assetRowData, setAssetRowData] = useState([]);
+  const [assetInfoId, setAssetInfoId] = useState("");
+  const [assetEmpId, setAssetEmpId] = useState("");
+  const [assetFieldName, setAssetFieldName] = useState("");
+  const [assetFromDate, setAssetFromDate] = useState("");
+  const [assetToDate, setAssetToDate] = useState("");
+  const [loadingAsset, setLoadingAsset] = useState(false);
+
+  const fetchAssetData = async () => {
+    try {
+      setLoadingAsset(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: 0,
+          EmployeeId: "",
+          FieldName: "",
+          FromDate: null,
+          ToDate: null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAssetRowData(data);
+      } else {
+        setAssetRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching Asset Data:", error);
+    } finally {
+      setLoadingAsset(false);
+    }
+  };
+
+  const handleAssetSearch = async () => {
+    if (assetFromDate && assetToDate) {
+      if (new Date(assetFromDate) > new Date(assetToDate)) {
+        toast.warning("From Date should not be greater than To Date");
+        return;
+      }
+    }
+
+    try {
+      setLoadingAsset(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: assetInfoId || null,
+          EmployeeId: assetEmpId,
+          FieldName: assetFieldName,
+          FromDate: assetFromDate || null,
+          ToDate: assetToDate || null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAssetRowData(data);
+      } else {
+        setAssetRowData([]);
+        toast.warning("No data found");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingAsset(false);
+    }
+  };
+
+  const handleAssetReset = () => {
+    setAssetInfoId("");
+    setAssetEmpId("");
+    setAssetFieldName("");
+    setAssetFromDate("");
+    setAssetToDate("");
+    fetchAssetData();
+  };
+
+  const handleAssetApproval = async (row, isApproved) => {
+    try {
+      const status = isApproved ? "Approved" : "Rejected";
+
+      const response = await fetch(`${config.apiBaseUrl}/ApproveAssetRequest`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          approvalData: [
+            {
+              DetailID: row.DetailID,
+              info_request_id: row.info_request_id,
+              company_code: row.company_code,
+              EmployeeID: row.EmployeeID,
+              request_status: status,
+
+              AssetID: row.AssetID,
+              ExpectedReturnDate: row.ExpectedReturnDate,
+              ActualReturnDate: row.ActualReturnDate,
+              Remarks: row.Remarks,
+            },
+          ],
+        }),
+      });
+
+      if (response.ok) {
+        toast.success(`Asset Request ${status}`);
+        fetchAssetData();
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  const assetColumnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 120,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        return (
+          <div className="grid-action-buttons">
+            <button
+              className="grid-approve-btn"
+              onClick={() => handleAssetApproval(row, true)}
+            >
+              <i className="fa-solid fa-check"></i>
+            </button>
+
+            <button
+              className="grid-reject-btn"
+              onClick={() => handleAssetApproval(row, false)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      },
+    },
+    { headerName: "Detail ID", field: "DetailID", cellStyle: { textAlign: "center" } },
+    { headerName: "Employee ID", field: "EmployeeID", cellStyle: { textAlign: "center" } },
+    { headerName: "Request ID", field: "RequestID", cellStyle: { textAlign: "center" } },
+    { headerName: "Field Name", field: "FieldName", cellStyle: { textAlign: "center" } },
+    {
+      headerName: "Old Value", field: "OldValue", cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => {
+        const value = params.value;
+        if (value && !isNaN(Date.parse(value))) {
+          return formatDate(value);
+        }
+        return value;
+      },
+    },
+    {
+      headerName: "New Value", field: "NewValue", cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => {
+        const value = params.value;
+        if (value && !isNaN(Date.parse(value))) {
+          return formatDate(value);
+        }
+        return value;
+      },
+    },
+    { headerName: "Status", field: "request_status", cellStyle: { textAlign: "center" } },
+    { headerName: "Created By", field: "CreatedBy", cellStyle: { textAlign: "center" } },
+    { headerName: "Created Date", field: "CreatedDate", valueFormatter: (params) => formatDate(params.value), },
+  ];
+
+
+  //document Report Screen Input Field
+  const [documentRowData, setDocumentRowData] = useState([]);
+
+  const [docInfoId, setDocInfoId] = useState("");
+  const [docEmpId, setDocEmpId] = useState("");
+  const [docColumn, setDocColumn] = useState("");
+  const [docFromDate, setDocFromDate] = useState("");
+  const [docToDate, setDocToDate] = useState("");
+
+  const [loadingDocument, setLoadingDocument] = useState(false);
+
+  useEffect(() => {
+    if (requestType === "Document") {
+      fetchDocumentData();
+    }
+  }, [requestType]);
+
+  const fetchDocumentData = async () => {
+    try {
+      setLoadingDocument(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: 0,
+          EmployeeId: "",
+          column_name: "",
+          from_date: null,
+          to_date: null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDocumentRowData(data);
+      } else {
+        setDocumentRowData([]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingDocument(false);
+    }
+  };
+
+  const handleDocumentSearch = async () => {
+    try {
+      setLoadingDocument(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Info_request_id: docInfoId || 0,
+          EmployeeId: docEmpId,
+          column_name: docColumn,
+          from_date: docFromDate || null,
+          to_date: docToDate || null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDocumentRowData(data);
+      } else {
+        setDocumentRowData([]);
+        toast.warning("No data found");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingDocument(false);
+    }
+  };
+
+  const handleDocumentReset = () => {
+    setDocInfoId("");
+    setDocEmpId("");
+    setDocColumn("");
+    setDocFromDate("");
+    setDocToDate("");
+
+    fetchDocumentData();
+  };
+
+  const handleDocumentApproval = async (row, isApproved) => {
+    try {
+      const status = isApproved ? "Approved" : "Rejected";
+
+      const response = await fetch(`${config.apiBaseUrl}/ApproveDocumentRequest`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2573,105 +3261,88 @@ const handlePersonalApproval = async (row, isApproved) => {
             },
           ],
         }),
+      });
+
+      if (response.ok) {
+        toast.success(`Document Request ${status}`);
+        fetchDocumentData();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Failed");
       }
-    );
-
-    if (response.ok) {
-      toast.success(`Personal Request ${status}`);
-      fetchPersonalData(); // 🔁 reload
-    } else {
-      const error = await response.json();
-      toast.error(error.message || "Failed to process request");
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
     }
-  } catch (error) {
-    console.error("Approval Error:", error);
-    toast.error("Something went wrong");
-  }
-};
+  };
 
-const handlePersonalReset = () => {
-  setPersonalColumn("");
-  setPersonalFromDate("");
-  setPersonalEmpId("");
-  setPersonalToDate("");
-  fetchPersonalData(); // 🔁 reload all
-};
+  const documentColumnDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 120,
+      cellRenderer: (params) => {
+        const row = params.data;
 
+        return (
+          <div className="grid-action-buttons">
+            <button
+              className="grid-approve-btn"
+              onClick={() => handleDocumentApproval(row, true)}
+            >
+              <i className="fa-solid fa-check"></i>
+            </button>
 
-
-const personalColumnDefs = [
-  {
-    headerName: "Actions",
-    field: "actions",
-    width: 120,
-    cellRenderer: (params) => {
-      const row = params.data;
-
-      return (
-        <div className="grid-action-buttons">
-          <button
-            className="grid-approve-btn"
-            title="Approve"
-            onClick={() => handlePersonalApproval(row, true)}
-          >
-            <i className="fa-solid fa-check"></i>
-          </button>
-
-          <button
-            className="grid-reject-btn"
-            title="Reject"
-            onClick={() => handlePersonalApproval(row, false)}
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      );
+            <button
+              className="grid-reject-btn"
+              onClick={() => handleDocumentApproval(row, false)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      },
     },
-  },
-  {
-    headerName: "Employee ID",
-    field: "EmployeeId",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Request ID",
-    field: "info_request_id",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Field Name",
-    field: "column_name",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Old Value",
-    field: "old_value",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "New Value",
-    field: "new_value",
-    cellStyle: {
-      textAlign: "center",
-      color: "green",          // 🔥 highlight change
-      fontWeight: "bold",
+    {
+      headerName: "Employee ID",
+      field: "EmployeeId",
+      cellStyle: { textAlign: "center" },
     },
-  },
-  {
-    headerName: "Status",
-    field: "request_status",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Created By",
-    field: "created_by",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Created Date",
-    field: "created_date",
-    cellStyle: { textAlign: "center" }
-    ,valueFormatter: (params) => formatDate(params.value),
+    {
+      headerName: "Request ID",
+      field: "info_request_id",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Field Name",
+      field: "column_name",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Old Value",
+      field: "old_value",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "New Value",
+      field: "new_value",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Status",
+      field: "request_status",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Created By",
+      field: "created_by",
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue.split("/").join("-"));
@@ -2682,633 +3353,182 @@ const personalColumnDefs = [
           }
           return 0;
         },
-      }, 
-  },
-  {
-    headerName: "Detail ID",
-    field: "detail_id",
-    hide: true,
-    cellStyle: { textAlign: "center" },
-  },
-];
-
-  //family Report Screen Input Field
-  //family States
-  const [familyRowData, setFamilyRowData] = useState([]);
-  const [familyInfoId, setFamilyInfoId] = useState("");
-  const [familyEmpId, setFamilyEmpId] = useState("");
-  const [familyColumn, setFamilyColumn] = useState("");
-  const [familyFromDate, setFamilyFromDate] = useState("");
-  const [familyToDate, setFamilyToDate] = useState("");
-  
-  const [loadingFamily, setLoadingFamily] = useState(false);
-
-      useEffect(() => {
-    if (requestType === "Family") {
-      fetchFamilyData();
-    }
-  }, [requestType]);
-
-  const fetchFamilyData = async () => {
-  try {
-    setLoadingFamily(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: 0,
-        EmployeeId: "",
-        column_name: "",
-        from_date: null,
-        to_date: null,
-      }),
-    });
+    },
+  ];
 
-    if (response.ok) {
-      const data = await response.json();
-      setFamilyRowData(data);
-    } else {
-      setFamilyRowData([]);
-    }
-  } catch (error) {
-    console.error("Error fetching Family Data:", error);
-  } finally {
-    setLoadingFamily(false);
-  }
-};
+  //Comp Off Report Screen
+  const [compOffRowData, setCompOffRowData] = useState([]);
+  const [holidayFromDate, setHolidayFromDate] = useState("");
+  const [holidayToDate, setHolidayToDate] = useState("");
+  const [holidayName, setHolidayName] = useState("");
 
-  const handleFamilySearch = async () => {
-  if (familyFromDate && familyToDate) {
-    if (new Date(familyFromDate) > new Date(familyToDate)) {
+  const compOffColDefs = [
+    {
+      headerName: "Actions",
+      field: "actions",
+      width: 120,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        return (
+          <div className="grid-action-buttons">
+            <button
+              className="grid-approve-btn"
+              onClick={() =>
+                handleApproval(
+                  requestType,
+                  getRequestId(requestType, row),
+                  row,
+                  true
+                )
+              }
+            >
+              <i className="fa-solid fa-check"></i>
+            </button>
+
+            <button
+              className="grid-reject-btn"
+              onClick={() =>
+                handleApproval(
+                  requestType,
+                  getRequestId(requestType, row),
+                  row,
+                  false
+                )
+              }
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Employee ID",
+      field: "EmployeeId",
+      cellStyle: { textAlign: "center" },
+      editable: false,
+    },
+    {
+      headerName: "Employee Name",
+      field: "EmployeeName",
+      cellStyle: { textAlign: "center" },
+      editable: false,
+    },
+    {
+      headerName: "Holiday Date",
+      field: "HolidayDate",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
+    },
+    {
+      headerName: "Holiday Name",
+      field: "HolidayName",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "From Date",
+      field: "LeaveFromDate",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
+    },
+    {
+      headerName: "To Date",
+      field: "LeaveToDate",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+      valueFormatter: params => {
+        if (!params.value) return "";
+        return format(new Date(params.value), 'yyyy-MM-dd');
+      }
+    },
+    {
+      headerName: "Status",
+      field: "Status",
+      editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Keyfield",
+      field: "Keyfield",
+      hide: true,
+      editable: false,
+      cellStyle: { textAlign: "center" },
+    },
+  ];
+
+  const defaultColDef = {
+    resizable: true,
+    wrapText: true,
+  };
+
+  const handleCompOffSearch = async () => {
+    const from = new Date(holidayFromDate);
+    const to = new Date(holidayToDate);
+
+    if (from > to) {
       toast.warning("From Date should not be greater than To Date");
       return;
     }
-  }
 
-  try {
-    setLoadingFamily(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: familyInfoId || 0,
-        EmployeeId: familyEmpId,
-        column_name: familyColumn,
-        from_date: familyFromDate || null,
-        to_date: familyToDate || null,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setFamilyRowData(data);
-    } else {
-      setFamilyRowData([]);
-      toast.warning("No data found");
+    setLoading(true);
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/compOffRequestReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+          EmployeeId: searchEmpId,
+          FromDate: holidayFromDate,
+          ToDate: holidayToDate,
+          Status: 'Pending',
+          HolidayName: holidayName,
+          RepManager: sessionStorage.getItem('selectedUserCode')
+        })
+      });
+      if (response.ok) {
+        const searchData = await response.json();
+        setCompOffRowData(searchData);
+        console.log("data fetched successfully")
+      } else if (response.status === 404) {
+        setCompOffRowData([]);
+        toast.warning("Data not found")
+        console.log("Data not found");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message, {
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoadingFamily(false);
-  }
   };
 
-  const handleFamilyReset = () => {
-    setFamilyInfoId("");
-    setFamilyEmpId("");
-    setFamilyColumn("");
-    setFamilyFromDate("");
-    setFamilyToDate("");
-    fetchFamilyData();
+  const handleReloadSearch = () => {
+    clearInputsSearch([])
+    setLeaveRowData([])
   };
 
-  const handleFamilyApproval = async (row, isApproved) => {
-  try {
-    const status = isApproved ? "Approved" : "Rejected";
-
-    const response = await fetch(`${config.apiBaseUrl}/ApproveFamilyRequest`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        approvalData: [
-          {
-            detail_id: row.detail_id,
-            info_request_id: row.info_request_id,
-            company_code: row.company_code,
-            EmployeeId: row.EmployeeId,
-            request_status: status,
-            created_by: sessionStorage.getItem("selectedUserCode"),
-          },
-        ],
-      }),
-    });
-
-    if (response.ok) {
-      toast.success(`Family Request ${status}`);
-      fetchFamilyData();
-    } else {
-      const err = await response.json();
-      toast.error(err.message || "Failed");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Something went wrong");
-  }
-};
-
-  const familyColumnDefs = [
-  {
-    headerName: "Actions",
-    field: "actions",
-    width: 120,
-    cellRenderer: (params) => {
-      const row = params.data;
-
-      return (
-        <div className="grid-action-buttons">
-          <button
-            className="grid-approve-btn"
-            onClick={() => handleFamilyApproval(row, true)}
-          >
-            <i className="fa-solid fa-check"></i>
-          </button>
-
-          <button
-            className="grid-reject-btn"
-            onClick={() => handleFamilyApproval(row, false)}
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      );
-    },
-  },
-  { 
-    headerName: "Employee ID", 
-    field: "EmployeeId", 
-    cellStyle: { textAlign: "center" } 
-  },
-  {
-     headerName: "Request ID", 
-     field: "info_request_id", 
-     cellStyle: { textAlign: "center" }
-  },
-  {
-    headerName: "Field Name",
-    field: "column_name", 
-    cellStyle: { textAlign: "center" } 
-  },
-
-  {
-    headerName: "Old Value",
-    field: "old_value",
-    cellStyle: { textAlign: "center"},
-  },
-
-  {
-    headerName: "New Value",
-    field: "new_value",
-    cellStyle: { textAlign: "center"},
-  },
-
-  { 
-    headerName: "Status", 
-    field: "request_status", 
-    cellStyle: { textAlign: "center" } 
-  },
-  { 
-    headerName: "Created By", 
-    field: "created_by", 
-    cellStyle: { textAlign: "center" } 
-  },
-
-  {
-    headerName: "Created Date",
-    field: "created_date",
-    cellStyle: { textAlign: "center" },
-    valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      }, 
-
-  },
-
-  { 
-    headerName: "Detail ID", 
-    field: "detail_id", 
-    hide: true 
-  },
-];
-
-//Assets Report Screen Input Field
-// Asset States
-const [assetRowData, setAssetRowData] = useState([]);
-const [assetInfoId, setAssetInfoId] = useState("");
-const [assetEmpId, setAssetEmpId] = useState("");
-const [assetFieldName, setAssetFieldName] = useState("");
-const [assetFromDate, setAssetFromDate] = useState("");
-const [assetToDate, setAssetToDate] = useState("");
-const [loadingAsset, setLoadingAsset] = useState(false);
-
-const fetchAssetData = async () => {
-  try {
-    setLoadingAsset(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: 0,
-        EmployeeId: "",
-        FieldName: "",
-        FromDate: null,
-        ToDate: null,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setAssetRowData(data);
-    } else {
-      setAssetRowData([]);
-    }
-  } catch (error) {
-    console.error("Error fetching Asset Data:", error);
-  } finally {
-    setLoadingAsset(false);
-  }
-};
-
-const handleAssetSearch = async () => {
-  if (assetFromDate && assetToDate) {
-    if (new Date(assetFromDate) > new Date(assetToDate)) {
-      toast.warning("From Date should not be greater than To Date");
-      return;
-    }
-  }
-
-  try {
-    setLoadingAsset(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: assetInfoId || null,
-        EmployeeId: assetEmpId,
-        FieldName: assetFieldName,
-        FromDate: assetFromDate || null,
-        ToDate: assetToDate || null,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setAssetRowData(data);
-    } else {
-      setAssetRowData([]);
-      toast.warning("No data found");
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoadingAsset(false);
-  }
-};
-
-const handleAssetReset = () => {
-  setAssetInfoId("");
-  setAssetEmpId("");
-  setAssetFieldName("");
-  setAssetFromDate("");
-  setAssetToDate("");
-  fetchAssetData();
-};
-
-const handleAssetApproval = async (row, isApproved) => {
-  try {
-    const status = isApproved ? "Approved" : "Rejected";
-
-    const response = await fetch(`${config.apiBaseUrl}/ApproveAssetRequest`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        approvalData: [
-          {
-            DetailID: row.DetailID,
-            info_request_id: row.info_request_id,
-            company_code: row.company_code,
-            EmployeeID: row.EmployeeID,
-            request_status: status,
-
-            AssetID: row.AssetID,
-            ExpectedReturnDate: row.ExpectedReturnDate,
-            ActualReturnDate: row.ActualReturnDate,
-            Remarks: row.Remarks,
-          },
-        ],
-      }),
-    });
-
-    if (response.ok) {
-      toast.success(`Asset Request ${status}`);
-      fetchAssetData();
-    } else {
-      const err = await response.json();
-      toast.error(err.message || "Failed");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Something went wrong");
-  }
-};
-
-const assetColumnDefs = [
-  {
-    headerName: "Actions",
-    field: "actions",
-    width: 120,
-    cellRenderer: (params) => {
-      const row = params.data;
-
-      return (
-        <div className="grid-action-buttons">
-          <button
-            className="grid-approve-btn"
-            onClick={() => handleAssetApproval(row, true)}
-          >
-            <i className="fa-solid fa-check"></i>
-          </button>
-
-          <button
-            className="grid-reject-btn"
-            onClick={() => handleAssetApproval(row, false)}
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      );
-    },
-  },
-  { headerName: "Detail ID", field: "DetailID", cellStyle: { textAlign: "center" } },
-  { headerName: "Employee ID", field: "EmployeeID", cellStyle: { textAlign: "center" } },
-  { headerName: "Request ID", field: "RequestID", cellStyle: { textAlign: "center" } },
-  { headerName: "Field Name", field: "FieldName", cellStyle: { textAlign: "center" } },
-  { headerName: "Old Value", field: "OldValue", cellStyle: { textAlign: "center" },
-    valueFormatter: (params) => { const value = params.value;
-    if (value && !isNaN(Date.parse(value))) {
-      return formatDate(value);
-    }
-    return value;
-  },},
-{ headerName: "New Value", field: "NewValue", cellStyle: { textAlign: "center" }, 
-  valueFormatter: (params) => { const value = params.value;
-    if (value && !isNaN(Date.parse(value))) {
-      return formatDate(value);
-    }
-    return value;
-  },},
-  { headerName: "Status", field: "request_status", cellStyle: { textAlign: "center" } },
-  { headerName: "Created By", field: "CreatedBy", cellStyle: { textAlign: "center" } },
-  { headerName: "Created Date", field: "CreatedDate", valueFormatter: (params) => formatDate(params.value), },
-];
-
-
-//document Report Screen Input Field
-const [documentRowData, setDocumentRowData] = useState([]);
-
-const [docInfoId, setDocInfoId] = useState("");
-const [docEmpId, setDocEmpId] = useState("");
-const [docColumn, setDocColumn] = useState("");
-const [docFromDate, setDocFromDate] = useState("");
-const [docToDate, setDocToDate] = useState("");
-
-const [loadingDocument, setLoadingDocument] = useState(false);
-
-useEffect(() => {
-  if (requestType === "Document") {
-    fetchDocumentData();
-  }
-}, [requestType]);
-
-const fetchDocumentData = async () => {
-  try {
-    setLoadingDocument(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: 0,
-        EmployeeId: "",
-        column_name: "",
-        from_date: null,
-        to_date: null,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setDocumentRowData(data);
-    } else {
-      setDocumentRowData([]);
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoadingDocument(false);
-  }
-};
-
-const handleDocumentSearch = async () => {
-  try {
-    setLoadingDocument(true);
-
-    const response = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Info_request_id: docInfoId || 0,
-        EmployeeId: docEmpId,
-        column_name: docColumn,
-        from_date: docFromDate || null,
-        to_date: docToDate || null,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setDocumentRowData(data);
-    } else {
-      setDocumentRowData([]);
-      toast.warning("No data found");
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoadingDocument(false);
-  }
-};
-
-const handleDocumentReset = () => {
-  setDocInfoId("");
-  setDocEmpId("");
-  setDocColumn("");
-  setDocFromDate("");
-  setDocToDate("");
-
-  fetchDocumentData();
-};
-
-const handleDocumentApproval = async (row, isApproved) => {
-  try {
-    const status = isApproved ? "Approved" : "Rejected";
-
-    const response = await fetch(`${config.apiBaseUrl}/ApproveDocumentRequest`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        approvalData: [
-          {
-            detail_id: row.detail_id,
-            info_request_id: row.info_request_id,
-            company_code: row.company_code,
-            EmployeeId: row.EmployeeId,
-            request_status: status,
-            created_by: sessionStorage.getItem("selectedUserCode"),
-            modified_by: sessionStorage.getItem("selectedUserCode"),
-          },
-        ],
-      }),
-    });
-
-    if (response.ok) {
-      toast.success(`Document Request ${status}`);
-      fetchDocumentData();
-    } else {
-      const error = await response.json();
-      toast.error(error.message || "Failed");
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error("Something went wrong");
-  }
-};
-
-const documentColumnDefs = [
-  {
-    headerName: "Actions",
-    field: "actions",
-    width: 120,
-    cellRenderer: (params) => {
-      const row = params.data;
-
-      return (
-        <div className="grid-action-buttons">
-          <button
-            className="grid-approve-btn"
-            onClick={() => handleDocumentApproval(row, true)}
-          >
-            <i className="fa-solid fa-check"></i>
-          </button>
-
-          <button
-            className="grid-reject-btn"
-            onClick={() => handleDocumentApproval(row, false)}
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      );
-    },
-  },
-  {
-    headerName: "Employee ID",
-    field: "EmployeeId",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Request ID",
-    field: "info_request_id",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Field Name",
-    field: "column_name",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Old Value",
-    field: "old_value",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "New Value",
-    field: "new_value",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Status",
-    field: "request_status",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Created By",
-    field: "created_by",
-    cellStyle: { textAlign: "center" },
-  },
-  {
-    headerName: "Created Date",
-    field: "created_date",
-    cellStyle: { textAlign: "center" },
-    valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      }, 
-  },
-];
+  const clearInputsSearch = () => {
+    setHolidayFromDate('');
+    setHolidayToDate('');
+    setHolidayName('');
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -4686,14 +4906,14 @@ const documentColumnDefs = [
         )}{" "}
       </>
 
-            <>
+      <>
         {requestType === "Employee" && mode === "type" && (
           <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-          
+
             <div className="header-flex">
               <h6>Search Criteria:</h6>
             </div>
-        
+
             <div className="row g-3">
 
               {/* Request ID */}
@@ -4730,7 +4950,7 @@ const documentColumnDefs = [
                 </div>
               </div>
 
-        
+
               {/* Column Name */}
               <div className="col-md-3">
                 <div className="inputGroup">
@@ -4745,7 +4965,7 @@ const documentColumnDefs = [
                   <label className="exp-form-labels">Field Name</label>
                 </div>
               </div>
-        
+
               {/* From Date */}
               <div className="col-md-3">
                 <div className="inputGroup">
@@ -4760,7 +4980,7 @@ const documentColumnDefs = [
                   <label className="exp-form-labels">From Date</label>
                 </div>
               </div>
-        
+
               {/* To Date */}
               <div className="col-md-3">
                 <div className="inputGroup">
@@ -4775,27 +4995,27 @@ const documentColumnDefs = [
                   <label className="exp-form-labels">To Date</label>
                 </div>
               </div>
-        
+
               {/* Buttons */}
               <div className="col-12">
                 <div className="search-btn-wrapper">
-        
+
                   <div className="icon-btn search" onClick={handlePersonalSearch}>
                     <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
-        
+
                   <div className="icon-btn reload" onClick={handlePersonalReset}>
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
-        
+
                 </div>
               </div>
-        
+
             </div>
           </div>
-        )}        
+        )}
         {requestType === "Employee" && (
           <div
             className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
@@ -4815,316 +5035,406 @@ const documentColumnDefs = [
           </div>
         )}{" "}
       </>
+
       <>
-  {requestType === "Family" && mode === "type" && (
-    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        {requestType === "Family" && mode === "type" && (
+          <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
 
-      <div className="header-flex">
-        <h6>Search Criteria:</h6>
-      </div>
-
-      <div className="row g-3">
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="number"
-              className="exp-input-field form-control"
-              value={familyInfoId}
-              onChange={(e) => setFamilyInfoId(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
-            />
-            <label className="exp-form-labels">Request ID</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="text"
-              className="exp-input-field form-control"
-              value={familyEmpId}
-              onChange={(e) => setFamilyEmpId(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
-            />
-            <label className="exp-form-labels">Employee ID</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="text"
-              className="exp-input-field form-control"
-              value={familyColumn}
-              onChange={(e) => setFamilyColumn(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
-            />
-            <label className="exp-form-labels">Field Name</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={familyFromDate}
-              onChange={(e) => setFamilyFromDate(e.target.value)}
-            />
-            <label className="exp-form-labels">From Date</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={familyToDate}
-              onChange={(e) => setFamilyToDate(e.target.value)}
-            />
-            <label className="exp-form-labels">To Date</label>
-          </div>
-        </div>
-
-        <div className="col-12">
-          <div className="search-btn-wrapper">
-
-            <div className="icon-btn search" onClick={handleFamilySearch}>
-              <span className="tooltip">Search</span>
-              <i className="fa-solid fa-magnifying-glass"></i>
+            <div className="header-flex">
+              <h6>Search Criteria:</h6>
             </div>
 
-            <div className="icon-btn reload" onClick={handleFamilyReset}>
-              <span className="tooltip">Reload</span>
-              <i className="fa-solid fa-rotate-right"></i>
-            </div>
+            <div className="row g-3">
 
-          </div>
-        </div>
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="number"
+                    className="exp-input-field form-control"
+                    value={familyInfoId}
+                    onChange={(e) => setFamilyInfoId(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+                  />
+                  <label className="exp-form-labels">Request ID</label>
+                </div>
+              </div>
 
-      </div>
-    </div>
-  )}
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={familyEmpId}
+                    onChange={(e) => setFamilyEmpId(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+                  />
+                  <label className="exp-form-labels">Employee ID</label>
+                </div>
+              </div>
 
-  {requestType === "Family" && (
-    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
-      <div className="ag-theme-alpine" style={{ height: 455 }}>
-        <AgGridReact
-          rowData={familyRowData}
-          columnDefs={familyColumnDefs}
-          pagination={true}
-          paginationPageSize={10}
-          defaultColDef={{
-            sortable: true,
-            filter: true,
-            resizable: true
-          }}
-        />
-        </div>
-        </div>
-      )}
-    </>
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={familyColumn}
+                    onChange={(e) => setFamilyColumn(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+                  />
+                  <label className="exp-form-labels">Field Name</label>
+                </div>
+              </div>
 
-<>
-  {requestType === "Asset" && mode === "type" && (
-    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={familyFromDate}
+                    onChange={(e) => setFamilyFromDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">From Date</label>
+                </div>
+              </div>
 
-      <div className="header-flex">
-        <h6>Search Criteria:</h6>
-      </div>
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={familyToDate}
+                    onChange={(e) => setFamilyToDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">To Date</label>
+                </div>
+              </div>
 
-      <div className="row g-3">
+              <div className="col-12">
+                <div className="search-btn-wrapper">
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="number"
-              className="exp-input-field form-control"
-              value={assetInfoId}
-              onChange={(e) => setAssetInfoId(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
-            />
-            <label className="exp-form-labels">Request ID</label>
-          </div>
-        </div>
+                  <div className="icon-btn search" onClick={handleFamilySearch}>
+                    <span className="tooltip">Search</span>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="text"
-              className="exp-input-field form-control"
-              value={assetEmpId}
-              onChange={(e) => setAssetEmpId(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
-            />
-            <label className="exp-form-labels">Employee ID</label>
-          </div>
-        </div>
+                  <div className="icon-btn reload" onClick={handleFamilyReset}>
+                    <span className="tooltip">Reload</span>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="text"
-              className="exp-input-field form-control"
-              value={assetFieldName}
-              onChange={(e) => setAssetFieldName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
-            />
-            <label className="exp-form-labels">Field Name</label>
-          </div>
-        </div>
+                </div>
+              </div>
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={assetFromDate}
-              onChange={(e) => setAssetFromDate(e.target.value)}
-            />
-            <label className="exp-form-labels">From Date</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input
-              type="date"
-              className="exp-input-field form-control"
-              value={assetToDate}
-              onChange={(e) => setAssetToDate(e.target.value)}
-            />
-            <label className="exp-form-labels">To Date</label>
-          </div>
-        </div>
-
-        <div className="col-12">
-          <div className="search-btn-wrapper">
-            <div className="icon-btn search" onClick={handleAssetSearch}>
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </div>
-
-            <div className="icon-btn reload" onClick={handleAssetReset}>
-              <i className="fa-solid fa-rotate-right"></i>
             </div>
           </div>
-        </div>
+        )}
 
-      </div>
-    </div>
-  )}
-
-  {requestType === "Asset" && (
-    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
-      <div className="ag-theme-alpine" style={{ height: 455 }}>
-        <AgGridReact
-          rowData={assetRowData}
-          columnDefs={assetColumnDefs}
-          pagination={true}
-        />
-      </div>
-    </div>
-  )}
-</>
-    <>
-  {requestType === "Document" && mode === "type" && (
-    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-      <div className="header-flex">
-        <h6>Search Criteria:</h6>
-      </div>
-
-      <div className="row g-3">
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input 
-            type="number" 
-            className="exp-input-field form-control"
-            value={docInfoId}
-            onChange={(e) => setDocInfoId(e.target.value)} 
-            />
-            <label>Request ID</label>
+        {requestType === "Family" && (
+          <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+            <div className="ag-theme-alpine" style={{ height: 455 }}>
+              <AgGridReact
+                rowData={familyRowData}
+                columnDefs={familyColumnDefs}
+                pagination={true}
+                paginationPageSize={10}
+                defaultColDef={{
+                  sortable: true,
+                  filter: true,
+                  resizable: true
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
+      </>
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input 
-            type="text" 
-            className="exp-input-field form-control"
-            value={docEmpId}
-            onChange={(e) => setDocEmpId(e.target.value)} 
-            />
-            <label>Employee ID</label>
-          </div>
-        </div>
+      <>
+        {requestType === "Asset" && mode === "type" && (
+          <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
 
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input 
-            type="text" 
-            className="exp-input-field form-control"
-            value={docColumn}
-            onChange={(e) => setDocColumn(e.target.value)} 
-            />
-            <label>Field Name</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input 
-            type="date" 
-            className="exp-input-field form-control"
-            value={docFromDate}
-            onChange={(e) => setDocFromDate(e.target.value)} 
-            />
-            <label>From Date</label>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="inputGroup">
-            <input 
-            type="date" 
-            className="exp-input-field form-control"
-            value={docToDate}
-            onChange={(e) => setDocToDate(e.target.value)} 
-            />
-            <label>To Date</label>
-          </div>
-        </div>
-
-        <div className="col-12">
-          <div className="search-btn-wrapper">
-
-            <div className="icon-btn search" onClick={handleDocumentSearch}>
-              <i className="fa-solid fa-magnifying-glass"></i>
+            <div className="header-flex">
+              <h6>Search Criteria:</h6>
             </div>
 
-            <div className="icon-btn reload" onClick={handleDocumentReset}>
-              <i className="fa-solid fa-rotate-right"></i>
+            <div className="row g-3">
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="number"
+                    className="exp-input-field form-control"
+                    value={assetInfoId}
+                    onChange={(e) => setAssetInfoId(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+                  />
+                  <label className="exp-form-labels">Request ID</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={assetEmpId}
+                    onChange={(e) => setAssetEmpId(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+                  />
+                  <label className="exp-form-labels">Employee ID</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={assetFieldName}
+                    onChange={(e) => setAssetFieldName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+                  />
+                  <label className="exp-form-labels">Field Name</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={assetFromDate}
+                    onChange={(e) => setAssetFromDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">From Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={assetToDate}
+                    onChange={(e) => setAssetToDate(e.target.value)}
+                  />
+                  <label className="exp-form-labels">To Date</label>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <div className="search-btn-wrapper">
+                  <div className="icon-btn search" onClick={handleAssetSearch}>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
+
+                  <div className="icon-btn reload" onClick={handleAssetReset}>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {requestType === "Asset" && (
+          <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+            <div className="ag-theme-alpine" style={{ height: 455 }}>
+              <AgGridReact
+                rowData={assetRowData}
+                columnDefs={assetColumnDefs}
+                pagination={true}
+              />
+            </div>
+          </div>
+        )}
+      </>
+
+      <>
+        {requestType === "Document" && mode === "type" && (
+          <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+            <div className="header-flex">
+              <h6>Search Criteria:</h6>
             </div>
 
-          </div>
-        </div>
-      </div>
-    </div>
-  )}
+            <div className="row g-3">
 
-  {requestType === "Document" && (
-    <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
-      <div className="ag-theme-alpine" style={{ height: 455 }}>
-        <AgGridReact
-          rowData={documentRowData}
-          columnDefs={documentColumnDefs}
-        />
-      </div>
-      </div>
-    )}
-  </>
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="number"
+                    className="exp-input-field form-control"
+                    value={docInfoId}
+                    onChange={(e) => setDocInfoId(e.target.value)}
+                  />
+                  <label>Request ID</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={docEmpId}
+                    onChange={(e) => setDocEmpId(e.target.value)}
+                  />
+                  <label>Employee ID</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={docColumn}
+                    onChange={(e) => setDocColumn(e.target.value)}
+                  />
+                  <label>Field Name</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={docFromDate}
+                    onChange={(e) => setDocFromDate(e.target.value)}
+                  />
+                  <label>From Date</label>
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={docToDate}
+                    onChange={(e) => setDocToDate(e.target.value)}
+                  />
+                  <label>To Date</label>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <div className="search-btn-wrapper">
+
+                  <div className="icon-btn search" onClick={handleDocumentSearch}>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
+
+                  <div className="icon-btn reload" onClick={handleDocumentReset}>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {requestType === "Document" && (
+          <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+            <div className="ag-theme-alpine" style={{ height: 455 }}>
+              <AgGridReact
+                rowData={documentRowData}
+                columnDefs={documentColumnDefs}
+              />
+            </div>
+          </div>
+        )}
+      </>
+
+      <>
+        {requestType === "Comp Off" && mode === "type" && (
+          <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+            <div className="header-flex">
+              <h6>Search Criteria:</h6>
+            </div>
+
+            <div className="row g-3">
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={holidayFromDate}
+                    onChange={(e) => setHolidayFromDate(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels`}>
+                    Holiday From Date
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="date"
+                    className="exp-input-field form-control"
+                    value={holidayToDate}
+                    onChange={(e) => setHolidayToDate(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels`}>
+                    Holiday To Date
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    value={holidayName}
+                    onChange={(e) => setHolidayName(e.target.value)}
+                    placeholder=" "
+                    autoComplete="off"
+                  />
+                  <label className={`exp-form-labels`}>
+                    Holiday Name
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <div className="search-btn-wrapper">
+                  <div className="icon-btn search" onClick={handleCompOffSearch}>
+                    <span className="tooltip">Search</span>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
+
+                  <div className="icon-btn reload" onClick={handleReloadSearch}>
+                    <span className="tooltip">Reload</span>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {requestType === "Comp Off" && (
+          <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box">
+            <div className="ag-theme-alpine" style={{ height: 455 }}>
+              <AgGridReact
+                rowData={compOffRowData}
+                columnDefs={compOffColDefs}
+                defaultColDef={defaultColDef}
+                rowSelection="single"
+              />
+            </div>
+          </div>
+        )}
+      </>
 
     </div>
   );

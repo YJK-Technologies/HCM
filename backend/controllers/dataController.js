@@ -47374,8 +47374,8 @@ const compOffRequestInsert = async (req, res) => {
       .input("ResPerson", sql.NVarChar, ResPerson)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("CreatedBy", sql.NVarChar, CreatedBy)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
-      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@CreatedBy,'','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
+      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@CreatedBy,'','','','',''`);
 
     res.status(200).json({ success: true, message: "Employee comp off inserted successfully" });
   } catch (err) {
@@ -47393,7 +47393,7 @@ const DashboardCompOffRequest = async (req, res) => {
       .input("mode", sql.NVarChar, "CLR")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47419,8 +47419,8 @@ const DashboardCompOffApproval = async (req, res) => {
       .input("ApprovedBy", sql.NVarChar, ApprovedBy)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("Keyfield", sql.NVarChar, Keyfield)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',
-      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,@HolidayDate,'','','',
+      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','','','',''`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -47438,7 +47438,7 @@ const getCompOffDropdown = async (req, res) => {
       .input("mode", sql.NVarChar, "CO")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','','','',''`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -47885,6 +47885,84 @@ const PendingAssetRequests_SC = async (req, res) => {
   }
 };
 //code ended by Sakthi 15-04-2026
+
+//Code added by pavun on 15-04-26
+const EmpCompOffList = async (req, res) => {
+  const { userid, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "WH")
+      .input("userid", sql.VarChar, userid)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_task_hour_report @mode,'','',@userid,'',@company_code,'', ''`);
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const compOffSearchCriteria = async (req, res) => {
+  const { FromDate, ToDate, HolidayName, Status, EmployeeId, CompanyCode } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("HolidayName", sql.NVarChar, HolidayName)
+      .input("Status", sql.NVarChar, Status)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','','','',@CompanyCode,'','','','',@FromDate,@ToDate`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const compOffRequestReport = async (req, res) => {
+  const { FromDate, ToDate, HolidayName, Status, EmployeeId, RepManager, CompanyCode } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.NVarChar, "CRM")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("HolidayName", sql.NVarChar, HolidayName)
+      .input("Status", sql.NVarChar, Status)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,'','','','',@FromDate,@ToDate`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+//Code ended by pavun on 15-06-26
 
 module.exports = {
   login,
@@ -49255,6 +49333,9 @@ module.exports = {
   payroll_settingsSearch,
   UpdatePayrollSettings,
   getdocument_type,
-  PendingAssetRequests_SC
+  PendingAssetRequests_SC,
+  EmpCompOffList,
+  compOffSearchCriteria,
+  compOffRequestReport
 
 };

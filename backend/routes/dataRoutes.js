@@ -1400,6 +1400,9 @@ router.post("/payroll_settingsSearch",dataController.payroll_settingsSearch)
 router.post("/UpdatePayrollSettings",dataController.UpdatePayrollSettings)
 router.post("/getdocument_type",dataController.getdocument_type)
 router.post("/PendingAssetRequests_SC",dataController.PendingAssetRequests_SC)
+router.post("/EmpCompOffList",dataController.EmpCompOffList)
+router.post("/compOffSearchCriteria",dataController.compOffSearchCriteria)
+router.post("/compOffRequestReport",dataController.compOffRequestReport)
 
 
 module.exports = router;
