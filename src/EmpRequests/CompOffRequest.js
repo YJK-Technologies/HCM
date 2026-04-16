@@ -66,7 +66,7 @@ const EmployeeCompOff = () => {
             }),
         })
             .then((response) => response.json())
-            .then(setCompOffDrop)
+             .then((val) => setCompOffDrop(val))
             .catch((error) => console.error("Error fetching warehouse:", error));
     }, []);
 
@@ -163,12 +163,13 @@ const EmployeeCompOff = () => {
         }
     };
 
-    const filteredOptionCopmOff = compOffDrop.map((option) => ({
+    const filteredOptionCopmOff = Array.isArray(compOffDrop)
+    ? compOffDrop.map((option) => ({
         value: option.Holiday_Date,
-        // label: option.Holiday_Name,
         label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
         holidayName: option.Holiday_Name
-    }));
+    }))
+    : [];
 
     const handleChangeCompOff = (selectedCompOff) => {
         setSelectedCompOff(selectedCompOff);
@@ -193,62 +194,6 @@ const EmployeeCompOff = () => {
     const handleChangeStatusSc = (SelectedStatusSc) => {
         setSelectedStatusSc(SelectedStatusSc);
         setStatusSc(SelectedStatusSc ? SelectedStatusSc.value : '');
-    };
-
-    const CancelActionRenderer = (params) => {
-        const { data } = params;
-
-        const handleCancel = async () => {
-            if (data.LeaveStatus === 'Cancelled') return;
-
-            showConfirmationToast("Are you sure you want to cancel this leave request?",
-                async () => {
-
-                    try {
-                        const response = await fetch(`${config.apiBaseUrl}/LeaveCancellation`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                EmployeeId: sessionStorage.getItem('selectedUserCode'),
-                                LeaveStatus: "Cancelled",
-                                FromDate: data.FromDate,
-                            }),
-                        });
-
-                        const result = await response.json();
-                        if (response.ok) {
-                            toast.success("Leave request cancelled successfully!");
-                            // await handleSearchItem();
-                        } else {
-                            console.error(result.message);
-                            toast.warning(result.message || "Failed to cancel leave");
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        toast.error('Error: ' + err.message);
-                    }
-                },
-                () => {
-                    toast.info("Data updated cancelled.");
-                }
-            );
-        };
-
-        const isCancelled = data.LeaveStatus === 'Cancelled';
-
-        return (
-            <div className="action-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <button
-                    onClick={handleCancel}
-                    disabled={isCancelled}
-                    className={`icon-cancel-btn ${isCancelled ? 'disabled' : ''}`}
-                >
-                    <XCircle size={18} strokeWidth={2.5} />
-                </button>
-            </div>
-        );
     };
 
     const leaveColumnDefs = [
@@ -294,28 +239,6 @@ const EmployeeCompOff = () => {
             editable: false,
             cellStyle: { textAlign: "center" },
         },
-        // {
-        //     headerName: "Action",
-        //     field: "action",
-        //     width: 160,
-        //     cellStyle: { textAlign: "center" },
-        //     sortable: false,
-        //     filter: false,
-        //     cellRenderer: (params) => {
-        //         const row = params.data;
-
-        //         if (row.LeaveStatus !== "Cancelled") {
-        //             return <CancelActionRenderer {...params} />;
-        //         }
-
-        //         return null;
-        //     },
-        //     tooltipValueGetter: (params) => {
-        //         return params.data.LeaveStatus === 'Cancelled'
-        //             ? "This request has already been cancelled."
-        //             : "Click to cancel this leave request.";
-        //     }
-        // },
     ];
 
     const defaultColDef = {
@@ -418,38 +341,6 @@ const EmployeeCompOff = () => {
             {loading && <LoadingScreen />}
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
-
-                    {/* <div className="col-md-3">
-                        <div className="inputGroup">
-                            <input
-                                type="date"
-                                className="exp-input-field form-control"
-                                value={HolidayDate}
-                                readOnly
-                                placeholder=" "
-                                autoComplete="off"
-                            />
-                            <label className={`exp-form-labels ${error && !HolidayDate ? 'text-danger' : ''}`}>
-                                Holiday Date<span className="text-danger">*</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-3">
-                        <div className="inputGroup">
-                            <input
-                                type="Text"
-                                className="exp-input-field form-control"
-                                value={HolidayName}
-                                readOnly
-                                placeholder=" "
-                                autoComplete="off"
-                            />
-                            <label className={`exp-form-labels ${error && !HolidayName ? 'text-danger' : ''}`}>
-                                Holiday Name<span className="text-danger">*</span>
-                            </label>
-                        </div>
-                    </div> */}
 
                     <div className="col-md-3">
                         <div

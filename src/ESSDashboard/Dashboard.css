@@ -2327,10 +2327,32 @@
   right: -20px;
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, var(--but) 0%, var(--ag-col) 100%);
   border-radius: 50%;
-  opacity: 0.4;
+  opacity: 0.3;
   z-index: 1;
+  transition: all 0.4s ease;
+}
+
+.birthday-accent-circle-bottom {
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--but) 0%, var(--ag-col) 100%);
+  border-radius: 50%;
+  opacity: 0.2;
+  z-index: 1;
+  transition: all 0.4s ease;
+}
+
+.birthday-card-inner:hover .birthday-accent-circle,
+.birthday-card-inner:hover .birthday-accent-circle-bottom {
+  opacity: 0.6; 
+  transform: scale(1.2); 
+  box-shadow: 0 0 20px 5px var(--but);
+  filter: blur(2px); 
 }
 
 .profile-image-wrapper {
@@ -2476,19 +2498,7 @@
 
 .birthday-card-wrapper {
     position: relative;
-    padding-bottom: 50px !important;
-}
-
-.birthday-accent-circle-bottom {
-    position: absolute;
-    bottom: -20px;
-    left: -20px;
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-    border-radius: 50%;
-    opacity: 0.3;
-    z-index: 1;
+    /* padding-bottom: 50px !important; */
 }
 
 .birthday-card-inner {
@@ -2688,10 +2698,11 @@
     right: -20px;
     width: 85px;
     height: 85px;
-    background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+    background: linear-gradient(135deg, var(--but) 0%, var(--ag-col) 100%);
     border-radius: 50%;
     opacity: 0.2;
     z-index: 1;
+    transition: all 0.4s ease;
 }
 
 .joinee-accent-circle-bottom {
@@ -2700,10 +2711,19 @@
     left: -20px;
     width: 85px;
     height: 85px;
-    background: linear-gradient(135deg, #818cf8 0%, #e0e7ff 100%);
+    background: linear-gradient(135deg, var(--but) 0%, var(--ag-col) 100%);
     border-radius: 50%;
     opacity: 0.2;
     z-index: 1;
+    transition: all 0.4s ease;
+}
+
+.joinee-card-inner:hover .joinee-accent-circle-top,
+.joinee-card-inner:hover .joinee-accent-circle-bottom {
+  opacity: 0.6; 
+  transform: scale(1.2); 
+  box-shadow: 0 0 20px 5px var(--but);
+  filter: blur(2px); 
 }
 
 /* Profile Styling */
@@ -3397,7 +3417,7 @@
 }
 
 .fixed-list-height {
-    height: 700px; 
+    height: 650px; 
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -3436,4 +3456,32 @@
     height: 100% !important;
     display: flex;
     flex-direction: column;
+}
+
+.initials-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ag-col); 
+  color: var(--font-color);      
+  font-weight: 700;
+  font-size: 2.8rem; 
+  font-family: 'Poppins';
+  border: 2px solid var(--border-color);
+  text-transform: uppercase;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%; 
+}
+
+.joinee-card-inner:hover .initials-avatar{
+  background-color: var(--sidenav-hover);
+  color: var(--font-hover);
+  transition: all 0.3s ease;
+}
+
+.birthday-card-inner:hover .initials-avatar {
+  background-color: var(--sidenav-hover);
+  color: var(--font-hover);
+  transition: all 0.3s ease;
 }
