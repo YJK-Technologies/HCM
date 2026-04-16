@@ -1,1113 +1,817 @@
 import React, { useState, useEffect } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
-import { showConfirmationToast } from './ToastConfirmation';
-import LoadingScreen from './Loading';
-import Select from 'react-select';
+import { showConfirmationToast } from "./ToastConfirmation";
+import LoadingScreen from "./Loading";
+import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
-const config = require('./Apiconfig');
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+const config = require("./Apiconfig");
 
-function PendingAssReqRep({ }) {
+function PendingAssReqRep({}) {
+  const [rowData, setRowData] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const [rowData, setRowData] = useState([]);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [ReqIdSc, setReqIdSc] = useState("");
+  const [reqNumberSc, setReqNumberSc] = useState("");
+  const [empIdDropSc, setEmpIdDropSc] = useState([]);
+  const [empIdSc, setEmpIdSc] = useState("");
+  const [selectedEmpIdSc, setSelectedEmpIdSc] = useState("");
+  const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
+  const [loanTypeIdSc, setLoanTypeIdSc] = useState("");
+  const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState("");
+  const [loanAmountSc, setLoanAmountSc] = useState("");
+  const [interestRateSc, setInterestRateSc] = useState("");
+  const [repayMonthSc, setRepayMonthSc] = useState("");
+  const [monthlyInstallmentSc, setMonthlyInstallmentSc] = useState("");
+  const [currencyCodeSc, setCurrencyCodeSc] = useState("");
+  const [purposeSc, setPurposeSc] = useState("");
+  const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
+  const [reqStatusSc, setReqStatusSc] = useState("");
+  const [selectedReqStatusSc, setSelectedReqStatusSc] = useState("");
+  const [repaymentDateSc, setRepaymentDateSc] = useState("");
+  const [totalItemsSc, setTotalItemsSc] = useState("");
+  const [pendingItemsSc, setPendingItemsSc] = useState("");
+  const [approvedItemsSc, setApprovedItemsSc] = useState("");
 
-    const [loanReqId, setLoanReqId] = useState('');
-    const [reqNumber, setReqNumber] = useState('');
-    const [empIdDrop, setEmpIdDrop] = useState([]);
-    const [empId, setEmpId] = useState('');
-    const [selectedEmpId, setSelectedEmpId] = useState('');
-    const [loanTypeIdDrop, setLoanTypeIdDrop] = useState([]);
-    const [loanTypeId, setLoanTypeId] = useState('');
-    const [selectedLoanTypeId, setSelectedLoanIypeId] = useState('');
-    const [loanAmount, setLoanAmount] = useState('');
-    const [interestRate, setInterestRate] = useState('');
-    const [repayMonth, setRepayMonth] = useState('');
-    const [monthlyInstallment, setMonthlyInstallment] = useState('');
-    const [currencyCode, setCurrencyCode] = useState('');
-    const [purpose, setPurpose] = useState("");
-    const [reqStatusDrop, setReqStatusDrop] = useState([]);
-    const [reqStatus, setReqStatus] = useState('');
-    const [selectedReqStatus, setSelectedReqStatus] = useState('');
-    const [repaymentDate, setRepaymentDate] = useState('');
+  const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
+  const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
 
-    const [loanReqIdSc, setLoanReqIdSc] = useState('');
-    const [reqNumberSc, setReqNumberSc] = useState('');
-    const [empIdDropSc, setEmpIdDropSc] = useState([]);
-    const [empIdSc, setEmpIdSc] = useState('');
-    const [selectedEmpIdSc, setSelectedEmpIdSc] = useState('');
-    const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
-    const [loanTypeIdSc, setLoanTypeIdSc] = useState('');
-    const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState('');
-    const [loanAmountSc, setLoanAmountSc] = useState('');
-    const [interestRateSc, setInterestRateSc] = useState('');
-    const [repayMonthSc, setRepayMonthSc] = useState('');
-    const [monthlyInstallmentSc, setMonthlyInstallmentSc] = useState('');
-    const [currencyCodeSc, setCurrencyCodeSc] = useState('');
-    const [purposeSc, setPurposeSc] = useState("");
-    const [reqStatusDropSc, setReqStatusDropSc] = useState([]);
-    const [reqStatusSc, setReqStatusSc] = useState('');
-    const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
-    const [repaymentDateSc, setRepaymentDateSc] = useState('');
+  const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
+  const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
+  const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
 
-    const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
-    const [isSelectedLoanType, setIsSelectedLoanType] = useState(false);
-    const [isSelectedReqStatus, setIsSelectedReqStatus] = useState(false);
+  const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
+  //purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
+  const companyPermissions = permissions
+    .filter((permission) => permission.screen_type === "PendingAssReqRep")
+    .map((permission) => permission.permission_type.toLowerCase());
 
-    const [isSelectedEmpIdSc, setIsSelectedEmpIdSc] = useState(false);
-    const [isSelectedLoanTypeSc, setIsSelectedLoanTypeSc] = useState(false);
-    const [isSelectedReqStatusSc, setIsSelectedReqStatusSc] = useState(false);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
-    const [loanTypeIdDropGrid, setLoanTypeIdDropGrid] = useState([]);
-    const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-    const [currencyDrop, setCurrencyDrop] = useState([]);
-    const [selectedCurrency, setSelectedCurrency] = useState('');
-    const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setLoanTypeIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-    const [currencyDropSc, setCurrencyDropSc] = useState([]);
-    const [selectedCurrencySc, setSelectedCurrencySc] = useState('');
-    const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setReqStatusDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-    const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
+  const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
+    ? empIdDropSc.map((option) => ({
+        value: option?.EmployeeId,
+        label: `${option?.EmployeeId}-${option?.First_Name}`,
+      }))
+    : [];
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const handleChangeEmpIdSc = (selectedEmpIdSc) => {
+    setSelectedEmpIdSc(selectedEmpIdSc);
+    setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
+  };
 
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setEmpIdDrop(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+  const handleChangeReqStatusSc = (selectedReqStatusSc) => {
+    setSelectedReqStatusSc(selectedReqStatusSc);
+    setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
+  };
 
-    // useEffect(() => {
-    //     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    //     fetch(`${config.apiBaseUrl}/getLoanTypes`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({ company_code })
-    //     })
-    //         .then((data) => data.json())
-    //         .then((val) => setLoanTypeIdDrop(val))
-    //         .catch((error) => console.error('Error fetching data:', error));
-    // }, []);
+  const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
+    ? [
+        { value: "All", label: "All" },
+        ...reqStatusDropSc.map((option) => ({
+          value: option?.attributedetails_name,
+          label: option?.attributedetails_name,
+        })),
+      ]
+    : [{ value: "All", label: "All" }];
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDrop(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const emp = val.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmpIdDropGrid(emp);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setCurrencyDrop(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
+  useEffect(() => {
     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, { // match backend route name
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Company_Code }),
-    })
-        .then((res) => res.json())
-        .then((data) => setLoanTypeIdDrop(data))
-        .catch((error) => console.error("Error fetching loan types:", error));
-}, []);
-
-    const filteredOptionEmpId = Array.isArray(empIdDrop)
-        ? empIdDrop.map((option) => ({
-            value: option?.EmployeeId,
-            label: `${option?.EmployeeId}-${option?.First_Name}`,
-        }))
-        : [];
-
-    // const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
-    //     ? loanTypeIdDrop.map((option) => ({
-    //         value: option?.attributedetails_name,
-    //         label: option?.attributedetails_name,
-    //     }))
-    //     : [];
-
-    const filteredOptionLoanType = Array.isArray(loanTypeIdDrop)
-        ? loanTypeIdDrop.map((option) => ({
-            value: option.Loan_Type_ID,
-            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
-        }))
-        : [];
-
-    const filteredOptionCurrency = Array.isArray(currencyDrop)
-        ? currencyDrop.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
-
-    const filteredOptionReqStatus = Array.isArray(reqStatusDrop)
-        ? reqStatusDrop.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
-
-    const handleChangeEmpId = (selectedEmpId) => {
-        setSelectedEmpId(selectedEmpId);
-        setEmpId(selectedEmpId ? selectedEmpId.value : "");
-    };
-
-    const handleChangeLoanType = (selectedLoanTypeId) => {
-        setSelectedLoanIypeId(selectedLoanTypeId);
-        setLoanTypeId(selectedLoanTypeId ? selectedLoanTypeId.value : "");
-    };
-
-    const handleChangeReqStatus = (selectedReqStatus) => {
-        setSelectedReqStatus(selectedReqStatus);
-        setReqStatus(selectedReqStatus ? selectedReqStatus.value : "");
-    };
-
-    const handleChangeCurrency = (selectedCurrency) => {
-        setSelectedCurrency(selectedCurrency);
-        setCurrencyCode(selectedCurrency ? selectedCurrency.value : "");
-    };
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setEmpIdDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setLoanTypeIdDropSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDropSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => setCurrencyDropSc(val))
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
-        ? empIdDropSc.map((option) => ({
-            value: option?.EmployeeId,
-            label: `${option?.EmployeeId}-${option?.First_Name}`,
-        }))
-        : [];
-
-    const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
-        ? loanTypeIdDropSc.map((option) => ({
-            value: option.Loan_Type_ID,
-            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
-        }))
-        : [];
-
-    const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
-        ? [
-            { value: "All", label: "All" },
-            ...reqStatusDropSc.map((option) => ({
-                value: option?.attributedetails_name,
-                label: option?.attributedetails_name,
-            })),
-        ]
-        : [{ value: "All", label: "All" }];
-
-    const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
-        ? currencyDropSc.map((option) => ({
-            value: option?.attributedetails_name,
-            label: option?.attributedetails_name,
-        }))
-        : [];
-
-    const handleChangeEmpIdSc = (selectedEmpIdSc) => {
-        setSelectedEmpIdSc(selectedEmpIdSc);
-        setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
-    };
-
-    const handleChangeLoanTypeSc = (selectedLoanTypeIdSc) => {
-        setSelectedLoanIypeIdSc(selectedLoanTypeIdSc);
-        setLoanTypeIdSc(selectedLoanTypeIdSc ? selectedLoanTypeIdSc.value : "");
-    };
-
-    const handleChangeReqStatusSc = (selectedReqStatusSc) => {
-        setSelectedReqStatusSc(selectedReqStatusSc);
-        setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
-    };
-
-    const handleChangeCurrencySc = (selectedCurrencySc) => {
-        setSelectedCurrencySc(selectedCurrencySc);
-        setCurrencyCodeSc(selectedCurrencySc ? selectedCurrencySc.value : "");
-    };
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const emp = val.map((option) => ({
-                    value: option.EmployeeId,
-                    label: `${option.EmployeeId} - ${option.First_Name}`,
-                }));
-                setEmpIdDropGrid(emp);
-            })
-            .catch((error) => console.error("Error fetching data:", error));
-    }, []);
-
-    useEffect(() => {
-      const Company_Code = sessionStorage.getItem('selectedCompanyCode');
-    
-      fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Company_Code })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const loanTypeOptions = data.map((option) => ({
-            value: option.Loan_Type_ID,           // adjust based on your DB column
-            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
-          }));
-      
-          setLoanTypeIdDropGrid(loanTypeOptions);
-        })
-        .catch((error) => console.error('Error fetching loan types:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const reqStatus = val.map(option => option.attributedetails_name);
-                setReqStatusDropGrid(reqStatus);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const currency = val.map(option => option.attributedetails_name);
-                setCurrencyDropGrid(currency);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    const searchClearInputFields = () => {
-        setLoanReqIdSc("");
-        setReqNumberSc("");
-        setEmpIdSc("");
-        setSelectedEmpIdSc("");
-        setLoanTypeIdSc("");
-        setSelectedLoanIypeIdSc("");
-        setLoanAmountSc("");
-        setInterestRateSc("");
-        setRepayMonthSc("");
-        setMonthlyInstallmentSc("");
-        setCurrencyCodeSc("");
-        setPurposeSc("");
-        setReqStatusSc("");
-        setSelectedReqStatusSc("");
-        setRepaymentDateSc("");
-        setSelectedCurrencySc("");
-        setSelectedCurrency("");
-    };
-
-    const columnDefs = [
-        {
-            headerName: "Actions",
-            field: "actions",
-            cellRenderer: (params) => {
-                const cellWidth = params.column.getActualWidth();
-                const isWideEnough = cellWidth > 20;
-                const showIcons = isWideEnough;
-
-                return (
-                    <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
-                        {showIcons && (
-                            <>
-                                <span
-                                    className="icon mx-2"
-                                    onClick={() => handleUpdate(params.data, params.node.data)}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Update"
-                                >
-                                    <i className="fa-regular fa-floppy-disk"></i>
-                                </span>
-
-                                <span
-                                    className="icon mx-2"
-                                    onClick={() => handleDelete(params.data)}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Delete"
-                                >
-                                    <i className="fa-solid fa-trash"></i>
-                                </span>
-                            </>
-                        )}
-                    </div>
-                );
-            },
-        },
-
-        {
-            headerName: "Loan Request ID",
-            field: "loan_request_id",
-            editable: false
-        },
-        {
-            headerName: "Employee ID",
-            field: "employee_id",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: empIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = empIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
-            },
-        },
-        {
-            headerName: "Request Number",
-            field: "request_number",
-            editable: true
-        },
-        {
-            headerName: "Loan Type ID",
-            field: "loan_type_id",
-            editable: true,
-            cellStyle: { textAlign: "left" },
-            cellEditor: "agSelectCellEditor",
-            // cellEditorParams: {
-            //     values: loanTypeIdDropGrid,
-            // },
-            cellEditorParams: {
-            values: loanTypeIdDropGrid.map(d => d.value),
-          },
-          valueFormatter: (params) => {
-            const dept = loanTypeIdDropGrid.find(d => d.value === params.value);
-            return dept ? dept.label : params.value;
+    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-        },
-        {
-            headerName: "Loan Amount",
-            field: "loan_amount",
-            editable: true
-        },
-        {
-            headerName: "Interest Rate",
-            field: "interest_rate",
-            editable: true
-        },
-        {
-            headerName: "Repayment Months",
-            field: "repayment_months",
-            editable: true
-        },
-        {
-            headerName: "Monthly Installment",
-            field: "monthly_installment",
-            editable: true
-        },
-        {
-            headerName: "Currency Code",
-            field: "currency_code",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: currencyDropGrid,
-            },
-        },
-        {
-            headerName: "Purpose",
-            field: "purpose",
-            editable: true
-        },
-        {
-            headerName: "Request Status",
-            field: "request_status",
-            editable: false,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: reqStatusDropGrid,
-            },
-        },
-        {
-            headerName: "Repayment Date",
-            field: "repayment_date",
-            editable: true,
-        },
-        {
-            headerName: "Keyfield",
-            field: "keyfield",
-            editable: true,
-            hide: true
-        }
-    ]
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const loanTypeOptions = data.map((option) => ({
+          value: option.Loan_Type_ID, // adjust based on your DB column
+          label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
+        }));
 
-    const gridOptions = {
-        pagination: true,
-        paginationPageSize: 10,
-    };
+        setLoanTypeIdDropGrid(loanTypeOptions);
+      })
+      .catch((error) => console.error("Error fetching loan types:", error));
+  }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const reqStatus = val.map((option) => option.attributedetails_name);
+        setReqStatusDropGrid(reqStatus);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-    const handleSearch = async () => {
-        setLoading(true);
-        try {
-            const body = {
-                loan_request_id: loanReqIdSc,
-                request_number: reqNumberSc,
-                employee_id: empIdSc,
-                loan_type_id: loanTypeIdSc,
-                loan_amount: loanAmountSc ? loanAmountSc : 0,
-                interest_rate: interestRateSc ? interestRateSc : 0,
-                repayment_months: repayMonthSc,
-                monthly_installment: monthlyInstallmentSc ? monthlyInstallmentSc : 0,
-                currency_code: currencyCodeSc,
-                purpose: purposeSc,
-                request_status: reqStatusSc,
-                repayment_date: repaymentDateSc,
-                company_code: sessionStorage.getItem('selectedCompanyCode'),
-            };
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map((option) => option.attributedetails_name);
+        setCurrencyDropGrid(currency);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-            const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
+  const searchClearInputFields = () => {
+    setReqIdSc("");
+    setReqNumberSc("");
+    setEmpIdSc("");
+    setSelectedEmpIdSc("");
+    setLoanTypeIdSc("");
+    setSelectedLoanIypeIdSc("");
+    setLoanAmountSc("");
+    setInterestRateSc("");
+    setRepayMonthSc("");
+    setMonthlyInstallmentSc("");
+    setCurrencyCodeSc("");
+    setPurposeSc("");
+    setReqStatusSc("");
+    setSelectedReqStatusSc("");
+    setRepaymentDateSc("");
+    setTotalItemsSc("");
+    setPendingItemsSc("");
+    setApprovedItemsSc("");
+  };
 
-            if (response.ok) {
-                const fetchedData = await response.json();
-                setRowData(fetchedData);
-            } else if (response.status === 404) {
-                console.log("Data Not found");
-                toast.warning("Data Not found");
-                setRowData([]);
-            } else {
-                const errorResponse = await response.json();
-                toast.warning(errorResponse.message || "Failed to insert sales data");
-                console.error(errorResponse.details || errorResponse.message);
-                setRowData([]);
-            }
-        } catch (error) {
-            console.error("Error fetching search data:", error);
-            toast.error("Error fetching search data:", error);
-            setRowData([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const columnDefs = [
+    {
+      headerName: "Request ID",
+      field: "info_request_id",
+      sortable: true,
+      filter: true,
+      width: 130,
+      checkboxSelection: true,
+    },
+    {
+      headerName: "Employee ID",
+      field: "EmployeeId",
+      sortable: true,
+      filter: true,
+      width: 140,
+    },
+    {
+      headerName: "Purpose",
+      field: "purpose",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "Request Status",
+      field: "request_status",
+      editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: reqStatusDropGrid,
+      },
+    },
+    {
+      headerName: "Total Items",
+      field: "TotalItems",
+      sortable: true,
+      filter: true,
+      width: 140,
+    },
+    {
+      headerName: "Pending Items",
+      field: "PendingItems",
+      sortable: true,
+      filter: true,
+      width: 150,
+    },
+    {
+      headerName: "Approved Items",
+      field: "ApprovedItems",
+      sortable: true,
+      filter: true,
+      width: 160,
+    },
+    {
+      headerName: "Company Code",
+      field: "company_code",
+      sortable: true,
+      filter: true,
+      width: 140,
+    },
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      sortable: true,
+      filter: true,
+      width: 150,
+      hide: true,
+      valueFormatter: (params) => {
+        if (!params.value) return "";
+        return new Date(params.value).toLocaleDateString("en-GB");
+      },
+    },
+  ];
 
-    const reloadGridData = () => {
+  const gridOptions = {
+    pagination: true,
+    paginationPageSize: 10,
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const body = {
+        info_request_id: ReqIdSc,
+        EmployeeId: empIdSc,
+        purpose: purposeSc,
+        request_status: reqStatusSc,
+        TotalItems: totalItemsSc,
+        PendingItems: pendingItemsSc,
+        ApprovedItems: approvedItemsSc,
+        created_by: sessionStorage.getItem("selectedUserCode"),
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/PendingAssetRequests_SC`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        const fetchedData = await response.json();
+        setRowData(fetchedData);
+      } else if (response.status === 404) {
+        toast.warning("Data Not found");
         setRowData([]);
-        searchClearInputFields();
+      } else {
+        const errorResponse = await response.json();
+        toast.error(errorResponse.message || "Something went wrong");
+        setRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching asset search data:", error);
+      toast.error("Error fetching asset search data");
+      setRowData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const reloadGridData = () => {
+    setRowData([]);
+    searchClearInputFields();
+  };
+
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
+  };
+
+  const getSafeData = () => {
+    if (!rowData || rowData.length === 0) {
+      return [
+        {
+          info_request_id: "",
+          EmployeeId: "",
+          purpose: "No Data Found",
+          request_status: "",
+          TotalItems: "",
+          PendingItems: "",
+          ApprovedItems: "",
+          company_code: "",
+          created_date: "",
+        },
+      ];
+    }
+    return rowData;
+  };
+
+  const generateReport = () => {
+    const dataSource = getSafeData();
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const reportWindow = window.open("", "_blank");
+
+    reportWindow.document.write(`
+    <html>
+    <head>
+    <title>Pending Asset Requests</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        padding: 20px;
+        background-color: #f4f6f9;
+        color: ${fontColor};
+      }
+      .header {
+        background: ${tableHeaderBg};
+        padding: 15px;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+      }
+      th {
+        background-color: ${tableHeaderBg};
+        color: white;
+        padding: 10px;
+      }
+      td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+      tr:nth-child(even) {
+        background-color: ${rowAltColor};
+      }
+      tr:hover {
+        background-color: ${hoverColor};
+      }
+      .print-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: ${headerGradientStart};
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      @media print {
+        .print-btn { display: none; }
+      }
+    </style>
+    </head>
+    <body>
+
+    <div class="header">
+      <h2>Pending Asset Requests Report</h2>
+      <p>Total Records: ${rowData.length || 0}</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Request ID</th>
+          <th>Employee ID</th>
+          <th>Purpose</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Pending</th>
+          <th>Approved</th>
+          <th>Company</th>
+          <th>Created Date</th>
+        </tr>
+      </thead>
+      <tbody>
+  `);
+
+    dataSource.forEach((row) => {
+      reportWindow.document.write(`
+      <tr>
+        <td>${row.info_request_id || ""}</td>
+        <td>${row.EmployeeId || ""}</td>
+        <td>${row.purpose || ""}</td>
+        <td>${row.request_status || ""}</td>
+        <td>${row.TotalItems || ""}</td>
+        <td>${row.PendingItems || ""}</td>
+        <td>${row.ApprovedItems || ""}</td>
+        <td>${row.company_code || ""}</td>
+        <td>${row.created_date || ""}</td>
+      </tr>
+    `);
+    });
+
+    reportWindow.document.write(`
+      </tbody>
+    </table>
+
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+
+    </body>
+    </html>
+  `);
+
+    reportWindow.document.close();
+  };
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+  };
+
+  const exportToPDF = () => {
+    const dataSource = getSafeData();
+
+    const headerBg = hexToRgb(getCSSVariable("--but"));
+    const tableHeader = hexToRgb(getCSSVariable("--ag-header"));
+    const fontColor = hexToRgb(getCSSVariable("--font-color"));
+    const altRow = hexToRgb(getCSSVariable("--ag-row"));
+
+    const headers = [
+      [
+        "Request ID",
+        "Employee ID",
+        "Purpose",
+        "Status",
+        "Total",
+        "Pending",
+        "Approved",
+        "Company",
+        "Created Date",
+      ],
+    ];
+
+    const body = dataSource.map((row) => [
+      row.info_request_id || "",
+      row.EmployeeId || "",
+      row.purpose || "",
+      row.request_status || "",
+      row.TotalItems || "",
+      row.PendingItems || "",
+      row.ApprovedItems || "",
+      row.company_code || "",
+      row.created_date || "",
+    ]);
+
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFillColor(...headerBg);
+    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+
+    doc.setTextColor(255);
+    doc.setFontSize(18);
+    doc.text("Pending Asset Requests Report", pageWidth / 2, 40, {
+      align: "center",
+    });
+
+    doc.setFontSize(10);
+    doc.text(
+      `Generated: ${new Date().toLocaleDateString()}`,
+      pageWidth / 2,
+      60,
+      { align: "center" },
+    );
+
+    autoTable(doc, {
+      startY: 90,
+      head: headers,
+      body: body,
+      styles: { fontSize: 9, textColor: fontColor },
+      headStyles: { fillColor: tableHeader, textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: altRow },
+    });
+
+    doc.save("Pending_Asset_Requests.pdf");
+  };
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Request ID": row.info_request_id || "",
+      "Employee ID": row.EmployeeId || "",
+      Purpose: row.purpose || "",
+      "Request Status": row.request_status || "",
+      "Total Items": row.TotalItems || 0,
+      "Pending Items": row.PendingItems || 0,
+      "Approved Items": row.ApprovedItems || 0,
+      "Company Code": row.company_code || "",
+      "Created Date": row.created_date
+        ? new Date(row.created_date).toLocaleDateString("en-GB")
+        : "",
+    }));
+  };
+  const handleExportToExcel = () => {
+    const dataSource = getSafeData();
+
+    const screenName = "Pending Asset Requests Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    const transformedData = transformRowData(dataSource);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
     };
 
-    const handleUpdate = async (rowData) => {
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
+    ];
 
-        showConfirmationToast(
-            "Are you sure you want to update the selected loan request data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+    const totalColumns = Object.keys(transformedData[0]).length;
 
-                    const dataToSend = {
-                        loan_requestsData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+      if (!cell) continue;
 
-                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopUpdate`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
 
-                    if (response.ok) {
-                        toast.success("loan request updated successfully", {
-                            onClose: () => handleSearch(),
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Update failed");
-                    }
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Error updating data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Update cancelled"),
-        );
-    };
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        if (!cell) continue;
 
-    const handleDelete = async (rowData) => {
-
-        showConfirmationToast(
-            "Are you sure you want to delete the selected loan request data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-                    const dataToSend = {
-                        loan_requestsData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                },
-                            ],
-                    };
-
-                    const response = await fetch(`${config.apiBaseUrl}/loan_requestsLoopDelete`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "company_code": company_code
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("loan request deleted successfully", {
-                            onClose: () => handleSearch(), // refresh data
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Delete failed");
-                    }
-                } catch (error) {
-                    console.error("Error deleting loan request rows:", error);
-                    toast.error("Error deleting loan request data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Delete cancelled"),
-        );
-    };
-
-    const getCSSVariable = (variableName) => {
-        return getComputedStyle(document.documentElement)
-            .getPropertyValue(variableName)
-            .trim();
-    };
-
-    const transformRowData = (data) => {
-        return data.map((row) => {
-            const empObj = empIdDropGrid.find(
-                (d) => d.value === row.employee_id
-            );
-
-            const empName = empObj
-                ? empObj.label.split(" - ").slice(1).join(" - ")
-                : "";
-
-            return {
-                "Loan Request ID": row.loan_request_id || "",
-                "Employee ID": `${row.employee_id} - ${empName}` || "",
-                "Request Number": row.request_number || "",
-                "Loan Type ID": row.loan_type_id || "",
-                "Loan Amount": row.loan_amount || "",
-                "Interest Rate": row.interest_rate || "",
-                "Repayment Months": row.repayment_months || "",
-                "Monthly Installment": row.monthly_installment || "",
-                "Currency Code": row.currency_code || "",
-                "Purpose": row.purpose || "",
-                "Request Status": row.request_status || "",
-                "Repayment Date": row.repayment_date || "",
-            };
-        });
-    };
-
-    const handleExportToExcel = () => {
-        if (!rowData || rowData.length === 0) {
-            toast.warning("There is no data to export.");
-            return;
-        }
-
-        const screenName = "Loan Request Search Report";
-        const company = sessionStorage.getItem("selectedCompanyName") || "";
-
-        /* ================= THEME COLORS ================= */
-
-        const titleBg = getCSSVariable("--but").replace("#", "");
-        const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
-        const fontColor = getCSSVariable("--font-color").replace("#", "");
-        const altRowBg = getCSSVariable("--ag-row").replace("#", "");
-
-        /* ================= HEADER ================= */
-
-        const headerData = [
-            [screenName],
-            company ? [`Company Name: ${company}`] : [],
-            [],
-        ];
-
-        const worksheet = XLSX.utils.aoa_to_sheet(headerData);
-
-        /* ================= TABLE DATA ================= */
-
-        const transformedData = transformRowData(rowData);
-
-        XLSX.utils.sheet_add_json(worksheet, transformedData, {
-            origin: `A${headerData.length + 1}`,
-        });
-
-        const range = XLSX.utils.decode_range(worksheet["!ref"]);
-        const headerRowIndex = headerData.length;
-
-        /* ================= TITLE STYLE ================= */
-
-        worksheet["A1"].s = {
-            font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: titleBg } },
-            alignment: { horizontal: "center", vertical: "center" },
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
         };
+      }
+    }
 
-        worksheet["!merges"] = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
-        ];
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
-        /* ================= TABLE HEADER STYLE ================= */
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Asset Requests");
 
-        const totalColumns = Object.keys(transformedData[0]).length;
+    XLSX.writeFile(workbook, "Pending_Asset_Requests_Report.xlsx");
+  };
+  return (
+    <div class="container-fluid Topnav-screen ">
+      {loading && <LoadingScreen />}
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Pending Asset Requests Report</h1>
+          <div className="action-wrapper desktop-actions">
+            {["all permission", "view"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i className="fa-solid fa-print"></i>
+              </div>
+            )}
+            {["all permission", "PDF"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={exportToPDF}>
+                <span className="tooltip">Pdf</span>
+                <i className="fa-solid fa-file-pdf"></i>
+              </div>
+            )}
+            {["all permission", "Excel"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
+              <div className="action-icon print" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+            )}
+          </div>
 
-        for (let C = 0; C < totalColumns; C++) {
-            const cell =
-                worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
+              <i className="fa-solid fa-list"></i>
+            </button>
 
-            if (!cell) continue;
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {["all permission", "view"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
+                <li className="dropdown-item" onClick={generateReport}>
+                  <i className="fa-solid fa-print text-dark fs-4"></i>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
+                <li className="dropdown-item" onClick={exportToPDF}>
+                  <i className="fa-solid fa-file-pdf text-dark"></i>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
+                <li className="dropdown-item" onClick={handleExportToExcel}>
+                  <i class="fa-solid fa-file-excel text-success"></i>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
 
-            cell.s = {
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: tableHeaderBg } },
-                alignment: { horizontal: "center" },
-                border: {
-                    top: { style: "thin" },
-                    bottom: { style: "thin" },
-                    left: { style: "thin" },
-                    right: { style: "thin" },
-                },
-            };
-        }
-
-        /* ================= TABLE BODY STYLE ================= */
-
-        for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
-            for (let C = 0; C < totalColumns; C++) {
-                const cell =
-                    worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
-
-                if (!cell) continue;
-
-                cell.s = {
-                    font: { color: { rgb: fontColor } },
-                    fill:
-                        R % 2 === 0
-                            ? { fgColor: { rgb: altRowBg } }
-                            : undefined,
-                    border: {
-                        top: { style: "thin" },
-                        bottom: { style: "thin" },
-                        left: { style: "thin" },
-                        right: { style: "thin" },
-                    },
-                };
-            }
-        }
-
-        /* ================= COLUMN WIDTH ================= */
-
-        worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
-
-        /* ================= EXPORT ================= */
-
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Request");
-
-        XLSX.writeFile(workbook, "Loan_Request_Search_Report.xlsx");
-    };
-
-    return (
-        <div class="container-fluid Topnav-screen ">
-            {loading && <LoadingScreen />}
-            <ToastContainer position="top-right" className="toast-design" theme="colored" />
-            <div className="shadow-lg p-1 bg-light rounded main-header-box">
-                <div className="header-flex">
-                    <h1 className="page-title">Pending Asset Requests Report</h1>
-                </div>
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <div className="row g-3">
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                maxLength={15}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                required
+                title="Please enter the Request ID"
+                autoComplete="off"
+                value={ReqIdSc}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setReqIdSc(value);
+                }}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                {" "}
+                Request ID
+              </label>
             </div>
+          </div>
 
-            <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-                <div className="row g-3">
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedEmpIdSc ? "has-value" : ""} 
+              ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+              title="Please enter the Employee ID"
+            >
+              <Select
+                id="department"
+                placeholder=" "
+                onFocus={() => setIsSelectedEmpIdSc(true)}
+                onBlur={() => setIsSelectedEmpIdSc(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedEmpIdSc}
+                onChange={handleChangeEmpIdSc}
+                options={filteredOptionEmpIdSc}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Employee ID
+              </label>
+            </div>
+          </div>
 
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required
-                                title="Please enter the Loan Request ID"
-                                autoComplete="off"
-                                value={loanReqIdSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setLoanReqIdSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Loan Request ID</label>
-                        </div>
-                    </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required
+                title="Please Enter the Purpose"
+                autoComplete="off"
+                value={purposeSc}
+                maxLength={100}
+                onChange={(e) => setPurposeSc(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Purpose
+              </label>
+            </div>
+          </div>
 
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedEmpIdSc ? "has-value" : ""} 
-                            ${isSelectedEmpIdSc ? "is-focused" : ""}`}
-                            title="Please enter the Employee ID"
-                        >
-                            <Select
-                                id="department"
-                                placeholder=" "
-                                onFocus={() => setIsSelectedEmpIdSc(true)}
-                                onBlur={() => setIsSelectedEmpIdSc(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                                type="text"
-                                value={selectedEmpIdSc}
-                                onChange={handleChangeEmpIdSc}
-                                options={filteredOptionEmpIdSc}
-                            />
-                            <label htmlFor="selecteddpt" className={`floating-label`}>
-                                Employee ID
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={15}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Request Number"
-                                autoComplete="off"
-                                value={reqNumberSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setReqNumberSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Request Number</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedLoanTypeIdSc ? "has-value" : ""} 
-                            ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
-                            title="Please enter the Loan Type ID"
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedLoanTypeSc(true)}
-                                onBlur={() => setIsSelectedLoanTypeSc(false)}
-                                isClearable
-                                value={selectedLoanTypeIdSc}
-                                onChange={handleChangeLoanTypeSc}
-                                options={filteredOptionLoanTypeSc}
-                            />
-                            <label for="sname" className={`floating-label`}>Loan Type ID</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Loan Amount"
-                                autoComplete="off"
-                                value={loanAmountSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setLoanAmountSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Loan Amount</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={5}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Interest Rate"
-                                autoComplete="off"
-                                value={interestRateSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9.]/g, "");
-                                    setInterestRateSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Interest Rate</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={5}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Repayment Months"
-                                autoComplete="off"
-                                value={repayMonthSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setRepayMonthSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Repayment Months</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={10}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Monthly Installment"
-                                autoComplete="off"
-                                value={monthlyInstallmentSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setMonthlyInstallmentSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Monthly Installment</label>
-                        </div>
-                    </div>
-
-                    {/* <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Currency Code"
-                                autoComplete="off"
-                                maxLength={3}
-                                value={currencyCodeSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
-                                    setCurrencyCodeSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Currency Code</label>
-                        </div>
-                    </div> */}
-
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedCurrencySc ? "has-value" : ""} 
-                            ${isSelectedCurrencySc ? "is-focused" : ""}`}
-                            title="Please select the Currency Code"
-                        >
-                            <Select
-                                id="country"
-                                type="text"
-                                classNamePrefix="react-select"
-                                placeholder=""
-                                onFocus={() => setIsSelectedCurrencySc(true)}
-                                onBlur={() => setIsSelectedCurrencySc(false)}
-                                isClearable
-                                value={selectedCurrencySc}
-                                onChange={handleChangeCurrencySc}
-                                options={filteredOptionCurrencySc}
-                            />
-                            <label for="sname" className={`floating-label`}>Currency Code</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Purpose"
-                                autoComplete="off"
-                                value={purposeSc}
-                                maxLength={100}
-                                onChange={(e) => setPurposeSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
+          {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedReqStatusSc ? "has-value" : ""} 
@@ -1128,79 +832,105 @@ function PendingAssReqRep({ }) {
                             />
                             <label for="sname" className={`floating-label`}>Request Status</label>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                maxLength={2}
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                required title="Please Enter the Repayment Date"
-                                autoComplete="off"
-                                value={repaymentDateSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-
-                                    if (value === "") {
-                                        setRepaymentDateSc("");
-                                        return;
-                                    }
-
-                                    const num = parseInt(value, 10);
-
-                                    if (num === 0 || num > 31) {
-                                        toast.warning("Please enter a date between 1 and 31");
-                                        return;
-                                    }
-
-                                    setRepaymentDateSc(value);
-                                }}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Repayment Date</label>
-                        </div>
-                    </div>
-
-                    {/* Search + Reload Buttons */}
-                    <div className="col-12">
-                        <div className="search-btn-wrapper">
-                            <div className="icon-btn search" onClick={handleSearch}>
-                                <span className="tooltip">Search</span>
-                                <i className="fa-solid fa-magnifying-glass"></i>
-                            </div>
-
-                            <div className="icon-btn reload" onClick={reloadGridData}>
-                                <span className="tooltip">Reload</span>
-                                <i className="fa-solid fa-rotate-right"></i>
-                            </div>
-
-                            <div className="icon-btn excel" onClick={handleExportToExcel}>
-                                <span className="tooltip">Excel</span>
-                                <i className="fa-solid fa-file-excel"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="Number"
+                placeholder=""
+                required
+                title="Please Enter the Total Items"
+                autoComplete="off"
+                value={totalItemsSc}
+                maxLength={100}
+                onChange={(e) => setTotalItemsSc(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Total Items
+              </label>
             </div>
+          </div>
 
-            <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-                <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                    <AgGridReact
-                        columnDefs={columnDefs}
-                        rowData={rowData}
-                        pagination={true}
-                        paginationAutoPageSize={true}
-                        gridOptions={gridOptions}
-                    />
-                </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="Number"
+                placeholder=""
+                required
+                title="Please Enter the Pending Items"
+                autoComplete="off"
+                value={pendingItemsSc}
+                maxLength={100}
+                onChange={(e) => setPendingItemsSc(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Pending Items
+              </label>
             </div>
+          </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="Number"
+                placeholder=""
+                required
+                title="Please Enter the Approved Items"
+                autoComplete="off"
+                value={approvedItemsSc}
+                maxLength={100}
+                onChange={(e) => setApprovedItemsSc(e.target.value)}
+              />
+              <label for="sname" className={`exp-form-labels`}>
+                Approved Items
+              </label>
+            </div>
+          </div>
 
+          {/* Search + Reload Buttons */}
+          <div className="col-12">
+            <div className="search-btn-wrapper">
+              <div className="icon-btn search" onClick={handleSearch}>
+                <span className="tooltip">Search</span>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <div className="icon-btn reload" onClick={reloadGridData}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-rotate-right"></i>
+              </div>
+
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
+              </div>
+            </div>
+          </div>
         </div>
-    );
+      </div>
+
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            columnDefs={columnDefs}
+            rowData={rowData}
+            pagination={true}
+            paginationAutoPageSize={true}
+            gridOptions={gridOptions}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
 export default PendingAssReqRep;
