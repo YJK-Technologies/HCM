@@ -158,7 +158,7 @@ function HiringDecisionReport() {
           body: JSON.stringify({
             candidate_name: canditateName,
             country_code: countryCode,
-            Final_Status: status,
+            final_status: status,
             job_title: jobTitle,
             department_id: departmentId,
             decided_by: decidedBy,
