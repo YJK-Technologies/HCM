@@ -47375,7 +47375,7 @@ const compOffRequestInsert = async (req, res) => {
       .input("ResPerson", sql.NVarChar, ResPerson)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("CreatedBy", sql.NVarChar, CreatedBy)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
       '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@CreatedBy,'','','','',''`);
 
     res.status(200).json({ success: true, message: "Employee comp off inserted successfully" });
@@ -47394,7 +47394,7 @@ const DashboardCompOffRequest = async (req, res) => {
       .input("mode", sql.NVarChar, "CLR")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47420,7 +47420,7 @@ const DashboardCompOffApproval = async (req, res) => {
       .input("ApprovedBy", sql.NVarChar, ApprovedBy)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("Keyfield", sql.NVarChar, Keyfield)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,@HolidayDate,'','','',
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',
       @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','','','',''`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
@@ -47439,7 +47439,7 @@ const getCompOffDropdown = async (req, res) => {
       .input("mode", sql.NVarChar, "CO")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,'','','','','',''`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -47929,7 +47929,7 @@ const compOffSearchCriteria = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','','','',@CompanyCode,'','','','',@FromDate,@ToDate`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','','','',@CompanyCode,'','','','',@FromDate,@ToDate`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47957,7 +47957,7 @@ const compOffRequestReport = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Test @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,'','','','',@FromDate,@ToDate`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,'','','','',@FromDate,@ToDate`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
