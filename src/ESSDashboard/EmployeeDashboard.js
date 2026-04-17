@@ -1831,7 +1831,17 @@ const Dashboard = (payslip) => {
                       <div className="joinee-accent-circle-bottom"></div>
 
                       <div className="profile-image-wrapper">
-                        <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                        {joinee.Photos ? (
+                          <img src={joinee.Photos} className="joinee-img-modern" alt="profile" />
+                        ) : (
+                          <div className="joinee-img-modern initials-avatar">
+                            {joinee.EmployeeName.split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </div>
+                        )}
                         <div className="joinee-icon-badge">✨</div>
                       </div>
 
@@ -1880,7 +1890,23 @@ const Dashboard = (payslip) => {
                       <div className="birthday-accent-circle-bottom"></div>
 
                       <div className="profile-image-wrapper">
-                        <img src={person.Photos} className="birthday-img-modern" alt="profile" />
+                        {person.Photos ? (
+                          <img
+                            src={person.Photos}
+                            className="birthday-img-modern"
+                            alt="profile"
+                          />
+                        ) : (
+                          <div className="birthday-img-modern initials-avatar">
+                            {person.EmployeeName ?
+                              person.EmployeeName.split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()
+                                .slice(0, 2)
+                              : "U"}
+                          </div>
+                        )}
                         <div className="birthday-icon-badge">🎂</div>
                       </div>
 
@@ -1900,15 +1926,17 @@ const Dashboard = (payslip) => {
               )}
             </div>
 
-            <div className="birthday-nav-controls-bottom">
-              <button className="nav-btn" onClick={handlePrev}>❮</button>
-              <div className="birthday-nav-dots">
-                {upcomingBirthdays.map((_, i) => (
-                  <span key={i} className={`dot ${currentIndex === i ? 'active' : ''}`}></span>
-                ))}
+            {upcomingBirthdays.length > 1 && (
+              <div className="birthday-nav-controls-bottom">
+                <button className="nav-btn" onClick={handlePrev}>❮</button>
+                <div className="birthday-nav-dots">
+                  {upcomingBirthdays.map((_, i) => (
+                    <span key={i} className={`dot ${currentIndex === i ? 'active' : ''}`}></span>
+                  ))}
+                </div>
+                <button className="nav-btn" onClick={handleNext}>❯</button>
               </div>
-              <button className="nav-btn" onClick={handleNext}>❯</button>
-            </div>
+            )}
           </div>
         </div>
 
