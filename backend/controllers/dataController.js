@@ -47693,7 +47693,7 @@ const UpdatePayrollSetting = async (req, res) => {
 
 //code added by Sakthi 13-04-2026
 const DeletePayrollSetting = async (req, res) => {
-  const { company_code, keyfield } = req.body;
+  const { company_code, keyfield, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47702,7 +47702,8 @@ const DeletePayrollSetting = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Payroll_Setting @mode, 0, '', 0, 0, 0, '', '', '', '', @company_code, @keyfield, '' , '', '', '';
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_Payroll_Setting @mode, 0, '', 0, 0, 0, '', '', '', '', @company_code, @keyfield, '' , '', @modified_by, '';
 `);
 
     res.status(200).json("Payroll deleted successfully");
@@ -47878,7 +47879,7 @@ const PendingAssetRequests_SC = async (req, res) => {
       .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("modified_date", sql.DateTime, modified_date)
-      .query(` EXEC sp_Asset_Report @mode, @info_request_id, @company_code, @EmployeeId, @keyfield, @purpose, @request_status, @TotalItems, @PendingItems, @ApprovedItems,'', '', '', '', '', 0, '', '', '', 0, 0, 0, 0, 0, @created_by, @created_date, @modified_by, @modified_date `);
+      .query(` EXEC sp_Asset_Report @mode, @info_request_id, @company_code, @EmployeeId, @keyfield, @purpose, @request_status, @TotalItems, @PendingItems, @ApprovedItems,'', '', '', '', '', 0, '', '', '', 0, 0, 0, 0, 0, '', '', @created_by, @created_date, @modified_by, @modified_date `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48015,6 +48016,134 @@ const getTransportMode = async (req, res) => {
   }
 };
 //code ended by Diesh Gokul on 15-04-26
+
+//code added by sakthi on 17-04-26
+const AssetLifecycleReport_AS = async (req, res) => {
+  try {
+    const {
+      company_code,
+      AssetID,
+      AssetName,
+      AssetCategory,
+      AssetStatus,
+      EmployeeID,
+      AllocationStatus,
+      PurchaseDate,
+      PurchaseCost,
+      AllocationDate,
+      ExpectedReturnDate,
+      ActualReturnDate,
+      TotalAllocations,
+      FirstAllocationDate,
+      LastReturnDate,
+      TotalDaysUsed,
+    } = req.body;
+
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "AS")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeID || "")
+      .input("AssetName", sql.NVarChar, AssetName || "")
+      .input("AssetCategory", sql.NVarChar, AssetCategory || "")
+      .input("AssetStatus", sql.NVarChar, AssetStatus || "")
+      .input("AllocationStatus", sql.NVarChar, AllocationStatus || "")
+      .input("AssetID", sql.BigInt, AssetID || 0)
+      .input("PurchaseDate", sql.Date, PurchaseDate || null)
+      .input("PurchaseCost", sql.Decimal(18, 2), PurchaseCost || 0)
+      .input("AllocationDate", sql.DateTime, AllocationDate || null)
+      .input("ExpectedReturnDate", sql.DateTime, ExpectedReturnDate || null)
+      .input("ActualReturnDate", sql.DateTime, ActualReturnDate || null)
+      .input("TotalAllocations", sql.Int, TotalAllocations || 0)
+      .input("FirstAllocationDate", sql.Date, FirstAllocationDate || null)
+      .input("LastReturnDate", sql.Date, LastReturnDate || null)
+      .input("TotalDaysUsed", sql.Int, TotalDaysUsed || 0)
+      .query(` EXEC sp_Asset_Report @mode, 0, @company_code, @EmployeeId, '', '', '', 0, 0, 0, @AssetName, @AssetCategory, @AssetStatus, 
+        @AllocationStatus, @PurchaseDate, @PurchaseCost, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AssetID, 
+        @TotalAllocations, @FirstAllocationDate, @LastReturnDate, @TotalDaysUsed, '', '','', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error in AssetLifecycleReport_AS:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi on 17-04-26
+
+//code added by Sakthi on 17-04-26
+const EmployeeAssetReport_EAR = async (req, res) => {
+  try {
+    const { company_code, EmployeeID, AssetID, AssetName, AssetCategory, SerialNumber, AllocationDate, ExpectedReturnDate, AllocationStatus, LastAllocationDate } = req.body;
+
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "EAR")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("EmployeeId", sql.NVarChar, EmployeeID || "")
+      .input("AssetName", sql.NVarChar, AssetName || "")
+      .input("AssetCategory", sql.NVarChar, AssetCategory || "")
+      .input("AllocationStatus", sql.NVarChar, AllocationStatus || "")
+      .input("AssetID", sql.BigInt, AssetID || 0)
+      .input("AllocationDate", sql.DateTime, AllocationDate || null)
+      .input("ExpectedReturnDate", sql.DateTime, ExpectedReturnDate || null)
+      .input("SerialNumber", sql.NVarChar, SerialNumber || "")
+      .input("LastAllocationDate", sql.Date, LastAllocationDate || null)
+      .query(`EXEC sp_Asset_Report @mode, 0, @company_code, @EmployeeId, '', '', '', 0, 0, 0, @AssetName, @AssetCategory, 
+        '', @AllocationStatus, NULL, 0, @AllocationDate, @ExpectedReturnDate, NULL, @AssetID, 0, NULL, NULL, 0, @SerialNumber, @LastAllocationDate, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error in EmployeeAssetReport_EAR:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 17-04-26
+
+//Code added by pavun on 17-04-2026
+const GetAbsentReport = async (req, res) => {
+  const { FromDate, ToDate, EmployeeId, Department, Designation, CompanyCode } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "A")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Department", sql.NVarChar, Department)
+      .input("Designation", sql.NVarChar, Designation)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,@CompanyCode`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Disbursement Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//Code added by pavun on 17-04-2026
 
 module.exports = {
   login,
@@ -49390,6 +49519,9 @@ module.exports = {
   EmpCompOffList,
   compOffSearchCriteria,
   compOffRequestReport,
-  AssetIDDrop
+  AssetIDDrop,
+  AssetLifecycleReport_AS,
+  EmployeeAssetReport_EAR,
+  GetAbsentReport
 
 };

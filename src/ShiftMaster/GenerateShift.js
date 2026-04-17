@@ -315,7 +315,7 @@ function GenerateShift({ }) {
                                 value={fromDate}
                                 onChange={(e) => setFromDate(e.target.value)}
                             />
-                            <label htmlFor="SalaryDate" className={`${error && !fromDate ? 'text-danger' : ''}`}>From Date<span className="text-danger">*</span></label>
+                            <label htmlFor="SalaryDate" className={`exp-form-labels ${error && !fromDate ? 'text-danger' : ''}`}>From Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 
@@ -331,7 +331,7 @@ function GenerateShift({ }) {
                                 value={toDate}
                                 onChange={(e) => setToDate(e.target.value)}
                             />
-                            <label htmlFor="SalaryDate" className={`${error && !toDate ? 'text-danger' : ''}`}>To Date<span className="text-danger">*</span></label>
+                            <label htmlFor="SalaryDate" className={`exp-form-labels ${error && !toDate ? 'text-danger' : ''}`}>To Date<span className="text-danger">*</span></label>
                         </div>
                     </div>
 

@@ -51,6 +51,7 @@ function CandidateMaster() {
   const [selectedCV, setSelectedCV] = useState("");
   const [candidate_CV, setCandidate_CV] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
+  const [canditatenameGrid, setcanditatenameGrid] = useState([]);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState('');
@@ -100,6 +101,26 @@ function CandidateMaster() {
     value: option.candidate_name,
     label: `${option.candidate_id} - ${option.candidate_name}`
   }));
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/CanditateID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const CandidateOption = data.map((option) => ({
+          value: option.candidate_id,
+          label: `${option.candidate_id} - ${option.candidate_name}`,
+        }));
+        setcanditatenameGrid(CandidateOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -181,6 +202,10 @@ function CandidateMaster() {
   }, []);
 
   const handleSearch = async () => {
+    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+      toast.warning("Please select both Applied From and Applied To dates");
+      return;
+    }
     setLoading(true);
     try {
       const body = {
@@ -444,11 +469,26 @@ function CandidateMaster() {
       headerName: "Candidate ID",
       field: "candidate_id",
       editable: false,
+            cellEditorParams: {
+        values: canditatenameGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = canditatenameGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Candidate Name",
       field: "candidate_name",
-      editable: true,
+      editable: false,
+      hide: true,
+      cellEditorParams: {
+        values: canditatenameGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = canditatenameGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Email",
@@ -1099,7 +1139,7 @@ function CandidateMaster() {
                 options={filteredOptioncandidate_name}
               />
               <label htmlFor="selecteddpt" className={`floating-label`}>
-                Candiate Name
+                Candiate ID
               </label>
             </div>
           </div>

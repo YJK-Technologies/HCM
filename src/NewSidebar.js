@@ -58,7 +58,8 @@ import {
   MdFlightTakeoff,
   MdPayments,
   MdCalendarMonth,
-  MdOutlineAccountBalance
+  MdOutlineAccountBalance,
+  MdOutlineEventBusy
 } from "react-icons/md";
 import { 
   HiOutlineUserGroup
@@ -143,7 +144,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Settings": BsGear,
-  "Assets": BsBoxSeam,
+  "Assets Master": BsBoxSeam,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
@@ -181,6 +182,10 @@ export const leafIconMap = {
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
   "Shift Summary Report": MdOutlineSchedule,
+  "Employee Assets Report": BsPersonCheck,
+  "Pending Asset Requests Report": BsClockHistory,
+  "Asset Lifecycle Report": BsArrowRepeat,
+  "Absent Report": MdOutlineEventBusy
 };
 
 const menuData = [
@@ -304,6 +309,23 @@ const menuData = [
       },
     ],
   },
+    {
+    label: "Assets",
+    icon: BsBoxSeam,
+    isDropdown: true,
+    subMenus: [
+          { label: "Assets Master", path: "/Assets" },
+      {
+        label: "Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Assets Report", path: "/EmpAssetsReport" },
+          { label: "Pending Asset Requests Report", path: "/PendingAssReqRep" },
+          { label: "Asset Lifecycle Report", path: "/AssetLifecycleRep" },
+        ],
+      },          
+    ],
+  },
   {
     label: "Attendance",
     icon: TbClockCheck,
@@ -337,6 +359,7 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
+          { label: "Absent Report", path: "/AbsentReport" },
         ],
       },
         {
