@@ -48016,6 +48016,40 @@ const getTransportMode = async (req, res) => {
 };
 //code ended by Diesh Gokul on 15-04-26
 
+//Code added by pavun on 17-04-2026
+const GetAbsentReport = async (req, res) => {
+  const { FromDate, ToDate, EmployeeId, Department, Designation, CompanyCode } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "A")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Department", sql.NVarChar, Department)
+      .input("Designation", sql.NVarChar, Designation)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,@CompanyCode`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Disbursement Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//Code added by pavun on 17-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49390,6 +49424,7 @@ module.exports = {
   EmpCompOffList,
   compOffSearchCriteria,
   compOffRequestReport,
-  AssetIDDrop
+  AssetIDDrop,
+  GetAbsentReport
 
 };

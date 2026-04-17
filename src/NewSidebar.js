@@ -58,7 +58,8 @@ import {
   MdFlightTakeoff,
   MdPayments,
   MdCalendarMonth,
-  MdOutlineAccountBalance
+  MdOutlineAccountBalance,
+  MdOutlineEventBusy
 } from "react-icons/md";
 import { 
   HiOutlineUserGroup
@@ -181,6 +182,7 @@ export const leafIconMap = {
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
   "Shift Summary Report": MdOutlineSchedule,
+  "Absent Report": MdOutlineEventBusy
 };
 
 const menuData = [
@@ -337,6 +339,7 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
+          { label: "Absent Report", path: "/AbsentReport" },
         ],
       },
         {

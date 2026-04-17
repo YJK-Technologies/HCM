@@ -140,6 +140,7 @@ import PayrollSettingsAdd from './PayrollSettingsAdd.js';
 import PendingAssReqRep from './PendingAssReqRep.js';
 import CompOffRequest from './EmpRequests/CompOffRequest.js';
 import AssetLifecycleRep from './AssetLifecycleRep.js';
+import AbsentReport from './AttendanceReport/AbsentReport.js';
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -351,6 +352,7 @@ function Main() {
     { path: "/PendingAssReqRep", component: <PendingAssReqRep /> },
     { path: "/CompOffRequest", component: <CompOffRequest /> },
     { path: "/AssetLifecycleRep", component: <AssetLifecycleRep /> },
+    { path: "/AbsentReport", component: <AbsentReport /> },
 
   
   ];
