@@ -1405,6 +1405,7 @@ router.post("/compOffSearchCriteria",dataController.compOffSearchCriteria)
 router.post("/compOffRequestReport",dataController.compOffRequestReport)
 router.post("/AssetIDDrop",dataController.AssetIDDrop)
 router.post("/getTransportMode",dataController.getTransportMode)
+router.post("/GetAbsentReport",dataController.GetAbsentReport)
 
 
 module.exports = router;
