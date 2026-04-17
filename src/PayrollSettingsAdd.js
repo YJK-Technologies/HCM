@@ -70,8 +70,21 @@ useEffect(() => {
     .then(setStatusdrop);
 }, []);
 
+const resetForm = () => {
+  setsalary_from_to_day("");
+  setSalaryFromDay("");
+  setSalaryToDay("");
+  setOTRate("");
+  setEffectiveFrom("");
+  setEffectiveTo("");
+  setRemarks("");
+  setStatus("");
+  setSelectedStatus(null);
+  setError(false);
+};
+
   const handleSave = async () => {
-    if (!salary_from_day || !salary_to_day) {
+    if (!salary_from_day || !salary_to_day || !salary_from_to_day || !OT_Rate || !effective_from || !effective_to || !Status) {
       setError(true);
       toast.warning("Missing Required Fields");
       return;
@@ -92,8 +105,8 @@ useEffect(() => {
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           SI_no: selectedRow?.SI_no,           
           keyfield: selectedRow?.keyfield,     
-          modified_by: "admin",                
-        
+          modified_by: sessionStorage.getItem('selectedUserCode'),                
+          created_by: sessionStorage.getItem('selectedUserCode'),
           salary_from_to_day,
           salary_from_day,
           salary_to_day,
@@ -107,7 +120,9 @@ useEffect(() => {
 
       if (response.ok) {
         toast.success(mode === "create" ? "Saved successfully" : "Updated successfully");
-        navigate("/PayrollSettings");
+        resetForm(); 
+      //  navigate to main screen after Saved or Updated
+      // setTimeout(() => navigate("/PayrollSettings"), 1000);
       } else {
         const err = await response.json();
         toast.warning(err.message);
@@ -224,7 +239,7 @@ useEffect(() => {
                 ref={otRef}
                 onKeyDown={(e) => handleKeyDown(e, effFromRef, OT_Rate)}
               />
-              <label className="exp-form-labels">OT Rate</label>
+              <label className={`exp-form-labels ${error && !OT_Rate ? "text-danger" : ""}`}>OT Rate<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -240,7 +255,7 @@ useEffect(() => {
                 ref={effFromRef}
                 onKeyDown={(e) => handleKeyDown(e, effToRef, effective_from)}
               />
-              <label className="exp-form-labels">Financial From</label>
+              <label className={`exp-form-labels ${error && !effective_from ? "text-danger" : ""}`}>Financial From<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -256,7 +271,7 @@ useEffect(() => {
                 ref={effToRef}
                 onKeyDown={(e) => handleKeyDown(e, remarksRef, effective_to)}
               />
-              <label className="exp-form-labels">Financial To</label>
+              <label className={`exp-form-labels ${error && !effective_to ? "text-danger" : ""}`}>Financial To<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -291,7 +306,7 @@ useEffect(() => {
               placeholder=""
               isClearable
             />
-            <label className="floating-label">Status</label>
+            <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
           </div>
         </div>
 

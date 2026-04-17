@@ -143,7 +143,7 @@ export const leafIconMap = {
   Announcement: BsBell,
   "Employee Holiday": BsSun,
   "Settings": BsGear,
-  "Assets": BsBoxSeam,
+  "Assets Master": BsBoxSeam,
   "Generate Shift": BsArrowRepeat,
   "Visa Requests": MdTravelExplore,
   "Loan Request": FaHandHoldingUsd,
@@ -181,6 +181,9 @@ export const leafIconMap = {
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
   "Shift Summary Report": MdOutlineSchedule,
+  "Employee Assets Report": BsPersonCheck,
+  "Pending Asset Requests Report": BsClockHistory,
+  "Asset Lifecycle Report": BsArrowRepeat,
 };
 
 const menuData = [
@@ -302,6 +305,23 @@ const menuData = [
           { label: "Settings", path: "/PayrollSettings" },
         ],
       },
+    ],
+  },
+    {
+    label: "Assets",
+    icon: BsBoxSeam,
+    isDropdown: true,
+    subMenus: [
+          { label: "Assets Master", path: "/Assets" },
+      {
+        label: "Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Employee Assets Report", path: "/EmpAssetsReport" },
+          { label: "Pending Asset Requests Report", path: "/PendingAssReqRep" },
+          { label: "Asset Lifecycle Report", path: "/AssetLifecycleRep" },
+        ],
+      },          
     ],
   },
   {

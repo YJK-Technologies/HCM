@@ -278,6 +278,7 @@ function PendingAssReqRep({}) {
       field: "company_code",
       sortable: true,
       filter: true,
+      hide: true,
       width: 140,
     },
     {
@@ -578,6 +579,7 @@ function PendingAssReqRep({}) {
         : "",
     }));
   };
+
   const handleExportToExcel = () => {
     const dataSource = getSafeData();
 
@@ -907,10 +909,6 @@ function PendingAssReqRep({}) {
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
 
-              <div className="icon-btn excel" onClick={handleExportToExcel}>
-                <span className="tooltip">Excel</span>
-                <i className="fa-solid fa-file-excel"></i>
-              </div>
             </div>
           </div>
         </div>
