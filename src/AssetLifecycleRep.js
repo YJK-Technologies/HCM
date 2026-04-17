@@ -34,7 +34,6 @@ function AssetLifecycleRep({}) {
   const [WarrantyEnd, setWarrantyEnd] = useState("");
   const [AssetStatus, setAssetStatus] = useState("");
   const [Location, setLocation] = useState("");
-  const [Country, setCountry] = useState("");
   const [Status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [rowData, setrowData] = useState([]);
@@ -43,10 +42,7 @@ function AssetLifecycleRep({}) {
   const [isSelectCountry, setIsSelectCountry] = useState(false);
   const [selectedCountry, setselectedCountry] = useState("");
   const [Countrydrop, setCountrydrop] = useState([]);
-  const [CountrydropSC, setCountrydropSC] = useState([]);
   const [CountrydropGrid, setCountrydropGrid] = useState([]);
-  const [selectedCountrySC, setselectedCountrySC] = useState("");
-  const [isSelectCountrySC, setIsSelectCountrySC] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
   const [selectedCurrencySc, setSelectedCurrencySc] = useState("");
@@ -81,11 +77,7 @@ function AssetLifecycleRep({}) {
   const [PurchaseDateSC, setPurchaseDateSC] = useState("");
   const [PurchaseCostSC, setPurchaseCostSC] = useState("");
   const [CurrencyCodeSC, setCurrencyCodeSC] = useState("");
-  const [VendorNameSC, setVendorNameSC] = useState("");
-  const [WarrantyStartSC, setWarrantyStartSC] = useState("");
-  const [WarrantyEndSC, setWarrantyEndSC] = useState("");
   const [AssetStatusSC, setAssetStatusSC] = useState("");
-  const [LocationSC, setLocationSC] = useState("");
   const [CountrySC, setCountrySC] = useState("");
   const [StatusSC, setStatusSC] = useState("");
 
@@ -100,6 +92,10 @@ function AssetLifecycleRep({}) {
   const [isSelectAllocationStatus, setIsSelectAllocationStatus] = useState({});
   const [AllocationStatusSc, setAllocationStatusSc] = useState("");
   const [Allostatusdrop, setAlloStatusdrop] = useState([]);
+  const [AllocationDateSC, setAllocationDateSC] = useState("");
+  const [ExpectedReturnDateSC, setExpectedReturnDateSC] = useState("");
+  const [ActualReturnDateSC, setActualReturnDateSC] = useState("");
+  const [TotalAllocationsSC, setTotalAllocationsSC] = useState("");
 
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
@@ -161,10 +157,6 @@ function AssetLifecycleRep({}) {
       .then((val) => setstatusDropSC(val));
   }, []);
 
-  const handleCountryChange = (selectedCountry) => {
-    setselectedCountry(selectedCountry);
-    setCountry(selectedCountry ? selectedCountry.value : "");
-  };
   const filteredOptionCountry = Countrydrop.map((option) => ({
     value: option.Country_Code,
     label: `${option.Country_Code} - ${option.Country_Name}`,
@@ -183,30 +175,6 @@ function AssetLifecycleRep({}) {
       .then((val) => setCountrydrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setCountrydropSC(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-  const filteredOptionCountrySC = CountrydropSC.map((option) => ({
-    value: option.Country_Code,
-    label: `${option.Country_Code} - ${option.Country_Name}`,
-  }));
-
-  const handleCountryChangeSC = (selectedCountrySC) => {
-    setselectedCountrySC(selectedCountrySC);
-    setCountry(selectedCountrySC ? selectedCountrySC.value : "");
-  };
 
   const handleChangeCurrency = (selectedCurrency) => {
     setSelectedCurrency(selectedCurrency);
@@ -491,7 +459,6 @@ function AssetLifecycleRep({}) {
     setWarrantyEnd("");
     setAssetStatus("");
     setLocation("");
-    setCountry("");
     setStatus("");
     setAsset_CodeSC("");
     setAssetNameSC("");
@@ -502,13 +469,10 @@ function AssetLifecycleRep({}) {
     setModelSC("");
     setPurchaseDateSC("");
     setPurchaseCostSC("");
-    setVendorNameSC("");
-    setWarrantyStartSC("");
-    setWarrantyEndSC("");
-    setLocationSC("");
+    setExpectedReturnDateSC("");
+    setActualReturnDateSC("");
     setStatusSC("");
     setselectedAssetStatusSC("");
-    setselectedCountrySC("");
     setSelectedStatusSC("");
     setSelectedCurrencySc("");
   };
@@ -706,14 +670,14 @@ function AssetLifecycleRep({}) {
         Brand: BrandSC,
         Model: ModelSC,
         PurchaseDate: PurchaseDateSC ? PurchaseDateSC : null,
-        WarrantyStart: WarrantyStartSC ? WarrantyStartSC : null,
-        WarrantyEnd: WarrantyEndSC ? WarrantyEndSC : null,
+        WarrantyStart: ExpectedReturnDateSC ? ExpectedReturnDateSC : null,
+        WarrantyEnd: ActualReturnDateSC ? ActualReturnDateSC : null,
         PurchaseCost: PurchaseCostSC ? parseFloat(PurchaseCostSC) : 0,
         CurrencyCode: CurrencyCode,
-        VendorName: VendorNameSC,
+        VendorName: AllocationDateSC,
         AssetStatus: AssetStatus,
-        Location: LocationSC,
-        Country: Country,
+        Location: ExpectedReturnDateSC,
+        Country: ActualReturnDateSC,
 
         Status: StatusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -1139,24 +1103,6 @@ function AssetLifecycleRep({}) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Grade Name "
-                class="exp-input-field form-control"
-                type="Text"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={Asset_CodeSC}
-                onChange={(e) => setAsset_CodeSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Asset Code</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
                 id="Asset Name "
                 class="exp-input-field form-control"
                 type="Text"
@@ -1188,77 +1134,7 @@ function AssetLifecycleRep({}) {
               <label className="exp-form-labels">Asset Category</label>
             </div>
           </div>
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="SerialNumber"
-                class="exp-input-field form-control"
-                type="Text"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={SerialNumberSC}
-                onChange={(e) => setSerialNumberSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Serial Number</label>
-            </div>
-          </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="SerialNumber"
-                class="exp-input-field form-control"
-                type="Text"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={Bar_codeSC}
-                onChange={(e) => setBar_codeSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Bar Code</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="SerialNumber"
-                class="exp-input-field form-control"
-                type="Text"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={BrandSC}
-                onChange={(e) => setBrandSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Brand</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="SerialNumber"
-                class="exp-input-field form-control"
-                type="Text"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={ModelSC}
-                onChange={(e) => setModelSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Model</label>
-            </div>
-          </div>
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -1411,16 +1287,16 @@ function AssetLifecycleRep({}) {
               <input
                 id="PurchaseCost"
                 class="exp-input-field form-control"
-                type="text"
+                type="Date"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
-                value={VendorNameSC}
-                onChange={(e) => setVendorNameSC(e.target.value)}
+                title="Please Enter the Allocation Date"
+                value={AllocationDateSC}
+                onChange={(e) => setAllocationDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
-              <label className="exp-form-labels">Vendor Name</label>
+              <label className="exp-form-labels">Allocation Date</label>
             </div>
           </div>
 
@@ -1432,13 +1308,13 @@ function AssetLifecycleRep({}) {
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
-                value={WarrantyStartSC}
-                onChange={(e) => setWarrantyStartSC(e.target.value)}
+                title="Please Enter the Expected Return Date"
+                value={ExpectedReturnDateSC}
+                onChange={(e) => setExpectedReturnDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
-              <label className="exp-form-labels">Warranty Start</label>
+              <label className="exp-form-labels">Expected Return Date</label>
             </div>
           </div>
 
@@ -1451,12 +1327,12 @@ function AssetLifecycleRep({}) {
                 placeholder=""
                 required
                 title="Please Enter the Grade Name"
-                value={WarrantyEndSC}
-                onChange={(e) => setWarrantyEndSC(e.target.value)}
+                value={ActualReturnDateSC}
+                onChange={(e) => setActualReturnDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
-              <label className="exp-form-labels">Warranty End</label>
+              <label className="exp-form-labels">Actual Return Date</label>
             </div>
           </div>
 
@@ -1494,41 +1370,16 @@ function AssetLifecycleRep({}) {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
-                value={LocationSC}
-                onChange={(e) => setLocationSC(e.target.value)}
+                title="Please Enter the Total Allocations"
+                value={TotalAllocationsSC}
+                onChange={(e) => setTotalAllocationsSC(e.target.value)}
                 maxLength={100}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
-              <label className="exp-form-labels">Location</label>
+              <label className="exp-form-labels">Total Allocations</label>
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${selectedCountrySC ? "has-value" : ""} 
-              ${isSelectCountrySC ? "is-focused" : ""}`}
-            >
-              <Select
-                id="Country"
-                class="exp-input-field form-control"
-                type="text"
-                onFocus={() => setIsSelectCountrySC(true)}
-                onBlur={() => setIsSelectCountrySC(false)}
-                value={selectedCountrySC}
-                onChange={handleCountryChangeSC}
-                options={filteredOptionCountrySC}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                classNamePrefix="react-select"
-                maxLength={100}
-                isClearable
-              />
-              <label for="sname" className={`floating-label`}>
-                Country
-              </label>
-            </div>
-          </div>
 
           <div className="col-md-2">
             <div
