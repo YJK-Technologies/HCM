@@ -9,6 +9,7 @@ import Select from "react-select";
 import LoadingScreen from "./Loading";
 import { useNavigate } from "react-router-dom";
 import { showConfirmationToast } from "./ToastConfirmation";
+import { Title } from "chart.js";
 
 const config = require("./Apiconfig");
 
@@ -171,7 +172,8 @@ const handleSearch = async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               company_code: sessionStorage.getItem("selectedCompanyCode"),
-              keyfield: row.keyfield
+              keyfield: row.keyfield,
+              modified_by: sessionStorage.getItem('selectedUserCode'),                
             }),
           });
         }
@@ -184,7 +186,11 @@ const handleSearch = async () => {
       } finally {
         setLoading(false);
       }
-    });
+    },
+        () => {
+          toast.info("Data Delete cancelled.");
+        }
+      );
   };
 
   // GRID
@@ -193,68 +199,47 @@ const handleSearch = async () => {
 
     { headerName: "Salary Days",
       field: "salary_from_to_day",
-      editable: true ,
+      editable: false,
       cellRenderer: (params) => (
         <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
             {params.value}</span>)
     },
     { headerName: "OT Rate",
       field: "OT_Rate",
-      editable: true,
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false,
     },
     {
       headerName: " Salary From Day",
       field: "salary_from_day",
-      editable: true,
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false,
     },
     { headerName: "Salary To Day", 
       field: "salary_to_day",
-      editable: true,
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false,
     },
     {
       headerName: "Financial From",
       field: "effective_from",
-      editable: true,
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false,
     },
     {
       headerName: "Financial To",
       field: "effective_to",
-      editable: true,
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false,
     },
 
     { headerName: "Remarks",
       field: "remarks", 
-      editable: true, 
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
+      editable: false, 
     },
     {
       headerName: "Status",
       field: "Status",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: filteredStatus.map(s => s.value)
       },
-      cellRenderer: (params) => (
-        <span style={{ cursor: "pointer" }} onClick={() => handleNavigateWithRowData(params.data)} >
-            {params.value}</span>)
     }
   ];
 

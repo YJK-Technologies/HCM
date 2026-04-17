@@ -16,7 +16,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 const config = require("./Apiconfig");
 
-function AssetLifecycleRep({}) {
+function EmpAssetsReport({}) {
   const [loading, setLoading] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [Asset_Code, setAsset_Code] = useState("");
@@ -32,7 +32,6 @@ function AssetLifecycleRep({}) {
   const [VendorName, setVendorName] = useState("");
   const [WarrantyStart, setWarrantyStart] = useState("");
   const [WarrantyEnd, setWarrantyEnd] = useState("");
-  const [AssetStatus, setAssetStatus] = useState("");
   const [Location, setLocation] = useState("");
   const [Status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -48,10 +47,7 @@ function AssetLifecycleRep({}) {
   const [currencyDrop, setCurrencyDrop] = useState([]);
   const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
   const [statusDrop, setstatusDrop] = useState([]);
-  const [statusDropSC, setstatusDropSC] = useState([]);
   const [statusDropGrid, setstatusDropGrid] = useState([]);
-  const [selectedAssetStatusSC, setselectedAssetStatusSC] = useState("");
-  const [isSelectedAssetStatusSC, setIsSelectedAssetStatusSC] = useState(false);
   //status
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [StatusDrop, setStatusDrop] = useState([]);
@@ -64,12 +60,9 @@ function AssetLifecycleRep({}) {
   const [Asset_CodeSC, setAsset_CodeSC] = useState("");
   const [AssetNameSC, setAssetNameSC] = useState("");
   const [AssetCategorySC, setAssetCategorySC] = useState("");
-  const [SerialNumberSC, setSerialNumberSC] = useState("");
   const [Bar_codeSC, setBar_codeSC] = useState("");
   const [BrandSC, setBrandSC] = useState("");
   const [ModelSC, setModelSC] = useState("");
-  const [PurchaseDateSC, setPurchaseDateSC] = useState("");
-  const [PurchaseCostSC, setPurchaseCostSC] = useState("");
   const [CurrencyCodeSC, setCurrencyCodeSC] = useState("");
   const [AssetStatusSC, setAssetStatusSC] = useState("");
   const [CountrySC, setCountrySC] = useState("");
@@ -88,11 +81,8 @@ function AssetLifecycleRep({}) {
   const [Allostatusdrop, setAlloStatusdrop] = useState([]);
   const [AllocationDateSC, setAllocationDateSC] = useState("");
   const [ExpectedReturnDateSC, setExpectedReturnDateSC] = useState("");
-  const [ActualReturnDateSC, setActualReturnDateSC] = useState("");
-  const [TotalAllocationsSC, setTotalAllocationsSC] = useState("");
-  const [FirstAllocationDateSC, setFirstAllocationDateSC] = useState("");
-  const [LastReturnDateSC, setLastReturnDateSC] = useState("");
-  const [TotalDaysUsedSC, setTotalDaysUsedSC] = useState("");
+  const [LastAllocationDateSC, setLastAllocationDateSC] = useState("");
+  const [SerialNumberSC, setSerialNumberSC] = useState("");
 
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
@@ -114,45 +104,6 @@ function AssetLifecycleRep({}) {
       .then((val) => setstatusDrop(val));
   }, []);
 
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    })
-      .then((data) => data.json())
-      .then((val) => setstatusDropSC(val));
-  }, []);
-
-  const handlechangeAssetStatusSC = (SelectedStatus) => {
-    setselectedAssetStatusSC(SelectedStatus);
-    setAssetStatus(SelectedStatus ? SelectedStatus.value : "");
-  };
-
-  const filterOptionStatusSC = Array.isArray(statusDropSC)
-    ? statusDropSC.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
-    : [];
-
-  useEffect(() => {
-    fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-      }),
-    })
-      .then((data) => data.json())
-      .then((val) => setstatusDropSC(val));
-  }, []);
 
   const filteredOptionCountry = Countrydrop.map((option) => ({
     value: option.Country_Code,
@@ -404,7 +355,6 @@ function AssetLifecycleRep({}) {
     setVendorName("");
     setWarrantyStart("");
     setWarrantyEnd("");
-    setAssetStatus("");
     setLocation("");
     setStatus("");
     setAsset_CodeSC("");
@@ -414,21 +364,13 @@ function AssetLifecycleRep({}) {
     setBar_codeSC("");
     setBrandSC("");
     setModelSC("");
-    setPurchaseDateSC("");
-    setPurchaseCostSC("");
     setExpectedReturnDateSC("");
-    setActualReturnDateSC("");
-    setTotalAllocationsSC("");
     setSelectedAssetIDSc("");
     setAssetIDSC("");
     setSelectedEmpIdSc("");
     setEmpIdSc("");
     setAllocationDateSC("");
-    setselectedAssetStatusSC("");
-    setAssetStatus("");
-    setFirstAllocationDateSC("");
-    setLastReturnDateSC("");
-    setTotalDaysUsedSC("");
+    setLastAllocationDateSC("");
     setAllocationStatusSc("");
     setSelectedAllocationStatus("");
   };
@@ -466,30 +408,6 @@ const columnDefs = [
     filter: "agTextColumnFilter",
     editable: false,
   },
-
-  {
-    headerName: "Status",
-    field: "AssetStatus",
-    filter: "agTextColumnFilter",
-    editable: false,
-  },
-
-  {
-    headerName: "Purchase Date",
-    field: "PurchaseDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
-    editable: false,
-  },
-
-  {
-    headerName: "Purchase Cost",
-    field: "PurchaseCost",
-    filter: "agNumberColumnFilter",
-    editable: false,
-  },
-
-  // 🔹 Allocation Info
   {
     headerName: "Employee ID",
     field: "EmployeeID",
@@ -513,50 +431,21 @@ const columnDefs = [
   },
 
   {
-    headerName: "Actual Return",
-    field: "ActualReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
-    editable: false,
-  },
-
-  {
     headerName: "Allocation Status",
     field: "AllocationStatus",
     editable: false,
   },
 
-  // 🔹 Summary Fields
-  {
-    headerName: "Total Allocations",
-    field: "TotalAllocations",
-    editable: false,
-    filter: "agNumberColumnFilter",
-  },
 
   {
-    headerName: "First Allocation",
-    field: "FirstAllocationDate",
+    headerName: "Last Allocation Date",
+    field: "LastAllocationDate",
     valueFormatter: (p) =>
       p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
-    editable: false,
-  },
-
-  {
-    headerName: "Last Return",
-    field: "LastReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
-    editable: false,
-  },
-
-  {
-    headerName: "Total Days Used",
-    field: "TotalDaysUsed",
-    filter: "agNumberColumnFilter",
     editable: false,
   },
 ];
+
   const defaultColDef = {
     resizable: true,
     wrapText: true,
@@ -597,25 +486,19 @@ const handleSearch = async () => {
       AssetID: AssetIDSC,
       AssetName: AssetNameSC,
       AssetCategory: AssetCategorySC,
-      AssetStatus: AssetStatus,
 
       EmployeeID: empIdSc,
       AllocationStatus: AllocationStatusSc,
 
-      PurchaseDate: PurchaseDateSC,
-      PurchaseCost: PurchaseCostSC,
 
       AllocationDate: AllocationDateSC,
       ExpectedReturnDate: ExpectedReturnDateSC,
-      ActualReturnDate: ActualReturnDateSC,
 
-      TotalAllocations: TotalAllocationsSC,
-      FirstAllocationDate: FirstAllocationDateSC,
-      LastReturnDate: LastReturnDateSC,
-      TotalDaysUsed: TotalDaysUsedSC,
+      LastAllocationDate: LastAllocationDateSC,
+      SerialNumber: SerialNumberSC,
     };
 
-    const response = await fetch(`${config.apiBaseUrl}/AssetLifecycleReport_AS`, {
+    const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetReport_EAR`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -673,7 +556,7 @@ const generateReport = () => {
   reportWindow.document.write(`
   <html>
   <head>
-  <title>Asset Lifecycle Report</title>
+  <title>Employee Asset Report</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -726,7 +609,7 @@ const generateReport = () => {
   <body>
 
   <div class="header">
-    <h2>Asset Lifecycle Report</h2>
+    <h2>Employee Asset Report</h2>
     <p>Total Records: ${dataSource.length}</p>
   </div>
 
@@ -736,12 +619,10 @@ const generateReport = () => {
         <th>Asset ID</th>
         <th>Asset Name</th>
         <th>Category</th>
-        <th>Status</th>
-        <th>Employee</th>
+        <th>Allocation Status</th>
+        <th>Employee ID</th>
         <th>Allocation Date</th>
         <th>Expected Return</th>
-        <th>Actual Return</th>
-        <th>Total Days</th>
       </tr>
     </thead>
     <tbody>
@@ -753,12 +634,10 @@ const generateReport = () => {
         <td>${row.AssetID || ""}</td>
         <td>${row.AssetName || ""}</td>
         <td>${row.AssetCategory || ""}</td>
-        <td>${row.AssetStatus || ""}</td>
+        <td>${row.AllocationStatus || ""}</td>
         <td>${row.EmployeeID || ""}</td>
         <td>${row.AllocationDate ? new Date(row.AllocationDate).toLocaleDateString("en-GB") : ""}</td>
         <td>${row.ExpectedReturnDate ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB") : ""}</td>
-        <td>${row.ActualReturnDate ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB") : ""}</td>
-        <td>${row.TotalDaysUsed || ""}</td>
       </tr>
     `);
   });
@@ -799,26 +678,22 @@ const exportToPDF = () => {
 
   const headers = [[
     "Asset ID",
-    "Name",
+    "Asset Name",
     "Category",
-    "Status",
-    "Employee",
-    "Allocation",
-    "Expected",
-    "Return",
-    "Days"
+    "Allocation Status",
+    "Employee ID",
+    "Allocation Date",
+    "Expected Return",
   ]];
 
   const body = dataSource.map((row) => [
     row.AssetID || "",
     row.AssetName || "",
     row.AssetCategory || "",
-    row.AssetStatus || "",
+    row.AllocationStatus || "",
     row.EmployeeID || "",
     row.AllocationDate ? new Date(row.AllocationDate).toLocaleDateString("en-GB") : "",
     row.ExpectedReturnDate ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB") : "",
-    row.ActualReturnDate ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB") : "",
-    row.TotalDaysUsed || ""
   ]);
 
   const doc = new jsPDF("l", "pt", "a4");
@@ -829,7 +704,7 @@ const exportToPDF = () => {
 
   doc.setTextColor(255);
   doc.setFontSize(18);
-  doc.text("Asset Lifecycle Report", pageWidth / 2, 40, { align: "center" });
+  doc.text("Employee Asset Report", pageWidth / 2, 40, { align: "center" });
 
   doc.setFontSize(10);
   doc.text(
@@ -848,39 +723,39 @@ const exportToPDF = () => {
     alternateRowStyles: { fillColor: altRow },
   });
 
-  doc.save("Asset_Lifecycle_Report.pdf");
+  doc.save("Employee_Asset_Report.pdf");
 };
 
-
 const transformRowData = (data) => {
-  return data.map((row) => ({
-    "Asset ID": row.AssetID,
-    "Asset Name": row.AssetName,
-    Category: row.AssetCategory,
-    Status: row.AssetStatus,
-    Employee: row.EmployeeID,
-    "Allocation Date": row.AllocationDate
-      ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
-      : "",
-    "Expected Return": row.ExpectedReturnDate
-      ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Actual Return": row.ActualReturnDate
-      ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Total Days Used": row.TotalDaysUsed,
+  return (data || []).map((row) => ({
+    "Asset ID": row?.AssetID || "",
+    "Asset Name": row?.AssetName || "",
+    Category: row?.AssetCategory || "",
+    "Allocation Status": row?.AllocationStatus || "",
+    "Employee ID": row?.EmployeeID || "",
+
+    "Allocation Date":
+      row?.AllocationDate && !isNaN(new Date(row.AllocationDate))
+        ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
+        : "",
+
+    "Expected Return":
+      row?.ExpectedReturnDate && !isNaN(new Date(row.ExpectedReturnDate))
+        ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
+        : "",
+
   }));
 };
 
 const handleExportToExcel = () => {
   const dataSource = getSelectedOrAllData();
 
-  if (!dataSource || dataSource.length === 0) {
+  if (!dataSource.length) {
     toast.warning("No data to export");
     return;
   }
 
-  const screenName = "Asset Lifecycle Report";
+  const screenName = "Employee Asset Report";
   const company = sessionStorage.getItem("selectedCompanyName") || "";
 
   const titleBg = getCSSVariable("--but").replace("#", "");
@@ -896,24 +771,7 @@ const handleExportToExcel = () => {
 
   const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-  // 🔹 transform your current data
-  const transformedData = dataSource.map((row) => ({
-    "Asset ID": row.AssetID || "",
-    "Asset Name": row.AssetName || "",
-    Category: row.AssetCategory || "",
-    Status: row.AssetStatus || "",
-    Employee: row.EmployeeID || "",
-    "Allocation Date": row.AllocationDate
-      ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
-      : "",
-    "Expected Return": row.ExpectedReturnDate
-      ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Actual Return": row.ActualReturnDate
-      ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Total Days Used": row.TotalDaysUsed || "",
-  }));
+  const transformedData = transformRowData(dataSource);
 
   XLSX.utils.sheet_add_json(worksheet, transformedData, {
     origin: `A${headerData.length + 1}`,
@@ -922,7 +780,6 @@ const handleExportToExcel = () => {
   const range = XLSX.utils.decode_range(worksheet["!ref"]);
   const headerRowIndex = headerData.length;
 
-  // 🔹 Title style (same as reference)
   worksheet["A1"].s = {
     font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
     fill: { fgColor: { rgb: titleBg } },
@@ -938,7 +795,6 @@ const handleExportToExcel = () => {
 
   const totalColumns = Object.keys(transformedData[0]).length;
 
-  // 🔹 Header style
   for (let C = 0; C < totalColumns; C++) {
     const cell =
       worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
@@ -957,7 +813,6 @@ const handleExportToExcel = () => {
     };
   }
 
-  // 🔹 Body styling (alternate rows)
   for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
     for (let C = 0; C < totalColumns; C++) {
       const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
@@ -979,10 +834,10 @@ const handleExportToExcel = () => {
   worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Asset Report");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Asset Report");
 
-  XLSX.writeFile(workbook, "Asset_Lifecycle_Report.xlsx");
-};
+  XLSX.writeFile(workbook, "Employee_Asset_Report.xlsx");
+};  
 
 return (
     <div class="container-fluid Topnav-screen ">
@@ -994,7 +849,7 @@ return (
       />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">Asset Lifecycle Report</h1>
+          <h1 className="page-title">Employee Asset Report</h1>
           <div className="action-wrapper desktop-actions">
             {["all permission", "view"].some((p) =>
               companyPermissions.includes(p),
@@ -1128,68 +983,6 @@ return (
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="SerialNumber"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={PurchaseDateSC}
-                onChange={(e) => setPurchaseDateSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Purchase Date</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="PurchaseCost"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={PurchaseCostSC}
-                onChange={(e) => setPurchaseCostSC(e.target.value)}
-                maxLength={100}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <label className="exp-form-labels">Purchase Cost</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div
-              className={`inputGroup selectGroup 
-              ${selectedAssetStatusSC ? "has-value" : ""} 
-              ${isSelectedAssetStatusSC ? "is-focused" : ""}`}
-              title="Please enter the Status"
-            >
-              <Select
-                id="AssetStatus"
-                type="text"
-                value={selectedAssetStatusSC}
-                onChange={handlechangeAssetStatusSC}
-                options={filterOptionStatusSC}
-                placeholder=" "
-                onFocus={() => setIsSelectedAssetStatusSC(true)}
-                onBlur={() => setIsSelectedAssetStatusSC(false)}
-                classNamePrefix="react-select"
-                maxLength={100}
-                isClearable
-              />
-              <label for="sname" className={`floating-label`}>
-                Asset Status{" "}
-              </label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedEmpIdSc ? "has-value" : ""} 
@@ -1249,24 +1042,6 @@ return (
               <label className="exp-form-labels">Expected Return Date</label>
             </div>
           </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Warranty End"
-                class="exp-input-field form-control"
-                type="date"
-                placeholder=""
-                required
-                title="Please Enter the Grade Name"
-                value={ActualReturnDateSC}
-                onChange={(e) => setActualReturnDateSC(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                maxLength={100}
-              />
-              <label className="exp-form-labels">Actual Return Date</label>
-            </div>
-          </div>
           
           <div className="col-md-2">
             <div
@@ -1293,23 +1068,6 @@ return (
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Location"
-                class="exp-input-field form-control"
-                type="Number"
-                placeholder=""
-                required
-                title="Please Enter the Total Allocations"
-                value={TotalAllocationsSC}
-                onChange={(e) => setTotalAllocationsSC(e.target.value)}
-                maxLength={100}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <label className="exp-form-labels">Total Allocations</label>
-            </div>
-          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1319,13 +1077,13 @@ return (
                 type="Date"
                 placeholder=""
                 required
-                title="Please Enter the First Allocation Date"
-                value={FirstAllocationDateSC}
-                onChange={(e) => setFirstAllocationDateSC(e.target.value)}
+                title="Please Enter the Last Allocation Date"
+                value={LastAllocationDateSC}
+                onChange={(e) => setLastAllocationDateSC(e.target.value)}
                 maxLength={100}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
-              <label className="exp-form-labels">First Allocation Date</label>
+              <label className="exp-form-labels">Last Allocation Date</label>
             </div>
           </div>
 
@@ -1334,34 +1092,16 @@ return (
               <input
                 id="Location"
                 class="exp-input-field form-control"
-                type="Date"
+                type="TEXT"
                 placeholder=""
                 required
-                title="Please Enter the Last Return Date"
-                value={LastReturnDateSC}
-                onChange={(e) => setLastReturnDateSC(e.target.value)}
+                title="Please Enter the Serial Number"
+                value={SerialNumberSC}
+                onChange={(e) => setSerialNumberSC(e.target.value)}
                 maxLength={100}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
-              <label className="exp-form-labels">Last Return Date</label>
-            </div>
-          </div>
-
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Location"
-                class="exp-input-field form-control"
-                type="number"
-                placeholder=""
-                required
-                title="Please Enter the Total Days Used"
-                value={TotalDaysUsedSC}
-                onChange={(e) => setTotalDaysUsedSC(e.target.value)}
-                maxLength={100}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <label className="exp-form-labels">Total Days Used</label>
+              <label className="exp-form-labels">Serial Number</label>
             </div>
           </div>
 
@@ -1404,4 +1144,4 @@ return (
   );
 }
 
-export default AssetLifecycleRep;
+export default EmpAssetsReport;

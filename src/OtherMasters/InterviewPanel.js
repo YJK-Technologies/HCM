@@ -469,8 +469,8 @@ function InterviewPanel({ }) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
+              "company_code":sessionStorage.getItem('selectedCompanyCode'),
+              "modified-by": sessionStorage.getItem('selectedUserCode')
             },
             body: JSON.stringify(dataToSend)
           });

@@ -292,6 +292,9 @@ function InterviewPanelMem({ }) {
       headerName: "Role",
       field: "Role",
       editable: true,
+      valueFormatter: (params) => {
+      return params.value ? params.value.replace(/[^a-zA-Z0-9 ]/g, "") : "";
+      }
     },
     {
       headerName: "Keyfield",
@@ -812,7 +815,10 @@ function InterviewPanelMem({ }) {
                 autoComplete="off"
                 value={Role}
                 maxLength={50}
-                onChange={(e) => setRole(e.target.value)}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setRole(filteredValue);
+                }}
               />
               <label
                 for="add1"
@@ -909,7 +915,10 @@ function InterviewPanelMem({ }) {
                 required
                 autoComplete="off"
                 value={RoleSC}
-                onChange={(e) => setRoleSC(e.target.value)}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setRoleSC(filteredValue);
+                }}
               />
               <label for="add1" className={`exp-form-labels`}>
                 Role
