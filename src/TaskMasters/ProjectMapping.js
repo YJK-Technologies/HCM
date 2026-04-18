@@ -504,19 +504,36 @@ function Input({ }) {
         setLoading(true);
         try {
           const modified_by = sessionStorage.getItem('selectedUserCode');
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+
+          // const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          
+          const dataToSend = {
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
           const response = await fetch(`${config.apiBaseUrl}/updateProjectMapping`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "modified-by": modified_by
             },
             body: JSON.stringify(dataToSend)
           });
 
           if (response.ok) {
             toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
+              onClose: () => handleSearch(), 
             });
           } else {
             const errorResponse = await response.json();
@@ -541,7 +558,25 @@ function Input({ }) {
       async () => {
         setLoading(true);
         try {
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          // const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          
+          const dataToSend = {
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
           const response = await fetch(`${config.apiBaseUrl}/deleteProjectMapping`, {
             method: "POST",
             headers: {

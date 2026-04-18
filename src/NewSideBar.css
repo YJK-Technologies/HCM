@@ -567,7 +567,7 @@
 
 .sidebar .primary-nav {
   flex: 1;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   overflow-x: visible;  /* IMPORTANT */
   padding: 0 15px 20px 15px;
 }

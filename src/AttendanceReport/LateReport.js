@@ -15,7 +15,7 @@ import * as XLSX from "xlsx-js-style";
 
 const config = require("../Apiconfig");
 
-function AbsentReport() {
+function LateReport() {
     const [rowData, setRowData] = useState([]);
     const [gridApi, setGridApi] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -39,15 +39,11 @@ function AbsentReport() {
     const [isSelectedEmp, setIsSelectedEmp] = useState(false);
     const [isSelectDepartment, setIsSelectDepartment] = useState(false);
     const [isSelectDesignation, setIsSelectDesignation] = useState(false);
-    const [leaveDrop, setLeaveDrop] = useState([]);
-    const [selectedLeave, setSelectedLeave] = useState("");
-    const [leaveStatus, setLeaveStatus] = useState('');
-    const [isSelectedLeave, setIsSelectedLeave] = useState(false);
 
     //purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
     const companyPermissions = permissions
-        .filter((permission) => permission.screen_type === "AbsentReport")
+        .filter((permission) => permission.screen_type === "LateReport")
         .map((permission) => permission.permission_type.toLowerCase());
 
     const company_code = sessionStorage.getItem('selectedCompanyCode')
@@ -103,43 +99,12 @@ function AbsentReport() {
         fetchUserData();
     }, []);
 
-    useEffect(() => {
-        const fetchLeaveData = async () => {
-            try {
-                const response = await fetch(`${config.apiBaseUrl}/LeaveSummaryDrop`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
-                });
-
-                const val = await response.json();
-                setLeaveDrop(val);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
-        fetchLeaveData();
-    }, []);
-
     const filteredOptionDpt = [
         { value: 'All', label: 'All' },
         ...(Array.isArray(DptDrop)
             ? DptDrop.map((option) => ({
                 value: option.Department,
                 label: option.Department,
-            }))
-            : [])
-    ];
-
-    const filteredOptionLeave = [
-        { value: 'All', label: 'All' },
-        ...(Array.isArray(leaveDrop)
-            ? leaveDrop.map((option) => ({
-                value: option.attributedetails_name,
-                label: option.attributedetails_name,
             }))
             : [])
     ];
@@ -153,11 +118,6 @@ function AbsentReport() {
     const handleChangedesgination = (selecteddesg) => {
         setSelectedDsg(selecteddesg);
         setDesignation(selecteddesg ? selecteddesg.value : '');
-    };
-
-    const handleChangeLeave = (selectedLeave) => {
-        setSelectedLeave(selectedLeave);
-        setLeaveStatus(selectedLeave ? selectedLeave.value : '');
     };
 
     const fetchDesignation = async (selectedValue) => {
@@ -247,8 +207,18 @@ function AbsentReport() {
             editable: false,
         },
         {
-            headerName: "Attendance Status",
-            field: "AttendanceStatus",
+            headerName: "Check In",
+            field: "FirstCheckIn",
+            editable: false,
+        },
+        {
+            headerName: "Check Out",
+            field: "LastCheckOut",
+            editable: false,
+        },
+        {
+            headerName: "Late Minutes",
+            field: "LateMinutes",
             editable: false,
         },
     ];
@@ -279,7 +249,7 @@ function AbsentReport() {
 
         setLoading(true);
         try {
-            const response = await fetch(`${config.apiBaseUrl}/GetAbsentReport`, {
+            const response = await fetch(`${config.apiBaseUrl}/GetLateReport`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -290,8 +260,7 @@ function AbsentReport() {
                     ToDate: toDate,
                     EmployeeId: employeeID,
                     Department: department,
-                    Designation: designation,
-                    LeaveStatus: leaveStatus
+                    Designation: designation
                 }),
             });
 
@@ -333,7 +302,9 @@ function AbsentReport() {
                 "Department Name": formatValue(row.DepartmentName),
                 "Designation ID": formatValue(row.designation_ID),
                 "Designation Name": formatValue(row.DesignationName),
-                "Attendance Status": formatValue(row.AttendanceStatus),
+                "Check In": formatValue(row.FirstCheckIn),
+                "Check Out": formatValue(row.LastCheckOut),
+                "Late Minutes": formatValue(row.LateMinutes),
             };
         });
 
@@ -354,7 +325,7 @@ function AbsentReport() {
         link.href = logoUrl;
 
         reportWindow.document.head.appendChild(link);
-        reportWindow.document.write("<html><head><title>Leave Summary Report</title>");
+        reportWindow.document.write("<html><head><title>Late Report</title>");
         reportWindow.document.write("<style>");
         reportWindow.document.write(`
         body {
@@ -460,7 +431,7 @@ function AbsentReport() {
         <div class="header">
             <img src="${logoUrl}" class="logo" />
             <div class="title-section">
-              <h2>Leave Summary Report</h2>
+              <h2>Late Report</h2>
             </div>
             </div>`);
         reportWindow.document.write(`<div style="margin-top:10px;">
@@ -583,7 +554,7 @@ function AbsentReport() {
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(16);
             doc.setFont(undefined, "bold");
-            doc.text("Leave Summary Report", pageWidth / 2, 35, { align: "center" });
+            doc.text("Late Report", pageWidth / 2, 35, { align: "center" });
 
             /* ================= SUB HEADER ================= */
 
@@ -629,7 +600,7 @@ function AbsentReport() {
                 margin: { left: 40, right: 40 },
             });
 
-            doc.save("Leave_Summary_Report.pdf");
+            doc.save("Late_Report.pdf");
         });
     };
 
@@ -642,7 +613,9 @@ function AbsentReport() {
             "Department Name": row.DepartmentName || "",
             "Designation ID": row.designation_ID || "",
             "Designation Name": row.DesignationName || "",
-            "Attendance Status": row.AttendanceStatus || "",
+            "Check In": row.FirstCheckIn || "",
+            "Check Out": row.LastCheckOut || "",
+            "Late Minutes": row.LateMinutes || "",
         }));
     };
 
@@ -658,7 +631,7 @@ function AbsentReport() {
             return;
         }
 
-        const screenName = "Leave Summary Report";
+        const screenName = "Late Report";
         const company = sessionStorage.getItem("selectedCompanyName") || "";
 
         /* ================= THEME COLORS ================= */
@@ -756,9 +729,9 @@ function AbsentReport() {
         /* ================= EXPORT ================= */
 
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Leave Summary Report");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Late Report");
 
-        XLSX.writeFile(workbook, "Leave_Summary_Report.xlsx");
+        XLSX.writeFile(workbook, "Late_Report.xlsx");
     };
 
     return (
@@ -771,7 +744,7 @@ function AbsentReport() {
             />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Leave Summary Report</h1>
+                    <h1 className="page-title">Late Report</h1>
 
                     <div className="action-wrapper desktop-actions">
                         {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
@@ -933,30 +906,6 @@ function AbsentReport() {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedLeave ? "has-value" : ""} 
-                            ${isSelectedLeave ? "is-focused" : ""}`}
-                        >
-                            <Select
-                                id="department"
-                                placeholder=" "
-                                onFocus={() => setIsSelectedLeave(true)}
-                                onBlur={() => setIsSelectedLeave(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                                type="text"
-                                value={selectedLeave}
-                                onChange={handleChangeLeave}
-                                options={filteredOptionLeave}
-                            />
-                            <label htmlFor="selecteddpt" className={`floating-label`}>
-                                Leave Status
-                            </label>
-                        </div>
-                    </div>
-
                     {/* Search + Reload Buttons */}
                     <div className="col-12">
                         <div className="search-btn-wrapper">
@@ -994,4 +943,4 @@ function AbsentReport() {
     );
 }
 
-export default AbsentReport;
+export default LateReport;
