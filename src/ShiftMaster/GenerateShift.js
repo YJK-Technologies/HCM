@@ -338,7 +338,7 @@ function GenerateShift({ }) {
                     <div className="col-md-2">
                         <div class="me-2">
                             <div class=" d-flex justify-content-start">
-                                <button className="Documents-btn mt-2" title="Generate Payslip" onClick={handleGenerateShift}>
+                                <button className="Documents-btn mt-2" title="Generate Shift" onClick={handleGenerateShift}>
                                     <span class="folderContainer">
                                         <svg
                                             class="fileBack"

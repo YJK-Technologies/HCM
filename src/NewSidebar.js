@@ -43,7 +43,8 @@ import {
   BsArrowRepeat,
   BsPersonPlus,
   BsBoxSeam,
-  BsCalendarPlus
+  BsCalendarPlus,
+  BsHourglassSplit
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -69,7 +70,8 @@ import { TbClockCheck, TbHistory } from "react-icons/tb";
 import {
   AiOutlinePercentage,
   AiOutlineFileDone,
-  AiOutlineDashboard
+  AiOutlineDashboard,
+  AiOutlineWarning
 } from "react-icons/ai";
 import { FaHandHoldingUsd, FaCheckCircle, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
 
@@ -185,7 +187,9 @@ export const leafIconMap = {
   "Employee Assets Report": BsPersonCheck,
   "Pending Asset Requests Report": BsClockHistory,
   "Asset Lifecycle Report": BsArrowRepeat,
-  "Absent Report": MdOutlineEventBusy
+  "Leave Summary Report": MdOutlineEventBusy,
+  "Late Report": AiOutlineWarning,
+  "Overtime Report": BsHourglassSplit,
 };
 
 const menuData = [
@@ -359,7 +363,9 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
-          { label: "Absent Report", path: "/AbsentReport" },
+          { label: "Late Report", path: "/LateReport" },
+          { label: "Overtime Report", path: "/OvertimeReport" },
+          { label: "Leave Summary Report", path: "/AbsentReport" },
         ],
       },
         {

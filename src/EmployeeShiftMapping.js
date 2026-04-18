@@ -604,7 +604,6 @@ function EmployeeTypeMaster() {
 
     const defaultColDef = {
         resizable: true,
-        wrapText: true,
         editable: true,
     };
 
@@ -841,9 +840,26 @@ function EmployeeTypeMaster() {
                 try {
                     setLoading(true);
                     const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+
+                    // const dataToSend = {
+                    //     Employee_shift_mappingData: Array.isArray(rowData) ? rowData : [rowData],
+                    // };
 
                     const dataToSend = {
-                        Employee_shift_mappingData: Array.isArray(rowData) ? rowData : [rowData],
+                        Employee_shift_mappingData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                Company_Code,
+                                Modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    Company_Code,
+                                    Modified_by,
+                                },
+                            ],
                     };
 
                     const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
@@ -851,7 +867,6 @@ function EmployeeTypeMaster() {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                "Company_Code": Company_Code
                             },
                             body: JSON.stringify(dataToSend),
                         },

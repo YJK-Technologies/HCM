@@ -633,24 +633,37 @@ function Input({ }) {
     }
   };
 
-  const saveEditedData = async () => {
+  const saveEditedData = async (rowData) => {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
     try {
       const modified_by = sessionStorage.getItem('selectedUserCode');
-      const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.TaskMasterID === row.TaskMasterID) : [editedData];
+      
+      // const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.TaskMasterID === row.TaskMasterID) : [editedData];
+
+      const dataToSend = {
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
 
       const response = await fetch(`${config.apiBaseUrl}/updateTask`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Modified-By": modified_by,
-          "company_code": sessionStorage.getItem('selectedCompanyCode')
-
         },
-        body: JSON.stringify({ editedData: selectedRowsData }), // Send only the selected rows for saving
-        "modified_by": modified_by,
+        body: JSON.stringify(dataToSend), 
 
       });
 
@@ -676,19 +689,37 @@ function Input({ }) {
   };
 
   const deleteSelectedRows = async (rowData) => {
-    const TaskMasterDelete = { TaskMasterIDToDelete: Array.isArray(rowData) ? rowData : [rowData] };
+    // const TaskMasterDelete = { TaskMasterIDToDelete: Array.isArray(rowData) ? rowData : [rowData] };
 
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
         try {
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+          const dataToSend = {
+            TaskMasterIDToDelete: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
           const response = await fetch(`${config.apiBaseUrl}/deleteTask`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "company_code": sessionStorage.getItem('selectedCompanyCode')
             },
-            body: JSON.stringify(TaskMasterDelete),
+            body: JSON.stringify(dataToSend),
           });
 
           if (response.ok) {

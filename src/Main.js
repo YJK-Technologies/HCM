@@ -142,6 +142,8 @@ import CompOffRequest from './EmpRequests/CompOffRequest.js';
 import AssetLifecycleRep from './AssetLifecycleRep.js';
 import EmpAssetsReport from './EmpAssetsReport.js';
 import AbsentReport from './AttendanceReport/AbsentReport.js';
+import LateReport from './AttendanceReport/LateReport.js';
+import OvertimeReport from './AttendanceReport/OvertimeReport.js';
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -354,6 +356,8 @@ function Main() {
     { path: "/CompOffRequest", component: <CompOffRequest /> },
     { path: "/AssetLifecycleRep", component: <AssetLifecycleRep /> },
     { path: "/EmpAssetsReport", component: <EmpAssetsReport /> },
+    { path: "/LateReport", component: <LateReport /> },
+    { path: "/OvertimeReport", component: <OvertimeReport /> },
     { path: "/AbsentReport", component: <AbsentReport /> },
 
   

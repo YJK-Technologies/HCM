@@ -524,9 +524,26 @@ function ShiftPatternMaster() {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
+
+          // const dataToSend = {
+          //   Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+          // };
 
           const dataToSend = {
-            Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+            Shift_MasterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  Company_Code,
+                  Modified_by,
+                },
+              ],
           };
 
           const response = await fetch(`${config.apiBaseUrl}/ShiftPattern_Delete`,
