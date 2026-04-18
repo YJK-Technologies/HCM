@@ -349,7 +349,7 @@ function JobMaster({ }) {
     {
       headerName: "Job ID",
       field: "job_id",
-      editable: true
+      editable: true,
     },
     {
       headerName: "Job Title",
@@ -867,7 +867,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={job_title}
-                onChange={(e) => setjob_title((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setjob_title(filteredValue);
+                }}
               />
               <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Job Title<span className="text-danger">*</span></label>
             </div>
@@ -929,7 +932,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={location}
-                onChange={(e) => setlocation((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setlocation(filteredValue);
+                }}
               />
               <label for="sname" className={`exp-form-labels ${error && !location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
             </div>
@@ -1023,7 +1029,10 @@ function JobMaster({ }) {
                 required title="Please enter the Annual Bonus"
                 autoComplete="off"
                 value={job_titleSC}
-                onChange={(e) => setjob_titleSC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setjob_titleSC(filteredValue);
+                }}
               />
               <label for="sname" className="exp-form-labels">Job Title</label>
             </div>
@@ -1084,7 +1093,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={locationSC}
-                onChange={(e) => setlocationSC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setlocationSC(filteredValue);
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>Location</label>
             </div>

@@ -57,6 +57,7 @@ function InterviewFeedback({ }) {
   const [isSelectRecommendationSC, setisSelectRecommendationSC] = useState(false);
   const [isSelectRecommendation, setisSelectRecommendation] = useState(false);
   const [employeeDrop, setEmployeeDrop] = useState([]);
+  const [scheduleIDGrid, setscheduleIDGrid] = useState([]);
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -300,6 +301,27 @@ function InterviewFeedback({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/ScheduleID`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const scheduleID = data.map((option) => ({
+          value: option.schedule_id,
+          label: `${option.schedule_id}`,
+        }));
+        setscheduleIDGrid(scheduleID);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const handleKeyDownStatus = async (e) => {
     if (e.key === "Enter" && hasValueChanged) {
       await handleSearch();
@@ -344,7 +366,16 @@ function InterviewFeedback({ }) {
     {
       headerName: "Schedule ID",
       field: "schedule_id",
-      editable: true
+      editable: true,
+            cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: scheduleIDGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = scheduleIDGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+
     },
     {
       headerName: "Employee ID",
@@ -496,87 +527,117 @@ function InterviewFeedback({ }) {
     searchClearInputFields();
   };
 
-  const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+    const handleUpdate = async (rowData) => {
+        showConfirmationToast(
+            "Are you sure you want to update the selected employee shift mapping data?",
+            async () => {
+                try {
+                    setLoading(true);
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const dataToSend = { interview_feedbackData: Array.isArray(rowData) ? rowData : [rowData] };
+                    const dataToSend = {
+                        interview_feedbackData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
+                    };
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_feedbackLoopUpdate`, {
+                    const response = await fetch(`${config.apiBaseUrl}/interview_feedbackLoopUpdate`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
+
+                    if (response.ok) {
+                        toast.success("Employee shift mapping updated successfully", {
+                            onClose: () => handleSearch(),
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Update failed");
+                    }
+                } catch (error) {
+                    console.error("Update error:", error);
+                    toast.error("Error updating data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            },
+            () => toast.info("Update cancelled"),
+        );
+    };
+  
+const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          interview_feedbackData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_feedbackLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+        );
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-          const dataToSend = { interview_feedbackData: Array.isArray(rowData) ? rowData : [rowData] };
-
-          const response = await fetch(`${config.apiBaseUrl}/interview_feedbackLoopDelete`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code
-            },
-            body: JSON.stringify(dataToSend)
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
           });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-          }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
+
 
   const tabs = [
     { label: 'Job Master' },
@@ -860,7 +921,10 @@ function InterviewFeedback({ }) {
                 required
                 autoComplete="off"
                 value={rating}
-                onChange={(e) => setrating((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setrating(filteredValue);
+                }}
               />
               <label for="add1" className={`exp-form-labels ${error && !rating ? 'text-danger' : ''}`}>Rating<span className="text-danger">*</span></label>
             </div>
@@ -876,7 +940,10 @@ function InterviewFeedback({ }) {
                 required
                 autoComplete="off"
                 value={comments}
-                onChange={(e) => setcomments((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setcomments(filteredValue);
+                }}
               />
               <label for="add1" className={`exp-form-labels ${error && !comments ? 'text-danger' : ''}`}>comments<span className="text-danger">*</span></label>
             </div>
@@ -1087,7 +1154,10 @@ function InterviewFeedback({ }) {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={commentsSC}
-                onChange={(e) => setcommentsSC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setcommentsSC(filteredValue);
+                }}
               />
               <label for="sname" className="exp-form-labels">Comments</label>
             </div>
