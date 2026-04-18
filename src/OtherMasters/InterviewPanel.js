@@ -454,87 +454,117 @@ function InterviewPanel({ }) {
     searchClearInputFields();
   };
 
-  const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+    const handleUpdate = async (rowData) => {
 
-          const dataToSend = { interview_panelData: Array.isArray(rowData) ? rowData : [rowData] };
+        showConfirmationToast(
+            "Are you sure you want to update the selected employee shift mapping data?",
+            async () => {
+                try {
+                    setLoading(true);
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_panelLoopUpdate`, {
+                    const dataToSend = {
+                        interview_panelData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
+                    };
+
+                    const response = await fetch(`${config.apiBaseUrl}/interview_panelLoopUpdate`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
+
+                    if (response.ok) {
+                        toast.success("Employee shift mapping updated successfully", {
+                            onClose: () => handleSearch(),
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Update failed");
+                    }
+                } catch (error) {
+                    console.error("Update error:", error);
+                    toast.error("Error updating data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            },
+            () => toast.info("Update cancelled"),
+        );
+    };
+
+const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          interview_panelData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_panelLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code":sessionStorage.getItem('selectedCompanyCode'),
-              "modified-by": sessionStorage.getItem('selectedUserCode')
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+        );
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-          const dataToSend = { interview_panelData: Array.isArray(rowData) ? rowData : [rowData] };
-
-          const response = await fetch(`${config.apiBaseUrl}/interview_panelLoopDelete`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code
-            },
-            body: JSON.stringify(dataToSend)
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
           });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-          }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
 
   const tabs = [
     { label: 'Job Master' },
@@ -779,7 +809,10 @@ function InterviewPanel({ }) {
                 required
                 autoComplete="off"
                 value={panel_name}
-                onChange={(e) => setpanel_name((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setpanel_name(filteredValue);
+                }}
               />
               <label for="sname" className={`exp-form-labels ${error && !panel_name ? 'text-danger' : ''}`}>Panel Name<span className="text-danger">*</span></label>
             </div>
@@ -872,7 +905,10 @@ function InterviewPanel({ }) {
                 required title="Please Choose the Start Year"
                 autoComplete="off"
                 value={panel_nameSC}
-                onChange={(e) => setpanel_nameSC(e.target.value)}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setpanel_nameSC(filteredValue);
+                }}
               />
               <label For="city" className="exp-form-labels">Panel Name</label>
             </div>
