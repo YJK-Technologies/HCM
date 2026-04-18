@@ -29092,22 +29092,16 @@ const updateProject = async (req, res) => {
         .input("mode", sql.NVarChar, "U")
         .input("ProjectID", sql.NVarChar, updatedRow.ProjectID)
         .input("ProjectName", sql.NVarChar, updatedRow.ProjectName)
-        .input(
-          "ProjectDescription",
-          sql.NVarChar,
-          updatedRow.ProjectDescription,
-        )
+        .input("ProjectDescription", sql.NVarChar,updatedRow.ProjectDescription)
         .input("ProjectManager", sql.NVarChar, updatedRow.ProjectManager)
         .input("StartDate", sql.NVarChar, updatedRow.StartDate)
         .input("EndDate", sql.NVarChar, updatedRow.EndDate)
         .input("PriorityLevel", sql.NVarChar, updatedRow.PriorityLevel)
         .input("TaskStatus", sql.NVarChar, updatedRow.TaskStatus)
         .input("EstimatedHours", sql.NVarChar, updatedRow.EstimatedHours)
-        .input("modified_by", sql.NVarChar, req.headers["modified-by"])
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
-        .query(
-          `EXEC sp_ProjectMaster @mode,@ProjectID,@ProjectName,@ProjectDescription,@ProjectManager,@StartDate,@EndDate,@PriorityLevel,@TaskStatus,@EstimatedHours,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_ProjectMaster @mode,@ProjectID,@ProjectName,@ProjectDescription,@ProjectManager,@StartDate,@EndDate,@PriorityLevel,@TaskStatus,@EstimatedHours,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.json({ message: "Data updated successfully" });
   } catch (err) {
@@ -29131,9 +29125,8 @@ const deleteProject = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("ProjectID", sql.NVarChar, updatedRow.ProjectID)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
-        .query(
-          `EXEC sp_ProjectMaster @mode,@ProjectID,'','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .query(`EXEC sp_ProjectMaster @mode,@ProjectID,'','','','','','','','',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.json({ message: "Data deleted successfully" });
   } catch (err) {
@@ -29563,19 +29556,9 @@ const updateTask = async (req, res) => {
         .input("BufferHours", sql.NVarChar, updatedRow.BufferHours)
         .input("TaskStatus", sql.NVarChar, updatedRow.TaskStatus)
         .input("PriorityLevel", sql.NVarChar, updatedRow.PriorityLevel)
-        .input("modified_by", sql.NVarChar, req.headers["modified-by"])
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
-        .input("tempstr1", sql.NVarChar, updatedRow.tempstr1)
-        .input("tempstr2", sql.NVarChar, updatedRow.tempstr2)
-        .input("tempstr3", sql.NVarChar, updatedRow.tempstr3)
-        .input("tempstr4", sql.NVarChar, updatedRow.tempstr4)
-        .input("datetime1", sql.NVarChar, updatedRow.datetime1)
-        .input("datetime2", sql.NVarChar, updatedRow.datetime2)
-        .input("datetime3", sql.NVarChar, updatedRow.datetime3)
-        .input("datetime4", sql.NVarChar, updatedRow.datetime4)
-        .query(
-          `EXEC sp_TaskMaster @mode,@TaskMasterID,@TaskTitle,@Description,@ProjectID,@userID,@StartDate,@EndDate,@EstimatedHours,@BufferHours,@TaskStatus,@PriorityLevel,'',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .query(`EXEC sp_TaskMaster @mode,@TaskMasterID,@TaskTitle,@Description,@ProjectID,@userID,@StartDate,@EndDate,@EstimatedHours,@BufferHours,@TaskStatus,@PriorityLevel,'',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
@@ -29601,10 +29584,9 @@ const DeleteTask = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("TaskMasterID", sql.NVarChar, updatedRow.TaskMasterID)
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
-        .query(
-          `EXEC sp_TaskMaster @mode,@TaskMasterID,'','','','','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .query(`EXEC sp_TaskMaster @mode,@TaskMasterID,'','','','','','','','','','','',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json(" Data deleted successfully");
   } catch (err) {
@@ -29901,10 +29883,9 @@ const updateProjectMapping = async (req, res) => {
         .input("ProjectID", sql.NVarChar, updatedRow.ProjectID)
         .input("userID", sql.NVarChar, updatedRow.userID)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .input("modified_by", sql.NVarChar, req.headers["modified-by"])
-        .query(
-          `EXEC sp_ProjectMapping @mode,@ProjectID,'','',@userID,@keyfield,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .query(`EXEC sp_ProjectMapping @mode,@ProjectID,'','',@userID,@keyfield,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Data Updated Successfully");
   } catch (err) {
@@ -29928,9 +29909,9 @@ const deleteProjectMapping = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(
-          `EXEC sp_ProjectMapping @mode,'','','','',@keyfield,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .query(`EXEC sp_ProjectMapping @mode,'','','','',@keyfield,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -38625,9 +38606,11 @@ const interview_panelLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
 
         .query(
-          `EXEC sp_interview_panel @mode, '', '', '', '','', '', @keyfield, '', '', '', ''`,
+          `EXEC sp_interview_panel @mode, '', '', '', '','', @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_panel data deleted successfully");
@@ -38890,9 +38873,10 @@ const interview_panel_membersLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("company_code", sql.NVarChar, item.company_code)
         .query(
-          `EXEC sp_interview_panel_members @mode, 0, 0,'', '','', @keyfield, '', '', '', ''`,
+          `EXEC sp_interview_panel_members @mode, 0, 0,'', '',@company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_panel_members data deleted successfully");
@@ -39000,9 +38984,10 @@ const interview_scheduleLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_schedule @mode,0, 0, 0, '', '', '', '', '','','', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_schedule @mode,0, 0, 0, '', '', '', '', '','',@company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_schedule data deleted successfully");
@@ -39104,8 +39089,10 @@ const interview_feedbackLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_feedback @mode, 0, 0, '', 0, '', '','', '', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_feedback @mode, 0, 0, '', 0, '', '','', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_feedback data deleted successfully");
@@ -39209,8 +39196,10 @@ const interview_decisionLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_decision @mode, 0, 0, 0, 0, '', '', '','', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_decision @mode, 0, 0, 0, 0, '', '', '', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_decision data deleted successfully");
@@ -40401,9 +40390,8 @@ const sp_Shift_MasterLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(
-          `EXEC sp_Shift_Master @mode, '', '', '', '', 0, '', 0, 0, '', '', @keyfield, @company_code, '', '', '', ''`,
-        );
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .query(`EXEC sp_Shift_Master @mode, '', '', '', '', 0, '', 0, 0, '', '', @keyfield, @company_code, '', '', @modified_by, ''`);
     }
     res.status(200).json("sp Shift Master data deleted successfully");
   } catch (err) {
@@ -41004,9 +40992,7 @@ const Shift_Pattern_DetailLoopUpdate = async (req, res) => {
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.DateTime, item.Modified_by)
-        .query(
-          `EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, @keyfield, '', '', @Modified_by, ''`,
-        );
+        .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data updated successfully");
   } catch (err) {
@@ -41031,9 +41017,8 @@ const Shift_Pattern_DetailLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(
-          `EXEC sp_Shift_Pattern_Detail @mode, '', '', 0, '', '', @Company_Code, @keyfield, '', '', '', ''`,
-        );
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
+        .query(`EXEC sp_Shift_Pattern_Detail @mode, '', '', 0, '', '', @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data deleted successfully");
   } catch (err) {
@@ -41455,9 +41440,7 @@ const ShiftPattern_Update = async (req, res) => {
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(
-          `EXEC sp_Shift_Pattern_Master @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`,
-        );
+        .query(`EXEC sp_Shift_Pattern_Master @mode, @Pattern_Code, @Pattern_Name, @Rotation_Days, @Description, @Status, @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift Pattern data updated successfully");
   } catch (err) {
@@ -41481,9 +41464,8 @@ const ShiftPattern_Delete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .query(
-          `EXEC sp_Shift_Pattern_Master @mode, '', '', '', '', '', @Company_Code, @keyfield, '', '', '', ''`,
-        );
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
+        .query(`EXEC sp_Shift_Pattern_Master @mode, '', '', '', '', '', @Company_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("ShiftPattern_Delete data deleted successfully");
   } catch (err) {
@@ -47245,9 +47227,10 @@ const EmployeeAssets_HdrLoopDelete = async (req, res) => {
       await pool.request()
         .input("mode", sql.NVarChar, "D")
         .input("AssetID", sql.Int, item.AssetID)
+        .input("modify_by", sql.NVarChar, item.modify_by)
         .input("company_code", sql.NVarChar, item.company_code)
         .query(`EXEC sp_EmployeeAssets_Hdr @mode, @AssetID, '',
-           '', '', '', '', '','', '', 0, '', '', '', '', '', '', '', '', @company_code, '', '', '', '', ''`);
+           '', '', '', '', '','', '', 0, '', '', '', '', '', '', '', '', @company_code, '', '', '', @modify_by, ''`);
     }
     res.status(200).json("EmployeeAssets_Hdr data deleted successfully");
   } catch (err) {
@@ -48113,7 +48096,7 @@ const EmployeeAssetReport_EAR = async (req, res) => {
 
 //Code added by pavun on 17-04-2026
 const GetAbsentReport = async (req, res) => {
-  const { FromDate, ToDate, EmployeeId, Department, Designation, CompanyCode } = req.body;
+  const { FromDate, ToDate, EmployeeId, Department, Designation, LeaveStatus, CompanyCode } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48126,8 +48109,9 @@ const GetAbsentReport = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Department", sql.NVarChar, Department)
       .input("Designation", sql.NVarChar, Designation)
+      .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,@CompanyCode`);
+      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,@LeaveStatus,@CompanyCode`);
 
     // Response handling
     if (result.recordset.length > 0) {
@@ -48144,6 +48128,88 @@ const GetAbsentReport = async (req, res) => {
   }
 };
 //Code added by pavun on 17-04-2026
+
+//Code added by pavun on 18-04-2026
+const GetLateReport = async (req, res) => {
+  const { FromDate, ToDate, EmployeeId, Department, Designation, CompanyCode } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "L")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Department", sql.NVarChar, Department)
+      .input("Designation", sql.NVarChar, Designation)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,'',@CompanyCode`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Disbursement Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+const GetOvertimeReport = async (req, res) => {
+  const { FromDate, ToDate, EmployeeId, Department, Designation, CompanyCode } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "O")
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("Department", sql.NVarChar, Department)
+      .input("Designation", sql.NVarChar, Designation)
+      .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .query(`EXEC sp_Attendance_Report @mode,@FromDate,@ToDate,@EmployeeId,@Department,@Designation,'',@CompanyCode`);
+
+    // Response handling
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+
+  } catch (err) {
+    console.error("Error fetching Loan Disbursement Report:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+const LeaveSummaryDrop = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_attribute_Info 'F',@company_code,'Leave Summary','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+//Code added by pavun on 18-04-2026
 
 module.exports = {
   login,
@@ -49522,6 +49588,9 @@ module.exports = {
   AssetIDDrop,
   AssetLifecycleReport_AS,
   EmployeeAssetReport_EAR,
-  GetAbsentReport
+  GetAbsentReport,
+  GetLateReport,
+  GetOvertimeReport,
+  LeaveSummaryDrop
 
 };

@@ -485,41 +485,59 @@ function Project({ }) {
     }
   };
 
-  const saveEditedData = async () => {
-        showConfirmationToast(
+  const saveEditedData = async (rowData) => {
+    showConfirmationToast(
       "Are you sure you want to Update the data in the selected rows?",
       async () => {
-      setLoading(true);
-    try {
-      const modified_by = sessionStorage.getItem('selectedUserCode');
-      const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.ProjectID === row.ProjectID) : [editedData];
-      console.log(selectedRowsData)
-      const response = await fetch(`${config.apiBaseUrl}/updateProject`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "modified_by": modified_by,
+        setLoading(true);
+        try {
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-        },
-        body: JSON.stringify({ editedData: selectedRowsData, company_code: sessionStorage.getItem("selectedCompanyCode") }),
-      });
+          // const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.ProjectID === row.ProjectID) : [editedData];
 
-      if (response.status === 200) {
-        setTimeout(() => {
-          toast.success("Data Updated Successfully")
-          handleSearch();
-        }, 1000);
-        return;
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to Updated selected data");
-      }
-    } catch (error) {
-      console.error("Error saving data:", error);
-      toast.error("Error Updating Data: " + error.message);
-    } finally {
-      setLoading(false);
-    }
+          const dataToSend = {
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/updateProject`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+
+            },
+            // body: JSON.stringify({ editedData: selectedRowsData, company_code: sessionStorage.getItem("selectedCompanyCode") }),
+            body: JSON.stringify(dataToSend),
+          });
+
+          if (response.status === 200) {
+            setTimeout(() => {
+              toast.success("Data Updated Successfully")
+              handleSearch();
+            }, 1000);
+            return;
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Failed to Updated selected data");
+          }
+        } catch (error) {
+          console.error("Error saving data:", error);
+          toast.error("Error Updating Data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -528,19 +546,38 @@ function Project({ }) {
   };
 
   const deleteSelectedRows = async (rowData) => {
-    const ProjectIDDelete = { ProjectIDToDelete: Array.isArray(rowData) ? rowData : [rowData] };
+    // const ProjectIDDelete = { ProjectIDToDelete: Array.isArray(rowData) ? rowData : [rowData] };
 
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-      setLoading(true);
         try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem('selectedCompanyCode');
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+          const dataToSend = {
+            ProjectIDToDelete: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
           const response = await fetch(`${config.apiBaseUrl}/deleteProject`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify(ProjectIDDelete),
+            body: JSON.stringify(dataToSend),
           });
 
           if (response.ok) {
@@ -629,7 +666,7 @@ function Project({ }) {
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data: " + error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };

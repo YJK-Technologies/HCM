@@ -620,87 +620,117 @@ function InterviewSchedule({ }) {
     searchClearInputFields();
   };
 
-  const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+    const handleUpdate = async (rowData) => {
+        showConfirmationToast(
+            "Are you sure you want to update the selected employee shift mapping data?",
+            async () => {
+                try {
+                    setLoading(true);
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const dataToSend = { interview_scheduleData: Array.isArray(rowData) ? rowData : [rowData] };
+                    const dataToSend = {
+                        interview_scheduleData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
+                    };
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_scheduleLoopUpdate`, {
+                    const response = await fetch(`${config.apiBaseUrl}/interview_scheduleLoopUpdate`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
+
+                    if (response.ok) {
+                        toast.success("Employee shift mapping updated successfully", {
+                            onClose: () => handleSearch(),
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Update failed");
+                    }
+                } catch (error) {
+                    console.error("Update error:", error);
+                    toast.error("Error updating data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            },
+            () => toast.info("Update cancelled"),
+        );
+    };
+
+const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          interview_scheduleData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_scheduleLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+        );
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-          const dataToSend = { interview_scheduleData: Array.isArray(rowData) ? rowData : [rowData] };
-
-          const response = await fetch(`${config.apiBaseUrl}/interview_scheduleLoopDelete`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code
-            },
-            body: JSON.stringify(dataToSend)
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
           });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-          }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
+  
 
   const tabs = [
     { label: 'Job Master' },
@@ -1051,7 +1081,10 @@ function InterviewSchedule({ }) {
                 required
                 autoComplete="off"
                 value={location}
-                onChange={(e) => setlocation((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setlocation(filteredValue);
+                }}
               />
               <label for="sname" className={`exp-form-labels ${error && !location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
             </div>
@@ -1239,7 +1272,10 @@ function InterviewSchedule({ }) {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={locationSC}
-                onChange={(e) => setlocationSC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setlocationSC(filteredValue);
+                }}
               />
               <label for="sname" className="exp-form-labels">Location</label>
             </div>

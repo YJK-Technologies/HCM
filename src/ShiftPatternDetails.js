@@ -651,18 +651,33 @@ function ShiftPatternDetails() {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            Shift_Pattern_DetailData: Array.isArray(rowData) ? rowData : [rowData],
+            Shift_Pattern_DetailData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  Company_Code,
+                  Modified_by,
+                },
+              ],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/Shift_Pattern_DetailLoopDelete`,
+          // const dataToSend = {
+          //   Shift_Pattern_DetailData: Array.isArray(rowData) ? rowData : [rowData],
+          // };
+
+          const response = await fetch(`${config.apiBaseUrl}/Shift_Pattern_DetailLoopDelete`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Company_Code": Company_Code
               },
               body: JSON.stringify(dataToSend),
             },

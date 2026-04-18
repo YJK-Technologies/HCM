@@ -661,8 +661,24 @@ function ShiftMasterGrid() {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
+          // const dataToSend = {
+          //   sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+          // };
+
           const dataToSend = {
-            sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData],
+            sp_Shift_MasterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
           };
 
           const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopUpdate`,
@@ -670,8 +686,6 @@ function ShiftMasterGrid() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "company_code": company_code,
-                "modified-by": modified_by
               },
               body: JSON.stringify(dataToSend),
             }
@@ -704,9 +718,26 @@ function ShiftMasterGrid() {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+
+          // const dataToSend = {
+          //   sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData]
+          // };
 
           const dataToSend = {
-            sp_Shift_MasterData: Array.isArray(rowData) ? rowData : [rowData]
+            sp_Shift_MasterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
           };
 
           const response = await fetch(`${config.apiBaseUrl}/sp_Shift_MasterLoopDelete`, {

@@ -1408,6 +1408,9 @@ router.post("/getTransportMode",dataController.getTransportMode)
 router.post("/AssetLifecycleReport_AS",dataController.AssetLifecycleReport_AS)
 router.post("/EmployeeAssetReport_EAR",dataController.EmployeeAssetReport_EAR)
 router.post("/GetAbsentReport",dataController.GetAbsentReport)
+router.post("/GetLateReport",dataController.GetLateReport)
+router.post("/GetOvertimeReport",dataController.GetOvertimeReport) 
+router.post("/LeaveSummaryDrop",dataController.LeaveSummaryDrop) 
 
 
 module.exports = router;

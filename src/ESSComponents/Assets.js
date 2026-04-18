@@ -234,76 +234,76 @@ function Assets({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-    useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
-      })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
       .then((response) => response.json())
       .then((data) => {
         const CurrencyDrop = data.map(option => option.attributedetails_name);
         setCurrencyDropGrid(CurrencyDrop);
       })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
-    useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
-      })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
       .then((response) => response.json())
       .then((data) => {
         const statusDrop = data.map(option => option.attributedetails_name);
         setstatusDropGrid(statusDrop);
       })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
-      useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/GetCountry`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ company_code })
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            const Countrydrop = data.map((option) => ({
-              value: option.Country_Code,
-              label: `${option.Country_Code} - ${option.Country_Name}`,
-            }));
-            setCountrydropGrid(Countrydrop);
-          })
-          .catch((error) => console.error('Error fetching data:', error));
-      }, []);
-
-      useEffect(() => {
-      const company_code = sessionStorage.getItem('selectedCompanyCode');
-      fetch(`${config.apiBaseUrl}/status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ company_code })
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/GetCountry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const Countrydrop = data.map((option) => ({
+          value: option.Country_Code,
+          label: `${option.Country_Code} - ${option.Country_Name}`,
+        }));
+        setCountrydropGrid(Countrydrop);
       })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
       .then((response) => response.json())
       .then((data) => {
         const statusDrop = data.map(option => option.attributedetails_name);
         setStatusGriddrop(statusDrop);
       })
-        .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
 
   const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
@@ -518,22 +518,22 @@ function Assets({ }) {
       editable: true
     },
     {
-  headerName: "Purchase Date",
-  field: "PurchaseDate",
-  editable: true,
-  cellStyle: { textAlign: "left" },
-  valueFormatter: (params) => {
-    if (!params.value) return "";
+      headerName: "Purchase Date",
+      field: "PurchaseDate",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      valueFormatter: (params) => {
+        if (!params.value) return "";
 
-    const date = new Date(params.value);
+        const date = new Date(params.value);
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
-  }
-},
+        return `${day}-${month}-${year}`;
+      }
+    },
     {
       headerName: "Purchase Cost",
       field: "PurchaseCost",
@@ -561,16 +561,16 @@ function Assets({ }) {
       editable: true,
       cellStyle: { textAlign: "left" },
       valueFormatter: (params) => {
-    if (!params.value) return "";
+        if (!params.value) return "";
 
-    const date = new Date(params.value);
+        const date = new Date(params.value);
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
-  }
+        return `${day}-${month}-${year}`;
+      }
     },
     {
       headerName: "Warranty End",
@@ -578,16 +578,16 @@ function Assets({ }) {
       editable: true,
       cellStyle: { textAlign: "left" },
       valueFormatter: (params) => {
-    if (!params.value) return "";
+        if (!params.value) return "";
 
-    const date = new Date(params.value);
+        const date = new Date(params.value);
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
-  }
+        return `${day}-${month}-${year}`;
+      }
     },
 
     {
@@ -632,7 +632,7 @@ function Assets({ }) {
     },
   ]
 
-    const defaultColDef = {
+  const defaultColDef = {
     resizable: true,
     wrapText: true,
     editable: true,
@@ -833,7 +833,7 @@ function Assets({ }) {
   };
 
   const handleSave = async () => {
-    if ( !Asset_Code || !AssetName || !AssetCategory ||
+    if (!Asset_Code || !AssetName || !AssetCategory ||
       !SerialNumber || !Bar_code || !Brand || !Model || !PurchaseDate || !PurchaseCost
       || !CurrencyCode || !VendorName || !WarrantyStart || !WarrantyEnd || !Location) {
       setError(" ");
@@ -892,134 +892,166 @@ function Assets({ }) {
     }
   };
 
-// UPDATE
-const saveEditedData = async () => {
-  showConfirmationToast(
-    "Are you sure you want to update the data in the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+  // UPDATE
+  const saveEditedData = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to update the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modify_by = sessionStorage.getItem("selectedUserCode");
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modify_by = sessionStorage.getItem("selectedUserCode");
 
-        const rows = Array.isArray(rowData) ? rowData : [rowData];
+          // const rows = Array.isArray(rowData) ? rowData : [rowData];
 
-        const dataToSend = {
-          EmployeeAssets_HdrData: rows.map((row) => ({
-            AssetID: row.AssetID || 0,
-            Asset_Code: row.Asset_Code || null,
-            AssetName: row.AssetName || null,
-            AssetCategory: row.AssetCategory || null,
-            SerialNumber: row.SerialNumber || null,
-            Bar_code: row.Bar_code || null,
-            Brand: row.Brand || null,
-            Model: row.Model || null,
-            // Dates (safe handling)
-            PurchaseDate: row.PurchaseDate || null,
-            WarrantyStart: row.WarrantyStart || null,
-            WarrantyEnd: row.WarrantyEnd || null,
-            // Numbers
-            PurchaseCost: row.PurchaseCost
-              ? parseFloat(row.PurchaseCost)
-              : 0,
-            CurrencyCode: row.CurrencyCode || null,
-            VendorName: row.VendorName || null,
-            AssetStatus: row.AssetStatus || null,
-            Location: row.Location || null,
-            Country: row.Country || null,
-            Status: row.Status || null,
+          const dataToSend = {
+            EmployeeAssets_HdrData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modify_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modify_by,
+                },
+              ],
+          };
 
-            company_code:  sessionStorage.getItem("selectedCompanyCode"),
-            Keyfield: row.Keyfield || null,
+          // const dataToSend = {
+          //   EmployeeAssets_HdrData: rows.map((row) => ({
+          //     AssetID: row.AssetID || 0,
+          //     Asset_Code: row.Asset_Code || null,
+          //     AssetName: row.AssetName || null,
+          //     AssetCategory: row.AssetCategory || null,
+          //     SerialNumber: row.SerialNumber || null,
+          //     Bar_code: row.Bar_code || null,
+          //     Brand: row.Brand || null,
+          //     Model: row.Model || null,
+          //     // Dates (safe handling)
+          //     PurchaseDate: row.PurchaseDate || null,
+          //     WarrantyStart: row.WarrantyStart || null,
+          //     WarrantyEnd: row.WarrantyEnd || null,
+          //     // Numbers
+          //     PurchaseCost: row.PurchaseCost
+          //       ? parseFloat(row.PurchaseCost)
+          //       : 0,
+          //     CurrencyCode: row.CurrencyCode || null,
+          //     VendorName: row.VendorName || null,
+          //     AssetStatus: row.AssetStatus || null,
+          //     Location: row.Location || null,
+          //     Country: row.Country || null,
+          //     Status: row.Status || null,
 
-            modify_by: modify_by,
-            modify_date: new Date().toISOString(), // safer
-          })),
-        };
+          //     company_code:  sessionStorage.getItem("selectedCompanyCode"),
+          //     Keyfield: row.Keyfield || null,
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          //     modify_by: modify_by,
+          //     modify_date: new Date().toISOString(), // safer
+          //   })),
+          // };
+
+          const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.error(errorResponse.message || "Update failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data updated successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.error(errorResponse.message || "Update failed");
+        } catch (error) {
+          console.error("Error updating rows:", error);
+          toast.error("Error Updating Data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error updating rows:", error);
-        toast.error("Error Updating Data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Update cancelled");
       }
-    },
-    () => {
-      toast.info("Update cancelled");
-    }
-  );
-};
+    );
+  };
 
-// DELETE
-const deleteSelectedRows = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the data in the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+  // DELETE
+  const deleteSelectedRows = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to delete the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modify_by = sessionStorage.getItem("selectedUserCode");
 
-        const rows = Array.isArray(rowData) ? rowData : [rowData];
+          // const rows = Array.isArray(rowData) ? rowData : [rowData];
 
-        const dataToSend = {
-          EmployeeAssets_HdrData: rows.map((row) => ({
-            AssetID: row.AssetID,
-            company_code: company_code,
-          })),
-        };
+          const dataToSend = {
+            EmployeeAssets_HdrData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modify_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modify_by,
+                },
+              ],
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/EmployeeAssets_HdrLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          // const dataToSend = {
+          //   EmployeeAssets_HdrData: rows.map((row) => ({
+          //     AssetID: row.AssetID,
+          //     company_code: company_code,
+          //   })),
+          // };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/EmployeeAssets_HdrLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.error(errorResponse.message || "Failed to delete data");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.error(errorResponse.message || "Failed to delete data");
+        } catch (error) {
+          console.error("Error deleting rows:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error deleting rows:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Data delete cancelled.");
       }
-    },
-    () => {
-      toast.info("Data delete cancelled.");
-    }
-  );
-};
+    );
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1364,7 +1396,7 @@ const deleteSelectedRows = async (rowData) => {
 
         <div className="row g-3">
 
-            <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Grade Name "
