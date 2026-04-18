@@ -38606,9 +38606,11 @@ const interview_panelLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
 
         .query(
-          `EXEC sp_interview_panel @mode, '', '', '', '','', '', @keyfield, '', '', '', ''`,
+          `EXEC sp_interview_panel @mode, '', '', '', '','', @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_panel data deleted successfully");
@@ -38871,9 +38873,10 @@ const interview_panel_membersLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-
+        .input("modified_by", sql.NVarChar, item.modified_by)
+        .input("company_code", sql.NVarChar, item.company_code)
         .query(
-          `EXEC sp_interview_panel_members @mode, 0, 0,'', '','', @keyfield, '', '', '', ''`,
+          `EXEC sp_interview_panel_members @mode, 0, 0,'', '',@company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_panel_members data deleted successfully");
@@ -38981,9 +38984,10 @@ const interview_scheduleLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_schedule @mode,0, 0, 0, '', '', '', '', '','','', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_schedule @mode,0, 0, 0, '', '', '', '', '','',@company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_schedule data deleted successfully");
@@ -39085,8 +39089,10 @@ const interview_feedbackLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_feedback @mode, 0, 0, '', 0, '', '','', '', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_feedback @mode, 0, 0, '', 0, '', '','', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_feedback data deleted successfully");
@@ -39190,8 +39196,10 @@ const interview_decisionLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_interview_decision @mode, 0, 0, 0, 0, '', '', '','', @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_interview_decision @mode, 0, 0, 0, 0, '', '', '', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("interview_decision data deleted successfully");

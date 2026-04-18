@@ -405,105 +405,120 @@ function InterviewPanelMem({ }) {
     searchClearInputFields();
   };
 
-  const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
+const handleUpdate = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to update the data in the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = {
-            interview_panel_membersData: Array.isArray(rowData)
-              ? rowData
-              : [rowData],
-          };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/interview_panel_membersLoopUpdate`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
-                "modified-by": modified_by,
-              },
-              body: JSON.stringify(dataToSend),
+        const dataToSend = {
+          interview_panel_membersData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_panel_membersLoopUpdate`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-          );
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(
-              errorResponse.message || "Failed to insert sales data",
-            );
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error("Error Deleting Data: " + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data updated successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Update failed");
         }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      },
-    );
-  };
+      } catch (error) {
+        console.error("Update error:", error);
+        toast.error("Error updating data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Update cancelled");
+    }
+  );
+};
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
+const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = {
-            interview_panel_membersData: Array.isArray(rowData)
-              ? rowData
-              : [rowData],
-          };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          interview_panel_membersData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/interview_panel_membersLoopDelete`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                company_code: company_code,
-              },
-              body: JSON.stringify(dataToSend),
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_panel_membersLoopDelete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-          );
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(
-              errorResponse.message || "Failed to insert sales data",
-            );
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error("Error Deleting Data: " + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
-      },
-    );
-  };
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
 
   const tabs = [
     { label: "Job Master" },
@@ -847,7 +862,10 @@ function InterviewPanelMem({ }) {
                 title="Please Choose the Start Year"
                 autoComplete="off"
                 value={member_id}
-                onChange={(e) => setmember_id(e.target.value)}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setmember_id(filteredValue);
+                }}
               />
               <label For="city" className="exp-form-labels">
                 Member ID

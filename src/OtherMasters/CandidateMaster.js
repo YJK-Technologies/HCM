@@ -856,7 +856,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={candidate_name}
                 maxLength={50}
-                onChange={(e) => setcandidate_name((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setcandidate_name(filteredValue);
+                }}
               />
               <label for="sname" className={` exp-form-labels ${error && !candidate_name ? 'text-danger' : ''}`}>Candidate Name<span className="text-danger">*</span></label>
             </div>
@@ -954,7 +957,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Education}
                 maxLength={100}
-                onChange={(e) => { setEducation(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setEducation(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -976,7 +982,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Experience}
                 maxLength={100}
-                onChange={(e) => { setExperience(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setExperience(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -998,7 +1007,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experience}
                 maxLength={100}
-                onChange={(e) => { setRelated_experience(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setRelated_experience(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -1020,7 +1032,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Job_description}
                 maxLength={100}
-                onChange={(e) => { setJob_description(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setJob_description(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -1217,7 +1232,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={EducationSC}
                 maxLength={100}
-                onChange={(e) => { setEducationSC(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setEducationSC(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -1239,7 +1257,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={ExperienceSC}
                 maxLength={100}
-                onChange={(e) => { setExperienceSC(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setExperienceSC(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -1261,7 +1282,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experienceSC}
                 maxLength={100}
-                onChange={(e) => { setRelated_experienceSC(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setRelated_experienceSC(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"
@@ -1283,7 +1307,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={JobDescriptionSC}
                 maxLength={100}
-                onChange={(e) => { setJobDescriptionSC(e.target.value); }}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setJobDescriptionSC(filteredValue);
+                }}
               />
               <label
                 htmlFor="fdate"

@@ -551,86 +551,121 @@ function InterviewDecision({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+  showConfirmationToast(
+    "Are you sure you want to update the data in the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = { interview_decisionData: Array.isArray(rowData) ? rowData : [rowData] };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_decisionLoopUpdate`, {
+        const dataToSend = {
+          interview_decisionData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_decisionLoopUpdate`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data updated successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Update failed");
         }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
+      } catch (error) {
+        console.error("Update error:", error);
+        toast.error("Error updating data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Update cancelled");
+    }
+  );
+};
 
-  const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
+const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = { interview_decisionData: Array.isArray(rowData) ? rowData : [rowData] };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          interview_decisionData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
 
-          const response = await fetch(`${config.apiBaseUrl}/interview_decisionLoopDelete`, {
+        const response = await fetch(
+          `${config.apiBaseUrl}/interview_decisionLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
+
+
   const tabs = [
     { label: 'Job Master' },
     { label: 'Candidate Master' },
@@ -931,7 +966,10 @@ function InterviewDecision({ }) {
                 required
                 autoComplete="off"
                 value={decided_by}
-                onChange={(e) => setdecided_by((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setdecided_by(filteredValue);
+                }}
               />
               <label for="add1" className={`exp-form-labels ${error && !decided_by ? 'text-danger' : ''}`}>Decided By<span className="text-danger">*</span></label>
             </div>
@@ -947,7 +985,10 @@ function InterviewDecision({ }) {
                 required
                 autoComplete="off"
                 value={remarks}
-                onChange={(e) => setremarks((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setremarks(filteredValue);
+                }}
               />
               <label for="add1" className={`exp-form-labels ${error && !remarks ? 'text-danger' : ''}`}>Remarks<span className="text-danger">*</span></label>
             </div>
@@ -1110,7 +1151,10 @@ function InterviewDecision({ }) {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={decided_bySC}
-                onChange={(e) => setdecided_bySC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setdecided_bySC(filteredValue);
+                }}
               />
               <label for="sname" className="exp-form-labels">Decided By</label>
             </div>
@@ -1125,7 +1169,10 @@ function InterviewDecision({ }) {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={remarksSC}
-                onChange={(e) => setremarksSC((e.target.value))}
+                onChange={(e) => {const value = e.target.value;
+                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                setremarksSC(filteredValue);
+                }}
               />
               <label for="sname" className="exp-form-labels">Remarks</label>
             </div>
