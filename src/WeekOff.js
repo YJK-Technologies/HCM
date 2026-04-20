@@ -274,7 +274,8 @@ function WeekOff() {
 
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode")
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem("selectedUserCode"),
     };
 
     showConfirmationToast(
@@ -333,6 +334,7 @@ function WeekOff() {
       upcoming_birthday: Number(member.birthdayDays) || 0,
       new_joinees: Number(member.joineesDays) || 0,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem("selectedUserCode"),
       keyfield: member.keyfield
     };
 

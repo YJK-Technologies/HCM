@@ -409,7 +409,7 @@ function Input({ }) {
     }
   };
 
-  const saveEditedData = async () => {
+  const saveEditedData = async (rowData) => {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
@@ -419,14 +419,25 @@ function Input({ }) {
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
-
+        const dataToSend = {
+          editedData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
           const response = await fetch(`${config.apiBaseUrl}/updateAnnouncementDetails`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
             },
             body: JSON.stringify(dataToSend)
           });
@@ -455,7 +466,24 @@ function Input({ }) {
 
   const deleteSelectedRows = async (rowData) => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+    const modified_by = sessionStorage.getItem('selectedUserCode');
+
+    const dataToSend = {
+                        editedData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
+                    };
+
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {

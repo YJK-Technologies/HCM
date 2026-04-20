@@ -495,17 +495,21 @@ function LoanType({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+
 
                     const dataToSend = {
                         editedData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
+                                Modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
+                                    Modified_by,
                                 },
                             ],
                     };

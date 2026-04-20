@@ -138,7 +138,8 @@ function PMSsettings() {
       async () => {
         try {
           const Header = {
-            company_code: sessionStorage.getItem("selectedCompanyCode")
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem('selectedUserCode')
           };
 
           const response = await fetch(`${config.apiBaseUrl}/deletePMSsettings`, {
