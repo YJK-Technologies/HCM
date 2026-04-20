@@ -441,6 +441,8 @@ const handleSave = async () => {
     ApprovedBy: member.ApprovedBy,
     Remarks: member.Remarks,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
+    modify_by: sessionStorage.getItem('selectedUserCode')
+
   };
 
   showConfirmationToast(
@@ -489,6 +491,7 @@ const handleDeleteAsset = async (relation, index) => {
   const payload = {
     keyfield: member.keyfield,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
+    modify_by: sessionStorage.getItem('selectedUserCode')
   };
 
   showConfirmationToast(
