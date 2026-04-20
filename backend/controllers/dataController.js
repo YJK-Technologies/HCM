@@ -21327,7 +21327,7 @@ const allEmployeeCompanyData = async (req, res) => {
 };
 
 const deleteEmployeeCompany = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, modified_by } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -21335,8 +21335,9 @@ const deleteEmployeeCompany = async (req, res) => {
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("company_code", sql.VarChar, company_code)
+      .input("modified_by", sql.VarChar, modified_by)
       .query(
-        `EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Employee data deleted successfully.");
@@ -21472,12 +21473,13 @@ const deleteEmployeeFamily = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
-        .query(`EXEC sp_employee_family 'D','','','','','',0,'',@keyfield,@company_code,'','','','','','',0,'',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+        .input("modified_by", sql.NVarChar, modified_by)
+        .query(`EXEC sp_employee_family 'D','','','','','',0,'',@keyfield,@company_code,'','','','','','',0,'',0,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
     }
 
@@ -21606,7 +21608,7 @@ const allSalaryDetailsData = async (req, res) => {
 };
 
 const deleteSalaryDetails = async (req, res) => {
-  const { EmployeeId, PFNo, company_code } = req.body;
+  const { EmployeeId, PFNo, company_code, modified_by } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -21615,8 +21617,9 @@ const deleteSalaryDetails = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("PFNo", sql.NVarChar, PFNo)
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Employee salary data deleted successfully");
@@ -21943,7 +21946,7 @@ const getallEmployeebankdet = async (req, res) => {
 };
 
 const Employeebankdetdelete = async (req, res) => {
-  const { EmployeeId, Account_NO, company_code } = req.body;
+  const { EmployeeId, Account_NO, company_code, modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     await pool
@@ -21951,8 +21954,9 @@ const Employeebankdetdelete = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Account_NO", sql.NVarChar, Account_NO)
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.VarChar, modified_by)
       .query(
-        `EXEC sp_employee_bankdetails 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','','', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`,
+        `EXEC sp_employee_bankdetails 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','',@modified_by, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`,
       );
     res.status(200).json("Bank details Deleted Successfully");
   } catch (err) {
@@ -22335,7 +22339,7 @@ const Employeedataupdate = async (req, res) => {
 };
 
 const deleteemployeeper = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, Modified_by } = req.body;
   if (!EmployeeId) {
     return res.status(400).json({ message: "Employee ID is required." });
   }
@@ -22345,10 +22349,11 @@ const deleteemployeeper = async (req, res) => {
       .request()
       .input("employeeID", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Modified_by", sql.NVarChar, Modified_by)
       .query(
-        `EXEC [sp_employee_personal]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC [sp_employee_personal]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
-    if (result.rowsAffected[0] > 0) {
+    if (result.rowsAffected[0] > 0) {  
       return res
         .status(200)
         .json({ message: "Employee Personal  deleted successfully." });
@@ -23161,13 +23166,14 @@ const deleteEmployeeAcademicDetails = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
 
@@ -23311,7 +23317,7 @@ const updateempDoc = async (req, res) => {
         .input("modified_by", updatedRow.modified_by)
         .input("company_code", updatedRow.company_code)
         .query(
-          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Employee family data updated successfully");
@@ -23334,13 +23340,14 @@ const deleteEmployeeIdentityDocument = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of documentNoToDelete) {
-      const { documentNo, company_code } = record;
+      const { documentNo, company_code, modified_by } = record;
       await pool
         .request()
         .input("documentNo", sql.NVarChar, documentNo)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_employee_identity_document 'D','','',@documentNo,'','',0,@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_employee_identity_document 'D','','',@documentNo,'','',0,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
 
@@ -31833,13 +31840,14 @@ const delempdoc = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_ess_employee_documents 'D','','','',@keyfield,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_ess_employee_documents 'D','','','',@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Employee document data deleted successfully");
@@ -46493,8 +46501,7 @@ const EmployeeAssetsLoopUpdate = async (req, res) => {
         .input("CreatedBy", sql.NVarChar, item.CreatedBy)
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
-        .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, ''`);
     }
     res.status(200).json("EmployeeAssets data updated successfully");
   } catch (err) {
@@ -46517,7 +46524,8 @@ const EmployeeAssetsLoopDelete = async (req, res) => {
         .input("AllocationID", sql.Int, item.AllocationID)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("Keyfield", sql.NVarChar, item.Keyfield)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', '','',''`);
+        .input("modify_by", sql.NVarChar, item.modify_by)
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', '',@modify_by,''`);
     }
     res.status(200).json("EmployeeAssets data deleted successfully");
   } catch (err) {
@@ -48232,6 +48240,49 @@ const LeaveSummaryDrop = async (req, res) => {
 
 //Code added by pavun on 18-04-2026
 
+//code added by Sakthi on 20-04-2026
+const getUCN = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC SP_user_info_hdr 'UCN', @company_code, '', '', '', '', 
+              '', '', '', '', '', '', '', '', '', '', 
+              '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+      `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 20-04-2026
+
+//code added by Sakthi on 20-04-2026
+const getDateFormat = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'FD',@company_code,'DateFormat','','', '' ,'','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 20-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49612,6 +49663,8 @@ module.exports = {
   GetAbsentReport,
   GetLateReport,
   GetOvertimeReport,
-  LeaveSummaryDrop
+  LeaveSummaryDrop,
+  getUCN,
+  getDateFormat
 
 };

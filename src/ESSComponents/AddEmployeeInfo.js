@@ -350,7 +350,7 @@ function Input({ }) {
           formData.append("Place_of_Birth", placeOfBirth);
           formData.append("Passport_No", passportNo);
           formData.append("company_code", sessionStorage.getItem('selectedCompanyCode'));
-          formData.append("modified_by", sessionStorage.getItem('selectedUserCode'));
+          formData.append("Modified_by", sessionStorage.getItem('selectedUserCode'));
 
           if (user_images) {
             formData.append("Photos", user_images);
@@ -942,7 +942,8 @@ function Input({ }) {
         try {
           const deatils = {
             EmployeeId: EmployeeId,
-            company_code: sessionStorage.getItem("selectedCompanyCode")
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Modified_by: sessionStorage.getItem('selectedUserCode')
           }
 
           const response = await fetch(`${config.apiBaseUrl}/deleteemployeedata`, {
