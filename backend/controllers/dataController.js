@@ -38753,8 +38753,9 @@ const job_masterLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '', '', '', '', '', '', '','', ''`,
+          `EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '', '', '', '', '', '', '',@modified_by, ''`,
         );
     }
     res.status(200).json("job_master data deleted successfully");
