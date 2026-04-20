@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import * as React from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -70,14 +70,22 @@ const columnDefs = [
     field: "DOJ",
     filter: 'agTextColumnFilter',
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'dd-MM-yyyy'),
+    valueFormatter: params => {
+      if (!params.value) return "";
+      const date = new Date(params.value);
+      return isNaN(date) ? "" : format(date, 'dd-MM-yyyy');
+    },
   },
   {
     headerName: "DOL",
     field: "DOL",
     filter: 'agTextColumnFilter',
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'dd-MM-yyyy'),
+    valueFormatter: params => {
+      if (!params.value) return "";  
+      const date = new Date(params.value);
+      return isNaN(date) ? "" : format(date, 'dd-MM-yyyy');
+    },
   },
   {
     headerName: "Manager",
@@ -142,27 +150,27 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
     }))
     : [];
 
-    const handleChangeCode = (selectedOption) => {
+  const handleChangeCode = (selectedOption) => {
     setselectedmanager(selectedOption);
     setManager(selectedOption ? selectedOption.value : '');
   };
 
   useEffect(() => {
-      fetch(`${config.apiBaseUrl}/getESSmanager`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      })
-        .then((response) => response.json())
-        .then(setManagerdrop)
-        .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
+    fetch(`${config.apiBaseUrl}/getESSmanager`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
 
-    const handleStatusChange = (selectedStatus) => {
+  const handleStatusChange = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : '');
   };
@@ -209,9 +217,9 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
 
   const handleSearch = async () => {
     if (new Date(from_date) > new Date(to_date)) {
-                toast.warning("From Date cannot be greater than To Date");
-                return;
-            }
+      toast.warning("From Date cannot be greater than To Date");
+      return;
+    }
     setLoading(true)
     try {
       const response = await fetch(`${config.apiBaseUrl}/EmployeeCompanyISC`, {
@@ -220,8 +228,8 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date, 
-          Employee_Type: selectedEmpType ? selectedEmpType.value : null, 
+          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date,
+          Employee_Type: selectedEmpType ? selectedEmpType.value : null,
           company_code: sessionStorage.getItem('selectedCompanyCode')
 
         })
@@ -265,34 +273,34 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
     }
   };
 
-const handleClosePopup = () => {
-  clearInputs();     // ✅ clear all inputs
-  setRowData([]);    // ✅ clear grid
-  handleClose();     // ✅ close parent popup
-};
+  const handleClosePopup = () => {
+    clearInputs();     // ✅ clear all inputs
+    setRowData([]);    // ✅ clear grid
+    handleClose();     // ✅ close parent popup
+  };
 
-const handleReload = () => {
-  clearInputs();   // ❌ remove []
-  setRowData([]);
-};
+  const handleReload = () => {
+    clearInputs();   // ❌ remove []
+    setRowData([]);
+  };
 
-const clearInputs = () => {
-  setEmployeeId("");
-  setname("");
-  setDepartment("");
-  setDesignation("");
+  const clearInputs = () => {
+    setEmployeeId("");
+    setname("");
+    setDepartment("");
+    setDesignation("");
 
-  setselectedmanager(null);
-  setSelectedStatus(null);
-  setSelectedEmpType(null);
+    setselectedmanager(null);
+    setSelectedStatus(null);
+    setSelectedEmpType(null);
 
-  setManager("");   // ✅ important
-  setStatus("");    // ✅ important
-  setEmpType("");
+    setManager("");   // ✅ important
+    setStatus("");    // ✅ important
+    setEmpType("");
 
-  setfrom_date("");
-  setto_date("");
-};
+    setfrom_date("");
+    setto_date("");
+  };
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -323,7 +331,7 @@ const clearInputs = () => {
     <div>
       {open && (
         <div className="modal-overlay">
-      {loading && <LoadingScreen />}
+          {loading && <LoadingScreen />}
           <div className="custom-modal container-fluid Topnav-screen">
             <div className="custom-modal-body">
 
@@ -403,113 +411,113 @@ const clearInputs = () => {
                 </div>
 
                 <div className="form-block col-md-3">
-            <div
-              className={`inputGroup selectGroup 
+                  <div
+                    className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
-            >
-              <Select
-                id="manager"
-                placeholder=" "
-                onFocus={() => setIsSelectManager(true)}
-                onBlur={() => setIsSelectManager(false)}
-                classNamePrefix="react-select"
-                isClearable
-                type="text"
-                name="manager"
-                value={selectedmanager}
-                options={filteredOptionManager}
-                onChange={handleChangeCode}
-                required
-              />
-              <label htmlFor="selectedmanager" className={`floating-label`}>
-                Manager
-              </label>
-            </div>
-          </div>
+                  >
+                    <Select
+                      id="manager"
+                      placeholder=" "
+                      onFocus={() => setIsSelectManager(true)}
+                      onBlur={() => setIsSelectManager(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      type="text"
+                      name="manager"
+                      value={selectedmanager}
+                      options={filteredOptionManager}
+                      onChange={handleChangeCode}
+                      required
+                    />
+                    <label htmlFor="selectedmanager" className={`floating-label`}>
+                      Manager
+                    </label>
+                  </div>
+                </div>
 
-          <div className="form-block col-md-3">
-            <div
-              className={`inputGroup selectGroup 
+                <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-            >
-              <Select
-                id="status"
-                type="text"
-                placeholder=" "
-                onFocus={() => setIsSelectStatus(true)}
-                onBlur={() => setIsSelectStatus(false)}
-                classNamePrefix="react-select"
-                isClearable
-                value={selectedStatus}
-                onChange={handleStatusChange}
-                options={filteredOptionStatus}
-              />
-              <label htmlFor="Status" className={`floating-label`}>
-                Status
-              </label>
-            </div>
-          </div>
+                  >
+                    <Select
+                      id="status"
+                      type="text"
+                      placeholder=" "
+                      onFocus={() => setIsSelectStatus(true)}
+                      onBlur={() => setIsSelectStatus(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      value={selectedStatus}
+                      onChange={handleStatusChange}
+                      options={filteredOptionStatus}
+                    />
+                    <label htmlFor="Status" className={`floating-label`}>
+                      Status
+                    </label>
+                  </div>
+                </div>
 
-          <div className="form-block col-md-3">
-            <div className="inputGroup">
-              <input
-                id="DOJ"
-                className="exp-input-field form-control"
-                type="date"
-                name="DOJ"
-                placeholder=" "
-                value={from_date}
-                onChange={(e) => setfrom_date(e.target.value)}
-                required
-              />
-              <label htmlFor="DOJ" className={`exp-form-labels`}>
-                From Date
-              </label>
-            </div>
-          </div>
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      id="DOJ"
+                      className="exp-input-field form-control"
+                      type="date"
+                      name="DOJ"
+                      placeholder=" "
+                      value={from_date}
+                      onChange={(e) => setfrom_date(e.target.value)}
+                      required
+                    />
+                    <label htmlFor="DOJ" className={`exp-form-labels`}>
+                      From Date
+                    </label>
+                  </div>
+                </div>
 
-          <div className="form-block col-md-3">
-            <div className="inputGroup">
-              <input
-                id="DOL"
-                className="exp-input-field form-control"
-                type="date"
-                name="DOL"
-                placeholder=" "
-                value={to_date}
-                onChange={(e) => setto_date(e.target.value)}
-              />
-              <label htmlFor="DOL" className="exp-form-labels">To Date</label>
-            </div>
-          </div>
+                <div className="form-block col-md-3">
+                  <div className="inputGroup">
+                    <input
+                      id="DOL"
+                      className="exp-input-field form-control"
+                      type="date"
+                      name="DOL"
+                      placeholder=" "
+                      value={to_date}
+                      onChange={(e) => setto_date(e.target.value)}
+                    />
+                    <label htmlFor="DOL" className="exp-form-labels">To Date</label>
+                  </div>
+                </div>
 
-          <div className="form-block col-md-3">
-            <div
-              className={`inputGroup selectGroup 
+                <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
               ${selectedEmpType ? "has-value" : ""} 
               ${isSelectEmpType ? "is-focused" : ""}`}
-            >
-              <Select
-                id="shift"
-                type="text"
-                value={selectedEmpType}
-                onChange={handleChangeEmpType}
-                options={filteredOptionEmpType}
-                 placeholder=" "
-                onFocus={() => setIsSelectEmpType(true)}
-                onBlur={() => setIsSelectEmpType(false)}
-                classNamePrefix="react-select"
-                isClearable
-              />
-          
-            <label htmlFor="selectedshift" className={`floating-label`}>
-              Employee Type
-            </label>
-            </div>
-          
-          </div>
+                  >
+                    <Select
+                      id="shift"
+                      type="text"
+                      value={selectedEmpType}
+                      onChange={handleChangeEmpType}
+                      options={filteredOptionEmpType}
+                      placeholder=" "
+                      onFocus={() => setIsSelectEmpType(true)}
+                      onBlur={() => setIsSelectEmpType(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                    />
+
+                    <label htmlFor="selectedshift" className={`floating-label`}>
+                      Employee Type
+                    </label>
+                  </div>
+
+                </div>
 
                 <div className="form-block col-12">
                   <div className="search-btn-wrapper">

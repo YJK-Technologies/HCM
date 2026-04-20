@@ -465,11 +465,11 @@ function LoanRequest({ }) {
                 return dept ? dept.label : params.value;
             },
         },
-        {
-            headerName: "Request Number",
-            field: "request_number",
-            editable: true
-        },
+        // {
+        //     headerName: "Request Number",
+        //     field: "request_number",
+        //     editable: true
+        // },
         {
             headerName: "Loan Type ID",
             field: "loan_type_id",
@@ -551,7 +551,7 @@ function LoanRequest({ }) {
     const handleSave = async () => {
         if (
             // !loanReqId ||
-            !empId ||
+            // !empId ||
             !loanTypeId ||
             !loanAmount ||
             !interestRate ||
@@ -572,7 +572,7 @@ function LoanRequest({ }) {
             const Header = {
                 loan_request_id: loanReqId,
                 request_number: reqNumber,
-                employee_id: empId,
+                employee_id: sessionStorage.getItem('selectedUserCode'),
                 loan_type_id: loanTypeId,
                 loan_amount: loanAmount,
                 interest_rate: interestRate,
@@ -616,7 +616,7 @@ function LoanRequest({ }) {
             const body = {
                 loan_request_id: loanReqIdSc,
                 request_number: reqNumberSc,
-                employee_id: empIdSc,
+                employee_id: sessionStorage.getItem('selectedUserCode'),
                 loan_type_id: loanTypeIdSc,
                 loan_amount: loanAmountSc ? loanAmountSc : 0,
                 interest_rate: interestRateSc ? interestRateSc : 0,
@@ -794,7 +794,7 @@ function LoanRequest({ }) {
             return {
                 "Loan Request ID": row.loan_request_id || "",
                 "Employee ID": `${row.employee_id} - ${empName}` || "",
-                "Request Number": row.request_number || "",
+                // "Request Number": row.request_number || "",
                 "Loan Type ID": row.loan_type_id || "",
                 "Loan Amount": row.loan_amount || "",
                 "Interest Rate": row.interest_rate || "",
@@ -958,7 +958,7 @@ function LoanRequest({ }) {
                         </div>
                     </div> */}
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedEmpId ? "has-value" : ""} 
@@ -981,9 +981,9 @@ function LoanRequest({ }) {
                                 Employee ID<span className="text-danger">*</span>
                             </label>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1003,7 +1003,7 @@ function LoanRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div
@@ -1268,7 +1268,7 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedEmpIdSc ? "has-value" : ""} 
@@ -1291,9 +1291,9 @@ function LoanRequest({ }) {
                                 Employee ID
                             </label>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="fdate"
@@ -1313,7 +1313,7 @@ function LoanRequest({ }) {
                             />
                             <label for="sname" className={`exp-form-labels`}>Request Number</label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div

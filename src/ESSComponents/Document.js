@@ -972,7 +972,7 @@ function Input({}) {
 
               <div className="col-md-2">
                 <div className="inputGroup">
-                  <div className="image-upload-container">
+                  <div className={`image-upload-container ${error && !member.document ? "image-error" : ""}`}>
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"

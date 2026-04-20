@@ -292,8 +292,7 @@ const TopBar = () => {
               {/* User Info Header */}
               <li className="px-3 py-2 border-bottom mb-2">
                 <div className="d-flex align-items-center">
-                  <div className="me-2">
-                    {/* Reusing your avatar logic */}
+                  <div className="flex-shrink-0 me-2"> {/* Added flex-shrink-0 */}
                     {userImageSrc ? (
                       <img src={userImageSrc} alt="User" width="40" height="40" className="rounded-circle border" />
                     ) : (
@@ -301,15 +300,26 @@ const TopBar = () => {
                     )}
                   </div>
                   <div className="lh-sm">
-                    <p className="mb-0 fw-bold text-white">{user_name || 'User'}</p>
-                    {/* <small className="text-white text-center align-text-center" style={{ fontSize: '11px' }}>Active Account</small> */}
+                    {/* Title attribute added so user can see full name on hover if it is cut off */}
+                    <p className="mb-0 fw-bold text-white" style={{paddingLeft:"0px"}} title={user_name || 'User'}>
+                      {user_name || 'User'}
+                    </p>
                   </div>
                 </div>
               </li>
 
               {/* Main Actions */}
-              <li><a className="dropdown-item" onClick={handleAccount}><i className="bi bi-building me-2"></i>Companies</a></li>
-              <li><a className="dropdown-item" onClick={handlesetting}><i className="bi bi-gear me-2"></i>Settings</a></li>
+              <li>
+                <a className="dropdown-item" onClick={handleAccount}>
+                  <i className="bi bi-building me-2"></i>Companies
+                </a>
+              </li>
+              
+              <li>
+                <a className="dropdown-item" onClick={handlesetting}>
+                  <i className="bi bi-gear me-2"></i>Settings
+                </a>
+              </li>
 
               <li>
                 <label className="dropdown-item mb-0">

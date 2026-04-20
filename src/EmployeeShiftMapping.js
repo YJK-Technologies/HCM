@@ -90,7 +90,7 @@ function EmployeeTypeMaster() {
     //code added by Harish purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
     const companyMappingPermission = permissions
-        .filter((permission) => permission.screen_type === "Company Mapping")
+        .filter((permission) => permission.screen_type === "EmployeeShiftMapping")
         .map((permission) => permission.permission_type.toLowerCase());
 
     const searchClearInputFields = () => {
