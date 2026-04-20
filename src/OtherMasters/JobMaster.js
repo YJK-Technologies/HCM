@@ -585,45 +585,102 @@ function JobMaster({ }) {
   };
 
 
+  // const handleDelete = async (rowData) => {
+  //   showConfirmationToast(
+  //     "Are you sure you want to Delete the data in the selected rows?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+  //         const dataToSend = { job_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+
+  //         const response = await fetch(`${config.apiBaseUrl}/job_masterLoopDelete`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "company_code": company_code
+  //           },
+  //           body: JSON.stringify(dataToSend)
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data deleted successfully", {
+  //             onClose: () => handleSearch(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error deleting rows:", error);
+  //         toast.error('Error Deleting Data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data Delete cancelled.");
+  //     }
+  //   );
+  // };
+
   const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = { job_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          job_masterData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
 
-          const response = await fetch(`${config.apiBaseUrl}/job_masterLoopDelete`, {
+        const response = await fetch(
+          `${config.apiBaseUrl}/job_masterLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
 
   const tabs = [
     { label: 'Job Master' },
