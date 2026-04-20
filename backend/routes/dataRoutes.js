@@ -1411,6 +1411,9 @@ router.post("/GetAbsentReport",dataController.GetAbsentReport)
 router.post("/GetLateReport",dataController.GetLateReport)
 router.post("/GetOvertimeReport",dataController.GetOvertimeReport) 
 router.post("/LeaveSummaryDrop",dataController.LeaveSummaryDrop) 
+router.post("/getUCN",dataController.getUCN)
+router.post("/getDateFormat",dataController.getDateFormat)
+
 
 
 module.exports = router;

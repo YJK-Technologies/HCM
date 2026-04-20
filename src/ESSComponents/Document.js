@@ -599,7 +599,7 @@ function Input({}) {
       document_files: fileBase64,
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
     setError(false);
 
@@ -664,6 +664,7 @@ function Input({}) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
 
     showConfirmationToast(
@@ -971,7 +972,7 @@ function Input({}) {
 
               <div className="col-md-2">
                 <div className="inputGroup">
-                  <div className="image-upload-container">
+                  <div className={`image-upload-container ${error && !member.document ? "image-error" : ""}`}>
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"

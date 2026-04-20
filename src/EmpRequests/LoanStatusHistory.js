@@ -80,18 +80,18 @@ function LoanStatusHistory() {
 
 
     const filteredOptionLoanStatus = Array.isArray(loanStatusDrop)
-        ? loanStatusDrop.map((option) => ({
-            value: option.attributedetails_name,
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
             label: option.attributedetails_name,
-        }))
-        : [];
+        }))
+        : [];
 
     const filteredOptionLoanStatusSc = Array.isArray(loanStatusDrop)
-        ? loanStatusDrop.map((option) => ({
-            value: option.attributedetails_name,
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
             label: option.attributedetails_name,
-        }))
-        : [];
+        }))
+        : [];
     const handleChangeLoanStatus = (selectedLoanStatus) => {
         setSelectedLoanStatus(selectedLoanStatus);
         setLoanStatus(selectedLoanStatus ? selectedLoanStatus.value : "");
@@ -102,25 +102,25 @@ function LoanStatusHistory() {
     };
 
     const filteredOptionLoanNewStatus = Array.isArray(loanStatusDrop)
-        ? loanStatusDrop.map((option) => ({
-            value: option.attributedetails_name,
+        ? loanStatusDrop.map((option) => ({
+            value: option.attributedetails_name,
             label: option.attributedetails_name,
-        }))
-        : [];
+        }))
+        : [];
 
     const filteredOptionLoanNewStatusSc = Array.isArray(loanStatusDropSc)
-        ? loanStatusDropSc.map((option) => ({
-            value: option.attributedetails_name,
+        ? loanStatusDropSc.map((option) => ({
+            value: option.attributedetails_name,
             label: option.attributedetails_name,
-        }))
-        : [];
+        }))
+        : [];
 
     const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
-        ? loanReqIdDrop.map((option) => ({
-            value: option.loan_request_id,
+        ? loanReqIdDrop.map((option) => ({
+            value: option.loan_request_id,
             label: option.loan_request_id,
-        }))
-        : [];
+        }))
+        : [];
 
     const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
         setSelectedLoanReqIdSc(selectedLoanReqIdSc);
@@ -447,14 +447,14 @@ function LoanStatusHistory() {
     }));
 
     const filteredOptionLoanReqIdSc = Array.isArray(loanReqIdDropSc)
-        ? loanReqIdDropSc.map((option) => ({
-            value: option.loan_request_id,
+        ? loanReqIdDropSc.map((option) => ({
+            value: option.loan_request_id,
             label: option.loan_request_id,
-        }))
-        : [];
+        }))
+        : [];
 
 
-    
+
 
     const handleSearch = async () => {
         setLoading(true);
@@ -601,7 +601,7 @@ function LoanStatusHistory() {
             headerName: "Remarks",
             field: "remarks",
             editable: true,
-            
+
         },
 
     ];
@@ -779,9 +779,22 @@ function LoanStatusHistory() {
                 setLoading(true);
                 try {
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
-                        sp_loan_status_historyData: Array.isArray(rowData) ? rowData : [rowData],
+                        sp_loan_status_historyData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
                     };
 
                     const response = await fetch(`${config.apiBaseUrl}/loan_status_historyLoopDelete`,
@@ -977,9 +990,9 @@ function LoanStatusHistory() {
                                     value={history_id}
                                     title="Please enter the History ID"
                                     onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    sethistory_id(value);
-                                }}
+                                        const value = e.target.value.replace(/\D/g, "");
+                                        sethistory_id(value);
+                                    }}
                                 />
                                 <label for="state" className={`exp-form-labels ${error && !history_id ? "text-danger" : ""}`}>
                                     History ID<span className="text-danger">*</span>
@@ -992,7 +1005,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanReqId ? "has-value" : ""} 
                                     ${isSelectedLoanReqId ? "is-focused" : ""}`}
-                                    title="Please select the Loan Request ID"
+                                title="Please select the Loan Request ID"
                             >
                                 <Select
                                     id="department"
@@ -1015,7 +1028,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanStatus ? "has-value" : ""} 
                                     ${isSelectedLoanStatus ? "is-focused" : ""}`}
-                                    title="Please select the Old Status"
+                                title="Please select the Old Status"
                             >
                                 <Select
                                     id="status"
@@ -1037,7 +1050,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanNewStatus ? "has-value" : ""} 
                                     ${isSelectedLoanNewStatus ? "is-focused" : ""}`}
-                                    title="Please select the New Status"
+                                title="Please select the New Status"
                             >
                                 <Select
                                     id="status"
@@ -1061,7 +1074,7 @@ function LoanStatusHistory() {
                                     class="exp-input-field form-control"
                                     type="text"
                                     placeholder=""
-                                    required 
+                                    required
                                     autoComplete="off"
                                     value={remarks}
                                     maxLength={255}
@@ -1095,9 +1108,9 @@ function LoanStatusHistory() {
                                     value={history_idSc}
                                     title="Please enter the History ID"
                                     onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    sethistory_idSc(value);
-                                }}
+                                        const value = e.target.value.replace(/\D/g, "");
+                                        sethistory_idSc(value);
+                                    }}
                                 />
                                 <label for="state" className={`exp-form-labels`}>History ID</label>
                             </div>
@@ -1108,7 +1121,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanReqIdSc ? "has-value" : ""} 
                                     ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
-                                    title="Please select the Loan Request ID"
+                                title="Please select the Loan Request ID"
                             >
                                 <Select
                                     id="status"
@@ -1130,7 +1143,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanStatusSc ? "has-value" : ""} 
                                     ${isSelectedLoanStatusSc ? "is-focused" : ""}`}
-                                    title="Please select the Old Status"
+                                title="Please select the Old Status"
                             >
                                 <Select
                                     id="status"
@@ -1152,7 +1165,7 @@ function LoanStatusHistory() {
                                 className={`inputGroup selectGroup 
                                     ${selectedLoanNewStatusSc ? "has-value" : ""} 
                                     ${isSelectedLoanNewStatusSc ? "is-focused" : ""}`}
-                                    title="Please select the New Status"
+                                title="Please select the New Status"
                             >
                                 <Select
                                     id="status"

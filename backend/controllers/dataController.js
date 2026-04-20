@@ -17,19 +17,15 @@ const uploadImages = async (req, res) => {
   try {
     let fileUrl;
 
-    // Case 1: File uploaded via multer
     if (req.file) {
       fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
     }
-    // Case 2: Base64 image in request body
     else if (req.body && req.body.base64 && req.body.filename) {
       const { base64, filename } = req.body;
 
-      // Remove metadata prefix if exists
       const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
       const buffer = Buffer.from(base64Data, "base64");
 
-      // Save file to uploads folder
       const savePath = path.join(__dirname, "../uploads", filename);
       fs.writeFileSync(savePath, buffer);
 
@@ -21181,9 +21177,10 @@ const deleteGrade = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("GradeID", sql.NVarChar, updatedRow.GradeID)
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_Grade 'D',@GradeID,'',0,0,0,0,0,0,0,0,0,0,'',0,0,0,@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_Grade 'D',@GradeID,'',0,0,0,0,0,0,0,0,0,0,'',0,0,0,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -21326,7 +21323,7 @@ const allEmployeeCompanyData = async (req, res) => {
 };
 
 const deleteEmployeeCompany = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, modified_by } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -21334,8 +21331,9 @@ const deleteEmployeeCompany = async (req, res) => {
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("company_code", sql.VarChar, company_code)
+      .input("modified_by", sql.VarChar, modified_by)
       .query(
-        `EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_employee_company 'D',@EmployeeId,'','','','','','','','','',@company_code,'','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Employee data deleted successfully.");
@@ -21471,12 +21469,13 @@ const deleteEmployeeFamily = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
-        .query(`EXEC sp_employee_family 'D','','','','','',0,'',@keyfield,@company_code,'','','','','','',0,'',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+        .input("modified_by", sql.NVarChar, modified_by)
+        .query(`EXEC sp_employee_family 'D','','','','','',0,'',@keyfield,@company_code,'','','','','','',0,'',0,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
     }
 
@@ -21605,7 +21604,7 @@ const allSalaryDetailsData = async (req, res) => {
 };
 
 const deleteSalaryDetails = async (req, res) => {
-  const { EmployeeId, PFNo, company_code } = req.body;
+  const { EmployeeId, PFNo, company_code, modified_by } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -21614,8 +21613,9 @@ const deleteSalaryDetails = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("PFNo", sql.NVarChar, PFNo)
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_salary_details 'D',@EmployeeId,'','','',@PFNo,0,'',@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Employee salary data deleted successfully");
@@ -21942,7 +21942,7 @@ const getallEmployeebankdet = async (req, res) => {
 };
 
 const Employeebankdetdelete = async (req, res) => {
-  const { EmployeeId, Account_NO, company_code } = req.body;
+  const { EmployeeId, Account_NO, company_code, modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     await pool
@@ -21950,8 +21950,9 @@ const Employeebankdetdelete = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Account_NO", sql.NVarChar, Account_NO)
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.VarChar, modified_by)
       .query(
-        `EXEC sp_employee_bankdetails 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','','', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`,
+        `EXEC sp_employee_bankdetails 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,0,'','','','','','','','','','','',@modified_by, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`,
       );
     res.status(200).json("Bank details Deleted Successfully");
   } catch (err) {
@@ -22334,7 +22335,7 @@ const Employeedataupdate = async (req, res) => {
 };
 
 const deleteemployeeper = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, Modified_by } = req.body;
   if (!EmployeeId) {
     return res.status(400).json({ message: "Employee ID is required." });
   }
@@ -22344,10 +22345,11 @@ const deleteemployeeper = async (req, res) => {
       .request()
       .input("employeeID", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Modified_by", sql.NVarChar, Modified_by)
       .query(
-        `EXEC [sp_employee_personal]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC [sp_employee_personal]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
-    if (result.rowsAffected[0] > 0) {
+    if (result.rowsAffected[0] > 0) {  
       return res
         .status(200)
         .json({ message: "Employee Personal  deleted successfully." });
@@ -23160,13 +23162,14 @@ const deleteEmployeeAcademicDetails = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
 
@@ -23310,7 +23313,7 @@ const updateempDoc = async (req, res) => {
         .input("modified_by", updatedRow.modified_by)
         .input("company_code", updatedRow.company_code)
         .query(
-          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Employee family data updated successfully");
@@ -23333,13 +23336,14 @@ const deleteEmployeeIdentityDocument = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of documentNoToDelete) {
-      const { documentNo, company_code } = record;
+      const { documentNo, company_code, modified_by } = record;
       await pool
         .request()
         .input("documentNo", sql.NVarChar, documentNo)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_employee_identity_document 'D','','',@documentNo,'','',0,@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_employee_identity_document 'D','','',@documentNo,'','',0,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
 
@@ -24451,9 +24455,10 @@ const deleteAnnouncement = async (req, res) => {
       await pool
         .request()
         .input("Announcement_id", sql.NVarChar, updatedRow.Announcement_id)
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(`EXEC sp_Announcement 'D',@Announcement_id,'','','',
-        '','','','','','','','',@company_code,'','',NULL,NULL,NULL,
+        '','','','','','','','',@company_code,'',@modified_by,NULL,NULL,NULL,
         NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Employee Announcement data deleted successfully");
@@ -24472,7 +24477,7 @@ const updateAnnouncementDetails = async (req, res) => {
   }
 
   try {
-    const pool = await connection.connectToDatabase();
+    const pool = await sql.connect(dbConfig);
     for (const updatedRow of editedData) {
       await pool
         .request()
@@ -27243,8 +27248,9 @@ const DelBonusDetails = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_bonus @mode,@company_code,'',0,0,0,0,0,0,'','',@keyfield,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_bonus @mode,@company_code,'',0,0,0,0,0,0,'','',@keyfield,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -27427,8 +27433,9 @@ const deleteTDS = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("keyfield", sql.NVarChar, delrow.keyfield)
+        .input("modified_by", sql.NVarChar, delrow.modified_by)
         .query(
-          `EXEC sp_TDS @mode,@company_code,0,0,'','',@keyfield,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_TDS @mode,@company_code,0,0,'','',@keyfield,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data deleted Successfully");
@@ -27750,8 +27757,9 @@ const deleteProfessionalTax = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("Keyfield", sql.NVarChar, updatedRow.Keyfield)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_Professional_Tax @mode,@company_code,0,0,0,'','',@Keyfield,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_Professional_Tax @mode,@company_code,0,0,0,'','',@Keyfield,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -27764,7 +27772,6 @@ const deleteProfessionalTax = async (req, res) => {
 const addLoanType = async (req, res) => {
   const {
     company_code,
-    Loan_Type_ID,
     Loan_Type_Name,
     Max_amount,
     Max_repayment_months,
@@ -27782,7 +27789,6 @@ const addLoanType = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "I")
       .input("company_code", sql.NVarChar, company_code)
-      .input("Loan_Type_ID", sql.Int, Loan_Type_ID)
       .input("Loan_Type_Name", sql.VarChar, Loan_Type_Name)
       .input("Max_amount", sql.Decimal(12, 2), Max_amount)
       .input("Max_repayment_months", sql.Int, Max_repayment_months)
@@ -27792,7 +27798,7 @@ const addLoanType = async (req, res) => {
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
             '', '', '', '', '', '', '', ''`);
     res.status(200).json("Loan type data inserted successfully");
   } catch (err) {
@@ -27873,8 +27879,9 @@ const deleteLoanType = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
         .query(
-          `EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', @keyfield, '','', '', '', '', '', '', '', '', ''`,
+          `EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', @keyfield, '',@Modified_by, '', '', '', '', '', '', '', ''`,
         );
     }
 
@@ -27963,8 +27970,9 @@ const deletePfDetail = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_PF_Both_share @mode,@company_code,0,0,'','',@keyfield,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_PF_Both_share @mode,@company_code,0,0,'','',@keyfield,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data deleted successfully");
@@ -30342,8 +30350,9 @@ const deleteLeave = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("LeaveId", sql.NVarChar, updatedRow.LeaveId)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'','','','','','','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -30377,10 +30386,10 @@ const UpdateLeaveType = async (req, res) => {
         .input("carryForward", sql.Int, updatedRow.carryForward)
         .input("Exceed_Leave", sql.VarChar, updatedRow.Exceed_Leave)
         .input("LeaveReason", sql.VarChar, updatedRow.LeaveReason)
-        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
 
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.json({ success: true, message: "Data inserted successfully" });
@@ -30932,7 +30941,8 @@ const deleteEmployeeHoliday = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','',@company_code,'','','','',@keyfield`);
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','',@company_code,'',@modified_by,'','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -31717,17 +31727,17 @@ const UpdateSalary = async (req, res) => {
   }
 
   try {
-    const pool = await connection.connectToDatabase();
-    for (const updatedRow of editedData) {
+    const pool = await sql.connect(dbConfig);
+    for (const item of editedData) {
       await pool
         .request()
         .input("mode", sql.NVarChar, "U")
-        .input("Start_Year", sql.Date, updatedRow.Start_Year)
-        .input("End_Year", sql.Date, updatedRow.End_Year)
-        .input("Salary_Days", sql.Int, updatedRow.Salary_Days)
-        .input("status", sql.NVarChar, updatedRow.Status)
-        .input("company_code", sql.NVarChar, updatedRow.company_code)
-        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
+        .input("Start_Year", sql.Date, item.Start_Year)
+        .input("End_Year", sql.Date, item.End_Year)
+        .input("Salary_Days", sql.Int, item.Salary_Days)
+        .input("status", sql.NVarChar, item.status)
+        .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
           `EXEC sp_ESS_Salary_days @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,'',@modified_by,null,null,null,null,null,null,null,null`,
         );
@@ -31755,8 +31765,9 @@ const salaryDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         // .input("company_code",         sql.NVarChar,req.headers['company_code'])
         .input("company_code", sql.NVarChar, updatedRow.company_code)
+        .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(
-          `EXEC sp_ESS_Salary_days  @mode ,'','','',@company_code,'','','',null,null,null,null,null,null,null,null`,
+          `EXEC sp_ESS_Salary_days  @mode ,'','','',@company_code,'','',@modified_by,null,null,null,null,null,null,null,null`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -31823,13 +31834,14 @@ const delempdoc = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_ess_employee_documents 'D','','','',@keyfield,@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_ess_employee_documents 'D','','','',@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Employee document data deleted successfully");
@@ -33602,14 +33614,15 @@ const deleteWeekOff = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code } = record;
+      const { keyfield, company_code, modified_by} = record;
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
         .query(
-          `EXEC sp_setting_screen_weekoff @mode,'',@company_code,'',@keyfield,'' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_setting_screen_weekoff @mode,'',@company_code,'',@keyfield,'' ,@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("data deleted successfully");
@@ -33889,15 +33902,16 @@ const AddPMSSetting = async (req, res) => {
 };
 
 const deletePMSsettings = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, modified_by} = req.body;
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     await pool
       .request()
       .input("mode", sql.NVarChar, "D")
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'','',@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS @mode,'','',@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     res.status(200).json("data deleted successfully");
   } catch (err) {
@@ -33937,7 +33951,7 @@ const PMSsettingsUpdate = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'',@Per_Day_Working_hours,@company_code,@Status,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS @mode,'',@Per_Day_Working_hours,@company_code,@Status,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Edited data saved successfully");
@@ -38464,8 +38478,9 @@ const candidate_masterLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.VarChar, item.modified_by)
         .query(
-          `EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', '', ''`,
+          `EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', @modified_by, ''`,
         );
     }
     res.status(200).json("candidate_master data deleted successfully");
@@ -38753,8 +38768,9 @@ const job_masterLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '', '', '', '', '', '', '','', ''`,
+          `EXEC sp_job_master @mode, '', '', '', '', @keyfield, '', '', '', '', '', '', '', '',@modified_by, ''`,
         );
     }
     res.status(200).json("job_master data deleted successfully");
@@ -41055,7 +41071,7 @@ const Employee_shift_mappingInsert = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping insertd successfully",
+      message: "Employee shift mapping insertd successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41093,7 +41109,7 @@ const Employee_shift_mappingUpdate = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping updated successfully",
+      message: "Employee shift mapping updated successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41116,7 +41132,7 @@ const Employee_shift_mappingDelete = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping deleted successfully",
+      message: "Employee shift mapping deleted successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41148,7 +41164,7 @@ const Employee_shift_mappingLoopInsert = async (req, res) => {
         .query(`EXEC sp_Employee_shift_mapping @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,'',@Company_Code,@Created_by,'','',''`);
     }
-    res.status(200).json("Employee_shift_mapping data inserted successfully");
+    res.status(200).json("Employee shift mapping data inserted successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopInsert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41180,7 +41196,7 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
         .query(`EXEC sp_Employee_shift_mapping @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@keyfield,@Company_Code,'','',@Modified_by,''`);
     }
-    res.status(200).json("Employee_shift_mapping data updated successfully");
+    res.status(200).json("Employee shift mapping data updated successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopUpdate:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41203,11 +41219,12 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
         .query(
-          `EXEC sp_Employee_shift_mapping @mode,'','','','','',@keyfield,@Company_Code,'','','',''`,
+          `EXEC sp_Employee_shift_mapping @mode,'','','','','',@keyfield,@Company_Code,'','',@Modified_by,''`,
         );
     }
-    res.status(200).json("Employee_shift_mapping data deleted successfully");
+    res.status(200).json("Employee shift mapping data deleted successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopDelete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42231,8 +42248,9 @@ const loan_approvalsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_approvals @mode, 0, 0, 0, 0, '', '', '', '', '', @company_code, @keyfield, '', '', '', ''`,
+          `EXEC sp_loan_approvals @mode, 0, 0, 0, 0, '', '', '', '', '', @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_approvals data deleted successfully");
@@ -42449,10 +42467,11 @@ const loan_repayment_scheduleLoopDelete = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
-        .input("keyfield", sql.Int, item.keyfield)
+        .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_repayment_schedule @mode, 0, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_loan_repayment_schedule @mode, 0, 0, '', '', 0, 0, 0, '', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_repayment_schedule data deleted successfully");
@@ -42651,8 +42670,9 @@ const loan_paymentsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_payments @mode, 0, 0, '', 0, '', '', @company_code, @keyfield, '', '', '', '', '', ''`,
+          `EXEC sp_loan_payments @mode, 0, 0, '', 0, '', '', @company_code, @keyfield, '', '', '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_payments data deleted successfully");
@@ -42689,11 +42709,22 @@ const getInterviewDashboardCount = async (req, res) => {
 //code added by pavun on 05-03-26
 const generateShiftPDF = (employee, shifts) => {
   const pdfDir = path.join(__dirname, "pdf");
-  if (!fs.existsSync(pdfDir)) {
-    fs.mkdirSync(pdfDir);
+
+  const subDir = path.join(
+    pdfDir,
+    `Shift_${employee.Employee_ID?.slice(0, 2) || "XX"}`,
+    employee.Employee_ID || "unknown"
+  );
+
+  if (!fs.existsSync(subDir)) {
+    fs.mkdirSync(subDir, { recursive: true });
   }
 
-  const filePath = path.join(pdfDir, `Shift_${employee.Employee_ID}.pdf`);
+  const filePath = path.join(
+    subDir,
+    `${moment().format("YY-MM")}.pdf`
+  );
+
   const doc = new PDFDocument({
     margin: 40,
     size: "A4",
@@ -42701,20 +42732,16 @@ const generateShiftPDF = (employee, shifts) => {
 
   doc.pipe(fs.createWriteStream(filePath));
 
-  // --- CONFIGURATION (Matching Sample Colors) ---
   const colors = {
-    primary: "#0f4c81", // Dark Blue (Table Header)
-    secondary: "#f4f6f9", // Light Gray (Background)
+    primary: "#0f4c81",
+    secondary: "#f4f6f9",
     text: "#333333",
-    rowAlt: "#f7f7f7", // Zebra striping
+    rowAlt: "#f7f7f7",
     border: "#dddddd",
   };
 
-  /* ---------- HEADER WITH LOGO ---------- */
-  // Note: Ensure your logo exists at this path or use a placeholder
   const logoPath = path.join(__dirname, "public", "favicon.ico");
 
-  // Header Background Box (The blue bar from your sample)
   doc.rect(0, 0, 600, 100).fill(colors.primary);
 
   if (fs.existsSync(logoPath)) {
@@ -42729,7 +42756,6 @@ const generateShiftPDF = (employee, shifts) => {
 
   doc.moveDown(4);
 
-  /* ---------- SUB-INFO SECTION ---------- */
   doc.fillColor(colors.text).fontSize(10).font("Helvetica");
 
   const currentY = 115;
@@ -42743,10 +42769,9 @@ const generateShiftPDF = (employee, shifts) => {
     `Printed Date: ${moment().format("DD-MM-YYYY")}`,
     400,
     currentY + 15,
-    { align: "right" },
+    { align: "right" }
   );
 
-  /* ---------- TABLE DESIGN ---------- */
   const tableX = 40;
   const column = {
     date: tableX + 10,
@@ -42758,7 +42783,6 @@ const generateShiftPDF = (employee, shifts) => {
   let y = 160;
 
   const drawHeader = () => {
-    // Header background
     doc.rect(tableX, y, 520, 30).fill(colors.primary);
 
     doc
@@ -42775,22 +42799,17 @@ const generateShiftPDF = (employee, shifts) => {
 
   drawHeader();
 
-  /* ---------- TABLE BODY ---------- */
   shifts.forEach((shift, index) => {
-    // Page breaking logic
     if (y > 730) {
       doc.addPage();
       y = 40;
       drawHeader();
     }
 
-    // Zebra Striping
-    const isEven = index % 2 === 0;
-    if (isEven) {
+    if (index % 2 === 0) {
       doc.rect(tableX, y, 520, 25).fill(colors.rowAlt);
     }
 
-    // Border Bottom
     doc
       .moveTo(tableX, y + 25)
       .lineTo(tableX + 520, y + 25)
@@ -42809,16 +42828,6 @@ const generateShiftPDF = (employee, shifts) => {
 
     y += 25;
   });
-
-  /* ---------- FOOTER ---------- */
-  const pageCount = doc.bufferedPageRange().count;
-  // doc.fontSize(9).fillColor("gray");
-  // doc.text(
-  //   `© ${new Date().getFullYear()} YJK Technologies | Confidential Report`,
-  //   0,
-  //   doc.page.height - 50,
-  //   { align: "center" }
-  // );
 
   doc.end();
   return filePath;
@@ -43828,8 +43837,9 @@ const loan_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_requests @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, @keyfield, '', '', '', ''`,
+          `EXEC sp_loan_requests @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_requests data deleted successfully");
@@ -44120,8 +44130,9 @@ const loan_documentsLoopDelete = async (req, res) => {
         .input("document_id", sql.Int, item.document_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', '','','', @company_code, @keyfield, '', '', '', ''`,
+          `EXEC sp_loan_documents @mode, @document_id, 0, '', '', '', '', '','','', @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("loan_documents data deleted successfully");
@@ -44686,8 +44697,9 @@ const loan_status_historyLoopDelete = async (req, res) => {
         .input("history_id", sql.Int, item.history_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("key_field", sql.NVarChar, item.key_field)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_loan_status_history @mode, @history_id, '', '', '', '', '', '', @company_code, @key_field, '', '', '', ''`,
+          `EXEC sp_loan_status_history @mode, @history_id, '', '', '', '', '', '', @company_code, @key_field, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("sp_loan_status_history data deleted successfully");
@@ -46472,8 +46484,7 @@ const EmployeeAssetsLoopUpdate = async (req, res) => {
         .input("CreatedBy", sql.NVarChar, item.CreatedBy)
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
-        .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, ''`);
     }
     res.status(200).json("EmployeeAssets data updated successfully");
   } catch (err) {
@@ -46496,7 +46507,8 @@ const EmployeeAssetsLoopDelete = async (req, res) => {
         .input("AllocationID", sql.Int, item.AllocationID)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("Keyfield", sql.NVarChar, item.Keyfield)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', '','',''`);
+        .input("modify_by", sql.NVarChar, item.modify_by)
+        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '', '', '', '', '', @company_code, @Keyfield, '', '', '', '',@modify_by,''`);
     }
     res.status(200).json("EmployeeAssets data deleted successfully");
   } catch (err) {
@@ -46516,9 +46528,7 @@ const LoanTypeIdDropDown = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(
-        `EXEC sp_Loan_Type 'A', @company_code, 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`,
-      );
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -48211,6 +48221,49 @@ const LeaveSummaryDrop = async (req, res) => {
 
 //Code added by pavun on 18-04-2026
 
+//code added by Sakthi on 20-04-2026
+const getUCN = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC SP_user_info_hdr 'UCN', @company_code, '', '', '', '', 
+              '', '', '', '', '', '', '', '', '', '', 
+              '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+      `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 20-04-2026
+
+//code added by Sakthi on 20-04-2026
+const getDateFormat = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'FD',@company_code,'DateFormat','','', '' ,'','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 20-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49591,6 +49644,8 @@ module.exports = {
   GetAbsentReport,
   GetLateReport,
   GetOvertimeReport,
-  LeaveSummaryDrop
+  LeaveSummaryDrop,
+  getUCN,
+  getDateFormat
 
 };

@@ -387,7 +387,7 @@ function LoanType({ }) {
     };
 
     const handleInsert = async () => {
-        if (!loanTypeId || !loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status || !startYear || !endYear) {
+        if (!loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status || !startYear || !endYear) {
             setError(true);
             toast.warning("Error: Missing required fields");
             return;
@@ -397,7 +397,7 @@ function LoanType({ }) {
 
         try {
             const Headers = {
-                Loan_Type_ID: loanTypeId,
+                // Loan_Type_ID: loanTypeId,
                 Loan_Type_Name: loanTypeName,
                 Max_amount: maxAmount,
                 Max_repayment_months: maxRepaymentMonths,
@@ -495,17 +495,21 @@ function LoanType({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+
 
                     const dataToSend = {
                         editedData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
+                                Modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
+                                    Modified_by,
                                 },
                             ],
                     };
@@ -721,7 +725,7 @@ function LoanType({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 id="Loan_ID"
@@ -742,7 +746,7 @@ function LoanType({ }) {
                             />
                             <label for="sname" className={`exp-form-labels ${error && !loanTypeId ? 'text-danger' : ''}`}>Loan Type ID<span className="text-danger">*</span></label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div

@@ -294,7 +294,7 @@ const menuData = [
       { label: "Payslip Master", path: "/PayslipSalaryDays" },
       { label: "Salary Process", path: "/salarypath" },
       { label: "Loan Dashboard", path: "/LoanDashboard" },
-      { label: "Loan", path: "/EmployeeLoan" },
+      // { label: "Loan", path: "/EmployeeLoan" },
       { label: "Loan Type", path: "/LoanType" },
       { label: "Loan Documents", path: "/LoanDocuments" },
       { label: "Loan Request", path: "/LoanRequest" },

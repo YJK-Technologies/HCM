@@ -672,6 +672,7 @@ function Input({}) {
       expiryDate: member.expiryDate,
       document: fileBase64,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
     setError(false);
 
@@ -749,6 +750,7 @@ function Input({}) {
     const documentNoToDelete = {
       documentNo: member.documentNo,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
 
     showConfirmationToast(

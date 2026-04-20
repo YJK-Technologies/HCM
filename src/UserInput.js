@@ -23,7 +23,6 @@ function UserInput({ }) {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedRole, setSelectedRole] = useState('');
   const [selectedLog, setSelectedLog] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
   const [statusdrop, setStatusdrop] = useState([]);
@@ -55,7 +54,12 @@ function UserInput({ }) {
   const [isSelectGender, setIsSelectGender] = useState(false);
   const [isSelectLog, setIsSelectLog] = useState(false);
   const [isSelectRole, setIsSelectRole] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('');
   const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [isSelectUserCode, setIsSelectUserCode] = useState(false);
+  const [selectedUserCode, setSelectedUserCode] = useState('');
+
+  const [UserCodeNameDrop, setUserCodeNameDrop] = useState([]);
 
   const location = useLocation();
   const { mode, selectedRow } = location.state || {};
@@ -64,6 +68,7 @@ function UserInput({ }) {
 
   const clearInputFields = () => {
     setUser_code("");
+    setSelectedUserCode("");
     setUser_name("");
     setFirst_name("");
     setLast_name("");
@@ -261,6 +266,21 @@ function UserInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/getUCN`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setUserCodeNameDrop(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const filteredOptionStatus = statusdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -269,6 +289,11 @@ function UserInput({ }) {
   const filteredOptionRole = roleDrop.map((option) => ({
     value: option.role_id,
     label: option.role_name,
+  }));
+
+  const filteredOptionUserCode = UserCodeNameDrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId} - ${option.Name}`
   }));
 
   const filteredOptionLog = Loginoroutdrop.map((option) => ({
@@ -289,6 +314,11 @@ function UserInput({ }) {
   const handleChangeRole = (selectedRole) => {
     setSelectedRole(selectedRole);
     setRole(selectedRole ? selectedRole.value : '');
+  };
+  
+  const handleChangeUserCode = (selectedUserCode) => {
+    setSelectedUserCode(selectedUserCode);
+    setUser_code(selectedUserCode ? selectedUserCode.value : '');
   };
 
   const handleChangeLog = (selectedLog) => {
@@ -515,25 +545,31 @@ function UserInput({ }) {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="ucode"
-                class="exp-input-field form-control"
-                type="text"
-                autoComplete="off"
-                placeholder=" "
-                required
-                value={user_code}
-                onChange={(e) => setUser_code(e.target.value)}
-                maxLength={18}
-                ref={usercode}
-                onKeyDown={(e) => handleKeyDown(e, username, usercode)}
-                readOnly={mode === "update"}
-              />
-              <label for="state" className={`exp-form-labels ${error && !user_code ? 'text-danger' : ''}`}>User Code<span className="text-danger">*</span></label>
+          {mode !== 'update' && (
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedUserCode ? "has-value" : ""} 
+              ${isSelectUserCode ? "is-focused" : ""}`}
+              >
+                <Select
+                  id="usertype"
+                  value={selectedUserCode}
+                  onChange={handleChangeUserCode}
+                  options={filteredOptionUserCode}
+                  placeholder=" "
+                  onFocus={() => setIsSelectUserCode(true)}
+                  onBlur={() => setIsSelectUserCode(false)}
+                  classNamePrefix="react-select"
+                  isClearable
+                  maxLength={18}
+                  ref={usercode}
+                  onKeyDown={(e) => handleKeyDown(e, username, usercode)}
+                />
+                <label for="state" className={`floating-label ${error && !user_code ? 'text-danger' : ''}`}>User Code<span className="text-danger">*</span></label>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="col-md-2">
             <div className="inputGroup">

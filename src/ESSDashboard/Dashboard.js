@@ -2655,6 +2655,23 @@ const Dashboard = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const [requestSearch, setRequestSearch] = useState("");
+
+const filteredRequests = dashboardRequests
+  .filter(r => (r.status || "").toLowerCase() === "pending")
+  .filter(req => {
+    const searchLower = (requestSearch || "").trim().toLowerCase();
+
+    if (!searchLower) return true;
+
+    return (
+      (req.EmployeeName && String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
+      (req.EmployeeId && String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
+      (req.type && String(req.type).toLowerCase().includes(searchLower)) ||
+      (req.title && String(req.title).toLowerCase().includes(searchLower))
+    );
+  });
+
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
       <ToastContainer
@@ -2900,7 +2917,7 @@ const Dashboard = () => {
             <div className="grid-col-lg-6 spacing-mt-2">
               <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
                 <div className="display-flex flex-between-center mb-3">
-                  <h6 className="card-title-heading mb-0">New Joinees</h6>
+                  <h6 className="card-title-heading mb-0">New Joiners</h6>
                 </div>
 
                 <div className="fixed-card-content">
@@ -2934,9 +2951,9 @@ const Dashboard = () => {
                               <h6 className="emp-name-text">
                                 {joinee.EmployeeName}
                               </h6>
-                              <p className="emp-dept-sub">
+                              <div className="emp-dept-sub">
                                 {joinee.department_ID} • {joinee.EmployeeId}
-                              </p>
+                              </div>
                               <div className="welcome-badge">
                                 Welcome Onboard! 🤝
                               </div>
@@ -3018,9 +3035,9 @@ const Dashboard = () => {
                               <h6 className="emp-name-text">
                                 {person.EmployeeName}
                               </h6>
-                              <p className="emp-dept-sub">
+                              <div className="emp-dept-sub">
                                 {person.Department || "Team Member"}
-                              </p>
+                              </div>
                               <div className="wish-badge">Happy Birthday! 🎈</div>
                             </div>
                           </div>
@@ -3060,31 +3077,39 @@ const Dashboard = () => {
 
         {/* Leave Approval */}
         <div className="grid-col-lg-4">
-          <div
-            className="app-card-base height-full leave-list-wrapper rounded app-shadow-lg"
-            style={{ overflow: "hidden" }}
-          >
-            {/* Header with Count */}
-            <div className="display-flex flex-between-center spacing-mb-3 padding-horizontal-2">
-              <h6 className="card-title-heading spacing-mb-0">
-                Pending Requests
-              </h6>
-              <span className="leave-count-badge">
-                {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length}
-                &nbsp;Pending
-              </span>
+          <div className="app-card-base pending-requests-card rounded app-shadow-lg">
+            {/* Header Section */}
+            <div className="card-header-modern">
+              {/* Row 1: Title and Count */}
+              <div className="header-top-row d-flex justify-content-between align-items-center mb-2">
+                <h6 className="card-title-heading mb-0">Pending Requests</h6>
+                <span className="request-badge-count">
+                  {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length} Pending
+                </span>
+              </div>
+
+              {/* Row 2: Search Bar (Bottom) */}
+              <div className="header-bottom-row">
+                <div className="search-wrapper-modern">
+                  <i className="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input
+                    type="text"
+                    className="search-input-modern"
+                    placeholder="Search employee or request type..."
+                    value={requestSearch}
+                    onChange={(e) => setRequestSearch(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Scrollable List Container */}
-            <div
-              className="custom-list-container fixed-list-height"
-              style={{ overflowY: "auto" }}
-            >
-              {dashboardRequests.length > 0 ? (
-                dashboardRequests.map((req, index) => (
+            {/* Scrollable List */}
+            <div className="custom-list-container fixed-list-height">
+              {filteredRequests.length > 0 ? (
+                filteredRequests.map((req, index) => (
                   <div
                     key={index}
-                    className="leave-item-modern"
+                    className="request-item-modern"
                     onClick={() => {
                       navigate("/RequestReport", {
                         state: {
@@ -3100,93 +3125,76 @@ const Dashboard = () => {
                       })
                     }}
                   >
-                    {/* LEFT */}
-                    <div className="leave-item-left">
-                      <div className="emp-details">
-                        <div className="emp-info-header">
-                          <span className="emp-id-text">{req.EmployeeId}</span>
-                          <span className="separator">-</span>
-                          <span className="emp-name-text">
-                            {req.EmployeeName}
-                          </span>
-                        </div>
-                        <div
-                          className="leave-type-pill"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/RequestReport", {
-                              state: {
-                                employeeId: req.EmployeeId,
-                                type: req.type,
-                                status: "Pending",
-                                mode: "type",
-                              },
-                            });
-                          }}
-                        >
-                          {req.type === "Employee Change"
-                            ? req.title
-                            : `${req.type} - ${req.title}`}
-                        </div>
-                      </div>
+                    {/* Avatar Fallback Logic */}
+                    <div className="req-avatar">
+                      {req.EmployeeName
+                        ? req.EmployeeName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+                        : "Mr.X"
+                      }
                     </div>
+                    <div className="req-content">
+                      <div className="req-top-row">
+                        <span className="req-emp-name">{req.EmployeeName}</span>
+                        <span className="req-type-tag" onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/RequestReport", {
+                            state: { employeeId: req.EmployeeId, type: req.type, status: "Pending", mode: "type" },
+                          });
+                        }}>
+                          {req.type}
+                        </span>
+                      </div>
 
-                    {/* CENTER */}
-                    <div className="leave-item-center">
+                      <div className="req-mid-row">
+                        <span className="req-id">ID: {req.EmployeeId}</span>
+                        <span className="req-dot">•</span>
+                        <span className="req-title">{req.title}</span>
+                      </div>
+
                       {req.FromDate && (
-                        <div className="date-box">
-                          <span className="date-label">
-                            {req.days
-                              ? `Duration (${req.days} Days)`
-                              : "Duration"}
-                          </span>
-                          <div className="date-range-text">
-                            {req.FromDate}
-                            <i className="fa-solid fa-arrow-right"></i>
-                            {req.ToDate}
-                          </div>
+                        <div className="req-date-footer">
+                          <i className="fa-regular fa-calendar-days"></i>
+                          <span>{req.FromDate}</span>
+                          <i className="fa-solid fa-arrow-right-long mx-2"></i>
+                          <span>{req.ToDate}</span>
+                          {req.days && <span className="req-days-count">({req.days} Days)</span>}
                         </div>
                       )}
                     </div>
 
-                    {/* RIGHT */}
-                    <div className="leave-item-right">
-                      <div className="action-button-group">
-                        <button
-                          className="btn-action-minimal approve"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleApproval(req.type, req.id, req.FromDate, true,
-                              {
-                                EmployeeId: req.EmployeeId,
-                                HolidayDate: req.HolidayDate,
-                              });
-                          }}
-                        >
-                          <i className="fa-solid fa-check"></i>
-                        </button>
-                        <div className="action-divider"></div>
-                        <button
-                          className="btn-action-minimal reject"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleApproval(req.type, req.id, req.FromDate, false,
-                              {
-                                EmployeeId: req.EmployeeId,
-                                HolidayDate: req.HolidayDate,
-                              });
-                          }}
-                        >
-                          <i className="fa-solid fa-xmark"></i>
-                        </button>
-                      </div>
+                    {/* Action Group */}
+                    <div className="req-actions-vertical">
+                      <button
+                        className="action-circle-btn approve"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApproval(req.type, req.id, req.FromDate, true, {
+                            EmployeeId: req.EmployeeId,
+                            HolidayDate: req.HolidayDate,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-check"></i>
+                      </button>
+                      <button
+                        className="action-circle-btn reject"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApproval(req.type, req.id, req.FromDate, false, {
+                            EmployeeId: req.EmployeeId,
+                            HolidayDate: req.HolidayDate,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-xmark"></i>
+                      </button>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="no-data-state">
-                  <i className="fa-solid fa-calendar-check"></i>
-                  <p>No Pending Requests</p>
+                  <div className="empty-illustration">📂</div>
+                  <p>No matching requests found</p>
                 </div>
               )}
             </div>

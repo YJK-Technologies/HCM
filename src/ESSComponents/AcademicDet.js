@@ -572,6 +572,8 @@ function Input({}) {
       document: fileBase64,
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
+
     };
     setError(false);
 
@@ -642,6 +644,7 @@ function Input({}) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
     setError(false);
 
