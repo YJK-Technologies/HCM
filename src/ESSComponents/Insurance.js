@@ -347,6 +347,7 @@ function Input({}) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
     };
     setError(false);
     showConfirmationToast(
@@ -425,6 +426,8 @@ function Input({}) {
       Visa_Expiry_Date: member.visaExpiryDate,
       Air_Ticket_Entitled: Number(member.airTicketEntitled),
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem('selectedUserCode')
+
     };
     setError(false);
     showConfirmationToast(

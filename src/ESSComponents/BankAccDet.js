@@ -326,7 +326,8 @@ function Input({ }) {
           const Header = {
             EmployeeId: EmployeeId,
             Account_NO: Account_NO,
-            company_code: sessionStorage.getItem("selectedCompanyCode")
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode")
           };
 
           const response = await fetch(`${config.apiBaseUrl}/Employeebankdetdelete`, {

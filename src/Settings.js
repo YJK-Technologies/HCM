@@ -1,231 +1,4 @@
-// import { useState, useEffect } from "react";
-// import { ThemeProvider } from "./ThemeContext";
-// import AppContent from "./App_content";
-// import ForgotPopup from "./Forgotpopup";
-// import Select from "react-select";
-
-// const config = require("./Apiconfig");
-
-// const SettingsPage = () => {
-//   const [open, setOpen] = useState(false);
-//   const [perioddrop, setPerioddrop] = useState([]);
-//   const [selectedPeriod, setSelectedPeriod] = useState(null);
-
-//   // For floating label focus status
-//   const [isSelectLanguage, setIsSelectLanguage] = useState(false);
-//   const [isSelectSales, setIsSelectSales] = useState(false);
-//   const [isSelectPurchase, setIsSelectPurchase] = useState(false);
-//   const [isSelectItems, setIsSelectItems] = useState(false);
-//   const [isSelectStock, setIsSelectStock] = useState(false);
-//   const [selectedOption, setSelectedOption] = useState("");
-
-//   // useEffect(() => {
-//   //   fetch(`${config.apiBaseUrl}/getDateRange`)
-//   //     .then((data) => data.json())
-//   //     .then((val) => {
-//   //       setPerioddrop(val);
-
-//   //       if (val?.length > 0) {
-//   //         const first = {
-//   //           value: val[0].Sno,
-//   //           label: val[0].DateRangeDescription,
-//   //         };
-//   //         setSelectedPeriod(first);
-//   //       }
-//   //     });
-//   // }, []);
-
-//   const filteredOptionPeriod = perioddrop.map((option) => ({
-//     value: option.Sno,
-//     label: option.DateRangeDescription,
-//   }));
-
-//   const languageOptions = [
-//     { value: "en", label: "English" },
-//     { value: "fr", label: "French" },
-//     { value: "es", label: "Spanish" },
-//   ];
-
-//   const handleOpen = () => setOpen(true);
-//   const handleClose = () => setOpen(false);
-
-//   return (
-//     <div className="container-fluid Topnav-screen">
-//       {/* ---------------- Header Box ---------------- */}
-//       <div className="shadow-lg p-1 bg-light rounded main-header-box">
-//         <div className="header-flex">
-//           <h1 className="page-title">Settings</h1>
-
-//           {/* -------- Desktop Icons -------- */}
-//           <div className="action-wrapper desktop-actions">
-//             <div className="action-icon add">
-//               <span className="tooltip">Save</span>
-//               <i className="fa-solid fa-floppy-disk"></i>
-//             </div>
-
-//             <div className="action-icon search me-2" onClick={handleOpen}>
-//               <span className="tooltip">Reset Password</span>
-//               <i className="fa-solid fa-unlock-keyhole"></i>
-//             </div>
-//           </div>
-
-//           {/* -------- Mobile Dropdown Actions -------- */}
-//           <div className="dropdown mobile-actions">
-//             <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-//               <i className="fa-solid fa-list"></i>
-//             </button>
-
-//             <ul className="dropdown-menu dropdown-menu-end text-center">
-//               <li className="dropdown-item">
-//                 <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-//               </li>
-
-//               <li className="dropdown-item" onClick={handleOpen}>
-//                 <i className="fa-solid fa-unlock-keyhole text-primary fs-4"></i>
-//               </li>
-//             </ul>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* ---------------- Main Form Box ---------------- */}
-//       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-//         <div className="row g-3">
-//           {/* --------------- LANGUAGE ---------------- */}
-//           <div className="col-md-2 me-4">
-//             <label className="fw-bold fs-5">General :</label>
-
-//             <div
-//               className={`inputGroup selectGroup 
-//               ${selectedOption ? "has-value" : ""} 
-//               ${isSelectLanguage ? "is-focused" : ""}`}
-//             >
-//               <Select
-//                 options={languageOptions}
-//                 value={selectedOption}
-//                 onChange={setSelectedOption}
-//                 classNamePrefix="react-select"
-//                 isClearable
-//                 placeholder=""
-//                 onFocus={() => setIsSelectLanguage(true)}
-//                 onBlur={() => setIsSelectLanguage(false)}
-//               />
-//               <label className="floating-label">Language</label>
-//             </div>
-//           </div>
-
-//           {/* --------------- DASHBOARD SETTINGS ---------------- */}
-//           <div className="col-md-4">
-//             <label className="fw-bold fs-5">Dashboard Settings :</label>
-
-//             <div className="row">
-//               {/* Total Sales */}
-//               <div className="col-12 col-md-8">
-//                 <div
-//                   className={`inputGroup selectGroup 
-//                     ${selectedPeriod ? "has-value" : ""} 
-//                     ${isSelectSales ? "is-focused" : ""}`}
-//                 >
-//                   <Select
-//                     value={selectedPeriod}
-//                     onChange={setSelectedPeriod}
-//                     options={filteredOptionPeriod}
-//                     classNamePrefix="react-select"
-//                     placeholder=""
-//                     isClearable
-//                     onFocus={() => setIsSelectSales(true)}
-//                     onBlur={() => setIsSelectSales(false)}
-//                   />
-//                   <label className="floating-label">Total Sales</label>
-//                 </div>
-//               </div>
-
-//               {/* Total Purchase */}
-//               <div className="col-12 col-md-8">
-//                 <div
-//                   className={`inputGroup selectGroup 
-//                     ${selectedPeriod ? "has-value" : ""} 
-//                     ${isSelectPurchase ? "is-focused" : ""}`}
-//                 >
-//                   <Select
-//                     value={selectedPeriod}
-//                     onChange={setSelectedPeriod}
-//                     options={filteredOptionPeriod}
-//                     classNamePrefix="react-select"
-//                     placeholder=""
-//                     isClearable
-//                     onFocus={() => setIsSelectPurchase(true)}
-//                     onBlur={() => setIsSelectPurchase(false)}
-//                   />
-//                   <label className="floating-label">Total Purchase</label>
-//                 </div>
-//               </div>
-
-//               {/* Total Items */}
-//               <div className="col-12 col-md-8">
-//                 <div
-//                   className={`inputGroup selectGroup 
-//                     ${selectedPeriod ? "has-value" : ""} 
-//                     ${isSelectItems ? "is-focused" : ""}`}
-//                 >
-//                   <Select
-//                     value={selectedPeriod}
-//                     onChange={setSelectedPeriod}
-//                     options={filteredOptionPeriod}
-//                     classNamePrefix="react-select"
-//                     placeholder=""
-//                     isClearable
-//                     onFocus={() => setIsSelectItems(true)}
-//                     onBlur={() => setIsSelectItems(false)}
-//                   />
-//                   <label className="floating-label">Total Items</label>
-//                 </div>
-//               </div>
-
-//               {/* Total Stock Values */}
-//               <div className="col-12 col-md-8">
-//                 <div
-//                   className={`inputGroup selectGroup 
-//                     ${selectedPeriod ? "has-value" : ""} 
-//                     ${isSelectStock ? "is-focused" : ""}`}
-//                 >
-//                   <Select
-//                     value={selectedPeriod}
-//                     onChange={setSelectedPeriod}
-//                     options={filteredOptionPeriod}
-//                     classNamePrefix="react-select"
-//                     placeholder=""
-//                     isClearable
-//                     onFocus={() => setIsSelectStock(true)}
-//                     onBlur={() => setIsSelectStock(false)}
-//                   />
-//                   <label className="floating-label">Total Stock Values</label>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* --------------- THEME ---------------- */}
-//           <div className="col-md-2">
-//             <label className="fw-bold fs-5">Theme :</label>
-//             <div className="inputGroup">
-//               <ThemeProvider>
-//                 <AppContent />
-//               </ThemeProvider>
-//             </div>
-//           </div>
-
-//           {/* ---------------- Forgot Password Popup ---------------- */}
-//           <ForgotPopup open={open} handleClose={handleClose} />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SettingsPage;
-
-import { useState } from "react";
+import { useState, useEffect, useRef} from "react";
 import { ThemeProvider } from "./ThemeContext";
 import AppContent from "./App_content";
 import ForgotPopup from "./Forgotpopup";
@@ -244,12 +17,41 @@ const SettingsPage = () => {
   const [joineesPeriod, setJoineesPeriod] = useState(null);
   const [birthdayDays, setBirthdayDays] = useState(null);
   const [joineesDays, setJoineesDays] = useState(null);
+  const [DateDrop, setDateDrop] = useState([]);
 
+const config = require("./Apiconfig");
+    
   const languageOptions = [
     { value: "en", label: "English" },
     { value: "fr", label: "French" },
     { value: "es", label: "Spanish" },
   ];
+
+    useEffect(() => {
+        const fetchLeaveData = async () => {
+            try {
+                const response = await fetch(`${config.apiBaseUrl}/getDateFormat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
+                });
+
+                const val = await response.json();
+                setDateDrop(val);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchLeaveData();
+    }, []);
+
+  const filteredOptionDate = DateDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_code,
+  }));  
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -308,19 +110,19 @@ const SettingsPage = () => {
             <section className="settings-card shadow-sm">
               <div className="card-header-simple">
                 <i className="fa-solid fa-chart-line"></i>
-                <h3>Dashboard Visualizations</h3>
+                <h3>Global Date Format</h3>
               </div>
 
               <div className="card-body-simple">
                 <p className="section-instruction">
-                  Customize the default data ranges and visibility for your dashboard widgets.
+                  Customize the default data ranges and visibility for your Global Date Format.
                 </p>
 
                 {/* Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
                 <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
 
                   {/* Total Sales */}
-                  <div className="col">
+                  {/* <div className="col">
                     <div className="custom-select-container">
                       <label><i className="fa-solid fa-sack-dollar me-2"></i>Total Sales Period</label>
                       <Select
@@ -332,10 +134,10 @@ const SettingsPage = () => {
                         isClearable
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Total Purchase */}
-                  <div className="col">
+                  {/* <div className="col">
                     <div className="custom-select-container">
                       <label><i className="fa-solid fa-cart-shopping me-2"></i>Total Purchase Period</label>
                       <Select
@@ -347,10 +149,10 @@ const SettingsPage = () => {
                         isClearable
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Total Items */}
-                  <div className="col">
+                  {/* <div className="col">
                     <div className="custom-select-container">
                       <label><i className="fa-solid fa-boxes-stacked me-2"></i>Total Items Period</label>
                       <Select
@@ -362,12 +164,12 @@ const SettingsPage = () => {
                         isClearable
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Total Stock Values */}
                   <div className="col">
                     <div className="custom-select-container">
-                      <label><i className="fa-solid fa-warehouse me-2"></i>Total Stock Values</label>
+                      <label><i className="fa-solid fa-warehouse me-2"></i>Date Format</label>
                       <Select
                         // value={stockPeriod}
                         // onChange={setStockPeriod}
@@ -380,7 +182,7 @@ const SettingsPage = () => {
                   </div>
 
                   {/* Upcoming Birthdays Input */}
-                  <div className="col">
+                  {/* <div className="col">
                     <div className="custom-input-group">
                       <label>
                         <i className="fa-solid fa-cake-candles me-2"></i>Upcoming Birthdays
@@ -396,10 +198,10 @@ const SettingsPage = () => {
                         <span className="input-suffix">Days</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* New Joinees Input */}
-                  <div className="col">
+                  {/* <div className="col">
                     <div className="custom-input-group">
                       <label>
                         <i className="fa-solid fa-user-plus me-2"></i>New Joinees
@@ -415,7 +217,7 @@ const SettingsPage = () => {
                         <span className="input-suffix">Days</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                 </div>
               </div>
