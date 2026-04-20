@@ -17,19 +17,15 @@ const uploadImages = async (req, res) => {
   try {
     let fileUrl;
 
-    // Case 1: File uploaded via multer
     if (req.file) {
       fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
     }
-    // Case 2: Base64 image in request body
     else if (req.body && req.body.base64 && req.body.filename) {
       const { base64, filename } = req.body;
 
-      // Remove metadata prefix if exists
       const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
       const buffer = Buffer.from(base64Data, "base64");
 
-      // Save file to uploads folder
       const savePath = path.join(__dirname, "../uploads", filename);
       fs.writeFileSync(savePath, buffer);
 
@@ -27764,7 +27760,6 @@ const deleteProfessionalTax = async (req, res) => {
 const addLoanType = async (req, res) => {
   const {
     company_code,
-    Loan_Type_ID,
     Loan_Type_Name,
     Max_amount,
     Max_repayment_months,
@@ -27782,7 +27777,6 @@ const addLoanType = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "I")
       .input("company_code", sql.NVarChar, company_code)
-      .input("Loan_Type_ID", sql.Int, Loan_Type_ID)
       .input("Loan_Type_Name", sql.VarChar, Loan_Type_Name)
       .input("Max_amount", sql.Decimal(12, 2), Max_amount)
       .input("Max_repayment_months", sql.Int, Max_repayment_months)
@@ -27792,7 +27786,7 @@ const addLoanType = async (req, res) => {
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
             '', '', '', '', '', '', '', ''`);
     res.status(200).json("Loan type data inserted successfully");
   } catch (err) {
@@ -41055,7 +41049,7 @@ const Employee_shift_mappingInsert = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping insertd successfully",
+      message: "Employee shift mapping insertd successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41093,7 +41087,7 @@ const Employee_shift_mappingUpdate = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping updated successfully",
+      message: "Employee shift mapping updated successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41116,7 +41110,7 @@ const Employee_shift_mappingDelete = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Employee_shift_mapping deleted successfully",
+      message: "Employee shift mapping deleted successfully",
     });
   } catch (err) {
     console.error("Error during Employee_shift_mapping insert:", err);
@@ -41148,7 +41142,7 @@ const Employee_shift_mappingLoopInsert = async (req, res) => {
         .query(`EXEC sp_Employee_shift_mapping @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,'',@Company_Code,@Created_by,'','',''`);
     }
-    res.status(200).json("Employee_shift_mapping data inserted successfully");
+    res.status(200).json("Employee shift mapping data inserted successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopInsert:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41180,7 +41174,7 @@ const Employee_shift_mappingLoopUpdate = async (req, res) => {
         .query(`EXEC sp_Employee_shift_mapping @mode,@Employee_ID,@Shift_Pattern_ID,@Effective_From,@Effective_To,
         @Is_Current,@keyfield,@Company_Code,'','',@Modified_by,''`);
     }
-    res.status(200).json("Employee_shift_mapping data updated successfully");
+    res.status(200).json("Employee shift mapping data updated successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopUpdate:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -41207,7 +41201,7 @@ const Employee_shift_mappingLoopDelete = async (req, res) => {
           `EXEC sp_Employee_shift_mapping @mode,'','','','','',@keyfield,@Company_Code,'','','',''`,
         );
     }
-    res.status(200).json("Employee_shift_mapping data deleted successfully");
+    res.status(200).json("Employee shift mapping data deleted successfully");
   } catch (err) {
     console.error("Error in Employee_shift_mappingLoopDelete:", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -42689,11 +42683,22 @@ const getInterviewDashboardCount = async (req, res) => {
 //code added by pavun on 05-03-26
 const generateShiftPDF = (employee, shifts) => {
   const pdfDir = path.join(__dirname, "pdf");
-  if (!fs.existsSync(pdfDir)) {
-    fs.mkdirSync(pdfDir);
+
+  const subDir = path.join(
+    pdfDir,
+    `Shift_${employee.Employee_ID?.slice(0, 2) || "XX"}`,
+    employee.Employee_ID || "unknown"
+  );
+
+  if (!fs.existsSync(subDir)) {
+    fs.mkdirSync(subDir, { recursive: true });
   }
 
-  const filePath = path.join(pdfDir, `Shift_${employee.Employee_ID}.pdf`);
+  const filePath = path.join(
+    subDir,
+    `${moment().format("YY-MM")}.pdf`
+  );
+
   const doc = new PDFDocument({
     margin: 40,
     size: "A4",
@@ -42701,20 +42706,16 @@ const generateShiftPDF = (employee, shifts) => {
 
   doc.pipe(fs.createWriteStream(filePath));
 
-  // --- CONFIGURATION (Matching Sample Colors) ---
   const colors = {
-    primary: "#0f4c81", // Dark Blue (Table Header)
-    secondary: "#f4f6f9", // Light Gray (Background)
+    primary: "#0f4c81",
+    secondary: "#f4f6f9",
     text: "#333333",
-    rowAlt: "#f7f7f7", // Zebra striping
+    rowAlt: "#f7f7f7",
     border: "#dddddd",
   };
 
-  /* ---------- HEADER WITH LOGO ---------- */
-  // Note: Ensure your logo exists at this path or use a placeholder
   const logoPath = path.join(__dirname, "public", "favicon.ico");
 
-  // Header Background Box (The blue bar from your sample)
   doc.rect(0, 0, 600, 100).fill(colors.primary);
 
   if (fs.existsSync(logoPath)) {
@@ -42729,7 +42730,6 @@ const generateShiftPDF = (employee, shifts) => {
 
   doc.moveDown(4);
 
-  /* ---------- SUB-INFO SECTION ---------- */
   doc.fillColor(colors.text).fontSize(10).font("Helvetica");
 
   const currentY = 115;
@@ -42743,10 +42743,9 @@ const generateShiftPDF = (employee, shifts) => {
     `Printed Date: ${moment().format("DD-MM-YYYY")}`,
     400,
     currentY + 15,
-    { align: "right" },
+    { align: "right" }
   );
 
-  /* ---------- TABLE DESIGN ---------- */
   const tableX = 40;
   const column = {
     date: tableX + 10,
@@ -42758,7 +42757,6 @@ const generateShiftPDF = (employee, shifts) => {
   let y = 160;
 
   const drawHeader = () => {
-    // Header background
     doc.rect(tableX, y, 520, 30).fill(colors.primary);
 
     doc
@@ -42775,22 +42773,17 @@ const generateShiftPDF = (employee, shifts) => {
 
   drawHeader();
 
-  /* ---------- TABLE BODY ---------- */
   shifts.forEach((shift, index) => {
-    // Page breaking logic
     if (y > 730) {
       doc.addPage();
       y = 40;
       drawHeader();
     }
 
-    // Zebra Striping
-    const isEven = index % 2 === 0;
-    if (isEven) {
+    if (index % 2 === 0) {
       doc.rect(tableX, y, 520, 25).fill(colors.rowAlt);
     }
 
-    // Border Bottom
     doc
       .moveTo(tableX, y + 25)
       .lineTo(tableX + 520, y + 25)
@@ -42809,16 +42802,6 @@ const generateShiftPDF = (employee, shifts) => {
 
     y += 25;
   });
-
-  /* ---------- FOOTER ---------- */
-  const pageCount = doc.bufferedPageRange().count;
-  // doc.fontSize(9).fillColor("gray");
-  // doc.text(
-  //   `© ${new Date().getFullYear()} YJK Technologies | Confidential Report`,
-  //   0,
-  //   doc.page.height - 50,
-  //   { align: "center" }
-  // );
 
   doc.end();
   return filePath;
@@ -46516,9 +46499,7 @@ const LoanTypeIdDropDown = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(
-        `EXEC sp_Loan_Type 'A', @company_code, 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`,
-      );
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found

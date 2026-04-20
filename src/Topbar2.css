@@ -246,3 +246,52 @@
     font-size: 1.1rem;
     opacity: 0.7;
 }
+/* Fix for User Info Header */
+.profile-dropdown-card li.border-bottom {
+    overflow: hidden; /* Prevents text from leaking out */
+}
+
+.profile-dropdown-card .lh-sm {
+    /* Critical fix: allows the container to shrink and handle long text */
+    min-width: 0; 
+    flex: 1;
+}
+
+.profile-dropdown-card .fw-bold.text-white {
+    /* Handles very long names by adding '...' */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+}
+
+/* Fix for Hover State */
+.profile-dropdown-card .dropdown-item {
+    padding: 10px 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.8) !important;
+    width: 100%; /* Ensures full width hover */
+    cursor: pointer;
+    border-radius: 0; /* Optional: standard dropdown feel */
+    transition: all 0.2s ease;
+}
+
+/* Ensure the camera label behaves like a link */
+.profile-dropdown-card label.dropdown-item {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* Enhanced Hover */
+.profile-dropdown-card .dropdown-item:hover {
+    background-color: var(--sidenav-hover) !important;
+    color: #fff !important;
+    padding-left: 20px; /* Subtle movement effect on hover */
+}
+
+.profile-dropdown-card .dropdown-item:hover .bi {
+    opacity: 1;
+}

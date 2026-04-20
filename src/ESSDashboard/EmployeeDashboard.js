@@ -1819,7 +1819,7 @@ const Dashboard = (payslip) => {
         <div className="grid-col-lg-3">
           <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
             <div className="display-flex flex-between-center mb-3">
-              <h6 className="card-title-heading mb-0">New Joinees</h6>
+              <h6 className="card-title-heading mb-0">New Joiners</h6>
             </div>
 
             <div className="joinee-carousel-container" ref={joineeCarouselRef}>
@@ -1847,7 +1847,7 @@ const Dashboard = (payslip) => {
 
                       <div className="joinee-details mt-3">
                         <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
-                        <p className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</p>
+                        <div className="emp-dept-sub">{joinee.department_ID} • {joinee.EmployeeId}</div>
                         <div className="welcome-badge">Welcome Onboard! 🤝</div>
                       </div>
                     </div>
@@ -1912,7 +1912,7 @@ const Dashboard = (payslip) => {
 
                       <div className="birthday-details mt-3">
                         <h6 className="emp-name-text">{person.EmployeeName}</h6>
-                        <p className="emp-dept-sub">{person.Department || 'Team Member'}</p>
+                        <div className="emp-dept-sub">{person.Department || 'Team Member'}</div>
                         <div className="wish-badge">Happy Birthday! 🎈</div>
                       </div>
                     </div>
