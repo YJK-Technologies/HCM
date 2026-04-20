@@ -431,7 +431,7 @@ function Assets({ }) {
               <>
                 <span
                   className="icon mx-2"
-                  onClick={() => saveEditedData(params.data, params.node.data)}
+                  onClick={() => handleUpdate(params.data, params.node.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
@@ -439,7 +439,7 @@ function Assets({ }) {
 
                 <span
                   className="icon mx-2"
-                  onClick={() => deleteSelectedRows(params.data)}
+                  onClick={() => handleDelete(params.data)}
                   style={{ cursor: 'pointer' }}
                 >
                   <i className="fa-solid fa-trash"></i>
@@ -862,7 +862,7 @@ function Assets({ }) {
         Country: Country,
         Status: Status,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-        created_by: sessionStorage.getItem("selectedUserCode")
+        CreatedBy: sessionStorage.getItem("selectedUserCode")
       };
 
       const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrInsert`, {
@@ -893,7 +893,7 @@ function Assets({ }) {
   };
 
   // UPDATE
-  const saveEditedData = async (rowData) => {
+  const handleUpdate = async (rowData) => {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
@@ -986,7 +986,7 @@ function Assets({ }) {
   };
 
   // DELETE
-  const deleteSelectedRows = async (rowData) => {
+  const handleDelete = async (rowData) => {
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {

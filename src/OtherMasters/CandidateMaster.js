@@ -310,87 +310,199 @@ function CandidateMaster() {
     setIsModalOpen(true);  // Show the modal
   };
 
+  // const handleUpdate = async (rowData) => {
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data in the selected rows?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const company_code = sessionStorage.getItem('selectedCompanyCode');
+  //         const modified_by = sessionStorage.getItem('selectedUserCode');
+
+  //         const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+
+  //         const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopUpdate`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "company_code": company_code,
+  //             "modified-by": modified_by
+  //           },
+  //           body: JSON.stringify(dataToSend)
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully", {
+  //             onClose: () => handleSearch(), // Runs handleSearch when toast closes
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error deleting rows:", error);
+  //         toast.error('Error Deleting Data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     }
+  //   );
+  // };
+
   const handleUpdate = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
 
-          const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+        showConfirmationToast(
+            "Are you sure you want to update the selected employee shift mapping data?",
+            async () => {
+                try {
+                    setLoading(true);
+                    const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const modified_by = sessionStorage.getItem("selectedUserCode");
 
-          const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopUpdate`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified-by": modified_by
+                    const dataToSend = {
+                        candidate_masterData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    modified_by,
+                                },
+                            ],
+                    };
+
+                    const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopUpdate`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(dataToSend),
+                        },
+                    );
+
+                    if (response.ok) {
+                        toast.success("Candidate Master updated successfully", {
+                            onClose: () => handleSearch(),
+                        });
+                    } else {
+                        const errorResponse = await response.json();
+                        toast.warning(errorResponse.message || "Update failed");
+                    }
+                } catch (error) {
+                    console.error("Update error:", error);
+                    toast.error("Error updating data: " + error.message);
+                } finally {
+                    setLoading(false);
+                }
             },
-            body: JSON.stringify(dataToSend)
-          });
+            () => toast.info("Update cancelled"),
+        );
+    };
 
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-          }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+  // const handleDelete = async (rowData) => {
+  //   showConfirmationToast(
+  //     "Are you sure you want to Delete the data in the selected rows?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+  //         const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+
+  //         const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopDelete`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "company_code": company_code
+  //           },
+  //           body: JSON.stringify(dataToSend)
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data deleted successfully", {
+  //             onClose: () => handleSearch(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error deleting rows:", error);
+  //         toast.error('Error Deleting Data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data Delete cancelled.");
+  //     }
+  //   );
+  // };
 
   const handleDelete = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to Delete the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-          const dataToSend = { candidate_masterData: Array.isArray(rowData) ? rowData : [rowData] };
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          candidate_masterData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+        };
 
-          const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopDelete`, {
+        const response = await fetch(
+          `${config.apiBaseUrl}/candidate_masterLoopDelete`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data deleted successfully", {
-              onClose: () => handleSearch(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
         }
-      },
-      () => {
-        toast.info("Data Delete cancelled.");
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
 
   const reloadGridData = () => {
     setRowData([]);

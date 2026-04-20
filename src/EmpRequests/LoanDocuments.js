@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function LoanDocuments({}) {
+function LoanDocuments({ }) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -103,52 +103,52 @@ function LoanDocuments({}) {
       .catch((error) => console.error("Error fetching loan request:", error));
   }, []);
 
-    useEffect(() => {
-      fetch(`${config.apiBaseUrl}/getdocument_type`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      })
-        .then((data) => data.json())
-        .then((val) => setDocumentTypeDrop(val));
-    }, []);
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getdocument_type`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setDocumentTypeDrop(val));
+  }, []);
 
   const handleChangeDocumentType = (selectedDocumentIdType) => {
     setSelectedDocumentIdType(selectedDocumentIdType);
     setDocumentIdType(selectedDocumentIdType ? selectedDocumentIdType.value : '');
-  };  
+  };
 
   const filteredOptionDocumentType = Array.isArray(documentTypeDrop)
     ? documentTypeDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
-    useEffect(() => {
-      fetch(`${config.apiBaseUrl}/getdocument_type`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      })
-        .then((data) => data.json())
-        .then((val) => setDocumentTypeDropSC(val));
-    }, []);
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getdocument_type`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setDocumentTypeDropSC(val));
+  }, []);
 
   const handleChangeDocumentTypeSC = (selectedDocumentIdTypeSC) => {
     setSelectedDocumentIdTypeSC(selectedDocumentIdTypeSC);
     setDocumentIdTypeSC(selectedDocumentIdTypeSC ? selectedDocumentIdTypeSC.value : '');
-  };  
+  };
 
   const filteredOptionDocumentTypeSC = Array.isArray(documentTypeDropSC)
     ? documentTypeDropSC.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -173,23 +173,23 @@ function LoanDocuments({}) {
 
   const filteredOptionLoanReqIdSC = Array.isArray(loanReqIdDropSC)
     ? loanReqIdDropSC.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-      }))
+      value: option.loan_request_id,
+      label: option.loan_request_id,
+    }))
     : [];
 
   const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
     ? loanReqIdDrop.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-      }))
+      value: option.loan_request_id,
+      label: option.loan_request_id,
+    }))
     : [];
 
   const filteredOptionLoanReqIdAG = Array.isArray(loanReqIdDropAG)
     ? loanReqIdDropAG.map((option) => ({
-        value: option.loan_request_id,
-        label: option.loan_request_id,
-      }))
+      value: option.loan_request_id,
+      label: option.loan_request_id,
+    }))
     : [];
 
   const handleLoanReq = (SelectedLoanReq) => {
@@ -302,6 +302,17 @@ function LoanDocuments({}) {
       headerName: "Uploaded Date",
       field: "uploaded_at",
       editable: true,
+      valueFormatter: (params) => {
+        if (!params.value) return "";
+
+        const date = new Date(params.value);
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+      }
     },
     // PDF PREVIEW COLUMN
     {
@@ -472,17 +483,17 @@ function LoanDocuments({}) {
           const dataToSend = {
             loan_documentsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -522,19 +533,22 @@ function LoanDocuments({}) {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
             loan_documentsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
-                  company_code,
-                }))
+                ...row,
+                company_code,
+                modified_by
+              }))
               : [
-                  {
-                    ...rowData,
-                    company_code,
-                  },
-                ],
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by
+                },
+              ],
           };
 
           const response = await fetch(
@@ -771,7 +785,7 @@ function LoanDocuments({}) {
               className={`inputGroup selectGroup 
                 ${selectedLoanReq ? "has-value" : ""} 
                 ${isLoanReqFocus ? "is-focused" : ""}`}
-                title="Please enter the Loan Request ID"
+              title="Please enter the Loan Request ID"
             >
               <Select
                 id="loanReq"
@@ -811,7 +825,7 @@ function LoanDocuments({}) {
               />
               <label htmlFor="DocumentType" className="floating-label">Document Type</label>
             </div>
-          </div>          
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -831,7 +845,7 @@ function LoanDocuments({}) {
                 File Path<span className="text-danger">*</span>
               </label>
             </div>
-          </div> 
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -967,7 +981,7 @@ function LoanDocuments({}) {
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
                   setdocument_idSC(value);
-                }}  
+                }}
               />
               <label for="sname" className={`exp-form-labels`}>
                 Document ID
@@ -1018,7 +1032,7 @@ function LoanDocuments({}) {
               />
               <label htmlFor="DocumentType" className="floating-label">Document Type</label>
             </div>
-          </div>          
+          </div>
 
 
           <div className="col-md-2">
