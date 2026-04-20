@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemeProvider } from "./ThemeContext";
 import AppContent from "./App_content";
 import ForgotPopup from "./Forgotpopup";
 import Select from "react-select";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
 const SettingsPage = () => {
   const [open, setOpen] = useState(false);
@@ -18,40 +18,43 @@ const SettingsPage = () => {
   const [birthdayDays, setBirthdayDays] = useState(null);
   const [joineesDays, setJoineesDays] = useState(null);
   const [DateDrop, setDateDrop] = useState([]);
+  const [dateFormat, setDateFormat] = useState(null);
+  
+  const config = require("./Apiconfig");
 
-const config = require("./Apiconfig");
-    
   const languageOptions = [
     { value: "en", label: "English" },
     { value: "fr", label: "French" },
     { value: "es", label: "Spanish" },
   ];
 
-    useEffect(() => {
-        const fetchLeaveData = async () => {
-            try {
-                const response = await fetch(`${config.apiBaseUrl}/getDateFormat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
-                });
+  useEffect(() => {
+    const fetchLeaveData = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getDateFormat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
 
-                const val = await response.json();
-                setDateDrop(val);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
+        const val = await response.json();
+        setDateDrop(val);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
-        fetchLeaveData();
-    }, []);
+    fetchLeaveData();
+  }, []);
 
   const filteredOptionDate = DateDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_code,
-  }));  
+  }));
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -77,7 +80,6 @@ const config = require("./Apiconfig");
 
       <main className="settings-content">
         <div className="row g-2 mb-2">
-
           <div className="col-lg-4">
             <section className="settings-card shadow-sm">
               <div className="card-header-simple">
@@ -115,12 +117,12 @@ const config = require("./Apiconfig");
 
               <div className="card-body-simple">
                 <p className="section-instruction">
-                  Customize the default data ranges and visibility for your Global Date Format.
+                  Customize the default data ranges and visibility for your
+                  Global Date Format.
                 </p>
 
                 {/* Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
                 <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-
                   {/* Total Sales */}
                   {/* <div className="col">
                     <div className="custom-select-container">
@@ -169,13 +171,14 @@ const config = require("./Apiconfig");
                   {/* Total Stock Values */}
                   <div className="col">
                     <div className="custom-select-container">
-                      <label><i className="fa-solid fa-warehouse me-2"></i>Date Format</label>
+                      <label>
+                        <i className="fa-solid fa-warehouse me-2"></i>Date  Format</label>
                       <Select
-                        // value={stockPeriod}
-                        // onChange={setStockPeriod}
-                        // options={filteredOptionPeriod}
+                        value={dateFormat}
+                        onChange={setDateFormat}
+                        options={filteredOptionDate} // ✅ correct options
                         classNamePrefix="modern-select"
-                        placeholder="Select Period"
+                        placeholder="Select Date Format"
                         isClearable
                       />
                     </div>
@@ -218,12 +221,10 @@ const config = require("./Apiconfig");
                       </div>
                     </div>
                   </div> */}
-
                 </div>
               </div>
             </section>
           </div>
-
         </div>
       </main>
 
