@@ -347,6 +347,7 @@ function Input() {
           const Header = {
             EmployeeId: EmployeeId,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode")
           }
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeCompany`, {
 

@@ -552,17 +552,20 @@ function LoanApprovals({}) {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
             loan_approvalsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                   ...row,
                   company_code,
+                  modified_by
                 }))
               : [
                   {
                     ...rowData,
                     company_code,
+                    modified_by
                   },
                 ],
           };

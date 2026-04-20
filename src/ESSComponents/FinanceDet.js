@@ -308,7 +308,8 @@ case 'EmployeeAssets':
           const Header = {
             EmployeeId: EmployeeId,
             PFNo: PFNo,
-            company_code: sessionStorage.getItem("selectedCompanyCode")
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem('selectedUserCode')
           };
 
           const response = await fetch(`${config.apiBaseUrl}/deleteSalaryDetails`, {
@@ -357,8 +358,8 @@ case 'EmployeeAssets':
           setLoading(true);
           const Header = {
             EmployeeId: EmployeeId,
-            salaryType: salaryType,
-            Payscale: payscale,
+            salaryType: selectedSalaryType ? selectedSalaryType.value : salaryType,
+            Payscale: payscale === selectedPayscale ? selectedPayscale.value : payscale,
             PFNo: PFNo,
             salary_month: salaryMonth,
             company_code: sessionStorage.getItem('selectedCompanyCode'),

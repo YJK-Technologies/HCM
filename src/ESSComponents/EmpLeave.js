@@ -439,23 +439,35 @@ function Input({ }) {
   };
 
 
-  const saveEditedData = async () => {
+  const saveEditedData = async (rowData) => {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+          const Modified_by = sessionStorage.getItem('selectedUserCode');
 
-          const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
+          const dataToSend = {
+                        editedData: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                Modified_by,
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    Modified_by,
+                                },
+                            ],
+                    };
 
           const response = await fetch(`${config.apiBaseUrl}/UpdateLeaveType `, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "company_code": company_code,
-              "modified_by": modified_by
             },
             body: JSON.stringify(dataToSend)
           });
@@ -482,19 +494,38 @@ function Input({ }) {
   };
 
   const deleteSelectedRows = async (rowData) => {
-    const LeaveIdDelete = { LeaveIdToDelete: Array.isArray(rowData) ? rowData : [rowData] };
+    // const LeaveIdDelete = { LeaveIdToDelete: Array.isArray(rowData) ? rowData : [rowData] };
 
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
         try {
           setLoading(true);
+          const company_code = sessionStorage.getItem('selectedCompanyCode');
+          const Modified_by = sessionStorage.getItem('selectedUserCode');
+
+          const dataToSend = {
+                        LeaveIdToDelete: Array.isArray(rowData)
+                            ? rowData.map((row) => ({
+                                ...row,
+                                company_code,
+                                Modified_by
+                            }))
+                            : [
+                                {
+                                    ...rowData,
+                                    company_code,
+                                    Modified_by
+                                },
+                            ],
+                    };
+
           const response = await fetch(`${config.apiBaseUrl}/deleteLeave`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify(LeaveIdDelete),
+            body: JSON.stringify(dataToSend),
           });
 
           if (response.ok) {

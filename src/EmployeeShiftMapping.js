@@ -832,64 +832,121 @@ function EmployeeTypeMaster() {
         );
     };
 
+    // const handleDelete = async (rowData) => {
+
+    //     showConfirmationToast(
+    //         "Are you sure you want to delete the selected employee shift mapping data?",
+    //         async () => {
+    //             try {
+    //                 setLoading(true);
+    //                 const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    //                 const Modified_by = sessionStorage.getItem("selectedUserCode");
+
+    //                 // const dataToSend = {
+    //                 //     Employee_shift_mappingData: Array.isArray(rowData) ? rowData : [rowData],
+    //                 // };
+
+    //                 const dataToSend = {
+    //                     Employee_shift_mappingData: Array.isArray(rowData)
+    //                         ? rowData.map((row) => ({
+    //                             ...row,
+    //                             Company_Code,
+    //                             Modified_by,
+    //                         }))
+    //                         : [
+    //                             {
+    //                                 ...rowData,
+    //                                 Company_Code,
+    //                                 Modified_by,
+    //                             },
+    //                         ],
+    //                 };
+
+    //                 const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
+    //                     {
+    //                         method: "POST",
+    //                         headers: {
+    //                             "Content-Type": "application/json",
+    //                         },
+    //                         body: JSON.stringify(dataToSend),
+    //                     },
+    //                 );
+
+    //                 if (response.ok) {
+    //                     toast.success("Employee shift mapping deleted successfully", {
+    //                         onClose: () => handleSearch(), // refresh data
+    //                     });
+    //                 } else {
+    //                     const errorResponse = await response.json();
+    //                     toast.warning(errorResponse.message || "Delete failed");
+    //                 }
+    //             } catch (error) {
+    //                 console.error("Error deleting employee shift mapping rows:", error);
+    //                 toast.error("Error deleting employee shift mapping data: " + error.message);
+    //             } finally {
+    //                 setLoading(false);
+    //             }
+    //         },
+    //         () => toast.info("Delete cancelled"),
+    //     );
+    // };
+
     const handleDelete = async (rowData) => {
+  showConfirmationToast(
+    "Are you sure you want to delete the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
 
-        showConfirmationToast(
-            "Are you sure you want to delete the selected employee shift mapping data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
-                    const Modified_by = sessionStorage.getItem("selectedUserCode");
+        const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+        const Modified_by = sessionStorage.getItem("selectedUserCode");
+        const dataToSend = {
+          Employee_shift_mappingData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  Company_Code,
+                  Modified_by,
+                },
+              ],
+        };
 
-                    // const dataToSend = {
-                    //     Employee_shift_mappingData: Array.isArray(rowData) ? rowData : [rowData],
-                    // };
-
-                    const dataToSend = {
-                        Employee_shift_mappingData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                Company_Code,
-                                Modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    Company_Code,
-                                    Modified_by,
-                                },
-                            ],
-                    };
-
-                    const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Employee shift mapping deleted successfully", {
-                            onClose: () => handleSearch(), // refresh data
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Delete failed");
-                    }
-                } catch (error) {
-                    console.error("Error deleting employee shift mapping rows:", error);
-                    toast.error("Error deleting employee shift mapping data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
+        const response = await fetch(
+          `${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-            () => toast.info("Delete cancelled"),
+            body: JSON.stringify(dataToSend),
+          }
         );
-    };
+
+        if (response.ok) {
+          toast.success("Data deleted successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Delete failed");
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast.error("Error deleting data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Delete cancelled");
+    }
+  );
+};
 
     const getCSSVariable = (variableName) => {
         return getComputedStyle(document.documentElement)
