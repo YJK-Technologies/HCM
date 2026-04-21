@@ -396,7 +396,7 @@
   line-height: 1.5;
 }
 
-.btn-outline-primary-custom {
+/* .btn-outline-primary-custom {
   border-color: #007bff;
   color: #007bff;
   transition: all 0.2s;
@@ -407,6 +407,29 @@
   background-color: #007bff;
   color: white;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+} */
+
+.btn-outline-primary-custom {
+  border: 1px solid var(--but);
+  color: var(--but);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-outline-primary-custom:hover {
+  background-color: var(--but);
+  color: #ffffff; 
+  box-shadow: 0 4px 12px rgba(var(--but-rgb), 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-outline-primary-custom:active {
+  transform: translateY(0px);
 }
 
 /* --- Attendance Card --- */
@@ -638,7 +661,7 @@
   margin-right: 10px;
 }
 
-.team-toggle-button {
+/* .team-toggle-button {
   width: 50%;
   border-radius: 6px;
   padding: 5px 10px;
@@ -654,6 +677,62 @@
 
 .team-toggle-button:hover {
   background-color: #5a6268;
+} */
+
+/* Header Layout Improvements */
+.myteam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.myteam-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* React Select Wrapper Fix */
+.team-select-wrapper {
+  min-width: 180px;
+  font-size: 13px;
+}
+
+/* Global Theme Toggle Button */
+.team-toggle-button {
+  background-color: var(--ag-col); /* Light version of theme color */
+  color: var(--font-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 100px;
+  cursor: pointer;
+}
+
+.team-toggle-button:hover {
+  background-color: var(--but); /* Primary theme color on hover */
+  color: #ffffff;
+  border-color: var(--but);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Customizing React Select internal style to match theme */
+.team-select-wrapper .react-select__control {
+  border-color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  min-height: 35px !important;
+}
+
+.team-select-wrapper .react-select__control--is-focused {
+  border-color: var(--but) !important;
+  box-shadow: 0 0 0 1px var(--but) !important;
 }
 
 .request-action-icons {

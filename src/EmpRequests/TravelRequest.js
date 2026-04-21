@@ -978,19 +978,11 @@ function TravelRequest({ }) {
       field: "travel_request_id",
       editable: true,
     },
-
-    // {
-    //   headerName: "Request Number",
-    //   field: "request_number",
-    //   editable: true,
-    // },
-
     {
       headerName: "Employee ID",
       field: "employee_id",
       editable: false,
     },
-
     {
       headerName: "Department",
       field: "department_id",
@@ -1004,7 +996,6 @@ function TravelRequest({ }) {
         return dept ? dept.label : params.value;
       },
     },
-
     {
       headerName: "Travel Type",
       field: "travel_type",
@@ -1014,7 +1005,6 @@ function TravelRequest({ }) {
         values: travel_typeDropGrid,
       },
     },
-
     {
       headerName: "Destination Country",
       field: "destination_country_id",
@@ -1033,25 +1023,21 @@ function TravelRequest({ }) {
       field: "destination_city",
       editable: true,
     },
-
     {
       headerName: "Purpose of Travel",
       field: "purpose_of_travel",
       editable: true,
     },
-
     {
       headerName: "Start Date",
       field: "travel_start_date",
       editable: true,
     },
-
     {
       headerName: "End Date",
       field: "travel_end_date",
       editable: true,
     },
-
     {
       headerName: "Transport Mode",
       field: "transport_mode",
@@ -1061,19 +1047,16 @@ function TravelRequest({ }) {
         values: transport_modeDropGrid,
       },
     },
-
     {
       headerName: "Accommodation Required",
       field: "accommodation_required",
       editable: true,
     },
-
     {
       headerName: "Estimated Cost",
       field: "estimated_cost",
       editable: true,
     },
-
     {
       headerName: "Currency Code",
       field: "currency_code",
@@ -1083,7 +1066,6 @@ function TravelRequest({ }) {
         values: currencyDropGrid,
       },
     },
-
     {
       headerName: "Request Status",
       field: "request_status",
@@ -1093,13 +1075,11 @@ function TravelRequest({ }) {
         values: reqStatusDropAG,
       },
     },
-
     {
       headerName: "Remarks",
       field: "Remarks",
       editable: true,
     },
-
     {
       headerName: "Priority Level",
       field: "priority_level",
@@ -1110,7 +1090,6 @@ function TravelRequest({ }) {
         values: PriorityGridDrop,
       },
     },
-
     {
       headerName: "Manager",
       field: "manager_id",
@@ -1124,7 +1103,6 @@ function TravelRequest({ }) {
         return loan ? loan.label : params.value;
       },
     },
-
     {
       headerName: "Keyfield",
       field: "keyfield",
@@ -1194,8 +1172,7 @@ function TravelRequest({ }) {
         modified_date: null,
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/travel_requestsInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/travel_requestsInsert`,
         {
           method: "POST",
           headers: {
@@ -1369,17 +1346,20 @@ function TravelRequest({ }) {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
             travel_requestsData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
+                modified_by
               }))
               : [
                 {
                   ...rowData,
                   company_code,
+                  modified_by
                 },
               ],
           };

@@ -61,6 +61,7 @@ function Project({ }) {
   const [isSearchManager, setIsSearchManager] = useState(false);
   const [isSearchPriority, setIsSearchPriority] = useState(false);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
+  const [ManagerGridDrop, setManagerGridDrop] = useState([]);
 
   // const options = [
   //   { value: 'add', label: 'Add' },
@@ -166,7 +167,11 @@ function Project({ }) {
       field: "ProjectManager",
       filter: 'agTextColumnFilter',
       // minWidth: 200, maxWidth: 250,
-      editable: true
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: ManagerGridDrop
+      }
     },
     {
       headerName: "Start Date", field: "StartDate", filter: 'agDateColumnFilter',
@@ -290,6 +295,27 @@ function Project({ }) {
     })
       .then((response) => response.json())
       .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        // user_code: sessionStorage.getItem("selectedUserCode"),
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+
+      .then((data) => {
+        // Extract city names from the fetched data
+        const statusOption = data.map(option => option.EmployeeId);
+        setManagerGridDrop(statusOption);
+      })
       .catch((error) => console.error("Error fetching warehouse:", error));
   }, []);
 

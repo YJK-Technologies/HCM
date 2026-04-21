@@ -42,6 +42,11 @@ function VisaRequest({ }) {
     const [sponsorName, setSponsorName] = useState('');
     const [estimatedCost, setEstimatedCost] = useState('');
     const [remarks, setRemarks] = useState('');
+    const [selectedmanager, setselectedmanager] = useState("");
+    const [ProjectManager, setProjectManager] = useState("");
+    const [isSelectManager, setIsSelectManager] = useState(false);
+    const [Managerdrop, setManagerdrop] = useState([]);
+    const [ManagerdropAG, setManagerdropAG] = useState([]);
 
     const [visaRequestIdSc, setVisaRequestIdSc] = useState('');
     const [empIdDropSc, setEmpIdDropSc] = useState([]);
@@ -67,6 +72,10 @@ function VisaRequest({ }) {
     const [sponsorNameSc, setSponsorNameSc] = useState('');
     const [estimatedCostSc, setEstimatedCostSc] = useState('');
     const [remarksSc, setRemarksSc] = useState('');
+    const [selectedmanagerSC, setselectedmanagerSC] = useState("");
+    const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
+    const [ManagerdropSC, setManagerdropSC] = useState([]);
+    const [ProjectManagerSC, setProjectManagerSC] = useState("");
 
     const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
     const [isSelectedCountryId, setIsSelectedCountryId] = useState(false);
@@ -156,6 +165,21 @@ function VisaRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((response) => response.json())
+            .then(setManagerdrop)
+            .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
     const filteredOptionEmpId = Array.isArray(empIdDrop)
         ? empIdDrop.map((option) => ({
             value: option?.EmployeeId,
@@ -191,6 +215,13 @@ function VisaRequest({ }) {
         }))
         : [];
 
+    const filteredOptionManager = Array.isArray(Managerdrop)
+        ? Managerdrop.map((option) => ({
+            value: option.EmployeeId,
+            label: `${option.EmployeeId}-${option.full_name}`,
+        }))
+        : [];
+
     const handleChangeEmpId = (selectedEmpId) => {
         setSelectedEmpId(selectedEmpId);
         setEmpId(selectedEmpId ? selectedEmpId.value : "");
@@ -214,6 +245,11 @@ function VisaRequest({ }) {
     const handleChangeReqStatus = (selectedReqStatus) => {
         setSelectedReqStatus(selectedReqStatus);
         setReqStatus(selectedReqStatus ? selectedReqStatus.value : "");
+    };
+
+    const handleChangemanager = (selectedOption) => {
+        setselectedmanager(selectedOption);
+        setProjectManager(selectedOption ? selectedOption.value : "");
     };
 
     useEffect(() => {
@@ -286,6 +322,21 @@ function VisaRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((response) => response.json())
+            .then(setManagerdropSC)
+            .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
     const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
         ? empIdDropSc.map((option) => ({
             value: option?.EmployeeId,
@@ -324,6 +375,13 @@ function VisaRequest({ }) {
         ]
         : [{ value: "All", label: "All" }];
 
+    const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
+        ? ManagerdropSC.map((option) => ({
+            value: option.EmployeeId,
+            label: `${option.EmployeeId}-${option.full_name}`,
+        }))
+        : [];
+
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
         setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -347,6 +405,11 @@ function VisaRequest({ }) {
     const handleChangeReqStatusSc = (selectedReqStatusSc) => {
         setSelectedReqStatusSc(selectedReqStatusSc);
         setReqStatusSc(selectedReqStatusSc ? selectedReqStatusSc.value : "");
+    };
+
+    const handleChangemanagerSC = (selectedOption) => {
+        setselectedmanagerSC(selectedOption);
+        setProjectManagerSC(selectedOption ? selectedOption.value : "");
     };
 
     useEffect(() => {
@@ -439,6 +502,28 @@ function VisaRequest({ }) {
                 setReqStatusDropGrid(reqStatus);
             })
             .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const Manager = val.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId}`,
+                }));
+
+                setManagerdropAG(Manager);
+            })
+            .catch((error) => console.error("Error fetching Travel request:", error));
     }, []);
 
     const searchClearInputFields = () => {
@@ -601,6 +686,19 @@ function VisaRequest({ }) {
             editable: true
         },
         {
+            headerName: "Manager",
+            field: "manager_id",
+            editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: ManagerdropAG.map((d) => d.value),
+            },
+            valueFormatter: (params) => {
+                const loan = ManagerdropAG.find((d) => d.value === params.value);
+                return loan ? loan.label : params.value;
+            },
+        },
+        {
             headerName: "Keyfield",
             field: "keyfield",
             editable: true,
@@ -615,12 +713,13 @@ function VisaRequest({ }) {
 
     const handleSave = async () => {
         if (
-            !empId ||
+            // !empId ||
             !passportId ||
             !visaType ||
             !travelStartDate ||
             !travelEndDate ||
             // !reqStatus ||
+            !ProjectManager ||
             !priority ||
             !estimatedCost
         ) {
@@ -639,7 +738,7 @@ function VisaRequest({ }) {
         try {
             const Header = {
                 visa_request_id: visaRequestId,
-                employee_id: empId,
+                employee_id: sessionStorage.getItem('selectedUserCode'),
                 passport_id: passportId,
                 destination_country_id: countryId,
                 visa_type_id: visaType,
@@ -652,6 +751,7 @@ function VisaRequest({ }) {
                 sponsor_name: sponsorName,
                 estimated_cost: estimatedCost,
                 Remarks: remarks,
+                manager_id: ProjectManager,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
                 Created_by: sessionStorage.getItem('selectedUserCode')
             };
@@ -685,7 +785,7 @@ function VisaRequest({ }) {
         try {
             const body = {
                 visa_request_id: visaRequestIdSc,
-                employee_id: empIdSc,
+                employee_id: sessionStorage.getItem('selectedUserCode'),
                 passport_id: passportIdSc,
                 destination_country_id: countryIdSc,
                 visa_type_id: visaTypeSc,
@@ -698,6 +798,7 @@ function VisaRequest({ }) {
                 sponsor_name: sponsorNameSc,
                 estimated_cost: estimatedCostSc ? estimatedCostSc : 0,
                 Remarks: remarksSc,
+                manager_id: ProjectManagerSC,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
@@ -799,17 +900,20 @@ function VisaRequest({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
                         visa_requestsData: Array.isArray(rowData)
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
+                                Modified_by
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
+                                    Modified_by
                                 },
                             ],
                     };
@@ -883,6 +987,7 @@ function VisaRequest({ }) {
                 "Sponsor Name": row.sponsor_name || "",
                 "Estimated Cost": row.estimated_cost || "",
                 "Remarks": row.Remarks || "",
+                Manager: row.manager_id || "",
             };
         });
     };
@@ -1036,7 +1141,7 @@ function VisaRequest({ }) {
                         </div>
                     </div> */}
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedEmpId ? "has-value" : ""} 
@@ -1058,7 +1163,7 @@ function VisaRequest({ }) {
                                 Employee ID<span className="text-danger">*</span>
                             </label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div className="inputGroup">
@@ -1297,6 +1402,35 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedmanager ? "has-value" : ""} 
+                            ${isSelectManager ? "is-focused" : ""}`}
+                            title="Please select the Manager"
+                        >
+                            <Select
+                                id="LoanEligibleAmount"
+                                type="text"
+                                placeholder=" "
+                                onFocus={() => setIsSelectManager(true)}
+                                onBlur={() => setIsSelectManager(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                                value={selectedmanager}
+                                options={filteredOptionManager}
+                                onChange={handleChangemanager}
+                                maxLength={18}
+                            />
+                            <label
+                                for="add1"
+                                className={`floating-label ${error && !ProjectManager ? "text-danger" : ""}`}
+                            >
+                                Manager<span className="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -1328,7 +1462,7 @@ function VisaRequest({ }) {
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
                             ${selectedEmpIdSc ? "has-value" : ""} 
@@ -1350,7 +1484,7 @@ function VisaRequest({ }) {
                                 Employee ID
                             </label>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <div className="inputGroup">
@@ -1423,23 +1557,6 @@ function VisaRequest({ }) {
                             <input
                                 id="fdate"
                                 class="exp-input-field form-control"
-                                type="text"
-                                placeholder=""
-                                required title="Please Enter the Annual Bonus"
-                                autoComplete="off"
-                                value={purposeSc}
-                                maxLength={100}
-                                onChange={(e) => setPurposeSc((e.target.value))}
-                            />
-                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                id="fdate"
-                                class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
                                 required title="Please Enter the Annual Bonus"
@@ -1464,6 +1581,23 @@ function VisaRequest({ }) {
                                 onChange={(e) => setTravelEndDateSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Travel End Date</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="fdate"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                required title="Please Enter the Annual Bonus"
+                                autoComplete="off"
+                                value={purposeSc}
+                                maxLength={100}
+                                onChange={(e) => setPurposeSc((e.target.value))}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Purpose</label>
                         </div>
                     </div>
 
@@ -1586,6 +1720,32 @@ function VisaRequest({ }) {
                                 onChange={(e) => setRemarksSc((e.target.value))}
                             />
                             <label for="sname" className={`exp-form-labels`}>Remarks</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedmanagerSC ? "has-value" : ""} 
+                            ${isSelectManagerSC ? "is-focused" : ""}`}
+                            title="Please select the Manager"
+                        >
+                            <Select
+                                id="LoanEligibleAmount"
+                                type="text"
+                                placeholder=" "
+                                onFocus={() => setIsSelectManagerSC(true)}
+                                onBlur={() => setIsSelectManagerSC(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                                value={selectedmanagerSC}
+                                options={filteredOptionManagerSC}
+                                onChange={handleChangemanagerSC}
+                                maxLength={18}
+                            />
+                            <label for="add1" className={`floating-label `}>
+                                Manager
+                            </label>
                         </div>
                     </div>
 
