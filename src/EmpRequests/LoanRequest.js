@@ -493,6 +493,8 @@ function LoanRequest({ }) {
         setRepaymentDateSc("");
         setSelectedCurrencySc("");
         setSelectedCurrency("");
+        setselectedmanagerSC("");
+        setProjectManagerSC("");
     };
 
     const columnDefs = [
@@ -1155,19 +1157,24 @@ function LoanRequest({ }) {
                     <div className="col-md-2">
                         <div className="inputGroup">
                             <input
-                                id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                maxLength={5}
                                 inputMode="numeric"
-                                pattern="[0-9]*"
                                 title="Please enter the Interest Rate"
-                                required
-                                autoComplete="off"
                                 value={interestRate}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    let value = e.target.value;
+                                    value = value.replace(/[^0-9.]/g, "");
+                                    let parts = value.split(".");
+                                    if (parts.length > 2) {
+                                        parts = [parts[0], parts[1]];
+                                    }
+                                    parts[0] = parts[0].slice(0, 5);
+                                    if (parts[1]) {
+                                        parts[1] = parts[1].slice(0, 2);
+                                    }
+                                    value = parts.join(".");
                                     setInterestRate(value);
                                 }}
                             />
@@ -1504,8 +1511,18 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Interest Rate"
                                 autoComplete="off"
                                 value={interestRateSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                 onChange={(e) => {
+                                    let value = e.target.value;
+                                    value = value.replace(/[^0-9.]/g, "");
+                                    let parts = value.split(".");
+                                    if (parts.length > 2) {
+                                        parts = [parts[0], parts[1]];
+                                    }
+                                    parts[0] = parts[0].slice(0, 5);
+                                    if (parts[1]) {
+                                        parts[1] = parts[1].slice(0, 2);
+                                    }
+                                    value = parts.join(".");
                                     setInterestRateSc(value);
                                 }}
                             />

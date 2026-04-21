@@ -43084,7 +43084,7 @@ const visa_requestsInsert = async (req, res) => {
       .input("mode", sql.NVarChar, "I")
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("passport_id", sql.Int, passport_id)
+      .input("passport_id", sql.NVarChar, passport_id)
       .input("destination_country_id", sql.NVarChar, destination_country_id)
       .input("visa_type_id", sql.NVarChar, visa_type_id)
       .input("purpose", sql.NVarChar, purpose)
@@ -43121,7 +43121,7 @@ const visa_requestsUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("employee_id", sql.NVarChar, employee_id)
-      .input("passport_id", sql.Int, passport_id)
+      .input("passport_id", sql.NVarChar, passport_id)
       .input("destination_country_id", sql.NVarChar, destination_country_id)
       .input("visa_type_id", sql.NVarChar, visa_type_id)
       .input("purpose", sql.NVarChar, purpose)
@@ -43158,7 +43158,7 @@ const visa_requestsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("keyfield", sql.NVarChar, keyfield)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', ', '', ''`,);
+      .query(`EXEC sp_visa_requests_Test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', ', '', ''`,);
 
     res
       .status(200)
@@ -43184,7 +43184,7 @@ const visa_requestsLoopInsert = async (req, res) => {
         .input("mode", sql.NVarChar, "I")
         .input("visa_request_id", sql.Int, item.visa_request_id)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("passport_id", sql.Int, item.passport_id)
+        .input("passport_id", sql.NVarChar, item.passport_id)
         .input("destination_country_id", sql.NVarChar,item.destination_country_id)
         .input("visa_type_id", sql.NVarChar, item.visa_type_id)
         .input("purpose", sql.NVarChar, item.purpose)
@@ -43223,7 +43223,7 @@ const visa_requestsLoopUpdate = async (req, res) => {
         .input("mode", sql.NVarChar, "U")
         .input("visa_request_id", sql.Int, item.visa_request_id)
         .input("employee_id", sql.NVarChar, item.employee_id)
-        .input("passport_id", sql.Int, item.passport_id)
+        .input("passport_id", sql.NVarChar, item.passport_id)
         .input("destination_country_id",sql.NVarChar, item.destination_country_id)
         .input("visa_type_id", sql.NVarChar, item.visa_type_id)
         .input("purpose", sql.NVarChar, item.purpose)
@@ -43263,7 +43263,7 @@ const visa_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
-        .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', '', '', ''`);
+        .query(`EXEC sp_visa_requests_Test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', '', '', ''`);
     }
     res.status(200).json("visa_requests data deleted successfully");
   } catch (err) {
@@ -44914,7 +44914,7 @@ const visaRequestDashboard = async (req, res) => {
       .input("mode", sql.NVarChar, "VR")
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, @manager_id, '', '', '', '', ''`);
+      .query(`EXEC sp_visa_requests_Test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @manager_id, '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45007,7 +45007,7 @@ const ApprovalVisa = async (req, res) => {
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', '', ''`);
+      .query(`EXEC sp_visa_requests_Test @mode, @visa_request_id, '', '', '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', '', ''`);
 
     res.status(200).json("visa approval successfully");
   } catch (err) {

@@ -10,6 +10,7 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
+// import { FormInput, FormSelect } from "../Utils/Tooltip.js";
 const config = require('../Apiconfig');
 
 function VisaRequest({ }) {
@@ -546,6 +547,8 @@ function VisaRequest({ }) {
         setSponsorNameSc("");
         setEstimatedCostSc("");
         setRemarksSc("");
+        setselectedmanagerSC("");
+        setProjectManagerSC("");
     };
 
     const columnDefs = [
@@ -1172,7 +1175,7 @@ function VisaRequest({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Passport ID"
                                 autoComplete="off"
                                 value={passportId}
                                 onChange={(e) => {
@@ -1189,6 +1192,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedCountryId ? "has-value" : ""} 
                             ${isSelectedCountryId ? "is-focused" : ""}`}
+                            title="Please enter the Country ID"
                         >
                             <Select
                                 id="country"
@@ -1211,6 +1215,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedVisaType ? "has-value" : ""} 
                             ${isSelectedVisaType ? "is-focused" : ""}`}
+                            title="Please enter the Visa Type ID"
                         >
                             <Select
                                 id="country"
@@ -1235,7 +1240,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Travel Start Date"
                                 autoComplete="off"
                                 value={travelStartDate}
                                 onChange={(e) => setTravelStartDate((e.target.value))}
@@ -1251,7 +1256,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Travel End Date"
                                 autoComplete="off"
                                 value={travelEndDate}
                                 onChange={(e) => setTravelEndDate((e.target.value))}
@@ -1267,7 +1272,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Purpose"
                                 autoComplete="off"
                                 value={purpose}
                                 maxLength={100}
@@ -1326,6 +1331,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPriority ? "has-value" : ""} 
                             ${isSelectedPriority ? "is-focused" : ""}`}
+                            title="Please enter the Priority Level"
                         >
                             <Select
                                 id="country"
@@ -1350,7 +1356,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Sponsor Name"
                                 autoComplete="off"
                                 value={sponsorName}
                                 maxLength={150}
@@ -1367,7 +1373,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Estimated Cost"
                                 autoComplete="off"
                                 maxLength={6}
                                 inputMode="numeric"
@@ -1389,7 +1395,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Remarks"
                                 autoComplete="off"
                                 value={remarks}
                                 maxLength={255}
@@ -1447,7 +1453,7 @@ function VisaRequest({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Visa Request ID"
                                 autoComplete="off"
                                 value={visaRequestIdSc}
                                 onChange={(e) => {
@@ -1493,7 +1499,7 @@ function VisaRequest({ }) {
                                 maxLength={15}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Passport ID"
                                 autoComplete="off"
                                 value={passportIdSc}
                                 onChange={(e) => {
@@ -1510,6 +1516,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedCountryIdSc ? "has-value" : ""} 
                             ${isSelectedCountryIdSc ? "is-focused" : ""}`}
+                            title="Please enter the Country ID"
                         >
                             <Select
                                 id="country"
@@ -1532,6 +1539,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedVisaTypeSc ? "has-value" : ""} 
                             ${isSelectedVisaTypeSc ? "is-focused" : ""}`}
+                            title="Please enter the Visa Type ID"
                         >
                             <Select
                                 id="country"
@@ -1556,7 +1564,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Travel Start Date"
                                 autoComplete="off"
                                 value={travelStartDateSc}
                                 onChange={(e) => setTravelStartDateSc((e.target.value))}
@@ -1572,7 +1580,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="date"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Travel End Date"
                                 autoComplete="off"
                                 value={travelEndDateSc}
                                 onChange={(e) => setTravelEndDateSc((e.target.value))}
@@ -1588,7 +1596,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Purpose"
                                 autoComplete="off"
                                 value={purposeSc}
                                 maxLength={100}
@@ -1603,6 +1611,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedReqStatusSc ? "has-value" : ""} 
                             ${isSelectedReqStatusSc ? "is-focused" : ""}`}
+                            title="Please enter the Request Status"
                         >
                             <Select
                                 id="country"
@@ -1647,6 +1656,7 @@ function VisaRequest({ }) {
                             className={`inputGroup selectGroup 
                             ${selectedPrioritySc ? "has-value" : ""} 
                             ${isSelectedPrioritySc ? "is-focused" : ""}`}
+                            title="Please enter the Priority Level"
                         >
                             <Select
                                 id="country"
@@ -1671,7 +1681,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Sponsor Name"
                                 autoComplete="off"
                                 value={sponsorNameSc}
                                 maxLength={150}
@@ -1691,7 +1701,7 @@ function VisaRequest({ }) {
                                 maxLength={6}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Estimated Cost"
                                 autoComplete="off"
                                 value={estimatedCostSc}
                                 onChange={(e) => {
@@ -1710,7 +1720,7 @@ function VisaRequest({ }) {
                                 class="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                required title="Please Enter the Annual Bonus"
+                                required title="Please Enter the Remarks"
                                 autoComplete="off"
                                 value={remarksSc}
                                 maxLength={255}

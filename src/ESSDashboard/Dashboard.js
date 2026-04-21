@@ -218,48 +218,22 @@ const Dashboard = () => {
   }, []);
 
 
-  const fetchTHRSGridData = async () => {
-    try {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-      const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          start_date: shiftFromDate || null,
-          end_date: shiftToDate || null,
-          userid: user,
-          company_code,
-          Status: "Active", // important (not ALL)
-        }),
-      });
-
-      const data = await res.json();
-
-      const safeData = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.data)
-          ? data.data
-          : [];
-
-      setRowDataTHRS(safeData);
-    } catch (err) {
-      console.error("THRS Fetch Error:", err);
-    }
-  };
-
   useEffect(() => {
-    fetchTHRSGridDataAuto();
+    const today = new Date().toISOString().split("T")[0];
+
+    setShiftFromDate(today);
+    setShiftToDate(today);
+
+    fetchTHRSGridData(today, today, "All"); 
   }, []);
 
-  const fetchTHRSGridDataAuto = async () => {
+  const fetchTHRSGridData = async (
+    fromDate = shiftFromDate,
+    toDate = shiftToDate,
+    userId = user
+  ) => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
-
-      // get today's date in YYYY-MM-DD format
-      const today = new Date().toISOString().split("T")[0];
 
       const res = await fetch(`${config.apiBaseUrl}/getTHRSReport`, {
         method: "POST",
@@ -267,9 +241,9 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start_date: shiftFromDate || today,
-          end_date: shiftToDate || today,
-          userid: "All",
+          start_date: fromDate || null,
+          end_date: toDate || null,
+          userid: userId || "All",
           company_code,
           Status: "Active",
         }),
@@ -288,6 +262,7 @@ const Dashboard = () => {
       console.error("THRS Fetch Error:", err);
     }
   };
+
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -3340,7 +3315,7 @@ const Dashboard = () => {
               {/* Search */}
               <button
                 className="btn btn-sm btn-primary"
-                onClick={fetchTHRSGridData}
+                onClick={() => fetchTHRSGridData()} 
                 style={{ height: "30px", width: "40px" }}
                 title="Search"
               >
