@@ -88,6 +88,7 @@ function RequestReport({ }) {
         loan_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Visa") {
       url = `${config.apiBaseUrl}/visaRequestSearch`;
@@ -96,6 +97,7 @@ function RequestReport({ }) {
         visa_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Travel") {
       url = `${config.apiBaseUrl}/travel_requestsSearch`;
@@ -104,6 +106,7 @@ function RequestReport({ }) {
         travel_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Academic") {
       url = `${config.apiBaseUrl}/GetAcademicRequestDetails`;
@@ -536,14 +539,13 @@ function RequestReport({ }) {
         loan_amount: loanAmountSc ? loanAmountSc : 0,
         interest_rate: interestRateLoanSc ? interestRateLoanSc : 0,
         repayment_months: repayMonthLoanSc,
-        monthly_installment: monthlyInstallmentLoanSc
-          ? monthlyInstallmentLoanSc
-          : 0,
+        monthly_installment: monthlyInstallmentLoanSc ? monthlyInstallmentLoanSc : 0,
         currency_code: currencyCodeLoanSc,
         purpose: purposeLoanSc,
         request_status: "pending",
         repayment_date: repaymentDateLoanSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
@@ -1131,6 +1133,7 @@ function RequestReport({ }) {
         estimated_cost: estimatedCostVisaSc ? estimatedCostVisaSc : 0,
         Remarks: remarksVisaSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/visaRequestSearch`, {
@@ -1731,6 +1734,7 @@ function RequestReport({ }) {
         priority_level: priorityTravelSc || "",
         manager_id: managerTravelSc || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(
