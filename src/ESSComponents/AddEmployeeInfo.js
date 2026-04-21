@@ -70,6 +70,7 @@ function Input({ }) {
   const [emergencyContactRelationDrop, setEmergencyContactRelationDrop] = useState([]);
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
   const [city, setCity] = useState('');
+  const [Siblings, setSiblings] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [cityDrop, setCityDrop] = useState([]);
   const [title, setTitle] = useState('');
@@ -135,6 +136,7 @@ function Input({ }) {
       !Aadhaar_no ||
       !selectedmartial ||
       !kids ||
+      !Siblings ||
       !Grade_id ||
       !title ||
       !placeOfBirth ||
@@ -190,6 +192,7 @@ function Input({ }) {
       formData.append("Pan_No", pan_No);
       formData.append("Aadhar_no", Aadhaar_no);
       formData.append("Marital_Status", selectedmartial);
+      formData.append("Siblings", Siblings);
       formData.append("Kids", selectedkids);
       formData.append("Grade_id", selectedgradeid);
       formData.append("City", city);
@@ -823,6 +826,7 @@ function Input({ }) {
           Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name,
           Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
           Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
+          console.log(searchData);
 
         setEmployeeId(EmployeeId);
         setFirst_Name(First_Name);
@@ -897,10 +901,12 @@ function Input({ }) {
         const selectedEmergencyContactRelation = filteredOptionRelation.find(option => option.value === Emergency_Contact_Relationship);
         setSelectedEmergencyContactRelation(selectedEmergencyContactRelation);
         setEmergencyContactRelation(selectedEmergencyContactRelation?.value || null);
+        console.log("selectedEmergencyContactRelation", Emergency_Contact_Relationship);
 
         const selectedCity = filteredOptionCity.find(option => option.value === City);
         setSelectedCity(selectedCity);
         setCity(selectedCity?.value || null);
+        console.log("selectedCity", City);
 
         const selectedState = filteredOptionState.find(option => option.value === State);
         setSelectedState(selectedState);
@@ -1156,11 +1162,19 @@ function Input({ }) {
       genderdrop?.length > 0 &&
       IDdrop?.length > 0 &&
       Marital_StatusDrop?.length > 0 &&
-      KidsDrop?.length > 0
+      KidsDrop?.length > 0 &&
+      otherDrop?.length > 0 &&
+      stateDrop?.length > 0 &&
+      cityDrop?.length > 0 &&
+      emergencyContactRelationDrop?.length > 0 &&
+      religionDrop?.length > 0 &&
+      nationalityDrop?.length > 0 &&
+      titleDrop?.length > 0 &&
+      countryDrop?.length > 0
     ) {
       handleRefNo(employeeId);
     }
-  }, [location.state, genderdrop, IDdrop, Marital_StatusDrop, KidsDrop]);
+  }, [location.state, genderdrop, IDdrop, Marital_StatusDrop, KidsDrop, otherDrop, stateDrop, cityDrop, emergencyContactRelationDrop, religionDrop, nationalityDrop, titleDrop, countryDrop]);
 
   return (
     <div class="container-fluid Topnav-screen">
@@ -1921,6 +1935,27 @@ function Input({ }) {
                 autoComplete="off"
               />
               <label htmlFor="emergencyContactPhone" className={`exp-form-labels ${error && !emergencyContactPhone ? 'text-danger' : ''}`}>Emergency Contact Phone{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Siblings"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={Siblings}
+                maxLength={12}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setSiblings(value);
+                  }
+                }}
+                autoComplete="off"
+              />
+              <label htmlFor="Siblings" className={`exp-form-labels ${error && !Siblings ? 'text-danger' : ''}`}>Siblings{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
           </div>
 

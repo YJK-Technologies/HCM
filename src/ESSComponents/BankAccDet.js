@@ -644,10 +644,15 @@ function Input({ }) {
       setdesignation_id(designation_id || "");
     }
 
-    if (employeeId && currencyDrop.length > 0) {
+    if (
+       employeeId &&
+       currencyDrop.length > 0 &&
+       booleanDrop.length > 0 &&
+       accountTypeDrop.length > 0
+      ) {
       handleRefNo(employeeId);
     }
-  }, [location.state,currencyDrop]);
+  }, [location.state,currencyDrop, booleanDrop, accountTypeDrop]);
 
   const handleRemoveLogo = () => {
     setSelectedImage(null);
@@ -788,7 +793,7 @@ function Input({ }) {
       <div className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="sNo"
@@ -801,7 +806,7 @@ function Input({ }) {
               />
               <label for="add1" className={`exp-form-labels`}>SNo</label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">

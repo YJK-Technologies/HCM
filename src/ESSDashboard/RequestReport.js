@@ -198,7 +198,8 @@ function RequestReport({ }) {
           EmployeeId: id,
           LeaveStatus: status,
           FromDate: row.FromDate,
-          company_code: sessionStorage.getItem("selectedCompanyCode")
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
@@ -215,6 +216,7 @@ function RequestReport({ }) {
           visa_request_id: id,
           company_code,
           request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
@@ -223,6 +225,7 @@ function RequestReport({ }) {
           travel_request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Comp Off") {
         url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
@@ -233,6 +236,7 @@ function RequestReport({ }) {
           HolidayDate: row.HolidayDate,
           ApprovedBy: sessionStorage.getItem("selectedUserCode"),
           CompanyCode: company_code,
+          ModifiedBy: sessionStorage.getItem("selectedUserCode"),
           Keyfield: id,
         };
       }
@@ -2853,6 +2857,7 @@ function RequestReport({ }) {
               EmployeeId: row.EmployeeId,
               request_status: status,
               created_by: sessionStorage.getItem("selectedUserCode"),
+              modified_by: sessionStorage.getItem("selectedUserCode"),
             },
           ],
         }),
@@ -3076,6 +3081,8 @@ function RequestReport({ }) {
               ExpectedReturnDate: row.ExpectedReturnDate,
               ActualReturnDate: row.ActualReturnDate,
               Remarks: row.Remarks,
+              CreatedBy: sessionStorage.getItem("selectedUserCode"),
+              ModifiedBy: sessionStorage.getItem("selectedUserCode"),
             },
           ],
         }),

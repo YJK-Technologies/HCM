@@ -99,6 +99,7 @@ function ManualEmployeeInfo({}) {
   const [otherDrop, setOtherDrop] = useState([]);
   const [otherIdNo, setOtherIdNo] = useState("");
   const [purpose, setpurpose] = useState("");
+  const [Siblings, setSiblings] = useState('');
 
   const [isSelectGender, setIsSelectGender] = useState(false);
   const [isSelectGrade, setIsSelectGrade] = useState(false);
@@ -153,10 +154,44 @@ function ManualEmployeeInfo({}) {
 };
 
   const handleSave = async () => {
-  if (!EmployeeId) {
-    toast.warning("Error: Missing required fields");
-    return;
-  }
+    if (
+      !EmployeeId ||
+      !First_Name ||
+      !Last_Name ||
+      !Father_Name ||
+      !Mother_Name ||
+      !DOB ||
+      !Gender ||
+      !Email ||
+      !Phone1 ||
+      !Phone2 ||
+      !address1 ||
+      !address2 ||
+      !address3 ||
+      !permanantAddress ||
+      !pan_No ||
+      !Aadhaar_no ||
+      !selectedmartial ||
+      !kids ||
+      !Siblings ||
+      !Grade_id ||
+      !title ||
+      !placeOfBirth ||
+      !nationality ||
+      !religion ||
+      !bloodGroup ||
+      !emergencyContactName ||
+      !emergencyContactPhone ||
+      !emergencyContactRelation ||
+      !city ||
+      !state ||
+      !country ||
+      !postalCode
+    ) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
 
   try {
     setLoading(true);
@@ -287,6 +322,7 @@ const savePersonalDetails = async (info_request_id) => {
         Emergency_Contact_Name: emergencyContactName,
         Emergency_Contact_Relationship: emergencyContactRelation,
         Emergency_Contact_Phone: emergencyContactPhone,
+        Siblings: Siblings,
 
         // ✅ Location
         City: city,
@@ -1785,6 +1821,28 @@ const savePersonalDetails = async (info_request_id) => {
               </label>
             </div>
           </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="Siblings"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                value={Siblings}
+                maxLength={12}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    setSiblings(value);
+                  }
+                }}
+                autoComplete="off"
+              />
+              <label htmlFor="Siblings" className={`exp-form-labels ${error && !Siblings ? 'text-danger' : ''}`}>Siblings{showAsterisk && <span className="text-danger">*</span>}</label>
+            </div>
+          </div>
+
 
           <div className="col-md-2">
             <div

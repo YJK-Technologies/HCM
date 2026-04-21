@@ -1309,6 +1309,7 @@ const Dashboard = () => {
           HolidayDate: extra.HolidayDate,
           ApprovedBy: approver,
           CompanyCode: company_code,
+          modified_by: sessionStorage.getItem("selectedUserCode"),
           Keyfield: id,
         };
       }
@@ -1325,6 +1326,7 @@ const Dashboard = () => {
           LeaveStatus: status,
           FromDate: backendDate,
           company_code: company_code,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 
@@ -1347,6 +1349,7 @@ const Dashboard = () => {
           visa_request_id: id,
           company_code,
           request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 
@@ -1358,6 +1361,7 @@ const Dashboard = () => {
           travel_request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 
