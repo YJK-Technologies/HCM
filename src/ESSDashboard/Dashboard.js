@@ -997,7 +997,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -1010,7 +1010,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code }),
         });
 
         if (res.ok) visaData = await res.json();
@@ -1020,12 +1020,11 @@ const Dashboard = () => {
 
       /* ---------- Travel ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/travelRequestsDashboard`,
+        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ manager_id: user_code, company_code }),
           },
         );
 
@@ -1036,8 +1035,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Change ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1052,8 +1050,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Family Change ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetFamilyRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1068,8 +1065,7 @@ const Dashboard = () => {
 
       /* ---------- Academic ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetAcademicRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1084,8 +1080,7 @@ const Dashboard = () => {
 
       /* ---------- Documents ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetDocumentsRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1116,8 +1111,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Assets ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetAssetRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
