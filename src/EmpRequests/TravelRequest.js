@@ -943,19 +943,11 @@ function TravelRequest({ }) {
       field: "travel_request_id",
       editable: true,
     },
-
-    // {
-    //   headerName: "Request Number",
-    //   field: "request_number",
-    //   editable: true,
-    // },
-
     {
       headerName: "Employee ID",
       field: "employee_id",
       editable: false,
     },
-
     {
       headerName: "Department",
       field: "department_id",
@@ -969,7 +961,6 @@ function TravelRequest({ }) {
         return dept ? dept.label : params.value;
       },
     },
-
     {
       headerName: "Travel Type",
       field: "travel_type",
@@ -979,7 +970,6 @@ function TravelRequest({ }) {
         values: travel_typeDropGrid,
       },
     },
-
     {
       headerName: "Destination Country",
       field: "destination_country_id",
@@ -993,31 +983,26 @@ function TravelRequest({ }) {
       //   return country ? country.label : params.value;
       // },
     },
-
     {
       headerName: "Destination City",
       field: "destination_city",
       editable: true,
     },
-
     {
       headerName: "Purpose of Travel",
       field: "purpose_of_travel",
       editable: true,
     },
-
     {
       headerName: "Start Date",
       field: "travel_start_date",
       editable: true,
     },
-
     {
       headerName: "End Date",
       field: "travel_end_date",
       editable: true,
     },
-
     {
       headerName: "Transport Mode",
       field: "transport_mode",
@@ -1027,19 +1012,16 @@ function TravelRequest({ }) {
         values: transport_modeDropGrid,
       },
     },
-
     {
       headerName: "Accommodation Required",
       field: "accommodation_required",
       editable: true,
     },
-
     {
       headerName: "Estimated Cost",
       field: "estimated_cost",
       editable: true,
     },
-
     {
       headerName: "Currency Code",
       field: "currency_code",
@@ -1049,7 +1031,6 @@ function TravelRequest({ }) {
         values: currencyDropGrid,
       },
     },
-
     {
       headerName: "Request Status",
       field: "request_status",
@@ -1059,13 +1040,11 @@ function TravelRequest({ }) {
         values: reqStatusDropAG,
       },
     },
-
     {
       headerName: "Remarks",
       field: "Remarks",
       editable: true,
     },
-
     {
       headerName: "Priority Level",
       field: "priority_level",
@@ -1076,7 +1055,6 @@ function TravelRequest({ }) {
         values: PriorityGridDrop,
       },
     },
-
     {
       headerName: "Manager",
       field: "manager_id",
@@ -1090,7 +1068,6 @@ function TravelRequest({ }) {
         return loan ? loan.label : params.value;
       },
     },
-
     {
       headerName: "Keyfield",
       field: "keyfield",
@@ -1106,7 +1083,7 @@ function TravelRequest({ }) {
   const handleSave = async () => {
     if (
       // !travel_request_id ||
-      !empId ||
+      // !empId ||
       !dpt ||
       !travel_type ||
       !destination_country_id ||
@@ -1136,7 +1113,7 @@ function TravelRequest({ }) {
       const Header = {
         travel_request_id: travel_request_id,
         request_number: request_number,
-        employee_id: empId,
+        employee_id: sessionStorage.getItem("selectedUserCode"),
         department_id: dpt,
         travel_type: travel_type,
         destination_country_id: destination_country_id,
@@ -1160,8 +1137,7 @@ function TravelRequest({ }) {
         modified_date: null,
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/travel_requestsInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/travel_requestsInsert`,
         {
           method: "POST",
           headers: {
@@ -1195,7 +1171,7 @@ function TravelRequest({ }) {
       const body = {
         travel_request_id: travel_request_idSC || null,
         request_number: request_numberSC || "",
-        employee_id: empIdSc || "",
+        employee_id: sessionStorage.getItem("selectedUserCode"),
         department_id: dptSC || "",
         travel_type: travel_typeSC || "",
         destination_country_id: destination_country_idSC || null,
@@ -1586,7 +1562,7 @@ function TravelRequest({ }) {
             </div>
           </div> */}
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedEmpId ? "has-value" : ""} 
@@ -1612,7 +1588,7 @@ function TravelRequest({ }) {
                 Employee ID<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
@@ -2103,7 +2079,7 @@ function TravelRequest({ }) {
             </div>
           </div> */}
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedEmpIdSc ? "has-value" : ""} 
@@ -2126,7 +2102,7 @@ function TravelRequest({ }) {
                 Employee ID
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div

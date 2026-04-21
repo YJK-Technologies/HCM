@@ -269,7 +269,7 @@ const menuData = [
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
           { label: "Settings", path: "/WeekOff" },
-          { label: "Assets", path: "/Assets" },
+          // { label: "Assets", path: "/Assets" },
         ],
       },
       {

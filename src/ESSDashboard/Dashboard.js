@@ -997,7 +997,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -1010,7 +1010,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code }),
         });
 
         if (res.ok) visaData = await res.json();
@@ -1020,12 +1020,11 @@ const Dashboard = () => {
 
       /* ---------- Travel ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/travelRequestsDashboard`,
+        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ manager_id: user_code, company_code }),
           },
         );
 
@@ -1036,8 +1035,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Change ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1052,8 +1050,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Family Change ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetFamilyRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1068,8 +1065,7 @@ const Dashboard = () => {
 
       /* ---------- Academic ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetAcademicRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1084,8 +1080,7 @@ const Dashboard = () => {
 
       /* ---------- Documents ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetDocumentsRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1116,8 +1111,7 @@ const Dashboard = () => {
 
       /* ---------- Employee Assets ---------- */
       try {
-        const res = await fetch(
-          `${config.apiBaseUrl}/GetAssetRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -2659,20 +2653,20 @@ const Dashboard = () => {
 
   const [requestSearch, setRequestSearch] = useState("");
 
-const filteredRequests = dashboardRequests
-  .filter(r => (r.status || "").toLowerCase() === "pending")
-  .filter(req => {
-    const searchLower = (requestSearch || "").trim().toLowerCase();
+  const filteredRequests = dashboardRequests
+    .filter(r => (r.status || "").toLowerCase() === "pending")
+    .filter(req => {
+      const searchLower = (requestSearch || "").trim().toLowerCase();
 
-    if (!searchLower) return true;
+      if (!searchLower) return true;
 
-    return (
-      (req.EmployeeName && String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
-      (req.EmployeeId && String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
-      (req.type && String(req.type).toLowerCase().includes(searchLower)) ||
-      (req.title && String(req.title).toLowerCase().includes(searchLower))
-    );
-  });
+      return (
+        (req.EmployeeName && String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
+        (req.EmployeeId && String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
+        (req.type && String(req.type).toLowerCase().includes(searchLower)) ||
+        (req.title && String(req.title).toLowerCase().includes(searchLower))
+      );
+    });
 
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
@@ -2824,15 +2818,23 @@ const filteredRequests = dashboardRequests
           <div className="dashboard-row ">
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
-                <div className="display-flex flex-between-center">
+                <div className="display-flex flex-between-center padding-horizontal-2 spacing-mb-2">
                   <h6 className="card-title-heading spacing-mb-0">
                     Today Attendance
                   </h6>
                   <button
-                    className="shadow-none-custom app-btn btn-outline-primary-custom"
+                    className="btn-outline-primary-custom"
                     onClick={handleToggle}
                   >
-                    {showChart ? "Leave Chart" : "Show Chart"}
+                    {showChart ? (
+                      <>
+                        <i className="fa-solid fa-table-list mr-2"></i> Leave List
+                      </>
+                    ) : (
+                      <>
+                        <i className="fa-solid fa-chart-pie mr-2"></i> Show Chart
+                      </>
+                    )}
                   </button>
                 </div>
 
@@ -3205,10 +3207,10 @@ const filteredRequests = dashboardRequests
       </div>
       <div className="dashboard-row row ">
         <div className="col-6 spacing-mt-2">
-          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
-            {/* Header */}
+          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full padding-all-3">
+            {/* Header Section */}
             <div className="myteam-header">
-              <h6 className="card-title-heading spacing-mb-2">My Team</h6>
+              <h6 className="card-title-heading mb-0">My Team</h6>
 
               <div className="myteam-actions">
                 <Select
@@ -3217,10 +3219,12 @@ const filteredRequests = dashboardRequests
                   onChange={handleChangeManager}
                   options={filteredOptionManager}
                   className="team-select-wrapper"
+                  placeholder="Select Manager..."
                 />
 
+                {/* Global Color Toggle Button */}
                 <button
-                  className="shadow-none-custom team-toggle-button"
+                  className="team-toggle-button"
                   onClick={() => {
                     setViewChart(!viewChart);
                     if (viewChart) {
@@ -3228,39 +3232,54 @@ const filteredRequests = dashboardRequests
                     }
                   }}
                 >
-                  {viewChart ? "Team List" : "Chart"}
+                  {viewChart ? (
+                    <>
+                      <i className="fa-solid fa-list-ul mr-2"></i> Team List
+                    </>
+                  ) : (
+                    <>
+                      <i className="fa-solid fa-chart-pie mr-2"></i> Chart
+                    </>
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Content */}
-            {viewChart ? (
-              <div className="display-flex flex-between-center dashboard-row spacing-pb-2">
-                <div className="grid-col-md-8 grid-col-12">
-                  <div
-                    className="chart-container spacing-mt-2"
-                    style={{ height: 250, width: "100%" }}
-                  >
-                    {teamData?.labels?.length > 0 ? (
-                      <Doughnut data={teamData} options={teamOptions} />
-                    ) : (
-                      <div>No data</div>
-                    )}
+            {/* Content Section */}
+            <div className="myteam-content-area mt-3">
+              {viewChart ? (
+                <div className="display-flex justify-content-center dashboard-row">
+                  <div className="grid-col-12">
+                    <div
+                      className="chart-container"
+                      style={{ height: 260, width: "100%", paddingBottom: "20px" }}
+                    >
+                      {teamData?.labels?.length > 0 ? (
+                        <Doughnut data={teamData} options={teamOptions} />
+                      ) : (
+                        <div className="no-data-state py-5">
+                          <i className="fa-solid fa-inbox mb-2"></i>
+                          <p>No team data available</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div
-                className="app-grid-theme ag-theme-alpine spacing-mt-4 rounded-xl"
-                style={{ height: 255, width: "100%" }}
-              >
-                <AgGridReact
-                  columnDefs={columnDefsList}
-                  rowData={rowDataTeamList}
-                  rowHeight={30}
-                />
-              </div>
-            )}
+              ) : (
+                <div
+                  className="app-grid-theme ag-theme-alpine rounded-xl overflow-hidden"
+                  style={{ height: 265, width: "100%" }}
+                >
+                  <AgGridReact
+                    columnDefs={columnDefsList}
+                    rowData={rowDataTeamList}
+                    rowHeight={35}
+                    headerHeight={40}
+                    animateRows={true}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
