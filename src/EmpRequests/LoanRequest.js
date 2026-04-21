@@ -34,6 +34,11 @@ function LoanRequest({ }) {
     const [reqStatus, setReqStatus] = useState('');
     const [selectedReqStatus, setSelectedReqStatus] = useState('');
     const [repaymentDate, setRepaymentDate] = useState('');
+    const [selectedmanager, setselectedmanager] = useState("");
+    const [ProjectManager, setProjectManager] = useState("");
+    const [isSelectManager, setIsSelectManager] = useState(false);
+    const [Managerdrop, setManagerdrop] = useState([]);
+    const [ManagerdropAG, setManagerdropAG] = useState([]);
 
     const [loanReqIdSc, setLoanReqIdSc] = useState('');
     const [reqNumberSc, setReqNumberSc] = useState('');
@@ -53,6 +58,10 @@ function LoanRequest({ }) {
     const [reqStatusSc, setReqStatusSc] = useState('');
     const [selectedReqStatusSc, setSelectedReqStatusSc] = useState('');
     const [repaymentDateSc, setRepaymentDateSc] = useState('');
+    const [selectedmanagerSC, setselectedmanagerSC] = useState("");
+    const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
+    const [ManagerdropSC, setManagerdropSC] = useState([]);
+    const [ProjectManagerSC, setProjectManagerSC] = useState("");
 
     const [isSelectedEmpId, setIsSelectedEmpId] = useState(false);
     const [isSelectedLoanType, setIsSelectedLoanType] = useState(false);
@@ -135,19 +144,34 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+        const Company_Code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, { // match backend route name
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Company_Code }),
-    })
-        .then((res) => res.json())
-        .then((data) => setLoanTypeIdDrop(data))
-        .catch((error) => console.error("Error fetching loan types:", error));
-}, []);
+        fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, { // match backend route name
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Company_Code }),
+        })
+            .then((res) => res.json())
+            .then((data) => setLoanTypeIdDrop(data))
+            .catch((error) => console.error("Error fetching loan types:", error));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((response) => response.json())
+            .then(setManagerdrop)
+            .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
 
     const filteredOptionEmpId = Array.isArray(empIdDrop)
         ? empIdDrop.map((option) => ({
@@ -184,6 +208,13 @@ function LoanRequest({ }) {
         }))
         : [];
 
+    const filteredOptionManager = Array.isArray(Managerdrop)
+        ? Managerdrop.map((option) => ({
+            value: option.EmployeeId,
+            label: `${option.EmployeeId}-${option.full_name}`,
+        }))
+        : [];
+
     const handleChangeEmpId = (selectedEmpId) => {
         setSelectedEmpId(selectedEmpId);
         setEmpId(selectedEmpId ? selectedEmpId.value : "");
@@ -202,6 +233,11 @@ function LoanRequest({ }) {
     const handleChangeCurrency = (selectedCurrency) => {
         setSelectedCurrency(selectedCurrency);
         setCurrencyCode(selectedCurrency ? selectedCurrency.value : "");
+    };
+
+    const handleChangemanager = (selectedOption) => {
+        setselectedmanager(selectedOption);
+        setProjectManager(selectedOption ? selectedOption.value : "");
     };
 
     useEffect(() => {
@@ -262,6 +298,21 @@ function LoanRequest({ }) {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((response) => response.json())
+            .then(setManagerdropSC)
+            .catch((error) => console.error("Error fetching warehouse:", error));
+    }, []);
+
     const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
         ? empIdDropSc.map((option) => ({
             value: option?.EmployeeId,
@@ -293,6 +344,13 @@ function LoanRequest({ }) {
         }))
         : [];
 
+    const filteredOptionManagerSC = Array.isArray(ManagerdropSC)
+        ? ManagerdropSC.map((option) => ({
+            value: option.EmployeeId,
+            label: `${option.EmployeeId}-${option.full_name}`,
+        }))
+        : [];
+
     const handleChangeEmpIdSc = (selectedEmpIdSc) => {
         setSelectedEmpIdSc(selectedEmpIdSc);
         setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -311,6 +369,11 @@ function LoanRequest({ }) {
     const handleChangeCurrencySc = (selectedCurrencySc) => {
         setSelectedCurrencySc(selectedCurrencySc);
         setCurrencyCodeSc(selectedCurrencySc ? selectedCurrencySc.value : "");
+    };
+
+    const handleChangemanagerSC = (selectedOption) => {
+        setselectedmanagerSC(selectedOption);
+        setProjectManagerSC(selectedOption ? selectedOption.value : "");
     };
 
     useEffect(() => {
@@ -335,25 +398,25 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-      const Company_Code = sessionStorage.getItem('selectedCompanyCode');
-    
-      fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Company_Code })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const loanTypeOptions = data.map((option) => ({
-            value: option.Loan_Type_ID,           // adjust based on your DB column
-            label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
-          }));
-      
-          setLoanTypeIdDropGrid(loanTypeOptions);
+        const Company_Code = sessionStorage.getItem('selectedCompanyCode');
+
+        fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ Company_Code })
         })
-        .catch((error) => console.error('Error fetching loan types:', error));
+            .then((response) => response.json())
+            .then((data) => {
+                const loanTypeOptions = data.map((option) => ({
+                    value: option.Loan_Type_ID,           // adjust based on your DB column
+                    label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
+                }));
+
+                setLoanTypeIdDropGrid(loanTypeOptions);
+            })
+            .catch((error) => console.error('Error fetching loan types:', error));
     }, []);
 
     useEffect(() => {
@@ -390,6 +453,28 @@ function LoanRequest({ }) {
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/ESSManager`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const Manager = val.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId}`,
+                }));
+
+                setManagerdropAG(Manager);
+            })
+            .catch((error) => console.error("Error fetching Travel request:", error));
+    }, []);
+
     const searchClearInputFields = () => {
         setLoanReqIdSc("");
         setReqNumberSc("");
@@ -408,6 +493,8 @@ function LoanRequest({ }) {
         setRepaymentDateSc("");
         setSelectedCurrencySc("");
         setSelectedCurrency("");
+        setselectedmanagerSC("");
+        setProjectManagerSC("");
     };
 
     const columnDefs = [
@@ -480,12 +567,12 @@ function LoanRequest({ }) {
             //     values: loanTypeIdDropGrid,
             // },
             cellEditorParams: {
-            values: loanTypeIdDropGrid.map(d => d.value),
-          },
-          valueFormatter: (params) => {
-            const dept = loanTypeIdDropGrid.find(d => d.value === params.value);
-            return dept ? dept.label : params.value;
-      },
+                values: loanTypeIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = loanTypeIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
         },
         {
             headerName: "Loan Amount",
@@ -536,6 +623,19 @@ function LoanRequest({ }) {
             editable: true,
         },
         {
+            headerName: "Manager",
+            field: "manager_id",
+            editable: true,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: ManagerdropAG.map((d) => d.value),
+            },
+            valueFormatter: (params) => {
+                const loan = ManagerdropAG.find((d) => d.value === params.value);
+                return loan ? loan.label : params.value;
+            },
+        },
+        {
             headerName: "Keyfield",
             field: "keyfield",
             editable: true,
@@ -558,6 +658,7 @@ function LoanRequest({ }) {
             !repayMonth ||
             !monthlyInstallment ||
             !currencyCode ||
+            !ProjectManager ||
             // !reqStatus ||
             !repaymentDate
         ) {
@@ -582,6 +683,7 @@ function LoanRequest({ }) {
                 purpose: purpose,
                 request_status: 'Pending',
                 repayment_date: repaymentDate,
+                manager_id: ProjectManager,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
                 created_by: sessionStorage.getItem('selectedUserCode')
             };
@@ -626,6 +728,7 @@ function LoanRequest({ }) {
                 purpose: purposeSc,
                 request_status: reqStatusSc,
                 repayment_date: repaymentDateSc,
+                manager_id: ProjectManagerSC,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
             };
 
@@ -804,6 +907,7 @@ function LoanRequest({ }) {
                 "Purpose": row.purpose || "",
                 "Request Status": row.request_status || "",
                 "Repayment Date": row.repayment_date || "",
+                Manager: row.manager_id || "",
             };
         });
     };
@@ -1053,19 +1157,24 @@ function LoanRequest({ }) {
                     <div className="col-md-2">
                         <div className="inputGroup">
                             <input
-                                id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
-                                maxLength={5}
                                 inputMode="numeric"
-                                pattern="[0-9]*"
                                 title="Please enter the Interest Rate"
-                                required
-                                autoComplete="off"
                                 value={interestRate}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                    let value = e.target.value;
+                                    value = value.replace(/[^0-9.]/g, "");
+                                    let parts = value.split(".");
+                                    if (parts.length > 2) {
+                                        parts = [parts[0], parts[1]];
+                                    }
+                                    parts[0] = parts[0].slice(0, 5);
+                                    if (parts[1]) {
+                                        parts[1] = parts[1].slice(0, 2);
+                                    }
+                                    value = parts.join(".");
                                     setInterestRate(value);
                                 }}
                             />
@@ -1236,6 +1345,35 @@ function LoanRequest({ }) {
                         </div>
                     </div>
 
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedmanager ? "has-value" : ""} 
+                            ${isSelectManager ? "is-focused" : ""}`}
+                            title="Please select the Manager"
+                        >
+                            <Select
+                                id="LoanEligibleAmount"
+                                type="text"
+                                placeholder=" "
+                                onFocus={() => setIsSelectManager(true)}
+                                onBlur={() => setIsSelectManager(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                                value={selectedmanager}
+                                options={filteredOptionManager}
+                                onChange={handleChangemanager}
+                                maxLength={18}
+                            />
+                            <label
+                                for="add1"
+                                className={`floating-label ${error && !ProjectManager ? "text-danger" : ""}`}
+                            >
+                                Manager<span className="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -1373,8 +1511,18 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Interest Rate"
                                 autoComplete="off"
                                 value={interestRateSc}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                                 onChange={(e) => {
+                                    let value = e.target.value;
+                                    value = value.replace(/[^0-9.]/g, "");
+                                    let parts = value.split(".");
+                                    if (parts.length > 2) {
+                                        parts = [parts[0], parts[1]];
+                                    }
+                                    parts[0] = parts[0].slice(0, 5);
+                                    if (parts[1]) {
+                                        parts[1] = parts[1].slice(0, 2);
+                                    }
+                                    value = parts.join(".");
                                     setInterestRateSc(value);
                                 }}
                             />
@@ -1541,6 +1689,32 @@ function LoanRequest({ }) {
                                 }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Repayment Date</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedmanagerSC ? "has-value" : ""} 
+                            ${isSelectManagerSC ? "is-focused" : ""}`}
+                            title="Please select the Manager"
+                        >
+                            <Select
+                                id="LoanEligibleAmount"
+                                type="text"
+                                placeholder=" "
+                                onFocus={() => setIsSelectManagerSC(true)}
+                                onBlur={() => setIsSelectManagerSC(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                                value={selectedmanagerSC}
+                                options={filteredOptionManagerSC}
+                                onChange={handleChangemanagerSC}
+                                maxLength={18}
+                            />
+                            <label for="add1" className={`floating-label `}>
+                                Manager
+                            </label>
                         </div>
                     </div>
 

@@ -88,6 +88,7 @@ function RequestReport({ }) {
         loan_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Visa") {
       url = `${config.apiBaseUrl}/visaRequestSearch`;
@@ -96,6 +97,7 @@ function RequestReport({ }) {
         visa_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Travel") {
       url = `${config.apiBaseUrl}/travel_requestsSearch`;
@@ -104,6 +106,7 @@ function RequestReport({ }) {
         travel_request_id: safeId,
         request_status: status,
         company_code,
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Academic") {
       url = `${config.apiBaseUrl}/GetAcademicRequestDetails`;
@@ -195,7 +198,8 @@ function RequestReport({ }) {
           EmployeeId: id,
           LeaveStatus: status,
           FromDate: row.FromDate,
-          company_code: sessionStorage.getItem("selectedCompanyCode")
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Loan") {
         url = `${config.apiBaseUrl}/ApprovalLoan`;
@@ -212,6 +216,7 @@ function RequestReport({ }) {
           visa_request_id: id,
           company_code,
           request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
@@ -220,6 +225,7 @@ function RequestReport({ }) {
           travel_request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Comp Off") {
         url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
@@ -230,6 +236,7 @@ function RequestReport({ }) {
           HolidayDate: row.HolidayDate,
           ApprovedBy: sessionStorage.getItem("selectedUserCode"),
           CompanyCode: company_code,
+          ModifiedBy: sessionStorage.getItem("selectedUserCode"),
           Keyfield: id,
         };
       }
@@ -532,14 +539,13 @@ function RequestReport({ }) {
         loan_amount: loanAmountSc ? loanAmountSc : 0,
         interest_rate: interestRateLoanSc ? interestRateLoanSc : 0,
         repayment_months: repayMonthLoanSc,
-        monthly_installment: monthlyInstallmentLoanSc
-          ? monthlyInstallmentLoanSc
-          : 0,
+        monthly_installment: monthlyInstallmentLoanSc ? monthlyInstallmentLoanSc : 0,
         currency_code: currencyCodeLoanSc,
         purpose: purposeLoanSc,
         request_status: "pending",
         repayment_date: repaymentDateLoanSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
@@ -1127,6 +1133,7 @@ function RequestReport({ }) {
         estimated_cost: estimatedCostVisaSc ? estimatedCostVisaSc : 0,
         Remarks: remarksVisaSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/visaRequestSearch`, {
@@ -1727,6 +1734,7 @@ function RequestReport({ }) {
         priority_level: priorityTravelSc || "",
         manager_id: managerTravelSc || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
       const response = await fetch(
@@ -2849,6 +2857,7 @@ function RequestReport({ }) {
               EmployeeId: row.EmployeeId,
               request_status: status,
               created_by: sessionStorage.getItem("selectedUserCode"),
+              modified_by: sessionStorage.getItem("selectedUserCode"),
             },
           ],
         }),
@@ -3072,6 +3081,8 @@ function RequestReport({ }) {
               ExpectedReturnDate: row.ExpectedReturnDate,
               ActualReturnDate: row.ActualReturnDate,
               Remarks: row.Remarks,
+              CreatedBy: sessionStorage.getItem("selectedUserCode"),
+              ModifiedBy: sessionStorage.getItem("selectedUserCode"),
             },
           ],
         }),

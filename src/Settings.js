@@ -3,7 +3,7 @@ import { ThemeProvider } from "./ThemeContext";
 import AppContent from "./App_content";
 import ForgotPopup from "./Forgotpopup";
 import Select from "react-select";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const SettingsPage = () => {
   const [open, setOpen] = useState(false);
@@ -17,15 +17,19 @@ const SettingsPage = () => {
   const [joineesPeriod, setJoineesPeriod] = useState(null);
   const [birthdayDays, setBirthdayDays] = useState(null);
   const [joineesDays, setJoineesDays] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const [DateDrop, setDateDrop] = useState([]);
   const [dateFormat, setDateFormat] = useState(null);
-  
+  const [currency, setCurrency] = useState(null);
+  const [currencyDrop, setCurrencyDrop] = useState([]);
+
   const config = require("./Apiconfig");
 
   const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "fr", label: "French" },
-    { value: "es", label: "Spanish" },
+    { value: "English", label: "English" },
+    { value: "French", label: "French" },
+    { value: "Spanish", label: "Spanish" },
   ];
 
   useEffect(() => {
@@ -56,6 +60,71 @@ const SettingsPage = () => {
     label: option.attributedetails_code,
   }));
 
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setCurrencyDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+  
+  const filteredOptionCurrency = Array.isArray(currencyDrop)
+    ? currencyDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+
+  const handleSave = async () => {
+  if (!dateFormat || !selectedOption) {
+    toast.warning("Please select required fields");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const payload = {
+      Default_date_format: dateFormat.value,
+      Default_language: selectedOption.value,
+      Default_currency: currency.value, // or make dynamic later
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      created_by: sessionStorage.getItem("selectedUserCode"),
+    };
+
+    const response = await fetch(`${config.apiBaseUrl}/global_settingsInsert`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Settings saved successfully!", {
+        onClose: () => window.location.reload(),
+      });
+    } else {
+      const errorResponse = await response.json();
+      toast.warning(errorResponse.message || "Failed to save settings");
+    }
+  } catch (error) {
+    console.error("Error saving settings:", error);
+    toast.error("Error: " + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <div className="container-fluid Topnav-screen">
       <ToastContainer position="top-right" theme="colored" />
@@ -72,7 +141,7 @@ const SettingsPage = () => {
             <i className="fa-solid fa-key"></i>
             <span>Reset Password</span>
           </button>
-          <button className="btn-save">
+          <button className="btn-save" onClick={handleSave}>
             <i className="fa-solid fa-floppy-disk"></i> Save Changes
           </button>
         </div>
@@ -172,13 +241,28 @@ const SettingsPage = () => {
                   <div className="col">
                     <div className="custom-select-container">
                       <label>
-                        <i className="fa-solid fa-warehouse me-2"></i>Date  Format</label>
+                        <i className="fa-solid fa-warehouse me-2"></i>Date Format</label>
                       <Select
                         value={dateFormat}
                         onChange={setDateFormat}
-                        options={filteredOptionDate} // ✅ correct options
+                        options={filteredOptionDate} 
                         classNamePrefix="modern-select"
                         placeholder="Select Date Format"
+                        isClearable
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col">
+                    <div className="custom-select-container">
+                      <label>
+                        <i className="fa-solid fa-warehouse me-2"></i>Currency</label>
+                      <Select
+                        value={currency}
+                        onChange={setCurrency}
+                        options={filteredOptionCurrency} 
+                        classNamePrefix="modern-select"
+                        placeholder="Select Currency"
                         isClearable
                       />
                     </div>

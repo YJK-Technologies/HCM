@@ -536,9 +536,9 @@ function Input({}) {
 
           const memberData = {
             relationName: Relation || "",
-            selectRelation: Relation
-              ? { value: Relation, label: Relation }
-              : null,
+            selectRelation: filteredOptionrelation.find(
+              (opt) => opt.value === Relation
+            ) || null,
             name: Name,
             dob: formattedDOB,
             Age: AGE,
@@ -848,21 +848,29 @@ function Input({}) {
     RelationInputChange(relation, idx, "Age", age);
   };
 
-  useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } =
-      location.state || {};
+useEffect(() => {
+  const { employeeId, firstName, department_id, designation_id } =
+    location.state || {};
 
-    if (employeeId) {
-      setEmployeeId(employeeId);
-      setFirst_Name(firstName || "");
-      setdepartment_id(department_id || "");
-      setdesignation_id(designation_id || "");
-    }
+  if (employeeId) {
+    setEmployeeId(employeeId);
+    setFirst_Name(firstName || "");
+    setdepartment_id(department_id || "");
+    setdesignation_id(designation_id || "");
+  }
+}, [location.state]);
 
-    if (employeeId) {
-      handleEmployeeFamily(employeeId);
-    }
-  }, [location.state]);
+useEffect(() => {
+  if (
+    employeeID &&
+    relativedrop.length &&
+    booleanDrop.length &&
+    sexDrop.length &&
+    nationalityDrop.length
+  ) {
+    handleEmployeeFamily(employeeID);
+  }
+}, [employeeID, relativedrop, booleanDrop, sexDrop, nationalityDrop]);
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1037,7 +1045,7 @@ function Input({}) {
                     classNamePrefix="react-select"
                     isClearable
                     value={member.selectRelation}
-                    options={filteredOptionrelation}
+                    options={ filteredOptionrelation}
                     maxLength={50}
                     onChange={(selectedRelation) =>
                       handleChangeRelation(

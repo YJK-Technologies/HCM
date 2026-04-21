@@ -650,11 +650,12 @@ function Input() {
       DPTdrop?.length > 0 &&
       statusdrop?.length > 0 &&
       Managerdrop?.length > 0 &&
+      Shiftdrop?.length > 0 &&
       empTypeDrop?.length > 0 
     ) {
       handleRefNO(employeeId);
     }
-  }, [location.state, DPTdrop, Managerdrop, statusdrop, empTypeDrop]);
+  }, [location.state, DPTdrop, Managerdrop, statusdrop, Shiftdrop, empTypeDrop]);
 
   // useEffect(() => {
   //   if (location.state) {
