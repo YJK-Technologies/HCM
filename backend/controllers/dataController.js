@@ -21210,45 +21210,17 @@ const updateGrade = async (req, res) => {
         .input("HRA", sql.Decimal(14, 3), updatedRow.HRA)
         .input("Conveyance", sql.Decimal(14, 3), updatedRow.Conveyance)
         .input("Medical", sql.Decimal(14, 3), updatedRow.Medical)
-        .input(
-          "Special_Allowance",
-          sql.Decimal(14, 3),
-          updatedRow.Special_Allowance,
-        )
-        .input(
-          "Company_Pf_Contribution",
-          sql.Decimal(14, 3),
-          updatedRow.Company_Pf_Contribution,
-        )
+        .input("Special_Allowance",sql.Decimal(14, 3),updatedRow.Special_Allowance,)
+        .input("Company_Pf_Contribution", sql.Decimal(14, 3), updatedRow.Company_Pf_Contribution,)
         .input("Bonus_Arrears", sql.Decimal(14, 3), updatedRow.Bonus_Arrears)
-        .input(
-          "Other_Allowance",
-          sql.Decimal(14, 3),
-          updatedRow.Other_Allowance,
-        )
+        .input("Other_Allowance", sql.Decimal(14, 3), updatedRow.Other_Allowance,)
         .input("LeaveDeduction", sql.Decimal(14, 3), updatedRow.LeaveDeduction)
-        .input(
-          "otherDeductions",
-          sql.Decimal(14, 3),
-          updatedRow.otherDeductions,
-        )
+        .input("otherDeductions", sql.Decimal(14, 3), updatedRow.otherDeductions,)
         .input("ctc_currency", sql.NVarChar, updatedRow.ctc_currency)
-        .input(
-          "minimum_take_salary",
-          sql.Decimal(14, 3),
-          updatedRow.minimum_take_salary,
-        )
-        .input(
-          "salary_range_from",
-          sql.Decimal(10, 2),
-          updatedRow.salary_range_from,
-        )
-        .input(
-          "salary_range_to",
-          sql.Decimal(10, 2),
-          updatedRow.salary_range_to,
-        )
-        .input("company_code", sql.NVarChar, req.headers["company_code"])
+        .input("minimum_take_salary", sql.Decimal(14, 3), updatedRow.minimum_take_salary, )
+        .input("salary_range_from", sql.Decimal(10, 2), updatedRow.salary_range_from, )
+        .input("salary_range_to", sql.Decimal(10, 2), updatedRow.salary_range_to, )
+        .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
         .query(`EXEC sp_Grade @mode,@GradeID,@GradeName,@Basic,@HRA,@Conveyance,@Medical,@Special_Allowance,@Company_Pf_Contribution,@Bonus_Arrears,@Other_Allowance,@LeaveDeduction,
         @otherDeductions,@ctc_currency,@minimum_take_salary,@salary_range_from,@salary_range_to,@company_code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
@@ -43429,7 +43401,7 @@ const travel_requestsUpdate = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id)
       .input("department_id", sql.NVarChar, department_id)
       .input("travel_type", sql.NVarChar, travel_type)
-      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_country_id", sql.VarChar, destination_country_id)
       .input("destination_city", sql.NVarChar, destination_city)
       .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
       .input("travel_start_date", sql.Date, travel_start_date)
@@ -44180,7 +44152,7 @@ const travel_requestsSearch = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id)
       .input("department_id", sql.NVarChar, department_id)
       .input("travel_type", sql.NVarChar, travel_type)
-      .input("destination_country_id", sql.Int, destination_country_id)
+      .input("destination_country_id", sql.VarChar, destination_country_id)
       .input("destination_city", sql.NVarChar, destination_city)
       .input("purpose_of_travel", sql.NVarChar, purpose_of_travel)
       .input("travel_start_date", sql.VarChar, travel_start_date)
@@ -45875,7 +45847,8 @@ const ApprovePersonalRequest = async (req, res) => {
         .input("Other_Id_Type", sql.NVarChar, "")
         .input("Other_Id_No", sql.NVarChar, "")
 
-        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
+        .input("created_by", sql.NVarChar, row.created_by)
+        .input("modified_by", sql.NVarChar, row.modified_by)
 
         .query(`
           EXEC sp_ess_employee_personal_request_dtls
@@ -45895,7 +45868,7 @@ const ApprovePersonalRequest = async (req, res) => {
           @City, @State, @Postal_Code, @Country,
           @Passport_No, @Passport_Expiry_Date,
           @Other_Id_Type, @Other_Id_No,
-          @created_by, '', '', '', ''
+          @created_by, @modified_by, '', '', ''
         `);
     }
 
@@ -46074,14 +46047,14 @@ const ApproveFamilyRequest = async (req, res) => {
         .input("Visa_Entitled", sql.NVarChar, "")
         .input("Visa_Expiry_Date", sql.Date, null)
         .input("Air_Ticket_Entitled", sql.NVarChar, "")
-        .input("created_by", sql.NVarChar, row.modified_by || row.created_by)
+        .input("created_by", sql.NVarChar,  row.created_by)
+        .input("modified_by", sql.NVarChar, row.modified_by)
         .input("column_name", sql.NVarChar, "")
         .input("from_date", sql.Date, null)
         .input("to_date", sql.Date, null)
-        .query(` 
-          EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status,
+        .query(` EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status,
           @Relation, @Name, @DOB, @AGE, @aadhar_no, @Sex, @Nationality, @CPR_No, @CPR_Expiry_Date, 
-          @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, '', @column_name, @from_date, @to_date `);
+          @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, @modified_by, @column_name, @from_date, @to_date `);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -47558,9 +47531,11 @@ const ApproveAssetRequest = async (req, res) => {
         .input("ExpectedReturnDate", sql.Date, row.ExpectedReturnDate)
         .input("ActualReturnDate", sql.Date, row.ActualReturnDate)
         .input("Remarks", sql.NVarChar, row.Remarks)
+        .input("CreatedBy", sql.NVarChar, row.CreatedBy)
+        .input("ModifiedBy", sql.NVarChar, row.ModifiedBy)
         .query(` 
           EXEC sp_employee_assets_request_dtls 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, '', '', '', '', ''`);
+          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, @ModifiedBy, '', '', ''`);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -48263,6 +48238,60 @@ const getDateFormat = async (req, res) => {
   }
 };
 //code ended by Sakthi on 20-04-2026
+
+//code added by Sakthi on 20-04-2026
+const global_settingsInsert = async (req, res) => {
+  const {
+    Default_date_format,
+    Default_currency,
+    Default_language,
+    company_code,
+    created_by,
+  } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "I")
+      .input("Default_date_format", sql.NVarChar, Default_date_format)
+      .input("Default_currency", sql.NVarChar, Default_currency)
+      .input("Default_language", sql.NVarChar, Default_language)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfield", sql.NVarChar, company_code) 
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_Global_Settings @mode, @Default_date_format, @Default_currency, @Default_language, @company_code, @keyfield, @created_by, '', '', '',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Global Settings inserted successfully",
+    });
+  } catch (err) {
+    console.error("Error during Global Settings insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 20-04-2026
+
+//code added by Pavun on 21-04-2026
+const EmpDepartment = async (req, res) => {
+  const { EmployeeId, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "ED")
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_employee_company @mode,@EmployeeId,'','','','','','','','','',@company_code,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Pavun on 21-04-2026
 
 module.exports = {
   login,
@@ -49646,6 +49675,8 @@ module.exports = {
   GetOvertimeReport,
   LeaveSummaryDrop,
   getUCN,
-  getDateFormat
+  getDateFormat,
+  global_settingsInsert,
+  EmpDepartment
 
 };

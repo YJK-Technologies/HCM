@@ -134,6 +134,16 @@ function TravelRequest({ }) {
   const [selectedtravel_typeSc, setSelectedtravel_typeSc] = useState('');
   const [isSelectedtravel_typeSc, setIsSelectedtravel_typeSc] = useState(false);
 
+  const [selectedCountryId, setSelectedCountryId] = useState('');
+  const [countryId, setCountryId] = useState('');
+  const [isSelectedCountryId, setIsSelectedCountryId] = useState(false);
+
+  const [selectedCountryIdSc, setSelectedCountryIdSc] = useState('');
+  const [isSelectedCountryIdSc, setIsSelectedCountryIdSc] = useState(false);
+  const [countryIdSc, setCountryIdSc] = useState('');
+  const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
+  
+  
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -382,6 +392,30 @@ function TravelRequest({ }) {
       label: option?.attributedetails_name,
     }))
     : [];
+
+    const filteredOptionCountryId = Array.isArray(countryIdDrop)
+        ? countryIdDrop.map((option) => ({
+            value: option?.Country_Code,
+            label: `${option?.Country_Code} - ${option?.Country_Name}`,
+        }))
+        : [];
+
+    const filteredOptionCountryIdSc = Array.isArray(countryIdDropSc)
+        ? countryIdDropSc.map((option) => ({
+            value: option?.Country_Code,
+            label: `${option?.Country_Code} - ${option?.Country_Name}`,
+        }))
+        : [];
+
+    const handleChangeCountryId = (selectedCountryId) => {
+        setSelectedCountryId(selectedCountryId);
+        setCountryId(selectedCountryId ? selectedCountryId.value : "");
+    };
+
+    const handleChangeCountryIdSc = (selectedCountryIdSc) => {
+        setSelectedCountryIdSc(selectedCountryIdSc);
+        setCountryIdSc(selectedCountryIdSc ? selectedCountryIdSc.value : "");
+    };
 
   const handleChangeEmpId = (selectedEmpId) => {
     setSelectedEmpId(selectedEmpId);
@@ -659,42 +693,48 @@ function TravelRequest({ }) {
   };
 
   const filteredOptionDPt = DPTdrop.map((option) => ({
-    value: option.dept_id,
-    label: `${option.dept_id} - ${option.dept_name}`,
+    value: option.department_ID,
+    label: `${option.department_ID}`,
   }));
 
   const filteredOptionDPtSC = DPTdropSC.map((option) => ({
-    value: option.dept_id,
-    label: `${option.dept_id} - ${option.dept_name}`,
+    value: option.department_ID,
+    label: `${option.department_ID}`,
   }));
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setCountrydrop(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetCountry`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setCountyIdDropSc(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((data) => data.json())
-      .then((val) => setCountrydropSC(val))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetCountry`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const country = val.map((option) => ({
+                    value: option.Country_Code,
+                    label: `${option.Country_Code} - ${option.Country_Name}`,
+                }));
+                setCountyIdDropGrid(country);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -712,15 +752,16 @@ function TravelRequest({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const EmployeeId = sessionStorage.getItem("selectedUserCode");
 
     const fetchDept = async () => {
       try {
-        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+        const response = await fetch(`${config.apiBaseUrl}/EmpDepartment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, EmployeeId }),
         });
 
         if (!response.ok) {
@@ -741,15 +782,15 @@ function TravelRequest({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-
+    const EmployeeId = sessionStorage.getItem("selectedUserCode");
     const fetchDept = async () => {
       try {
-        const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
+        const response = await fetch(`${config.apiBaseUrl}/EmpDepartment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, EmployeeId }),
         });
 
         if (!response.ok) {
@@ -770,19 +811,20 @@ function TravelRequest({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
+    const EmployeeId = sessionStorage.getItem("selectedUserCode");
 
-    fetch(`${config.apiBaseUrl}/DeptID`, {
+    fetch(`${config.apiBaseUrl}/EmpDepartment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, EmployeeId }),
     })
       .then((response) => response.json())
       .then((data) => {
         const deptOptions = data.map((option) => ({
-          value: option.dept_id,
-          label: `${option.dept_id} - ${option.dept_name}`,
+          value: option.department_ID,
+          label: `${option.department_ID}`,
         }));
         setDepartmentDrop(deptOptions);
       })
@@ -813,27 +855,20 @@ function TravelRequest({ }) {
       // .then((val) => setDPTdrop(val))
       .catch((error) => console.error("Error fetching country data:", error));
   }, []);
-  useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ company_code }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const Countryptions = data.map((option) => ({
-          value: option.Country_Code,
-          label: `${option.Country_Code} - ${option.Country_Name}`,
-        }));
-        setCountrydropGR(Countryptions);
-      })
-      // .then((val) => setDPTdrop(val))
-      .catch((error) => console.error("Error fetching country data:", error));
-  }, []);
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/GetCountry`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((val) => setCountyIdDrop(val))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -984,15 +1019,14 @@ function TravelRequest({ }) {
       headerName: "Destination Country",
       field: "destination_country_id",
       editable: true,
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {
-      //   values: CountrydropGR.map((d) => d.value),
-      // },
-      // valueFormatter: (params) => {
-      //   const country = CountrydropGR.find((d) => d.value == params.value);
-      //   return country ? country.label : params.value;
-      // },
-    },
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: countryIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = countryIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },    },
 
     {
       headerName: "Destination City",
@@ -1106,10 +1140,10 @@ function TravelRequest({ }) {
   const handleSave = async () => {
     if (
       // !travel_request_id ||
-      !empId ||
+      // !empId ||
       !dpt ||
       !travel_type ||
-      !destination_country_id ||
+      !countryId ||
       !destination_city ||
       !purpose_of_travel ||
       !travelStartDate ||
@@ -1136,10 +1170,10 @@ function TravelRequest({ }) {
       const Header = {
         travel_request_id: travel_request_id,
         request_number: request_number,
-        employee_id: empId,
+        employee_id: sessionStorage.getItem("selectedUserCode"),
         department_id: dpt,
         travel_type: travel_type,
-        destination_country_id: destination_country_id,
+        destination_country_id: countryId,
         destination_city: destination_city,
         purpose_of_travel: purpose_of_travel,
         travel_start_date: travelStartDate,
@@ -1195,10 +1229,10 @@ function TravelRequest({ }) {
       const body = {
         travel_request_id: travel_request_idSC || null,
         request_number: request_numberSC || "",
-        employee_id: empIdSc || "",
+        employee_id: sessionStorage.getItem("selectedUserCode") || "",
         department_id: dptSC || "",
         travel_type: travel_typeSC || "",
-        destination_country_id: destination_country_idSC || null,
+        destination_country_id: countryIdSc || null,
         destination_city: destination_citySC || "",
         purpose_of_travel: purpose_of_travelSC || "",
         travel_start_date: travelStartDateSc || null,
@@ -1583,7 +1617,7 @@ function TravelRequest({ }) {
             </div>
           </div> */}
 
-          <div className="col-md-2">
+           {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedEmpId ? "has-value" : ""} 
@@ -1609,7 +1643,7 @@ function TravelRequest({ }) {
                 Employee ID<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
@@ -1625,6 +1659,7 @@ function TravelRequest({ }) {
                 onBlur={() => setIsSelectDepartment(false)}
                 classNamePrefix="react-select"
                 isClearable
+                title="Please enter the Department"
                 type="text"
                 value={selecteddpt}
                 onChange={handleDPT}
@@ -1638,7 +1673,7 @@ function TravelRequest({ }) {
                 {showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
-          </div>
+          </div> 
 
           {/* <div className="col-md-2">
             <div className="inputGroup">
@@ -1678,6 +1713,7 @@ function TravelRequest({ }) {
                 onFocus={() => setIsSelectedtravel_type(true)}
                 onBlur={() => setIsSelectedtravel_type(false)}
                 isClearable
+                title="Please enter the Travel Type"
                 value={selectedtravel_type}
                 onChange={handleChangetravel_type}
                 options={filteredOptiontravel_type}
@@ -1687,27 +1723,28 @@ function TravelRequest({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="Text"
-                maxLength={10}
-                placeholder=""
-                required
-                title="Please enter the Destination Country ID"
-                autoComplete="off"
-                value={destination_country_id}
-                onChange={(e) => setdestination_country_id(e.target.value)}
-              />
-              <label
-                for="sname"
-                className={`exp-form-labels ${error && !destination_country_id ? "text-danger" : ""}`}
+              <div
+                  className={`inputGroup selectGroup 
+                  ${selectedCountryId ? "has-value" : ""} 
+                  ${isSelectedCountryId ? "is-focused" : ""}`}
               >
-                Destination Country ID<span className="text-danger">*</span>
-              </label>
-            </div>
+                  <Select
+                      id="country"
+                      type="text"
+                      classNamePrefix="react-select"
+                      placeholder=""
+                      onFocus={() => setIsSelectedCountryId(true)}
+                      onBlur={() => setIsSelectedCountryId(false)}
+                      isClearable
+                      title="Please enter the Destination Country ID"
+                      value={selectedCountryId}
+                      onChange={handleChangeCountryId}
+                      options={filteredOptionCountryId}
+                  />
+                  <label for="sname" className={`floating-label ${error && !countryId ? 'text-danger' : ''}`}>Destination Country ID<span className="text-danger">*</span></label>
+              </div>
           </div>
+
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1832,6 +1869,7 @@ function TravelRequest({ }) {
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
+                title="Please enter the Transport Mode"
                 placeholder=""
                 onFocus={() => setIsSelectedtransport_mode(true)}
                 onBlur={() => setIsSelectedtransport_mode(false)}
@@ -1932,6 +1970,7 @@ function TravelRequest({ }) {
                 onFocus={() => setIsSelectedCurrency(true)}
                 onBlur={() => setIsSelectedCurrency(false)}
                 isClearable
+                title="Please enter the Currency Code"
                 value={selectedCurrency}
                 onChange={handleChangeCurrency}
                 options={filteredOptionCurrency}
@@ -2006,13 +2045,14 @@ function TravelRequest({ }) {
                 onFocus={() => setIsSelectedPriority(true)}
                 onBlur={() => setIsSelectedPriority(false)}
                 isClearable
+                title="Please select the Priority Level"
                 value={selectedPriority}
                 onChange={handleChangePriority}
                 options={filteredOptionPriority}
               />
               <label
                 for="sname"
-                className={`floating-label ${error && !Country_Code ? "text-danger" : ""}`}
+                className={`floating-label ${error && !priority ? "text-danger" : ""}`}
               >
                 Priority Level<span className="text-danger">*</span>
               </label>
@@ -2100,7 +2140,7 @@ function TravelRequest({ }) {
             </div>
           </div> */}
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
                 ${selectedEmpIdSc ? "has-value" : ""} 
@@ -2123,7 +2163,7 @@ function TravelRequest({ }) {
                 Employee ID
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
@@ -2175,7 +2215,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtravel_typeSc ? "has-value" : ""} 
               ${isSelectedtravel_typeSc ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Travel Type"
             >
               <Select
                 id="country"
@@ -2193,25 +2233,28 @@ function TravelRequest({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="fdate"
-                class="exp-input-field form-control"
-                type="text"
-                placeholder=""
-                maxLength={10}
-                required
-                title="Please enter the Destination Country ID"
-                autoComplete="off"
-                value={destination_country_idSC}
-                onChange={(e) => setdestination_country_idSC(e.target.value)}
-              />
-              <label for="sname" className={`exp-form-labels`}>
-                Destination Country ID
-              </label>
-            </div>
-          </div>
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedCountryIdSc ? "has-value" : ""} 
+                            ${isSelectedCountryIdSc ? "is-focused" : ""}`}
+                            title="Please select the Destination Country ID"
+                        >
+                            <Select
+                                id="country"
+                                type="text"
+                                classNamePrefix="react-select"
+                                placeholder=""
+                                onFocus={() => setIsSelectedCountryIdSc(true)}
+                                onBlur={() => setIsSelectedCountryIdSc(false)}
+                                isClearable
+                                value={selectedCountryIdSc}
+                                onChange={handleChangeCountryIdSc}
+                                options={filteredOptionCountryIdSc}
+                            />
+                            <label for="sname" className={`floating-label`}>Destination Country ID</label>
+                        </div>
+                    </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -2315,7 +2358,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtransport_modeSc ? "has-value" : ""} 
               ${isSelectedtransport_modeSc ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Transport Mode"
             >
               <Select
                 id="country"

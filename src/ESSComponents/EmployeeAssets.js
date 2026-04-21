@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -17,6 +17,7 @@ function EmployeeAssets({}) {
   const [EmployeeID, setEmployeeID] = useState("");
   const [error, setError] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
+  const employeeIdRef = useRef(null);
   const navigate = useNavigate();
   const [employeeID, setEmployeeId] = useState("");
   const [First_Name, setFirst_Name] = useState("");
@@ -31,6 +32,7 @@ function EmployeeAssets({}) {
   const [selectedAssetID, setselectedAssetID] = useState("");
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
+  const location = useLocation();
 
   const [Assetvalue, setAssetvalue] = useState([
     {
@@ -335,6 +337,22 @@ function EmployeeAssets({}) {
       console.log("Data not fetched...!");
     }
   };
+
+  useEffect(() => {
+    const { employeeId, firstName, department_id, designation_id } =
+      location.state || {};
+
+    if (employeeId) {
+      setEmployeeId(employeeId);
+      setFirst_Name(firstName || "");
+      setdepartment_id(department_id || "");
+      setdesignation_id(designation_id || "");
+    }
+
+    if (employeeId) {
+      handleEmployeeAssets(employeeId);
+    }
+  }, [location.state]);
 
 const handleSave = async () => {
   if (!EmployeeID?.trim()) {
@@ -860,6 +878,7 @@ const handleDeleteAsset = async (relation, index) => {
                 autoComplete="off"
                 type="text"
                 value={EmployeeID}
+                ref={employeeIdRef}
                 onChange={(e) => setEmployeeID(e.target.value)}
                 maxLength={18}
                 onKeyPress={handleKeyPress}
