@@ -454,19 +454,29 @@ function Input({ }) {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
-          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
-          };
+          sp_Country_MasterData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  Company_Code,
+                  Modified_by,
+                },
+              ],
+        };
 
           const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopUpdate`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Company_Code": Company_Code,
-                "modified-by": modified_by
               },
               body: JSON.stringify(dataToSend),
             }
@@ -499,17 +509,29 @@ function Input({ }) {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-            sp_Country_MasterData: Array.isArray(rowData) ? rowData : [rowData],
-          };
+          sp_Country_MasterData: Array.isArray(rowData)
+            ? rowData.map((row) => ({
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+            : [
+                {
+                  ...rowData,
+                  Company_Code,
+                  Modified_by,
+                },
+              ],
+        };
 
           const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopDelete`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Company_Code": Company_Code
               },
               body: JSON.stringify(dataToSend),
             },

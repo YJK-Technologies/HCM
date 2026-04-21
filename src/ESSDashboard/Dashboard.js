@@ -1340,6 +1340,7 @@ const Dashboard = () => {
           HolidayDate: extra.HolidayDate,
           ApprovedBy: approver,
           CompanyCode: company_code,
+          modified_by: sessionStorage.getItem("selectedUserCode"),
           Keyfield: id,
         };
       }
@@ -1356,6 +1357,7 @@ const Dashboard = () => {
           LeaveStatus: status,
           FromDate: backendDate,
           company_code: company_code,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 

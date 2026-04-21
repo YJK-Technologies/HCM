@@ -24773,7 +24773,7 @@ const getTeamManager = async (req, res) => {
 };
 
 const DashboardLeaveAuthorization = async (req, res) => {
-  const { EmployeeId, LeaveStatus, FromDate, company_code } = req.body; // Removed FromDate
+  const { EmployeeId, LeaveStatus, FromDate, company_code, modified_by } = req.body; // Removed FromDate
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -24783,7 +24783,8 @@ const DashboardLeaveAuthorization = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','','','', null, null, null, null, null, null, null, null`);
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','','',@modified_by, null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -40106,9 +40107,9 @@ const Country_MasterLoopUpdate = async (req, res) => {
         .input("Overtime_Allowed", sql.NVarChar, item.Overtime_Allowed)
         .input("Currency_Code", sql.NVarChar, item.Currency_Code)
         .input("Status", sql.NVarChar, item.Status)
-        .input("Modified_by", sql.NVarChar, item.modified_by)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("Company_Code", sql.NVarChar, req.headers["company_code"])
+        .input("Company_Code", sql.NVarChar, item.Company_Code)
         .query(`EXEC sp_Country_Master @mode, @Country_Code, @Country_Name, @TimeZone_Default,@Week_Start_Day, @ISO_Code, @Weekend_Days, @Max_Work_Hours_Day,
         @Max_Work_Hours_Week, @Overtime_Allowed, @Currency_Code, @Status, '','', @Modified_by,'',@keyfield,@Company_Code`);
     }
@@ -40135,9 +40136,10 @@ const Country_MasterLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
-        .input("Company_Code", sql.NVarChar, req.headers["company_code"])
+        .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
         .query(
-          `EXEC sp_Country_Master @mode, '', '', '', '', '', '', 0, 0, '', '', '', '','', '','',@keyfield,@Company_Code`,
+          `EXEC sp_Country_Master @mode, '', '', '', '', '', '', 0, 0, '', '', '', '','', @Modified_by,'',@keyfield,@Company_Code`,
         );
     }
     res.status(200).json("Country_Master data deleted successfully");
@@ -40244,8 +40246,9 @@ const Time_Zone_masterLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', @keyfield, @company_code, '', '', '', ''`,
+          `EXEC Sp_Time_Zone_master @mode, 0, '', '', 0, '', @keyfield, @company_code, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("Time_Zone_master data deleted successfully");
@@ -43309,8 +43312,9 @@ const visa_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Modified_by", sql.NVarChar, item.Modified_by)
         .query(
-          `EXEC sp_visa_requests @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, @keyfield, '', '', '', ''`,
+          `EXEC sp_visa_requests @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, @keyfield, '', '', @Modified_by, ''`,
         );
     }
     res.status(200).json("visa_requests data deleted successfully");
@@ -43572,7 +43576,11 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, '', '', @modified_by, ''`,
+          `EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id,
+           @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+           @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, 
+           @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, '', '', 
+           @modified_by, ''`,
         );
     }
     res.status(200).json("travel_requests data updated successfully");
@@ -43598,8 +43606,9 @@ const travel_requestsLoopDelete = async (req, res) => {
         .input("travel_request_id", sql.Int, item.travel_request_id)
         .input("company_code", sql.NVarChar, item.company_code)
         .input("keyfield", sql.NVarChar, item.keyfield)
+        .input("modified_by", sql.NVarChar, item.modified_by)
         .query(
-          `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @keyfield, '', '', '', ''`,
+          `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @keyfield, '', '', @modified_by, ''`,
         );
     }
     res.status(200).json("travel_requests data deleted successfully");
@@ -47401,7 +47410,7 @@ const DashboardCompOffRequest = async (req, res) => {
 };
 
 const DashboardCompOffApproval = async (req, res) => {
-  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode, Keyfield } = req.body; 
+  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode, Keyfield, ModifiedBy} = req.body; 
   try {
     const pool = await connection.connectToDatabase();
     await pool
@@ -47413,8 +47422,9 @@ const DashboardCompOffApproval = async (req, res) => {
       .input("ApprovedBy", sql.NVarChar, ApprovedBy)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("Keyfield", sql.NVarChar, Keyfield)
+      .input("ModifiedBy", sql.NVarChar, ModifiedBy)
       .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',
-      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','','','','',''`);
+      @ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,'','',@ModifiedBy,'','',''`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
