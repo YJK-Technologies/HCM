@@ -213,6 +213,7 @@ function RequestReport({ }) {
           visa_request_id: id,
           company_code,
           request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Travel") {
         url = `${config.apiBaseUrl}/ApprovalTravel`;
@@ -221,6 +222,7 @@ function RequestReport({ }) {
           travel_request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Comp Off") {
         url = `${config.apiBaseUrl}/DashboardCompOffApproval`;

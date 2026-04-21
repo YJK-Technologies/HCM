@@ -1374,6 +1374,7 @@ const Dashboard = () => {
           visa_request_id: id,
           company_code,
           request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 
@@ -1385,6 +1386,7 @@ const Dashboard = () => {
           travel_request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
 

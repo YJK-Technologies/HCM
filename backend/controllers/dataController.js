@@ -43152,7 +43152,7 @@ const visa_requestsUpdate = async (req, res) => {
 };
 
 const visa_requestsDelete = async (req, res) => {
-  const { keyfield, company_code } = req.body;
+  const { keyfield, company_code, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43161,7 +43161,8 @@ const visa_requestsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("keyfield", sql.NVarChar, keyfield)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', ', '', ''`,);
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, '', ', @Modified_by, ''`,);
 
     res
       .status(200)
@@ -44914,7 +44915,7 @@ const LoanRequestDashboard = async (req, res) => {
 };
 
 const visaRequestDashboard = async (req, res) => {
-  const { manager_id, company_code } = req.body;
+  const { manager_id, company_code, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44923,7 +44924,8 @@ const visaRequestDashboard = async (req, res) => {
       .input("mode", sql.NVarChar, "VR")
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, @manager_id, '', '', '', '', ''`);
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .query(`EXEC sp_visa_requests_Test @mode, 0, '', 0, '', '', '', '', '', '', '', '', '', 0, '', @company_code, @manager_id, '', '', '', @Modified_by, ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45006,7 +45008,7 @@ const ApprovalLoan = async (req, res) => {
 };
 
 const ApprovalVisa = async (req, res) => {
-  const { visa_request_id, request_status, company_code } = req.body;
+  const { visa_request_id, request_status, company_code , Modified_by} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -45016,7 +45018,8 @@ const ApprovalVisa = async (req, res) => {
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_Test @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', '', ''`);
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .query(`EXEC sp_visa_requests_Test @mode, @visa_request_id, '', 0, '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', '', '', @Modified_by, ''`);
 
     res.status(200).json("visa approval successfully");
   } catch (err) {
@@ -45026,7 +45029,7 @@ const ApprovalVisa = async (req, res) => {
 };
 
 const ApprovalTravel = async (req, res) => {
-  const { travel_request_id, request_status, company_code } = req.body;
+  const { travel_request_id, request_status, company_code, modified_by} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -45038,8 +45041,9 @@ const ApprovalTravel = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
+      .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', '', '', '', ''`,
+        `EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', '', '', @modified_by, ''`,
       );
 
     res.status(200).json("travel approval successfully");
