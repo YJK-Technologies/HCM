@@ -68,9 +68,9 @@ function UserInput({ }) {
   console.log(selectedRow);
 
   useEffect(() => {
-  if (!location.state) {
-    clearInputFields(); // ensure fresh create mode
-  }
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
   }, []);
 
   const clearInputFields = () => {
@@ -322,7 +322,7 @@ function UserInput({ }) {
     setSelectedRole(selectedRole);
     setRole(selectedRole ? selectedRole.value : '');
   };
-  
+
   const handleChangeUserCode = (selectedUserCode) => {
     setSelectedUserCode(selectedUserCode);
     setUser_code(selectedUserCode ? selectedUserCode.value : '');
@@ -448,9 +448,8 @@ function UserInput({ }) {
   };
 
   const handleKeyDownStatus = async (e) => {
-    if (e.key === 'Enter' && hasValueChanged) { // Only trigger search if the value has changed
-      // Trigger the search function
-      setHasValueChanged(false); // Reset the flag after search
+    if (e.key === 'Enter' && hasValueChanged) {
+      setHasValueChanged(false);
     }
   };
 
@@ -558,7 +557,7 @@ function UserInput({ }) {
                 className={`inputGroup selectGroup 
               ${selectedUserCode ? "has-value" : ""} 
               ${isSelectUserCode ? "is-focused" : ""}`}
-              title="Please Select the User Code"
+                title="Please Select the User Code"
               >
                 <Select
                   id="usertype"
@@ -715,7 +714,7 @@ function UserInput({ }) {
                 className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
-              title="Please Select the Role ID"
+                title="Please Select the Role ID"
               >
                 <Select
                   id="usertype"
@@ -815,7 +814,10 @@ function UserInput({ }) {
                     <button
                       type="button"
                       className="delete-image-btn"
-                      onClick={handleRemoveImage}
+                      onClick={(e) => {
+                        e.stopPropagation();  
+                        handleRemoveImage();
+                      }}
                     >
                       &times;
                     </button>
@@ -832,6 +834,7 @@ function UserInput({ }) {
                 <input type="file"
                   className="exp-input-field form-control hidden-file-input"
                   accept="image/*"
+                  style={{ pointerEvents: "none" }}
                   onChange={handleFileSelect}
                   ref={ImagE}
                   // onKeyDown={(e) => handleKeyDown(e, ImagE)}
@@ -867,7 +870,7 @@ function UserInput({ }) {
                   <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
-              )}            
+              )}
             </div>
           </div>
         </div>
