@@ -655,8 +655,22 @@ function Project({ }) {
     window.location.reload();
   };
 
+  const searchClearInputFields = () => {
+    setProjectId("");
+    setProjectname("");
+    setmanager("");
+    setselectedproject("");
+    setStartdate("");
+    setEnddate("");
+    setPriority("");
+    setSelectedPriorty("");
+    setTask("");
+    setSelectedTask("");
+  };
+
   const reloadData = () => {
     setrowData([])
+    searchClearInputFields();
   };
 
   const handleSearch = async () => {

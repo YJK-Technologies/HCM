@@ -492,8 +492,19 @@ function Input({ }) {
     window.location.reload();
   };
 
+  const searchClearInputFields = () => {
+    setProjectSc("");
+    setUserSc("");
+    setProjectname("");
+    setuser_name("");
+    setSelectedProjectSc("");
+    setSelectedUserSc("");
+  };
+
   const reloadData = () => {
-    window.location.reload();
+    setRowData([]);
+    searchClearInputFields();
+
   };
 
 
