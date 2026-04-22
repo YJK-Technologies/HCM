@@ -348,7 +348,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                         <h2>Reset Password</h2>
                         <p>Follow the steps to recover your account</p>
                     </div>
-                    <button className="close-circle-btn" onClick={onClose}>
+                    <button className="close-circle-btn" title = "Close" onClick={onClose}>
                         <i className="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -368,6 +368,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                 <label>New Password</label>
                                 <input 
                                     type="password" 
+                                    title = "Please enter the New Password"
                                     className="auth-text-input" 
                                     placeholder="••••••••"
                                     value={newPassword}
@@ -379,6 +380,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                 <label>Confirm Password</label>
                                 <input 
                                     type="password" 
+                                    title = "Please enter the Confirm Password"
                                     className="auth-text-input" 
                                     placeholder="••••••••"
                                     value={confirm_password}
@@ -386,7 +388,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                     required 
                                 />
                             </div>
-                            <button type="submit" className="auth-btn-primary">Update Password</button>
+                            <button type="submit" title = "Update Password" className="auth-btn-primary">Update Password</button>
                         </form>
                     ) : otpSent ? (
                         <form className="auth-form" onSubmit={handleOtpSubmit}>
@@ -395,6 +397,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                 <label>Verification Code</label>
                                 <input 
                                     type="text" 
+                                    title = "Please enter the Verification Code"
                                     className="auth-text-input text-center otp-input" 
                                     placeholder="0 0 0 0"
                                     value={enteredOtp}
@@ -403,8 +406,8 @@ const ForgotPopup = ({ open, handleClose }) => {
                                     required 
                                 />
                             </div>
-                            <button type="submit" className="auth-btn-primary">Verify Code</button>
-                            <button type="button" className="auth-btn-link" onClick={() => setOtpSent(false)}>Back to Email</button>
+                            <button type="submit" title = "Verify Code" className="auth-btn-primary">Verify Code</button>
+                            <button type="button" title = "Back to Email" className="auth-btn-link" onClick={() => setOtpSent(false)}>Back to Email</button>
                         </form>
                     ) : (
                         <form className="auth-form" onSubmit={handleEmailSubmit}>
@@ -412,6 +415,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                 <label>User Code</label>
                                 <input 
                                     type="text" 
+                                    title = "Please enter the User Code"
                                     className="auth-text-input" 
                                     placeholder="Enter your user code"
                                     value={user_code}
@@ -423,6 +427,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                 <label>Email Address</label>
                                 <input 
                                     type="email" 
+                                    title = "Please enter the Email Address"
                                     className="auth-text-input" 
                                     placeholder="name@company.com"
                                     value={email_id}
@@ -430,7 +435,7 @@ const ForgotPopup = ({ open, handleClose }) => {
                                     required 
                                 />
                             </div>
-                            <button type="submit" className="auth-btn-primary">Send Reset Code</button>
+                            <button type="submit" title = "Send Reset Code" className="auth-btn-primary">Send Reset Code</button>
                         </form>
                     )}
                 </div>

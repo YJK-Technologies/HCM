@@ -68,8 +68,6 @@ function RequestReport({ }) {
     const safeId = id ? id.toString() : "";
     const safeEmpId = employeeId ? employeeId.toString() : "";
 
-
-
     if (type === "Leave") {
       url = `${config.apiBaseUrl}/getEmployeeLeaveReport`;
 
@@ -82,7 +80,7 @@ function RequestReport({ }) {
         ReportingManager: sessionStorage.getItem("selectedUserCode"),
       };
     } else if (type === "Loan") {
-      url = `${config.apiBaseUrl}/loanRequestSearch`;
+      url = `${config.apiBaseUrl}/approvalLoanRequestSearch`;
 
       body = {
         loan_request_id: safeId,
@@ -139,6 +137,7 @@ function RequestReport({ }) {
       if (type === "Leave") {
         setLeaveRowData(data);
       } else if (type === "Loan") {
+        console.log(data);
         setRowLoanData(data);
       } else if (type === "Visa") {
         setRowVisaData(data);
@@ -272,13 +271,18 @@ function RequestReport({ }) {
   const [loanTypeIdDropSc, setLoanTypeIdDropSc] = useState([]);
   const [loanTypeIdSc, setLoanTypeIdSc] = useState("");
   const [selectedLoanTypeIdSc, setSelectedLoanIypeIdSc] = useState("");
-  const [loanAmountSc, setLoanAmountSc] = useState("");
-  const [interestRateLoanSc, setInterestRateLoanSc] = useState("");
-  const [repayMonthLoanSc, setRepayMonthLoanSc] = useState("");
-  const [monthlyInstallmentLoanSc, setMonthlyInstallmentLoanSc] = useState("");
+  const [loanAmountFromSc, setLoanAmountFromSc] = useState("");
+  const [loanAmountToSc, setLoanAmountToSc] = useState("");
+  const [interestRateLoanFromSc, setInterestRateLoanFromSc] = useState("");
+  const [interestRateLoanToSc, setInterestRateLoanToSc] = useState("");
+  const [repayMonthLoanFromSc, setRepayMonthLoanFromSc] = useState("");
+  const [repayMonthLoanToSc, setRepayMonthLoanToSc] = useState("");
+  const [monthlyInstallmentLoanFromSc, setMonthlyInstallmentLoanFromSc] = useState("");
+  const [monthlyInstallmentLoanToSc, setMonthlyInstallmentLoanToSc] = useState("");
   const [currencyCodeLoanSc, setCurrencyCodeLoanSc] = useState("");
   const [purposeLoanSc, setPurposeLoanSc] = useState("");
-  const [repaymentDateLoanSc, setRepaymentDateLoanSc] = useState("");
+  const [repaymentDateLoanFromSc, setRepaymentDateLoanFromSc] = useState("");
+  const [repaymentDateLoanToSc, setRepaymentDateLoanToSc] = useState("");
 
   const [empIdLoanDropGrid, setEmpIdLoanDropGrid] = useState([]);
 
@@ -306,13 +310,13 @@ function RequestReport({ }) {
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    fetch(`${config.apiBaseUrl}/getLoanTypes`, {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ Company_Code }),
     })
       .then((data) => data.json())
       .then((val) => setLoanTypeIdDropSc(val))
@@ -343,8 +347,8 @@ function RequestReport({ }) {
 
   const filteredOptionLoanTypeSc = Array.isArray(loanTypeIdDropSc)
     ? loanTypeIdDropSc.map((option) => ({
-      value: option?.attributedetails_name,
-      label: option?.attributedetails_name,
+      value: option?.Loan_Type_ID,
+      label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
     }))
     : [];
 
@@ -397,13 +401,18 @@ function RequestReport({ }) {
     setSelectedEmpIdLoanSc("");
     setLoanTypeIdSc("");
     setSelectedLoanIypeIdSc("");
-    setLoanAmountSc("");
-    setInterestRateLoanSc("");
-    setRepayMonthLoanSc("");
-    setMonthlyInstallmentLoanSc("");
+    setLoanAmountFromSc("");
+    setLoanAmountToSc("");
+    setInterestRateLoanFromSc("");
+    setInterestRateLoanToSc("");
+    setRepayMonthLoanFromSc("");
+    setRepayMonthLoanToSc("");
+    setMonthlyInstallmentLoanFromSc("");
+    setMonthlyInstallmentLoanToSc("");
     setCurrencyCodeLoanSc("");
     setPurposeLoanSc("");
-    setRepaymentDateLoanSc("");
+    setRepaymentDateLoanFromSc("");
+    setRepaymentDateLoanToSc("");
   };
 
   const columnLoanDefs = [
@@ -465,14 +474,19 @@ function RequestReport({ }) {
         return dept ? dept.label : params.value;
       },
     },
-    {
-      headerName: "Request Number",
-      field: "request_number",
-      editable: false,
-    },
+    // {
+    //   headerName: "Request Number",
+    //   field: "request_number",
+    //   editable: false,
+    // },
     {
       headerName: "Loan Type ID",
       field: "loan_type_id",
+      editable: false,
+    },
+    {
+      headerName: "Loan Type Name",
+      field: "Loan_Type_Name",
       editable: false,
     },
     {
@@ -536,19 +550,24 @@ function RequestReport({ }) {
         employee_id: empIdLoanSc,
         request_number: ReqNoLoanSc,
         loan_type_id: loanTypeIdSc,
-        loan_amount: loanAmountSc ? loanAmountSc : 0,
-        interest_rate: interestRateLoanSc ? interestRateLoanSc : 0,
-        repayment_months: repayMonthLoanSc,
-        monthly_installment: monthlyInstallmentLoanSc ? monthlyInstallmentLoanSc : 0,
+        LoanAmountFrom: loanAmountFromSc ? loanAmountFromSc : 0,
+        LoanAmountTo: loanAmountToSc ? loanAmountToSc : 0,
+        InterestRateFrom: interestRateLoanFromSc ? interestRateLoanFromSc : 0,
+        InterestRateTo: interestRateLoanToSc ? interestRateLoanToSc : 0,
+        RepaymentMonthsFrom: repayMonthLoanFromSc,
+        RepaymentMonthsTo: repayMonthLoanToSc,
+        MonthlyInstallmentFrom: monthlyInstallmentLoanFromSc ? monthlyInstallmentLoanFromSc : 0,
+        MonthlyInstallmentTo: monthlyInstallmentLoanToSc ? monthlyInstallmentLoanToSc : 0,
         currency_code: currencyCodeLoanSc,
         purpose: purposeLoanSc,
         request_status: "pending",
-        repayment_date: repaymentDateLoanSc,
+        RepaymentDateFrom: repaymentDateLoanFromSc,
+        RepaymentDateTo: repaymentDateLoanToSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
+      const response = await fetch(`${config.apiBaseUrl}/approvalLoanRequestSearch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -600,8 +619,8 @@ function RequestReport({ }) {
       return {
         "Loan Request ID": row.loan_request_id || "",
         "Employee ID": `${row.employee_id} - ${empName}` || "",
-        "Request Number": row.request_number || "",
         "Loan Type ID": row.loan_type_id || "",
+        "Loan Type Name": row.Loan_Type_Name || "",
         "Loan Amount": row.loan_amount || "",
         "Interest Rate": row.interest_rate || "",
         "Repayment Months": row.repayment_months || "",
@@ -1570,7 +1589,7 @@ function RequestReport({ }) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   
+                  getRequestId(requestType, row),
                   row,
                   true
                 )
@@ -1586,7 +1605,7 @@ function RequestReport({ }) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   
+                  getRequestId(requestType, row),
                   row,
                   false
                 )
@@ -1960,7 +1979,7 @@ function RequestReport({ }) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   
+                  getRequestId(requestType, row),
                   row,
                   true
                 )
@@ -1976,7 +1995,7 @@ function RequestReport({ }) {
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   
+                  getRequestId(requestType, row),
                   row,
                   false
                 )
@@ -3619,7 +3638,7 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-2">
+              {/* <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="fdate"
@@ -3642,13 +3661,13 @@ function RequestReport({ }) {
                     Request Number
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                    ${selectedLoanTypeIdSc ? "has-value" : ""} 
-                                    ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
+                  ${selectedLoanTypeIdSc ? "has-value" : ""} 
+                  ${isSelectedLoanTypeSc ? "is-focused" : ""}`}
                   title="Please enter the Loan Type ID"
                 >
                   <Select
@@ -3680,16 +3699,40 @@ function RequestReport({ }) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     required
-                    title="Please Enter the Loan Amount"
+                    title="Please Enter the Loan Amount From"
                     autoComplete="off"
-                    value={loanAmountSc}
+                    value={loanAmountFromSc}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
-                      setLoanAmountSc(value);
+                      setLoanAmountFromSc(value);
                     }}
                   />
                   <label for="sname" className={`exp-form-labels`}>
-                    Loan Amount
+                    Loan Amount From
+                  </label>
+                </div>
+              </div>
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="fdate"
+                    class="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    maxLength={10}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    title="Please Enter the Loan Amount To"
+                    autoComplete="off"
+                    value={loanAmountToSc}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setLoanAmountToSc(value);
+                    }}
+                  />
+                  <label for="sname" className={`exp-form-labels`}>
+                    Loan Amount To
                   </label>
                 </div>
               </div>
@@ -3705,16 +3748,16 @@ function RequestReport({ }) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     required
-                    title="Please Enter the Interest Rate"
+                    title="Please Enter the Interest Rate From"
                     autoComplete="off"
-                    value={interestRateLoanSc}
+                    value={interestRateLoanFromSc}
                     onChange={(e) => {
                       const value = e.target.value.replace(/[^0-9.]/g, "");
-                      setInterestRateLoanSc(value);
+                      setInterestRateLoanFromSc(value);
                     }}
                   />
                   <label for="sname" className={`exp-form-labels`}>
-                    Interest Rate
+                    Interest Rate From
                   </label>
                 </div>
               </div>
@@ -3730,16 +3773,66 @@ function RequestReport({ }) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     required
-                    title="Please Enter the Repayment Months"
+                    title="Please Enter the Interest Rate To"
                     autoComplete="off"
-                    value={repayMonthLoanSc}
+                    value={interestRateLoanToSc}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "");
-                      setRepayMonthLoanSc(value);
+                      const value = e.target.value.replace(/[^0-9.]/g, "");
+                      setInterestRateLoanToSc(value);
                     }}
                   />
                   <label for="sname" className={`exp-form-labels`}>
-                    Repayment Months
+                    Interest Rate To
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="fdate"
+                    class="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    maxLength={5}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    title="Please Enter the Repayment Months From"
+                    autoComplete="off"
+                    value={repayMonthLoanFromSc}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setRepayMonthLoanFromSc(value);
+                    }}
+                  />
+                  <label for="sname" className={`exp-form-labels`}>
+                    Repayment Months From
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="fdate"
+                    class="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    maxLength={5}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    title="Please Enter the Repayment Months To"
+                    autoComplete="off"
+                    value={repayMonthLoanToSc}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setRepayMonthLoanToSc(value);
+                    }}
+                  />
+                  <label for="sname" className={`exp-form-labels`}>
+                    Repayment Months To
                   </label>
                 </div>
               </div>
@@ -3755,16 +3848,41 @@ function RequestReport({ }) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     required
-                    title="Please Enter the Monthly Installment"
+                    title="Please Enter the Monthly Installment From"
                     autoComplete="off"
-                    value={monthlyInstallmentLoanSc}
+                    value={monthlyInstallmentLoanFromSc}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
-                      setMonthlyInstallmentLoanSc(value);
+                      setMonthlyInstallmentLoanFromSc(value);
                     }}
                   />
                   <label for="sname" className={`exp-form-labels`}>
-                    Monthly Installment
+                    Monthly Installment From
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="fdate"
+                    class="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    maxLength={10}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    title="Please Enter the Monthly Installment To"
+                    autoComplete="off"
+                    value={monthlyInstallmentLoanToSc}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setMonthlyInstallmentLoanToSc(value);
+                    }}
+                  />
+                  <label for="sname" className={`exp-form-labels`}>
+                    Monthly Installment To
                   </label>
                 </div>
               </div>
@@ -3772,8 +3890,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                    ${selectedCurrencyLoanSc ? "has-value" : ""} 
-                                    ${isSelectedCurrencyLoanSc ? "is-focused" : ""}`}
+                  ${selectedCurrencyLoanSc ? "has-value" : ""} 
+                  ${isSelectedCurrencyLoanSc ? "is-focused" : ""}`}
                   title="Please select the Salary Currency"
                 >
                   <Select
@@ -3825,14 +3943,14 @@ function RequestReport({ }) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     required
-                    title="Please Enter the Repayment Date"
+                    title="Please Enter the Repayment Date From"
                     autoComplete="off"
-                    value={repaymentDateLoanSc}
+                    value={repaymentDateLoanFromSc}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
 
                       if (value === "") {
-                        setRepaymentDateLoanSc("");
+                        setRepaymentDateLoanFromSc("");
                         return;
                       }
 
@@ -3843,11 +3961,49 @@ function RequestReport({ }) {
                         return;
                       }
 
-                      setRepaymentDateLoanSc(value);
+                      setRepaymentDateLoanFromSc(value);
                     }}
                   />
                   <label for="sname" className={`exp-form-labels`}>
-                    Repayment Date
+                    Repayment Date From
+                  </label>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <div className="inputGroup">
+                  <input
+                    id="fdate"
+                    class="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    maxLength={2}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    title="Please Enter the Repayment Date To"
+                    autoComplete="off"
+                    value={repaymentDateLoanToSc}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+
+                      if (value === "") {
+                        setRepaymentDateLoanToSc("");
+                        return;
+                      }
+
+                      const num = parseInt(value, 10);
+
+                      if (num === 0 || num > 31) {
+                        toast.warning("Please enter a date between 1 and 31");
+                        return;
+                      }
+
+                      setRepaymentDateLoanToSc(value);
+                    }}
+                  />
+                  <label for="sname" className={`exp-form-labels`}>
+                    Repayment Date To
                   </label>
                 </div>
               </div>
