@@ -957,6 +957,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectType ? "has-value" : ""} 
               ${isSelectType ? "is-focused" : ""}`}
+              title="Please select the Select Type"
             >
               <Select
                 id="SelectType"
@@ -978,6 +979,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectDetails ? "has-value" : ""} 
               ${isSelectDetails ? "is-focused" : ""}`}
+              title="Please select the Select Details"
             >
               <Select
                 id="SelectDetails"
@@ -1018,7 +1020,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please enter the Date"
+                required title="Please select the Start Date"
                 value={startdate}
                 onChange={(e) => setstartdate(e.target.value)}
               />
@@ -1033,7 +1035,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please enter the Date"
+                required title="Please select the End Date"
                 value={enddate}
                 onChange={(e) => setenddate(e.target.value)}
               />
@@ -1049,7 +1051,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="time"
                 placeholder=""
-                required title="Please enter the Time"
+                required title="Please enter the Start Time"
                 value={Start_Time}
                 onChange={(e) => setstarttime(e.target.value)}
               />
@@ -1064,7 +1066,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="time"
                 placeholder=""
-                required title="Please enter the Time"
+                required title="Please enter the End Time"
                 value={End_Time}
                 onChange={(e) => setendtime(e.target.value)}
               />
@@ -1077,6 +1079,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedMessageType ? "has-value" : ""} 
               ${isSelectMT ? "is-focused" : ""}`}
+              title="Please select the Message Type"
             >
               <Select
                 id="MessageType"
@@ -1114,6 +1117,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please select the Status"
             >
               <Select
                 id="status"
@@ -1160,6 +1164,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selecttype ? "has-value" : ""} 
               ${isSelecttype ? "is-focused" : ""}`}
+              title="Please select the Select Type"
             >
               <Select
                 id="SelectType"
@@ -1182,6 +1187,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectdetails ? "has-value" : ""} 
               ${isSelectdetails ? "is-focused" : ""}`}
+              title="Please select the Select Details"
             >
               <Select
                 id="SelectDetails"
@@ -1225,7 +1231,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please enter the Date"
+                required title="Please select the Start Date"
                 value={Start_Date}
                 onChange={(e) => setstartDate(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1241,7 +1247,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please enter the Date"
+                required title="Please select the End Date"
                 value={End_Date}
                 onChange={(e) => setEndDate(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1257,7 +1263,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="time"
                 placeholder=""
-                required title="Please enter the Time"
+                required title="Please enter the Start Time"
                 value={Start_time}
                 onChange={(e) => setstart_time(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1273,7 +1279,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="time"
                 placeholder=""
-                required title="Please enter the Time"
+                required title="Please enter the End Time"
                 value={endtime}
                 onChange={(e) => setend_time(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1287,6 +1293,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedmessagetype ? "has-value" : ""} 
               ${isSelectmessagetype ? "is-focused" : ""}`}
+              title="Please select the Message Type"
             >
               <Select
                 id="MessageType"
@@ -1325,6 +1332,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedstatus ? "has-value" : ""} 
               ${isSelectstatus ? "is-focused" : ""}`}
+              title="Please select the Status"
             >
               <Select
                 id="status"
