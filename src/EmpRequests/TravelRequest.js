@@ -43,7 +43,7 @@ function TravelRequest({ }) {
   const [travelStartDate, setTravelStartDate] = useState("");
   const [travelEndDate, setTravelEndDate] = useState("");
   
-  const [accommodation_required, setaccommodation_required] = useState("");
+  
   const [estimated_cost, setestimated_cost] = useState("");
   const [Currency_Code, setCurrency_Code] = useState("");
   const [reqStatusDrop, setReqStatusDrop] = useState([]);
@@ -80,7 +80,7 @@ function TravelRequest({ }) {
   
   const [destination_country_idSC, setdestination_country_idSC] = useState("");
   const [purpose_of_travelSC, setpurpose_of_travelSC] = useState("");
-  const [accommodation_requiredSc, setaccommodation_requiredSc] = useState("");
+  
   const [estimated_costSC, setestimated_costSC] = useState("");
   const [Currency_CodeSC, setCurrency_CodeSC] = useState("");
   const [selectedReqStatusSC, setSelectedReqStatusSC] = useState("");
@@ -142,6 +142,17 @@ function TravelRequest({ }) {
   const [isSelectedCountryIdSc, setIsSelectedCountryIdSc] = useState(false);
   const [countryIdSc, setCountryIdSc] = useState('');
   const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
+
+  const [accommodation_required, setaccommodation_required] = useState("");
+  const [accommodation_requiredDrop, setaccommodation_requiredDrop] = useState([]);
+  const [selectedaccommodation_required, setSelectedaccommodation_required] = useState('');
+  const [isSelectedaccommodation_required, setIsSelectedaccommodation_required] = useState(false);
+  const [accommodation_requiredDropGrid, setaccommodation_requiredDropGrid] = useState([]);
+
+  const [accommodation_requiredSc, setaccommodation_requiredSc] = useState("");
+  const [accommodation_requiredDropSc, setaccommodation_requiredDropSc] = useState([]);
+  const [selectedaccommodation_requiredSc, setSelectedaccommodation_requiredSc] = useState('');
+  const [isSelectedaccommodation_requiredSc, setIsSelectedaccommodation_requiredSc] = useState(false);
   
   
   useEffect(() => {
@@ -337,6 +348,21 @@ function TravelRequest({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => settransport_modeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const filteredOptionEmpId = Array.isArray(empIdDrop)
     ? empIdDrop.map((option) => ({
       value: option.EmployeeId,
@@ -388,6 +414,13 @@ function TravelRequest({ }) {
 
   const filteredOptiontransport_mode = Array.isArray(transport_modeDrop)
     ? transport_modeDrop.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
+  const filteredOptionaccommodation_required = Array.isArray(accommodation_requiredDrop)
+    ? accommodation_requiredDrop.map((option) => ({
       value: option?.attributedetails_name,
       label: option?.attributedetails_name,
     }))
@@ -579,6 +612,21 @@ function TravelRequest({ }) {
     })
       .then((data) => data.json())
       .then((val) => settransport_modeDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setaccommodation_requiredSc(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -941,6 +989,23 @@ function TravelRequest({ }) {
       .then((val) => {
         const currency = val.map(option => option.attributedetails_name);
         settransport_modeDropGrid(currency);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getBool`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const currency = val.map(option => option.attributedetails_name);
+        setaccommodation_requiredDropGrid(currency);
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
@@ -1683,7 +1748,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtravel_type ? "has-value" : ""} 
               ${isSelectedtravel_type ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Travel Type"
             >
               <Select
                 id="country"
@@ -1707,6 +1772,7 @@ function TravelRequest({ }) {
                   className={`inputGroup selectGroup 
                   ${selectedCountryId ? "has-value" : ""} 
                   ${isSelectedCountryId ? "is-focused" : ""}`}
+                  title="Please select the Destination Country ID"
               >
                   <Select
                       id="country"
@@ -1843,7 +1909,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtransport_mode ? "has-value" : ""} 
               ${isSelectedtransport_mode ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Transport Mode"
             >
               <Select
                 id="country"
@@ -1863,6 +1929,30 @@ function TravelRequest({ }) {
           </div>
 
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtransport_mode ? "has-value" : ""} 
+              ${isSelectedtransport_mode ? "is-focused" : ""}`}
+              title="Please select the Currency Code"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                title="Please enter the Transport Mode"
+                placeholder=""
+                onFocus={() => setIsSelectedtransport_mode(true)}
+                onBlur={() => setIsSelectedtransport_mode(false)}
+                isClearable
+                value={selectedtransport_mode}
+                onChange={handleChangetransport_mode}
+                options={filteredOptiontransport_mode}
+              />
+              <label for="sname" className={`floating-label ${error && !transport_mode ? 'text-danger' : ''}`}>Accommodation Required<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -1888,7 +1978,7 @@ function TravelRequest({ }) {
                 Accommodation Required<span className="text-danger">*</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -2032,7 +2122,7 @@ function TravelRequest({ }) {
               />
               <label
                 for="sname"
-                className={`floating-label ${error && !priority ? "text-danger" : ""}`}
+                className={`floating-label ${error && !selectedPriority ? "text-danger" : ""}`}
               >
                 Priority Level<span className="text-danger">*</span>
               </label>
@@ -2283,7 +2373,7 @@ function TravelRequest({ }) {
                 type="date"
                 placeholder=""
                 required
-                title="Please select the Travel Start Date"
+                title="Please Select the Travel Start Date"
                 autoComplete="off"
                 value={travelStartDateSc}
                 onChange={(e) => setTravelStartDateSc(e.target.value)}
@@ -2302,7 +2392,7 @@ function TravelRequest({ }) {
                 type="date"
                 placeholder=""
                 required
-                title="Please select the Travel End Date"
+                title="Please Select the Travel End Date"
                 autoComplete="off"
                 value={travelEndDateSc}
                 onChange={(e) => setTravelEndDateSc(e.target.value)}
@@ -2357,6 +2447,29 @@ function TravelRequest({ }) {
           </div>
 
           <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedtransport_modeSc ? "has-value" : ""} 
+              ${isSelectedtransport_modeSc ? "is-focused" : ""}`}
+              title="Please select the Transport Mode"
+            >
+              <Select
+                id="country"
+                type="text"
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectedtransport_modeSc(true)}
+                onBlur={() => setIsSelectedtransport_modeSc(false)}
+                isClearable
+                value={selectedtransport_modeSc}
+                onChange={handleChangetransport_modeSc}
+                options={filteredOptiontransport_modeSc}
+              />
+              <label for="sname" className={`floating-label`}>Accommodation Required</label>
+            </div>
+          </div>
+
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="fdate"
@@ -2379,7 +2492,7 @@ function TravelRequest({ }) {
                 Accommodation Required
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">

@@ -792,6 +792,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedType ? "has-value" : ""} 
               ${isSelectedType ? "is-focused" : ""}`}
+              title = "Please select the Type"
             >
               <Select
                 id="Type"
@@ -814,6 +815,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedAccrual ? "has-value" : ""} 
               ${isSelectedAccrual ? "is-focused" : ""}`}
+              title = "Please select the Accrual"
             >
               <Select
                 id="Accrual	"
@@ -881,6 +883,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedLeaveReason ? "has-value" : ""} 
               ${isSelectedLeaveReason ? "is-focused" : ""}`}
+              title = "Please select the Leave Reason"
             >
               <Select
                 id="LeaveReason"
@@ -939,6 +942,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedtype ? "has-value" : ""} 
               ${isSelecttypes ? "is-focused" : ""}`}
+              title = "Please select the Type"
             >
               <Select type="text"
                 required
@@ -960,6 +964,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedaccrual ? "has-value" : ""} 
               ${isSelectAL ? "is-focused" : ""}`}
+              title = "Please select the Accrual"
             >
               <Select type="text"
                 required
@@ -980,8 +985,9 @@ function Input({ }) {
             <div className="inputGroup">
               <input type="text"
                 className="exp-input-field form-control"
-                required title="Please Enter the Exceed Leave Value"
+                required 
                 placeholder=""
+                title = "Please Enter the Exceed Leave Value"
                 value={Exceedleave}
                 onChange={(e) => setExceedleave(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />

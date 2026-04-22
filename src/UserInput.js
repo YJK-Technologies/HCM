@@ -62,9 +62,16 @@ function UserInput({ }) {
   const [UserCodeNameDrop, setUserCodeNameDrop] = useState([]);
 
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
-
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
   console.log(selectedRow);
+
+  useEffect(() => {
+  if (!location.state) {
+    clearInputFields(); // ensure fresh create mode
+  }
+  }, []);
 
   const clearInputFields = () => {
     setUser_code("");
@@ -551,6 +558,7 @@ function UserInput({ }) {
                 className={`inputGroup selectGroup 
               ${selectedUserCode ? "has-value" : ""} 
               ${isSelectUserCode ? "is-focused" : ""}`}
+              title="Please Select the User Code"
               >
                 <Select
                   id="usertype"
@@ -576,6 +584,7 @@ function UserInput({ }) {
               <input
                 id="uname"
                 class="exp-input-field form-control"
+                title="Please Enter the User Name here"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -595,6 +604,7 @@ function UserInput({ }) {
               <input
                 id="fname"
                 class="exp-input-field form-control"
+                title="Please Enter the first name here"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -614,6 +624,7 @@ function UserInput({ }) {
               <input
                 id="lname"
                 class="exp-input-field form-control"
+                title="Please Enter the last name here"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -633,6 +644,7 @@ function UserInput({ }) {
               <input
                 id="upass"
                 class="exp-input-field form-control"
+                title="Please Enter the password here"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -652,6 +664,7 @@ function UserInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the User Status"
             >
               <Select
                 id="status"
@@ -676,6 +689,7 @@ function UserInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedLog ? "has-value" : ""} 
               ${isSelectLog ? "is-focused" : ""}`}
+              title="Please Select Log In or Log Out"
             >
               <Select
                 id="loginout"
@@ -701,6 +715,7 @@ function UserInput({ }) {
                 className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
+              title="Please Select the Role ID"
               >
                 <Select
                   id="usertype"
@@ -716,7 +731,7 @@ function UserInput({ }) {
                   ref={usertype}
                   onKeyDown={(e) => handleKeyDown(e, email, usertype)}
                 />
-                <label for="state" className={`floating-label ${error && !user_status ? 'text-danger' : ''}`}>Role ID<span className="text-danger">*</span></label>
+                <label for="state" className={`floating-label ${error && !role_id ? 'text-danger' : ''}`}>Role ID<span className="text-danger">*</span></label>
               </div>
             </div>
           )}
@@ -726,6 +741,7 @@ function UserInput({ }) {
               <input
                 id="uemail"
                 class="exp-input-field form-control"
+                title="Please Enter the Email here"
                 type="email"
                 autoComplete="off"
                 placeholder=" "
@@ -745,6 +761,7 @@ function UserInput({ }) {
               <input
                 id="udob"
                 class="exp-input-field form-control"
+                title="Please Select the Date of Birth"
                 type="date"
                 autoComplete="off"
                 placeholder=" "
@@ -764,6 +781,7 @@ function UserInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedGender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
+              title="Please Select the Gender"
             >
               <Select
                 id="gender"
@@ -839,17 +857,17 @@ function UserInput({ }) {
 
           <div class="col-12">
             <div className="search-btn-wrapper">
-              {mode === "create" ? (
-                <div className="icon-btn save" onClick={handleInsert}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              ) : (
+              {mode === "update" && selectedRow ? (
                 <div className="icon-btn update" onClick={handleUpdate}>
                   <span className="tooltip">Update</span>
                   <i class="fa-solid fa-pen-to-square"></i>
                 </div>
-              )}
+              ) : (
+                <div className="icon-btn save" onClick={handleInsert}>
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}            
             </div>
           </div>
         </div>
