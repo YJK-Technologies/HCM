@@ -1446,6 +1446,7 @@ const LeaveRequestPage = () => {
                   className={`inputGroup selectGroup 
                   ${SelectedLeave ? "has-value" : ""} 
                   ${isSelectLeave ? "is-focused" : ""}`}
+                  title="Please Select the Leave Type"
                 >
                   <Select
                     id="LeaveType"
@@ -1470,6 +1471,7 @@ const LeaveRequestPage = () => {
                     className={`inputGroup selectGroup 
                     ${selectedCompOff ? "has-value" : ""} 
                     ${isSelectCompOff ? "is-focused" : ""}`}
+                    title="Please Select the Comp Off Date"
                   >
                     <Select
                       value={selectedCompOff}
@@ -1493,6 +1495,7 @@ const LeaveRequestPage = () => {
                   className={`inputGroup selectGroup 
                   ${SelectedSlot ? "has-value" : ""} 
                   ${isSelectSlot ? "is-focused" : ""}`}
+                  title="Please Select the Slot"
                 >
                   <Select
                     id="Select_slots"
@@ -1514,6 +1517,7 @@ const LeaveRequestPage = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Select the From Date"
                     value={FromDate}
                     onChange={handleFromDate}
                     placeholder=" "
@@ -1530,6 +1534,7 @@ const LeaveRequestPage = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Select the To Date"
                     value={ToDate}
                     onChange={handleToDateChange}
                     disabled={LeaveType === "Comp Off"}
@@ -1546,6 +1551,7 @@ const LeaveRequestPage = () => {
                 <div className="inputGroup">
                   <textarea
                     className="form-control"
+                    title="Please Enter the Reason"
                     value={Reason}
                     onChange={(e) => setReason(e.target.value)}
                     rows="3"
@@ -1563,6 +1569,7 @@ const LeaveRequestPage = () => {
                   className={`inputGroup selectGroup 
                   ${selectedmanager ? "has-value" : ""} 
                   ${isSelectManager ? "is-focused" : ""}`}
+                  title="Please Select the Reporting Manager"
                 >
                   <Select
                     value={selectedmanager}
@@ -1585,6 +1592,7 @@ const LeaveRequestPage = () => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Responsible Person"
                     value={AlternativeReponsablePerson}
                     onChange={(e) => setReasponsiblePerson(e.target.value)}
                     placeholder=" "
@@ -1647,6 +1655,7 @@ const LeaveRequestPage = () => {
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Select the From Date"
                 value={fromDate}
                 placeholder=" "
                 autoComplete="off"
@@ -1662,6 +1671,7 @@ const LeaveRequestPage = () => {
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Select the To Date"
                 value={toDate}
                 placeholder=" "
                 autoComplete="off"
@@ -1677,6 +1687,7 @@ const LeaveRequestPage = () => {
               className={`inputGroup selectGroup 
               ${selectedLeave ? "has-value" : ""} 
               ${isSearchLeave ? "is-focused" : ""}`}
+              title="Please Select the Leave Type"
             >
               <Select
                 id="LeaveType"
@@ -1699,6 +1710,7 @@ const LeaveRequestPage = () => {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSearchStatus ? "is-focused" : ""}`}
+              title="Please Select the Leave Status"
             >
               <Select
                 id="Select_slots"

@@ -1683,7 +1683,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtravel_type ? "has-value" : ""} 
               ${isSelectedtravel_type ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Travel Type"
             >
               <Select
                 id="country"
@@ -1707,6 +1707,7 @@ function TravelRequest({ }) {
                   className={`inputGroup selectGroup 
                   ${selectedCountryId ? "has-value" : ""} 
                   ${isSelectedCountryId ? "is-focused" : ""}`}
+                  title="Please select the Destination Country ID"
               >
                   <Select
                       id="country"
@@ -1843,7 +1844,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedtransport_mode ? "has-value" : ""} 
               ${isSelectedtransport_mode ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Transport Mode"
             >
               <Select
                 id="country"
@@ -2283,7 +2284,7 @@ function TravelRequest({ }) {
                 type="date"
                 placeholder=""
                 required
-                title="Please select the Travel Start Date"
+                title="Please Select the Travel Start Date"
                 autoComplete="off"
                 value={travelStartDateSc}
                 onChange={(e) => setTravelStartDateSc(e.target.value)}
@@ -2302,7 +2303,7 @@ function TravelRequest({ }) {
                 type="date"
                 placeholder=""
                 required
-                title="Please select the Travel End Date"
+                title="Please Select the Travel End Date"
                 autoComplete="off"
                 value={travelEndDateSc}
                 onChange={(e) => setTravelEndDateSc(e.target.value)}
