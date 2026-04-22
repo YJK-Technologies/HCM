@@ -110,18 +110,6 @@ function TravelRequest({ }) {
 
   const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
 
-  const [transport_mode, settransport_mode] = useState("");
-  const [transport_modeDrop, settransport_modeDrop] = useState([]);
-  const [selectedtransport_mode, setSelectedtransport_mode] = useState('');
-  const [isSelectedtransport_mode, setIsSelectedtransport_mode] = useState(false);
-  const [transport_modeDropGrid, settransport_modeDropGrid] = useState([]);
-
-  const [transport_modeSc, settransport_modeSc] = useState("");
-  const [transport_modeDropSc, settransport_modeDropSc] = useState([]);
-  const [selectedtransport_modeSc, setSelectedtransport_modeSc] = useState('');
-  const [isSelectedtransport_modeSc, setIsSelectedtransport_modeSc] = useState(false);
-  
-
   const [travel_type, settravel_type] = useState("");
   const [travel_typeDrop, settravel_typeDrop] = useState([]);
   const [selectedtravel_type, setSelectedtravel_type] = useState('');
@@ -142,6 +130,17 @@ function TravelRequest({ }) {
   const [isSelectedCountryIdSc, setIsSelectedCountryIdSc] = useState(false);
   const [countryIdSc, setCountryIdSc] = useState('');
   const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
+
+  const [transport_mode, settransport_mode] = useState("");
+  const [transport_modeDrop, settransport_modeDrop] = useState([]);
+  const [selectedtransport_mode, setSelectedtransport_mode] = useState('');
+  const [isSelectedtransport_mode, setIsSelectedtransport_mode] = useState(false);
+  const [transport_modeDropGrid, settransport_modeDropGrid] = useState([]);
+
+  const [transport_modeSc, settransport_modeSc] = useState("");
+  const [transport_modeDropSc, settransport_modeDropSc] = useState([]);
+  const [selectedtransport_modeSc, setSelectedtransport_modeSc] = useState('');
+  const [isSelectedtransport_modeSc, setIsSelectedtransport_modeSc] = useState(false);
 
   const [accommodation_required, setaccommodation_required] = useState("");
   const [accommodation_requiredDrop, setaccommodation_requiredDrop] = useState([]);
@@ -359,7 +358,7 @@ function TravelRequest({ }) {
       body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
-      .then((val) => settransport_modeDrop(val))
+      .then((val) => setaccommodation_requiredDrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -492,6 +491,11 @@ function TravelRequest({ }) {
   const handleChangetransport_mode = (selectedtransport_mode) => {
     setSelectedtransport_mode(selectedtransport_mode);
     settransport_mode(selectedtransport_mode ? selectedtransport_mode.value : "");
+  };
+
+  const handleChangeaccommodation_required = (selectedaccommodation_required) => {
+    setSelectedaccommodation_required(selectedaccommodation_required);
+    setaccommodation_required(selectedaccommodation_required ? selectedaccommodation_required.value : "");
   };
 
   useEffect(() => {
@@ -698,6 +702,11 @@ function TravelRequest({ }) {
   const handleChangetransport_modeSc = (selectedtransport_modeSc) => {
     setSelectedtransport_modeSc(selectedtransport_modeSc);
     settransport_modeSc(selectedtransport_modeSc ? selectedtransport_modeSc.value : "");
+  };
+  
+  const handleChangeaccommodation_requiredSc = (selectedaccommodation_requiredSc) => {
+    setSelectedaccommodation_requiredSc(selectedaccommodation_requiredSc);
+    setaccommodation_requiredSc(selectedaccommodation_requiredSc ? selectedaccommodation_requiredSc.value : "");
   };
 
   const searchClearInputFields = () => {
@@ -1109,7 +1118,7 @@ function TravelRequest({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: transport_modeDropGrid,
+        values: accommodation_requiredDropGrid,
       },
     },
     {
@@ -1931,8 +1940,8 @@ function TravelRequest({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedtransport_mode ? "has-value" : ""} 
-              ${isSelectedtransport_mode ? "is-focused" : ""}`}
+              ${selectedaccommodation_required ? "has-value" : ""} 
+              ${isSelectedaccommodation_required ? "is-focused" : ""}`}
               title="Please select the Currency Code"
             >
               <Select
@@ -1941,12 +1950,12 @@ function TravelRequest({ }) {
                 classNamePrefix="react-select"
                 title="Please enter the Transport Mode"
                 placeholder=""
-                onFocus={() => setIsSelectedtransport_mode(true)}
-                onBlur={() => setIsSelectedtransport_mode(false)}
+                onFocus={() => setIsSelectedaccommodation_required(true)}
+                onBlur={() => setIsSelectedaccommodation_required(false)}
                 isClearable
-                value={selectedtransport_mode}
-                onChange={handleChangetransport_mode}
-                options={filteredOptiontransport_mode}
+                value={selectedaccommodation_required}
+                onChange={handleChangeaccommodation_required}
+                options={filteredOptionaccommodation_required}
               />
               <label for="sname" className={`floating-label ${error && !transport_mode ? 'text-danger' : ''}`}>Accommodation Required<span className="text-danger">*</span></label>
             </div>
@@ -2462,7 +2471,7 @@ function TravelRequest({ }) {
                 onBlur={() => setIsSelectedtransport_modeSc(false)}
                 isClearable
                 value={selectedtransport_modeSc}
-                onChange={handleChangetransport_modeSc}
+                onChange={handleChangeaccommodation_requiredSc}
                 options={filteredOptiontransport_modeSc}
               />
               <label for="sname" className={`floating-label`}>Accommodation Required</label>
