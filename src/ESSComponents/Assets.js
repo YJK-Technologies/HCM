@@ -374,23 +374,6 @@ function Assets({ }) {
   };
 
   const searchClearInputFields = () => {
-    setAsset_Code("");
-    setAssetName("");
-    setAssetCategory("");
-    setSerialNumber("");
-    setBar_code("");
-    setBrand("");
-    setModel("");
-    setPurchaseDate("");
-    setPurchaseCost("");
-    setCurrencyCode("");
-    setVendorName("");
-    setWarrantyStart("");
-    setWarrantyEnd("");
-    setAssetStatus("");
-    setLocation("");
-    setCountry("");
-    setStatus("");
     setAssetIDSC("");
     setAsset_CodeSC("");
     setAssetNameSC("");
@@ -1112,11 +1095,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Grade Name "
+                id="Asset Code"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Code"
                 value={Asset_Code}
                 onChange={(e) => setAsset_Code(e.target.value)}
                 maxLength={100}
@@ -1132,7 +1115,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Name"
                 value={AssetName}
                 onChange={(e) => setAssetName(e.target.value)}
                 maxLength={100}
@@ -1147,7 +1130,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Category"
                 value={AssetCategory}
                 onChange={(e) => setAssetCategory(e.target.value)}
                 maxLength={100}
@@ -1162,7 +1145,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Serial Number"
                 value={SerialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
                 maxLength={100}
@@ -1174,11 +1157,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Barcode"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Barcode"
                 value={Bar_code}
                 onChange={(e) => setBar_code(e.target.value)}
                 maxLength={100}
@@ -1190,11 +1173,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Brand"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Brand"
                 value={Brand}
                 onChange={(e) => setBrand(e.target.value)}
                 maxLength={100}
@@ -1206,11 +1189,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Model"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Model"
                 value={Model}
                 onChange={(e) => setModel(e.target.value)}
                 maxLength={100}
@@ -1221,11 +1204,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="PurchaseDate"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Purchase Date"
                 value={PurchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
                 maxLength={100}
@@ -1241,7 +1224,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Purchase Cost"
                 value={PurchaseCost}
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
@@ -1278,11 +1261,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="PurchaseCost"
+                id="Vendor Name"
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Vendor Name"
                 value={VendorName}
                 onChange={(e) => setVendorName(e.target.value)}
                 maxLength={100}
@@ -1294,11 +1277,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="PurchaseCost"
+                id="WarrantyStart"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Warranty Start Date"
                 value={WarrantyStart}
                 onChange={(e) => setWarrantyStart(e.target.value)}
                 maxLength={100}
@@ -1314,7 +1297,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Warranty End Date"
                 isClearable
                 value={WarrantyEnd}
                 onChange={(e) => setWarrantyEnd(e.target.value)}
@@ -1331,7 +1314,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Location"
                 value={Location}
                 onChange={(e) => setLocation(e.target.value)}
                 maxLength={100}
@@ -1344,6 +1327,7 @@ function Assets({ }) {
             <div className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
+              title="Please select the Country"
             >
               <Select
                 id="Country"
@@ -1369,6 +1353,7 @@ function Assets({ }) {
             <div className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectstatus ? "is-focused" : ""}`}
+              title="Please select the Status"
             >
               <Select
                 id="Status"
@@ -1399,11 +1384,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Grade Name "
+                id="Asset ID "
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset ID"
                 value={AssetIDSC}
                 onChange={(e) => setAssetIDSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1417,11 +1402,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="Grade Name "
+                id="Asset Code"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Code"
                 value={Asset_CodeSC}
                 onChange={(e) => setAsset_CodeSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1439,7 +1424,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Name"
                 value={AssetNameSC}
                 onChange={(e) => setAssetNameSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1455,7 +1440,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Asset Category"
                 value={AssetCategorySC}
                 onChange={(e) => setAssetCategorySC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1471,7 +1456,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Serial Number"
                 value={SerialNumberSC}
                 onChange={(e) => setSerialNumberSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1484,11 +1469,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Bar Code"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Bar Code"
                 value={Bar_codeSC}
                 onChange={(e) => setBar_codeSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1501,11 +1486,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Brand"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Brand"
                 value={BrandSC}
                 onChange={(e) => setBrandSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1518,11 +1503,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="Model"
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Model"
                 value={ModelSC}
                 onChange={(e) => setModelSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1534,11 +1519,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="SerialNumber"
+                id="PurchaseDate"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Purchase Date"
                 value={PurchaseDateSC}
                 onChange={(e) => setPurchaseDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1555,7 +1540,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Purchase Cost"
                 value={PurchaseCostSC}
                 onChange={(e) => setPurchaseCostSC(e.target.value)}
                 maxLength={100}
@@ -1595,11 +1580,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="PurchaseCost"
+                id="VendorName"
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Vendor Name"
                 value={VendorNameSC}
                 onChange={(e) => setVendorNameSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1612,11 +1597,11 @@ function Assets({ }) {
           <div className="col-md-2">
             <div className="inputGroup">
               <input
-                id="PurchaseCost"
+                id="WarrantyStart"
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Warranty Start Date"
                 value={WarrantyStartSC}
                 onChange={(e) => setWarrantyStartSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1633,7 +1618,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Warranty End Date"
                 value={WarrantyEndSC}
                 onChange={(e) => setWarrantyEndSC(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1647,7 +1632,7 @@ function Assets({ }) {
             <div className={`inputGroup selectGroup 
               ${selectedAssetStatusSC ? "has-value" : ""} 
               ${isSelectedAssetStatusSC ? "is-focused" : ""}`}
-              title="Please enter the Status"
+              title="Please enter the Asset Status"
             >
               <Select
                 id="AssetStatus"
@@ -1673,7 +1658,7 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Location"
                 value={LocationSC}
                 onChange={(e) => setLocationSC(e.target.value)}
                 maxLength={100}
@@ -1688,6 +1673,7 @@ function Assets({ }) {
             <div className={`inputGroup selectGroup 
               ${selectedCountrySC ? "has-value" : ""} 
               ${isSelectCountrySC ? "is-focused" : ""}`}
+              title="Please select the Country"
             >
               <Select
                 id="Country"
@@ -1713,6 +1699,7 @@ function Assets({ }) {
             <div className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectstatusSC ? "is-focused" : ""}`}
+              title="Please select the Status"
             >
               <Select
                 id="Status"

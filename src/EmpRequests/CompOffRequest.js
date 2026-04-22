@@ -347,6 +347,7 @@ const EmployeeCompOff = () => {
                             className={`inputGroup selectGroup 
                             ${selectedCompOff ? "has-value" : ""} 
                             ${isSelectedCompOff ? "is-focused" : ""}`}
+                            title="Please select the Comp Off Leave"
                         >
                             <Select
                                 value={selectedCompOff}
@@ -369,6 +370,7 @@ const EmployeeCompOff = () => {
                             <input
                                 type="date"
                                 className="exp-input-field form-control"
+                                title="Please select the From Date"
                                 value={FromDate}
                                 onChange={handleFromDate}
                                 placeholder=" "
@@ -386,6 +388,7 @@ const EmployeeCompOff = () => {
                                 type="date"
                                 className="exp-input-field form-control"
                                 value={ToDate}
+                                title="To Date will be same as From Date, Comp Off allows only single day"
                                 onChange={handleToDateChange}
                                 disabled
                                 placeholder=" "
@@ -402,6 +405,7 @@ const EmployeeCompOff = () => {
                             <textarea
                                 className="form-control"
                                 value={Reason}
+                                title="Please enter the Reason"
                                 onChange={(e) => setReason(e.target.value)}
                                 rows="3"
                                 placeholder=" "
@@ -418,6 +422,7 @@ const EmployeeCompOff = () => {
                             className={`inputGroup selectGroup 
                             ${selectedManager ? "has-value" : ""} 
                             ${isSelectManager ? "is-focused" : ""}`}
+                            title="Please select the Reporting Manager"
                         >
                             <Select
                                 value={selectedManager}
@@ -441,6 +446,7 @@ const EmployeeCompOff = () => {
                                 type="text"
                                 className="exp-input-field form-control"
                                 value={AlternativeReponsablePerson}
+                                title="Please enter the Responsible Person"
                                 onChange={(e) => setReasponsiblePerson(e.target.value)}
                                 placeholder=" "
                                 autoComplete="off"
@@ -472,6 +478,7 @@ const EmployeeCompOff = () => {
                             <input
                                 type="date"
                                 className="exp-input-field form-control"
+                                title="Please select the Holiday From Date"
                                 value={holidayFromDate}
                                 onChange={(e) => setHolidayFromDate(e.target.value)}
                                 placeholder=" "
@@ -488,6 +495,7 @@ const EmployeeCompOff = () => {
                             <input
                                 type="date"
                                 className="exp-input-field form-control"
+                                title="Please select the Holiday To Date"
                                 value={holidayToDate}
                                 onChange={(e) => setHolidayToDate(e.target.value)}
                                 placeholder=" "
@@ -504,6 +512,7 @@ const EmployeeCompOff = () => {
                             <input
                                 type="text"
                                 className="exp-input-field form-control"
+                                title="Please enter the Holiday Name"
                                 value={holidayName}
                                 onChange={(e) => setHolidayName(e.target.value)}
                                 placeholder=" "
@@ -520,6 +529,7 @@ const EmployeeCompOff = () => {
                             className={`inputGroup selectGroup 
                             ${selectedStatusSc ? "has-value" : ""} 
                             ${isSelectedStatusSc ? "is-focused" : ""}`}
+                            title="Please select the Leave Status"
                         >
                             <Select
                                 id="Select_slots"
