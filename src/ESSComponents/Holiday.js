@@ -777,7 +777,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Holiday Name"
                 value={holidayName}
                 onChange={(e) => setHolidayName(e.target.value)}
                 maxLength={255}
@@ -794,7 +794,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Country Code"
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
                 maxLength={255}
@@ -814,7 +814,7 @@ function HoliDays() {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Location ID"
                 value={locationId}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
@@ -830,6 +830,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedHolidayType ? "has-value" : ""} 
               ${isSelectHolidayType ? "is-focused" : ""}`}
+              title="Please Select the Holiday Type"
             >
               <Select
                 id="status"
@@ -868,6 +869,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedIsPaid ? "has-value" : ""} 
               ${isSelectIsPaid ? "is-focused" : ""}`}
+              title="Please Select the Is Paid"
             >
               <Select
                 id="status"
@@ -889,6 +891,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -954,7 +957,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Holiday Name"
                 value={holidayNameSc}
                 onChange={(e) => setHolidayNameSc(e.target.value)}
                 maxLength={255}
@@ -971,7 +974,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Country Code"
                 value={countryCodeSc}
                 onChange={(e) => setCountryCodeSc(e.target.value)}
                 maxLength={255}
@@ -988,7 +991,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Location ID"
                 value={locationIdSc}
                 onChange={(e) => setLocationIdSc(e.target.value)}
                 maxLength={255}
@@ -1002,6 +1005,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedHolidayTypeSc ? "has-value" : ""} 
               ${isSelectHolidayTypeSc ? "is-focused" : ""}`}
+              title="Please Select the Holiday Type"
             >
               <Select
                 id="status"
@@ -1040,6 +1044,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedIsPaidSc ? "has-value" : ""} 
               ${isSelectIsPaidSc ? "is-focused" : ""}`}
+              title="Please Select the Is Paid"
             >
               <Select
                 id="status"
@@ -1061,6 +1066,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedStatusSc ? "has-value" : ""} 
               ${isSelectStatusSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
