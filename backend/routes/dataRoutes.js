@@ -1415,6 +1415,8 @@ router.post("/getUCN",dataController.getUCN)
 router.post("/getDateFormat",dataController.getDateFormat)
 router.post("/global_settingsInsert",dataController.global_settingsInsert)
 router.post("/EmpDepartment",dataController.EmpDepartment)
+router.post("/approvalLoanRequestSearch",dataController.approvalLoanRequestSearch)
+router.post("/getSettings",dataController.getSettings)
 
 
 

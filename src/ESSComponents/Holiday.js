@@ -59,7 +59,7 @@ function HoliDays() {
   const [isSelectHolidayType, setIsSelectHolidayType] = useState(false);
   const [isSelectHolidayTypeSc, setIsSelectHolidayTypeSc] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
 
   const searchClearInputFields = () => {
     setstartdate("");
@@ -328,6 +328,17 @@ function HoliDays() {
       filter: "agDateColumnFilter",
       editable: true,
       cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => {
+        if (!params.value) return "";
+
+        const date = new Date(params.value);
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+      }
     },
     {
       headerName: "Holiday Type",
@@ -529,20 +540,20 @@ function HoliDays() {
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeHoliday`, {
             method: "POST",
@@ -806,8 +817,8 @@ function HoliDays() {
                 title="Please Enter the Location ID"
                 value={locationId}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setLocationId(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  setLocationId(value);
                 }}
               />
               <label for="cname" className={`exp-form-labels`}>Location ID</label>

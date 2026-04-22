@@ -328,6 +328,7 @@
   transition: 0.25s ease;
   pointer-events: none;
   z-index: 3;
+  font-size: 14px;
 }
 
 .selectGroup.is-focused .floating-label,
