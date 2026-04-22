@@ -84,6 +84,8 @@ function EmpAssetsReport({}) {
   const [LastAllocationDateSC, setLastAllocationDateSC] = useState("");
   const [SerialNumberSC, setSerialNumberSC] = useState("");
 
+  const [EmployeeIDDropGrid, setEmployeeIDDropGrid] = useState([]);
+
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
     .filter((permission) => permission.screen_type === "AssetLifecycleRep")
@@ -338,6 +340,26 @@ function EmpAssetsReport({}) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ company_code })
+        })
+            .then((data) => data.json())
+            .then((data) => {
+              const EmpID = data.map((option) => ({
+                value: option.EmployeeId,
+                label: `${option.EmployeeId} - ${option.First_Name}`,
+              }));
+              setEmployeeIDDropGrid(EmpID);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
   const handleChangeStatus = (Status) => {
     setSelectedStatus(Status);
     setStatus(Status ? Status.value : "");
@@ -412,6 +434,14 @@ const columnDefs = [
     headerName: "Employee ID",
     field: "EmployeeID",
     editable: false,
+    cellEditor: "agSelectCellEditor",
+    cellEditorParams: {
+        values: EmployeeIDDropGrid,
+    },
+    valueFormatter: (params) => {
+      const dept = EmployeeIDDropGrid.find(d => d.value === params.value);
+      return dept ? dept.label : params.value;
+    },
   },
 
   {
@@ -922,7 +952,7 @@ return (
               className={`inputGroup selectGroup 
               ${selectedAssetIDSc ? "has-value" : ""} 
               ${isSelectedAssetIDSc ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Asset ID"
             >
               <Select
                 id="PurchaseCost"
@@ -955,7 +985,7 @@ return (
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Asset Name"
                 value={AssetNameSC}
                 onChange={(e) => setAssetNameSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -972,7 +1002,7 @@ return (
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Asset Category"
                 value={AssetCategorySC}
                 onChange={(e) => setAssetCategorySC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1048,7 +1078,7 @@ return (
               className={`inputGroup selectGroup 
               ${selectedAllocationStatus ? "has-value" : ""} 
               ${isSelectAllocationStatus ? "is-focused" : ""}`}
-              title="Please enter the Employee ID"
+              title="Please Select the Allocation Status"
             >
               <Select
                 id="AllocationStatus"

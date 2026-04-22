@@ -261,7 +261,7 @@ function LoanDocuments({ }) {
     {
       headerName: "Loan Request ID",
       field: "loan_request_id",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: loanReqIdDropAG.map((d) => d.value),

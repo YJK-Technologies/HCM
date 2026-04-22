@@ -59,7 +59,7 @@ function HoliDays() {
   const [isSelectHolidayType, setIsSelectHolidayType] = useState(false);
   const [isSelectHolidayTypeSc, setIsSelectHolidayTypeSc] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
 
   const searchClearInputFields = () => {
     setstartdate("");
@@ -328,6 +328,17 @@ function HoliDays() {
       filter: "agDateColumnFilter",
       editable: true,
       cellStyle: { textAlign: "center" },
+      valueFormatter: (params) => {
+        if (!params.value) return "";
+
+        const date = new Date(params.value);
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+      }
     },
     {
       headerName: "Holiday Type",
@@ -529,20 +540,20 @@ function HoliDays() {
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeHoliday`, {
             method: "POST",
@@ -766,7 +777,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Holiday Name"
                 value={holidayName}
                 onChange={(e) => setHolidayName(e.target.value)}
                 maxLength={255}
@@ -783,7 +794,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Country Code"
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
                 maxLength={255}
@@ -803,11 +814,11 @@ function HoliDays() {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Location ID"
                 value={locationId}
                 onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setLocationId(value);
+                  const value = e.target.value.replace(/\D/g, "");
+                  setLocationId(value);
                 }}
               />
               <label for="cname" className={`exp-form-labels`}>Location ID</label>
@@ -819,6 +830,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedHolidayType ? "has-value" : ""} 
               ${isSelectHolidayType ? "is-focused" : ""}`}
+              title="Please Select the Holiday Type"
             >
               <Select
                 id="status"
@@ -857,6 +869,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedIsPaid ? "has-value" : ""} 
               ${isSelectIsPaid ? "is-focused" : ""}`}
+              title="Please Select the Is Paid"
             >
               <Select
                 id="status"
@@ -878,6 +891,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -943,7 +957,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Holiday Name"
                 value={holidayNameSc}
                 onChange={(e) => setHolidayNameSc(e.target.value)}
                 maxLength={255}
@@ -960,7 +974,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Country Code"
                 value={countryCodeSc}
                 onChange={(e) => setCountryCodeSc(e.target.value)}
                 maxLength={255}
@@ -977,7 +991,7 @@ function HoliDays() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Description"
+                title="Please Enter the Location ID"
                 value={locationIdSc}
                 onChange={(e) => setLocationIdSc(e.target.value)}
                 maxLength={255}
@@ -991,6 +1005,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedHolidayTypeSc ? "has-value" : ""} 
               ${isSelectHolidayTypeSc ? "is-focused" : ""}`}
+              title="Please Select the Holiday Type"
             >
               <Select
                 id="status"
@@ -1029,6 +1044,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedIsPaidSc ? "has-value" : ""} 
               ${isSelectIsPaidSc ? "is-focused" : ""}`}
+              title="Please Select the Is Paid"
             >
               <Select
                 id="status"
@@ -1050,6 +1066,7 @@ function HoliDays() {
               className={`inputGroup selectGroup 
               ${selectedStatusSc ? "has-value" : ""} 
               ${isSelectStatusSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"

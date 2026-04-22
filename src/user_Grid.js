@@ -451,7 +451,7 @@ function UserGrid() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
+    // wrapText: true,
   };
 
   const onGridReady = (params) => {
@@ -465,188 +465,205 @@ function UserGrid() {
       .trim();
   };
 
-  const generateReport = () => {
-    const selectedRows = gridApi.getSelectedRows();
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to generate a report");
-      return
+const generateReport = () => {
+  const selectedRows = gridApi.getSelectedRows();
+
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to generate a report");
+    return;
+  }
+
+  const reportData = selectedRows.map((row) => {
+    const safeValue = (val) => (val !== undefined && val !== null ? val : "");
+
+    return {
+      "User Code": safeValue(row.user_code),
+      "User Name": safeValue(row.user_name),
+      "First Name": safeValue(row.first_name),
+      "Last Name": safeValue(row.last_name),
+      "User Status": safeValue(row.user_status),
+      "Log In/Out": safeValue(row.log_in_out),
+      "Email Id": safeValue(row.email_id),
+      "DOB": safeValue(formatDate(row.dob)),
+      "Gender": safeValue(row.gender),
     };
-    const reportData = selectedRows.map((row) => {
-      const safeValue = (val) => (val !== undefined && val !== null ? val : '');
+  });
 
-      return {
-        "User Code": safeValue(row.user_code),
-        "User Name": safeValue(row.user_name),
-        "First Name": safeValue(row.first_name),
-        "Last Name": safeValue(row.last_name),
-        "User Status": safeValue(row.user_status),
-        "Log In/Out": safeValue(row.log_in_out),
-        "Email Id": safeValue(row.email_id),
-        "DOB": safeValue(formatDate(row.dob)),
-        "Gender": safeValue(row.gender),
-      };
-    });
+  /* ===== READ THEME COLORS ===== */
+  const headerGradientStart = getCSSVariable("--but");
+  const tableHeaderBg = getCSSVariable("--ag-header");
+  const fontColor = getCSSVariable("--font-color");
+  const rowAltColor = getCSSVariable("--ag-row");
+  const hoverColor = getCSSVariable("--ag-hover");
 
-    /* ================= READ THEME COLORS ================= */
+  const logoUrl = window.location.origin + "/favicon.ico";
+  const reportWindow = window.open("", "_blank");
 
-    const headerGradientStart = getCSSVariable("--but");
-    const tableHeaderBg = getCSSVariable("--ag-header");
-    const fontColor = getCSSVariable("--font-color");
-    const rowAltColor = getCSSVariable("--ag-row");
-    const hoverColor = getCSSVariable("--ag-hover");
+  const link = reportWindow.document.createElement("link");
+  link.rel = "icon";
+  link.type = "image/x-icon";
+  link.href = logoUrl;
+  reportWindow.document.head.appendChild(link);
 
-    const logoUrl = window.location.origin + "/favicon.ico";
-    const reportWindow = window.open("", "_blank");
+  reportWindow.document.write("<html><head><title>User Report</title>");
 
-    const link = reportWindow.document.createElement("link");
-    link.rel = "icon";
-    link.type = "image/x-icon";
-    link.href = logoUrl;
+  reportWindow.document.write("<style>");
+  reportWindow.document.write(`
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f6f9;
+      color: ${fontColor};
+    }
 
-    // 🔥 append to HEAD
-    reportWindow.document.head.appendChild(link);
-    reportWindow.document.write("<html><head><title>User Report</title>");
-    reportWindow.document.write("<style>");
-    reportWindow.document.write(`
+    .header {
+      display: flex;
+      align-items: center;
+      background: ${tableHeaderBg};
+      padding: 15px 20px;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .logo {
+      height: 60px;
+    }
+
+    .title-section {
+      flex: 1;
+      text-align: center;
+    }
+
+    .title-section h2 {
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    th {
+      background-color: ${tableHeaderBg};
+      color: white;
+      padding: 10px;
+      text-align: left;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+      background-color: ${rowAltColor};
+    }
+
+    tr:hover {
+      background-color: ${hoverColor};
+    }
+
+    .print-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: ${headerGradientStart};
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* ===== PRINT FIXES ===== */
+    @media print {
       body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f6f9;
-            color: ${fontColor};
-          }
-  
-          .header {
-            display: flex;
-            align-items: center;
-            background: ${tableHeaderBg};
-            padding: 15px 20px;
-            color: white;
-            border-radius: 8px;
-          }
-          
-          .logo {
-            height: 60px;
-          }
-          
-          .title-section {
-            flex: 1;
-            text-align: center;
-          }
-        
-          .title-section h2 {
-            margin: 0;
-          }
-  
-          .sub-info {
-            margin: 15px 0;
-            font-size: 14px;
-            color: #555;
-            display: flex;
-            justify-content: space-between;
-          }
-  
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-          }
-  
-          th {
-            background-color: ${tableHeaderBg};
-            color: white;
-            padding: 10px;
-            text-align: left;
-          }
-  
-          td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-          }
-  
-          tr:nth-child(even) {
-            background-color: ${rowAltColor};
-          }
-  
-          tr:hover {
-            background-color: ${hoverColor};
-          }
-  
-          .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 13px;
-            color: #777;
-          }
-  
-          .print-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: ${headerGradientStart};
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-          }
-  
-          .print-btn:hover {
-            opacity: 0.85;
-          }
-  
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
-          }
-       `);
-    reportWindow.document.write("</style></head><body>");
-    reportWindow.document.write(`<div class="header">
-    <img src="${logoUrl}" class="logo" />
-    <div class="title-section">
-      <h2>User Report</h2>
+        background: white;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      th {
+        background-color: ${tableHeaderBg} !important;
+        color: white !important;
+      }
+
+      .header {
+        background: ${tableHeaderBg} !important;
+        color: white !important;
+      }
+
+      tr:nth-child(even) {
+        background-color: ${rowAltColor} !important;
+      }
+
+      .print-btn {
+        display: none;
+      }
+    }
+  `);
+  reportWindow.document.write("</style></head><body>");
+
+  // HEADER
+  reportWindow.document.write(`
+    <div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>User Report</h2>
+      </div>
     </div>
-    </div>`);
-    reportWindow.document.write(`<div style="margin-top:10px;">
-    <strong>Total Records: ${selectedRows.length}</strong>
-    <span style="float:right;">
-      Printed Date: ${new Date().toLocaleDateString()}
-    </span>
-  </div>`);
-    // reportWindow.document.write("<h1><u>User Report</u></h1>");
+  `);
 
-    // Create table with headers
-    reportWindow.document.write("<table><thead><tr>");
-    Object.keys(reportData[0]).forEach((key) => {
-      reportWindow.document.write(`<th>${key}</th>`);
+  // INFO
+  reportWindow.document.write(`
+    <div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>
+  `);
+
+  // TABLE
+  reportWindow.document.write("<table><thead><tr>");
+  Object.keys(reportData[0]).forEach((key) => {
+    reportWindow.document.write(`<th>${key}</th>`);
+  });
+  reportWindow.document.write("</tr></thead><tbody>");
+
+  reportData.forEach((row) => {
+    reportWindow.document.write("<tr>");
+    Object.values(row).forEach((value) => {
+      reportWindow.document.write(`<td>${value}</td>`);
     });
-    reportWindow.document.write("</tr></thead><tbody>");
+    reportWindow.document.write("</tr>");
+  });
 
-    // Populate the rows
-    reportData.forEach((row) => {
-      reportWindow.document.write("<tr>");
-      Object.values(row).forEach((value) => {
-        reportWindow.document.write(`<td>${value}</td>`);
-      });
-      reportWindow.document.write("</tr>");
-    });
+  reportWindow.document.write("</tbody></table>");
 
-    reportWindow.document.write("</tbody></table>");
-    reportWindow.document.write(`
-  <div style="text-align:center;">
-    <button class="print-btn" onclick="window.print()">Print</button>
-  </div>
-`);
-    reportWindow.document.write("</body></html>");
-    reportWindow.document.close();
+  // PRINT BUTTON (WITH DELAY FIX)
+  reportWindow.document.write(`
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="setTimeout(() => window.print(), 300)">
+        Print
+      </button>
+    </div>
+  `);
+
+  reportWindow.document.write("</body></html>");
+  reportWindow.document.close();
+
+  // AUTO PRINT OPTION (optional but smooth UX)
+  reportWindow.onload = () => {
+    setTimeout(() => {
+      reportWindow.print();
+    }, 500);
   };
-
+};
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
@@ -987,6 +1004,7 @@ function UserGrid() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the User Status"
             >
               <Select
                 id="status"
@@ -1044,7 +1062,9 @@ function UserGrid() {
               className={`inputGroup selectGroup 
               ${selectedGender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
-            >                <Select
+              title="Please Select the Gender"
+            >                
+            <Select
                 id="gender"
                 isClearable
                 value={selectedGender}
