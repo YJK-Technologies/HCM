@@ -27,7 +27,7 @@ function Input({ }) {
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [rowData, setrowData] = useState('');
+  const [rowData, setrowData] = useState([]);
   const [ProjectID, setProjectID] = useState('');
   const [projectID, setprojectID] = useState('');
   const [UserID, setUserID] = useState('');
@@ -748,8 +748,23 @@ function Input({ }) {
     window.location.reload();
   };
 
+    const searchClearInputFields = () => {
+    setTaskMasterID('');
+    setprojectID('');
+    setSelectedproject('');
+    setUser('');
+    SetSelectedUser('');
+    settitle('');
+    setstartdate('');
+    setenddate('');
+    setstatus_typeSC('');
+    setselectedtstatusSC('');
+  };
+
+
   const reloadGridDatas = () => {
-    window.location.reload();
+    setrowData([]);
+    searchClearInputFields();
   };
 
 
