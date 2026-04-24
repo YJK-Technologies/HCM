@@ -206,6 +206,8 @@ function LoanApproval({ }) {
                     <div className="grid-action-buttons">
                         <button
                             className="grid-approve-btn"
+                            title="Approved"
+                            aria-label="Approve"
                             onClick={() =>
                                 handleApproval(
                                     row,
@@ -218,6 +220,8 @@ function LoanApproval({ }) {
 
                         <button
                             className="grid-reject-btn"
+                            title="Rejected"
+                            aria-label="Reject"
                             onClick={() =>
                                 handleApproval(
                                     row,

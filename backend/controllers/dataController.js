@@ -42892,9 +42892,7 @@ const getEmpShiftReport = async (req, res) => {
       .input("From_Date", sql.NVarChar, From_Date)
       .input("To_Date", sql.NVarChar, To_Date)
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_Employee_Shift_Report @mode,'','',@Employee_ID,@From_Date,@To_Date,@company_code,'','','',''`,
-      );
+      .query(`EXEC sp_Employee_Shift_Report @mode,'','',@Employee_ID,@From_Date,@To_Date,@company_code,'','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -48246,6 +48244,122 @@ const getSettings = async (req, res) => {
 };
 //Code ended by pavun on 22-04-2026
 
+//Code added by pavun on 24-04-2026
+const shiftChangeRequestInsert = async (req, res) => {
+  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code, RepManager, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "I")
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("current_shift_id", sql.NVarChar, current_shift_id)
+      .input("requested_shift_id", sql.NVarChar, requested_shift_id)
+      .input("reason", sql.NVarChar, reason)
+      .input("priority", sql.NVarChar, priority)
+      .input("swap_employee_id", sql.NVarChar, swap_employee_id) 
+      .input("effective_date", sql.NVarChar, effective_date)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
+        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Shift change request inserted successfully",
+    });
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const shiftChangeRequest = async (req, res) => {
+  const { company_code, RepManager } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SR")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 24-04-2026
+
+//Code added by pavun on 24-04-2026
+const shiftChangeRequestInsert = async (req, res) => {
+  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code, RepManager, created_by } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "I")
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("current_shift_id", sql.NVarChar, current_shift_id)
+      .input("requested_shift_id", sql.NVarChar, requested_shift_id)
+      .input("reason", sql.NVarChar, reason)
+      .input("priority", sql.NVarChar, priority)
+      .input("swap_employee_id", sql.NVarChar, swap_employee_id) 
+      .input("effective_date", sql.NVarChar, effective_date)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
+        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Shift change request inserted successfully",
+    });
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const shiftChangeRequest = async (req, res) => {
+  const { company_code, RepManager } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SR")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 24-04-2026
+
 //code added by Sakthi on 24-04-2026
 const GetJobID = async (req, res) => {
   const { company_code } = req.body;
@@ -49684,6 +49798,8 @@ module.exports = {
   approvalLoanRequestSearch,
   getSettings,
   GetJobID,
-  GetLoanTypeID
+  GetLoanTypeID,
+  shiftChangeRequestInsert,
+  shiftChangeRequest
 
 };

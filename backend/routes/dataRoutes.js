@@ -1419,6 +1419,9 @@ router.post("/approvalLoanRequestSearch",dataController.approvalLoanRequestSearc
 router.post("/getSettings",dataController.getSettings)
 router.post("/GetJobID", dataController.GetJobID)
 router.post("/GetLoanTypeID", dataController.GetLoanTypeID)
+router.post("/shiftChangeRequestInsert",dataController.shiftChangeRequestInsert)
+router.post("/shiftChangeRequest",dataController.shiftChangeRequest)
+
 
 
 module.exports = router;

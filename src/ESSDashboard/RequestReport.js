@@ -452,7 +452,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -467,7 +468,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -1035,11 +1037,12 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   // ✅ correct ID
+                  getRequestId(requestType, row),   
                   row,
                   true
                 )
@@ -1050,11 +1053,12 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,
-                  getRequestId(requestType, row),   // ✅ correct ID
+                  getRequestId(requestType, row),  
                   row,
                   false
                 )
@@ -2391,7 +2395,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() => handleAcademicApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -2399,7 +2404,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() => handleAcademicApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -2716,7 +2722,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() => handlePersonalApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -2724,7 +2731,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() => handlePersonalApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -2944,7 +2952,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() => handleFamilyApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -2952,7 +2961,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() => handleFamilyApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3134,7 +3144,6 @@ function RequestReport({ }) {
               company_code: row.company_code,
               EmployeeID: row.EmployeeID,
               request_status: status,
-
               AssetID: row.AssetID,
               ExpectedReturnDate: row.ExpectedReturnDate,
               ActualReturnDate: row.ActualReturnDate,
@@ -3171,7 +3180,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() => handleAssetApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -3179,7 +3189,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() => handleAssetApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3359,7 +3370,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() => handleDocumentApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -3367,7 +3379,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() => handleDocumentApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3448,7 +3461,8 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approve"
+              title="Approved"
+              aria-label="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -3463,7 +3477,8 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Reject"
+              title="Rejected"
+              aria-label="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -3661,8 +3676,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                    ${selectedEmpIdLoanSc ? "has-value" : ""} 
-                                    ${isSelectedEmpIdLoanSc ? "is-focused" : ""}`}
+                  ${selectedEmpIdLoanSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdLoanSc ? "is-focused" : ""}`}
                   title="Please enter the Employee ID"
                 >
                   <Select

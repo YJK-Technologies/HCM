@@ -21,6 +21,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { publicIpv4 } from "public-ip";
+import ShiftRequestModal from "./ShiftRequestModal.js"
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement);
 
@@ -61,6 +62,9 @@ const Dashboard = (payslip) => {
   const [currentIndexJoinee, setCurrentIndexJoinee] = useState(0);
   const carouselRef = useRef(null);
   const joineeCarouselRef = useRef(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
 
   useEffect(() => {
@@ -142,17 +146,17 @@ const Dashboard = (payslip) => {
     S1: {
       label: "Morning Shift",
       icon: "fa-sun",
-      color: "#f59e0b"
+      color: "#f59e0b" 
     },
     S2: {
       label: "General Shift",
       icon: "fa-briefcase",
-      color: "#3b82f6"
+      color: "#3b82f6" 
     },
     S3: {
       label: "Evening Shift",
       icon: "fa-cloud-sun",
-      color: "#8b5cf6"
+      color: "#8b5cf6" 
     },
     S4: {
       label: "Night Shift",
@@ -162,12 +166,12 @@ const Dashboard = (payslip) => {
     S5: {
       label: "Split Shift",
       icon: "fa-clock",
-      color: "#10b981"
+      color: "#ec4899"
     },
     S6: {
       label: "Week Off",
       icon: "fa-couch",
-      color: "#ef4444"
+      color: "#22c55e"
     }
   };
 
@@ -694,7 +698,43 @@ const Dashboard = (payslip) => {
       field: "End_Time",
       minWidth: 100
     },
+    {
+      headerName: "Action",
+      field: "action",
+      minWidth: 200,
+      maxWidth: 200,
+      cellClass: "d-flex align-items-center justify-content-center",
+      cellRenderer: (params) => {
+        const canRequest = params.data.Can_Request === 1;
+
+        return (
+          <button
+            className={`shift-action-btn ${canRequest ? 'active-btn' : 'locked-btn'}`}
+            disabled={!canRequest}
+            title={`${canRequest ? "Request Shift Change" : "Locked"}`}
+            onClick={() => handleShiftRequest(params.data)}
+          >
+            <span className="btn-icon">
+              {canRequest ? (
+                <i className="bi bi-arrow-left-right"></i>
+              ) : (
+                <i className="bi bi-lock-fill"></i>
+              )}
+            </span>
+            <span className="btn-text">
+              {canRequest ? "Request Shift Change" : "Locked"}
+            </span>
+          </button>
+        );
+      }
+    }
   ];
+
+  const handleShiftRequest = (rowData) => {
+    if (!rowData) return;
+    setSelectedRow(rowData);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchHolidayGridData = async () => {
@@ -1684,6 +1724,16 @@ const Dashboard = (payslip) => {
                     rowHeight={30}
                     pagination={true}
                     paginationAutoPageSize={true}
+                  />
+
+                  <ShiftRequestModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    rowData={selectedRow}
+                    onSuccess={() => {
+                      // Fetch fresh data for your grid here
+                      handleEmpShiftReportSearch();
+                    }}
                   />
                 </div>
               )}

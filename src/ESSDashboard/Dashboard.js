@@ -224,7 +224,7 @@ const Dashboard = () => {
     setShiftFromDate(today);
     setShiftToDate(today);
 
-    fetchTHRSGridData(today, today, "All"); 
+    fetchTHRSGridData(today, today, "All");
   }, []);
 
   const fetchTHRSGridData = async (
@@ -950,6 +950,7 @@ const Dashboard = () => {
       let documentData = [];
       let compOffData = [];
       let assetData = [];
+      let shiftChangeData = [];
 
       /* ---------- Leave ---------- */
       try {
@@ -1099,6 +1100,22 @@ const Dashboard = () => {
         console.log("Employee Assets API failed");
       }
 
+      /* ---------- Shift Change ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/shiftChangeRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            RepManager: user_code,
+          }),
+        });
+
+        if (res.ok) shiftChangeData = await res.json();
+      } catch (err) {
+        console.log("Shift Change API failed");
+      }
+
       /* ---------- Leave ---------- */
       const formattedLeave = leaveData
         .filter((r) => r.LeaveStatus === "Pending")
@@ -1162,6 +1179,26 @@ const Dashboard = () => {
         ToDate: row.LeaveToDate ? formatDate(row.LeaveToDate) : null,
         status: row.Status,
         days: row.LeaveDays,
+      }));
+
+      /* ---------- Shift Change ---------- */
+      const formattedShiftChange = shiftChangeData.map((row) => ({
+        type: "Shift Change",
+        id: row.request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.EmployeeName,
+        title: `${row.current_shift_name} → ${row.requested_shift_name}`,
+        FromDate: row.FromDate
+          ? formatDate(row.FromDate)
+          : null,
+        ToDate: row.ToDate
+          ? formatDate(row.ToDate)
+          : null,
+        status: row.request_status,
+        keyfield: row.keyfield,
+        currentShift: row.current_shift_name,
+        requestedShift: row.requested_shift_name,
+        days: row.LeaveDays
       }));
 
       /* ---------- Employee Change Group ---------- */
@@ -1279,6 +1316,7 @@ const Dashboard = () => {
         ...formattedDocuments,
         ...formattedCompOff,
         ...formattedAsset,
+        ...formattedShiftChange,
       ];
 
       setDashboardRequests(merged);
@@ -3147,6 +3185,7 @@ const Dashboard = () => {
                     <div className="req-actions-vertical">
                       <button
                         className="action-circle-btn approve"
+                        title="Approved"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleApproval(req.type, req.id, req.FromDate, true, {
@@ -3159,6 +3198,7 @@ const Dashboard = () => {
                       </button>
                       <button
                         className="action-circle-btn reject"
+                        title="Rejected"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleApproval(req.type, req.id, req.FromDate, false, {
@@ -3319,7 +3359,7 @@ const Dashboard = () => {
               {/* Search */}
               <button
                 className="btn btn-sm btn-primary"
-                onClick={() => fetchTHRSGridData()} 
+                onClick={() => fetchTHRSGridData()}
                 style={{ height: "30px", width: "40px" }}
                 title="Search"
               >
