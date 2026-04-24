@@ -102,6 +102,7 @@ function EmployeeTypeMaster() {
         setSelectedShiftTypeIdSc("");
         setShiftTypeIdSc("");
         setSelectedShiftPatternIdSc("");
+        setShiftPatternIdSc("");
         setEffectiveFromSc("");
         setEffectiveToSc("");
         setSelectedStatusSc("");

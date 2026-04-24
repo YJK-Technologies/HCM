@@ -110,18 +110,6 @@ function TravelRequest({ }) {
 
   const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
 
-  const [transport_mode, settransport_mode] = useState("");
-  const [transport_modeDrop, settransport_modeDrop] = useState([]);
-  const [selectedtransport_mode, setSelectedtransport_mode] = useState('');
-  const [isSelectedtransport_mode, setIsSelectedtransport_mode] = useState(false);
-  const [transport_modeDropGrid, settransport_modeDropGrid] = useState([]);
-
-  const [transport_modeSc, settransport_modeSc] = useState("");
-  const [transport_modeDropSc, settransport_modeDropSc] = useState([]);
-  const [selectedtransport_modeSc, setSelectedtransport_modeSc] = useState('');
-  const [isSelectedtransport_modeSc, setIsSelectedtransport_modeSc] = useState(false);
-  
-
   const [travel_type, settravel_type] = useState("");
   const [travel_typeDrop, settravel_typeDrop] = useState([]);
   const [selectedtravel_type, setSelectedtravel_type] = useState('');
@@ -142,6 +130,17 @@ function TravelRequest({ }) {
   const [isSelectedCountryIdSc, setIsSelectedCountryIdSc] = useState(false);
   const [countryIdSc, setCountryIdSc] = useState('');
   const [countryIdDropGrid, setCountyIdDropGrid] = useState([]);
+
+  const [transport_mode, settransport_mode] = useState("");
+  const [transport_modeDrop, settransport_modeDrop] = useState([]);
+  const [selectedtransport_mode, setSelectedtransport_mode] = useState('');
+  const [isSelectedtransport_mode, setIsSelectedtransport_mode] = useState(false);
+  const [transport_modeDropGrid, settransport_modeDropGrid] = useState([]);
+
+  const [transport_modeSc, settransport_modeSc] = useState("");
+  const [transport_modeDropSc, settransport_modeDropSc] = useState([]);
+  const [selectedtransport_modeSc, setSelectedtransport_modeSc] = useState('');
+  const [isSelectedtransport_modeSc, setIsSelectedtransport_modeSc] = useState(false);
 
   const [accommodation_required, setaccommodation_required] = useState("");
   const [accommodation_requiredDrop, setaccommodation_requiredDrop] = useState([]);
@@ -351,7 +350,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/getBool`, {
+    fetch(`${config.apiBaseUrl}/getKids`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -359,7 +358,7 @@ function TravelRequest({ }) {
       body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
-      .then((val) => settransport_modeDrop(val))
+      .then((val) => setaccommodation_requiredDrop(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -494,6 +493,11 @@ function TravelRequest({ }) {
     settransport_mode(selectedtransport_mode ? selectedtransport_mode.value : "");
   };
 
+  const handleChangeaccommodation_required = (selectedaccommodation_required) => {
+    setSelectedaccommodation_required(selectedaccommodation_required);
+    setaccommodation_required(selectedaccommodation_required ? selectedaccommodation_required.value : "");
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -618,7 +622,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-    fetch(`${config.apiBaseUrl}/getBool`, {
+    fetch(`${config.apiBaseUrl}/getKids`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -626,7 +630,7 @@ function TravelRequest({ }) {
       body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
-      .then((val) => setaccommodation_requiredSc(val))
+      .then((val) => setaccommodation_requiredDropSc(val))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -675,6 +679,13 @@ function TravelRequest({ }) {
     }))
     : [];
 
+  const filteredOptionaccommodation_requiredSc = Array.isArray(accommodation_requiredDropSc)
+    ? accommodation_requiredDropSc.map((option) => ({
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
+    : [];
+
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
     setEmpIdSc(selectedEmpIdSc ? selectedEmpIdSc.value : "");
@@ -698,6 +709,11 @@ function TravelRequest({ }) {
   const handleChangetransport_modeSc = (selectedtransport_modeSc) => {
     setSelectedtransport_modeSc(selectedtransport_modeSc);
     settransport_modeSc(selectedtransport_modeSc ? selectedtransport_modeSc.value : "");
+  };
+  
+  const handleChangeaccommodation_requiredSc = (selectedaccommodation_requiredSc) => {
+    setSelectedaccommodation_requiredSc(selectedaccommodation_requiredSc);
+    setaccommodation_requiredSc(selectedaccommodation_requiredSc ? selectedaccommodation_requiredSc.value : "");
   };
 
   const searchClearInputFields = () => {
@@ -995,7 +1011,7 @@ function TravelRequest({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-    fetch(`${config.apiBaseUrl}/getBool`, {
+    fetch(`${config.apiBaseUrl}/getKids`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1116,6 +1132,10 @@ function TravelRequest({ }) {
       headerName: "Accommodation Required",
       field: "accommodation_required",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: accommodation_requiredDropGrid,
+      },
     },
     {
       headerName: "Estimated Cost",
@@ -1280,7 +1300,7 @@ function TravelRequest({ }) {
         travel_start_date: travelStartDateSc || null,
         travel_end_date: travelEndDateSc || null,
         transport_mode: transport_modeSc || "",
-        accommodation_required: accommodation_requiredSc || null,
+        accommodation_required: accommodation_requiredSc || "",
         estimated_cost: estimated_costSC || null,
         currency_code: Currency_CodeSC || "",
         request_status: reqStatusSC || "",
@@ -1931,22 +1951,22 @@ function TravelRequest({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedtransport_mode ? "has-value" : ""} 
-              ${isSelectedtransport_mode ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              ${selectedaccommodation_required ? "has-value" : ""} 
+              ${isSelectedaccommodation_required ? "is-focused" : ""}`}
+              title="Please select the Accommodation Required"
             >
               <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
-                title="Please enter the Transport Mode"
+                title="Please enter the Accommodation Required"
                 placeholder=""
-                onFocus={() => setIsSelectedtransport_mode(true)}
-                onBlur={() => setIsSelectedtransport_mode(false)}
+                onFocus={() => setIsSelectedaccommodation_required(true)}
+                onBlur={() => setIsSelectedaccommodation_required(false)}
                 isClearable
-                value={selectedtransport_mode}
-                onChange={handleChangetransport_mode}
-                options={filteredOptiontransport_mode}
+                value={selectedaccommodation_required}
+                onChange={handleChangeaccommodation_required}
+                options={filteredOptionaccommodation_required}
               />
               <label for="sname" className={`floating-label ${error && !transport_mode ? 'text-danger' : ''}`}>Accommodation Required<span className="text-danger">*</span></label>
             </div>
@@ -2449,21 +2469,21 @@ function TravelRequest({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-              ${selectedtransport_modeSc ? "has-value" : ""} 
-              ${isSelectedtransport_modeSc ? "is-focused" : ""}`}
-              title="Please select the Transport Mode"
+              ${selectedaccommodation_requiredSc ? "has-value" : ""} 
+              ${isSelectedaccommodation_requiredSc ? "is-focused" : ""}`}
+              title="Please select the Accommodation Required"
             >
               <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
                 placeholder=""
-                onFocus={() => setIsSelectedtransport_modeSc(true)}
-                onBlur={() => setIsSelectedtransport_modeSc(false)}
+                onFocus={() => setIsSelectedaccommodation_requiredSc(true)}
+                onBlur={() => setIsSelectedaccommodation_requiredSc(false)}
                 isClearable
-                value={selectedtransport_modeSc}
-                onChange={handleChangetransport_modeSc}
-                options={filteredOptiontransport_modeSc}
+                value={selectedaccommodation_requiredSc}
+                onChange={handleChangeaccommodation_requiredSc}
+                options={filteredOptionaccommodation_requiredSc}
               />
               <label for="sname" className={`floating-label`}>Accommodation Required</label>
             </div>

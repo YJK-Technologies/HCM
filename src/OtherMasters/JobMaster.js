@@ -51,6 +51,7 @@ function JobMaster({ }) {
   const [employmentdropGR, setEmploymentdropGR] = useState([]);
   const [employmentdropSC, setEmploymentdropSC] = useState([]);
   const [departmentDrop, setDepartmentDrop] = useState([]);
+  const [JobDrop, setJobDrop] = useState([]);
   const [dpt, setdpt] = useState("");
   const [showAsterisk, setShowAsterisk] = useState(true);
   const [selecteddptSC, setselecteddeptSC] = useState("");
@@ -310,6 +311,30 @@ function JobMaster({ }) {
       );
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetJobID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const jobOptions = data.map((option) => ({
+          value: option.job_id,
+          label: `${option.job_id} - ${option.job_title}`,
+        }));
+        setJobDrop(jobOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching job data:", error)
+      );
+  }, []);
+
 
   const columnDefs = [
     {
@@ -349,7 +374,15 @@ function JobMaster({ }) {
     {
       headerName: "Job ID",
       field: "job_id",
-      editable: true,
+      editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: JobDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const job = JobDrop.find(d => d.value === params.value);
+        return job ? job.label : params.value;
+      },
     },
     {
       headerName: "Job Title",
