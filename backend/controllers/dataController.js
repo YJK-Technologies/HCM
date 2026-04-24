@@ -48410,6 +48410,26 @@ const GetLoanTypeID = async (req, res) => {
 };
 //code ended by Sakthi on 24-04-2026
 
+//code added by Dinesh Gokul on 24-04-2026
+const getAllDesgination = async (req, res) => {
+  const { dept_id, company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("dept_id", sql.NVarChar, dept_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_desgination 'AD',@dept_id,'', '', '', @company_code,'', '', '',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Dinesh Gokul on 24-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -49800,6 +49820,7 @@ module.exports = {
   GetJobID,
   GetLoanTypeID,
   shiftChangeRequestInsert,
-  shiftChangeRequest
+  shiftChangeRequest,
+  getAllDesgination
 
 };

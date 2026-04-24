@@ -166,7 +166,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
 
   const fetchProductCodes = async (selectedValue) => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+      const response = await fetch(`${config.apiBaseUrl}/getAllDesgination`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
