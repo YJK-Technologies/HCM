@@ -1938,7 +1938,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Siblings"
@@ -1957,7 +1957,7 @@ function Input({ }) {
               />
               <label htmlFor="Siblings" className={`exp-form-labels ${error && !Siblings ? 'text-danger' : ''}`}>Siblings{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div
