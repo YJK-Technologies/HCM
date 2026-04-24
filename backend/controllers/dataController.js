@@ -41884,6 +41884,8 @@ const CandidateAppliedSearch = async (req, res) => {
     applied_job_id,
     company_code,
     Job_description,
+    from_date,
+    to_date,
   } = req.body;
 
   try {
@@ -41900,8 +41902,10 @@ const CandidateAppliedSearch = async (req, res) => {
       .input("Related_experience", sql.VarChar, Related_experience)
       .input("Job_description", sql.VarChar, Job_description)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, @email, '', '', '', '', '', '',
-         '', '', '', '', '', 0, '', '','', '', '', '', 0, @applied_job_id, @phone, @Education, @Experience, @Related_experience, @Job_description, @company_code, 0, 0, 0, '', '', '', '', '' `);
+      .input("from_date", sql.NVarChar, from_date)
+      .input("to_date", sql.NVarChar, to_date)
+      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, @email, '', '', '', '', '', '',
+         '', '', '', '', '', 0, '', '','', '', '', '', 0, @applied_job_id, @phone, @Education, @Experience, @Related_experience, @Job_description, @company_code, 0, 0, 0, '', @from_date, @to_date, '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48242,6 +48246,55 @@ const getSettings = async (req, res) => {
 };
 //Code ended by pavun on 22-04-2026
 
+//code added by Sakthi on 24-04-2026
+const GetJobID = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "JIT")
+      .input("company_code", sql.VarChar, company_code)
+      .query(
+          `EXEC sp_job_master @mode, '', '', '', @company_code, '', '', '', '', '', '', '', '', '','', ''`,
+      );
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during CRM_Tag insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 24-04-2026
+
+//code added by Sakthi on 24-04-2026
+const GetLoanTypeID = async (req, res) => {
+  const { company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "LIN")
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_loan_requests @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during CRM_Tag insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by Sakthi on 24-04-2026
 
 module.exports = {
   login,
@@ -49629,6 +49682,8 @@ module.exports = {
   global_settingsInsert,
   EmpDepartment,
   approvalLoanRequestSearch,
-  getSettings
+  getSettings,
+  GetJobID,
+  GetLoanTypeID
 
 };

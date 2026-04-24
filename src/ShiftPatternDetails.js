@@ -277,10 +277,13 @@ function ShiftPatternDetails() {
 
   const searchClearInputFields = () => {
     setShift_Pattern_IDSC("");
+    setSelectedPatternIdSc("");
     setPattern_Detail_IDSC("");
     setDay_SequenceSC("");
     setShift_IDSC("");
+    setSelectedShiftIdSc("");
     setIs_Off_DaySC("");
+    setSelectedDayOffSc("");
   };
 
 
