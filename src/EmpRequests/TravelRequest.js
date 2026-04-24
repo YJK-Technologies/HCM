@@ -1125,13 +1125,17 @@ function TravelRequest({ }) {
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: accommodation_requiredDropGrid,
+        values: transport_modeDropGrid,
       },
     },
     {
       headerName: "Accommodation Required",
       field: "accommodation_required",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: accommodation_requiredDropGrid,
+      },
     },
     {
       headerName: "Estimated Cost",
@@ -1949,13 +1953,13 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedaccommodation_required ? "has-value" : ""} 
               ${isSelectedaccommodation_required ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Accommodation Required"
             >
               <Select
                 id="country"
                 type="text"
                 classNamePrefix="react-select"
-                title="Please enter the Transport Mode"
+                title="Please enter the Accommodation Required"
                 placeholder=""
                 onFocus={() => setIsSelectedaccommodation_required(true)}
                 onBlur={() => setIsSelectedaccommodation_required(false)}
@@ -2467,7 +2471,7 @@ function TravelRequest({ }) {
               className={`inputGroup selectGroup 
               ${selectedaccommodation_requiredSc ? "has-value" : ""} 
               ${isSelectedaccommodation_requiredSc ? "is-focused" : ""}`}
-              title="Please select the Transport Mode"
+              title="Please select the Accommodation Required"
             >
               <Select
                 id="country"
@@ -2477,7 +2481,7 @@ function TravelRequest({ }) {
                 onFocus={() => setIsSelectedaccommodation_requiredSc(true)}
                 onBlur={() => setIsSelectedaccommodation_requiredSc(false)}
                 isClearable
-                value={selectedtransport_modeSc}
+                value={selectedaccommodation_requiredSc}
                 onChange={handleChangeaccommodation_requiredSc}
                 options={filteredOptionaccommodation_requiredSc}
               />

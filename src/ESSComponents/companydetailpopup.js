@@ -82,7 +82,7 @@ const columnDefs = [
     filter: 'agTextColumnFilter',
     editable: false,
     valueFormatter: params => {
-      if (!params.value) return "";  
+      if (!params.value) return "";
       const date = new Date(params.value);
       return isNaN(date) ? "" : format(date, 'dd-MM-yyyy');
     },
@@ -142,6 +142,85 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const [empType, setEmpType] = useState('');
   const [empTypeDrop, setEmpTypeDrop] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+
+  const [selecteddpt, setselecteddept] = useState((null));
+  const [isSelectDepartment, setIsSelectDepartment] = useState(false);
+  const [dpt, setdpt] = useState("");
+  const [DPTdrop, setDPTdrop] = useState([]);
+
+  const [dynamicOptions, setDynamicOptions] = useState([]);
+  const [isSelectDesignation, setIsSelectDesignation] = useState(false);
+  const [selecteddesg, setSelecteddesg] = useState((null));
+  const company_code = sessionStorage.getItem('selectedCompanyCode')
+
+  const handleDPT = (selectedDPT) => {
+    setselecteddept(selectedDPT);
+    setdpt(selectedDPT ? selectedDPT.value : '');
+    fetchProductCodes(selectedDPT ? selectedDPT.value : '');
+  };
+
+  const filteredOptionDPt = DPTdrop.map((option) => ({
+    value: option.Department,
+    label: option.Department,
+  }));
+
+  const fetchProductCodes = async (selectedValue) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dept_id: selectedValue, company_code }),
+      });
+
+      const data = await response.json();
+      const formattedData = data.map((product) => ({
+        value: product.Desgination,
+        label: product.Desgination,
+      }));
+
+      setDynamicOptions(formattedData);
+      return formattedData;
+    } catch (error) {
+      console.error('Error fetching product codes:', error);
+      return [];
+    }
+  };
+
+  const handleChangedesgination = (selecteddesg) => {
+    setDesignation(selecteddesg);
+    setSelecteddesg(selecteddesg ? selecteddesg.value : '');
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getDept`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const val = await response.json();
+        setDPTdrop(val);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
 
   const filteredOptionManager = Array.isArray(Managerdrop)
     ? Managerdrop.map((option) => ({
@@ -380,7 +459,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3">
+                {/* <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
                       className="exp-input-field form-control"
@@ -393,9 +472,33 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     />
                     <label className="exp-form-labels">Department</label>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+              ${selecteddpt ? "has-value" : ""} 
+              ${isSelectDepartment ? "is-focused" : ""}`}
+                  >
+                    <Select
+                      id="department"
+                      placeholder=" "
+                      onFocus={() => setIsSelectDepartment(true)}
+                      onBlur={() => setIsSelectDepartment(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      type="text"
+                      value={selecteddpt}
+                      onChange={handleDPT}
+                      options={filteredOptionDPt}
+                    />
+                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                      Department
+                    </label>
+                  </div>
+                </div>
+
+                {/* <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
                       className="exp-input-field form-control"
@@ -407,6 +510,30 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                       onChange={(e) => setDesignation(e.target.value)}
                     />
                     <label className="exp-form-labels">Designation</label>
+                  </div>
+                </div> */}
+
+                <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+              ${Designation ? "has-value" : ""} 
+              ${isSelectDesignation ? "is-focused" : ""}`}
+                  >
+                    <Select
+                      id="designation"
+                      placeholder=" "
+                      onFocus={() => setIsSelectDesignation(true)}
+                      onBlur={() => setIsSelectDesignation(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      name="designation_ID"
+                      value={Designation}
+                      options={dynamicOptions}
+                      onChange={handleChangedesgination}
+                    />
+                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                      Designation
+                    </label>
                   </div>
                 </div>
 
