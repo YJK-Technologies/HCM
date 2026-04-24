@@ -293,6 +293,7 @@ function RequestReport({ }) {
   const [selectedCurrencyLoanSc, setSelectedCurrencyLoanSc] = useState("");
   const [isSelectedCurrencyLoanSc, setIsSelectedCurrencyLoanSc] =
     useState(false);
+  const [LoanTypeIdDrop, setLoanTypeIdDrop] = useState([]);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -395,6 +396,30 @@ function RequestReport({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/GetLoanTypeID`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const loanTypeOptions = data.map((option) => ({
+          value: option.loan_type_id,
+          label: `${option.loan_type_id} - ${option.Loan_Type_Name}`,
+        }));
+        setLoanTypeIdDrop(loanTypeOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching job data:", error)
+      );
+  }, []);
+
   const searchClearLoanInputFields = () => {
     setLoanReqIdSc("");
     setEmpIdLoanSc("");
@@ -427,6 +452,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -441,6 +467,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -483,6 +510,14 @@ function RequestReport({ }) {
       headerName: "Loan Type ID",
       field: "loan_type_id",
       editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: LoanTypeIdDrop.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const loanType = LoanTypeIdDrop.find(d => d.value === params.value);
+        return loanType ? loanType.label : params.value;
+      },
     },
     {
       headerName: "Loan Type Name",
@@ -1000,6 +1035,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -1014,6 +1050,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -1584,7 +1621,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approved"
+              title="Approve"
               aria-label="Approve"
               onClick={() =>
                 handleApproval(
@@ -1600,7 +1637,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Rejected"
+              title="Reject"
               aria-label="Reject"
               onClick={() =>
                 handleApproval(
@@ -1974,7 +2011,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
-              title="Approved"
+              title="Approve"
               aria-label="Approve"
               onClick={() =>
                 handleApproval(
@@ -1990,7 +2027,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
-              title="Rejected"
+              title="Reject"
               aria-label="Reject"
               onClick={() =>
                 handleApproval(
@@ -2907,6 +2944,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() => handleFamilyApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -2914,6 +2952,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() => handleFamilyApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3132,6 +3171,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() => handleAssetApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -3139,6 +3179,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() => handleAssetApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3318,6 +3359,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() => handleDocumentApproval(row, true)}
             >
               <i className="fa-solid fa-check"></i>
@@ -3325,6 +3367,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() => handleDocumentApproval(row, false)}
             >
               <i className="fa-solid fa-xmark"></i>
@@ -3405,6 +3448,7 @@ function RequestReport({ }) {
           <div className="grid-action-buttons">
             <button
               className="grid-approve-btn"
+              title="Approve"
               onClick={() =>
                 handleApproval(
                   requestType,
@@ -3419,6 +3463,7 @@ function RequestReport({ }) {
 
             <button
               className="grid-reject-btn"
+              title="Reject"
               onClick={() =>
                 handleApproval(
                   requestType,

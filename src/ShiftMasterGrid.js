@@ -87,10 +87,12 @@ function ShiftMasterGrid() {
     setEnd_TimeSC("");
     setShift_HoursSC("");
     setIs_Night_Shift("");
+    setSelectedNightShiftSc("");
     setIs_Night_ShiftSC("");
     setGrace_In_MinSC("");
     setGrace_Out_MinSC("");
     setCross_MidnightSC("");
+    setSelectedCrossNightSc("");
     setSelectedStatusSC("");
     setStatusSC("");
   };
