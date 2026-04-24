@@ -1417,6 +1417,10 @@ router.post("/global_settingsInsert",dataController.global_settingsInsert)
 router.post("/EmpDepartment",dataController.EmpDepartment)
 router.post("/approvalLoanRequestSearch",dataController.approvalLoanRequestSearch)
 router.post("/getSettings",dataController.getSettings)
+router.post("/GetJobID", dataController.GetJobID)
+router.post("/GetLoanTypeID", dataController.GetLoanTypeID)
+router.post("/shiftChangeRequestInsert",dataController.shiftChangeRequestInsert)
+router.post("/shiftChangeRequest",dataController.shiftChangeRequest)
 
 
 

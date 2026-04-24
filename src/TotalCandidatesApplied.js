@@ -38,6 +38,9 @@ function TotalCandidatesApplied() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gridApi, setGridApi] = useState(null);
   const [pinnedRowData, setPinnedRowData] = useState([]);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  
   const gridApiRef = useRef(null);
 
   //purpose of set user permisssion
@@ -158,6 +161,8 @@ function TotalCandidatesApplied() {
         Job_description: JobDescriptionSC,
         Related_experience: Related_experienceSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        from_date: fromDate,
+        to_date: toDate,
       };
 
       const response = await fetch(
@@ -807,11 +812,51 @@ function TotalCandidatesApplied() {
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
 
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the From Date"
+                autoComplete="off"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+                 From Date
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="fdate"
+                class="exp-input-field form-control"
+                type="date"
+                placeholder=""
+                required
+                title="Please Enter the To Date"
+                autoComplete="off"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label for="sname" className="exp-form-labels">
+               To Date
+              </label>
+            </div>
+          </div>
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedcandidate_name ? "has-value" : ""} 
               ${isselectedscheduleid ? "is-focused" : ""}`}
+              title="Please Select the Candidate Name"
             >
               <Select
                 id="department"
@@ -838,7 +883,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Eligibility Salary Days"
+                title="Please Enter the Email"
                 autoComplete="off"
                 value={emailSC}
                 maxLength={30}
@@ -858,6 +903,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 autoComplete="off"
+                title="Please Enter the Phone Number"
                 value={phoneSC}
                 maxLength={13}
                 inputMode="numeric"
@@ -878,6 +924,7 @@ function TotalCandidatesApplied() {
               className={`inputGroup selectGroup 
               ${selectedJobIDSC ? "has-value" : ""} 
               ${isselectedJobIDSC ? "is-focused" : ""}`}
+              title="Please Select the Applied Job ID"
             >
               <Select
                 id="department"
@@ -905,7 +952,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Applied Job ID"
+                title="Please Enter the Education"
                 autoComplete="off"
                 value={EducationSC}
                 maxLength={100}
@@ -926,7 +973,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Applied Job ID"
+                title="Please Enter the Experience"
                 autoComplete="off"
                 value={ExperienceSC}
                 maxLength={100}
@@ -947,7 +994,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Applied Job ID"
+                title="Please Enter the Related Experience"
                 autoComplete="off"
                 value={Related_experienceSC}
                 maxLength={100}
@@ -968,7 +1015,7 @@ function TotalCandidatesApplied() {
                 type="text"
                 placeholder=""
                 required
-                title="Please Enter the Applied Job ID"
+                title="Please Enter the Job Description"
                 autoComplete="off"
                 value={JobDescriptionSC}
                 maxLength={100}
