@@ -3,6 +3,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import "./input.css";
+import "ag-grid-enterprise";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'ag-grid-autocomplete-editor/dist/main.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -229,7 +230,7 @@ const AccountInformation = () => {
             <div className="action-wrapper">
               <div className="action-icon add" onClick={() => handleSave(selectedData)} >
                 <span className="tooltip">Save</span>
-                <i className="fa-solid fa-floppy-disk"></i>
+                <i className="fa-solid fa-floppy-disk" title='Save'></i>
               </div>
             </div>
 

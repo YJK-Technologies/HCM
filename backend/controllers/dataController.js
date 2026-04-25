@@ -48277,18 +48277,18 @@ const shiftChangeRequestInsert = async (req, res) => {
   }
 };
 
-const shiftChangeRequest = async (req, res) => {
-  const { company_code, RepManager } = req.body;
+const shiftChangeRequestEmployee = async (req, res) => {
+  const { company_code, swap_employee_id } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
 
     const result = await pool
       .request()
-      .input("mode", sql.NVarChar, "SR")
+      .input("mode", sql.NVarChar, "SRE")
       .input("company_code", sql.NVarChar, company_code)
-      .input("RepManager", sql.NVarChar, RepManager)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+      .input("swap_employee_id", sql.NVarChar, swap_employee_id)
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -49797,7 +49797,7 @@ module.exports = {
   GetJobID,
   GetLoanTypeID,
   shiftChangeRequestInsert,
-  shiftChangeRequest,
+  shiftChangeRequestEmployee,
   getAllDesgination,
   deletePrintTemplates
 
