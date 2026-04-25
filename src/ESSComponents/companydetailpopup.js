@@ -409,7 +409,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
       manager: row.manager,
       shift: row.shift,
       status: row.status,
-      First_name: row.first_name,
+      First_Name: row.first_name,
       Section: row.Section,
       Work_Location: row.Work_Location,
       Employee_Type: row.Employee_Type

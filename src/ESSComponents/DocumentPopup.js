@@ -361,6 +361,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
 
     const selectedData = selectedRows.map((row) => ({
       EmployeeId: row.EmployeeID,
+      First_Name: row.First_Name,
       Department: row.department_id,
       Designation: row.designation_id,
     }));
