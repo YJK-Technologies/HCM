@@ -1498,7 +1498,6 @@ function TravelRequest({ }) {
 
       return {
         "Travel Request ID": row.travel_request_id || "",
-        "Request Number": row.request_number || "",
         "Employee ID": row.employee_id || "",
         Department: deptName,
         "Travel Type": row.travel_type || "",

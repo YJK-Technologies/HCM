@@ -284,12 +284,12 @@ function PrintTemplate() {
         console.log(fileBase64);
 
         const keyfieldsToDelete = {
-            keyfield: member.keyfield,
+            Key_field: member.keyfield,
             company_code: sessionStorage.getItem("selectedCompanyCode")
         };
 
         try {
-            const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeAcademicDetails`, {
+            const response = await fetch(`${config.apiBaseUrl}/deletePrintTemplates`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
