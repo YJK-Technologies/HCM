@@ -246,6 +246,7 @@ function UserRoleInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title="Please Enter the User Code"
             >
               <Select
                 id="usercode"
@@ -270,6 +271,7 @@ function UserRoleInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
+              title="Please Enter the Role ID"
             >
               <Select
                 id="roleid"

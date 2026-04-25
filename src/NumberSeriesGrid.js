@@ -752,6 +752,7 @@ function NumberSeriesGrid() {
               className={`inputGroup selectGroup 
               ${selectedscreentype ? "has-value" : ""} 
               ${isSelectedscreentype ? "is-focused" : ""}`}
+              title="Please select the screen type"
             >
               <Select
                 id="wcode"

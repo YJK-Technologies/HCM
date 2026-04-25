@@ -752,7 +752,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the header code"
+                  required title="Please Enter the Code"
                   value={Code
                   }
                   maxLength={18}
@@ -771,7 +771,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the detail code"
+                  required title="Please Enter the Code Details"
                   value={codeDetails}
                   maxLength={250}
                   onChange={(e) => setcodeDetails(e.target.value)}
@@ -788,7 +788,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the address"
+                  required title="Please Enter the Address"
                   value={intermediary_addr_1}
                   maxLength={250}
                   onChange={(e) => setintermediary_addr_1(e.target.value)}
@@ -805,7 +805,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the city"
+                  required title="Please Enter the City"
                   value={intermediary_area_code}
                   maxLength={18}
                   onChange={(e) => setintermediary_area_code(e.target.value)}
@@ -822,7 +822,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=" "
-                  required title="Please fill the state"
+                  required title="Please Enter the State"
                   value={intermediary_stat_code}
                   maxLength={100}
                   onChange={(e) => setintermediary_stat_code(e.target.value)}
@@ -839,7 +839,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the country"
+                  required title="Please Enter the Country"
                   value={intermediary_cnty_code}
                   onChange={(e) => setintermediary_cnty_code(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -856,7 +856,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the IMEX number"
+                  required title="Please Enter the IMEX Number"
                   value={intermediary_imex_no}
                   onChange={(e) => setintermediary_imex_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -873,7 +873,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="number"
                   placeholder=""
-                  required title="Please fill the contact number"
+                  required title="Please Enter the Contact Number"
                   value={intermediary_office_no}
                   onChange={(e) => setintermediary_office_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -890,7 +890,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the fax number"
+                  required title="Please Enter the Fax Number"
                   value={intermediary_fax_no}
                   onChange={(e) => setintermediary_fax_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -907,7 +907,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the email ID"
+                  required title="Please Enter the Email ID"
                   value={intermediary_email_id}
                   maxLength={250}
                   onChange={(e) => setintermediary_email_id(e.target.value)}

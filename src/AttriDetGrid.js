@@ -622,7 +622,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the header code here"
+                title="Please fill the code"
                 value={attributeheader_code}
                 maxLength={18}
                 onChange={(e) => setattributeheader_code(e.target.value)}
@@ -658,7 +658,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the detail name here"
+                title="Please fill the detail name"
                 value={attributedetails_name}
                 maxLength={250}
                 onChange={(e) => setattributedetails_name(e.target.value)}
@@ -676,7 +676,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the description here"
+                title="Please fill the Description"
                 value={descriptions}
                 maxLength={250}
                 onChange={(e) => setdescriptions(e.target.value)}

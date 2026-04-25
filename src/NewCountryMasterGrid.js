@@ -740,7 +740,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade ID"
+                required title="Please Enter the Country Code"
                 value={Country_Code}
                 onChange={(e) => setCountry_Code(e.target.value)}
                 maxLength={10}
@@ -756,7 +756,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Country Name"
                 value={Country_Name}
                 onChange={(e) => setCountry_Name(e.target.value)}
                 maxLength={100}
@@ -773,7 +773,7 @@ function Input({ }) {
                 type="text"
                 maxLength={3}
                 placeholder=""
-                required title="Please Enter the Salary Range From Amount"
+                required title="Please Enter the ISO Code"
                 value={ISO_Code}
                 onChange={(e) => setISO_Code(e.target.value)}
               />
@@ -789,7 +789,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={50}
-                required title="Please Enter the Salary Range To Amount"
+                required title="Please Enter the Default Timezone"
                 value={TimeZone_Default}
                 onChange={(e) => setTimeZone_Default(e.target.value)}
               />
@@ -805,7 +805,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the Basic Amount"
+                required title="Please Enter the Week Start Day"
                 value={Week_Start_Day}
                 onChange={(e) => setWeek_Start_Day(e.target.value)}
               />
@@ -820,7 +820,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the HRA Allowance Amount"
+                required title="Please Enter the Weekend Days"
                 value={Weekend_Days}
                 onChange={(e) => setWeekend_Days(e.target.value)}
                 maxLength={50}
@@ -834,6 +834,7 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
+                title="Please Select the Max Hours Work Day"
                 placeholder=""
                 type="time"
                 maxLength={2}
@@ -860,7 +861,7 @@ function Input({ }) {
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder=""
-                required title="Please Enter the Medical Allowance Amount"
+                required title="Please Select the Max Hours Work Week"
                 value={Max_Work_Hours_Week}
                 onChange={(e) => {
                   // const value= e.target.value.replace(/\D/g, "");
@@ -876,6 +877,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedOvertime_Allowed ? "has-value" : ""} 
               ${isSelectOverTime ? "is-focused" : ""}`}
+              title="Please Select the Overtime Allowed"
             >
               <Select
                 id="status"
@@ -900,7 +902,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the  Company PF Contribution"
+                required title="Please Enter the  Currency Code"
                 value={Currency_Code}
                 onChange={(e) => setCurrency_Code(e.target.value)}
               />
@@ -913,6 +915,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -945,7 +948,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade ID"
+                required title="Please Enter the Country Code"
                 value={Country_CodeSC}
                 maxLength={10}
                 onChange={(e) => setCountry_CodeSC(e.target.value)}
@@ -961,7 +964,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required title="Please Enter the Country Name"
                 value={Country_NameSC}
                 onChange={(e) => setCountry_NameSC(e.target.value)}
                 maxLength={100}
@@ -977,7 +980,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Salary Range Amount"
+                required title="Please Enter the ISO Code"
                 value={ISO_CodeSC}
                 maxLength={3}
                 onChange={(e) => setISO_CodeSC(e.target.value)}
@@ -994,7 +997,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={50}
-                required title="Please Enter the Salary Range Amount"
+                required title="Please Enter the Default Timezone"
                 value={TimeZone_DefaultSC}
                 onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
               />
@@ -1010,7 +1013,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the Basic Amount"
+                required title="Please Enter the Week Start Day"
                 value={Week_Start_DaySC}
                 onChange={(e) => setWeek_Start_DaySC(e.target.value)}
               />
@@ -1025,7 +1028,7 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the HRA Allowance Amount"
+                required title="Please Enter the Weekend Days"
                 value={Weekend_DaysSC}
                 onChange={(e) => setWeekend_DaysSC(e.target.value)}
                 maxLength={50}
@@ -1044,7 +1047,7 @@ function Input({ }) {
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder=""
-                required title="Please Enter the Conveyance Allowance Amount"
+                required title="Please Enter the Max Work Hours Day"
                 value={Max_Work_Hours_DaySC}
                 onChange={(e) => {
                   // const value = e.target.value.replace(/\D/g, "");
@@ -1065,7 +1068,7 @@ function Input({ }) {
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder=""
-                required title="Please Enter the Medical Allowance Amount"
+                required title="Please Enter the Max Work Hours Week"
                 value={Max_Work_Hours_WeekSC}
                 onChange={(e) => {
                   // const value = e.target.value.replace(/\D/g, "");
@@ -1081,6 +1084,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedOvertime_AllowedSc ? "has-value" : ""} 
               ${isSelectOverTimeSC ? "is-focused" : ""}`}
+              title="Please Select the Overtime Allowed"
             >
               <Select
                 id="status"
@@ -1105,7 +1109,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={10}
-                required title="Please Enter the Company PF Contribution"
+                required title="Please Enter the Currency Code"
                 value={Currency_CodeSC}
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
               />
@@ -1118,6 +1122,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectStatusSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"

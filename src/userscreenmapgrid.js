@@ -652,7 +652,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the user code here"
+                required title="Please enter the Role Id"
                 value={role_id}
                 onChange={(e) => setrole_id(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -669,7 +669,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the screen type here"
+                required title="Please enter the Screen Type"
                 value={screen_type}
                 onChange={(e) => setscreen_type(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -685,7 +685,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please allow the permission here"
+                required title="Please enter the Permission Type "
                 value={permission_type}
                 onChange={(e) => setpermission_type(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
