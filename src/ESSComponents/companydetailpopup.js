@@ -433,6 +433,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                   <div className="inputGroup">
                     <input
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       type="text"
                       placeholder=" "
                       autoComplete="off"
@@ -448,6 +449,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                   <div className="inputGroup">
                     <input
                       type="text"
+                      title="Please Enter the Employee Name"
                       placeholder=" "
                       autoComplete="off"
                       className="exp-input-field form-control"
@@ -479,6 +481,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
               ${isSelectDepartment ? "is-focused" : ""}`}
+              title="Please Select the Department"
                   >
                     <Select
                       id="department"
@@ -518,6 +521,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${Designation ? "has-value" : ""} 
               ${isSelectDesignation ? "is-focused" : ""}`}
+              title="Please Select the Designation"
                   >
                     <Select
                       id="designation"
@@ -542,6 +546,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
+              title="Please Select the Manager"
                   >
                     <Select
                       id="manager"
@@ -568,6 +573,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
                   >
                     <Select
                       id="status"
@@ -592,6 +598,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     <input
                       id="DOJ"
                       className="exp-input-field form-control"
+                      title="Please Enter the From Date"
                       type="date"
                       name="DOJ"
                       placeholder=" "
@@ -610,6 +617,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     <input
                       id="DOL"
                       className="exp-input-field form-control"
+                      title="Please Enter the To Date"
                       type="date"
                       name="DOL"
                       placeholder=" "
@@ -625,6 +633,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selectedEmpType ? "has-value" : ""} 
               ${isSelectEmpType ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
                   >
                     <Select
                       id="shift"

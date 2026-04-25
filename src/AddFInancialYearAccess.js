@@ -334,6 +334,7 @@ function StdAccInput({ }) {
               <input
                 id="stdcode"
                 class="exp-input-field form-control"
+                title="Please Enter the Start Year"
                 type="Date"
                 value={startYear}
                 onChange={(e) => setStartYear(e.target.value)}
@@ -349,6 +350,7 @@ function StdAccInput({ }) {
               <input
                 id="stdname"
                 class="exp-input-field form-control"
+                  title="Please Enter the End Year"
                 type="Date"
                 value={endYear}
                 onChange={(e) => setEndYear(e.target.value)}
@@ -364,6 +366,7 @@ function StdAccInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedTransaction ? "has-value" : ""} 
               ${isSelectedTransaction ? "is-focused" : ""}`}
+              title="Please Select the Transactions Type"
             >
               <Select
                 id="taxtransaction"
@@ -388,6 +391,7 @@ function StdAccInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedLockType ? "has-value" : ""} 
               ${isSelectedLockType ? "is-focused" : ""}`}
+              title="Please Select the Locked"
             >
               <Select
                 class="exp-input-field"

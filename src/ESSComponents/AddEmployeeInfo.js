@@ -1311,6 +1311,7 @@ function Input({ }) {
               <input
                 id="FirstName"
                 class="exp-input-field form-control"
+                title="Please Enter the First Name"
                 type="text"
                 placeholder=" "
                 required
@@ -1328,6 +1329,7 @@ function Input({ }) {
               <input
                 id="MiddleName"
                 class="exp-input-field form-control"
+                title="Please Enter the Middle Name"
                 type="text"
                 placeholder=" "
                 value={Middle_Name}
@@ -1344,6 +1346,7 @@ function Input({ }) {
               <input
                 id="LastName"
                 class="exp-input-field form-control"
+                title="Please Enter the Last Name"
                 type="text"
                 placeholder=" "
                 value={Last_Name}
@@ -1360,6 +1363,7 @@ function Input({ }) {
               <input
                 id="FatherName"
                 class="exp-input-field form-control"
+                title="Please Enter the Father Name"
                 type="text"
                 placeholder=" "
                 value={Father_Name}
@@ -1376,6 +1380,7 @@ function Input({ }) {
               <input
                 id="MotherName"
                 class="exp-input-field form-control"
+                title="Please Enter the Mother Name"
                 type="text"
                 placeholder=" "
                 value={Mother_Name}
@@ -1394,6 +1399,7 @@ function Input({ }) {
               <input
                 id="dob"
                 class="exp-input-field form-control"
+                title="Please Enter the Date of Birth"
                 type="date"
                 placeholder=""
                 value={DOB}
@@ -1408,6 +1414,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${Gender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
+              title="Please Select the Gender"
             >
               <Select
                 inputId="gender"
@@ -1433,6 +1440,7 @@ function Input({ }) {
               <input
                 id="email"
                 className="exp-input-field form-control"
+                title="Please Enter the Email"
                 type="email"
                 placeholder=""
                 value={Email}
@@ -1449,6 +1457,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${Grade_id ? "has-value" : ""} 
               ${isSelectGrade ? "is-focused" : ""}`}
+              title="Please Select the Grade ID"
             >
               <Select
                 inputId="gradeid"
@@ -1471,6 +1480,7 @@ function Input({ }) {
               <input
                 id="Phone"
                 className="exp-input-field form-control"
+                title="Please Enter the Phone Number"
                 type="number"
                 placeholder=""
                 required
@@ -1493,6 +1503,7 @@ function Input({ }) {
               <input
                 id="phone2"
                 className="exp-input-field form-control"
+                title="Please Enter the Alternative Phone Number"
                 type="Number"
                 placeholder=""
                 value={Phone2}
@@ -1515,6 +1526,7 @@ function Input({ }) {
               <input
                 id="address1"
                 class="exp-input-field form-control"
+                title="Please Enter the Address 1"
                 type="text"
                 placeholder=""
                 value={address1}
@@ -1532,6 +1544,7 @@ function Input({ }) {
                 id="address2"
                 class="exp-input-field form-control"
                 type="text"
+                title="Please Enter the Address 2"
                 placeholder=""
                 value={address2}
                 maxLength={100}
@@ -1547,6 +1560,7 @@ function Input({ }) {
               <input
                 id="address3"
                 class="exp-input-field form-control"
+                title="Please Enter the Address 3"
                 type="text"
                 placeholder=""
                 value={address3}
@@ -1563,6 +1577,7 @@ function Input({ }) {
               <input
                 id="permanantAddress"
                 class="exp-input-field form-control"
+                title="Please Enter the Permanent Address"
                 type="text"
                 placeholder=""
                 value={permanantAddress}
@@ -1579,6 +1594,7 @@ function Input({ }) {
               <input
                 id="ReferenceName"
                 class="exp-input-field form-control"
+                title="Please Enter the Reference Name"
                 type="text"
                 placeholder=""
                 value={reference_Name}
@@ -1596,6 +1612,7 @@ function Input({ }) {
               <input
                 id="ReferencePhone"
                 class="exp-input-field form-control"
+                title="Please Enter the Reference Phone Number"
                 type="Number"
                 placeholder=""
                 value={reference_Phone}
@@ -1618,6 +1635,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${marital_Status ? "has-value" : ""} 
               ${isSelectMarital ? "is-focused" : ""}`}
+              title="Please Select the Marital Status"
             >
               <Select
                 inputId="maritalStatus"
@@ -1641,6 +1659,7 @@ function Input({ }) {
               <input
                 id="Panno"
                 class="exp-input-field form-control"
+                title="Please Enter the PAN Number"
                 type="text"
                 placeholder=" "
                 value={pan_No}
@@ -1663,6 +1682,7 @@ function Input({ }) {
               <input
                 id="Aadharno"
                 class="exp-input-field form-control"
+                title="Please Enter the Aadhaar Number"
                 type="Number"
                 placeholder=""
                 value={Aadhaar_no}
@@ -1685,6 +1705,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${kids ? "has-value" : ""} 
               ${isSelectKids ? "is-focused" : ""}`}
+              title="Please Select the Number of Kids"
             >
               <Select
                 inputId="KidS"
@@ -1708,6 +1729,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedTitle ? "has-value" : ""} 
               ${isSelectTitle ? "is-focused" : ""}`}
+              title="Please Select the Title"
             >
               <Select
                 inputId="title"
@@ -1731,6 +1753,7 @@ function Input({ }) {
               <input
                 id="placeOfBirth"
                 className="exp-input-field form-control"
+                title="Please Enter the Place of Birth"
                 type="text"
                 placeholder=""
                 value={placeOfBirth}
@@ -1747,6 +1770,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedNationality ? "has-value" : ""} 
               ${isSelectNationality ? "is-focused" : ""}`}
+              title="Please Select the Nationality"
             >
               <Select
                 inputId="nationality"
@@ -1770,6 +1794,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedReligion ? "has-value" : ""} 
               ${isSelectReligion ? "is-focused" : ""}`}
+              title="Please Select the Religion"
             >
               <Select
                 inputId="religion"
@@ -1793,6 +1818,7 @@ function Input({ }) {
               <input
                 id="bloodGroup"
                 className="exp-input-field form-control"
+                title="Please Enter the Blood Group"
                 type="text"
                 placeholder=""
                 value={bloodGroup}
@@ -1815,6 +1841,7 @@ function Input({ }) {
                 onChange={(e) => setSpouseName(e.target.value)}
                 maxLength={100}
                 autoComplete="off"
+                title="Please Enter the Spouse Name"
               />
               <label htmlFor="spouseName" className="exp-form-labels">Spouse Name</label>
             </div>
@@ -1825,6 +1852,7 @@ function Input({ }) {
               <input
                 id="noOfChildren"
                 className="exp-input-field form-control"
+                title="Please Enter the Number of Children"
                 type="text"
                 placeholder=""
                 value={noOfChildren}
@@ -1846,6 +1874,7 @@ function Input({ }) {
               <input
                 id="noOfSiblings"
                 className="exp-input-field form-control"
+                title="Please Enter the Number of Siblings"
                 type="text"
                 placeholder=""
                 value={noOfSiblings}
@@ -1867,6 +1896,7 @@ function Input({ }) {
               <input
                 id="businessEmail"
                 className="exp-input-field form-control"
+                title="Please Enter the Business Email"
                 type="email"
                 placeholder=""
                 value={businessEmail}
@@ -1883,6 +1913,7 @@ function Input({ }) {
               <input
                 id="emergencyContactName"
                 className="exp-input-field form-control"
+                title="Please Enter the Emergency Contact Name"
                 type="text"
                 placeholder=""
                 value={emergencyContactName}
@@ -1899,6 +1930,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedEmergencyContactRelation ? "has-value" : ""} 
               ${isSelectRelation ? "is-focused" : ""}`}
+              title="Please Select the Emergency Contact Relation"
             >
               <Select
                 inputId="emergencyContactRelation"
@@ -1922,6 +1954,7 @@ function Input({ }) {
               <input
                 id="emergencyContactPhone"
                 className="exp-input-field form-control"
+                title="Please Enter the Emergency Contact Phone Number"
                 type="text"
                 placeholder=""
                 value={emergencyContactPhone}
@@ -1964,6 +1997,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedCity ? "has-value" : ""} 
               ${isSelectCity ? "is-focused" : ""}`}
+              title="Please Select the City"
             >
               <Select
                 inputId="city"
@@ -1987,6 +2021,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedState ? "has-value" : ""} 
               ${isSelectState ? "is-focused" : ""}`}
+              title="Please Select the State"
             >
               <Select
                 inputId="state"
@@ -2010,6 +2045,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
+              title="Please Select the Country"
             >
               <Select
                 inputId="country"
@@ -2033,6 +2069,7 @@ function Input({ }) {
               <input
                 id="postalCode"
                 className="exp-input-field form-control"
+                title="Please Enter the Postal Code"
                 type="text"
                 placeholder=""
                 value={postalCode}
@@ -2054,6 +2091,7 @@ function Input({ }) {
               <input
                 id="passportNo"
                 className="exp-input-field form-control"
+                title="Please Enter the Passport Number"
                 type="text"
                 placeholder=""
                 value={passportNo}
@@ -2070,6 +2108,7 @@ function Input({ }) {
               <input
                 id="passportExpiryDate"
                 className="exp-input-field form-control"
+                title="Please Enter the Passport Expiry Date"
                 type="date"
                 placeholder=""
                 value={passportExpiryDate}
@@ -2086,6 +2125,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedOtherIdType ? "has-value" : ""} 
               ${isSelectOtherType ? "is-focused" : ""}`}
+              title="Please Select the Other ID Type"
             >
               <Select
                 inputId="otherIdType"
@@ -2109,6 +2149,7 @@ function Input({ }) {
               <input
                 id="otherIdNo"
                 className="exp-input-field form-control"
+                title="Please Enter the Other ID Number"
                 type="text"
                 placeholder=""
                 value={otherIdNo}
@@ -2154,6 +2195,7 @@ function Input({ }) {
                   accept="image/*"
                   onChange={handleFileSelect1}
                   ref={logo}
+                  title="Please Upload the Logo"
                 />
               </div>
             </div>

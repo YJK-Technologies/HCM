@@ -247,8 +247,9 @@ function AttriDetInput({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-      ${selectedHeader ? "has-value" : ""} 
-      ${isSelectCode ? "is-focused" : ""}`}
+              ${selectedHeader ? "has-value" : ""} 
+              ${isSelectCode ? "is-focused" : ""}`}
+              title="Please Select the Code"
             >
               <Select
                 id="HdrCode"
@@ -286,6 +287,7 @@ function AttriDetInput({ }) {
               <input
                 id="adcode"
                 className="exp-input-field form-control"
+                title="Please fill the sub code"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -306,6 +308,7 @@ function AttriDetInput({ }) {
               <input
                 id="adnames"
                 class="exp-input-field form-control"
+                title="Please fill the Detail Name"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -326,6 +329,7 @@ function AttriDetInput({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
+                title="Please fill the Description"
                 value={descriptions}
                 onChange={(e) => setDescriptions(e.target.value)}
                 maxLength={250}

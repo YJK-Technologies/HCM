@@ -290,6 +290,7 @@ function DesginationInput({ }) {
                   className={`inputGroup selectGroup 
               ${selecteddept ? "has-value" : ""} 
               ${isSelectdep ? "is-focused" : ""}`}
+                  title="Please select the Department"
                 >
                   <Select
                     id="deptid"
@@ -315,7 +316,7 @@ function DesginationInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Employee No"
+                    required title="Please enter the Designation ID"
                     value={desgination_id}
                     onChange={(e) => setdesgination_id(e.target.value)}
                     maxLength={10}
@@ -333,14 +334,14 @@ function DesginationInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Employee Name"
+                    required title="Please enter the Designation Name"
                     value={desgination}
                     onChange={(e) => setdesgination(e.target.value)}
                     maxLength={50}
                     ref={desg}
                     onKeyDown={(e) => handleKeyDown(e, Status, desg)}
                   />
-                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Desgination Name<span className="text-danger">*</span></label>
+                  <label for="state" className={`exp-form-labels ${error && !desgination ? 'text-danger' : ''}`}>Designation Name<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -349,6 +350,7 @@ function DesginationInput({ }) {
                   className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+                  title="Please select the Status"
                 >
                   <Select
                     id="status"

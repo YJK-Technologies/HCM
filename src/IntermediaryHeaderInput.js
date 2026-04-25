@@ -154,6 +154,7 @@ if (!open) return null;
               <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
+                title="Please Enter the Header Code"
                 autoComplete="off"
                 placeholder=" "
                 value={Code}
@@ -178,6 +179,7 @@ if (!open) return null;
                 onChange={(e) => setDetails(e.target.value)}
                 maxLength={250}
                 ref={nameRef}
+                title="Please Enter the Name"
               />
               <label className={`exp-form-labels ${error && !Details ? 'text-danger' : ''}`}>
                 Name<span className="text-danger">*</span>
@@ -191,6 +193,7 @@ if (!open) return null;
               className={`inputGroup selectGroup 
       ${selectedStatus ? "has-value" : ""} 
       ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 value={selectedStatus}
@@ -213,8 +216,9 @@ if (!open) return null;
             <div className="form-block col-md-3">
               <div
               className={`inputGroup selectGroup 
-      ${selectedDelete ? "has-value" : ""} 
-      ${isSelectDelete ? "is-focused" : ""}`}
+              ${selectedDelete ? "has-value" : ""} 
+              ${isSelectDelete ? "is-focused" : ""}`}
+              title="Please Select the Delete Permission"
             >
               <Select
                 value={selectedDelete}

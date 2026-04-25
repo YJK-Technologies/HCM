@@ -658,7 +658,7 @@ function Desgination() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the department ID here"
+                required title="Please Enter the Department ID "
                 value={dept_id}
                 onChange={(e) => setdept_id(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -675,13 +675,13 @@ function Desgination() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the Desgiantion ID here"
+                required title="Please Enter the Designation ID "
                 value={desgination_id}
                 onChange={(e) => setdesgination_id(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 maxLength={250}
               />
-              <label for="cname" class="exp-form-labels">Desgination ID</label>
+              <label for="cname" class="exp-form-labels">Designation ID</label>
             </div>
           </div>
 
@@ -690,6 +690,7 @@ function Desgination() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"

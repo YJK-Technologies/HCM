@@ -235,7 +235,7 @@ function DepartmentInput({ }) {
                     type="text"
                     placeholder=""
                     required
-                    title="Please enter the attribute header code"
+                    title="Please enter the Department Code"
                     value={departmentCode}
                     onChange={(e) => setDepartmentCode(e.target.value)}
                     maxLength={100}
@@ -257,7 +257,7 @@ function DepartmentInput({ }) {
                     placeholder=""
                     required
                     autoComplete="off"
-                    title="Please enter the attribute header name"
+                    title="Please enter the Department Name"
                     value={departmenntName}
                     maxLength={250}
                     onChange={(e) => setDepartmenntName(e.target.value)}
@@ -281,6 +281,7 @@ function DepartmentInput({ }) {
                   className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+                  title="Please select the Status"
                 >
                   <Select
                     id="status"
