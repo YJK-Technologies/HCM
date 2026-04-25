@@ -209,6 +209,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
       documentType: row.documentType,
       documentNo: row.documentNo,
       issueDate: row.issueDate,
+      first_name: row.first_name,
       expiryDate: row.expiryDate,
       Department: row.department_id,
       Designation: row.designation_id,

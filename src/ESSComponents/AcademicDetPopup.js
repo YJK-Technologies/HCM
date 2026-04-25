@@ -206,6 +206,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
   const handleConfirm = () => {
     const selectedData = selectedRows.map(row => ({
       employeeId: row.EmployeeId,
+      first_name: row.first_name,
       Department: row.department_id,
       Designation: row.designation_id,
     }));
