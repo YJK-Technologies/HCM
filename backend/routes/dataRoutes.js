@@ -1421,6 +1421,9 @@ router.post("/GetJobID", dataController.GetJobID)
 router.post("/GetLoanTypeID", dataController.GetLoanTypeID)
 router.post("/shiftChangeRequestInsert",dataController.shiftChangeRequestInsert)
 router.post("/shiftChangeRequestEmployee",dataController.shiftChangeRequestEmployee)
+router.post("/getAllDesgination",dataController.getAllDesgination)
+router.post("/deletePrintTemplates",dataController.deletePrintTemplates)
+
 
 
 

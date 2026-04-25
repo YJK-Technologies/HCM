@@ -270,6 +270,9 @@ function EmployeeAssets({}) {
       }
     }
   }
+  showConfirmationToast(
+      "Are you sure you want to update the data ?",
+      async () => {
 
   try {
     setLoading(true);
@@ -322,6 +325,11 @@ function EmployeeAssets({}) {
   } finally {
     setLoading(false);
   }
+  },
+            () => {
+              toast.info("Data updated cancelled.");
+            }
+    );
   };
 
   const saveAssetDetails = async (info_request_id) => {
