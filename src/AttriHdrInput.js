@@ -113,6 +113,7 @@ function AttriHdrInput({ open, handleClose }) {
                 <div className="inputGroup">
                   <input
                     className="exp-input-field form-control"
+                    title="Please fill the Code"
                     type="text"
                     autoComplete="off"
                     placeholder=" "
@@ -138,6 +139,7 @@ function AttriHdrInput({ open, handleClose }) {
                     onChange={(e) => setAttributeheader_Name(e.target.value)}
                     maxLength={250}
                     ref={Name}
+                    title="Please fill the Name"
                   />
                   <label className={`exp-form-labels ${error && !attributeheader_name ? 'text-danger' : ''}`}>
                     Name<span className="text-danger">*</span>
@@ -150,6 +152,7 @@ function AttriHdrInput({ open, handleClose }) {
                   className={`inputGroup selectGroup 
                 ${selectedStatus ? "has-value" : ""} 
                 ${isSelectStatus ? "is-focused" : ""}`}
+                title="Please Select the Status"
                 >
                   <Select
                     value={selectedStatus}

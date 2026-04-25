@@ -370,8 +370,9 @@ function NumberSeriesInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedscreentype ? "has-value" : ""} 
-      ${isSelectedscreentype ? "is-focused" : ""}`}
+                  ${selectedscreentype ? "has-value" : ""} 
+                  ${isSelectedscreentype ? "is-focused" : ""}`}
+                  title="Please Select the Screen Type"
                 >
                   <Select
                     id="status"
@@ -399,7 +400,7 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="date"
                     placeholder=""
-                    required title="Please enter the start year"
+                    required title="Please Enter the Start Year"
                     value={Start_Year}
                     onChange={(e) => setStart_Year
                       (e.target.value)}
@@ -419,7 +420,7 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="date"
                     placeholder=""
-                    required title="Please enter the end year"
+                    required title="Please Enter the End Year"
                     value={End_Year}
                     onChange={(e) => setEnd_Year
                       (e.target.value)}
@@ -439,7 +440,7 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please enter the start number"
+                    required title="Please Enter the Start Number"
                     value={Start_No}
                     onChange={(e) => setStart_No
                       (e.target.value)}
@@ -458,7 +459,7 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please enter the running number"
+                    required title="Please Enter the Running Number"
                     value={Running_No}
                     onChange={(e) => setRunning_No
                       (e.target.value)}
@@ -477,7 +478,7 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please enter the end number"
+                    required title="Please Enter the End Number"
                     value={End_No}
                     onChange={(e) => setEnd_No
                       (e.target.value)}
@@ -493,6 +494,7 @@ function NumberSeriesInput({ }) {
                 <div className="inputGroup">
                   <input
                     className="exp-input-field form-control"
+                    title="Please Enter the Text"
                     id='party_code'
                     autoComplete="off"
                     placeholder=" "
@@ -510,8 +512,9 @@ function NumberSeriesInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedStatus ? "has-value" : ""} 
-      ${isSelectedStatus ? "is-focused" : ""}`}
+                  ${selectedStatus ? "has-value" : ""} 
+                  ${isSelectedStatus ? "is-focused" : ""}`}
+                  title="Please Select the Status"
                 >
                   <Select
                     id="status"
@@ -534,8 +537,9 @@ function NumberSeriesInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedBoolean ? "has-value" : ""} 
-      ${isSelectedBoolean ? "is-focused" : ""}`}
+                  ${selectedBoolean ? "has-value" : ""} 
+                  ${isSelectedBoolean ? "is-focused" : ""}`}
+                  title="Please Select the Number Prefix Status"
                 >
                   <Select
                     id="numpref"

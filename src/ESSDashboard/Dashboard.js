@@ -1793,7 +1793,7 @@ const Dashboard = () => {
       minWidth: 130,
     },
     {
-      headerName: "Shift",
+      headerName: "Shift Code",
       field: "Shift_Code",
       minWidth: 130,
       cellEditor: "agSelectCellEditor",
@@ -1869,10 +1869,10 @@ const Dashboard = () => {
       headerName: "Manager",
       field: "manager",
     },
-    {
-      headerName: "Shift",
-      field: "shift",
-    },
+    // {
+    //   headerName: "Shift",
+    //   field: "shift",
+    // },
     {
       headerName: "Aadhaar No",
       field: "AAdhar_no",
@@ -2111,9 +2111,9 @@ const Dashboard = () => {
     }
   };
 
-  const reloadGridData = () => {
-    window.location.reload();
-  };
+  // const reloadGridData = () => {
+  //   window.location.reload();
+  // };
 
   // useEffect(() => {
   //   const fetchAttendanceData = async () => {
@@ -2683,6 +2683,49 @@ const Dashboard = () => {
       );
     });
 
+  const reloadGridDatas = () => {
+    clearInputsField([])
+    setRowData([])
+  };
+
+    const clearInputsField = () => {
+    setShiftEndTime('');
+    setShiftStartTime('');
+    setShiftDay('');
+    setSelectedShiftCode('');
+    setShiftCode('');
+    setSelectedShiftPatternId('');
+    setShiftPatternId('');
+    setSelectedShiftDesigId('');
+    setShiftDesigId('');
+    setSelectedShiftDeptId('');
+    setShiftDeptId('');
+    setSelectedShiftEmpId('');
+    setShiftEmpId('');
+    setShiftToDate('');
+    setShiftFromDate('');
+  };
+
+  const reloadGridData = () => {
+    clearInputs([])
+    setShiftRowData([])
+  };
+
+    const clearInputs = () => {
+    setSelectedMaritalStatus('');
+    setMaritalStatus('');
+    setAccountNo('');
+    setPfNo('');
+    setAadharNo('');
+    setmanager('');
+    setDesignation('');
+    setDepartment('');
+    setEmployeeName('');
+    setEmployeeId('');
+    setEmployeeName('');
+  };
+
+
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
       <ToastContainer
@@ -3103,7 +3146,7 @@ const Dashboard = () => {
               <div className="header-top-row d-flex justify-content-between align-items-center mb-2">
                 <h6 className="card-title-heading mb-0">Pending Requests</h6>
                 <span className="request-badge-count">
-                  {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length} Pending
+                  {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length}&nbsp;&nbsp;Pending
                 </span>
               </div>
 
@@ -3592,7 +3635,7 @@ const Dashboard = () => {
                     <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
-                  <div className="icon-btn reload" onClick={reloadGridData}>
+                  <div className="icon-btn reload" onClick={reloadGridDatas}>
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
@@ -3786,7 +3829,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              {/* <div className="grid-col-md-5">
                 <div
                   className={`inputGroup selectGroup 
                 ${selectedShift ? "has-value" : ""} 
@@ -3807,7 +3850,7 @@ const Dashboard = () => {
                   />
                   <label className="floating-label">Shift</label>
                 </div>
-              </div>
+              </div> */}
 
               <div className="ms-2">
                 <div className="search-btn-wrapper">

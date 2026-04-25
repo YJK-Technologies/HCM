@@ -653,6 +653,7 @@ function BankAccInput({ }) {
                   <input
                     id="cusad1"
                     className="exp-input-field form-control"
+                    title="Account code is generated based on the Account Name and User Account Code. It is a unique identifier for each bank account in the system."
                     type="text"
                     placeholder=""
                     required
@@ -670,8 +671,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedUser ? "has-value" : ""} 
-      ${isSelectedUser ? "is-focused" : ""}`}
+                  ${selectedUser ? "has-value" : ""} 
+                  ${isSelectedUser ? "is-focused" : ""}`}
+                  title="Please select the User Account Code"
                 >
                   <Select
                     id="UserAccCode"
@@ -697,7 +699,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the accountant name"
+                    required title="Please enter the Bank Name"
                     value={account_name}
                     onBlur={handleKeyPressRef}
                     onChange={handleChangeName}
@@ -734,7 +736,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please enter the IFSC code"
                     value={IFSC_code}
                     onChange={(e) => setIFSC_code(e.target.value)}
                     maxLength={11}
@@ -748,8 +750,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedAcctype ? "has-value" : ""} 
-      ${isSelectedAcctype ? "is-focused" : ""}`}
+                  ${selectedAcctype ? "has-value" : ""} 
+                  ${isSelectedAcctype ? "is-focused" : ""}`}
+                  title="Please select the Account Type"
                 >
                   <Select
                     id="acctype"
@@ -794,7 +797,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please enter the Address1"
                     value={acc_addr_1}
                     onChange={(e) => setacc_addr_1(e.target.value)}
                     maxLength={250}
@@ -812,7 +815,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please enter the Address2"
                     value={acc_addr_2}
                     onChange={(e) => setacc_addr_2(e.target.value)}
                     maxLength={250}
@@ -830,7 +833,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please enter the Address3"
                     value={acc_addr_3}
                     onChange={(e) => setacc_addr_3(e.target.value)}
                     maxLength={250}
@@ -848,7 +851,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please enter the Address4"
                     value={acc_addr_4}
                     onChange={(e) => setacc_addr_4(e.target.value)}
                     maxLength={250}
@@ -864,6 +867,7 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
       ${selectedCity ? "has-value" : ""} 
       ${isSelectCity ? "is-focused" : ""}`}
+                  title="Please select the City"
                 >
                   <Select
                     id="city"
@@ -887,6 +891,8 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
       ${selectedState ? "has-value" : ""} 
       ${isSelectState ? "is-focused" : ""}`}
+                  title="Please select the State"
+
                 >
                   <Select
                     id="state"
@@ -910,6 +916,7 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
       ${selectedCountry ? "has-value" : ""} 
       ${isSelectedCountry ? "is-focused" : ""}`}
+                  title="Please select the Country"
                 >
                   <Select
                     id="country"
@@ -933,6 +940,7 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
       ${selectedDefaultBank ? "has-value" : ""} 
       ${isSelectedDefaultBank ? "is-focused" : ""}`}
+                  title="Please select the Default Bank"
                 >
                   <Select
                     id="officeType"

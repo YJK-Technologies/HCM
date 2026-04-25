@@ -341,15 +341,21 @@ function EmployeeAssets({}) {
   useEffect(() => {
     const { employeeId, firstName, department_id, designation_id } =
       location.state || {};
-
+    // if (employeeId) {
+    //   setEmployeeId(employeeId);
+    //   setFirst_Name(firstName || "");
+    //   setdepartment_id(department_id || "");
+    //   setdesignation_id(designation_id || "");
+    // }
+    // if (employeeId) {
+    //   handleEmployeeAssets(employeeId);
+    // }
     if (employeeId) {
-      setEmployeeId(employeeId);
+      setEmployeeId(employeeId);   
+      setEmployeeID(employeeId);   
       setFirst_Name(firstName || "");
       setdepartment_id(department_id || "");
       setdesignation_id(designation_id || "");
-    }
-
-    if (employeeId) {
       handleEmployeeAssets(employeeId);
     }
   }, [location.state]);

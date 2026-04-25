@@ -275,7 +275,7 @@ function WareHouseInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the warehouse code"
+                    required title="Please enter the Warehouse code"
                     value={warehouse_code}
                     maxLength={18}
                     onChange={(e) => setWarehouse_Code(e.target.value)}
@@ -310,6 +310,7 @@ function WareHouseInput({ }) {
                   className={`inputGroup selectGroup 
                      ${selectedStatus ? "has-value" : ""} 
                      ${isSelectedStatus ? "is-focused" : ""}`}
+                      title="Please select the status"
                 >
                   <Select
                     id="status"
@@ -334,6 +335,7 @@ function WareHouseInput({ }) {
                   className={`inputGroup selectGroup 
                      ${selectedLocation ? "has-value" : ""} 
                      ${isSelectedLocation ? "is-focused" : ""}`}
+                      title="Please select the location number"
                 >
                   <Select
                     id="status"

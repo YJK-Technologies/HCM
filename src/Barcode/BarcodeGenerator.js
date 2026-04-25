@@ -51,14 +51,14 @@ const BarcodeGenerator = () => {
           className="input"
           placeholder="Enter value to generate barcode"
         />
-        <button onClick={handleGenerateBarcode} className="login-button">
+        <button onClick={handleGenerateBarcode} title='Generate Barcode' className="login-button">
           Generate Barcode
         </button>
         <div id="barcodeWrapper" style={{ marginTop: '20px', overflowX:"scroll" }} ref={componentRef}>
           {barcodeValue && <Barcode value={barcodeValue} displayValue={true} />}
         </div>
         {barcodeValue && (
-        <button onClick={handlePrint} className="barcode-print">
+        <button onClick={handlePrint} title='Print Barcode' className="barcode-print">
           Print
         </button>
       )}
