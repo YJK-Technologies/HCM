@@ -256,13 +256,13 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        const Company_Code = sessionStorage.getItem('selectedCompanyCode');
         fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ company_code })
+            body: JSON.stringify({ Company_Code })
         })
             .then((data) => data.json())
             .then((val) => setLoanTypeIdDropSc(val))

@@ -8,6 +8,7 @@ import TabButtons from "./Tabs";
 import AcademicDetails from "./AcademicDetPopup.js";
 import PdfPreview from "./PdfPreviewHelp";
 import LoadingScreen from "../Loading";
+import { showConfirmationToast } from "../ToastConfirmation";
 
 const config = require("../Apiconfig");
 
@@ -199,6 +200,10 @@ const handleSave = async () => {
     return;
   }
 
+  showConfirmationToast(
+      "Are you sure you want to update the data ?",
+      async () => {
+
   try {
     setLoading(true);
 
@@ -250,6 +255,11 @@ const handleSave = async () => {
   } finally {
     setLoading(false);
   }
+  },
+            () => {
+              toast.info("Data updated cancelled.");
+            }
+    );
 };
 const saveAcademicDetails = async (info_request_id) => {
   try {

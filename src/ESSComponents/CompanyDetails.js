@@ -812,6 +812,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
               ${isSelectDepartment ? "is-focused" : ""}`}
+              title="Please Select the Department"
             >
               <Select
                 id="department"
@@ -836,6 +837,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${Designation ? "has-value" : ""} 
               ${isSelectDesignation ? "is-focused" : ""}`}
+              title="Please Select the Designation"
             >
               <Select
                 id="designation"
@@ -860,6 +862,7 @@ function Input() {
               <input
                 id="DOJ"
                 className="exp-input-field form-control"
+                title="Please Enter the Date of Joining"
                 type="date"
                 name="DOJ"
                 placeholder=" "
@@ -883,6 +886,7 @@ function Input() {
                 placeholder=" "
                 value={DOL}
                 onChange={(e) => setDOL(e.target.value)}
+                title="Please Enter the Date of Leaving"
               />
               <label htmlFor="DOL" className="exp-form-labels">DOL</label>
             </div>
@@ -893,6 +897,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
+              title="Please Select the Manager"
             >
               <Select
                 id="manager"
@@ -919,6 +924,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${selectedShift ? "has-value" : ""} 
               ${isSelectShift ? "is-focused" : ""}`}
+              title="Please Select the Shift"
             >
               <Select
                 id="shift"
@@ -944,6 +950,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -968,6 +975,7 @@ function Input() {
               className={`inputGroup selectGroup 
               ${selectedEmpType ? "has-value" : ""} 
               ${isSelectEmpType ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
             >
               <Select
                 id="shift"
@@ -993,6 +1001,7 @@ function Input() {
               <input
                 id="DOL"
                 className="exp-input-field form-control"
+                title="Please Enter the Section"
                 type="text"
                 name="DOL"
                 placeholder=" "
@@ -1009,6 +1018,7 @@ function Input() {
               <input
                 id="DOL"
                 className="exp-input-field form-control"
+                title="Please Enter the Work Location"
                 type="text"
                 name="DOL"
                 placeholder=" "

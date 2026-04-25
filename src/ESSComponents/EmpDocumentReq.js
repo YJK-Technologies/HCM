@@ -124,6 +124,10 @@ function EmpDocumentReq({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
+
+    showConfirmationToast(
+        "Are you sure you want to update the data ?",
+        async () => {
   
     try {
       setLoading(true);
@@ -176,7 +180,13 @@ function EmpDocumentReq({ }) {
     } finally {
       setLoading(false);
     }
+    },
+              () => {
+                toast.info("Data updated cancelled.");
+              }
+      );
   };
+
 const saveDocumentDetails = async (info_request_id) => {
   try {
     const company_code = sessionStorage.getItem("selectedCompanyCode");

@@ -900,7 +900,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the code here"
+                required title="Please Enter the code"
                 value={account_code}
                 onChange={(e) => setaccount_code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -917,7 +917,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the name here"
+                required title="Please Enter the Name"
                 value={account_name}
                 onChange={(e) => setaccount_name(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -934,7 +934,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the address here"
+                required title="Please Enter the Address"
                 value={acc_addr_1}
                 onChange={(e) => setacc_addr_1(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -951,7 +951,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the area here"
+                required title="Please Enter the City"
                 value={acc_area_code}
                 onChange={(e) => setacc_area_code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -968,7 +968,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the state here"
+                required title="Please Enter the State"
                 value={acc_state_code}
                 onChange={(e) => setacc_state_code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -985,7 +985,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the country here"
+                required title="Please Enter the Country"
                 value={acc_country_code}
                 onChange={(e) => setacc_country_code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1001,6 +1001,7 @@ function BankAccGrid() {
               className={`inputGroup selectGroup 
               ${selectedAcctype ? "has-value" : ""} 
               ${isSelectAcctype ? "is-focused" : ""}`}
+              title="Please select the Account Type"
             >
               <Select
                 id="acctype"
@@ -1025,7 +1026,7 @@ function BankAccGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the contact number here"
+                required title="Please Enter the Branch"
                 value={branch}
                 onChange={(e) => setbranch(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

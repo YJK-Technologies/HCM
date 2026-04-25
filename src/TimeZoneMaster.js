@@ -712,6 +712,7 @@ function TimeZoneMaster() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
+                                    title="Please Enter the Time Zone Name"
                                     type="text"
                                     placeholder=" "
                                     autoComplete="off"
@@ -730,6 +731,7 @@ function TimeZoneMaster() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
+                                    title="Please Enter the UTC Offset"
                                     type="text"
                                     placeholder=" "
                                     autoComplete="off"
@@ -749,6 +751,7 @@ function TimeZoneMaster() {
                                 className={`inputGroup selectGroup 
                                     ${selectedDstApplicable ? "has-value" : ""} 
                                     ${isSelectedDstApplicable ? "is-focused" : ""}`}
+                                title="Please Select the DST Applicable"
                             >
                                 <Select
                                     id="status"
@@ -770,6 +773,8 @@ function TimeZoneMaster() {
                                 className={`inputGroup selectGroup 
                                     ${selectedStatus ? "has-value" : ""} 
                                     ${isSelectedStatus ? "is-focused" : ""}`}
+                                title="Please Select the Status"
+
                             >
                                 <Select
                                     id="status"
@@ -799,6 +804,7 @@ function TimeZoneMaster() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
+                                    title="Please Enter the Time Zone ID"
                                     type="number"
                                     placeholder=" "
                                     autoComplete="off"
@@ -815,6 +821,7 @@ function TimeZoneMaster() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
+                                    title="Please Enter the Time Zone Name"
                                     type="text"
                                     placeholder=" "
                                     autoComplete="off"
@@ -831,6 +838,7 @@ function TimeZoneMaster() {
                             <div className="inputGroup">
                                 <input
                                     class="exp-input-field form-control"
+                                    title="Please Enter the UTC Offset"
                                     type="text"
                                     placeholder=" "
                                     autoComplete="off"
@@ -848,6 +856,7 @@ function TimeZoneMaster() {
                                 className={`inputGroup selectGroup 
                                     ${selectedDstApplicableSc ? "has-value" : ""} 
                                     ${isSelectedDstApplicableSc ? "is-focused" : ""}`}
+                                title="Please Select the DST Applicable"
                             >
                                 <Select
                                     id="status"
@@ -869,6 +878,7 @@ function TimeZoneMaster() {
                                 className={`inputGroup selectGroup 
                                     ${selectedStatusSc ? "has-value" : ""} 
                                     ${isSelectedStatusSc ? "is-focused" : ""}`}
+                                title="Please Select the Status"
                             >
                                 <Select
                                     id="status"

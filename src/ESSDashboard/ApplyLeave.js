@@ -728,6 +728,7 @@ const ApplyLeave = () => {
                   className={`inputGroup selectGroup 
                   ${SelectedLeave ? "has-value" : ""} 
                   ${isSelectLeave ? "is-focused" : ""}`}
+                  title="Please Select the Leave Type"
                 >
                   <Select
                     id="LeaveType"
@@ -752,6 +753,7 @@ const ApplyLeave = () => {
                     className={`inputGroup selectGroup 
                     ${selectedCompOff ? "has-value" : ""} 
                     ${isSelectCompOff ? "is-focused" : ""}`}
+                    title="Please Select the Comp Off"
                   >
                     <Select
                       value={selectedCompOff}
@@ -775,6 +777,7 @@ const ApplyLeave = () => {
                   className={`inputGroup selectGroup 
                   ${SelectedSlot ? "has-value" : ""} 
                   ${isSelectSlot ? "is-focused" : ""}`}
+                  title="Please Select the Slot"
                 >
                   <Select
                     id="Select_slots"
@@ -796,8 +799,10 @@ const ApplyLeave = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Select the From Date"
                     value={FromDate}
                     onChange={handleFromDate}
+                    min={new Date().toISOString().split("T")[0]}
                     placeholder=" "
                     autoComplete="off"
                   />
@@ -812,8 +817,10 @@ const ApplyLeave = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Select the To Date"
                     value={ToDate}
                     onChange={handleToDateChange}
+                    min={new Date().toISOString().split("T")[0]}
                     disabled={LeaveType === "Comp Off"}
                     placeholder=" "
                     autoComplete="off"
@@ -830,6 +837,7 @@ const ApplyLeave = () => {
                     className="form-control"
                     value={Reason}
                     onChange={(e) => setReason(e.target.value)}
+                    title="Please Enter the Reason"
                     rows="3"
                     placeholder=" "
                     autoComplete="off"
@@ -845,6 +853,7 @@ const ApplyLeave = () => {
                   className={`inputGroup selectGroup 
                   ${selectedmanager ? "has-value" : ""} 
                   ${isSelectManager ? "is-focused" : ""}`}
+                  title="Please Select the Reporting Manager"
                 >
                   <Select
                     value={selectedmanager}
@@ -867,6 +876,7 @@ const ApplyLeave = () => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Responsible Person"
                     value={AlternativeReponsablePerson}
                     onChange={(e) => setReasponsiblePerson(e.target.value)}
                     placeholder=" "
@@ -925,6 +935,7 @@ const ApplyLeave = () => {
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Select the From Date"
                 value={fromDate}
                 placeholder=" "
                 autoComplete="off"
@@ -940,6 +951,7 @@ const ApplyLeave = () => {
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Select the To Date"
                 value={toDate}
                 placeholder=" "
                 autoComplete="off"
@@ -955,6 +967,7 @@ const ApplyLeave = () => {
               className={`inputGroup selectGroup 
               ${selectedLeave ? "has-value" : ""} 
               ${isSearchLeave ? "is-focused" : ""}`}
+              title="Please Select the Leave Type"
             >
               <Select
                 id="LeaveType"
@@ -977,6 +990,7 @@ const ApplyLeave = () => {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSearchStatus ? "is-focused" : ""}`}
+              title="Please Select the Leave Status"
             >
               <Select
                 id="Select_slots"

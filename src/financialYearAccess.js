@@ -920,7 +920,7 @@ function Grid() {
                 className="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please fill the company number here"
+                required title="Please Enter the Start Year"
                 value={start_year}
                 onChange={(e) => setstart_year(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -938,7 +938,7 @@ function Grid() {
                 className="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please fill the company name here"
+                required title="Please Enter the End Year"
                 value={end_year}
                 onChange={(e) => setend_year(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -953,6 +953,7 @@ function Grid() {
               className={`inputGroup selectGroup 
               ${selectedTransaction ? "has-value" : ""} 
               ${isSelectedTransaction ? "is-focused" : ""}`}
+              title="Please Select the Transactions Type"
             >
               <Select
                 isClearable
@@ -975,6 +976,7 @@ function Grid() {
               className={`inputGroup selectGroup 
               ${selectedLockType ? "has-value" : ""} 
               ${isSelectedLockType ? "is-focused" : ""}`}
+              title="Please Select the Locked"
             >
               <Select
                 isClearable

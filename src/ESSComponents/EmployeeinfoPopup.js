@@ -412,6 +412,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -428,6 +429,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Select the Date of Birth"
                       value={DOB}
                       onChange={(e) => setDOB(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -443,6 +445,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the First Name"
                       value={First_Name}
                       maxLength={100}
                       onChange={(e) => setFirst_Name(e.target.value)}
@@ -459,6 +462,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Last Name"
                       value={Last_Name}
                       maxLength={100}
                       onChange={(e) => setLast_Name(e.target.value)}
@@ -471,8 +475,9 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                 <div className="form-block col-md-3">
                   <div
                     className={`inputGroup selectGroup 
-                              ${Gender ? "has-value" : ""} 
-                              ${isSelectGender ? "is-focused" : ""}`}
+                    ${Gender ? "has-value" : ""} 
+                    ${isSelectGender ? "is-focused" : ""}`}
+                    title="Please Select the Gender"
                   >
                     <Select
                       inputId="gender"
@@ -498,6 +503,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     <input
                       id="permanantAddress"
                       class="exp-input-field form-control"
+                      title="Please Enter the Address"
                       type="text"
                       placeholder=""
                       value={address}
@@ -514,6 +520,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     <input
                       id="Phone"
                       className="exp-input-field form-control"
+                      title="Please Enter the Phone Number"
                       type="number"
                       placeholder=""
                       required
@@ -536,6 +543,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     <input
                       id="ReferenceName"
                       class="exp-input-field form-control"
+                      title="Please Enter the Designation ID"
                       type="text"
                       placeholder=""
                       value={designation_id}
@@ -553,6 +561,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     <input
                       id="ReferenceName"
                       class="exp-input-field form-control"
+                      title="Please Enter the Department ID"
                       type="text"
                       placeholder=""
                       value={department_id}

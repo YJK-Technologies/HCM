@@ -174,6 +174,10 @@ function EmpFamPersonalDetail({ }) {
       return;
     }
 
+    showConfirmationToast(
+        "Are you sure you want to update the data ?",
+        async () => {
+
     try {
       setLoading(true);
 
@@ -225,6 +229,11 @@ function EmpFamPersonalDetail({ }) {
     } finally {
       setLoading(false);
     }
+    },
+              () => {
+                toast.info("Data updated cancelled.");
+              }
+      );
   };
 
   const saveFamilyDetails = async (info_request_id) => {

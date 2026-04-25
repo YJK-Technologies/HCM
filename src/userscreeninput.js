@@ -299,6 +299,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
+              title="Please select the Role ID"
             >
               <Select
                 id="roleid"
@@ -323,6 +324,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedscreens ? "has-value" : ""} 
               ${isSelectScreen ? "is-focused" : ""}`}
+              title="Please select the Screen Type"
             >
               <Select
                 id="status"
@@ -347,6 +349,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedpermissions ? "has-value" : ""} 
               ${isSelectPermission ? "is-focused" : ""}`}
+              title="Please select the Permission Type"
             >
               <Select
                 id="status"
