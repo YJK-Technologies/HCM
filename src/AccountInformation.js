@@ -230,7 +230,7 @@ const AccountInformation = () => {
             <div className="action-wrapper">
               <div className="action-icon add" onClick={() => handleSave(selectedData)} >
                 <span className="tooltip">Save</span>
-                <i className="fa-solid fa-floppy-disk"></i>
+                <i className="fa-solid fa-floppy-disk" title='Save'></i>
               </div>
             </div>
 

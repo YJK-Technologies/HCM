@@ -72,6 +72,7 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
         let newErrors = {};
         if (!form.requested_shift_id) newErrors.requested_shift_id = true;
         if (!form.rep_manager) newErrors.rep_manager = true;
+        if (!form.swap_employee_id) newErrors.swap_employee_id = true;
         if (!form.priority) newErrors.priority = true;
         if (!form.reason.trim()) newErrors.reason = true;
 
@@ -198,12 +199,13 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label-bold">Swap Employee (Optional)</label>
+                            <label className="form-label-bold" style={{ color: errors.swap_employee_id ? 'red' : 'inherit' }}>Swap Employee<span className="text-danger">*</span></label>
                             <Select
                                 styles={customSelectStyles}
                                 options={employeeOptions}
                                 isClearable
-                                onChange={(val) => setForm({ ...form, swap_employee_id: val })}
+                                value={form.swap_employee_id}
+                                onChange={(val) => handleFieldChange('swap_employee_id', val)}
                                 placeholder="Select Employee..."
                             />
                         </div>
