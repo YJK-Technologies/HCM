@@ -583,7 +583,7 @@ function RoleInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the role ID here"
+                  required title="Please enter the role ID"
                   value={role_id}
                   maxLength={18}
                   onChange={(e) => setrole_id(e.target.value)}
@@ -600,7 +600,7 @@ function RoleInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the role name here"
+                  required title="Please enter the role name"
                   value={role_name}
                   maxLength={50}
                   onChange={(e) => setrole_name(e.target.value)}
