@@ -159,10 +159,18 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
     fetchProductCodes(selectedDPT ? selectedDPT.value : '');
   };
 
-  const filteredOptionDPt = DPTdrop.map((option) => ({
-    value: option.Department,
-    label: option.Department,
-  }));
+  // const filteredOptionDPt = DPTdrop.map((option) => ({
+  //   value: option.Department,
+  //   label: option.Department,
+  // }));
+
+  const filteredOptionDPt = [{ value: 'All', label: 'All' }, 
+    ...(Array.isArray(DPTdrop) ? DPTdrop.map((option) => ({
+        value: option.Department,
+        label: option.Department,
+      }))
+      : [])
+  ];
 
   const fetchProductCodes = async (selectedValue) => {
     try {
@@ -307,7 +315,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          EmployeeId, Department, Designation, Name, manager, status, from_date, to_date,
+          EmployeeId, Department:dpt, Designation:selecteddesg, Name, manager, status, from_date, to_date,
           Employee_Type: selectedEmpType ? selectedEmpType.value : null,
           company_code: sessionStorage.getItem('selectedCompanyCode')
 
@@ -379,6 +387,10 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
 
     setfrom_date("");
     setto_date("");
+    setdpt("");
+    setselecteddept("");
+    setDesignation("");
+    setSelecteddesg("");
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
