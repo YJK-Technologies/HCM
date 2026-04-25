@@ -453,79 +453,23 @@ case 'EmployeeAssets':
 
     console.log("Finance Data:", data);
 
-    // 🔴 3. Employee ID
-    const employeeIdRef = document.getElementById("EmployeeId");
-    if (employeeIdRef) {
-      employeeIdRef.value = employeeId || "";
+
       setEmployeeId(employeeId || "");
-    }
-
-    // 🔴 4. Employee Name
-    const firstnameRef = document.getElementById("EmployeelabelName");
-    if (firstnameRef) {
-      firstnameRef.value = first_name || "";
       setFirst_Name(first_name || "");
-    }
-
-    // 🔴 5. Department
-    const deptRef = document.getElementById("Departmentlabel");
-    if (deptRef) {
-      deptRef.value = Department || "";
       setdepartment_id(Department || "");
-    }
-
-    // 🔴 6. Designation
-    const desigRef = document.getElementById("designationLabel");
-    if (desigRef) {
-      desigRef.value = Designation || "";
       setdesignation_id(Designation || "");
-    }
-
-    // 🔴 7. PF Number
-    const pfRef = document.getElementById("PFNo");
-    if (pfRef) {
-      pfRef.value = PFNo || "";
       setPFNo(PFNo || "");
-    }
-
-    // 🔴 8. Salary Month
-    const salaryMonthRef = document.getElementById("salaryMonth");
-    if (salaryMonthRef) {
-      salaryMonthRef.value = salaryMonth || "";
       setSalaryMonth(salaryMonth || "");
-    }
 
-    // 🔴 9. Salary Type (SAFE)
-    const salaryTypeRef = document.getElementById("salaryType");
-    if (salaryTypeRef && salaryType) {
-      const selectedSalaryType = filteredOptionSalaryType.find(
-        option => option.value === salaryType
-      );
+      const selectedSalaryType = filteredOptionSalaryType.find(option => option.value === salaryType);
+      setSelectedSalaryType(selectedSalaryType);
+      setSalaryType(selectedSalaryType?.value || null);
 
-      if (selectedSalaryType) {
-        setSelectedSalaryType(selectedSalaryType);
-        setSalaryType(selectedSalaryType.value);
-      } else {
-        setSelectedSalaryType(null);
-        setSalaryType("");
-      }
-    }
 
-    // 🔴 10. Payscale (SAFE)
-    const payScaleRef = document.getElementById("payScale");
-    if (payScaleRef && Payscale) {
-      const selectedPayscale = filteredOptionPayscale.find(
-        option => option.value === Payscale
-      );
+      const selectedPayscale = filteredOptionPayscale.find(option => option.value === Payscale);
+      setselectedPayscale(selectedPayscale);
+      setPayscale(selectedPayscale?.value || null);
 
-      if (selectedPayscale) {
-        setselectedPayscale(selectedPayscale);
-        setPayscale(selectedPayscale.value);
-      } else {
-        setselectedPayscale(null);
-        setPayscale("");
-      }
-    }
   };
 
 
