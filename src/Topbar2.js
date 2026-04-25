@@ -293,46 +293,6 @@ const TopBar = () => {
               <p className="text-white mb-0">Welcome, {user_code}</p>
             </div>
 
-<<<<<<< HEAD
-          {/* Profile Dropdown */}
-          <div className="profile-dropdown ms-3 mt-4">
-            <a
-              className="nav-link dropdown-toggle p-0"
-              href="#"
-              id="navbarDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              {userImageSrc ? (
-                <img
-                  src={userImageSrc}
-                  alt="User Avatar"
-                  width="35"
-                  height="35"
-                  className="profile-avatar rounded-circle position-relative"
-                  title={user_code}
-                />
-              ) : (
-                <div
-                  className="avatar-placeholder rounded-circle position-relative"
-                  title="Profile"
-                >
-                  {user_code ? user_code.charAt(0) : 'U'}
-                </div>
-              )}
-            </a>
-            <ul className="dropdown-menu dropdown-menu-end profile-dropdown-card" aria-labelledby="navbarDropdown">
-              {/* User Info Header */}
-              <li className="px-3 py-2 border-bottom mb-2">
-                <div className="d-flex align-items-center">
-                  <div className="flex-shrink-0 me-2"> {/* Added flex-shrink-0 */}
-                    {userImageSrc ? (
-                      <img src={userImageSrc} alt="User" width="40" height="40" className="rounded-circle border" />
-                    ) : (
-                      <div className="avatar-placeholder-small">{user_code?.charAt(0)}</div>
-                    )}
-=======
             {/* Profile Dropdown */}
             <div className="profile-dropdown ms-3 mt-4">
               <a
@@ -358,7 +318,6 @@ const TopBar = () => {
                     title={user_code}
                   >
                     {user_code ? user_code.charAt(0) : 'U'}
->>>>>>> 7d52db836b2bb8e52bc6faf96940f7a1f85faa90
                   </div>
                 )}
               </a>
