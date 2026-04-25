@@ -629,7 +629,7 @@ function UserRoleGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the user code here"
+                required title="Please enter the user code"
                 value={user_code}
                 onChange={(e) => setuser_code(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -646,7 +646,7 @@ function UserRoleGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the user name here"
+                required title="Please enter the user name"
                 value={user_name}
                 onChange={(e) => setuser_name(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -663,7 +663,7 @@ function UserRoleGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please fill the role ID here"
+                required title="Please enter the role ID"
                 value={role_id}
                 onChange={(e) => setrole_id(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -680,7 +680,7 @@ function UserRoleGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="please fill the role name here"
+                required title="please enter the role name"
                 value={role_name}
                 onChange={(e) => setrole_name(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
