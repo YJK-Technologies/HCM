@@ -1400,7 +1400,6 @@ const LeaveRequestPage = () => {
     setReasponsiblePerson('');
   };
 
-
   return (
     <div className="container-fluid Topnav-screen">
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
@@ -1508,7 +1507,8 @@ const LeaveRequestPage = () => {
                     classNamePrefix="react-select"
                     isClearable
                   />
-                  <label className="floating-label">Select Slot</label>
+                  <label className={`floating-label ${error && !Select_slots ? 'text-danger' : ''}`}>
+                    Select Slot<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -1520,6 +1520,7 @@ const LeaveRequestPage = () => {
                     title="Please Select the From Date"
                     value={FromDate}
                     onChange={handleFromDate}
+                    min={new Date().toISOString().split("T")[0]}
                     placeholder=" "
                     autoComplete="off"
                   />
@@ -1538,6 +1539,7 @@ const LeaveRequestPage = () => {
                     value={ToDate}
                     onChange={handleToDateChange}
                     disabled={LeaveType === "Comp Off"}
+                    min={FromDate || new Date().toISOString().split("T")[0]}
                     placeholder=" "
                     autoComplete="off"
                   />

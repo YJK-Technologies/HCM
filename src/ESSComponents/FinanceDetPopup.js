@@ -217,7 +217,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
       Payscale: row.Payscale,
       PFNo: row.PFNo,
       salaryMonth: row.salary_month,
-      first_name: row.first_name,
+      first_name: row.First_Name,
       Department: row.department_id,
       Designation: row.designation_id,
     }));
