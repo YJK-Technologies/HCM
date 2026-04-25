@@ -42835,7 +42835,7 @@ const getGenerateShift = async (req, res) => {
       .input("To_Date", sql.NVarChar, To_Date)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Employee_Shift_Report @mode,@department_ID,@designation_ID,@Employee_ID,
+      .query(`EXEC sp_Employee_Shift_Report_Test_DG @mode,@department_ID,@designation_ID,@Employee_ID,
         @From_Date,@To_Date,@company_code,@created_by,'','',''`);
 
     const shifts = result.recordset;
@@ -48372,6 +48372,41 @@ const getAllDesgination = async (req, res) => {
   }
 };
 //code ended by Dinesh Gokul on 24-04-2026
+
+//code added by Dinesh Gokul on 24-04-2026
+const deletePrintTemplates = async (req, res) => {
+  const keyfieldsToDelete = req.body.keyfieldsToDelete;
+
+  if (!keyfieldsToDelete || !keyfieldsToDelete.length) {
+    res.status(400).json("Invalid or empty keyfields array.");
+    return;
+  }
+
+  try {
+    const pool = await connection.connectToDatabase();
+    for (const record of keyfieldsToDelete) {
+      const { Key_field, company_code, modified_by } = record;
+      await pool
+        .request()
+        .input("mode", sql.NVarChar, "D")
+        .input("Key_field", sql.NVarChar, Key_field)
+        .input("company_code", sql.NVarChar, company_code)
+        .input("modified_by", sql.NVarChar, modified_by)
+        .query(
+          `EXEC sp_Print_templates @mode,'',0,@Key_field,'','','','',null,null,null,null,null,null,null,null,@company_code`,
+        );
+    }
+
+    res.status(200).json("Employee academic details deleted successfully");
+  } catch (err) {
+    console.error("Error inserting data:", err);
+
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by Dinesh Gokul on 24-04-2026
 module.exports = {
   login,
   forgetPassword,
@@ -49763,6 +49798,7 @@ module.exports = {
   GetLoanTypeID,
   shiftChangeRequestInsert,
   shiftChangeRequest,
-  getAllDesgination
+  getAllDesgination,
+  deletePrintTemplates
 
 };

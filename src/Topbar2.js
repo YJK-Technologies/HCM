@@ -282,7 +282,7 @@ const TopBar = () => {
               ) : (
                 <div
                   className="avatar-placeholder rounded-circle position-relative"
-                  title={user_code}
+                  title="Profile"
                 >
                   {user_code ? user_code.charAt(0) : 'U'}
                 </div>

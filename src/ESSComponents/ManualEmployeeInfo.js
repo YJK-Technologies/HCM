@@ -173,7 +173,6 @@ function ManualEmployeeInfo({}) {
       !Aadhaar_no ||
       !selectedmartial ||
       !kids ||
-      !Siblings ||
       !Grade_id ||
       !title ||
       !placeOfBirth ||
@@ -192,7 +191,10 @@ function ManualEmployeeInfo({}) {
       toast.warning("Error: Missing required fields");
       return;
     }
-
+    showConfirmationToast(
+    "Are you sure you want to update the data ?",
+    async () => {
+    
   try {
     setLoading(true);
 
@@ -244,6 +246,12 @@ function ManualEmployeeInfo({}) {
   } finally {
     setLoading(false);
   }
+
+    },
+          () => {
+            toast.info("Data updated cancelled.");
+          }
+  );
 };
 
 const savePersonalDetails = async (info_request_id) => {
@@ -1822,7 +1830,7 @@ const savePersonalDetails = async (info_request_id) => {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Siblings"
@@ -1841,7 +1849,7 @@ const savePersonalDetails = async (info_request_id) => {
               />
               <label htmlFor="Siblings" className={`exp-form-labels ${error && !Siblings ? 'text-danger' : ''}`}>Siblings{showAsterisk && <span className="text-danger">*</span>}</label>
             </div>
-          </div>
+          </div> */}
 
 
           <div className="col-md-2">

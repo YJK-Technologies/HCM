@@ -1422,6 +1422,7 @@ router.post("/GetLoanTypeID", dataController.GetLoanTypeID)
 router.post("/shiftChangeRequestInsert",dataController.shiftChangeRequestInsert)
 router.post("/shiftChangeRequest",dataController.shiftChangeRequest)
 router.post("/getAllDesgination",dataController.getAllDesgination)
+router.post("/deletePrintTemplates",dataController.deletePrintTemplates)
 
 
 
