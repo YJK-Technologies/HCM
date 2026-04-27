@@ -29284,7 +29284,7 @@ const addDailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
@@ -30836,7 +30836,7 @@ const DailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
@@ -30872,7 +30872,7 @@ const DailyLogOUT = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check out data inserted successfully");
   } catch (err) {
@@ -33802,7 +33802,7 @@ const GetUserCheckIN = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "FC")
       .input("userid", sql.NVarChar, userid)
-      .query(` EXEC sp_DailyLogin_Test @mode,@userid,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(` EXEC sp_DailyLogin @mode,@userid,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
     res.json(result.recordset);
   } catch (err) {
@@ -34063,7 +34063,7 @@ const getCheckInStatus = async (req, res) => {
       .input("userID", sql.NVarChar, userID)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_DailyLogin_Test @mode,@userID,'','','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_DailyLogin @mode,@userID,'','','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.json(result.recordset);
