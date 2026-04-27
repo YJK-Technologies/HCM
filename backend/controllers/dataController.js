@@ -48363,7 +48363,7 @@ const GetLoanTypeID = async (req, res) => {
 };
 //code ended by Sakthi on 24-04-2026
 
-//Code added by pavun on 25-06-2026
+//Code added by pavun on 25-04-2026
 const shiftRequestEmployeeApproval = async (req, res) => {
   const { request_id, company_code, swap_employee_id, is_swap_request, modified_by } = req.body;
 
@@ -48389,7 +48389,7 @@ const shiftRequestEmployeeApproval = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-//Code ended by pavun on 25-06-2026
+//Code ended by pavun on 25-04-2026
 
 //code added by Dinesh Gokul on 24-04-2026
 const getAllDesgination = async (req, res) => {
@@ -48446,6 +48446,57 @@ const deletePrintTemplates = async (req, res) => {
   }
 };
 //code ended by Dinesh Gokul on 24-04-2026
+
+//Code added by pavun on 27-04-2026
+const shiftChangeRequestManager = async (req, res) => {
+  const { RepManager, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SRM")
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const shiftRequestManagerApproval = async (req, res) => {
+  const { request_id, company_code, request_status } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SMA")
+      .input("request_id", sql.Int, request_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','','',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Shift change request updated successfully",
+    });
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 27-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49839,6 +49890,8 @@ module.exports = {
   shiftChangeRequestEmployee,
   getAllDesgination,
   deletePrintTemplates,
-  shiftRequestEmployeeApproval
+  shiftRequestEmployeeApproval,
+  shiftChangeRequestManager,
+  shiftRequestManagerApproval
 
 };
