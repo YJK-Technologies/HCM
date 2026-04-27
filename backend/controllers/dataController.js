@@ -30872,7 +30872,8 @@ const DailyLogOUT = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, 
+        @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check out data inserted successfully");
   } catch (err) {
