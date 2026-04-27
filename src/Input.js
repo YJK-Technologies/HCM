@@ -621,6 +621,7 @@ function Input({ }) {
                 required
                 value={company_no}
                 onChange={(e) => setCompany_no(e.target.value)}
+                title="Please Enter the Company Code"
                 maxLength={18}
                 ref={companycode}
                 onKeyDown={(e) => handleKeyDown(e, companyname, companycode)}
@@ -635,6 +636,7 @@ function Input({ }) {
               <input
                 id="cname"
                 class="exp-input-field form-control"
+                title="Please Enter the Company Name"
                 type="text"
                 placeholder=" "
                 required
@@ -654,6 +656,7 @@ function Input({ }) {
               <input
                 id="sname"
                 class="exp-input-field form-control"
+                title="Please Enter the Short Name"
                 type="text"
                 placeholder=" "
                 required
@@ -673,6 +676,7 @@ function Input({ }) {
               <input
                 id="add1"
                 class="exp-input-field form-control"
+                title="Please Enter the Address 1"
                 type="text"
                 placeholder=" "
                 required
@@ -692,9 +696,10 @@ function Input({ }) {
               <input
                 id="add2"
                 class="exp-input-field form-control"
+                title="Please Enter the Address 2"
                 type="text"
                 placeholder=" "
-                required title="Please enter the address"
+                required
                 value={address2}
                 onChange={(e) => setAddress2(e.target.value)}
                 maxLength={250}
@@ -712,6 +717,7 @@ function Input({ }) {
                 id="add3"
                 type="text"
                 className="exp-input-field form-control"
+                title="Please Enter the Address 3"
                 placeholder=" "
                 autoComplete="off"
                 value={address3}
@@ -729,6 +735,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedCity ? "has-value" : ""} 
               ${isSelectCity ? "is-focused" : ""}`}
+              title="Please Select the City"
             >
               <Select
                 id="city"
@@ -752,6 +759,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedState ? "has-value" : ""} 
               ${isSelectState ? "is-focused" : ""}`}
+              title="Please Select the State"
             >
               <Select
                 id="state"
@@ -775,6 +783,7 @@ function Input({ }) {
               <input
                 id="pin"
                 class="exp-input-field form-control"
+                title="Please Enter the Pin Code"
                 type="number"
                 autoComplete="off"
                 placeholder=" "
@@ -794,6 +803,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
+              title="Please Select the Country"
             >
               <Select
                 id="country"
@@ -817,6 +827,7 @@ function Input({ }) {
               <input
                 id="email"
                 className="exp-input-field form-control"
+                title="Please Enter the Email ID"
                 type="email"
                 placeholder=" "
                 autoComplete="off"
@@ -836,6 +847,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -859,6 +871,7 @@ function Input({ }) {
               <input
                 id="fdate"
                 class="exp-input-field form-control"
+                title="Please Enter the Founded Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -877,6 +890,7 @@ function Input({ }) {
               <input
                 id="wurl"
                 class="exp-input-field form-control"
+                title="Please Enter the Website URL"
                 type="url"
                 placeholder=" "
                 autoComplete="off"
@@ -896,6 +910,7 @@ function Input({ }) {
               <input
                 id="contno"
                 class="exp-input-field form-control"
+                title="Please Enter the Contact No"
                 type="number"
                 placeholder=" "
                 autoComplete="off"
@@ -914,6 +929,7 @@ function Input({ }) {
               <input
                 id="report"
                 class="exp-input-field form-control"
+                title="Please Enter the Annual Report URL"
                 type="text"
                 placeholder=""
                 required
@@ -933,6 +949,7 @@ function Input({ }) {
               <input
                 id="cusgstno"
                 class="exp-input-field form-control"
+                title="Please Enter the GST No"
                 type="text"
                 placeholder=" "
                 required
@@ -952,6 +969,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedLocation ? "has-value" : ""} 
               ${isSelectLocation ? "is-focused" : ""}`}
+              title="Please Select the Location No"
             >
               <Select
                 id="locno"

@@ -51,6 +51,7 @@ function Input() {
   const [empType, setEmpType] = useState('');
   const [section, setSection] = useState('');
   const [workLocation, setWorkLocation] = useState('');
+  const [originalData, setOriginalData] = useState(null);
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const companyPermissions = permissions
@@ -381,67 +382,139 @@ function Input() {
     );
   };
 
-  const handleUpdate = async () => {
-    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
+  // const handleUpdate = async () => {
+  //   if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-    setError(false);
+  //   setError(false);
 
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
-        try {
-          setLoading(true);
-          const Header = {
-            EmployeeId: EmployeeId,
-            department_ID: dpt,
-            designation_ID: selecteddesg,
-            DOJ,
-            DOL: DOL && DOL !== "" ? DOL : null,
-            manager: manager,
-            shift: Shift,
-            status: status,
-            Section: section,
-            Work_Location: workLocation,
-            Employee_Type: empType,
-            company_code: sessionStorage.getItem('selectedCompanyCode'),
-            modified_by: sessionStorage.getItem('selectedUserCode')
-          };
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data in the selected rows?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const Header = {
+  //           EmployeeId: EmployeeId,
+  //           department_ID: dpt,
+  //           designation_ID: selecteddesg,
+  //           DOJ,
+  //           DOL: DOL && DOL !== "" ? DOL : null,
+  //           manager: manager,
+  //           shift: Shift,
+  //           status: status,
+  //           Section: section,
+  //           Work_Location: workLocation,
+  //           Employee_Type: empType,
+  //           company_code: sessionStorage.getItem('selectedCompanyCode'),
+  //           modified_by: sessionStorage.getItem('selectedUserCode')
+  //         };
 
-          const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(Header),
-          });
+  //         const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify(Header),
+  //         });
 
-          if (response.ok) {
-            toast.success("Data updated successfully!", {
-              onClose: () => window.location.reload(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-            console.error(errorResponse.details || errorResponse.message);
-          }
-        } catch (error) {
-          console.error("Error inserting data:", error);
-          toast.error('Error inserting data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully!", {
+  //             onClose: () => window.location.reload(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //           console.error(errorResponse.details || errorResponse.message);
+  //         }
+  //       } catch (error) {
+  //         console.error("Error inserting data:", error);
+  //         toast.error('Error inserting data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     }
+  //   );
+  // };
 
   // Handle tab navigation
+  const handleUpdate = async () => {
+  if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  setError(false);
+
+  const currentData = {
+    EmployeeId: EmployeeId || "",
+    department_ID: dpt || "",
+    designation_ID: selecteddesg || "",
+    DOJ: DOJ || "",
+    DOL: DOL || "",
+    manager: manager || "",
+    shift: Shift || "",
+    status: status || "",
+    Section: section || "",
+    Work_Location: workLocation || "",
+    Employee_Type: empType || ""
+  };
+
+  // compare old vs new
+  const isChanged =
+    JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+  if (!isChanged) {
+    toast.warning("No changes detected");
+    return;
+  }
+
+  showConfirmationToast(
+    "Are you sure you want to update the data?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const Header = {
+          ...currentData,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode")
+        };
+
+        const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(Header)
+        });
+
+        if (response.ok) {
+          toast.success("Data updated successfully!", {
+            onClose: () => window.location.reload()
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Update failed");
+        }
+
+      } catch (error) {
+        toast.error("Error updating data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Update cancelled");
+    }
+  );
+};
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
@@ -608,6 +681,24 @@ function Input() {
           const selectedStatus = filteredOptionStatus.find(option => option.value === status);
           setSelectedStatus(selectedStatus);
           setStatus(selectedStatus?.value || null);
+
+          if (searchData && searchData.length > 0) {
+            const row = searchData[0];
+          
+            setOriginalData({
+              EmployeeId: row.EmployeeId || "",
+              department_ID: row.department_ID || "",
+              designation_ID: row.designation_ID || "",
+              DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
+              DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
+              manager: row.manager || "",
+              shift: row.shift || "",
+              status: row.status || "",
+              Section: row.Section || "",
+              Work_Location: row.Work_Location || "",
+              Employee_Type: row.Employee_Type || ""
+            });
+          }
 
         }
       } else if (response.status === 404) {

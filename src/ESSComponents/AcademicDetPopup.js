@@ -19,19 +19,19 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "first_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "middle_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee last Name",
+    headerName: "Last Name",
     field: "Last_Name",
     filter: 'agTextColumnFilter',
     editable: false,
@@ -247,7 +247,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -262,7 +262,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -277,7 +277,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={AcademicName}
                       onChange={(e) => setAcademicName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Academic Name</label>
                   </div>
@@ -292,7 +292,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={Major}
                       onChange={(e) => setMajor(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Major</label>
                   </div>
@@ -307,7 +307,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={Institution}
                       onChange={(e) => setInstitution(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Institution</label>
                   </div>

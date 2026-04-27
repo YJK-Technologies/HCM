@@ -954,6 +954,7 @@ function Grid() {
                 value={company_name}
                 onChange={handleCompanyNameChange}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                title="Please Enter the Company Name"
                 maxLength={250}
                 className="exp-input-field form-control"
                 autoComplete="off"
@@ -969,6 +970,7 @@ function Grid() {
               <input
                 value={city}
                 className="exp-input-field form-control"
+                title="Please Enter the City"
                 onChange={(e) => setCity(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 autoComplete="off"
@@ -984,6 +986,7 @@ function Grid() {
               <input
                 value={state}
                 className="exp-input-field form-control"
+                title="Please Enter the State"
                 onChange={(e) => setState(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 autoComplete="off"
@@ -998,6 +1001,7 @@ function Grid() {
             <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
+                title="Please Enter the Pin Code"
                 type="text"
                 maxLength={10}
                 value={pincode}
@@ -1015,6 +1019,7 @@ function Grid() {
             <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
+                title="Please Enter the Country"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1030,6 +1035,7 @@ function Grid() {
             <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
+                title="Please Enter the GST No"
                 value={company_gst_no}
                 onChange={(e) => setcompany_gst_no(e.target.value)}
                 maxLength={100}
@@ -1046,6 +1052,7 @@ function Grid() {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"

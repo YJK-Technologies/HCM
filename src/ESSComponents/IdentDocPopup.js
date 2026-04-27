@@ -19,17 +19,17 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "first_name",
     editable: false,
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "middle_name",
     editable: false,
   },
   {
-    headerName: "Employee last Name",
+    headerName: "Last Name",
     field: "Last_Name",
     editable: false,
   },
@@ -252,7 +252,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       value={EmployeeId}
                       maxLength={18}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -267,7 +267,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee Name</label>
@@ -283,7 +283,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       value={documentType}
                       maxLength={50}
                       onChange={(e) => setDocumentType(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Document Type</label>
@@ -299,7 +299,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       value={documentNo}
                       maxLength={100}
                       onChange={(e) => setDocumentNo(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Document No</label>
