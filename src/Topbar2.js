@@ -326,7 +326,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
 
             {/* Welcome Message */}
             <div className="welcome-message d-none d-md-block">
-              <p className="text-white mb-0">Welcome, {user_code}</p>
+              <p className="text-white mb-0">Welcome, {user_name}</p>
             </div>
 
             {/* Profile Dropdown */}
@@ -353,7 +353,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
                     className="avatar-placeholder rounded-circle position-relative"
                     title={user_code}
                   >
-                    {user_code ? user_code.charAt(0) : 'U'}
+                    {user_name ? user_name.charAt(0) : 'U'}
                   </div>
                 )}
               </a>

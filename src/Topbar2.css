@@ -297,7 +297,8 @@
     background-color: #2b2b3d !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-    margin-top: 3px !important;
+    margin-top: 0px !important;
+    overflow: hidden;
 }
 
 .view-all-btn-professional {
@@ -314,6 +315,8 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1) !important; 
     transition: all 0.3s ease;
     cursor: pointer;
+    margin-left: 0px;
+    border-radius: 0px;
 }
 
 .view-all-btn-professional:hover {
@@ -339,10 +342,11 @@
     position: fixed;
     top: 0;
     right: -500px;
+    max-width: 100%;
     width: 490px;
     height: 100vh;
     background-color: #1a1a27; 
-    z-index: 2000;
+    z-index: 2100;
     transition: right 0.3s ease-in-out;
     box-shadow: -5px 0 25px rgba(0,0,0,0.5);
     display: flex;
@@ -354,13 +358,15 @@
 }
 
 .drawer-header {
-    background-color: #6f42c1;
-    height: 60px;
+    background: linear-gradient(90deg, #6f42c1, #5a2d91);
+    min-height: 60px;
+    padding: 0 20px;
 }
 
 .drawer-body {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .drawer-overlay {
@@ -418,15 +424,16 @@
 
 /* Action Buttons (Circular like image) */
 .action-btn-circle {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px; /* Prevent shrinking in flexbox */
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     transition: 0.2s;
 }
 
@@ -504,4 +511,30 @@
 .dot-separator {
     font-size: 8px;
     vertical-align: middle;
+}
+
+@media (max-width: 576px) {
+    .notification-side-drawer {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .notification-dropdown-card {
+        width: 100% !important; 
+        position: absolute;
+    }
+
+    .notification-item-box {
+        padding: 12px !important;
+    }
+
+    .req-avatar-small {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .notification-content h6 {
+        font-size: 0.85rem;
+    }
 }
