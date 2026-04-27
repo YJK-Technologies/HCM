@@ -279,6 +279,14 @@ function Input({}) {
             keyfield: keyfield,
             documentUrl: documentUrl,
             document: documentFile,
+            isNewFile: false,
+
+            originalData: {
+              academicName: academicName || "",
+              major: major || "",
+              institution: institution || "",
+              academicYear: formattedDOB || "",
+            },
           };
 
           const existingRelation = acc.find(
@@ -358,6 +366,7 @@ function Input({}) {
                         ...member,
                         document: file,
                         documentUrl: fileUrl,
+                        isNewFile: true,
                       }
                     : member,
                 ),
@@ -529,83 +538,179 @@ function Input({}) {
     window.location.reload();
   };
 
-  const handleUpdate = async (relationName, index) => {
-    const relationGroup = Academic.find(
-      (group) => group.relation === relationName,
-    );
-    const member = relationGroup ? relationGroup.members[index] : null;
+  // const handleUpdate = async (relationName, index) => {
+  //   const relationGroup = Academic.find(
+  //     (group) => group.relation === relationName,
+  //   );
+  //   const member = relationGroup ? relationGroup.members[index] : null;
 
-    if (!member.keyfield) {
-      setError(true);
-      toast.warning("Error: Missing required keyfield");
-      return;
-    }
+  //   if (!member.keyfield) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required keyfield");
+  //     return;
+  //   }
 
-    if (!member) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
+  //   if (!member) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-    if (
-      !member.academicName ||
-      !member.major ||
-      !member.institution ||
-      !member.academicYear
-    ) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
+  //   if (
+  //     !member.academicName ||
+  //     !member.major ||
+  //     !member.institution ||
+  //     !member.academicYear
+  //   ) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-    const fileBase64 = member.document
-      ? await convertToBase64(member.document)
-      : null;
-    console.log(fileBase64);
+  //   const fileBase64 = member.document
+  //     ? await convertToBase64(member.document)
+  //     : null;
+  //   console.log(fileBase64);
 
-    const editedData = {
-      EmployeeId: EmployeeId,
-      academicName: member.academicName,
-      major: member.major,
-      institution: member.institution,
-      academicYear: member.academicYear,
-      document: fileBase64,
-      keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+  //   const editedData = {
+  //     EmployeeId: EmployeeId,
+  //     academicName: member.academicName,
+  //     major: member.major,
+  //     institution: member.institution,
+  //     academicYear: member.academicYear,
+  //     document: fileBase64,
+  //     keyfield: member.keyfield,
+  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //     modified_by: sessionStorage.getItem('selectedUserCode')
 
-    };
-    setError(false);
+  //   };
+  //   setError(false);
 
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ editedData: [editedData] }),
-        },
-      );
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ editedData: [editedData] }),
+  //       },
+  //     );
 
-      if (response.ok) {
-        toast.success("Data updated successfully!", {
-          onClose: () => window.location.reload(),
-        });
-      } else {
-        const errorResponse = await response.json();
-        console.error(errorResponse.message);
-        toast.warning(errorResponse.message, {});
-      }
-    } catch (err) {
-      console.error("Error delete data:", err);
-      toast.error("Error delete data: " + err.message, {});
-    } finally {
-      setLoading(false);
-    }
+  //     if (response.ok) {
+  //       toast.success("Data updated successfully!", {
+  //         onClose: () => window.location.reload(),
+  //       });
+  //     } else {
+  //       const errorResponse = await response.json();
+  //       console.error(errorResponse.message);
+  //       toast.warning(errorResponse.message, {});
+  //     }
+  //   } catch (err) {
+  //     console.error("Error delete data:", err);
+  //     toast.error("Error delete data: " + err.message, {});
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+const handleUpdate = async (relationName, index) => {
+  const relationGroup = Academic.find(
+    (group) => group.relation === relationName,
+  );
+
+  const member = relationGroup ? relationGroup.members[index] : null;
+
+  if (!member.keyfield) {
+    setError(true);
+    toast.warning("Error: Missing required keyfield");
+    return;
+  }
+
+  if (!member) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  if (
+    !member.academicName ||
+    !member.major ||
+    !member.institution ||
+    !member.academicYear
+  ) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  // SAME LOGIC - No changes detected
+  const original = member.originalData;
+
+  if (
+    original &&
+    original.academicName === member.academicName &&
+    original.major === member.major &&
+    original.institution === member.institution &&
+    original.academicYear === member.academicYear &&
+    member.isNewFile === false
+  ) {
+    toast.warning("No changes detected");
+    return;
+  }
+
+  const fileBase64 = member.document
+    ? await convertToBase64(member.document)
+    : null;
+
+  console.log(fileBase64);
+
+  const editedData = {
+    EmployeeId: EmployeeId,
+    academicName: member.academicName,
+    major: member.major,
+    institution: member.institution,
+    academicYear: member.academicYear,
+    document: fileBase64,
+    keyfield: member.keyfield,
+    company_code: sessionStorage.getItem("selectedCompanyCode"),
+    modified_by: sessionStorage.getItem("selectedUserCode"),
   };
+
+  setError(false);
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(
+      `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ editedData: [editedData] }),
+      },
+    );
+
+    if (response.ok) {
+      toast.success("Data updated successfully!", {
+        onClose: () => window.location.reload(),
+      });
+    } else {
+      const errorResponse = await response.json();
+      console.error(errorResponse.message);
+      toast.warning(errorResponse.message, {});
+    }
+  } catch (err) {
+    console.error("Error delete data:", err);
+    toast.error("Error delete data: " + err.message, {});
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (relationName, index) => {
     const relationGroup = Academic.find(
