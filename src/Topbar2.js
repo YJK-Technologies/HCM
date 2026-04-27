@@ -76,6 +76,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
         request_id: requestId,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         swap_employee_id: sessionStorage.getItem('selectedUserCode'),
+        modified_by: sessionStorage.getItem('selectedUserCode'),
         is_swap_request: actionStatus 
       }),
     });
@@ -326,7 +327,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
 
             {/* Welcome Message */}
             <div className="welcome-message d-none d-md-block">
-              <p className="text-white mb-0">Welcome, {user_code}</p>
+              <p className="text-white mb-0">Welcome, {user_name}</p>
             </div>
 
             {/* Profile Dropdown */}
@@ -353,7 +354,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
                     className="avatar-placeholder rounded-circle position-relative"
                     title={user_code}
                   >
-                    {user_code ? user_code.charAt(0) : 'U'}
+                    {user_name ? user_name.charAt(0) : 'U'}
                   </div>
                 )}
               </a>

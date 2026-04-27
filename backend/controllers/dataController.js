@@ -17160,6 +17160,8 @@ const GetAllDesgination = async (req, res) => {
 
 const desginationDelete = async (req, res) => {
   const keyfieldsToDelete = req.body.keyfield;
+  const company_code = req.body.company_code;
+  const modified_by = req.body.modified_by;
 
   if (!keyfieldsToDelete || !keyfieldsToDelete.length) {
     res.status(400).json("Invalid or emptykeyfields array.");
@@ -17174,8 +17176,10 @@ const desginationDelete = async (req, res) => {
         await pool
           .request()
           .input("keyfield", sql.NVarChar, keyfield)
+          .input("company_code", sql.NVarChar, company_code)
+          .input("modified_by", sql.NVarChar, modified_by)
           .query(
-            `EXEC sp_desgination 'D','','', '', '', '', @keyfield,'', '',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+            `EXEC sp_desgination 'D','','', '', '', @company_code, @keyfield,'', @modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
           );
       } catch (error) {
         if (error.number === 547) {
@@ -17342,6 +17346,8 @@ const DepartmetEditData = async (req, res) => {
 
 const departmentDelete = async (req, res) => {
   const keyfieldsToDelete = req.body.key_field;
+  const company_code = req.body.company_code;
+  const modified_by = req.body.modified_by;
 
   if (!keyfieldsToDelete || !keyfieldsToDelete.length) {
     res.status(400).json("Invalid or emptykeyfields array.");
@@ -17356,8 +17362,10 @@ const departmentDelete = async (req, res) => {
         await pool
           .request()
           .input("key_field", sql.NVarChar, key_field)
+          .input("company_code", sql.NVarChar, company_code)
+          .input("modified_by", sql.NVarChar, modified_by)
           .query(
-            `EXEC sp_department 'D','','','',@key_field,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+            `EXEC sp_department 'D','','',@company_code,@key_field,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
           );
       } catch (error) {
         if (error.number === 547) {
@@ -29276,7 +29284,7 @@ const addDailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
@@ -30828,7 +30836,7 @@ const DailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin_Test @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
@@ -30844,6 +30852,7 @@ const DailyLogOUT = async (req, res) => {
     DayofLogin,
     DeviceDetails,
     IP_Address,
+    Shift_Code,
     company_code,
     Location,
     created_by,
@@ -30859,10 +30868,11 @@ const DailyLogOUT = async (req, res) => {
       .input("DeviceDetails", sql.VarChar, DeviceDetails)
       .input("IP_Address", sql.VarChar, IP_Address)
       .input("Location", sql.VarChar, Location)
+      .input("Shift_Code", sql.VarChar, Shift_Code)
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
       .query(
-        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check out data inserted successfully");
   } catch (err) {
@@ -33792,7 +33802,7 @@ const GetUserCheckIN = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "FC")
       .input("userid", sql.NVarChar, userid)
-      .query(` EXEC sp_DailyLogin @mode,@userid,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(` EXEC sp_DailyLogin @mode,@userid,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 `);
     res.json(result.recordset);
   } catch (err) {
@@ -34053,7 +34063,7 @@ const getCheckInStatus = async (req, res) => {
       .input("userID", sql.NVarChar, userID)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_DailyLogin @mode,@userID,'','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_DailyLogin @mode,@userID,'','','','','','','','','',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.json(result.recordset);
@@ -48352,9 +48362,9 @@ const GetLoanTypeID = async (req, res) => {
 };
 //code ended by Sakthi on 24-04-2026
 
-//Code added by pavun on 25-06-2026
+//Code added by pavun on 25-04-2026
 const shiftRequestEmployeeApproval = async (req, res) => {
-  const { request_id, company_code, swap_employee_id, is_swap_request } = req.body;
+  const { request_id, company_code, swap_employee_id, is_swap_request, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48366,7 +48376,8 @@ const shiftRequestEmployeeApproval = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("is_swap_request", sql.NVarChar, is_swap_request)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','','',''`);
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,''`);
 
     res.status(200).json({
       success: true,
@@ -48377,7 +48388,7 @@ const shiftRequestEmployeeApproval = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
-//Code ended by pavun on 25-06-2026
+//Code ended by pavun on 25-04-2026
 
 //code added by Dinesh Gokul on 24-04-2026
 const getAllDesgination = async (req, res) => {
@@ -48434,6 +48445,57 @@ const deletePrintTemplates = async (req, res) => {
   }
 };
 //code ended by Dinesh Gokul on 24-04-2026
+
+//Code added by pavun on 27-04-2026
+const shiftChangeRequestManager = async (req, res) => {
+  const { RepManager, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SRM")
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const shiftRequestManagerApproval = async (req, res) => {
+  const { request_id, company_code, request_status } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SMA")
+      .input("request_id", sql.Int, request_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("request_status", sql.NVarChar, request_status)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','','',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Shift change request updated successfully",
+    });
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 27-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49827,6 +49889,8 @@ module.exports = {
   shiftChangeRequestEmployee,
   getAllDesgination,
   deletePrintTemplates,
-  shiftRequestEmployeeApproval
+  shiftRequestEmployeeApproval,
+  shiftChangeRequestManager,
+  shiftRequestManagerApproval
 
 };

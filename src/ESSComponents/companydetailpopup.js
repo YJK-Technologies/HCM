@@ -24,19 +24,19 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "first_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "middle_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee Last  Name",
+    headerName: "Last Name",
     field: "Last_Name",
     filter: 'agTextColumnFilter',
     editable: false,

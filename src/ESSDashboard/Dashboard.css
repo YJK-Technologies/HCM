@@ -3496,7 +3496,7 @@
 }
 
 .fixed-list-height {
-    height: 595px; 
+    height: 590px; 
     overflow-y: auto;
     display: flex;
     flex-direction: column;

@@ -19,19 +19,19 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "first_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "middle_name",
     filter: 'agTextColumnFilter',
     editable: false,
   },
   {
-    headerName: "Employee Last Name",
+    headerName: "Last Name",
     field: "Last_Name",
     filter: 'agTextColumnFilter',
     editable: false,
@@ -260,7 +260,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -276,7 +276,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -292,7 +292,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={salaryType}
                       onChange={(e) => setSalaryType(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Type</label>
                   </div>
@@ -308,7 +308,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={payScale}
                       onChange={(e) => setPayScale(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Payscale</label>
                   </div>
@@ -360,7 +360,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                         }
                       }}
                       maxLength={18}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Range From</label>
                   </div>
@@ -381,7 +381,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                         }
                       }}
                       maxLength={18}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Range To</label>
                   </div>

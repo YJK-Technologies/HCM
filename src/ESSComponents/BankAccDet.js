@@ -55,7 +55,7 @@ function Input({ }) {
   const [currencyDrop, setCurrencyDrop] = useState([]);
   const [selectedCurrency, setSelectedCurrency] = useState('');
   const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
-
+  const [originalData, setOriginalData] = useState(null);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -419,6 +419,36 @@ function Input({ }) {
         const imageUrl = URL.createObjectURL(imageBlob);
         setSelectedImage(imageUrl);
 
+        setOriginalData({
+          EmployeeId: EmployeeId || "",
+          AccountHolderName: AccountHolderName || "",
+          Account_NO: Account_NO || "",
+          IFSC_Code: IFSC_Code || "",
+          bankName: bankName || "",
+          branchName: branchName || "",
+          bankCity: Bank_City || "",
+          bankCountry: Bank_Country || "",
+          salaryCurrency: Salary_Currency || "",
+          WPSEnabled:
+            WPS_Enabled === true ? "1" :
+            WPS_Enabled === false ? "0" :
+            WPS_Enabled || "",
+          WPSMemberId: WPS_Member_Id || "",
+          isPrimaryAccount:
+            Is_Primary_Account === true ? "1" :
+            Is_Primary_Account === false ? "0" :
+            Is_Primary_Account || "",
+          isActive:
+            Is_Active === true ? "1" :
+            Is_Active === false ? "0" :
+            Is_Active || "",
+          isDelete:
+            Is_Deleted === true ? "1" :
+            Is_Deleted === false ? "0" :
+            Is_Deleted || "",
+          sNo: S_NO || "",
+        });
+
       } else if (response.status === 404) {
         toast.warning("Data not found")
         setAccountHolderName('');
@@ -440,16 +470,103 @@ function Input({ }) {
   };
 
 
+  // const handleUpdate = async () => {
+  //   if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
+  //   setError(false);
+
+  //   try {
+  //     setLoading(true)
+  //     const formData = new FormData();
+  //     formData.append("EmployeeId", EmployeeId);
+  //     formData.append("Account_NO", Account_NO);
+  //     formData.append("AccountHolderName", AccountHolderName);
+  //     formData.append("bankName", bankName);
+  //     formData.append("branchName", branchName);
+  //     formData.append("IFSC_Code", IFSC_Code);
+  //     formData.append("Bank_City", bankCity);
+  //     formData.append("Bank_Country", bankCountry);
+  //     formData.append("Salary_Currency", salaryCurrency);
+  //     formData.append("WPS_Enabled", WPSEnabled);
+  //     formData.append("WPS_Member_Id", WPSMemberId);
+  //     formData.append("Is_Primary_Account", isPrimaryAccount);
+  //     formData.append("Is_Active", isActive);
+  //     formData.append("Is_Deleted", isDelete);
+  //     formData.append("S_NO", sNo);
+  //     formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+  //     formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
+
+  //     if (passBookImg) {
+  //       formData.append("Bankbook_img", passBookImg);
+  //     }
+
+  //     const response = await fetch(`${config.apiBaseUrl}/updateEmployeebankdet`, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     if (response.ok) {
+  //       console.log("Data updated successfully");
+  //       toast.success("Data updated successfully!", {
+  //         onClose: () => window.location.reload(),
+  //       });
+  //     } else {
+  //       const errorResponse = await response.json();
+  //       console.error(errorResponse.message);
+  //       toast.warning(errorResponse.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error inserting data:", error);
+  //     toast.error('Error inserting data: ' + error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleUpdate = async () => {
-    if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
+    if (
+      !EmployeeId ||
+      !Account_NO ||
+      !AccountHolderName ||
+      !bankName ||
+      !IFSC_Code ||
+      !passBookImg
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
     }
     setError(false);
-
+    if (originalData) {
+      const currentData = {
+        EmployeeId: EmployeeId || "",
+        AccountHolderName: AccountHolderName || "",
+        Account_NO: Account_NO || "",
+        IFSC_Code: IFSC_Code || "",
+        bankName: bankName || "",
+        branchName: branchName || "",
+        bankCity: bankCity || "",
+        bankCountry: bankCountry || "",
+        salaryCurrency: salaryCurrency || "",
+        WPSEnabled: WPSEnabled || "",
+        WPSMemberId: WPSMemberId || "",
+        isPrimaryAccount: isPrimaryAccount || "",
+        isActive: isActive || "",
+        isDelete: isDelete || "",
+        sNo: sNo || "",
+      };
+      const isSame =
+        JSON.stringify(currentData) === JSON.stringify(originalData);
+      if (isSame) {
+        toast.warning("No changes detected");
+        return;
+      }
+    }
     try {
-      setLoading(true)
+      setLoading(true);
       const formData = new FormData();
       formData.append("EmployeeId", EmployeeId);
       formData.append("Account_NO", Account_NO);
@@ -466,31 +583,28 @@ function Input({ }) {
       formData.append("Is_Active", isActive);
       formData.append("Is_Deleted", isDelete);
       formData.append("S_NO", sNo);
-      formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
-      formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
-
+      formData.append("company_code",sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("modified_by",sessionStorage.getItem("selectedUserCode"));
       if (passBookImg) {
         formData.append("Bankbook_img", passBookImg);
       }
-
-      const response = await fetch(`${config.apiBaseUrl}/updateEmployeebankdet`, {
-        method: "POST",
-        body: formData,
-      });
-
+      const response = await fetch(
+        `${config.apiBaseUrl}/updateEmployeebankdet`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       if (response.ok) {
-        console.log("Data updated successfully");
         toast.success("Data updated successfully!", {
           onClose: () => window.location.reload(),
         });
       } else {
         const errorResponse = await response.json();
-        console.error(errorResponse.message);
         toast.warning(errorResponse.message);
       }
     } catch (error) {
-      console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -502,8 +616,6 @@ function Input({ }) {
   const handleBankAccDet = () => {
     setOpen(true);
   };
-
-
 
   const reloadGridData = () => {
     window.location.reload();
@@ -545,12 +657,14 @@ function Input({ }) {
   const Employeebankdetails = async (data) => {
 
     if (data && data.length > 0) {
-      setSaveButtonVisible(false);
-      setUpdateButtonVisible(true);
       const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
         IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
         Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = data;
-
+    // :white_check_mark: Run button logic only if AccountHolderName has value
+    if (AccountHolderName && AccountHolderName.trim() !== "") {
+      setSaveButtonVisible(false);
+      setUpdateButtonVisible(true);
+    }
       if (Bankbook_img) {
         const imageBlob = base64ToBlob(Bankbook_img);
         setPassBookImg(imageBlob);
@@ -581,6 +695,36 @@ function Input({ }) {
       setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
       setBooleanSelect(Is_Active, setSelectedIsActive, setIsActive);
       setBooleanSelect(Is_Deleted, setSelectedIsDelete, setIsDelete);
+
+      setOriginalData({
+        EmployeeId: EmployeeId || "",
+        AccountHolderName: AccountHolderName || "",
+        Account_NO: Account_NO || "",
+        IFSC_Code: IFSC_Code || "",
+        bankName: bankName || "",
+        branchName: branchName || "",
+        bankCity: Bank_City || "",
+        bankCountry: Bank_Country || "",
+        salaryCurrency: Salary_Currency || "",
+        WPSEnabled:
+          WPS_Enabled === true ? "1" :
+          WPS_Enabled === false ? "0" :
+          WPS_Enabled || "",
+        WPSMemberId: WPS_Member_Id || "",
+        isPrimaryAccount:
+          Is_Primary_Account === true ? "1" :
+          Is_Primary_Account === false ? "0" :
+          Is_Primary_Account || "",
+        isActive:
+          Is_Active === true ? "1" :
+          Is_Active === false ? "0" :
+          Is_Active || "",
+        isDelete:
+          Is_Deleted === true ? "1" :
+          Is_Deleted === false ? "0" :
+          Is_Deleted || "",
+        sNo: S_NO || "",
+      });
 
     } else {
       console.log("Data not fetched...!");
