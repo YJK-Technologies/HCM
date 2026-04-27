@@ -76,6 +76,7 @@ const handleRequestAction = async (requestId, actionStatus) => {
         request_id: requestId,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         swap_employee_id: sessionStorage.getItem('selectedUserCode'),
+        modified_by: sessionStorage.getItem('selectedUserCode'),
         is_swap_request: actionStatus 
       }),
     });

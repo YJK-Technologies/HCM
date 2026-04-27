@@ -486,6 +486,7 @@ function Desgination() {
     }
 
     const modified_by = sessionStorage.getItem('selectedUserCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     const keyfieldsToDelete = selectedRows.map((row) => row.keyfield);
 
@@ -502,7 +503,7 @@ function Desgination() {
               "Content-Type": "application/json",
               "Modified-By": modified_by
             },
-            body: JSON.stringify({ keyfield: keyfieldsToDelete })
+            body: JSON.stringify({ keyfield: keyfieldsToDelete, company_code: company_code, modified_by: modified_by})
           });
 
           if (response.ok) {

@@ -457,7 +457,7 @@ function Department() {
       toast.warning("Please select atleast One Row to Delete")
       return;
     }
-
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
     const modified_by = sessionStorage.getItem("selectedUserCode");
 
     const keyfieldsToDelete = selectedRows.map((row) => row.key_field);
@@ -470,10 +470,13 @@ function Department() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Modified-By": modified_by,
+              "modified-By": modified_by,
+              "company_code": company_code,
             },
             body: JSON.stringify({
               key_field: keyfieldsToDelete,
+              company_code: company_code,
+              modified_by: modified_by,
             }),
           });
 
