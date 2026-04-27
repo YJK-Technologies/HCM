@@ -416,7 +416,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -432,7 +432,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       title="Please Select the Date of Birth"
                       value={DOB}
                       onChange={(e) => setDOB(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">DOB</label>
                   </div>
@@ -449,7 +449,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       value={First_Name}
                       maxLength={100}
                       onChange={(e) => setFirst_Name(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">First Name</label>
                   </div>
@@ -466,7 +466,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                       value={Last_Name}
                       maxLength={100}
                       onChange={(e) => setLast_Name(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Last Name</label>
                   </div>
