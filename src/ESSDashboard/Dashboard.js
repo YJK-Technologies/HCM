@@ -1102,7 +1102,7 @@ const Dashboard = () => {
 
       /* ---------- Shift Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/shiftChangeRequest`, {
+        const res = await fetch(`${config.apiBaseUrl}/shiftChangeRequestManager`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1467,7 +1467,10 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      } else if (type === "Asset") {
+      } 
+      
+      /* --------------- Asset Change -----------------*/
+      else if (type === "Asset") {
         url = `${config.apiBaseUrl}/ApproveAssetRequest`;
 
         const selectedRequest = dashboardRequests.find(
@@ -1516,6 +1519,18 @@ const Dashboard = () => {
           }),
         };
       }
+
+      /* ---------- Shift Request ---------- */
+      else if (type === "Shift Change") {
+        url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
+
+        body = {
+          request_id: id,
+          company_code,
+          request_status: status,
+        };
+      }
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -3280,6 +3295,7 @@ const Dashboard = () => {
                   options={filteredOptionManager}
                   className="team-select-wrapper"
                   placeholder="Select Manager..."
+                  isClearable
                 />
 
                 {/* Global Color Toggle Button */}

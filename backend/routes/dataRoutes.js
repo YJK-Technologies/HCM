@@ -1424,6 +1424,8 @@ router.post("/shiftChangeRequestEmployee",dataController.shiftChangeRequestEmplo
 router.post("/shiftRequestEmployeeApproval",dataController.shiftRequestEmployeeApproval)
 router.post("/getAllDesgination",dataController.getAllDesgination)
 router.post("/deletePrintTemplates",dataController.deletePrintTemplates)
+router.post("/shiftChangeRequestManager",dataController.shiftChangeRequestManager)
+router.post("/shiftRequestManagerApproval",dataController.shiftRequestManagerApproval)
 
 
 
