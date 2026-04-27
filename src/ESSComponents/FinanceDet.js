@@ -34,7 +34,7 @@ function Input({ }) {
   const [isSelectSalary, setIsSelectSalary] = useState(false);
   const [isSelectPayscale, setIsSelectPayscale] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [originalData, setOriginalData] = useState(null);
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const financePermissions = permissions
@@ -275,6 +275,18 @@ case 'EmployeeAssets':
         setselectedPayscale(selectedOptionPayscale);
         setPayscale(selectedOptionPayscale);
 
+
+        
+          // existing setState code...
+        
+          setOriginalData({
+            EmployeeId: EmployeeId || "",
+            salaryType: salaryType || "",
+            Payscale: Payscale || "",
+            PFNo: PFNo || "",
+            salary_month: salary_month || ""
+          });
+
       } else if (response.status === 404) {
         toast.warning('Data not found');
         setSalaryType('');
@@ -343,58 +355,126 @@ case 'EmployeeAssets':
     );
   };
 
-  const handleUpdate = async () => {
-    if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
-    setError(false);
+  // const handleUpdate = async () => {
+  //   if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
+  //   setError(false);
     
-    showConfirmationToast(
-      "Are you sure you want to update the data ?",
-      async () => {
-        try {
-          setLoading(true);
-          const Header = {
-            EmployeeId: EmployeeId,
-            salaryType: selectedSalaryType ? selectedSalaryType.value : salaryType,
-            Payscale: payscale === selectedPayscale ? selectedPayscale.value : payscale,
-            PFNo: PFNo,
-            salary_month: salaryMonth,
-            company_code: sessionStorage.getItem('selectedCompanyCode'),
-            modified_by: sessionStorage.getItem('selectedUserCode')
-          };
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data ?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const Header = {
+  //           EmployeeId: EmployeeId,
+  //           salaryType: selectedSalaryType ? selectedSalaryType.value : salaryType,
+  //           Payscale: payscale === selectedPayscale ? selectedPayscale.value : payscale,
+  //           PFNo: PFNo,
+  //           salary_month: salaryMonth,
+  //           company_code: sessionStorage.getItem('selectedCompanyCode'),
+  //           modified_by: sessionStorage.getItem('selectedUserCode')
+  //         };
 
-          const response = await fetch(`${config.apiBaseUrl}/updateSalaryDetails`, {
+  //         const response = await fetch(`${config.apiBaseUrl}/updateSalaryDetails`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify(Header),
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully!", {
+  //             onClose: () => window.location.reload(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //           console.error(errorResponse.details || errorResponse.message);
+  //         }
+  //       } catch (error) {
+  //         console.error("Error inserting data:", error);
+  //         toast.error('Error inserting data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     }
+  //   );
+  // };
+const handleUpdate = async () => {
+  if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  setError(false);
+
+  const currentData = {
+    EmployeeId: EmployeeId || "",
+    salaryType: selectedSalaryType?.value || salaryType,
+    Payscale: selectedPayscale?.value || payscale,
+    PFNo: PFNo || "",
+    salary_month: salaryMonth || ""
+  };
+
+  const isChanged =
+    JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+  if (!isChanged) {
+    toast.warning("No changes detected");
+    return;
+  }
+
+  showConfirmationToast(
+    "Are you sure you want to update the data ?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const Header = {
+          ...currentData,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode")
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/updateSalaryDetails`,
+          {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json"
             },
-            body: JSON.stringify(Header),
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully!", {
-              onClose: () => window.location.reload(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
-            console.error(errorResponse.details || errorResponse.message);
+            body: JSON.stringify(Header)
           }
-        } catch (error) {
-          console.error("Error inserting data:", error);
-          toast.error('Error inserting data: ' + error.message);
-        } finally {
-          setLoading(false);
+        );
+
+        if (response.ok) {
+          toast.success("Data updated successfully!", {
+            onClose: () => window.location.reload()
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message || "Update failed");
         }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
+
+      } catch (error) {
+        toast.error("Error updating data: " + error.message);
+      } finally {
+        setLoading(false);
       }
-    );
-  };
+    },
+    () => {
+      toast.info("Data update cancelled.");
+    }
+  );
+};
 
   const reloadGridData = () => {
     window.location.reload();

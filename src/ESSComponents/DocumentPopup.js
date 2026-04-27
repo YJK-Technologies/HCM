@@ -34,19 +34,19 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "First_Name",
     editable: false,
     cellStyle: { textAlign: "center" },
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "Middle_Name",
     editable: false,
     cellStyle: { textAlign: "center" },
   },
   {
-    headerName: "Employee Last Name",
+    headerName: "Last Name",
     field: "Last_Name",
     editable: false,
     cellStyle: { textAlign: "center" },
@@ -405,7 +405,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                       className="exp-input-field form-control"
                       value={Employee_Id}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       maxLength={18}
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -421,7 +421,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>

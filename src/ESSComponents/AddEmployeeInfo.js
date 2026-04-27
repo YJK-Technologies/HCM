@@ -109,6 +109,7 @@ function Input({ }) {
   const [isSelectState, setIsSelectState] = useState(false);
   const [isSelectCountry, setIsSelectCountry] = useState(false);
   const [isSelectOtherType, setIsSelectOtherType] = useState(false);
+  const [originalData, setOriginalData] = useState(null);
   const logo = useRef(null)
 
   //code added by Pavun purpose of set user permisssion
@@ -304,6 +305,68 @@ function Input({ }) {
       toast.warning("Please enter a valid email business");
       return;
     }
+
+    const currentData = {
+      First_Name,
+      Middle_Name,
+      Last_Name,
+      Father_Name,
+      Mother_Name,
+      DOB,
+      Gender: selectedGender,
+      Email,
+      Phone1,
+      Phone2,
+      address1,
+      address2,
+      address3,
+      permanantAddress,
+      reference_Name,
+      reference_Phone,
+      pan_No,
+      Aadhaar_no,
+      marital_Status: selectedmartial,
+      kids: selectedkids,
+      Grade_id: selectedgradeid,
+
+      title,
+      placeOfBirth,
+      nationality,
+      religion,
+      bloodGroup,
+
+      spouseName,
+      noOfChildren,
+      noOfSiblings,
+      businessEmail,
+
+      emergencyContactName,
+      emergencyContactPhone,
+      emergencyContactRelation,
+
+      city,
+      state,
+      country,
+      postalCode,
+
+      passportNo,
+      passportExpiryDate,
+
+      otherIdType,
+      otherIdNo
+    };
+    if (
+      JSON.stringify(currentData) === JSON.stringify(originalData) &&
+      !user_images?.name
+    ) {
+      toast.warning("No changes detected");
+      return;
+    }
+    
+      if (JSON.stringify(currentData) === JSON.stringify(originalData) && !user_images?.name) {
+        toast.warning("No changes detected");
+        return;
+      }
 
     showConfirmationToast(
       "Are you sure you want to update the data ?",
@@ -920,6 +983,55 @@ function Input({ }) {
         setSelectedOtherIdType(selectedOtherIdType);
         setOtherIdType(selectedOtherIdType?.value || null);
 
+        setOriginalData({
+          First_Name,
+          Middle_Name,
+          Last_Name,
+          Father_Name: father_name,
+          Mother_Name: mother_name,
+          DOB: formatDate(DOB),
+          Gender,
+          Email: email,
+          Phone1: phone1,
+          Phone2: phone2,
+          address1: Address1,
+          address2,
+          address3,
+          permanantAddress: PermanantAddress,
+          reference_Name: Reference_name,
+          reference_Phone: Reference_Phone,
+          pan_No: Pan_No,
+          Aadhaar_no: Aadhar_no,
+          marital_Status: Marital_Status,
+          kids: Kids,
+          Grade_id,
+                
+          title: Title,
+          placeOfBirth: Place_of_Birth,
+          nationality: Nationality,
+          religion: Religion,
+          bloodGroup: Blood_Group,
+                
+          spouseName: Spouse_Name,
+          noOfChildren: Number_of_Children,
+          noOfSiblings: Number_of_Siblings,
+          businessEmail: Email_Business,
+                
+          emergencyContactName: Emergency_Contact_Name,
+          emergencyContactPhone: Emergency_Contact_Phone,
+          emergencyContactRelation: Emergency_Contact_Relationship,
+                
+          city: City,
+          state: State,
+          country: Country,
+          postalCode: Postal_Code,
+                
+          passportNo: Passport_No,
+          passportExpiryDate: formatDate(Passport_Expiry_Date),
+                
+          otherIdType: Other_Id_Type,
+          otherIdNo: Other_Id_No
+        });
         console.log("data fetched successfully")
       } else if (response.status === 404) {
         toast.error("Data not found")

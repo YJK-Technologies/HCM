@@ -387,6 +387,12 @@ function Input({}) {
             documentUrl: documentUrl,
             document: documentFile,
             keyfield: keyfield,
+
+            isNewFile: false,
+
+            originalData: {
+              documentName: document_name || "",
+            },
           };
 
           const existingRelation = acc.find(
@@ -547,6 +553,7 @@ function Input({}) {
                         ...member,
                         document: file,
                         documentUrl: fileUrl,
+                        isNewFile: true,
                       }
                     : member,
                 ),
@@ -565,79 +572,168 @@ function Input({}) {
     }
   };
 
-  const handleUpdate = async (relationName, index) => {
-    const relationGroup = documents.find(
-      (group) => group.relation === relationName,
-    );
-    const member = relationGroup ? relationGroup.members[index] : null;
+  // const handleUpdate = async (relationName, index) => {
+  //   const relationGroup = documents.find(
+  //     (group) => group.relation === relationName,
+  //   );
+  //   const member = relationGroup ? relationGroup.members[index] : null;
 
-    if (!member.keyfield) {
-      setError(true);
-      toast.warning("Error: Missing required keyfield");
-      return;
-    }
+  //   if (!member.keyfield) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required keyfield");
+  //     return;
+  //   }
 
-    if (!member) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
+  //   if (!member) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-    if (!member.documentName || !member.keyfield) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
+  //   if (!member.documentName || !member.keyfield) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-    const fileBase64 = member.document
-      ? await convertToBase64(member.document)
-      : null;
+  //   const fileBase64 = member.document
+  //     ? await convertToBase64(member.document)
+  //     : null;
 
-    const editedData = {
-      EmployeeId: employeeId,
-      document_name: member.documentName,
-      document_files: fileBase64,
-      keyfield: member.keyfield,
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
-    };
-    setError(false);
+  //   const editedData = {
+  //     EmployeeId: employeeId,
+  //     document_name: member.documentName,
+  //     document_files: fileBase64,
+  //     keyfield: member.keyfield,
+  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //     modified_by: sessionStorage.getItem('selectedUserCode')
+  //   };
+  //   setError(false);
 
-    showConfirmationToast(
-      "Are you sure you want to update the data in the row ?",
-      async () => {
-        try {
-          setLoading(true);
-          const response = await fetch(`${config.apiBaseUrl}/updateempDoc`, {
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data in the row ?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const response = await fetch(`${config.apiBaseUrl}/updateempDoc`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({ editedData: [editedData] }),
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully!", {
+  //             onClose: () => window.location.reload(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           console.error(errorResponse.message);
+  //           toast.warning(errorResponse.message, {});
+  //         }
+  //       } catch (err) {
+  //         console.error("Error delete data:", err);
+  //         toast.error("Error delete data: " + err.message, {});
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     },
+  //   );
+  // };
+const handleUpdate = async (relationName, index) => {
+  const relationGroup = documents.find(
+    (group) => group.relation === relationName,
+  );
+
+  const member = relationGroup ? relationGroup.members[index] : null;
+
+  if (!member.keyfield) {
+    setError(true);
+    toast.warning("Error: Missing required keyfield");
+    return;
+  }
+
+  if (!member) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  if (!member.documentName) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  // ✅ No change detection
+  const original = member.originalData;
+
+  if (
+    original &&
+    original.documentName === member.documentName &&
+    member.isNewFile === false
+  ) {
+    toast.warning("No changes detected");
+    return;
+  }
+
+  const fileBase64 = member.document
+    ? await convertToBase64(member.document)
+    : null;
+
+  const editedData = {
+    EmployeeId: employeeId,
+    document_name: member.documentName,
+    document_files: fileBase64,
+    keyfield: member.keyfield,
+    company_code: sessionStorage.getItem("selectedCompanyCode"),
+    modified_by: sessionStorage.getItem("selectedUserCode"),
+  };
+
+  setError(false);
+
+  showConfirmationToast(
+    "Are you sure you want to update the data in the row ?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/updateempDoc`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ editedData: [editedData] }),
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully!", {
-              onClose: () => window.location.reload(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            console.error(errorResponse.message);
-            toast.warning(errorResponse.message, {});
+            body: JSON.stringify({
+              editedData: [editedData],
+            }),
           }
-        } catch (err) {
-          console.error("Error delete data:", err);
-          toast.error("Error delete data: " + err.message, {});
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      },
-    );
-  };
+        );
 
+        if (response.ok) {
+          toast.success("Data updated successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message);
+        }
+      } catch (err) {
+        toast.error("Error update data: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Data update cancelled.");
+    }
+  );
+}
   const handleDelete = async (relationName, index) => {
     const relationGroup = documents.find(
       (group) => group.relation === relationName,

@@ -19,19 +19,19 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Employee First Name",
+    headerName: "First Name",
     field: "first_name",
     filter: 'agTextColumnFilter',
     editable: true,
   },
   {
-    headerName: "Employee Middle Name",
+    headerName: "Middle Name",
     field: "middle_name",
     filter: 'agTextColumnFilter',
     editable: true,
   },
   {
-    headerName: "Employee Last  Name",
+    headerName: "Last Name",
     field: "Last_Name",
     filter: 'agTextColumnFilter',
     editable: true,
@@ -295,7 +295,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -311,7 +311,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       value={EmployeeName}
                       maxLength={250}
                       onChange={(e) => setEmployeeName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee Name</label>
@@ -327,7 +327,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       value={relation}
                       maxLength={100}
                       onChange={(e) => setRelation(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Relation</label>
@@ -343,7 +343,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       value={Name}
                       maxLength={100}
                       onChange={(e) => setName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Relation Name</label>

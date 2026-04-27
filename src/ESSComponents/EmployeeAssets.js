@@ -32,6 +32,7 @@ function EmployeeAssets({}) {
   const [selectedAssetID, setselectedAssetID] = useState("");
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
+  const [originalAssetvalue, setOriginalAssetvalue] = useState([]);
   const location = useLocation();
 
   const [Assetvalue, setAssetvalue] = useState([
@@ -436,21 +437,99 @@ const handleSave = async () => {
   }
 };
 
-  const handleUpdateAsset = async (relation, index) => {
+//   const handleUpdateAsset = async (relation, index) => {
+//   const relationGroup = Assetvalue.find(
+//     (group) => group.relation === relation
+//   );
+
+//   const member = relationGroup?.members[index];
+
+//   if (!member?.keyfield) {
+//     toast.warning("Missing keyfield");
+//     return;
+//   }
+
+//   const parseDate = (date) => {
+//   return date ? new Date(date) : null;
+// };
+
+//   const editedData = {
+//     Keyfield: member.keyfield,
+//     AssetID: member.AssetID?.value,
+//     EmployeeID: EmployeeID,
+//     AllocationDate: parseDate(member.AllocationDate),
+//     ExpectedReturnDate: parseDate(member.ExpectedReturnDate),
+//     ActualReturnDate: parseDate(member.ActualReturnDate),
+//     AllocationStatus: member.selectedStatus?.value,
+//     ConditionAtIssue: member.ConditionAtIssue,
+//     ConditionAtReturn: member.ConditionAtReturn,
+//     ApprovedBy: member.ApprovedBy,
+//     Remarks: member.Remarks,
+//     company_code: sessionStorage.getItem("selectedCompanyCode"),
+//     modify_by: sessionStorage.getItem('selectedUserCode')
+
+//   };
+
+//   showConfirmationToast(
+//     "Update this row?",
+//     async () => {
+//       setLoading(true);
+//       try {
+//         const res = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopUpdate`, {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({ EmployeeAssetsData: [editedData] }),
+//         });
+
+//         if (res.ok) {
+//           toast.success("Updated successfully", {
+//             onClose: () => window.location.reload(),
+//           });
+//         } else {
+//           const err = await res.json();
+//           toast.warning(err.message);
+//         }
+//       } catch (e) {
+//         toast.error(e.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//       },
+//       () => {
+//         toast.info("Data updated cancelled.");
+//       },
+//   );
+// };
+
+const handleUpdateAsset = async (relation, index) => {
   const relationGroup = Assetvalue.find(
     (group) => group.relation === relation
   );
 
+  const originalGroup = originalAssetvalue.find(
+    (group) => group.relation === relation
+  );
+
   const member = relationGroup?.members[index];
+  const originalMember = originalGroup?.members[index];
 
   if (!member?.keyfield) {
     toast.warning("Missing keyfield");
     return;
   }
 
+  // No changes check
+  const currentData = JSON.stringify(member);
+  const oldData = JSON.stringify(originalMember);
+
+  if (currentData === oldData) {
+    toast.warning("No changes detected. Please modify before update.");
+    return;
+  }
+
   const parseDate = (date) => {
-  return date ? new Date(date) : null;
-};
+    return date ? new Date(date) : null;
+  };
 
   const editedData = {
     Keyfield: member.keyfield,
@@ -465,8 +544,7 @@ const handleSave = async () => {
     ApprovedBy: member.ApprovedBy,
     Remarks: member.Remarks,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
-    modify_by: sessionStorage.getItem('selectedUserCode')
-
+    modify_by: sessionStorage.getItem("selectedUserCode"),
   };
 
   showConfirmationToast(
@@ -474,11 +552,18 @@ const handleSave = async () => {
     async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopUpdate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ EmployeeAssetsData: [editedData] }),
-        });
+        const res = await fetch(
+          `${config.apiBaseUrl}/EmployeeAssetsLoopUpdate`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              EmployeeAssetsData: [editedData],
+            }),
+          }
+        );
 
         if (res.ok) {
           toast.success("Updated successfully", {
@@ -493,10 +578,10 @@ const handleSave = async () => {
       } finally {
         setLoading(false);
       }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      },
+    },
+    () => {
+      toast.info("Update cancelled");
+    }
   );
 };
 
@@ -684,7 +769,8 @@ const handleDeleteAsset = async (relation, index) => {
         ];
 
         setAssetvalue(mappedAssets);
-                console.log(mappedAssets);
+        setOriginalAssetvalue(JSON.parse(JSON.stringify(mappedAssets)));
+        console.log(mappedAssets);
 
       } else if (response.status === 404) {
         toast.warning("Data not found");
