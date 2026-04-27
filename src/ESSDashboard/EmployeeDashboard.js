@@ -1075,6 +1075,7 @@ const Dashboard = (payslip) => {
         body: JSON.stringify({
           userID: sessionStorage.getItem('selectedUserCode'),
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          created_by: sessionStorage.getItem("selectedUserCode"),
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
