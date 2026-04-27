@@ -277,7 +277,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Country Code"
                 required
                 autoComplete="off"
                 value={Country_Code}
@@ -294,7 +294,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Country Name"
                 required
                 autoComplete="off"
                 value={Country_Name}
@@ -309,6 +309,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
               <input
                 id="ordno"
                 class="exp-input-field form-control"
+                  title="Please Enter the Default Timezone"
                 type="text"
                 placeholder=""
                 required
@@ -324,6 +325,7 @@ const weekoffMap = weekoffdrop.reduce((acc, item) => {
               className={`inputGroup selectGroup 
               ${selectedWeekoff ? "has-value" : ""} 
               ${issslectedweekoff ? "is-focused" : ""}`}
+              title="Please Select the Week Start Day"
             >
               <Select
                 id="status"

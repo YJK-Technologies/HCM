@@ -416,6 +416,7 @@ function PrintTemplate() {
                             <input
                                 id="employeeId"
                                 className="exp-input-field form-control"
+                                title="Please Enter the Screens"
                                 type="text"
                                 placeholder=""
                                 required
@@ -435,10 +436,10 @@ function PrintTemplate() {
                             <input
                                 id="employeeId"
                                 className="exp-input-field form-control"
+                                title="Please fill the Template Name"
                                 type="text"
                                 placeholder=""
                                 required
-                                title="Please enter the EmployeeId"
                                 value={templatename}
                                 ref={employeeIdRef}
                                 onChange={(e) => settemplatename(e.target.value)}
@@ -494,7 +495,7 @@ function PrintTemplate() {
                                             value={member.screenName}
                                             placeholder=" "
                                             maxLength={50}
-                                            title="Please enter the Academic Name"
+                                            title="Please enter the Screens"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'screenName', e.target.value)}
                                         />
                                         <label className={` exp-form-labels ${error && !member.screenName ? 'text-danger' : ''}`}>Screens{showAsterisk && <span className="text-danger">*</span>}</label>
@@ -509,7 +510,7 @@ function PrintTemplate() {
                                             value={member.templatename}
                                             placeholder=" "
                                             maxLength={125}
-                                            title="Please enter the Major"
+                                            title="Please enter the Template Name"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'templatename', e.target.value)}
                                         />
                                         <label className={`exp-form-labels ${error && !member.templatename ? 'text-danger' : ''}`}>Template Name{showAsterisk && <span className="text-danger">*</span>}</label>

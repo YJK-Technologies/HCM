@@ -613,7 +613,7 @@ function Department() {
                   type="text"
                   placeholder=""
                   required
-                  title="Please fill the Department Code here"
+                  title="Please Enter the Department Code "
                   value={dept_id}
                   maxLength={18}
                   onChange={(e) => setdept_id(e.target.value)}
@@ -631,7 +631,7 @@ function Department() {
                   type="text"
                   placeholder=""
                   required
-                  title="Please fill the Department Name here"
+                  title="Please Enter the Department Name "
                   value={dept_name}
                   maxLength={18}
                   onChange={(e) => setdept_name(e.target.value)}
@@ -646,6 +646,7 @@ function Department() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please select the Status"
               >
                 <Select
                   id="status"

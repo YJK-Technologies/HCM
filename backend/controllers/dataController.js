@@ -48352,6 +48352,33 @@ const GetLoanTypeID = async (req, res) => {
 };
 //code ended by Sakthi on 24-04-2026
 
+//Code added by pavun on 25-06-2026
+const shiftRequestEmployeeApproval = async (req, res) => {
+  const { request_id, company_code, swap_employee_id, is_swap_request } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SEA")
+      .input("request_id", sql.Int, request_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("swap_employee_id", sql.NVarChar, swap_employee_id)
+      .input("is_swap_request", sql.NVarChar, is_swap_request)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','','',''`);
+
+    res.status(200).json({
+      success: true,
+      message: "Shift change request updated successfully",
+    });
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 25-06-2026
+
 //code added by Dinesh Gokul on 24-04-2026
 const getAllDesgination = async (req, res) => {
   const { dept_id, company_code } = req.body;
@@ -49799,6 +49826,7 @@ module.exports = {
   shiftChangeRequestInsert,
   shiftChangeRequestEmployee,
   getAllDesgination,
-  deletePrintTemplates
+  deletePrintTemplates,
+  shiftRequestEmployeeApproval
 
 };
