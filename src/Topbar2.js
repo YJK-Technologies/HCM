@@ -8,6 +8,7 @@ import DocumentPdf from './pdf/YJK_ERP_DOCUMENTATION.pdf';
 import { ThemeProvider } from './ThemeContext';
 import AppContent from './App_content';
 import { showConfirmationToast } from './ToastConfirmation';
+import { ToastContainer, toast } from 'react-toastify';
 
 // Assuming config is imported from Apiconfig
 const TopBar = () => {
@@ -52,9 +53,44 @@ const TopBar = () => {
     }
   }, [company_code, user_code, config.apiBaseUrl]);
 
+  // useEffect(() => {
+  //   fetchNotifications();
+  // }, [fetchNotifications]);
+
   useEffect(() => {
     fetchNotifications();
+
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [fetchNotifications]);
+
+const handleRequestAction = async (requestId, actionStatus) => {
+  try {
+    const response = await fetch(`${config.apiBaseUrl}/shiftRequestEmployeeApproval`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request_id: requestId,
+        company_code: sessionStorage.getItem('selectedCompanyCode'),
+        swap_employee_id: sessionStorage.getItem('selectedUserCode'),
+        is_swap_request: actionStatus 
+      }),
+    });
+
+    if (response.ok) {
+      toast.success(`Request ${actionStatus} successfully!`);
+      fetchNotifications();
+    } else {
+      toast.error("Process failed. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error processing request:", err);
+    toast.error("Internal Server Error");
+  }
+};
 
   // const handleLogout = () => {
   //   localStorage.clear();
@@ -423,10 +459,24 @@ const TopBar = () => {
                           </div>
 
                           <div className="d-flex flex-column gap-2">
-                            <button className="action-btn-circle approve" title="Approve">
+                            <button
+                              className="action-btn-circle approve"
+                              title="Approve"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRequestAction(req.request_id, "Approved");
+                              }}
+                            >
                               <i className="bi bi-check-lg"></i>
                             </button>
-                            <button className="action-btn-circle reject" title="Reject">
+                            <button
+                              className="action-btn-circle reject"
+                              title="Reject"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRequestAction(req.request_id, "Rejected");
+                              }}
+                            >
                               <i className="bi bi-x-lg"></i>
                             </button>
                           </div>
@@ -509,7 +559,7 @@ const TopBar = () => {
                         <span className="badge bg-soft-purple text-purple x-small">Shift Change Request</span>
                       </div>
 
-                      <p className="text-white-50 small mb-1 text-truncate-2" style={{paddingLeft:"0px"}}>
+                      <p className="text-white-50 small mb-1 text-truncate-2" style={{ paddingLeft: "0px" }}>
                         Requested <strong>{req.requested_shift_name}</strong> for {new Date(req.FromDate).toLocaleDateString()}.
                       </p>
 
@@ -518,10 +568,18 @@ const TopBar = () => {
 
                   {/* Right Side: Action Buttons */}
                   <div className="d-flex gap-2 ms-3 flex-shrink-0">
-                    <button className="action-btn-circle approve-btn" title="Approve">
+                    <button
+                      className="action-btn-circle approve-btn"
+                      title="Approve"
+                      onClick={() => handleRequestAction(req.request_id, "Approved")}
+                    >
                       <i className="bi bi-check-lg"></i>
                     </button>
-                    <button className="action-btn-circle reject-btn" title="Reject">
+                    <button
+                      className="action-btn-circle reject-btn"
+                      title="Reject"
+                      onClick={() => handleRequestAction(req.request_id, "Rejected")}
+                    >
                       <i className="bi bi-x-lg"></i>
                     </button>
                   </div>
