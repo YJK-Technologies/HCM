@@ -222,7 +222,7 @@ const handleConfirm = () => {
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee ID</label>
@@ -238,7 +238,7 @@ const handleConfirm = () => {
                       value={AssetID}
                       maxLength={250}
                       onChange={(e) => setAssetID(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">AssetID</label>
@@ -254,7 +254,7 @@ const handleConfirm = () => {
                       value={ConditionAtIssue}
                       maxLength={100}
                       onChange={(e) => setConditionAtIssue(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">ConditionAtIssue</label>
@@ -270,7 +270,7 @@ const handleConfirm = () => {
                       value={Remarks}
                       maxLength={100}
                       onChange={(e) => setRemarks(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Remarks</label>

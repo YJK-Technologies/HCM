@@ -204,7 +204,16 @@ function Input({}) {
             expiryDate: formattedExpiryDate || "",
             documentUrl: documentUrl,
             document: documentFile,
-            keyfield: keyfield || documentNo, //  IMPORTANT
+            keyfield: keyfield || documentNo,
+
+            isNewFile: false,
+
+            originalData: {
+              documentType: documentType || "",
+              documentNo: documentNo || "",
+              issueDate: formattedIssueDate || "",
+              expiryDate: formattedExpiryDate || "",
+            },
           };
 
           const existingRelation = acc.find(
@@ -601,6 +610,7 @@ function Input({}) {
                         ...member,
                         document: file,
                         documentUrl: fileUrl,
+                        isNewFile: true,
                       }
                     : member,
                 ),
@@ -658,6 +668,19 @@ function Input({}) {
       toast.error("Issue Date must be less than Expiry Date");
       return; // STOPS UPDATE
     }
+    const original = member.originalData;
+    if (
+      original &&
+      original.documentType === member.documentType &&
+      original.documentNo === member.documentNo &&
+      original.issueDate === member.issueDate &&
+      original.expiryDate === member.expiryDate &&
+      member.isNewFile === false
+    ) {
+      toast.warning("No changes detected");
+      return;
+    }
+
     const fileBase64 = member.document
       ? await convertToBase64(member.document)
       : null;

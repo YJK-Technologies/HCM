@@ -58,7 +58,7 @@ function Input({}) {
   const [isSelectAirTicket, setIsSelectAirTicket] = useState({});
   const [isSelectVisa, setIsSelectVisa] = useState({});
   const [loading, setLoading] = useState(false);
-
+  const [originalFamilyMembers, setOriginalFamilyMembers] = useState([]);
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const familyPermissions = permissions
@@ -387,86 +387,200 @@ function Input({}) {
     );
   };
 
-  const handleUpdate = async (relationName, index) => {
-    const relationGroup = familyMembers.find(
-      (group) => group.relation === relationName,
-    );
-    const member = relationGroup ? relationGroup.members[index] : null;
-    if (!member.keyfield) {
-      setDeleteError(" ");
-      toast.warning("Error: Missing required keyfield");
-      return;
-    }
-    console.log("member", member);
-    if (!member) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
-    if (!member.relationName || !member.name || !member.dob || !member.Age) {
-      setError(true);
-      toast.warning("Error: Missing required fields");
-      return;
-    }
-    const editedData = {
-      EmployeeId: employeeID,
-      Relation: member.relationName,
-      Name: member.name,
-      DOB: member.dob,
-      AGE: member.Age,
-      aadhar_no: member.aadharNo,
-      keyfield: member.keyfield,
-      Sex: member.sex,
-      Nationality: member.nationality,
-      CPR_No: member.CRPNo,
-      CPR_Expiry_Date: member.CRP_ExpiryDate,
-      Passport_No: member.passportNo,
-      Passport_Expiry_Date: member.passportExpiryDate,
-      Visa_Entitled: Number(member.visaEntitled),
-      Visa_Expiry_Date: member.visaExpiryDate,
-      Air_Ticket_Entitled: Number(member.airTicketEntitled),
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+  // const handleUpdate = async (relationName, index) => {
+  //   const relationGroup = familyMembers.find(
+  //     (group) => group.relation === relationName,
+  //   );
+  //   const member = relationGroup ? relationGroup.members[index] : null;
+  //   if (!member.keyfield) {
+  //     setDeleteError(" ");
+  //     toast.warning("Error: Missing required keyfield");
+  //     return;
+  //   }
+  //   console.log("member", member);
+  //   if (!member) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
+  //   if (!member.relationName || !member.name || !member.dob || !member.Age) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
+  //   const editedData = {
+  //     EmployeeId: employeeID,
+  //     Relation: member.relationName,
+  //     Name: member.name,
+  //     DOB: member.dob,
+  //     AGE: member.Age,
+  //     aadhar_no: member.aadharNo,
+  //     keyfield: member.keyfield,
+  //     Sex: member.sex,
+  //     Nationality: member.nationality,
+  //     CPR_No: member.CRPNo,
+  //     CPR_Expiry_Date: member.CRP_ExpiryDate,
+  //     Passport_No: member.passportNo,
+  //     Passport_Expiry_Date: member.passportExpiryDate,
+  //     Visa_Entitled: Number(member.visaEntitled),
+  //     Visa_Expiry_Date: member.visaExpiryDate,
+  //     Air_Ticket_Entitled: Number(member.airTicketEntitled),
+  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //     modified_by: sessionStorage.getItem('selectedUserCode')
 
-    };
-    setError(false);
-    showConfirmationToast(
-      "Are you sure you want to update the data in the row ?",
-      async () => {
-        try {
-          setLoading(true);
-          const response = await fetch(
-            `${config.apiBaseUrl}/updateEmployeeFamily`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ editedData: [editedData] }),
-            },
-          );
-          if (response.ok) {
-            toast.success("Data updated successfully!", {
-              onClose: () => window.location.reload(),
-            });
-          } else {
-            const errorResponse = await response.json();
-            console.error(errorResponse.message);
-            toast.warning(errorResponse.message, {});
-          }
-        } catch (err) {
-          console.error("Error updating data:", err);
-          toast.error("Error updating data: " + err.message, {});
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      },
-    );
+  //   };
+  //   setError(false);
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data in the row ?",
+  //     async () => {
+  //       try {
+  //         setLoading(true);
+  //         const response = await fetch(
+  //           `${config.apiBaseUrl}/updateEmployeeFamily`,
+  //           {
+  //             method: "POST",
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body: JSON.stringify({ editedData: [editedData] }),
+  //           },
+  //         );
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully!", {
+  //             onClose: () => window.location.reload(),
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           console.error(errorResponse.message);
+  //           toast.warning(errorResponse.message, {});
+  //         }
+  //       } catch (err) {
+  //         console.error("Error updating data:", err);
+  //         toast.error("Error updating data: " + err.message, {});
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     },
+  //   );
+  // };
+const handleUpdate = async (relationName, index) => {
+  const relationGroup = familyMembers.find(
+    (group) => group.relation === relationName,
+  );
+
+  const member = relationGroup ? relationGroup.members[index] : null;
+
+  if (!member.keyfield) {
+    setDeleteError(" ");
+    toast.warning("Error: Missing required keyfield");
+    return;
+  }
+
+  if (!member) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  if (!member.relationName || !member.name || !member.dob || !member.Age) {
+    setError(true);
+    toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  /* ---------------- CHECK NO CHANGES ---------------- */
+  const originalMember =
+    originalFamilyMembers
+      ?.find((group) => group.relation === relationName)
+      ?.members[index];
+
+  if (originalMember) {
+    const noChanges =
+      originalMember.relationName === member.relationName &&
+      originalMember.name === member.name &&
+      originalMember.dob === member.dob &&
+      String(originalMember.Age) === String(member.Age) &&
+      originalMember.aadharNo === member.aadharNo &&
+      originalMember.sex === member.sex &&
+      originalMember.nationality === member.nationality &&
+      originalMember.CRPNo === member.CRPNo &&
+      originalMember.CRP_ExpiryDate === member.CRP_ExpiryDate &&
+      originalMember.passportNo === member.passportNo &&
+      originalMember.passportExpiryDate === member.passportExpiryDate &&
+      String(originalMember.visaEntitled) === String(member.visaEntitled) &&
+      originalMember.visaExpiryDate === member.visaExpiryDate &&
+      String(originalMember.airTicketEntitled) ===
+        String(member.airTicketEntitled);
+
+    if (noChanges) {
+      toast.warning("No changes detected. Update not required.");
+      return;
+    }
+  }
+  /* ---------------- END CHECK ---------------- */
+
+  const editedData = {
+    EmployeeId: employeeID,
+    Relation: member.relationName,
+    Name: member.name,
+    DOB: member.dob,
+    AGE: member.Age,
+    aadhar_no: member.aadharNo,
+    keyfield: member.keyfield,
+    Sex: member.sex,
+    Nationality: member.nationality,
+    CPR_No: member.CRPNo,
+    CPR_Expiry_Date: member.CRP_ExpiryDate,
+    Passport_No: member.passportNo,
+    Passport_Expiry_Date: member.passportExpiryDate,
+    Visa_Entitled: Number(member.visaEntitled),
+    Visa_Expiry_Date: member.visaExpiryDate,
+    Air_Ticket_Entitled: Number(member.airTicketEntitled),
+    company_code: sessionStorage.getItem("selectedCompanyCode"),
+    modified_by: sessionStorage.getItem("selectedUserCode"),
   };
 
+  setError(false);
+
+  showConfirmationToast(
+    "Are you sure you want to update the data in the row ?",
+    async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/updateEmployeeFamily`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ editedData: [editedData] }),
+          },
+        );
+
+        if (response.ok) {
+          toast.success("Data updated successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        } else {
+          const errorResponse = await response.json();
+          toast.warning(errorResponse.message);
+        }
+      } catch (err) {
+        toast.error("Error updating data: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Data updated cancelled.");
+    },
+  );
+};
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleEmployeeFamily(employeeID);
@@ -581,6 +695,11 @@ function Input({}) {
         }, []);
 
         setFamilyMembers(updatedFamilyMembers);
+
+        setOriginalFamilyMembers(
+          JSON.parse(JSON.stringify(updatedFamilyMembers))
+        );
+
         setEmployeeId(EmployeeId);
       } else if (response.status === 404) {
         toast.warning("Data not found");
@@ -862,15 +981,15 @@ useEffect(() => {
 
 useEffect(() => {
   if (
-    employeeID &&
+    location.state?.employeeId &&
     relativedrop.length &&
     booleanDrop.length &&
     sexDrop.length &&
     nationalityDrop.length
   ) {
-    handleEmployeeFamily(employeeID);
+    handleEmployeeFamily(location.state.employeeId);
   }
-}, [employeeID, relativedrop, booleanDrop, sexDrop, nationalityDrop]);
+}, [location.state, relativedrop, booleanDrop, sexDrop, nationalityDrop]);
 
   return (
     <div class="container-fluid Topnav-screen ">
