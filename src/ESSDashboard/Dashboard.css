@@ -3988,3 +3988,76 @@
 .Toastify__toast-container--top-right {
     z-index: 1000001 !important;
 }
+
+
+/* Added this code for mobile view of My Team & Time Tracking -- 28-04-2026 by Dinesh Gokul */
+/* --- PERFECT ALIGNMENT FIX --- */
+@media (max-width: 768px) {
+  
+  /* 1. The Container: Pull it up slightly to fix the top gap */
+  .main-stats-container {
+    display: flex !important;
+    flex-direction: column !important;
+    /* Pulls the whole group up to match the standard 0.25rem gap */
+    margin-top: -0.25rem !important; 
+  }
+
+  /* 2. My Team Section */
+  .my-team-wrapper {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    /* Maintain the internal gap you liked */
+    margin-top: 0.25rem !important; 
+    margin-bottom: 0.50rem !important;
+  }
+
+  /* 3. Time Tracking Section */
+  .time-tracking-wrapper {
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    /* Standard gap for internal and external bottom spacing */
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+/* --- Mobile Responsive Filters (Targeting screens < 768px) --- */
+@media (max-width: 768px) {
+  /* 1. Ensure the container wraps its children */
+  .spacing-mb-3.d-flex.flex-row {
+    flex-wrap: wrap !important;
+    gap: 12px 8px !important; /* Vertical gap 12px, Horizontal 8px */
+  }
+
+  /* 2. Make Date inputs take half width each to sit side-by-side */
+  .spacing-mb-3 .col-md-3:nth-child(1),
+  .spacing-mb-3 .col-md-3:nth-child(2) {
+    width: calc(50% - 4px) !important;
+    flex: 0 0 auto;
+  }
+
+  /* 3. Make User Code take most of the width, leaving room for Search */
+  .spacing-mb-3 .col-md-3:nth-child(3) {
+    width: calc(80% - 8px) !important;
+    flex: 0 0 auto;
+  }
+
+  /* 4. Align the Search button to the end of the User Code row */
+  .spacing-mb-3 .btn-primary[title="Search"] {
+    width: calc(20% - 4px) !important;
+    height: 38px !important; /* Matches standard input height */
+    margin-top: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 5. Fix internal label positioning for mobile inputs if they overlap */
+  .inputGroup .exp-input-field {
+    width: 100% !important;
+  }
+}
+
+/* Ended this code for mobile view of My Team & Time Tracking -- 28-04-2026 by Dinesh Gokul */

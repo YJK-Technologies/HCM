@@ -1331,6 +1331,7 @@ const Dashboard = () => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
       const approver = sessionStorage.getItem("selectedUserCode");
+      const modified_by = sessionStorage.getItem("selectedUserCode");
 
       let url = "";
       let body = {};
@@ -1528,6 +1529,7 @@ const Dashboard = () => {
           request_id: id,
           company_code,
           request_status: status,
+          modified_by: sessionStorage.getItem('selectedUserCode'),
         };
       }
 
@@ -3280,8 +3282,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="dashboard-row row ">
-        <div className="col-6 spacing-mt-2">
+      <div className="dashboard-row row main-stats-container">
+        <div className="col-6 spacing-mt-2 time-tracking-wrapper">
           <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full padding-all-3">
             {/* Header Section */}
             <div className="myteam-header">
@@ -3359,7 +3361,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="col-6 spacing-mt-2">
+        <div className="col-6 spacing-mt-2 my-team-wrapper">
           <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
             {/* Header */}
             <div className="myteam-header">
