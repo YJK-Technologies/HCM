@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import TabButtons from "./Tabs";
-import Select from 'react-select'
+import Select from "react-select";
 import { useNavigate, useLocation } from "react-router-dom";
 import FinancialDetails from "./FinanceDetPopup";
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
-const config = require('../Apiconfig');
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
+const config = require("../Apiconfig");
 
-function Input({ }) {
+function Input({}) {
   const [EmployeeId, setEmployeeId] = useState("");
   const [salaryType, setSalaryType] = useState("");
   const [payscale, setPayscale] = useState("");
@@ -20,14 +20,14 @@ function Input({ }) {
   const [error, setError] = useState(false);
   const [salaryTypeDrop, setSalaryTypeDrop] = useState([]);
   const [PayscaleDrop, setPayscaleDrop] = useState([]);
-  const [selectedSalaryType, setSelectedSalaryType] = useState('');
-  const [selectedPayscale, setselectedPayscale] = useState('');
+  const [selectedSalaryType, setSelectedSalaryType] = useState("");
+  const [selectedPayscale, setselectedPayscale] = useState("");
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [updateButtonVisible, setUpdateButtonVisible] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const [First_Name, setFirst_Name] = useState('');
+  const [First_Name, setFirst_Name] = useState("");
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
 
@@ -36,10 +36,10 @@ function Input({ }) {
   const [loading, setLoading] = useState(false);
   const [originalData, setOriginalData] = useState(null);
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const financePermissions = permissions
-    .filter(permission => permission.screen_type === 'FinanceDet')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "FinanceDet")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getSalaryType`, {
@@ -77,80 +77,143 @@ function Input({ }) {
 
   const handleChangeSalaryType = (selectedSalaryType) => {
     setSelectedSalaryType(selectedSalaryType);
-    setSalaryType(selectedSalaryType ? selectedSalaryType.value : '');
+    setSalaryType(selectedSalaryType ? selectedSalaryType.value : "");
   };
 
   const handleChangePayscale = (selectedPayscale) => {
     setselectedPayscale(selectedPayscale);
-    setPayscale(selectedPayscale ? selectedPayscale.value : '');
+    setPayscale(selectedPayscale ? selectedPayscale.value : "");
   };
 
   const NavigatecomDet = () => {
-    navigate("/CompanyDetails", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/CompanyDetails", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const FinanceDet = () => {
-    navigate("/FinanceDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/FinanceDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const BankAccDet = () => {
-    navigate("/BankAccDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/BankAccDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const IdentDoc = () => {
-    navigate("/IdentDoc", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/IdentDoc", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const AcademicDet = () => {
-    navigate("/AcademicDet", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AcademicDet", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Insurance = () => {
-    navigate("/Family", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Family", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const Documents = () => {
-    navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/Documents", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const EmployeeAssets = () => {
-    navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/EmployeeAssets", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
   const EmployeeLoan = () => {
-    navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
+    navigate("/AddEmployeeInfo", {
+      state: {
+        employeeId: EmployeeId,
+        firstName: First_Name,
+        department_id: department_id,
+        designation_id: designation_id,
+      },
+    });
   };
 
-  const [activeTab, setActiveTab] = useState('Financial Details');
+  const [activeTab, setActiveTab] = useState("Financial Details");
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
 
     switch (tabLabel) {
-      case 'Personal Details':
+      case "Personal Details":
         EmployeeLoan();
         break;
-      case 'Company Details':
+      case "Company Details":
         NavigatecomDet();
         break;
-      case 'Financial Details':
+      case "Financial Details":
         FinanceDet();
         break;
-      case 'Bank Account Details':
+      case "Bank Account Details":
         BankAccDet();
         break;
-      case 'Identity Documents':
+      case "Identity Documents":
         IdentDoc();
         break;
-      case 'Academic Details':
+      case "Academic Details":
         AcademicDet();
         break;
-      case 'Family':
+      case "Family":
         Insurance();
         break;
-      case 'Documents':
+      case "Documents":
         Documents();
         break;
-case 'EmployeeAssets':
+      case "EmployeeAssets":
         EmployeeAssets();
         break;
 
@@ -160,19 +223,20 @@ case 'EmployeeAssets':
   };
 
   const tabs = [
-    { label: 'Personal Details' },
-    { label: 'Company Details' },
-    { label: 'Financial Details' },
-    { label: 'Bank Account Details' },
-    { label: 'Identity Documents' },
-    { label: 'Academic Details' },
-    { label: 'Family' },
-    { label: 'Documents' },
-    { label: 'EmployeeAssets' }
+    { label: "Personal Details" },
+    { label: "Company Details" },
+    { label: "Financial Details" },
+    { label: "Bank Account Details" },
+    { label: "Identity Documents" },
+    { label: "Academic Details" },
+    { label: "Family" },
+    { label: "Documents" },
+    { label: "EmployeeAssets" },
   ];
 
   useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+    const { employeeId, firstName, department_id, designation_id } =
+      location.state || {};
 
     if (employeeId) {
       setEmployeeId(employeeId);
@@ -181,11 +245,7 @@ case 'EmployeeAssets':
       setdesignation_id(designation_id || "");
     }
 
-    if (
-      employeeId &&
-      salaryTypeDrop?.length > 0 &&
-      PayscaleDrop?.length > 0
-    ) {
+    if (employeeId && salaryTypeDrop?.length > 0 && PayscaleDrop?.length > 0) {
       handleRefNo(employeeId);
     }
   }, [location.state, salaryTypeDrop, PayscaleDrop]);
@@ -206,8 +266,8 @@ case 'EmployeeAssets':
         Payscale: payscale,
         PFNo: PFNo,
         salary_month: salaryMonth,
-        company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode')
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        created_by: sessionStorage.getItem("selectedUserCode"),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addSalaryDetails`, {
@@ -230,15 +290,15 @@ case 'EmployeeAssets':
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleRefNo(EmployeeId)
+    if (e.key === "Enter") {
+      handleRefNo(EmployeeId);
     }
   };
 
@@ -247,9 +307,12 @@ case 'EmployeeAssets':
       const response = await fetch(`${config.apiBaseUrl}/getEmployeeSalary`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), })
+        body: JSON.stringify({
+          Id: code,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       });
 
       if (response.ok) {
@@ -257,7 +320,18 @@ case 'EmployeeAssets':
         setUpdateButtonVisible(true);
         setShowAsterisk(false);
         const searchData = await response.json();
-        const [{ EmployeeId, PFNo, department_id, First_Name, designation_id, Payscale, salaryType, salary_month }] = searchData;
+        const [
+          {
+            EmployeeId,
+            PFNo,
+            department_id,
+            First_Name,
+            designation_id,
+            Payscale,
+            salaryType,
+            salary_month,
+          },
+        ] = searchData;
 
         setEmployeeId(EmployeeId);
         setPFNo(PFNo);
@@ -266,33 +340,34 @@ case 'EmployeeAssets':
         setdesignation_id(designation_id);
         setFirst_Name(First_Name);
 
-        const selectedSalaryType = filteredOptionSalaryType.find(option => option.value === salaryType);
+        const selectedSalaryType = filteredOptionSalaryType.find(
+          (option) => option.value === salaryType,
+        );
         setSelectedSalaryType(selectedSalaryType);
         console.log(selectedSalaryType.value);
         setSalaryType(selectedSalaryType);
 
-        const selectedOptionPayscale = filteredOptionPayscale.find(option => option.value === Payscale);
+        const selectedOptionPayscale = filteredOptionPayscale.find(
+          (option) => option.value === Payscale,
+        );
         setselectedPayscale(selectedOptionPayscale);
         setPayscale(selectedOptionPayscale);
 
+        // existing setState code...
 
-        
-          // existing setState code...
-        
-          setOriginalData({
-            EmployeeId: EmployeeId || "",
-            salaryType: salaryType || "",
-            Payscale: Payscale || "",
-            PFNo: PFNo || "",
-            salary_month: salary_month || ""
-          });
-
+        setOriginalData({
+          EmployeeId: EmployeeId || "",
+          salaryType: salaryType || "",
+          Payscale: Payscale || "",
+          PFNo: PFNo || "",
+          salary_month: salary_month || "",
+        });
       } else if (response.status === 404) {
-        toast.warning('Data not found');
-        setSalaryType('');
-        setPayscale('');
-        setPFNo('');
-        setSalaryMonth('');
+        toast.warning("Data not found");
+        setSalaryType("");
+        setPayscale("");
+        setPFNo("");
+        setSalaryMonth("");
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
@@ -300,7 +375,7 @@ case 'EmployeeAssets':
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     }
   };
 
@@ -311,7 +386,7 @@ case 'EmployeeAssets':
       return;
     }
     setError(false);
-    
+
     showConfirmationToast(
       "Are you sure you want to Delete the data ?",
       async () => {
@@ -321,16 +396,19 @@ case 'EmployeeAssets':
             EmployeeId: EmployeeId,
             PFNo: PFNo,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            modified_by: sessionStorage.getItem('selectedUserCode')
+            modified_by: sessionStorage.getItem("selectedUserCode"),
           };
 
-          const response = await fetch(`${config.apiBaseUrl}/deleteSalaryDetails`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(
+            `${config.apiBaseUrl}/deleteSalaryDetails`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Header),
             },
-            body: JSON.stringify(Header),
-          });
+          );
 
           if (response.status === 200) {
             console.log("Data deleted successfully");
@@ -339,19 +417,21 @@ case 'EmployeeAssets':
             });
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(
+              errorResponse.message || "Failed to insert sales data",
+            );
             console.error(errorResponse.details || errorResponse.message);
           }
         } catch (error) {
           console.error("Error inserting data:", error);
-          toast.error('Error inserting data: ' + error.message);
+          toast.error("Error inserting data: " + error.message);
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
@@ -362,7 +442,7 @@ case 'EmployeeAssets':
   //     return;
   //   }
   //   setError(false);
-    
+
   //   showConfirmationToast(
   //     "Are you sure you want to update the data ?",
   //     async () => {
@@ -407,74 +487,73 @@ case 'EmployeeAssets':
   //     }
   //   );
   // };
-const handleUpdate = async () => {
-  if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  setError(false);
-
-  const currentData = {
-    EmployeeId: EmployeeId || "",
-    salaryType: selectedSalaryType?.value || salaryType,
-    Payscale: selectedPayscale?.value || payscale,
-    PFNo: PFNo || "",
-    salary_month: salaryMonth || ""
-  };
-
-  const isChanged =
-    JSON.stringify(originalData) !== JSON.stringify(currentData);
-
-  if (!isChanged) {
-    toast.warning("No changes detected");
-    return;
-  }
-
-  showConfirmationToast(
-    "Are you sure you want to update the data ?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const Header = {
-          ...currentData,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          modified_by: sessionStorage.getItem("selectedUserCode")
-        };
-
-        const response = await fetch(
-          `${config.apiBaseUrl}/updateSalaryDetails`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(Header)
-          }
-        );
-
-        if (response.ok) {
-          toast.success("Data updated successfully!", {
-            onClose: () => window.location.reload()
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Update failed");
-        }
-
-      } catch (error) {
-        toast.error("Error updating data: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    () => {
-      toast.info("Data update cancelled.");
+  const handleUpdate = async () => {
+    if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  );
-};
+
+    setError(false);
+
+    const currentData = {
+      EmployeeId: EmployeeId || "",
+      salaryType: selectedSalaryType?.value || salaryType,
+      Payscale: selectedPayscale?.value || payscale,
+      PFNo: PFNo || "",
+      salary_month: salaryMonth || "",
+    };
+
+    const isChanged =
+      JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+    if (!isChanged) {
+      toast.warning("No changes detected");
+      return;
+    }
+
+    showConfirmationToast(
+      "Are you sure you want to update the data ?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const Header = {
+            ...currentData,
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/updateSalaryDetails`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Header),
+            },
+          );
+
+          if (response.ok) {
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data update cancelled.");
+      },
+    );
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -491,7 +570,6 @@ const handleUpdate = async () => {
   };
 
   const finaceDetails = async (data) => {
-
     // 🔴 1. Handle NO DATA case FIRST
     if (!data || data.length === 0) {
       toast.warning("Financial details not found for this employee");
@@ -520,42 +598,53 @@ const handleUpdate = async () => {
     setUpdateButtonVisible(true);
     setShowAsterisk(false);
 
-    const [{
-      employeeId,
-      salaryType,
-      first_name,
-      Department,
-      Designation,
-      Payscale,
-      PFNo,
-      salaryMonth
-    }] = data;
+    const [
+      {
+        employeeId,
+        salaryType,
+        first_name,
+        Department,
+        Designation,
+        Payscale,
+        PFNo,
+        salaryMonth,
+      },
+    ] = data;
 
     console.log("Finance Data:", data);
 
+    setEmployeeId(employeeId || "");
+    setFirst_Name(first_name || "");
+    setdepartment_id(Department || "");
+    setdesignation_id(Designation || "");
+    setPFNo(PFNo || "");
+    setSalaryMonth(salaryMonth || "");
 
-      setEmployeeId(employeeId || "");
-      setFirst_Name(first_name || "");
-      setdepartment_id(Department || "");
-      setdesignation_id(Designation || "");
-      setPFNo(PFNo || "");
-      setSalaryMonth(salaryMonth || "");
+    const selectedSalaryType = filteredOptionSalaryType.find(
+      (option) => option.value === salaryType,
+    );
+    setSelectedSalaryType(selectedSalaryType);
+    setSalaryType(selectedSalaryType?.value || null);
 
-      const selectedSalaryType = filteredOptionSalaryType.find(option => option.value === salaryType);
-      setSelectedSalaryType(selectedSalaryType);
-      setSalaryType(selectedSalaryType?.value || null);
+    const selectedPayscale = filteredOptionPayscale.find(
+      (option) => option.value === Payscale,
+    );
+    setselectedPayscale(selectedPayscale);
+    setPayscale(selectedPayscale?.value || null);
 
-
-      const selectedPayscale = filteredOptionPayscale.find(option => option.value === Payscale);
-      setselectedPayscale(selectedPayscale);
-      setPayscale(selectedPayscale?.value || null);
-
+    setOriginalData({
+      EmployeeId: employeeId || "",
+      salaryType: salaryType || "",
+      Payscale: Payscale || "",
+      PFNo: PFNo || "",
+      salary_month: salaryMonth || "",
+    });
   };
-
 
   const handleSalaryChange = (e) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { // Allow only numeric values
+    if (/^\d*$/.test(value)) {
+      // Allow only numeric values
       setSalaryMonth(value);
     }
   };
@@ -571,31 +660,40 @@ const handleUpdate = async () => {
   //   }
   // }, [location.state]);
 
-
-
-
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Financial Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && ['add', 'all permission'].some(permission => financePermissions.includes(permission)) && (
-              <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
-              </div>
-            )}
-            {updateButtonVisible && ['update', 'all permission'].some(permission => financePermissions.includes(permission)) && (
-              <div className="action-icon update" onClick={handleUpdate}>
-                <span className="tooltip">Update</span>
-                <i class="fa-solid fa-pen-to-square"></i>
-              </div>
-            )}
-            {['delete', 'all permission'].some(permission => financePermissions.includes(permission)) && (
+            {saveButtonVisible &&
+              ["add", "all permission"].some((permission) =>
+                financePermissions.includes(permission),
+              ) && (
+                <div className="action-icon add" onClick={handleSave}>
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
+            {updateButtonVisible &&
+              ["update", "all permission"].some((permission) =>
+                financePermissions.includes(permission),
+              ) && (
+                <div className="action-icon update" onClick={handleUpdate}>
+                  <span className="tooltip">Update</span>
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+              )}
+            {["delete", "all permission"].some((permission) =>
+              financePermissions.includes(permission),
+            ) && (
               <div className="action-icon delete" onClick={handleDelete}>
                 <span className="tooltip">Delete</span>
                 <i class="fa-solid fa-trash"></i>
@@ -609,36 +707,47 @@ const handleUpdate = async () => {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
+              {saveButtonVisible &&
+                ["add", "all permission"].some((p) =>
+                  financePermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  </li>
+                )}
 
-              {saveButtonVisible && ['add', 'all permission'].some(p => financePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                </li>
-              )}
+              {updateButtonVisible &&
+                ["update", "all permission"].some((p) =>
+                  financePermissions.includes(p),
+                ) && (
+                  <li className="dropdown-item" onClick={handleUpdate}>
+                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                  </li>
+                )}
 
-              {updateButtonVisible && ['update', 'all permission'].some(p => financePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleUpdate}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                </li>
-              )}
-
-              {['delete', 'all permission'].some(p => financePermissions.includes(p)) && (
+              {["delete", "all permission"].some((p) =>
+                financePermissions.includes(p),
+              ) && (
                 <li className="dropdown-item" onClick={handleDelete}>
                   <i className="fa-solid fa-user-minus text-danger fs-4"></i>
                 </li>
               )}
 
-              {['all permission', 'reload'].some(p => financePermissions.includes(p)) && (
+              {["all permission", "reload"].some((p) =>
+                financePermissions.includes(p),
+              ) && (
                 <li className="dropdown-item" onClick={reloadGridData}>
                   <i className="fa-solid fa-arrow-rotate-right"></i>
                 </li>
               )}
-
             </ul>
           </div>
         </div>
@@ -646,13 +755,13 @@ const handleUpdate = async () => {
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="EmployeeId"
                 class="exp-input-field form-control"
                 type="text"
+                required
                 placeholder=" "
                 value={EmployeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
@@ -660,8 +769,17 @@ const handleUpdate = async () => {
                 maxLength={18}
                 autoComplete="off"
               />
-              <label for="cno" className={`exp-form-labels ${error && !EmployeeId ? 'text-danger' : ''}`}>Employee ID<span className="text-danger">*</span> </label>
-              <span className="select-add-btn" title="Financial Details Help" onClick={handleEmployeeInfo}>
+              <label
+                for="cno"
+                className={`exp-form-labels ${error && !EmployeeId ? "text-danger" : ""}`}
+              >
+                Employee ID<span className="text-danger">*</span>{" "}
+              </label>
+              <span
+                className="select-add-btn"
+                title="Financial Details Help"
+                onClick={handleEmployeeInfo}
+              >
                 <i className="fa fa-search"></i>
               </span>
             </div>
@@ -670,17 +788,17 @@ const handleUpdate = async () => {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='FirstNamelabel' className="partyName">
+                <label id="FirstNamelabel" className="partyName">
                   <strong>Employee Name:</strong> {First_Name}
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="col-md-2" style={{ marginRight: "20px", }}>
+          <div className="col-md-2" style={{ marginRight: "20px" }}>
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='Departmentlabel' className="partyName">
+                <label id="Departmentlabel" className="partyName">
                   <strong>Department:</strong> {department_id}
                 </label>
               </div>
@@ -690,26 +808,29 @@ const handleUpdate = async () => {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label id='designationLabel' className="partyName">
+                <label id="designationLabel" className="partyName">
                   <strong>Designation:</strong> {designation_id}
                 </label>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />
+      <TabButtons
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabClick={handleTabClick}
+      />
 
       <div className="shadow-lg p-2 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedSalaryType ? "has-value" : ""} 
               ${isSelectSalary ? "is-focused" : ""}`}
+              title="Please Select the Salary Type"
             >
               <Select
                 id="salaryType"
@@ -723,7 +844,13 @@ const handleUpdate = async () => {
                 options={filteredOptionSalaryType}
                 maxLength={50}
               />
-              <label for="cname" className={`floating-label ${error && !salaryType ? 'text-danger' : ''}`}>Salary Type{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                for="cname"
+                className={`floating-label ${error && !salaryType ? "text-danger" : ""}`}
+              >
+                Salary Type
+                {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -732,6 +859,7 @@ const handleUpdate = async () => {
               className={`inputGroup selectGroup 
               ${selectedPayscale ? "has-value" : ""} 
               ${isSelectPayscale ? "is-focused" : ""}`}
+              title="Please Select the Payscale"
             >
               <Select
                 id="payScale"
@@ -745,7 +873,12 @@ const handleUpdate = async () => {
                 options={filteredOptionPayscale}
                 maxLength={50}
               />
-              <label for="sname" className={`floating-label ${error && !payscale ? 'text-danger' : ''}`}>Payscale{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label
+                for="sname"
+                className={`floating-label ${error && !payscale ? "text-danger" : ""}`}
+              >
+                Payscale{showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
@@ -753,6 +886,7 @@ const handleUpdate = async () => {
             <div className="inputGroup">
               <input
                 class="exp-input-field form-control"
+                title="Please Enter the PF No"
                 type="text"
                 id="PFNo"
                 placeholder=" "
@@ -761,7 +895,12 @@ const handleUpdate = async () => {
                 onChange={(e) => setPFNo(e.target.value)}
                 maxLength={100}
               />
-              <label for="sname" className={`exp-form-labels ${error && !PFNo ? 'text-danger' : ''}`}>PF No<span className="text-danger">*</span></label>
+              <label
+                for="sname"
+                className={`exp-form-labels ${error && !PFNo ? "text-danger" : ""}`}
+              >
+                PF No<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -776,17 +915,25 @@ const handleUpdate = async () => {
                 value={salaryMonth}
                 onChange={(e) => handleSalaryChange(e)}
                 maxLength={17}
+                title="Please Enter the Salary Per Annum"
               />
-              <label htmlFor="sname" className={`exp-form-labels ${error && !salaryMonth ? 'text-danger' : ''}`}>
-                Salary Per Annum{showAsterisk && <span className="text-danger">*</span>}
+              <label
+                htmlFor="sname"
+                className={`exp-form-labels ${error && !salaryMonth ? "text-danger" : ""}`}
+              >
+                Salary Per Annum
+                {showAsterisk && <span className="text-danger">*</span>}
               </label>
             </div>
           </div>
-
         </div>
       </div>
       <div>
-        <FinancialDetails open={open} handleClose={handleClose} finaceDetails={finaceDetails} />
+        <FinancialDetails
+          open={open}
+          handleClose={handleClose}
+          finaceDetails={finaceDetails}
+        />
       </div>
     </div>
   );

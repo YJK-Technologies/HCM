@@ -179,6 +179,7 @@ const resetForm = () => {
                 type="number"
                 placeholder=""
                 className="exp-input-field form-control"
+                title="Please Enter the Salary From To Days"
                 value={salary_from_to_day}
                 onChange={(e) => setsalary_from_to_day(e.target.value)}
                 ref={fromDayRef}
@@ -198,6 +199,7 @@ const resetForm = () => {
                 type="number"
                 placeholder=""
                 className="exp-input-field form-control"
+                title="Please Enter the Salary From Day"
                 value={salary_from_day}
                 onChange={(e) => setSalaryFromDay(e.target.value)}
                 ref={fromDayRef}
@@ -216,6 +218,7 @@ const resetForm = () => {
                 type="number"
                 placeholder=""
                 className="exp-input-field form-control"
+                title="Please Enter the Salary To Day"
                 value={salary_to_day}
                 onChange={(e) => setSalaryToDay(e.target.value)}
                 ref={toDayRef}
@@ -234,6 +237,7 @@ const resetForm = () => {
                 type="number"
                 placeholder=""
                 className="exp-input-field form-control"
+                title="Please Enter the OT Rate"
                 value={OT_Rate}
                 onChange={(e) => setOTRate(e.target.value)}
                 ref={otRef}
@@ -249,6 +253,7 @@ const resetForm = () => {
               <input
                 type="date"
                 className="exp-input-field form-control"
+                  title="Please Enter the Financial From Date"
                 placeholder=""
                 value={effective_from}
                 onChange={(e) => setEffectiveFrom(e.target.value)}
@@ -266,6 +271,7 @@ const resetForm = () => {
                 type="date"
                 placeholder=""
                 className="exp-input-field form-control"
+                title="Please Enter the Financial To Date"
                 value={effective_to}
                 onChange={(e) => setEffectiveTo(e.target.value)}
                 ref={effToRef}
@@ -281,6 +287,7 @@ const resetForm = () => {
               <input
                 type="text"
                 className="exp-input-field form-control"
+                title="Please Enter the Remarks"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 ref={remarksRef}
@@ -291,7 +298,7 @@ const resetForm = () => {
           </div>
 
           <div className="col-md-2">
-          <div className={`inputGroup selectGroup ${selectedStatus ? "has-value" : ""}`}>
+          <div className={`inputGroup selectGroup ${selectedStatus ? "has-value" : ""}`} title="Please Select the Status">
             <Select
               value={selectedStatus}
               onChange={(val) => {

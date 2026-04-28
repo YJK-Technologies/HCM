@@ -1049,7 +1049,7 @@ function Assets({ }) {
               <div className="action-icon add"
                 onClick={handleSave}
               >
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -1213,7 +1213,7 @@ function Assets({ }) {
                 onChange={(e) => setPurchaseDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !PurchaseDate ? 'text-danger' : ''}`}> PurchaseDate<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !PurchaseDate ? 'text-danger' : ''}`}> Purchase Date<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1229,7 +1229,7 @@ function Assets({ }) {
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !PurchaseCost ? 'text-danger' : ''}`}> PurchaseCost<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !PurchaseCost ? 'text-danger' : ''}`}> Purchase Cost<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -1244,7 +1244,6 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Grade Name"
                 onFocus={() => setIsSelectedCurrency(true)}
                 onBlur={() => setIsSelectedCurrency(false)}
                 classNamePrefix="react-select"
@@ -1270,7 +1269,7 @@ function Assets({ }) {
                 onChange={(e) => setVendorName(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !VendorName ? 'text-danger' : ''}`}> VendorName<span className="text-danger">*</span></label>
+              <label className={` exp-form-labels ${error && !VendorName ? 'text-danger' : ''}`}> Vendor Name<span className="text-danger">*</span></label>
             </div>
           </div>
 

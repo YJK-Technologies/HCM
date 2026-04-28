@@ -402,6 +402,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                       type="text"
                       autoComplete="off"
                       placeholder=" "
+                      title="Please Enter the Employee ID"
                       className="exp-input-field form-control"
                       value={Employee_Id}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -422,6 +423,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      title="Please Enter the Employee Name"
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -434,6 +436,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Document Name"
                       value={document_name}
                       onChange={(e) => setdocument_name(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}

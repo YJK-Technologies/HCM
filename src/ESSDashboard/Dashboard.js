@@ -3245,7 +3245,7 @@ const Dashboard = () => {
                     <div className="req-actions-vertical">
                       <button
                         className="action-circle-btn approve"
-                        title="Approved"
+                        title="Approve"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleApproval(req.type, req.id, req.FromDate, true, {
@@ -3258,7 +3258,7 @@ const Dashboard = () => {
                       </button>
                       <button
                         className="action-circle-btn reject"
-                        title="Rejected"
+                        title="Reject"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleApproval(req.type, req.id, req.FromDate, false, {

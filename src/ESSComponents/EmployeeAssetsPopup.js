@@ -219,6 +219,7 @@ const handleConfirm = () => {
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -235,13 +236,14 @@ const handleConfirm = () => {
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Asset ID"
                       value={AssetID}
                       maxLength={250}
                       onChange={(e) => setAssetID(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
-                    <label className="exp-form-labels">AssetID</label>
+                    <label className="exp-form-labels">Asset ID</label>
                   </div>
                 </div>
 
@@ -251,13 +253,14 @@ const handleConfirm = () => {
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Condition at Issue"
                       value={ConditionAtIssue}
                       maxLength={100}
                       onChange={(e) => setConditionAtIssue(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       autoComplete="off"
                     />
-                    <label className="exp-form-labels">ConditionAtIssue</label>
+                    <label className="exp-form-labels">Condition at Issue</label>
                   </div>
                 </div>
 
@@ -267,6 +270,7 @@ const handleConfirm = () => {
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Remarks"
                       value={Remarks}
                       maxLength={100}
                       onChange={(e) => setRemarks(e.target.value)}

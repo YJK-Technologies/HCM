@@ -720,7 +720,7 @@ function HoliDays() {
           <h1 className="page-title">Employee Holiday</h1>
           <div className="action-wrapper desktop-actions">
             <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">save</span>
+              <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
             <div className="action-icon print" onClick={handleReload}>

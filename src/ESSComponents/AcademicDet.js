@@ -968,7 +968,7 @@ const handleUpdate = async (relationName, index) => {
               academicPermissions.includes(permission),
             ) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -1087,6 +1087,7 @@ const handleUpdate = async (relationName, index) => {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Row"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -1095,6 +1096,7 @@ const handleUpdate = async (relationName, index) => {
                     <button
                       type="button"
                       className="btn btn-danger"
+                      title="Delete Row"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -1108,6 +1110,7 @@ const handleUpdate = async (relationName, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Academic Name"
                     value={member.academicName}
                     placeholder=" "
                     autoComplete="off"
@@ -1139,6 +1142,7 @@ const handleUpdate = async (relationName, index) => {
                     maxLength={125}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the Major"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1162,6 +1166,7 @@ const handleUpdate = async (relationName, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Institution"
                     value={member.institution}
                     maxLength={225}
                     placeholder=" "
@@ -1189,6 +1194,7 @@ const handleUpdate = async (relationName, index) => {
                   <input
                     id="fdate"
                     class="exp-input-field form-control"
+                    title="Please Enter the Academic Year"
                     type="date"
                     placeholder=" "
                     autoComplete="off"

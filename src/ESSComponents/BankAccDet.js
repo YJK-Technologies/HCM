@@ -816,7 +816,7 @@ function Input({ }) {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => bankPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleInsert}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -887,6 +887,7 @@ function Input({ }) {
                 type="text"
                 placeholder=" "
                 autoComplete="off"
+                required
                 value={EmployeeId}
                 maxLength={100}
                 onChange={(e) => setEmployeeId(e.target.value)}
@@ -957,6 +958,7 @@ function Input({ }) {
               <input
                 id="cno"
                 class="exp-input-field form-control"
+                title="Please Enter the Account Holder Name"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -980,6 +982,7 @@ function Input({ }) {
                 value={Account_NO}
                 maxLength={50}
                 onChange={(e) => setAccountNumber(e.target.value)}
+                title="Please Enter the Account Number"
               />
               <label for="cname" className={`exp-form-labels ${error && !Account_NO ? 'text-danger' : ''}`}>Account Number<span className="text-danger">*</span></label>
             </div>
@@ -990,6 +993,7 @@ function Input({ }) {
               <input
                 id="IFSC_Code"
                 class="exp-input-field form-control"
+                title="Please Enter the IFSC Code"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1006,6 +1010,7 @@ function Input({ }) {
               <input
                 id="bankName"
                 class="exp-input-field form-control"
+                  title="Please Enter the Bank Name"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1024,6 +1029,7 @@ function Input({ }) {
               <input
                 id="branchName"
                 class="exp-input-field form-control"
+                title="Please Enter the Branch Name"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1064,6 +1070,7 @@ function Input({ }) {
               <input
                 id="bankCity"
                 class="exp-input-field form-control"
+                  title="Please Enter the Bank City"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1080,6 +1087,7 @@ function Input({ }) {
               <input
                 id="bankCountry"
                 class="exp-input-field form-control"
+                title="Please Enter the Bank Country"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1135,6 +1143,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedWPSEnabled ? "has-value" : ""} 
               ${isSelectWPSEnabled ? "is-focused" : ""}`}
+              title="Please select if WPS Enabled"
             >
               <Select
                 id="WPSEnabled"
@@ -1159,6 +1168,7 @@ function Input({ }) {
               <input
                 id="WPSMemberId"
                 class="exp-input-field form-control"
+                  title="Please Enter the WPS Member Id"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1180,6 +1190,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedIsPrimaryAccount ? "has-value" : ""} 
               ${isSelectIsPrimaryAccount ? "is-focused" : ""}`}
+              title="Please select if this is the Primary Account"
             >
               <Select
                 id="IsPrimaryAccount"

@@ -278,6 +278,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -294,6 +295,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee Name"
                       value={Name}
                       maxLength={200}
                       onChange={(e) => setname(e.target.value)}
@@ -310,6 +312,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Account Holder Name"
                       value={AccountHolderName}
                       maxLength={200}
                       onChange={(e) => setAccountHolderName(e.target.value)}
@@ -326,6 +329,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Account Number"
                       value={Account_NO}
                       maxLength={50}
                       onChange={(e) => setAccountNumber(e.target.value)}
@@ -340,6 +344,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                     <input
                       id="IFSC_Code"
                       class="exp-input-field form-control"
+                      title="Please Enter the IFSC Code"
                       type="text"
                       placeholder=" "
                       autoComplete="off"
@@ -358,6 +363,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Bank Name"
                       value={bankName}
                       maxLength={255}
                       onChange={(e) => setbankName(e.target.value)}
@@ -372,6 +378,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                     <input
                       id="branchName"
                       class="exp-input-field form-control"
+                      title="Please Enter the Branch Name"
                       type="text"
                       placeholder=" "
                       autoComplete="off"

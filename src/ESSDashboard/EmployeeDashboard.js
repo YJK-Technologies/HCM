@@ -1998,7 +1998,7 @@ const Dashboard = (payslip) => {
               <div>
                 <h6 className="card-title-heading mb-0">Leave Balance</h6>
               </div>
-              <button className="btn-apply-modern" onClick={handleLeave}>
+              <button className="btn-apply-modern" title="Apply Leave" onClick={handleLeave}>
                 Apply Leave
               </button>
             </div>
