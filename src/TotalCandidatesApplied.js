@@ -7,7 +7,6 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import Select from "react-select";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import "./apps.css";
 import LoadingScreen from "./Loading";
 import * as XLSX from "xlsx-js-style";

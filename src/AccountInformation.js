@@ -3,7 +3,6 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import "./input.css";
-import "ag-grid-enterprise";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'ag-grid-autocomplete-editor/dist/main.css';
 import { ToastContainer, toast } from 'react-toastify';
