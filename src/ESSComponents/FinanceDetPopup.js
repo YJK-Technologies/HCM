@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import "ag-grid-enterprise";
 import 'ag-grid-autocomplete-editor/dist/main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -255,6 +254,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="text"
                       autoComplete="off"
+                      title="Please Enter the Employee ID"
                       placeholder=" "
                       maxLength={18}
                       className="exp-input-field form-control"
@@ -271,6 +271,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="text"
                       autoComplete="off"
+                        title="Please Enter the Employee Name"
                       placeholder=" "
                       maxLength={225}
                       className="exp-input-field form-control"
@@ -286,6 +287,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   <div className="inputGroup">
                     <input
                       type="text"
+                        title="Please Enter the Salary Type"
                       autoComplete="off"
                       placeholder=" "
                       maxLength={50}
@@ -303,6 +305,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="text"
                       autoComplete="off"
+                      title="Please Enter the Payscale"
                       placeholder=" "
                       maxLength={50}
                       className="exp-input-field form-control"
@@ -333,6 +336,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   <div className="inputGroup">
                     <input
                       class="exp-input-field form-control"
+                        title="Please Enter the PF No"
                       type="text"
                       id="PFNo"
                       placeholder=" "
@@ -350,6 +354,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="number"
                       autoComplete="off"
+                      title="Please Enter the Salary Range From"
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={salary_from}
@@ -371,6 +376,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="number"
                       autoComplete="off"
+                      title="Please Enter the Salary Range To"
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={salary_to}

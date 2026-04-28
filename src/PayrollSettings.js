@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import "./apps.css";
 import { ToastContainer, toast } from "react-toastify";
 import Select from "react-select";
@@ -337,6 +336,7 @@ return (
             <input
               type="number"
               className="exp-input-field form-control"
+              title="Please Enter the Salary Days"
               placeholder=""
               value={salaryFromToDaySC}
               onChange={(e) => setSalaryFromToDaySC(e.target.value)}
@@ -352,6 +352,7 @@ return (
               type="number"
               placeholder=""
               className="exp-input-field form-control"
+              title="Please Enter the OT Rate"
               value={OTRateSC}
               onChange={(e) => setOTRateSC(e.target.value)}
             />
@@ -366,6 +367,7 @@ return (
               type="number"
               placeholder=""
               className="exp-input-field form-control"
+              title="Please Enter the Salary From Day"
               value={salaryFromDaySC}
               onChange={(e) => setSalaryFromDaySC(e.target.value)}
             />
@@ -380,6 +382,7 @@ return (
               type="number"
               placeholder=""
               className="exp-input-field form-control"
+              title="Please Enter the Salary To Day"
               value={salaryToDaySC}
               onChange={(e) => setSalaryToDaySC(e.target.value)}
             />
@@ -394,6 +397,7 @@ return (
               type="date"
               placeholder=""
               className="exp-input-field form-control"
+              title="Please Enter the Financial From Date"
               value={effectiveFromSC}
               onChange={(e) => setEffectiveFromSC(e.target.value)}
             />
@@ -408,6 +412,7 @@ return (
               type="date"
               className="exp-input-field form-control"
               placeholder=""
+              title="Please Enter the Financial To Date"
               value={effectiveToSC}
               onChange={(e) => setEffectiveToSC(e.target.value)}
             />
@@ -422,6 +427,7 @@ return (
               type="text"
               className="exp-input-field form-control"
               placeholder=""
+              title="Please Enter the Remarks"
               value={remarksSC}
               onChange={(e) => setRemarksSC(e.target.value)}
             />
@@ -431,7 +437,7 @@ return (
 
         {/* Status */}
         <div className="col-md-2">
-          <div className={`inputGroup selectGroup ${selectedStatus ? "has-value" : ""}`}>
+          <div className={`inputGroup selectGroup ${selectedStatus ? "has-value" : ""}`} title="Please Enter the Status">
             <Select
               value={selectedStatus}
               onChange={handleStatusChange}

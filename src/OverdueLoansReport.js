@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
@@ -631,7 +630,7 @@ return (
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Employee PF"
+                title="Please Enter the Last Name"
                 required
                 autoComplete="off"
                 value={Last_Name}
@@ -700,7 +699,7 @@ return (
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Installment Number"
                 autoComplete="off"
                 value={InstallmentNumber}
                 onChange={(e) => setInstallmentNumber(e.target.value)}
@@ -757,6 +756,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the From Date"
                 value={FromDate}
                 onChange={(e) => setFromDate(e.target.value)}
               />
@@ -769,6 +769,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the To Date"
                 value={ToDate}
                 onChange={(e) => setToDate(e.target.value)}
               />

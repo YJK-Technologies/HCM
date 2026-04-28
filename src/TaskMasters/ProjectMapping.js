@@ -669,6 +669,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedProject ? "has-value" : ""} 
               ${isSelectProject ? "is-focused" : ""}`}
+              title="Please select the Project"
             >
               <Select
                 id="gradeid"
@@ -690,6 +691,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title="Please select the User"
             >
               <Select
                 id="gradeid"
@@ -755,6 +757,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedProjectSc ? "has-value" : ""} 
               ${isSelectProjectSc ? "is-focused" : ""}`}
+              title="Please select the Project ID"
             >
               <Select
                 id="gradeid"
@@ -779,6 +782,7 @@ function Input({ }) {
                 placeholder=" "
                 autoComplete="off"
                 className="exp-input-field form-control"
+                title="Please Enter the Project Name"
                 value={Projectname}
                 maxLength={255}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -810,6 +814,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedUserSc ? "has-value" : ""} 
               ${isSelectUserSc ? "is-focused" : ""}`}
+              title="Please select the User ID"
             >
               <Select
                 id="gradeid"
@@ -831,6 +836,7 @@ function Input({ }) {
               <input
                 id="username"
                 className="exp-input-field form-control"
+                title="Please Enter the User Name"
                 type="text"
                 placeholder=" "
                 autoComplete="off"

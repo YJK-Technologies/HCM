@@ -8,7 +8,6 @@ import "ag-grid-community/styles/ag-grid.css";
 import TabButtons from './Tabs.js';
 import { useNavigate } from "react-router-dom";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';
@@ -709,6 +708,7 @@ function Input() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
               >
                 <Select
                   id="status"
@@ -790,6 +790,7 @@ function Input() {
                 className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
               >
                 <Select
                   id="status"

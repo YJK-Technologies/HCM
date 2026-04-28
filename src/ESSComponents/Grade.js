@@ -7,7 +7,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
@@ -732,7 +731,7 @@ function Input({ }) {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}

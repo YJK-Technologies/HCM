@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
+
 import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import * as XLSX from "xlsx-js-style";
@@ -1067,7 +1067,7 @@ return (
               className={`inputGroup selectGroup 
               ${selectedAssetIDSc ? "has-value" : ""} 
               ${isSelectedAssetIDSc ? "is-focused" : ""}`}
-              title="Please select the Currency Code"
+              title="Please select the Asset ID"
             >
               <Select
                 id="PurchaseCost"
@@ -1076,7 +1076,6 @@ return (
                 classNamePrefix="react-select"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
                 onFocus={() => setIsSelectedAssetIDSc(true)}
                 onBlur={() => setIsSelectedAssetIDSc(false)}
                 value={selectedAssetIDSc}
@@ -1100,7 +1099,7 @@ return (
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Asset Name"
                 value={AssetNameSC}
                 onChange={(e) => setAssetNameSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1117,7 +1116,7 @@ return (
                 type="Text"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Asset Category"
                 value={AssetCategorySC}
                 onChange={(e) => setAssetCategorySC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1135,7 +1134,7 @@ return (
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Purchase Date"
                 value={PurchaseDateSC}
                 onChange={(e) => setPurchaseDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1153,7 +1152,7 @@ return (
                 type="Number"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Purchase Cost"
                 value={PurchaseCostSC}
                 onChange={(e) => setPurchaseCostSC(e.target.value)}
                 maxLength={100}
@@ -1168,7 +1167,7 @@ return (
               className={`inputGroup selectGroup 
               ${selectedAssetStatusSC ? "has-value" : ""} 
               ${isSelectedAssetStatusSC ? "is-focused" : ""}`}
-              title="Please enter the Status"
+              title="Please enter the Asset Status"
             >
               <Select
                 id="AssetStatus"
@@ -1258,7 +1257,7 @@ return (
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Grade Name"
+                title="Please Enter the Actual Return Date"
                 value={ActualReturnDateSC}
                 onChange={(e) => setActualReturnDateSC(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1273,7 +1272,7 @@ return (
               className={`inputGroup selectGroup 
               ${selectedAllocationStatus ? "has-value" : ""} 
               ${isSelectAllocationStatus ? "is-focused" : ""}`}
-              title="Please enter the Employee ID"
+              title="Please enter the Allocation Status"
             >
               <Select
                 id="AllocationStatus"

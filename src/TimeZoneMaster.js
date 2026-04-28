@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -339,7 +338,7 @@ function TimeZoneMaster() {
 
     const defaultColDef = {
         resizable: true,
-        wrapText: true,
+        // wrapText: true,
         editable: true,
     };
 

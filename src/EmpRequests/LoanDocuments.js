@@ -809,6 +809,7 @@ function LoanDocuments({ }) {
               className={`inputGroup selectGroup 
               ${selectedDocumentIdType ? "has-value" : ""} 
               ${isSelectDocumentType ? "is-focused" : ""}`}
+              title="Please enter the Document Type"
             >
               <Select
                 inputId="documentIdType"
@@ -1016,6 +1017,7 @@ function LoanDocuments({ }) {
               className={`inputGroup selectGroup 
               ${selectedDocumentIdTypeSC ? "has-value" : ""} 
               ${isSelectDocumentTypeSC ? "is-focused" : ""}`}
+              title="Please enter the Document Type"
             >
               <Select
                 inputId="documentIdType"

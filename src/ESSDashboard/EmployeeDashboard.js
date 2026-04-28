@@ -1076,6 +1076,7 @@ const Dashboard = (payslip) => {
           userID: sessionStorage.getItem('selectedUserCode'),
           company_code: sessionStorage.getItem('selectedCompanyCode'),
           created_by: sessionStorage.getItem("selectedUserCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode"),
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
@@ -1997,7 +1998,7 @@ const Dashboard = (payslip) => {
               <div>
                 <h6 className="card-title-heading mb-0">Leave Balance</h6>
               </div>
-              <button className="btn-apply-modern" onClick={handleLeave}>
+              <button className="btn-apply-modern" title="Apply Leave" onClick={handleLeave}>
                 Apply Leave
               </button>
             </div>

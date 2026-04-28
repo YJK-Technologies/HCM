@@ -1406,11 +1406,11 @@ const LeaveRequestPage = () => {
         <div className="header-flex">
           <h1 className="page-title">Leave Request</h1>
           <div className="action-wrapper desktop-actions">
-            <div className="action-icon reload" onClick={handleReloadAdd}>
+            <div className="action-icon print" onClick={handleReloadAdd}>
               <span className="tooltip">Reload</span>
-              <i className="fa-solid fa-rotate-right"></i>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
-            <div className="action-icon save" onClick={handleSave}>
+            <div className="action-icon add" onClick={handleSave}>
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>

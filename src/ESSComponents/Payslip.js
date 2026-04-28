@@ -394,6 +394,7 @@ useEffect(() => {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectedUser ? "is-focused" : ""}`}
+              title="Please Select the Employee ID"
             >
                      <Select
                         id="cno"

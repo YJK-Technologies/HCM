@@ -204,14 +204,30 @@ function Input({}) {
     { label: "EmployeeAssets" },
   ];
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(",")[1]); // Remove metadata prefix
-      reader.onerror = (error) => reject(error);
-    });
-  };
+const convertToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () =>
+      resolve(reader.result.split(",")[1]); // remove metadata prefix
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+// ✅ check valid file
+const isValidFile = (file) => {
+  return file && file instanceof File && file.size > 0;
+};
+
+// ✅ check empty buffer from API
+const isEmptyBuffer = (doc) => {
+  return (
+    doc &&
+    doc.type === "Buffer" &&
+    Array.isArray(doc.data) &&
+    doc.data.length === 0
+  );
+};
 
   const handleSave = async () => {
     if (!employeeId) {
@@ -319,21 +335,28 @@ function Input({}) {
       handleRefNo(employeeId);
     }
   };
+const convertBufferToBlobUrlAndFile = (
+  buffer,
+  fileName = "document.pdf",
+  mimeType = "application/pdf"
+) => {
+  if (
+    buffer &&
+    buffer.type === "Buffer" &&
+    Array.isArray(buffer.data) &&
+    buffer.data.length > 0
+  ) {
+    const byteArray = new Uint8Array(buffer.data);
+    const blob = new Blob([byteArray], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    const file = new File([blob], fileName, { type: mimeType });
 
-  const convertBufferToBlobUrlAndFile = (
-    buffer,
-    fileName = "document.pdf",
-    mimeType = "application/pdf",
-  ) => {
-    if (buffer && buffer.type === "Buffer") {
-      const byteArray = new Uint8Array(buffer.data);
-      const blob = new Blob([byteArray], { type: mimeType });
-      const blobUrl = URL.createObjectURL(blob);
-      const file = new File([blob], fileName, { type: mimeType });
-      return { blobUrl, file };
-    }
-    return { blobUrl: null, file: null };
-  };
+    return { blobUrl, file };
+  }
+
+  // EMPTY BUFFER → treat as NO FILE
+  return { blobUrl: null, file: null };
+};
 
   const handleRefNo = async (code) => {
     try {
@@ -646,20 +669,20 @@ function Input({}) {
   // };
 const handleUpdate = async (relationName, index) => {
   const relationGroup = documents.find(
-    (group) => group.relation === relationName,
+    (group) => group.relation === relationName
   );
 
   const member = relationGroup ? relationGroup.members[index] : null;
 
-  if (!member.keyfield) {
-    setError(true);
-    toast.warning("Error: Missing required keyfield");
-    return;
-  }
-
   if (!member) {
     setError(true);
     toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  if (!member.keyfield) {
+    setError(true);
+    toast.warning("Error: Missing required keyfield");
     return;
   }
 
@@ -669,7 +692,7 @@ const handleUpdate = async (relationName, index) => {
     return;
   }
 
-  // ✅ No change detection
+  // ✅ no change detection
   const original = member.originalData;
 
   if (
@@ -681,9 +704,15 @@ const handleUpdate = async (relationName, index) => {
     return;
   }
 
-  const fileBase64 = member.document
-    ? await convertToBase64(member.document)
-    : null;
+  // ✅ SAFE FILE CONVERSION
+  let fileBase64 = null;
+
+  if (
+    isValidFile(member.document) &&
+    !isEmptyBuffer(member.document_files)
+  ) {
+    fileBase64 = await convertToBase64(member.document);
+  }
 
   const editedData = {
     EmployeeId: employeeId,
@@ -733,7 +762,7 @@ const handleUpdate = async (relationName, index) => {
       toast.info("Data update cancelled.");
     }
   );
-}
+};
   const handleDelete = async (relationName, index) => {
     const relationGroup = documents.find(
       (group) => group.relation === relationName,
@@ -932,6 +961,7 @@ const handleUpdate = async (relationName, index) => {
                 type="text"
                 placeholder=" "
                 autoComplete="off"
+                required
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -1027,6 +1057,7 @@ const handleUpdate = async (relationName, index) => {
                   className={`inputGroup selectGroup 
               ${member.selectDocumentName ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
+               title="Please Select the Document Name"
                 >
                   <Select
                     id={`cname-${index}`}
