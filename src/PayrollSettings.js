@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import "./apps.css";
 import { ToastContainer, toast } from "react-toastify";
 import Select from "react-select";

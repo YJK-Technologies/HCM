@@ -9,7 +9,6 @@ import TabButtons from '../ESSComponents/Tabs';
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select';
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import './App.css'
 import { useNavigate } from "react-router-dom";
 import Select from 'react-select';

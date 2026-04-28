@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import './EmployeeLoan.css'
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
