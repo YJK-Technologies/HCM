@@ -977,7 +977,7 @@ function Input({ }) {
           <div className="action-wrapper desktop-actions">
             {/* {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && ( */}
             <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">save</span>
+              <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
             {/*})}*/}
@@ -1025,6 +1025,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedProject ? "has-value" : ""} 
               ${isSelectProject ? "is-focused" : ""}`}
+              title="Please select the Project"
             >
               <Select
                 id="gradeid"
@@ -1088,6 +1089,8 @@ function Input({ }) {
             <div className="inputGroup">
               <textarea
                 className="form-control"
+                id="ProjectDescription"
+                title="Please Enter the Project Description"
                 value={ProjectDescription}
                 placeholder=" "
                 autoComplete="off"
@@ -1137,6 +1140,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title="Please select the User"
             >
               <Select
                 id="LoanEligibleAmount"
@@ -1163,6 +1167,7 @@ function Input({ }) {
               <input
                 id="EffetiveDate"
                 class="exp-input-field form-control"
+                title="Please Enter the Task Title"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1181,6 +1186,7 @@ function Input({ }) {
               <input
                 id="date"
                 class="exp-input-field form-control"
+                title="Please Enter the Start Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -1198,6 +1204,7 @@ function Input({ }) {
               <input
                 id="date"
                 class="exp-input-field form-control"
+                title="Please Enter the End Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -1215,6 +1222,7 @@ function Input({ }) {
               <input
                 id="EndDate"
                 class="exp-input-field form-control"
+                title="Please Enter the Estimated Hours"
                 type="number"
                 placeholder=" "
                 autoComplete="off"
@@ -1233,6 +1241,7 @@ function Input({ }) {
               <input
                 id="EndDate"
                 class="exp-input-field form-control"
+                title="Please Enter the Buffer Hours"
                 type="number"
                 placeholder=" "
                 autoComplete="off"
@@ -1251,6 +1260,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedtstatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please select the Task Status"
             >
               <Select
                 id="taskstatus"
@@ -1274,6 +1284,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedPriortyLeavel ? "has-value" : ""} 
               ${isSelectPriority ? "is-focused" : ""}`}
+              title="Please select the Priority Level"
             >
               <Select
                 id="PriorityLevel"
@@ -1299,12 +1310,12 @@ function Input({ }) {
               <textarea
                 id="HowManyMonth"
                 class="exp-input-field form-control"
+                title="Please Enter the Task Description"
                 type="text"
                 placeholder=""
                 value={Descriptions}
                 onChange={(e) => setDescriptions(e.target.value)}
                 style={{ height: '100px' }}
-                required title="Please enter the address"
               />
               <label For="city" className={`${error && !Descriptions ? 'text-danger' : ''}`}>Task Description<span className="text-danger">*</span></label>
             </div>
@@ -1385,6 +1396,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedProject ? "has-value" : ""} 
               ${isSearchProject ? "is-focused" : ""}`}
+              title="Please select the Project"
             >
               <Select
                 id="LoanEligibleAmount"
@@ -1413,7 +1425,7 @@ function Input({ }) {
                 autoComplete="off"
                 type="text"
                 required
-                title="Please enter the company code"
+                title="Please Enter the Task Master ID"
                 value={TaskMasterID}
                 onChange={(e) => setTaskMasterID(e.target.value)}
                 maxLength={20}
@@ -1430,6 +1442,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedUser ? "has-value" : ""} 
               ${isSearchUser ? "is-focused" : ""}`}
+              title="Please select the User"
             >
               <Select
                 id="LoanEligibleAmount"
@@ -1456,6 +1469,7 @@ function Input({ }) {
                 type="text"
                 placeholder=" "
                 className="exp-input-field form-control"
+                title="Please Enter the Task Title"
                 autoComplete="off"
                 value={TaskTitle}
                 onChange={(e) => settitle(e.target.value)}
@@ -1473,6 +1487,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedtstatusSC ? "has-value" : ""} 
               ${isSearchStatus ? "is-focused" : ""}`}
+              title="Please select the Task Status"
             >
               <Select
                 id="taskstatus"
@@ -1495,6 +1510,7 @@ function Input({ }) {
                 id="date"
                 placeholder=" "
                 className="exp-input-field form-control"
+                title="Please Enter the Start Date"
                 autoComplete="off"
                 type="date"
                 value={startdate}
@@ -1513,6 +1529,7 @@ function Input({ }) {
                 type="date"
                 placeholder=" "
                 className="exp-input-field form-control"
+                title="Please Enter the End Date"
                 autoComplete="off"
                 value={enddate}
                 onChange={(e) => setenddate(e.target.value)}

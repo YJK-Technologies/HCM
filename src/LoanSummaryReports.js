@@ -605,7 +605,7 @@ return (
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Employee PF"
+                title="Please Enter the Last Name"
                 required
                 autoComplete="off"
                 value={Last_Name}
@@ -674,7 +674,7 @@ return (
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Loan Amount"
                 autoComplete="off"
                 value={loan_amount}
                 onChange={(e) => setloan_amount(e.target.value)}
@@ -692,7 +692,7 @@ return (
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Monthly Installment"
                 autoComplete="off"
                 value={monthly_installment}
                 onChange={(e) => setmonthly_installment(e.target.value)}
@@ -711,7 +711,7 @@ return (
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Repayment Months"
                 autoComplete="off"
                 value={repayment_months}
                 onChange={(e) => setrepayment_months(e.target.value)}
@@ -752,6 +752,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the From Date"
                 value={FromDate}
                 onChange={(e) => setFromDate(e.target.value)}
               />
@@ -764,6 +765,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the To Date"
                 value={ToDate}
                 onChange={(e) => setToDate(e.target.value)}
               />

@@ -3046,6 +3046,12 @@ function RequestReport({ }) {
   const [assetToDate, setAssetToDate] = useState("");
   const [loadingAsset, setLoadingAsset] = useState(false);
 
+  useEffect(() => {
+    if (requestType === "Asset") {
+      fetchAssetData();
+    }
+  }, [requestType]);
+
   const fetchAssetData = async () => {
     try {
       setLoadingAsset(true);

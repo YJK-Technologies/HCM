@@ -638,7 +638,7 @@ return (
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please Enter the Employee PF"
+                title="Please Enter the Last Name"
                 required
                 autoComplete="off"
                 value={Last_Name}
@@ -707,7 +707,7 @@ return (
                 type="number"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Approval Level"
                 autoComplete="off"
                 value={approval_level}
                 onChange={(e) => setapproval_level(e.target.value)}
@@ -748,7 +748,7 @@ return (
                 type="date"
                 placeholder=""
                 required
-                title="Please Enter the Company Contribution"
+                title="Please Enter the Approval Date"
                 autoComplete="off"
                 value={approval_date}
                 onChange={(e) => setapproval_date(e.target.value)}
@@ -764,6 +764,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the From Date"
                 value={FromDate}
                 onChange={(e) => setFromDate(e.target.value)}
               />
@@ -776,6 +777,7 @@ return (
               <input
                 type="date"
                 className="exp-input-field form-control"
+                title="Please Enter the To Date"
                 value={ToDate}
                 onChange={(e) => setToDate(e.target.value)}
               />
