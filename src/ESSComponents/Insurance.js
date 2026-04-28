@@ -1008,7 +1008,7 @@ useEffect(() => {
               familyPermissions.includes(permission),
             ) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -1054,6 +1054,7 @@ useEffect(() => {
                 autoComplete="off"
                 type="text"
                 value={employeeID}
+                required
                 onChange={(e) => setEmployeeId(e.target.value)}
                 maxLength={18}
                 onKeyPress={handleKeyPress}
@@ -1125,6 +1126,7 @@ useEffect(() => {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Row"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -1133,6 +1135,7 @@ useEffect(() => {
                     <button
                       type="button"
                       className="btn btn-danger"
+                      title="Delete Row"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -1146,6 +1149,7 @@ useEffect(() => {
                   className={`inputGroup selectGroup 
                   ${member.selectRelation ? "has-value" : ""} 
                   ${isSelectRelation[index] ? "is-focused" : ""}`}
+                  title="Please Select the Relation"
                 >
                   <Select
                     placeholder=" "
@@ -1189,6 +1193,7 @@ useEffect(() => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Name"
                     placeholder=" "
                     autoComplete="off"
                     value={member.name}
@@ -1222,6 +1227,7 @@ useEffect(() => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Select the Date of Birth"
                     placeholder=" "
                     autoComplete="off"
                     value={member.dob}
@@ -1244,6 +1250,7 @@ useEffect(() => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Age"
                     value={member.Age}
                     placeholder=" "
                     maxLength={3}
@@ -1267,6 +1274,7 @@ useEffect(() => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Aadhaar No"
                     value={member.aadharNo}
                     maxLength={12}
                     placeholder=" "
@@ -1296,6 +1304,7 @@ useEffect(() => {
                   className={`inputGroup selectGroup 
                   ${member.selectSex ? "has-value" : ""} 
                   ${isSelectSex[index] ? "is-focused" : ""}`}
+                  title="Please Select the Gender"
                 >
                   <Select
                     placeholder=" "
@@ -1332,6 +1341,7 @@ useEffect(() => {
                   className={`inputGroup selectGroup 
                   ${member.selectNationality ? "has-value" : ""} 
                   ${isSelectNationality[index] ? "is-focused" : ""}`}
+                  title="Please Select the Nationality"
                 >
                   <Select
                     placeholder=" "
@@ -1378,6 +1388,7 @@ useEffect(() => {
                     maxLength={30}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the CRP No"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1402,6 +1413,7 @@ useEffect(() => {
                     maxLength={18}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the CRP Expiry Date"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1426,6 +1438,7 @@ useEffect(() => {
                     maxLength={9}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the Passport No"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1450,6 +1463,7 @@ useEffect(() => {
                     maxLength={18}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the Passport Expiry Date"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1470,6 +1484,7 @@ useEffect(() => {
                   className={`inputGroup selectGroup 
                   ${member.selectVisa ? "has-value" : ""} 
                   ${isSelectVisa[index] ? "is-focused" : ""}`}
+                  title="Please Select if Visa Entitled"
                 >
                   <Select
                     placeholder=" "
@@ -1503,6 +1518,7 @@ useEffect(() => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Visa Expiry Date"
                     value={member.visaExpiryDate}
                     maxLength={18}
                     placeholder=" "
@@ -1527,6 +1543,7 @@ useEffect(() => {
                   className={`inputGroup selectGroup 
                   ${member.selectAirTicket ? "has-value" : ""} 
                   ${isSelectAirTicket[index] ? "is-focused" : ""}`}
+                  title="Please Select if Air Ticket Entitled"
                 >
                   <Select
                     placeholder=" "

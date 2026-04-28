@@ -989,7 +989,7 @@ const savePersonalDetails = async (info_request_id) => {
                 employeePermissions.includes(permission),
               ) && (
                 <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
+                  <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
               )}
@@ -1038,6 +1038,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="FirstName"
                 className="exp-input-field form-control"
+                title="Please Enter the First Name"
                 type="text"
                 placeholder=" "
                 required
@@ -1067,6 +1068,7 @@ const savePersonalDetails = async (info_request_id) => {
                 onChange={(e) => setMiddle_Name(e.target.value)}
                 maxLength={75}
                 autoComplete="off"
+                title="Please Enter the Middle Name"
               />
               <label htmlFor="MiddleName" className="exp-form-labels">
                 Middle Name
@@ -1085,6 +1087,7 @@ const savePersonalDetails = async (info_request_id) => {
                 onChange={(e) => setLast_Name(e.target.value)}
                 maxLength={75}
                 autoComplete="off"
+                title="Please Enter the Last Name"
               />
               <label
                 htmlFor="LastName"
@@ -1101,6 +1104,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="FatherName"
                 className="exp-input-field form-control"
+                title="Please Enter the Father Name"
                 type="text"
                 placeholder=" "
                 value={Father_Name}
@@ -1123,6 +1127,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="MotherName"
                 className="exp-input-field form-control"
+                title="Please Enter the Mother Name"
                 type="text"
                 placeholder=" "
                 value={Mother_Name}
@@ -1145,6 +1150,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="dob"
                 className="exp-input-field form-control"
+                title="Please Enter the Date of Birth"
                 type="date"
                 placeholder=""
                 value={DOB}
@@ -1164,6 +1170,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${Gender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
+              title="Please Select the Gender"
             >
               <Select
                 inputId="gender"
@@ -1194,6 +1201,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="email"
                 className="exp-input-field form-control"
+                title="Please Enter the Email"
                 type="email"
                 placeholder=""
                 value={Email}
@@ -1215,6 +1223,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${Grade_id ? "has-value" : ""} 
               ${isSelectGrade ? "is-focused" : ""}`}
+              title="Please Select the Grade ID"
             >
               <Select
                 inputId="gradeid"
@@ -1242,6 +1251,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="Phone"
                 className="exp-input-field form-control"
+                title="Please Enter the Phone Number"
                 type="number"
                 placeholder=""
                 required
@@ -1272,6 +1282,7 @@ const savePersonalDetails = async (info_request_id) => {
                 type="Number"
                 placeholder=""
                 value={Phone2}
+                title="Please Enter the Alternative Phone Number"
                 // onChange={(e) => setPhone2(e.target.value)}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -1297,6 +1308,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="address1"
                 className="exp-input-field form-control"
+                title="Please Enter the Address 1"
                 type="text"
                 placeholder=""
                 value={address1}
@@ -1319,6 +1331,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="address2"
                 className="exp-input-field form-control"
+                title="Please Enter the Address 2"
                 type="text"
                 placeholder=""
                 value={address2}
@@ -1341,6 +1354,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="address3"
                 className="exp-input-field form-control"
+                title="Please Enter the Address 3"
                 type="text"
                 placeholder=""
                 value={address3}
@@ -1362,6 +1376,7 @@ const savePersonalDetails = async (info_request_id) => {
             <div className="inputGroup">
               <input
                 id="permanantAddress"
+                  title="Please Enter the Permanent Address"
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
@@ -1385,6 +1400,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="ReferenceName"
                 className="exp-input-field form-control"
+                title="Please Enter the Reference Name"
                 type="text"
                 placeholder=""
                 value={reference_Name}
@@ -1407,6 +1423,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="ReferencePhone"
                 className="exp-input-field form-control"
+                title="Please Enter the Reference Phone Number"
                 type="Number"
                 placeholder=""
                 value={reference_Phone}
@@ -1434,6 +1451,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${marital_Status ? "has-value" : ""} 
               ${isSelectMarital ? "is-focused" : ""}`}
+              title="Please Select the Marital Status"
             >
               <Select
                 inputId="maritalStatus"
@@ -1463,6 +1481,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="Panno"
                 className="exp-input-field form-control"
+                title="Please Enter the PAN Number"
                 type="text"
                 placeholder=" "
                 value={pan_No}
@@ -1490,6 +1509,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="Aadharno"
                 className="exp-input-field form-control"
+                title="Please Enter the Aadhaar Number"
                 type="Number"
                 placeholder=""
                 value={Aadhaar_no}
@@ -1518,6 +1538,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${kids ? "has-value" : ""} 
               ${isSelectKids ? "is-focused" : ""}`}
+              title="Please Select the Number of Kids"
             >
               <Select
                 inputId="KidS"
@@ -1546,6 +1567,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedTitle ? "has-value" : ""} 
               ${isSelectTitle ? "is-focused" : ""}`}
+              title="Please Select the Title"
             >
               <Select
                 inputId="title"
@@ -1574,6 +1596,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="placeOfBirth"
                 className="exp-input-field form-control"
+                title="Please Enter the Place of Birth"
                 type="text"
                 placeholder=""
                 value={placeOfBirth}
@@ -1596,6 +1619,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedNationality ? "has-value" : ""} 
               ${isSelectNationality ? "is-focused" : ""}`}
+              title="Please Select the Nationality"
             >
               <Select
                 inputId="nationality"
@@ -1625,6 +1649,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedReligion ? "has-value" : ""} 
               ${isSelectReligion ? "is-focused" : ""}`}
+              title="Please Select the Religion"
             >
               <Select
                 inputId="religion"
@@ -1653,6 +1678,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="bloodGroup"
                 className="exp-input-field form-control"
+                  title="Please Enter the Blood Group"
                 type="text"
                 placeholder=""
                 value={bloodGroup}
@@ -1675,6 +1701,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="spouseName"
                 className="exp-input-field form-control"
+                  title="Please Enter the Spouse Name"
                 type="text"
                 placeholder=""
                 value={spouseName}
@@ -1693,6 +1720,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="noOfChildren"
                 className="exp-input-field form-control"
+                  title="Please Enter the Number of Children"
                 type="text"
                 placeholder=""
                 value={noOfChildren}
@@ -1716,6 +1744,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="noOfSiblings"
                 className="exp-input-field form-control"
+                  title="Please Enter the Number of Siblings"
                 type="text"
                 placeholder=""
                 value={noOfSiblings}
@@ -1739,6 +1768,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="businessEmail"
                 className="exp-input-field form-control"
+                  title="Please Enter the Business Email"
                 type="email"
                 placeholder=""
                 value={businessEmail}
@@ -1757,6 +1787,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="emergencyContactName"
                 className="exp-input-field form-control"
+                  title="Please Enter the Emergency Contact Name"
                 type="text"
                 placeholder=""
                 value={emergencyContactName}
@@ -1779,6 +1810,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedEmergencyContactRelation ? "has-value" : ""} 
               ${isSelectRelation ? "is-focused" : ""}`}
+              title="Please Select the Emergency Contact Relation"
             >
               <Select
                 inputId="emergencyContactRelation"
@@ -1819,6 +1851,7 @@ const savePersonalDetails = async (info_request_id) => {
                   }
                 }}
                 autoComplete="off"
+                title="Please Enter the Emergency Contact Phone"
               />
               <label
                 htmlFor="emergencyContactPhone"
@@ -1857,6 +1890,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedCity ? "has-value" : ""} 
               ${isSelectCity ? "is-focused" : ""}`}
+              title="Please Select the City"
             >
               <Select
                 inputId="city"
@@ -1885,6 +1919,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedState ? "has-value" : ""} 
               ${isSelectState ? "is-focused" : ""}`}
+              title="Please Select the State"
             >
               <Select
                 inputId="state"
@@ -1913,6 +1948,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
+              title="Please Select the Country"
             >
               <Select
                 inputId="country"
@@ -1941,6 +1977,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="postalCode"
                 className="exp-input-field form-control"
+                  title="Please Enter the Postal Code"
                 type="text"
                 placeholder=""
                 value={postalCode}
@@ -1968,6 +2005,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportNo"
                 className="exp-input-field form-control"
+                  title="Please Enter the Passport Number"
                 type="text"
                 placeholder=""
                 value={passportNo}
@@ -1986,6 +2024,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportExpiryDate"
                 className="exp-input-field form-control"
+                  title="Please Enter the Passport Expiry Date"
                 type="date"
                 placeholder=""
                 value={passportExpiryDate}
@@ -2004,6 +2043,7 @@ const savePersonalDetails = async (info_request_id) => {
               className={`inputGroup selectGroup 
               ${selectedOtherIdType ? "has-value" : ""} 
               ${isSelectOtherType ? "is-focused" : ""}`}
+              title="Please Select the Other ID Type"
             >
               <Select
                 inputId="otherIdType"
@@ -2029,6 +2069,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="otherIdNo"
                 className="exp-input-field form-control"
+                  title="Please Enter the Other ID Number"
                 type="text"
                 placeholder=""
                 value={otherIdNo}
@@ -2047,6 +2088,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportNo"
                 className="exp-input-field form-control"
+                  title="Please Enter the Purpose"
                 type="text"
                 placeholder=""
                 value={purpose}

@@ -650,7 +650,7 @@ function EmployeeAssets({}) {
                 EmpAssetsPermissions.includes(permission),
               ) && (
                 <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
+                  <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
               )}
@@ -707,6 +707,7 @@ function EmployeeAssets({}) {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Row"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -717,6 +718,7 @@ function EmployeeAssets({}) {
                     <button
                       type="button"
                       className="btn btn-danger ms-2"
+                      title="Delete Row"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -730,6 +732,7 @@ function EmployeeAssets({}) {
                   className={`inputGroup selectGroup 
                    ${member.AssetID ? "has-value" : ""} 
                    ${isSelectAssetID[index] ? "is-focused" : ""}`}
+                    title="Please Select the Asset ID"
                 >
                   <Select
                     type="number"
@@ -761,7 +764,7 @@ function EmployeeAssets({}) {
                     htmlFor="selecteddpt"
                     className={`floating-label ${error && !member.AssetID ? "text-danger" : ""}`}
                   >
-                    AssetID{<span className="text-danger">*</span>}
+                    Asset ID{<span className="text-danger">*</span>}
                   </label>
                 </div>
               </div>
@@ -773,6 +776,7 @@ function EmployeeAssets({}) {
                     type="date"
                     name="ExpectedReturnDate"
                     className="exp-input-field form-control"
+                    title="Please Enter the Expected Return Date"
                     autoComplete="off"
                     value={member.ExpectedReturnDate}
                     onChange={(e) => {
@@ -799,7 +803,7 @@ function EmployeeAssets({}) {
                     for="cno"
                     className={`exp-form-labels ${error && !member.ExpectedReturnDate ? "text-danger" : ""}`}
                   >
-                    ExpectedReturnDate
+                    Expected Return Date
                     {showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
@@ -810,7 +814,9 @@ function EmployeeAssets({}) {
                 <div className="inputGroup">
                   <input
                     type="date"
+                      name="ActualReturnDate"
                     className="exp-input-field form-control"
+                      title="Please Enter the Actual Return Date"
                     value={member.ActualReturnDate}
                     maxLength={18}
                     placeholder=" "
@@ -826,7 +832,7 @@ function EmployeeAssets({}) {
                   />
                   <label for="cno" className="exp-form-labels">
                     {" "}
-                    ActualReturnDate
+                    Actual Return Date
                   </label>
                 </div>
               </div>
@@ -837,6 +843,7 @@ function EmployeeAssets({}) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                      title="Please Enter the Remarks"
                     placeholder=" "
                     value={member.Remarks}
                     pattern="[A-Za-z]+"
@@ -864,6 +871,7 @@ function EmployeeAssets({}) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                      title="Please Enter the Purpose"
                     placeholder=" "
                     value={member.Purpose}
                     pattern="[A-Za-z]+"

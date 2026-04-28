@@ -690,7 +690,7 @@ function EmpFamPersonalDetail({ }) {
                 familyPermissions.includes(permission),
               ) && (
                 <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
+                  <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
               )}
@@ -744,6 +744,7 @@ function EmpFamPersonalDetail({ }) {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Member"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -752,6 +753,7 @@ function EmpFamPersonalDetail({ }) {
                     <button
                       type="button"
                       className="btn btn-danger"
+                      title="Delete Member"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -765,6 +767,7 @@ function EmpFamPersonalDetail({ }) {
     className={`inputGroup selectGroup 
       ${member.selectRelation ? "has-value" : ""} 
       ${isSelectRelation[index] ? "is-focused" : ""}`}
+    title="Please Select the Relation"
   >
     <Select
       placeholder=" "
@@ -809,6 +812,7 @@ function EmpFamPersonalDetail({ }) {
     <input
       type="text"
       className="exp-input-field form-control"
+      title="Please Enter the Name"
       placeholder=" "
       autoComplete="off"
       value={member.name}
@@ -840,6 +844,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Date of Birth"
                     placeholder=" "
                     autoComplete="off"
                     value={member.dob}
@@ -861,6 +866,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Age"
                     value={member.Age}
                     placeholder=" "
                     maxLength={3}
@@ -884,6 +890,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Aadhar No"
                     value={member.aadharNo}
                     maxLength={12}
                     placeholder=" "
@@ -913,6 +920,7 @@ function EmpFamPersonalDetail({ }) {
                   className={`inputGroup selectGroup 
                   ${member.selectSex ? "has-value" : ""} 
                   ${isSelectSex[index] ? "is-focused" : ""}`}
+                  title="Please Select the Sex"
                 >
                   <Select
                     placeholder=" "
@@ -949,6 +957,7 @@ function EmpFamPersonalDetail({ }) {
                   className={`inputGroup selectGroup 
                   ${member.selectNationality ? "has-value" : ""} 
                   ${isSelectNationality[index] ? "is-focused" : ""}`}
+                  title="Please Select the Nationality"
                 >
                   <Select
                     placeholder=" "
@@ -991,6 +1000,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the CRP No"
                     value={member.CRPNo}
                     maxLength={30}
                     placeholder=" "
@@ -1015,6 +1025,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the CRP Expiry Date"
                     value={member.CRP_ExpiryDate}
                     maxLength={18}
                     placeholder=" "
@@ -1039,6 +1050,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Passport No"
                     value={member.passportNo}
                     maxLength={9}
                     placeholder=" "
@@ -1063,6 +1075,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Passport Expiry Date"
                     value={member.passportExpiryDate}
                     maxLength={18}
                     placeholder=" "
@@ -1087,6 +1100,7 @@ function EmpFamPersonalDetail({ }) {
                   className={`inputGroup selectGroup 
                   ${member.selectVisa ? "has-value" : ""} 
                   ${isSelectVisa[index] ? "is-focused" : ""}`}
+                  title="Please Select if Visa Entitled"
                 >
                   <Select
                     placeholder=" "
@@ -1120,6 +1134,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Visa Expiry Date"
                     value={member.visaExpiryDate}
                     maxLength={18}
                     placeholder=" "
@@ -1144,6 +1159,7 @@ function EmpFamPersonalDetail({ }) {
                   className={`inputGroup selectGroup 
                   ${member.selectAirTicket ? "has-value" : ""} 
                   ${isSelectAirTicket[index] ? "is-focused" : ""}`}
+                  title="Please Select if Air Ticket Entitled"
                 >
                   <Select
                     placeholder=" "
@@ -1183,6 +1199,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     id="passportNo"
                     className="exp-input-field form-control"
+                      title="Please Enter the Purpose"
                     type="text"
                     placeholder=""
                     value={purpose}

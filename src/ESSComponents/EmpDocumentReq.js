@@ -614,7 +614,7 @@ const saveDocumentDetails = async (info_request_id) => {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => documentsPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -657,11 +657,11 @@ const saveDocumentDetails = async (info_request_id) => {
 
               <div className="col-md-1">
                 <div className="inputGroup">
-                  <button type="button" onClick={() => handleAddRow(relationGroup.relation)} className="btn btn-primary" title="Add Row">
+                  <button type="button" title="Add Row" onClick={() => handleAddRow(relationGroup.relation)} className="btn btn-primary">
                     <i className="fa-solid fa-circle-plus"></i>
                   </button>
                   {relationGroup.members.length > 1 && (
-                    <button type="button" onClick={() => handleDeleteRow(relationGroup.relation, index)} className="btn btn-danger" title="Delete Row">
+                    <button type="button" title="Delete Row" onClick={() => handleDeleteRow(relationGroup.relation, index)} className="btn btn-danger">
                       <i className="fa-regular fa-trash-can"></i>
                     </button>
                   )}
@@ -673,6 +673,7 @@ const saveDocumentDetails = async (info_request_id) => {
                   className={`inputGroup selectGroup 
               ${member.selectDocumentName ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
+               title="Please Select the Document Name"
                 >
                   <Select
                     id={`cname-${index}`}
@@ -706,6 +707,7 @@ const saveDocumentDetails = async (info_request_id) => {
                   onChange={(e) => setpurpose(e.target.value)}
                   maxLength={30}
                   autoComplete="off"
+                  title="Please Enter the Purpose"
                 />
                 <label htmlFor="passportNo" className="exp-form-labels">
                   Purpose

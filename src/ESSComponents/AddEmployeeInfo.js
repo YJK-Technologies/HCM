@@ -137,7 +137,7 @@ function Input({ }) {
       !Aadhaar_no ||
       !selectedmartial ||
       !kids ||
-      !Siblings ||
+      // !Siblings ||
       !Grade_id ||
       !title ||
       !placeOfBirth ||
@@ -156,6 +156,38 @@ function Input({ }) {
       toast.warning("Error: Missing required fields");
       return;
     }
+    console.log("First_Name:", First_Name);
+    console.log("Last_Name:", Last_Name);
+    console.log("Father_Name:", Father_Name);
+    console.log("Mother_Name:", Mother_Name);
+    console.log("DOB:", DOB);
+    console.log("Gender:", selectedGender);
+    console.log("Email:", Email);
+    console.log("Phone1:", Phone1);
+    console.log("Phone2:", Phone2);
+    console.log("address1:", address1);
+    console.log("address2:", address2);
+    console.log("address3:", address3);
+    console.log("permanantAddress:", permanantAddress);
+    console.log("pan_No:", pan_No);
+    console.log("Aadhaar_no:", Aadhaar_no);
+      console.log("Marital_Status:", selectedmartial);
+    console.log("Kids:", selectedkids);
+    console.log("Siblings:", Siblings);
+    console.log("Grade_id:", selectedgradeid);
+    console.log("title:", title);
+    console.log("placeOfBirth:", placeOfBirth);
+    console.log("nationality:", nationality);
+    console.log("religion:", religion);
+    console.log("bloodGroup:", bloodGroup);
+    console.log("emergencyContactName:", emergencyContactName);
+    console.log("emergencyContactPhone:", emergencyContactPhone);
+    console.log("emergencyContactRelation:", emergencyContactRelation);
+    console.log("city:", city);
+    console.log("state:", state);
+    console.log("country:", country);
+    console.log("postalCode:", postalCode);
+    
 
     if (!validateEmail(Email)) {
       setError(true);
@@ -1237,6 +1269,55 @@ function Input({ }) {
     setSelectedOtherIdType(selectedOtherIdType);
     setOtherIdType(selectedOtherIdType?.value || null);
 
+setOriginalData({
+  First_Name,
+  Middle_Name,
+  Last_Name,
+  Father_Name,
+  Mother_Name,
+  DOB: formatDate(DOB),
+  Gender,
+  Email,
+  Phone1: phone1,
+  Phone2: phone2,
+  address1: Address1,
+  address2: Address2,
+  address3: Address3,
+  permanantAddress: PermanantAddress,
+  reference_Name: Reference_Name,
+  reference_Phone: Reference_Phone,
+  pan_No: Pan_No,
+  Aadhaar_no: Aadhar_no,
+  marital_Status: Marital_Status,
+  kids: Kids,
+  Grade_id,
+
+  title: Title,
+  placeOfBirth: Place_of_Birth,
+  nationality: Nationality,
+  religion: Religion,
+  bloodGroup: Blood_Group,
+
+  spouseName: Spouse_Name,
+  noOfChildren: Number_of_Children,
+  noOfSiblings: Number_of_Siblings,
+  businessEmail: Email_Business,
+
+  emergencyContactName: Emergency_Contact_Name,
+  emergencyContactPhone: Emergency_Contact_Phone,
+  emergencyContactRelation: Emergency_Contact_Relationship,
+
+  city: City,
+  state: State,
+  country: Country,
+  postalCode: Postal_Code,
+
+  passportNo: Passport_No,
+  passportExpiryDate: formatDate(Passport_Expiry_Date),
+
+  otherIdType: Other_Id_Type,
+  otherIdNo: Other_Id_No
+});
     console.log("Popup data mapped successfully");
   };
 
@@ -1298,7 +1379,7 @@ function Input({ }) {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleInsert}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}

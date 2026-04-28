@@ -604,6 +604,25 @@ function Input() {
       const selectedStatus = filteredOptionStatus.find(option => option.value === status);
       setSelectedStatus(selectedStatus);
       setStatus(selectedStatus?.value || null);
+          if (data && data.length > 0) {
+            const row = data[0];
+          
+            setOriginalData({
+              EmployeeId: row.EmployeeId || "",
+              department_ID: row.department_ID || "",
+              designation_ID: row.designation_ID || "",
+              DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
+              DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
+              manager: row.manager || "",
+              shift: row.shift || "",
+              status: row.status || "",
+              Section: row.Section || "",
+              Work_Location: row.Work_Location || "",
+              Employee_Type: row.Employee_Type || ""
+            });
+          }
+
+      
       console.log(data);
     };
   }
@@ -779,7 +798,7 @@ function Input() {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}

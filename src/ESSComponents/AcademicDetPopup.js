@@ -245,6 +245,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -262,6 +263,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
+                      title="Please Enter the Employee Name"
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
@@ -275,6 +277,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                        title="Please Enter the Academic Name"
                       value={AcademicName}
                       onChange={(e) => setAcademicName(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -290,6 +293,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Major"
                       value={Major}
                       onChange={(e) => setMajor(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -305,6 +309,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Major"
                       value={Institution}
                       onChange={(e) => setInstitution(e.target.value)}
                       // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -318,6 +323,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                     <input
                       id="fdate"
                       className="exp-input-field form-control"
+                        title="Please Enter the Academic Year From"
                       type="date"
                       placeholder=" "
                       autoComplete="off"
@@ -339,6 +345,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                     <input
                       id="fdate"
                       className="exp-input-field form-control"
+                      title="Please Enter the Academic Year To"
                       type="date"
                       placeholder=" "
                       autoComplete="off"

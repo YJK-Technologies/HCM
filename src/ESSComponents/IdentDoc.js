@@ -886,7 +886,7 @@ function Input({}) {
               identityPermissions.includes(permission),
             ) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -930,6 +930,7 @@ function Input({}) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=" "
+                required
                 value={EmployeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 maxLength={18}
@@ -1029,6 +1030,7 @@ function Input({}) {
                   className={`inputGroup selectGroup 
               ${member.selectDocumentType ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
+               title="Please Select the Document Type"
                 >
                   <Select
                     id={`cname-${index}`}
@@ -1074,6 +1076,7 @@ function Input({}) {
                   <input
                     id={`sname-${index}`}
                     className="exp-input-field form-control"
+                    title="Please Enter the Document Number"
                     type="text"
                     placeholder=" "
                     autoComplete="off"
@@ -1104,6 +1107,7 @@ function Input({}) {
                   <input
                     id={`add1-${index}`}
                     className="exp-input-field form-control"
+                    title="Please Enter the Issue Date"
                     placeholder=" "
                     autoComplete="off"
                     type="date"
@@ -1145,6 +1149,7 @@ function Input({}) {
                     id={`add2-${index}`}
                     className="exp-input-field form-control"
                     type="date"
+                    title="Please Enter the Expiry Date"
                     value={member.expiryDate}
                     onChange={(e) => {
                       const value = e.target.value;

@@ -950,6 +950,7 @@ function ShiftMasterGrid() {
                 <input
                   id="TimeZone_Name"
                   class="exp-input-field form-control"
+                  title="Please Enter the Shift Code"
                   type="text"
                   maxLength={20}
                   placeholder=" "
@@ -971,6 +972,7 @@ function ShiftMasterGrid() {
                 <input
                   id="UTC_Offset"
                   class="exp-input-field form-control"
+                  title="Please Enter the Shift Name"
                   type="text"
                   maxLength={50}
                   placeholder=""
@@ -991,6 +993,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                  title="Please Enter the Start Time"
                   type="time"
                   value={Start_Time}
                   onChange={handleStartTimeChange}
@@ -1005,6 +1008,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                  title="Please Enter the End Time"
                   type="time"
                   value={End_Time}
                   onChange={handleEndTimeChange}
@@ -1019,6 +1023,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                  title="Please Enter the Shift Hours"
                   type="number"
                   value={Shift_Hours}
                   onChange={(e) => {
@@ -1039,6 +1044,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedNightShift ? "has-value" : ""} 
               ${isSelectedNightShift ? "is-focused" : ""}`}
+              title="Please select if it's a Night Shift"
               >
                 <Select
                   id="status"
@@ -1059,6 +1065,7 @@ function ShiftMasterGrid() {
                 <input
                   className="exp-input-field form-control"
                   type="text"
+                  title="Please Enter the Grace in Minutes"
                   value={Grace_In_Min}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, ""); // only digits
@@ -1075,6 +1082,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                  title="Please Enter the Grace out Minutes"
                   type="text"
                   value={Grace_Out_Min}
                   onChange={(e) => {
@@ -1093,6 +1101,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedCrossNight ? "has-value" : ""} 
               ${isSelectedCrossNight ? "is-focused" : ""}`}
+              title="Please select if it's a Cross Midnight Shift"
               >
                 <Select
                   id="status"
@@ -1113,6 +1122,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please select the Status"
               >
                 <Select
                   id="status"
@@ -1163,6 +1173,7 @@ function ShiftMasterGrid() {
                 <input
                   id="TimeZone_Name"
                   class="exp-input-field form-control"
+                  title="Please Enter the Shift Code"
                   type="text"
                   maxLength={20}
                   placeholder=" "
@@ -1185,6 +1196,7 @@ function ShiftMasterGrid() {
                 <input
                   id="UTC_Offset"
                   class="exp-input-field form-control"
+                    title="Please Enter the Shift Name"
                   type="text"
                   maxLength={50}
                   placeholder=""
@@ -1205,6 +1217,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                    title="Please Enter the Start Time"
                   type="time"
                   value={Start_TimeSC}
                   onChange={(e) => {
@@ -1222,6 +1235,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                    title="Please Enter the End Time"
                   type="time"
                   value={End_TimeSC}
                   onChange={(e) => setEnd_TimeSC(e.target.value)}
@@ -1236,6 +1250,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                    title="Please Enter the Shift Hours"
                   type="number"
                   value={Shift_HoursSC}
                   onChange={(e) => {
@@ -1256,6 +1271,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedNightShiftSc ? "has-value" : ""} 
               ${isSelectedNightShiftSc ? "is-focused" : ""}`}
+              title="Please select if it's a Night Shift"
               >
                 <Select
                   id="status"
@@ -1275,6 +1291,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
+                  title="Please Enter the Grace in Minutes"
                   type="text"
                   value={Grace_In_MinSC}
                   onChange={(e) => {
@@ -1293,6 +1310,7 @@ function ShiftMasterGrid() {
                 <input
                   className="exp-input-field form-control"
                   type="text"
+                  title="Please Enter the Grace out Minutes"
                   value={Grace_Out_MinSC}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, ""); // only digits
@@ -1310,6 +1328,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedCrossNightSc ? "has-value" : ""} 
               ${isSelectedCrossNightSc ? "is-focused" : ""}`}
+              title="Please select if it's a Cross Midnight Shift"
               >
                 <Select
                   id="status"
@@ -1330,6 +1349,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
+              title="Please select the Status"
               >
                 <Select
                   id="status"
