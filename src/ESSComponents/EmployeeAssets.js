@@ -920,7 +920,7 @@ const handleDeleteAsset = async (relation, index) => {
                 EmpAssetsPermissions.includes(permission),
               ) && (
                 <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
+                  <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
               )}
@@ -968,6 +968,7 @@ const handleDeleteAsset = async (relation, index) => {
                 class="exp-input-field form-control"
                 placeholder=" "
                 autoComplete="off"
+                required
                 type="text"
                 value={EmployeeID}
                 ref={employeeIdRef}
@@ -975,7 +976,7 @@ const handleDeleteAsset = async (relation, index) => {
                 maxLength={18}
                 onKeyPress={handleKeyPress}
               />
-              <label className="exp-form-labels">Employee ID</label>
+              <label className="exp-form-labels">Employee ID{<span className="text-danger">*</span>}</label>
               <span
                 className="select-add-btn"
                 title="Employee Help"
@@ -1035,6 +1036,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Row"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -1045,6 +1047,7 @@ const handleDeleteAsset = async (relation, index) => {
                     <button
                       type="button"
                       className="btn btn-danger ms-2"
+                      title="Delete Row"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -1058,6 +1061,7 @@ const handleDeleteAsset = async (relation, index) => {
                   className={`inputGroup selectGroup 
                    ${member.AssetID ? "has-value" : ""} 
                    ${isSelectAssetID[index] ? "is-focused" : ""}`}
+                   title="Please Select the Asset ID"
                 >
                   <Select
                     type="number"
@@ -1089,7 +1093,7 @@ const handleDeleteAsset = async (relation, index) => {
                     htmlFor="selecteddpt"
                     className={`floating-label ${error && !member.AssetID ? "text-danger" : ""}`}
                   >
-                    AssetID{<span className="text-danger">*</span>}
+                    Asset ID{<span className="text-danger">*</span>}
                   </label>
                 </div>
               </div>
@@ -1099,6 +1103,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Allocation Date"
                     name="AllocationDate"
                     autoComplete="off"
                     value={member.AllocationDate}
@@ -1128,7 +1133,7 @@ const handleDeleteAsset = async (relation, index) => {
                     htmlFor="cno"
                     className={`exp-form-labels ${error && !member.AllocationDate ? "text-danger" : ""}`}
                   >
-                    AllocationDate
+                    Allocation Date
                     {showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
@@ -1141,6 +1146,7 @@ const handleDeleteAsset = async (relation, index) => {
                     type="date"
                     name="ExpectedReturnDate"
                     className="exp-input-field form-control"
+                    title="Please Enter the Expected Return Date"
                     autoComplete="off"
                     value={member.ExpectedReturnDate}
                     onChange={(e) => {
@@ -1167,7 +1173,7 @@ const handleDeleteAsset = async (relation, index) => {
                     for="cno"
                     className={`exp-form-labels ${error && !member.ExpectedReturnDate ? "text-danger" : ""}`}
                   >
-                    ExpectedReturnDate
+                    Expected Return Date
                     {showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
@@ -1179,6 +1185,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
+                    title="Please Enter the Actual Return Date"
                     value={member.ActualReturnDate}
                     maxLength={18}
                     placeholder=" "
@@ -1194,7 +1201,7 @@ const handleDeleteAsset = async (relation, index) => {
                   />
                   <label for="cno" className="exp-form-labels">
                     {" "}
-                    ActualReturnDate
+                    Actual Return Date
                   </label>
                 </div>
               </div>
@@ -1205,6 +1212,7 @@ const handleDeleteAsset = async (relation, index) => {
                   className={`inputGroup selectGroup 
                ${member.selectedStatus ? "has-value" : ""}
                   ${isSelectAllocationStatus[index] ? "is-focused" : ""}`}
+                  title="Please Select the Allocation Status"
                 >
                   <Select
                     placeholder=" "
@@ -1245,6 +1253,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Condition at Issue"
                     placeholder=" "
                     value={member.ConditionAtIssue}
                     pattern="[A-Za-z]+"
@@ -1278,6 +1287,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Condition at Return"
                     placeholder=" "
                     value={member.ConditionAtReturn}
                     pattern="[A-Za-z]+"
@@ -1305,6 +1315,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Approved By"
                     placeholder=" "
                     value={member.ApprovedBy}
                     pattern="[A-Za-z]+"
@@ -1332,6 +1343,7 @@ const handleDeleteAsset = async (relation, index) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Remarks"
                     placeholder=" "
                     value={member.Remarks}
                     pattern="[A-Za-z]+"

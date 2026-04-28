@@ -731,7 +731,7 @@ function Input({ }) {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}

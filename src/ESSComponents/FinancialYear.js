@@ -708,6 +708,7 @@ function Input() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
               >
                 <Select
                   id="status"
@@ -789,6 +790,7 @@ function Input() {
                 className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
               >
                 <Select
                   id="status"

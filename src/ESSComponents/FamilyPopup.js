@@ -291,6 +291,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -306,6 +307,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                     <input
                       type="text"
                       placeholder=" "
+                      title="Please Enter the Employee Name"
                       className="exp-input-field form-control"
                       value={EmployeeName}
                       maxLength={250}
@@ -323,6 +325,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Relation"
                       value={relation}
                       maxLength={100}
                       onChange={(e) => setRelation(e.target.value)}
@@ -339,6 +342,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Relation Name"
                       value={Name}
                       maxLength={100}
                       onChange={(e) => setName(e.target.value)}
@@ -352,8 +356,9 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                 <div className="form-block col-md-3">
                   <div
                     className={`inputGroup selectGroup 
-                              ${Gender ? "has-value" : ""} 
-                              ${isSelectGender ? "is-focused" : ""}`}
+                    ${Gender ? "has-value" : ""} 
+                    ${isSelectGender ? "is-focused" : ""}`}
+                    title="Please Select the Gender"
                   >
                     <Select
                       inputId="gender"
@@ -379,6 +384,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                     <input
                       id="Phone"
                       className="exp-input-field form-control"
+                      title="Please Enter the Age From"
                       type="number"
                       placeholder=""
                       required
@@ -401,6 +407,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                     <input
                       id="Phone"
                       className="exp-input-field form-control"
+                      title="Please Enter the Age To"
                       type="number"
                       placeholder=""
                       required

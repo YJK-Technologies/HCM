@@ -30856,6 +30856,7 @@ const DailyLogOUT = async (req, res) => {
     company_code,
     Location,
     created_by,
+    modified_by
   } = req.body;
   let pool;
   try {
@@ -30871,8 +30872,10 @@ const DailyLogOUT = async (req, res) => {
       .input("Shift_Code", sql.VarChar, Shift_Code)
       .input("company_code", sql.VarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
+      .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, @company_code,@created_by,'',null,null,null,null,null,null,null,null`,
+        `EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, 
+        @company_code,@created_by,@modified_by,null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check out data inserted successfully");
   } catch (err) {
@@ -48472,7 +48475,7 @@ const shiftChangeRequestManager = async (req, res) => {
 };
 
 const shiftRequestManagerApproval = async (req, res) => {
-  const { request_id, company_code, request_status } = req.body;
+  const { request_id, company_code, request_status, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48483,7 +48486,8 @@ const shiftRequestManagerApproval = async (req, res) => {
       .input("request_id", sql.Int, request_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("request_status", sql.NVarChar, request_status)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','','',''`);
+      .input("modified_by", sql.NVarChar, modified_by)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,''`);
 
     res.status(200).json({
       success: true,

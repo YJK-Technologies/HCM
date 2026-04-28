@@ -623,7 +623,7 @@ const convertToBase64 = (file) => {
                 academicPermissions.includes(permission),
               ) && (
                 <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">save</span>
+                  <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
               )}
@@ -677,6 +677,7 @@ const convertToBase64 = (file) => {
                   <button
                     type="button"
                     className="btn btn-primary ms-3"
+                    title="Add Details"
                     onClick={() => addRow(relationGroup.relation)}
                   >
                     <i className="fa-solid fa-circle-plus"></i>
@@ -685,6 +686,7 @@ const convertToBase64 = (file) => {
                     <button
                       type="button"
                       className="btn btn-danger"
+                      title="Delete Details"
                       onClick={() => deleteRow(relationGroup.relation, index)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
@@ -698,6 +700,7 @@ const convertToBase64 = (file) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Academic Name"
                     value={member.academicName}
                     placeholder=" "
                     autoComplete="off"
@@ -728,6 +731,7 @@ const convertToBase64 = (file) => {
                     maxLength={125}
                     placeholder=" "
                     autoComplete="off"
+                    title="Please Enter the Major"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -750,6 +754,7 @@ const convertToBase64 = (file) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                      title="Please Enter the Institution"
                     value={member.institution}
                     maxLength={225}
                     placeholder=" "
@@ -776,6 +781,7 @@ const convertToBase64 = (file) => {
                   <input
                     id="fdate"
                     class="exp-input-field form-control"
+                      title="Please Enter the Academic Year"
                     type="date"
                     placeholder=" "
                     autoComplete="off"
@@ -800,11 +806,11 @@ const convertToBase64 = (file) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
+                    title="Please Enter the Purpose"
                     value={member.purpose}
                     placeholder=" "
                     autoComplete="off"
                     maxLength={50}
-                    title="Enter the Porpose"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,

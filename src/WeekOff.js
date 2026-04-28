@@ -552,7 +552,7 @@ function WeekOff() {
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && ['add', 'all permission'].some(permission => weekOffPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
-                <span className="tooltip">save</span>
+                <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
@@ -572,11 +572,13 @@ function WeekOff() {
               {saveButtonVisible && ['add', 'all permission'].some(p => weekOffPermissions.includes(p)) && (
                 <li className="dropdown-item" onClick={handleSave}>
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                  <span className="tooltip">Save</span>
                 </li>
               )}
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
+                <span className="tooltip">Reload</span>
               </li>
 
             </ul>
@@ -592,6 +594,7 @@ function WeekOff() {
               className={`inputGroup selectGroup 
               ${selectedgenerate ? "has-value" : ""} 
                ${isSelectEmployee ? "is-focused" : ""}`}
+               title="Please Select the Employee ID"
             >
               <Select
                 placeholder=" "
@@ -614,6 +617,7 @@ function WeekOff() {
               <input
                 id="Phone"
                 className="exp-input-field form-control"
+                title="Please Enter the Upcoming Birthday"
                 type="number"
                 placeholder=""
                 required
@@ -639,6 +643,7 @@ function WeekOff() {
                 type="number"
                 placeholder=""
                 required
+                title="Please Enter the New Joinees"
                 value={new_joinees}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -679,6 +684,7 @@ function WeekOff() {
                     {relationGroup.members.length < 3 && (
                       <button
                         className="btn btn-primary"
+                        title="Add Row"
                         onClick={() => addRow(relationGroup.relation)}
                       >
                         <i className="fa-solid fa-circle-plus"></i>
@@ -687,6 +693,7 @@ function WeekOff() {
                     {relationGroup.members.length > 1 && (
                       <button
                         className="btn btn-danger"
+                        title="Delete Row"
                         onClick={() => deleteRow(relationGroup.relation, index)}
                       >
                         <i className="fa-regular fa-trash-can"></i>
@@ -701,6 +708,7 @@ function WeekOff() {
                   className={`inputGroup selectGroup 
               ${member.selectRelation ? "has-value" : ""} 
                ${isSelectWeek[index] ? "is-focused" : ""}`}
+                title="Please Select the Week Off Day"
                 >
                   <Select
                     value={member.selectRelation}
@@ -727,6 +735,7 @@ function WeekOff() {
                   className={`inputGroup selectGroup 
               ${member.selectedStatus ? "has-value" : ""} 
                ${isSelectStatus[index] ? "is-focused" : ""}`}
+                title="Please Select the Status"
                 >
                   <Select
                     placeholder=" "

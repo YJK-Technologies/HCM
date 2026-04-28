@@ -338,7 +338,7 @@ function TimeZoneMaster() {
 
     const defaultColDef = {
         resizable: true,
-        wrapText: true,
+        // wrapText: true,
         editable: true,
     };
 

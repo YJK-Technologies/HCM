@@ -729,7 +729,7 @@ function Project({ }) {
           <div className="action-wrapper desktop-actions">
             {/* {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && ( */}
             <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">save</span>
+              <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
             {/*})}*/}
@@ -756,6 +756,7 @@ function Project({ }) {
 
               <li className="dropdown-item" onClick={reloadGridData}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
+                <span className="tooltip">Reload</span>
               </li>
 
             </ul>
@@ -772,6 +773,7 @@ function Project({ }) {
               <input
                 id="ProjectID"
                 className="exp-input-field form-control p-2"
+                title="Please Enter the Project ID"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -790,6 +792,7 @@ function Project({ }) {
                 id="loanID"
                 type="text"
                 className="exp-input-field form-control"
+                title="Please Enter the Project Name"
                 placeholder=" "
                 autoComplete="off"
                 maxLength={255}
@@ -807,6 +810,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
+              title="Please select the Project Manager"
             >
               <Select
                 id="LoanEligibleAmount"
@@ -838,6 +842,7 @@ function Project({ }) {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 autoComplete="off"
+                title="Please Enter the Estimated Hours"
                 value={EstimatedHours}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
@@ -855,6 +860,7 @@ function Project({ }) {
               <textarea
                 id="Approvedby"
                 className="form-control"
+                title="Please Enter the Project Description"
                 placeholder=" "
                 autoComplete="off"
                 value={ProjectDescription}
@@ -871,6 +877,7 @@ function Project({ }) {
               <input
                 id="StartDate"
                 class="exp-input-field form-control"
+                title="Please Enter the Start Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -890,6 +897,7 @@ function Project({ }) {
               <input
                 id="EndDate"
                 class="exp-input-field form-control"
+                title="Please Enter the End Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -908,6 +916,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selectedPriortyLeavel ? "has-value" : ""} 
               ${isSelectPriority ? "is-focused" : ""}`}
+              title="Please select the Priority Level"
             >
               <Select
                 id="PriorityLevel"
@@ -933,6 +942,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selectedTaskStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please select the Task Status"
             >
               <Select
                 id="TaskStatus"
@@ -966,6 +976,7 @@ function Project({ }) {
               <input
                 id="EmployeeId"
                 className="exp-input-field form-control"
+                title="Please Enter the Project ID"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -987,6 +998,7 @@ function Project({ }) {
                 type="text"
                 placeholder=" "
                 className="exp-input-field form-control"
+                title="Please Enter the Project Name"
                 autoComplete="off"
                 value={Projectname}
                 maxLength={255}
@@ -1004,6 +1016,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selectedProject ? "has-value" : ""} 
               ${isSearchManager ? "is-focused" : ""}`}
+              title="Please select the Project Manager"
             >
               <Select
                 id="ProjectManager"
@@ -1031,6 +1044,7 @@ function Project({ }) {
               <input
                 id="StartDate"
                 class="exp-input-field form-control"
+                title="Please Enter the Start Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -1050,6 +1064,7 @@ function Project({ }) {
               <input
                 id="EndDate"
                 className="exp-input-field form-control"
+                title="Please Enter the End Date"
                 type="date"
                 placeholder=" "
                 autoComplete="off"
@@ -1069,6 +1084,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selectedPriorty ? "has-value" : ""} 
               ${isSearchPriority ? "is-focused" : ""}`}
+              title="Please select the Priority Level"
             >
               <Select
                 id="PriorityLevel"
@@ -1095,6 +1111,7 @@ function Project({ }) {
               className={`inputGroup selectGroup 
               ${selctedTask ? "has-value" : ""} 
               ${isSearchStatus ? "is-focused" : ""}`}
+              title="Please select the Task Status"
             >
               <Select
                 id="TaskStatus"

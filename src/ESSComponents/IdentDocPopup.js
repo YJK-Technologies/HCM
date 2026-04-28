@@ -248,6 +248,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee ID"
                       value={EmployeeId}
                       maxLength={18}
                       onChange={(e) => setEmployeeId(e.target.value)}
@@ -264,6 +265,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Employee Name"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
                       // onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -279,6 +281,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Document Type"
                       value={documentType}
                       maxLength={50}
                       onChange={(e) => setDocumentType(e.target.value)}
@@ -295,6 +298,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                       type="text"
                       placeholder=" "
                       className="exp-input-field form-control"
+                      title="Please Enter the Document No"
                       value={documentNo}
                       maxLength={100}
                       onChange={(e) => setDocumentNo(e.target.value)}
