@@ -1426,6 +1426,9 @@ router.post("/getAllDesgination",dataController.getAllDesgination)
 router.post("/deletePrintTemplates",dataController.deletePrintTemplates)
 router.post("/shiftChangeRequestManager",dataController.shiftChangeRequestManager)
 router.post("/shiftRequestManagerApproval",dataController.shiftRequestManagerApproval)
+router.post("/getLoanDashboard",dataController.getLoanDashboard)
+router.post("/getAGES",dataController.getAGES)
+router.post("/getAGESTypes",dataController.getAGESTypes)
 
 
 
