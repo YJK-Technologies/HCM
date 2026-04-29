@@ -41,6 +41,7 @@ function TotalInterviewsScheduled({ }) {
   const gridApiRef = useRef(null);
   const [timeZone, setTimeZone] = useState('');
   const [meetingLink, setMeetingLink] = useState('');
+  const [test, setTest] = useState('');
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');

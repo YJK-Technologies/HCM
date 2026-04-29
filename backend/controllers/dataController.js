@@ -23288,7 +23288,7 @@ const updateempDoc = async (req, res) => {
         .input("mode", sql.NVarChar, "U")
         .input("EmployeeId", updatedRow.EmployeeId)
         .input("document_name", updatedRow.document_name)
-        .input("document_files", updatedRow.document_files)
+        .input("document_files", document_files)
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
         .input("company_code", updatedRow.company_code)
