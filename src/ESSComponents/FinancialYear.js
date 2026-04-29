@@ -8,7 +8,6 @@ import "ag-grid-community/styles/ag-grid.css";
 import TabButtons from './Tabs.js';
 import { useNavigate } from "react-router-dom";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';

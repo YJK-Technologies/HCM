@@ -4,7 +4,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
 import { useNavigate } from "react-router-dom";
 import TabButtons from './Tabs.js';
 import 'react-toastify/dist/ReactToastify.css';
