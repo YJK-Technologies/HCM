@@ -4,6 +4,8 @@ import "./InterviewDashboard.css";
 import config from "./Apiconfig";
 import { Users, UserCheck, Layout } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
 
 const getCurrentMonthRange = () => {
   const now = new Date();
@@ -55,6 +57,11 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
   const [leaveFromDate, setLeaveFromDate] = useState(startDate);
   const [leaveToDate, setLeaveToDate] = useState(endDate);
 
+  // ================= AGE Wise  =================
+  const [ageData, setAgeData] = useState([]);
+  const [ageFromDate, setAgeFromDate] = useState(startDate);
+  const [ageToDate, setAgeToDate] = useState(endDate);
+
   // ================= SUMMARY FETCH =================
   useEffect(() => {
     const fetchSummary = async () => {
@@ -77,6 +84,29 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
       }
     };
     fetchSummary();
+  }, []);
+
+  useEffect(() => {
+    const fetchLoanSummary = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getLoanDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "AGC",
+            company_code: companyCode,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.length > 0) setSummary(data[0]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLoanSummary();
   }, []);
 
   // ================= COMMON FETCH FUNCTION =================
@@ -111,6 +141,57 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
     }
   };
 
+// ================= AGE WISE FETCH FUNCTION =================
+  const fetchLoanChartData = async (mode, fromDate, toDate, setter, nameField, countField ) => {
+  if (new Date(fromDate) > new Date(toDate)) {
+    toast.warning("From Date cannot be greater than To Date");
+    setter([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(`${config.apiBaseUrl}/getLoanDashboard`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mode,
+        company_code: companyCode,
+        fromDate,
+        toDate,
+      }),
+    });
+
+    const result = await response.json();
+
+    setter(
+      result.map((item) => ({
+        name: item[nameField],
+        count: item[countField],
+      }))
+    );
+  } catch (error) {
+    console.error(error);
+    setter([]);
+  }
+};
+
+  const navigate = useNavigate();
+
+  const handleAgeChartClick = (data) => {
+  if (!data || !data.activeLabel) return;
+
+  navigate("/AgesReport", {
+    state: {
+      age_group: data.activeLabel,
+      fromDate: ageFromDate,
+      toDate: ageToDate,
+    },
+  });
+};
+
+
   useEffect(() => {
     fetchChartData("DESIG", desigFromDate, desigToDate, setDesigData, "Designation", "EmployeeCount");
   }, [desigFromDate, desigToDate]);
@@ -130,6 +211,10 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
   useEffect(() => {
     fetchChartData("LS", leaveFromDate, leaveToDate, setLeaveData, "LeaveStatus", "LeaveCount");
   }, [leaveFromDate, leaveToDate]);
+
+  useEffect(() => {
+  fetchLoanChartData("AGC", ageFromDate, ageToDate, setAgeData, "Age_Group", "Total_Count" );
+}, [ageFromDate, ageToDate]);
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -365,6 +450,75 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
             </PieChart>
         </ResponsiveContainer>
     </div>
+
+</div>
+
+{/* AGE GROUP CHART */}
+<div className="hcm-chart-container">
+  <div className="chart-header mobile-stack">
+    <div className="header-text">
+      <h2>Age Group Employee Count</h2>
+      <p>Employees by age range within selected date range</p>
+    </div>
+
+    <div className="filter-container mobile-filter">
+      <div className="filter-group">
+        <label>From Date</label>
+        <input
+          type="date"
+          className="input-bg"
+          value={ageFromDate}
+          onChange={(e) => setAgeFromDate(e.target.value)}
+        />
+      </div>
+
+      <div className="filter-group">
+        <label>To Date</label>
+        <input
+          type="date"
+          className="input-bg"
+          value={ageToDate}
+          onChange={(e) => setAgeToDate(e.target.value)}
+        />
+      </div>
+    </div>
+  </div>
+
+  <div style={{ width: "100%", height: 320 }}>
+    <ResponsiveContainer>
+      <BarChart
+        data={ageData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+        onClick={handleAgeChartClick}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#E8F0F5"
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          interval={0}
+          fontSize={12}
+        />
+
+        <YAxis axisLine={false} tickLine={false} />
+
+        <Tooltip cursor={{ fill: "#F4F7F9" }} />
+
+        <Bar
+          dataKey="count"
+          fill="#8b5cf6"
+          radius={[4, 4, 0, 0]}
+          barSize={30}
+          cursor="pointer"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
 </div>
 
 </section>    </div>

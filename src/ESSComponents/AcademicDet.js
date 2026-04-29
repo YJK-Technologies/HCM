@@ -152,8 +152,7 @@ function Input({}) {
       setError(false);
 
       // 🔹 API Call
-      const response = await fetch(
-        `${config.apiBaseUrl}/addEmployeeAcademicDetails`,
+      const response = await fetch(`${config.apiBaseUrl}/addEmployeeAcademicDetails`,
         {
           method: "POST",
           headers: {

@@ -32,6 +32,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { showEightHourToast } from "../GlobalToast";
 
 ChartJS.register(
   BarElement,
@@ -135,6 +136,10 @@ const Dashboard = () => {
   const joineeCarouselRef = useRef(null);
 
   const [dashboard, setDashboard] = useState({});
+
+  const hasStoppedRef = useRef(false);
+  const intervalRef = useRef(null);
+  
 
   // useEffect(() => {
   //   fetchDashboardData();
@@ -846,39 +851,6 @@ const Dashboard = () => {
       setIntervalId(id);
     }
   }, []);
-
-  const startTimer = () => {
-    setIsCheckedIn((prev) => {
-      const newState = !prev;
-
-      // SAVE CHECK-IN STATE
-      localStorage.setItem("isCheckedIn", newState.toString());
-
-      if (newState) {
-        // ▶️ START TIMER
-        const startTime = Date.now() - secondsPassed * 1000;
-
-        const id = setInterval(() => {
-          const elapsed = Math.floor((Date.now() - startTime) / 1000);
-          setSecondsPassed(elapsed);
-          setTimer(formatTime(elapsed));
-          localStorage.setItem("loggedSeconds", elapsed);
-        }, 1000);
-
-        setIntervalId(id);
-      } else {
-        // ⏹ STOP TIMER
-        if (intervalId) {
-          clearInterval(intervalId);
-          setIntervalId(null);
-        }
-
-        localStorage.removeItem("loggedSeconds");
-      }
-
-      return newState;
-    });
-  };
 
   const formatTime = (seconds) => {
     const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -1962,48 +1934,19 @@ const Dashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // const handleInsert = async () => {
-  //   try {
-  //     const response = await fetch(`${config.apiBaseUrl}/addDailyattendance`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         EmployeeId: sessionStorage.getItem("selectedUserCode"),
-  //       }),
-  //     });
-
-  //     if (response.status === 200) {
-  //       toast.success("Data inserted successfully!");
-  //       setIsCheckedIn((prev) => {
-  //         if (prev) {
-  //           stopTimer(); // Stop the timer if checked out
-  //         } else {
-  //           startTimer(); // Start or resume the timer if checked in
-  //         }
-  //         return !prev; // Toggle check-in state
-  //       });
-  //     } else if (response.status === 400) {
-  //       const errorResponse = await response.json();
-  //       toast.warning(errorResponse.message);
-  //     } else {
-  //       toast.error("Failed to insert data");
-  //     }
-  //   } catch (error) {
-  //     toast.error("Error inserting data: " + error.message);
-  //   }
-  // };
-
   const handleTime = async () => {
     try {
       const route = isCheckedIn ? "/DailyLogOUT" : "/DailyLogin";
-
       const response = await fetch(`${config.apiBaseUrl}${route}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          userID: sessionStorage.getItem("selectedUserCode"),
+          userID: sessionStorage.getItem('selectedUserCode'),
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          created_by: sessionStorage.getItem("selectedUserCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode"),
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
@@ -2011,35 +1954,38 @@ const Dashboard = () => {
       });
 
       if (response.status === 200) {
-        startTimer(); // 🔥 ONLY THIS
-      } else if (response.status === 400) {
+        setIsCheckedIn((prev) => {
+          const newState = !prev;
+          localStorage.setItem("isCheckedIn", newState);
+
+          const today = new Date().toISOString().split("T")[0];
+          const lastDate = localStorage.getItem("lastCheckDate");
+
+          if (newState) {
+            if (lastDate === today) {
+              const lastElapsedTime = parseInt(localStorage.getItem("lastElapsedTime")) || 0;
+              localStorage.setItem("elapsedTime", lastElapsedTime);
+            } else {
+              localStorage.setItem("elapsedTime", 0);
+              localStorage.setItem("lastElapsedTime", 0);
+            }
+
+            localStorage.setItem("lastCheckDate", today);
+            hasStoppedRef.current = false;
+            startTimer();
+          } else {
+            stopTimer();
+          }
+          return newState;
+        });
+      } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message);
-      } else {
-        toast.error("Failed to insert data");
       }
     } catch (error) {
       toast.error("Error inserting data: " + error.message);
     }
   };
-
-  // useEffect(() => {
-  //   if (sessionStorage.getItem("elapsedTime")) {
-  //     const storedTime = parseInt(sessionStorage.getItem("elapsedTime"));
-  //     const hours = String(Math.floor(storedTime / 3600)).padStart(2, "0");
-  //     const minutes = String(Math.floor((storedTime % 3600) / 60)).padStart(2, "0");
-  //     const seconds = String(storedTime % 60).padStart(2, "0");
-  //     setTimer(`${hours}:${minutes}:${seconds}`);
-  //   }
-  // }, []);
-
-  // const handleRowSelection = (id, isChecked) => {
-  //   if (isChecked) {
-  //     console.log(`Row with ID ${id} selected`);
-  //   } else {
-  //     console.log(`Row with ID ${id} deselected`);
-  //   }
-  // };
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -2354,38 +2300,89 @@ const Dashboard = () => {
   ];
 
   const stopTimer = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
+    if (hasStoppedRef.current) return;
+    hasStoppedRef.current = true;
+
+    clearInterval(intervalRef.current);
+
+    const startTime = parseInt(localStorage.getItem("startTime"));
+    const currentTime = Date.now();
+
+    let lastElapsedTime = 0;
+    if (!isNaN(startTime)) {
+      lastElapsedTime = Math.floor((currentTime - startTime) / 1000);
     }
 
-    localStorage.removeItem("loggedSeconds");
-    localStorage.setItem("isCheckedIn", "false");
-    setIsCheckedIn(false);
+    console.log("Calculated Elapsed Time:", lastElapsedTime);
+
+    localStorage.setItem("lastElapsedTime", lastElapsedTime);
+    localStorage.removeItem("elapsedTime");
+    localStorage.removeItem("startTime");
   };
+
   useEffect(() => {
-    const storedCheckIn = localStorage.getItem("isCheckedIn");
-    const checkInTime = localStorage.getItem("checkInTime");
+    const today = new Date().toISOString().split("T")[0];
+    const savedDate = localStorage.getItem("lastCheckDate");
 
-    if (storedCheckIn === "true" && checkInTime) {
-      const elapsedSeconds = Math.floor(
-        (Date.now() - Number(checkInTime)) / 1000,
-      );
-
-      setIsCheckedIn(true);
-      setSecondsPassed(elapsedSeconds);
-      setTimer(formatTime(elapsedSeconds));
-
-      // 🔥 Restart timer after screen switch
-      const id = setInterval(() => {
-        const seconds = Math.floor((Date.now() - Number(checkInTime)) / 1000);
-        setSecondsPassed(seconds);
-        setTimer(formatTime(seconds));
-      }, 1000);
-
-      setIntervalId(id);
+    if (isCheckedIn && savedDate === today) {
+      startTimer();
     }
-  }, []);
+
+    return () => clearInterval(intervalRef.current);
+  }, [isCheckedIn]);
+
+  const startTimer = () => {
+    let storedElapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0;
+
+    let startTime =
+      parseInt(localStorage.getItem("startTime")) ||
+      Date.now() - storedElapsedTime * 1000;
+
+    localStorage.setItem("startTime", startTime);
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      localStorage.setItem("elapsedTime", elapsedTime);
+
+      const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, "0");
+      const seconds = String(elapsedTime % 60).padStart(2, "0");
+
+      setTimer(`${hours}:${minutes}:${seconds}`);
+
+      if (elapsedTime === 28800 && !localStorage.getItem("mailSent")) {
+        sendAutoMail();
+        localStorage.setItem("mailSent", "true");
+        showEightHourToast(() => {
+          console.log("User acknowledged the toast");
+        });
+      }
+    }, 1000);
+  };
+
+  const sendAutoMail = async () => {
+    const userEmail = sessionStorage.getItem("userEmailId");
+
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/sendAutoMail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      if (response.ok) {
+        console.log("Email sent successfully");
+      } else {
+        console.error("Failed to send email");
+      }
+    } catch (error) {
+      console.error("Error sending mail:", error.message);
+    }
+  };
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
@@ -2768,7 +2765,7 @@ const Dashboard = () => {
             />
 
             <button
-              onClick={startTimer}
+              onClick={handleTime}
               className="check-btn"
               style={{
                 backgroundColor: isCheckedIn ? "red" : "green",

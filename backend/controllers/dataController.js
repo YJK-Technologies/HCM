@@ -23288,7 +23288,7 @@ const updateempDoc = async (req, res) => {
         .input("mode", sql.NVarChar, "U")
         .input("EmployeeId", updatedRow.EmployeeId)
         .input("document_name", updatedRow.document_name)
-        .input("document_files", updatedRow.document_files)
+        .input("document_files", document_files)
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
         .input("company_code", updatedRow.company_code)
@@ -48500,6 +48500,96 @@ const shiftRequestManagerApproval = async (req, res) => {
 };
 //Code ended by pavun on 27-04-2026
 
+//Code Added by Sakthi on 29-04-2026
+const getLoanDashboard = async (req, res) => {
+  const {
+    mode,
+    company_code,
+    fromDate,
+    toDate,
+    department_id,
+    age_group
+  } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, mode)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, fromDate || null)
+      .input("to_date", sql.Date, toDate || null)
+      .input("department_id", sql.NVarChar, department_id || null)
+      .input("age_group", sql.NVarChar, age_group || null)
+      .query(`EXEC sp_loan_dashboard_test @mode, @company_code, @from_date, @to_date, @department_id, @age_group,'','','','' `);
+
+    res.status(200).json(result.recordset);
+
+  } catch (err) {
+    console.error("Loan Dashboard Error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//Code Ended by Sakthi on 29-04-2026
+
+//code added by Sakthi on 29-04-2026
+const getAGES = async (req, res) => {
+  const {mode, company_code, fromDate, toDate, department_id, age_group, employee_id, first_name, designation_id, DOB } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "AGES")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("from_date", sql.Date, fromDate || null)
+      .input("to_date", sql.Date, toDate || null)
+      .input("department_id", sql.NVarChar, department_id || null)
+      .input("age_group", sql.NVarChar, age_group || null)
+      .input("employee_id", sql.NVarChar, employee_id || null)
+      .input("first_name", sql.NVarChar, first_name || null)
+      .input("designation_id", sql.NVarChar, designation_id || null)
+      .input("DOB", sql.NVarChar, DOB || null)
+      .query(`EXEC sp_loan_dashboard_test @mode, @company_code, @from_date, @to_date, @department_id, @age_group, @employee_id, @first_name, @designation_id, @DOB `);
+
+    res.status(200).json(result.recordset);
+
+  } catch (err) {
+    console.error("Loan Dashboard Error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+//Code Ended by Sakthi on 29-04-2026
+
+// code added by Sakthi on 29-04-2026
+const getAGESTypes = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'AGES','','', '','','', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+// code ended by Sakthi on 29-04-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -49895,6 +49985,9 @@ module.exports = {
   deletePrintTemplates,
   shiftRequestEmployeeApproval,
   shiftChangeRequestManager,
-  shiftRequestManagerApproval
+  shiftRequestManagerApproval,
+  getLoanDashboard,
+  getAGES,
+  getAGESTypes
 
 };
