@@ -238,7 +238,7 @@ function DepartmentInput({ }) {
                     title="Please enter the Department Code"
                     value={departmentCode}
                     onChange={(e) => setDepartmentCode(e.target.value)}
-                    maxLength={100}
+                    maxLength={20}
                     autoComplete="off"
                     ref={code}
                     onKeyDown={(e) => handleKeyDown(e, Name, code)}
@@ -259,7 +259,7 @@ function DepartmentInput({ }) {
                     autoComplete="off"
                     title="Please enter the Department Name"
                     value={departmenntName}
-                    maxLength={250}
+                    maxLength={50}
                     onChange={(e) => setDepartmenntName(e.target.value)}
                     ref={Name}
                     onKeyDown={(e) => {

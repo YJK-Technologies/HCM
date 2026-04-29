@@ -1353,6 +1353,7 @@ const AccountInformation = () => {
               className={`inputGroup selectGroup 
               ${selectedProject ? "has-value" : ""} 
               ${isSelectProject ? "is-focused" : ""}`}
+              title='Please select the Project'
             >
               <Select
                 id="Approvedby"
@@ -1431,6 +1432,7 @@ const AccountInformation = () => {
                 placeholder=" "
                 autoComplete='off'
                 value={taskmasterid}
+                title='Please enter the Task Master ID'
                 onChange={(e) => settaskmasterid(e.target.value)}
                 maxLength={50}
                 onKeyDown={(e) => {
@@ -1441,7 +1443,7 @@ const AccountInformation = () => {
                 }}
               />
               <label className="exp-form-labels">Task Master ID</label>
-              <span className="select-add-btn" onClick={handleTicket}>
+              <span className="select-add-btn" title='Search' onClick={handleTicket}>
                 <i className="fa fa-search" ></i>
               </span>
             </div>
@@ -1457,6 +1459,7 @@ const AccountInformation = () => {
                 required
                 autoComplete='off'
                 value={Tasktitle}
+                title='Please enter the Task Title'
                 onChange={(e) => setTasktitle(e.target.value)}
                 maxLength={20}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1474,6 +1477,7 @@ const AccountInformation = () => {
                 placeholder=" "
                 autoComplete='off'
                 value={priority}
+                title='Please enter the Priority'
                 onChange={(e) => setpriority(e.target.value)}
                 maxLength={30}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1491,6 +1495,7 @@ const AccountInformation = () => {
                 placeholder=" "
                 autoComplete='off'
                 value={description}
+                title='Please enter the Description'
                 onChange={(e) => setdescription(e.target.value)}
                 maxLength={30}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -1735,7 +1740,7 @@ const AccountInformation = () => {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=''
-                required title="Please Enter the Task Title"
+                required title="Please enter the Task Title"
                 value={tasktitle}
                 onChange={(e) => settasktitle(e.target.value)}
 
@@ -1749,6 +1754,7 @@ const AccountInformation = () => {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title='Please select the User Code'
             >
               <Select
                 id="Approvedby"
@@ -1774,7 +1780,7 @@ const AccountInformation = () => {
                   type="time"
                   placeholder=""
                   required
-                  title="Please Choose the Hours"
+                  title="Please select the Hours Taken"
                   value={estimatedhours}
                   onChange={(e) => setestimatedhours(e.target.value)}
                   maxLength={100}
@@ -1789,6 +1795,7 @@ const AccountInformation = () => {
               className={`inputGroup selectGroup 
               ${selectedtstatusSC ? "has-value" : ""} 
               ${isSelectstatusSC ? "is-focused" : ""}`}
+              title='Please select the Task Status'
             >
               <Select
                 id="EMIAmount"
@@ -1811,6 +1818,7 @@ const AccountInformation = () => {
               className={`inputGroup selectGroup 
               ${selectedPriortyLeavel ? "has-value" : ""} 
               ${isSelectPL ? "is-focused" : ""}`}
+              title='Please select the Priority Level'
             >
               <Select
                 id="PriorityLevel"
@@ -1918,39 +1926,42 @@ const AccountInformation = () => {
               Description<span className="text-danger">*</span>
             </label>
 
-            <Editor
-              required title="Please Enter the Description"
-              editorState={editorState}
-              onEditorStateChange={handleEditorStateChange}
-              wrapperClassName="demo-wrapper"
-              editorClassName="demo-editor editor-content"
-              editorStyle={{
-                height: "200px",
-                border: "1px solid #ccc",
-                padding: "5px",
-                direction: "ltr",
-                textAlign: "left",
-                backgroundColor: "#ffffff"
-              }}
-              toolbar={{
-                options: ['inline', 'list', 'textAlign', 'link', 'history', 'image'],
-                inline: { options: ['bold', 'italic', 'underline'] },
-                image: {
-                  uploadCallback: uploadImageCallBack,
-                  previewImage: true,
-                  alt: { present: true, mandatory: false },
-                  inputAccept: "image/*",
-                }
-              }}
-              handleDroppedFiles={handleDroppedFiles}
-              handlePastedFiles={(files) => {
-                if (files.length > 0) {
-                  handleDroppedFiles(null, files);
-                  return true;
-                }
-                return false;
-              }}
-            />
+            {/* Wrap the Editor in a div with the title attribute for the tooltip */}
+            <div title="Please enter the Description">
+              <Editor
+                required
+                editorState={editorState}
+                onEditorStateChange={handleEditorStateChange}
+                wrapperClassName="demo-wrapper"
+                editorClassName="demo-editor editor-content"
+                editorStyle={{
+                  height: "200px",
+                  border: "1px solid #ccc",
+                  padding: "5px",
+                  direction: "ltr",
+                  textAlign: "left",
+                  backgroundColor: "#ffffff"
+                }}
+                toolbar={{
+                  options: ['inline', 'list', 'textAlign', 'link', 'history', 'image'],
+                  inline: { options: ['bold', 'italic', 'underline'] },
+                  image: {
+                    uploadCallback: uploadImageCallBack,
+                    previewImage: true,
+                    alt: { present: true, mandatory: false },
+                    inputAccept: "image/*",
+                  }
+                }}
+                handleDroppedFiles={handleDroppedFiles}
+                handlePastedFiles={(files) => {
+                  if (files.length > 0) {
+                    handleDroppedFiles(null, files);
+                    return true;
+                  }
+                  return false;
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
