@@ -1375,7 +1375,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label className=" partyName">
-                  <strong> Project Name:{ProjectName}</strong>
+                  <strong> Project Name: {ProjectName}</strong>
                 </label>
               </div>
             </div>
@@ -1393,7 +1393,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label className="exp-form-labels partyName">
-                  <strong>Project Manager:{Manager}</strong>
+                  <strong>Project Manager: {Manager}</strong>
                 </label>
               </div>
             </div>
@@ -1402,7 +1402,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label className="exp-form-labels partyName">
-                  <strong>Start Date:{StartDate}</strong>
+                  <strong>Start Date: {StartDate}</strong>
                 </label>
               </div>
             </div>
@@ -1535,7 +1535,7 @@ const AccountInformation = () => {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label class="exp-form-labels partyName"><strong >Task Master ID :{taskid}</strong></label>
+                <label class="exp-form-labels partyName"><strong >Task Master ID : {taskid}</strong></label>
               </div>
             </div>
           </div>
@@ -1543,7 +1543,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong>Task Title:{TaskTitle}</strong>
+                  <strong>Task Title: {TaskTitle}</strong>
                 </label>
               </div>
             </div>
@@ -1552,7 +1552,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong >User:{userID}</strong>
+                  <strong >User: {userID}</strong>
                 </label>
               </div>
             </div>
@@ -1561,7 +1561,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels  partyName">
-                  <strong className='  col-md-12'> Task Description:{Description}</strong>
+                  <strong className='  col-md-12'> Task Description: {Description}</strong>
                 </label>
               </div>
             </div>
@@ -1569,7 +1569,7 @@ const AccountInformation = () => {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label class="exp-form-labels partyName"> <strong> Files :</strong></label>
+                <label class="exp-form-labels partyName"> <strong> Files : </strong></label>
               </div>
             </div>
 
@@ -1667,7 +1667,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong >Start Date:{startdate}</strong>
+                  <strong >Start Date: {startdate}</strong>
                 </label>
               </div>
             </div>
@@ -1676,7 +1676,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong >End Date:{endDate}</strong>
+                  <strong >End Date: {endDate}</strong>
                 </label>
               </div>
             </div>
@@ -1685,7 +1685,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong > Status:{TaskStatus}</strong>
+                  <strong > Status: {TaskStatus}</strong>
                 </label>
               </div>
             </div>
@@ -1694,7 +1694,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong > Estimated Hours:{EstimatedHours}</strong>
+                  <strong > Estimated Hours: {EstimatedHours}</strong>
                 </label>
               </div>
             </div>
@@ -1703,7 +1703,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong > Buffer Hours:{BufferHours}</strong>
+                  <strong > Buffer Hours: {BufferHours}</strong>
                 </label>
               </div>
             </div>
@@ -1712,7 +1712,7 @@ const AccountInformation = () => {
             <div className="exp-form-floating">
               <div className="info-label-container">
                 <label class="exp-form-labels partyName">
-                  <strong >Total Hours Spent:{HourseTaken}</strong>
+                  <strong >Total Hours Spent: {HourseTaken}</strong>
                 </label>
               </div>
             </div>
@@ -1721,7 +1721,7 @@ const AccountInformation = () => {
           <div className="col-md-2">
             <div className="exp-form-floating">
               <div className="info-label-container">
-                <label for="cname" > <strong>Daily Task ID :{dailytask}</strong></label>
+                <label for="cname" > <strong>Daily Task ID: {dailytask}</strong></label>
               </div>
             </div>
           </div>

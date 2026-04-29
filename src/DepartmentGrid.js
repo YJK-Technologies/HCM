@@ -149,6 +149,7 @@ function Department() {
       editable: true,
       cellStyle: { textAlign: "center" },
       // minWidth: 150,
+      width: 250,
       cellEditorParams: {
         maxLength: 250,
       },
