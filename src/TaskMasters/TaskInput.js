@@ -184,6 +184,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       placeholder=" "
                       className="exp-input-field form-control"
                       value={ProjectID}
+                      title="Selected Project ID will appear here"
                     />
                     <label className={`exp-form-labels ${error && !ProjectID ? 'text-danger' : ''}`}>
                       Project ID<span className="text-danger">*</span>
@@ -200,6 +201,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       autoComplete="off"
                       className="exp-input-field form-control"
                       value={TaskMaster}
+                      title="Please enter the Task Master ID"
                       onChange={(e) => setTaskMaster(e.target.value)}
                     />
                     <label className="exp-form-labels">Task Master ID</label>
@@ -215,6 +217,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       autoComplete="off"
                       className="exp-input-field form-control"
                       value={Title}
+                      title="Please enter the Task Title"
                       onChange={(e) => setTitle(e.target.value)}
                     />
                     <label className={`exp-form-labels ${error && !Title ? 'text-danger' : ''}`}>
@@ -229,6 +232,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                     className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title="Please select the User ID"
                   >
                     <Select
                       placeholder=" "
@@ -253,12 +257,13 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       type="date"
                       className="exp-input-field form-control"
                       value={StartDate}
+                      title="Please select the Start Date"
                       placeholder=" "
                       autoComplete="off"
                       onChange={(e) => setStartDate(e.target.value)}
                     />
                     <label className={`exp-form-labels ${error && !StartDate ? 'text-danger' : ''}`}>
-                      Start Date <span className="text-danger">*</span>
+                      Start Date<span className="text-danger">*</span>
                     </label>
                   </div>
                 </div>
@@ -270,6 +275,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       type="date"
                       className="exp-input-field form-control"
                       value={EndDate}
+                      title="Please select the End Date"
                       placeholder=" "
                       autoComplete="off"
                       onChange={(e) => setEndDate(e.target.value)}
@@ -287,6 +293,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       type="text"
                       className="exp-input-field form-control"
                       value={Endtime}
+                      title="Please enter the Estimated Hours"
                       placeholder=" "
                       autoComplete="off"
                       onChange={(e) => setEndtime(e.target.value)}
@@ -304,6 +311,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                       type="text"
                       className="exp-input-field form-control"
                       value={buffer}
+                      title="Please enter the Buffer Hours"
                       placeholder=" "
                       autoComplete="off"
                       onChange={(e) => setbuffer(e.target.value)}
@@ -320,6 +328,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                     <textarea
                       className="form-control"
                       value={Descriptions}
+                      title="Please enter the Task Description"
                       placeholder=" "
                       autoComplete="off"
                       onChange={(e) => setDescriptions(e.target.value)}
@@ -336,6 +345,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                     className={`inputGroup selectGroup 
               ${selectedtstatus ? "has-value" : ""} 
               ${isSelectTask ? "is-focused" : ""}`}
+              title="Please select the Task Status"
                   >
                     <Select
                       value={selectedtstatus}
@@ -359,6 +369,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
                     className={`inputGroup selectGroup 
               ${selectedPriortyLeavel ? "has-value" : ""} 
               ${isSelectPriority ? "is-focused" : ""}`}
+              title="Please select the Priority Level"
                   >
                     <Select
                       value={selectedPriortyLeavel}

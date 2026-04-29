@@ -57,11 +57,13 @@ const SettingsPage = () => {
             (opt) => opt.value === settings.Default_date_format
           );
           setDateFormat(selectedDate);
+          setDateFormatValue(selectedDate.value);
 
           const selectedCurrency = filteredOptionCurrency.find(
             (opt) => opt.value === settings.Default_currency
           );
           setCurrency(selectedCurrency);
+          setCurrencyValue(selectedCurrency.value);
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
