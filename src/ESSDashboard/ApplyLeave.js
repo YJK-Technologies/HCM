@@ -424,20 +424,12 @@ const ApplyLeave = () => {
       field: "FromDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "To Date",
       field: "ToDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "Status",
@@ -450,10 +442,6 @@ const ApplyLeave = () => {
       field: "HolidayDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "Holiday Name",

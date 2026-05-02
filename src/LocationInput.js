@@ -59,7 +59,15 @@ function LocInfoInput({ }) {
   const [isSelectStatus, setIsSelectStatus] = useState(false);
 
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setlocation_no("");
@@ -436,7 +444,7 @@ function LocInfoInput({ }) {
                 placeholder=" "
                 autoComplete="off"
                 required
-                title="Please enter the Location No"
+                title="Please Enter the Location No"
                 value={location_no}
                 onChange={(e) => setlocation_no(e.target.value)}
                 onKeyDown={(e) =>
@@ -458,7 +466,7 @@ function LocInfoInput({ }) {
                 type="text"
                 placeholder=" "
                 required
-                title="Please enter the Location Name"
+                title="Please Enter the Location Name"
                 autoComplete="off"
                 value={location_name}
                 onChange={(e) => setlocation_name(e.target.value)}
@@ -481,7 +489,7 @@ function LocInfoInput({ }) {
                 placeholder=" "
                 autoComplete="off"
                 required
-                title="Please enter the Short Name"
+                title="Please Enter the Short Name"
                 value={short_name}
                 onChange={(e) => setshort_name(e.target.value)}
                 onKeyDown={(e) =>
@@ -502,7 +510,7 @@ function LocInfoInput({ }) {
                 type="text"
                 placeholder=" "
                 required
-                title="Please enter the Address 1"
+                title="Please Enter the Address 1"
                 value={address1}
                 onKeyDown={(e) => handleKeyDown(e, AddresS2, address)}
                 ref={address}
@@ -521,7 +529,7 @@ function LocInfoInput({ }) {
                 type="text"
                 placeholder=" "
                 required
-                title="Please enter the Address 2"
+                title="Please Enter the Address 2"
                 autoComplete="off"
                 value={address2}
                 ref={AddresS2}
@@ -543,7 +551,7 @@ function LocInfoInput({ }) {
                 type="text"
                 placeholder=" "
                 required
-                title="Please enter the Address 3"
+                title="Please Enter the Address 3"
                 value={address3}
                 ref={Address3}
                 onChange={(e) => setaddress3(e.target.value)}
@@ -560,7 +568,7 @@ function LocInfoInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedCity ? "has-value" : ""} 
               ${isSelectCity ? "is-focused" : ""}`}
-              title="Please select the City"
+              title="Please Select the City"
             >
               <Select
                 id="city"
@@ -587,7 +595,7 @@ function LocInfoInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedState ? "has-value" : ""} 
               ${isSelectState ? "is-focused" : ""}`}
-              title="Please select the State"
+              title="Please Select the State"
             >
               <Select
                 id="state"
@@ -618,7 +626,7 @@ function LocInfoInput({ }) {
                 autoComplete="off"
                 placeholder=" "
                 required
-                title="Please enter the Pin Code"
+                title="Please Enter the Pin Code"
                 value={pincode}
                 onKeyDown={(e) => handleKeyDown(e, Country, Pincode)}
                 ref={Pincode}
@@ -638,7 +646,7 @@ function LocInfoInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
-              title="Please select the Country"
+              title="Please Select the Country"
             >
               <Select
                 id="country"
@@ -667,7 +675,7 @@ function LocInfoInput({ }) {
                 autoComplete="off"
                 placeholder=" "
                 required
-                title="Please enter the Email"
+                title="Please Enter the Email"
                 value={email_id}
                 onChange={(e) => setemail_id(e.target.value)}
                 maxLength={150}
@@ -683,7 +691,7 @@ function LocInfoInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please select the Status"
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -711,7 +719,7 @@ function LocInfoInput({ }) {
                 autoComplete="off"
                 placeholder=" "
                 required
-                title="Please enter the Contact No"
+                title="Please Enter the Contact No"
                 value={contact_no}
                 ref={Contactno}
                 onChange={(e) =>

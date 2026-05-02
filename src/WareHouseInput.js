@@ -36,8 +36,15 @@ function WareHouseInput({ }) {
   const [isSelectedLocation, setIsSelectedLocation] = useState(false);
 
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
-  console.log(selectedRow);
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setWarehouse_Code("");
@@ -275,7 +282,7 @@ function WareHouseInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Warehouse code"
+                    required title="Please Enter the Warehouse Code"
                     value={warehouse_code}
                     maxLength={18}
                     onChange={(e) => setWarehouse_Code(e.target.value)}
@@ -283,7 +290,7 @@ function WareHouseInput({ }) {
                     readOnly={mode === "update"}
                     onKeyDown={(e) => handleKeyDown(e, WarehouseName, WarehouseCode)}
                   />
-                  <label className={`exp-form-labels ${error && !warehouse_code ? 'text-danger' : ''}`}>WareHouse Code<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !warehouse_code ? 'text-danger' : ''}`}>Warehouse Code<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -294,23 +301,23 @@ function WareHouseInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the warehouse name"
+                    required title="Please Enter the Warehouse Name"
                     value={warehouse_name}
                     maxLength={250}
                     onChange={(e) => setWarehouse_Name(e.target.value)}
                     ref={WarehouseName}
                     onKeyDown={(e) => handleKeyDown(e, Status, WarehouseName)}
                   />
-                  <label className={`exp-form-labels ${error && !warehouse_name ? 'text-danger' : ''}`}>WareHouse Name<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !warehouse_name ? 'text-danger' : ''}`}>Warehouse Name<span className="text-danger">*</span></label>
                 </div>
               </div>
 
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                     ${selectedStatus ? "has-value" : ""} 
-                     ${isSelectedStatus ? "is-focused" : ""}`}
-                      title="Please select the status"
+                  ${selectedStatus ? "has-value" : ""} 
+                  ${isSelectedStatus ? "is-focused" : ""}`}
+                  title="Please Select the Status"
                 >
                   <Select
                     id="status"
@@ -333,9 +340,9 @@ function WareHouseInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                     ${selectedLocation ? "has-value" : ""} 
-                     ${isSelectedLocation ? "is-focused" : ""}`}
-                      title="Please select the location number"
+                  ${selectedLocation ? "has-value" : ""} 
+                  ${isSelectedLocation ? "is-focused" : ""}`}
+                  title="Please Select the Location No"
                 >
                   <Select
                     id="status"

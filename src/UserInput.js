@@ -65,7 +65,6 @@ function UserInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
-  console.log(selectedRow);
 
   useEffect(() => {
     if (!location.state) {
@@ -583,7 +582,7 @@ function UserInput({ }) {
               <input
                 id="uname"
                 class="exp-input-field form-control"
-                title="Please Enter the User Name here"
+                title="Please Enter the User Name"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -603,7 +602,7 @@ function UserInput({ }) {
               <input
                 id="fname"
                 class="exp-input-field form-control"
-                title="Please Enter the first name here"
+                title="Please Enter the First Name"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -623,7 +622,7 @@ function UserInput({ }) {
               <input
                 id="lname"
                 class="exp-input-field form-control"
-                title="Please Enter the last name here"
+                title="Please Enter the Last Name"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -643,7 +642,7 @@ function UserInput({ }) {
               <input
                 id="upass"
                 class="exp-input-field form-control"
-                title="Please Enter the password here"
+                title="Please Enter the Password"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -663,7 +662,7 @@ function UserInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please Select the User Status"
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -740,7 +739,7 @@ function UserInput({ }) {
               <input
                 id="uemail"
                 class="exp-input-field form-control"
-                title="Please Enter the Email here"
+                title="Please Enter the Email"
                 type="email"
                 autoComplete="off"
                 placeholder=" "

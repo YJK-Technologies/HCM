@@ -436,14 +436,31 @@ function IntermediaryGrid() {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+        @media print {
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -855,7 +872,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please Enter the IMEX Number"
+                  required title="Please Enter the IMEX No"
                   value={intermediary_imex_no}
                   onChange={(e) => setintermediary_imex_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -872,7 +889,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="number"
                   placeholder=""
-                  required title="Please Enter the Contact Number"
+                  required title="Please Enter the Contact No"
                   value={intermediary_office_no}
                   onChange={(e) => setintermediary_office_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -889,7 +906,7 @@ function IntermediaryGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please Enter the Fax Number"
+                  required title="Please Enter the Fax No"
                   value={intermediary_fax_no}
                   onChange={(e) => setintermediary_fax_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

@@ -750,7 +750,7 @@ const Dashboard = (payslip) => {
         if (response.ok) {
           const searchData = await response.json();
           const newRows = searchData.map((matchedItem) => ({
-            HOLIDAYS: formatDates(matchedItem.HOLIDAYS),
+            HOLIDAYS: matchedItem.HOLIDAYS,
             Description: matchedItem.Description,
           }));
           setHolidayRowData(newRows);

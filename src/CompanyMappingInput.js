@@ -45,9 +45,15 @@ function UserComMap_input({ }) {
   const [isSelectStatus, setIsSelectStatus] = useState(false);
 
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
-  console.log(selectedRow);
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setSelectedUser("");
@@ -283,7 +289,7 @@ function UserComMap_input({ }) {
       //   clearInputFields();
       //   toast.success("Data Updated successfully!")
       if (response.ok) {
-         toast.success("Data updated successfully", {
+        toast.success("Data updated successfully", {
           onClose: () => {
             clearInputFields();
             setError(false)
@@ -327,6 +333,7 @@ function UserComMap_input({ }) {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
+              title="Please Select the User Code"
             >
               <Select
                 id="usercode"
@@ -354,6 +361,7 @@ function UserComMap_input({ }) {
               className={`inputGroup selectGroup 
               ${selectedCompany ? "has-value" : ""} 
               ${isSelectCompany ? "is-focused" : ""}`}
+              title="Please Select the Company Code"
             >
               <Select
                 id="comno"
@@ -381,6 +389,7 @@ function UserComMap_input({ }) {
               className={`inputGroup selectGroup 
               ${selectedLocation ? "has-value" : ""} 
               ${isSelectLocation ? "is-focused" : ""}`}
+              title="Please Select the Location No"
             >
               <Select
                 id="locno"
@@ -404,6 +413,7 @@ function UserComMap_input({ }) {
               className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
             >
               <Select
                 id="status"
@@ -431,6 +441,7 @@ function UserComMap_input({ }) {
                 placeholder=""
                 required
                 autoComplete="off"
+                title="Please Enter the Order No"
                 value={order_no}
                 onChange={(e) =>
                   setorder_no(

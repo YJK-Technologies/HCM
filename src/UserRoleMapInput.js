@@ -31,9 +31,15 @@ function UserRoleInput({ }) {
   const [isUpdated, setIsUpdated] = useState(false);
   const [keyfield, setKeyfield] = useState('');
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
-  console.log(selectedRow);
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setSelectedUser("");
@@ -246,7 +252,7 @@ function UserRoleInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedUser ? "has-value" : ""} 
               ${isSelectUser ? "is-focused" : ""}`}
-              title="Please Enter the User Code"
+              title="Please Select the User Code"
             >
               <Select
                 id="usercode"
@@ -271,7 +277,7 @@ function UserRoleInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
-              title="Please Enter the Role ID"
+              title="Please Select the Role ID"
             >
               <Select
                 id="roleid"

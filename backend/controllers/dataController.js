@@ -24923,16 +24923,8 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("institution", sql.NVarChar, institution)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
-      .input(
-        "academic_year_from",
-        sql.Date,
-        academic_year_from ? new Date(academic_year_from) : null
-      )
-      .input(
-        "academic_year_to",
-        sql.Date,
-        academic_year_to ? new Date(academic_year_to) : null
-      )
+      .input("academic_year_from", sql.Date, academic_year_from ? new Date(academic_year_from) : null)
+      .input("academic_year_to", sql.Date, academic_year_to ? new Date(academic_year_to) : null)
       .query(
         `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );

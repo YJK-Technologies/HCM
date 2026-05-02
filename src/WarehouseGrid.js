@@ -387,14 +387,31 @@ function WarehouseGrid() {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+        @media print {
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -707,7 +724,7 @@ function WarehouseGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please Enter the Warehouse code "
+                  required title="Please Enter the Warehouse Code"
                   value={warehouse_code}
                   onChange={(e) => setwarehouse_code(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -723,7 +740,7 @@ function WarehouseGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please Enter the Warehouse name here"
+                  required title="Please Enter the Warehouse Name"
                   value={warehouse_name}
                   onChange={(e) => setwarehouse_name(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -738,7 +755,7 @@ function WarehouseGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please select the status"
+              title="Please Select the Status"
               >
                 <Select
                   id="status"
@@ -763,7 +780,7 @@ function WarehouseGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please Enter the Location number here"
+                  required title="Please Enter the Location No"
                   value={location_no}
                   onChange={(e) => setlocation_no(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

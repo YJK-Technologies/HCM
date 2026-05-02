@@ -30,7 +30,7 @@ const MyAgGridComponent = () => {
 
 
   const columnEmployee = [
-    { headerName: 'Date', field: 'work_date', sort: 'asc', valueFormatter: (params) => formatDate(params.value), width: '110' },
+    { headerName: 'Date', field: 'work_date', sort: 'asc', width: '110' },
     { headerName: 'Employee ID', field: 'user', editable: true, width: '170' },
     { headerName: 'Shift Code', field: 'Shift_Code', editable: true, width: '170' },
     // { headerName: 'Employee Name', field: 'user' },
@@ -494,7 +494,7 @@ const MyAgGridComponent = () => {
   const [rowDataEmployeeTime, setRowDataEmployeeTime] = useState([]);
 
   const columnEmployeeTime = [
-    { headerName: 'Date', field: 'DayofLogin', valueFormatter: (params) => formatDate(params.value), width: '110' },
+    { headerName: 'Date', field: 'DayofLogin', width: '110' },
     { headerName: 'Employee ID', field: 'userID', width: '120' },
     { headerName: 'Check In', field: 'Checkin', sort: "asc", width: '120' },
     { headerName: 'Check Out', field: 'CheckOut', width: '120' },
