@@ -392,13 +392,30 @@ function CompanyMappingGrid() {
           }
   
           @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -719,7 +736,7 @@ function CompanyMappingGrid() {
                   type="text"
                   placeholder=" "
                   required
-                  title="Please fill the user code here"
+                  title="Please Enter the User Code"
                   value={user_code}
                   onChange={(e) => setuser_code(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -737,7 +754,7 @@ function CompanyMappingGrid() {
                   type="text"
                   placeholder=" "
                   required
-                  title="Please fill the company code here"
+                  title="Please Enter the Company Code"
                   value={company_no}
                   onChange={(e) => setcompany_no(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -755,7 +772,7 @@ function CompanyMappingGrid() {
                   type="text"
                   placeholder=" "
                   required
-                  title="Please fill the location number here"
+                  title="Please Enter the Location No"
                   value={location_no}
                   onChange={(e) => setlocation_no(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -770,6 +787,7 @@ function CompanyMappingGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
               >
                 <Select
                   id="status"

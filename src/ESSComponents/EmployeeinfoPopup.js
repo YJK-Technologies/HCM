@@ -32,7 +32,6 @@ const columnDefs = [
     headerName: "DOB",
     field: "DOB",
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
   },
   {
     headerName: "Image",

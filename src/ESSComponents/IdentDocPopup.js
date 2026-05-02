@@ -66,13 +66,11 @@ const columnDefs = [
     headerName: "Issue Date",
     field: "issueDate",
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
   },
   {
     headerName: "Expiry Date",
     field: "expiryDate",
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
   },
   // {
   //   headerName: "Document",

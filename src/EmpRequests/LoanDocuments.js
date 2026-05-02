@@ -251,13 +251,11 @@ function LoanDocuments({ }) {
         );
       },
     },
-
     {
       headerName: "Document ID",
       field: "document_id",
       editable: false,
     },
-
     {
       headerName: "Loan Request ID",
       field: "loan_request_id",
@@ -271,7 +269,6 @@ function LoanDocuments({ }) {
         return loan ? loan.label : params.value;
       },
     },
-
     {
       headerName: "Document Type",
       field: "document_type",
@@ -285,34 +282,20 @@ function LoanDocuments({ }) {
         return dept ? dept.label : params.value;
       },
     },
-
     {
       headerName: "File Path",
       field: "file_path",
       editable: true,
     },
-
     {
       headerName: "Uploaded By",
       field: "uploaded_by",
       editable: true,
     },
-
     {
       headerName: "Uploaded Date",
       field: "uploaded_at",
       editable: true,
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-
-        const date = new Date(params.value);
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}-${month}-${year}`;
-      }
     },
     // PDF PREVIEW COLUMN
     {
@@ -341,14 +324,12 @@ function LoanDocuments({ }) {
         );
       },
     },
-
     {
       headerName: "Company Code",
       field: "company_code",
       editable: false,
       hide: true,
     },
-
     {
       headerName: "Keyfield",
       field: "keyfield",

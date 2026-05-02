@@ -101,13 +101,11 @@ function Input({ }) {
     {
       headerName: "Start Year",
       field: "Start_Year",
-      valueFormatter: (params) => formatDate(params.value),
       editable: true
     },
     {
       headerName: "End Year",
       field: "End_Year",
-      valueFormatter: (params) => formatDate(params.value),
       editable: true
     },
     {
@@ -204,8 +202,8 @@ function Input({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-          Start_Year: formatDate(matchedItem.Start_Year),
-          End_Year: formatDate(matchedItem.End_Year),
+          Start_Year: matchedItem.Start_Year,
+          End_Year: matchedItem.End_Year,
           Company_Fund: matchedItem.Company_Fund,
           Employee_Fund: matchedItem.Employee_Fund,
           keyfield: matchedItem.keyfield,

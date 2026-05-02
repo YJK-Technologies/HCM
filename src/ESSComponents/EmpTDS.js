@@ -103,7 +103,6 @@ function Input({ }) {
       headerName: "Start Year",
       field: "Start_Year",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 18,
@@ -113,7 +112,6 @@ function Input({ }) {
       headerName: "End Year",
       field: "End_Year",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 250,

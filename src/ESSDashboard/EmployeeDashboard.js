@@ -33,7 +33,7 @@ const Dashboard = (payslip) => {
   const Today = new Date().toISOString().split("T")[0];
   const [isCalendarVisible, setIsCalendarVisible] = useState(true);
   const [rowData, setRowData] = useState('');
-  const [rempShiftRowData, setEmpShiftRowData] = useState('');
+  const [rempShiftRowData, setEmpShiftRowData] = useState([]);
   const [NewJoinees, setNewJoinees] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [startdate, setstartdate] = useState(Today);
@@ -750,7 +750,7 @@ const Dashboard = (payslip) => {
         if (response.ok) {
           const searchData = await response.json();
           const newRows = searchData.map((matchedItem) => ({
-            HOLIDAYS: formatDates(matchedItem.HOLIDAYS),
+            HOLIDAYS: matchedItem.HOLIDAYS,
             Description: matchedItem.Description,
           }));
           setHolidayRowData(newRows);

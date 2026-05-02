@@ -188,31 +188,12 @@ function NumberSeriesGrid() {
       field: "Start_Year",
       editable: false,
       cellStyle: { textAlign: "left" },
-
-      // minWidth: 10,
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // Return an empty string if the value is null or undefined
-        const date = new Date(params.value);
-        const day = date.getDate().toString().padStart(2, "0"); // Get day (padStart ensures double-digit format)
-        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Get month (+1 because months are zero-indexed)
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`; // Return formatted date string with day, month, and year
-      },
     },
     {
       headerName: "End Year",
       field: "End_Year",
       editable: false,
       cellStyle: { textAlign: "left" },
-      // minWidth: 10,
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // Return an empty string if the value is null or undefined
-        const date = new Date(params.value);
-        const day = date.getDate().toString().padStart(2, "0"); // Get day (padStart ensures double-digit format)
-        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Get month (+1 because months are zero-indexed)
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`; // Return formatted date string with day, month, and year
-      },
     },
     {
       headerName: "Start No",
@@ -320,8 +301,8 @@ function NumberSeriesGrid() {
 
       return {
         "Screen Type": formatValue(row.Screen_Type),
-        "Start Year": formatValue(formatDate(row.Start_Year)),
-        "End Year": formatValue(formatDate(row.End_Year)),
+        "Start Year": formatValue(row.Start_Year),
+        "End Year": formatValue(row.End_Year),
         "Start No": formatValue(row.Start_No),
         "Running No": formatValue(row.Running_No),
         "End No": formatValue(row.End_No),
@@ -438,14 +419,31 @@ function NumberSeriesGrid() {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+        @media print {
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -751,7 +749,7 @@ function NumberSeriesGrid() {
               className={`inputGroup selectGroup 
               ${selectedscreentype ? "has-value" : ""} 
               ${isSelectedscreentype ? "is-focused" : ""}`}
-              title="Please select the screen type"
+              title="Please Select the Screen Type"
             >
               <Select
                 id="wcode"
@@ -765,7 +763,6 @@ function NumberSeriesGrid() {
                 onFocus={() => setIsSelectscreentype(true)}
                 onBlur={() => setIsSelectscreentype(false)}
                 required
-                title="Please select a screen type"
                 maxLength={50}
               />
               <label for="tcode" class="floating-label">Screen Type</label>

@@ -601,7 +601,6 @@ function Grid() {
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
           }
   
           th {
@@ -613,10 +612,12 @@ function Grid() {
   
           td {
             padding: 8px;
+            text-align: left;
             border-bottom: 1px solid #ddd;
           }
   
           tr:nth-child(even) {
+            text-align: left;
             background-color: ${rowAltColor};
           }
   
@@ -646,15 +647,33 @@ function Grid() {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+        @media print {
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
+
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
     <img src="${logoUrl}" class="logo" />
@@ -939,6 +958,7 @@ function Grid() {
                 maxLength={18}
                 className="exp-input-field form-control"
                 required
+                title="Please Enter the Company No"
                 autoComplete="off"
                 placeholder=" "
               />

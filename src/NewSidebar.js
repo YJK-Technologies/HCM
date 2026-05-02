@@ -257,13 +257,13 @@ const menuData = [
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
           { label: "Comp Off Request", path: "/CompOffRequest" },
+          { label: "Shift Change Request", path: "/ShiftChangeRequest" },
         ],
       },
       {
         label: "Others",
         isDropdown: true,
         subMenus: [
-         
           { label: "Grade", path: "/EmployeeGrade" },
           { label: "Leave", path: "/EmpLeave" },
           { label: "Announcement", path: "/Announce" },

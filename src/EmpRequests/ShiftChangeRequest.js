@@ -11,23 +11,13 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import ShiftRequestModal from "../ESSDashboard/ShiftRequestModal";
 const config = require('../Apiconfig');
 
-const EmployeeCompOff = () => {
+const ShiftChangeRequest = () => {
     const [FromDate, setFromDate] = useState("");
     const [ToDate, setToDate] = useState("");
-    const [Reason, setReason] = useState("");
-    const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
-    const [error, setError] = useState(false);
-    const [Managerdrop, setManagerdrop] = useState([]);
-    const [selectedManager, setSelectedManager] = useState('');
-    const [ReportingManager, setReportingManager] = useState("");
     const [loading, setLoading] = useState(false);
-    const [isSelectManager, setIsSelectManager] = useState(false);
-    const [compOffDrop, setCompOffDrop] = useState([]);
-    const [selectedCompOff, setSelectedCompOff] = useState('');
-    const [compOff, setCompOff] = useState("");
-    const [isSelectedCompOff, setIsSelectedCompOff] = useState(false);
 
     const [leaveRowData, setLeaveRowData] = useState([]);
     const [holidayFromDate, setHolidayFromDate] = useState("");
@@ -39,151 +29,107 @@ const EmployeeCompOff = () => {
     const [isSelectedStatusSc, setIsSelectedStatusSc] = useState(false);
     const gridRef = useRef()
 
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/ESSManager`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
-        })
-            .then((response) => response.json())
-            .then(setManagerdrop)
-            .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [rempShiftRowData, setEmpShiftRowData] = useState([]);
+
+    const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
+    const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
+    const [departmentDrop, setDepartmentDrop] = useState([]);
+    const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
 
     useEffect(() => {
-        fetch(`${config.apiBaseUrl}/EmpCompOffList`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-                userid: sessionStorage.getItem("selectedUserCode"),
-            }),
-        })
-            .then((response) => response.json())
-             .then((val) => setCompOffDrop(val))
-            .catch((error) => console.error("Error fetching warehouse:", error));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
             method: "POST",
             headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const employeeIdOption = data.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId} - ${option.First_Name}`,
+                }));
+                setEmployeeIdDropGrid(employeeIdOption);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getDepartment`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const deptOptions = data.map((option) => ({
+                    value: option.dept_id,
+                    label: `${option.dept_id} - ${option.dept_name}`,
+                }));
+                setDepartmentDrop(deptOptions);
+            })
+            // .then((val) => setDPTdrop(val))
+            .catch((error) =>
+                console.error("Error fetching department data:", error)
+            );
+    }, []);
+
+    useEffect(() => {
+        const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Company_Code }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const shiftPatternIdOption = data.map((option) => ({
+                    value: option.Pattern_Code,
+                    label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+                }));
+                setShiftPatternIdDropGrid(shiftPatternIdOption);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
+        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+            method: 'POST',
+            headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-            }),
+            body: JSON.stringify({ company_code })
         })
-            .then((data) => data.json())
-            .then((val) => setstatusDropSc(val))
+            .then((response) => response.json())
+            .then((data) => {
+                const shiftOption = data.map((option) => ({
+                    value: option.Shift_Code,
+                    label: `${option.Shift_Code} - ${option.Shift_Name}`,
+                }));
+                setShiftIdDropGrid(shiftOption);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
     const handleFromDate = (e) => {
         const selectedDate = e.target.value;
         setFromDate(selectedDate);
-        setToDate(selectedDate);
     };
 
     const handleToDateChange = (e) => {
         const selectedDate = e.target.value;
-
-        if (FromDate && selectedDate !== FromDate) {
-            toast.warning("Comp Off allows only single day");
-            setToDate(FromDate);
-            return;
-        }
         setToDate(selectedDate);
-    };
-
-    const formatToBackendDate = (date) => {
-        const [day, month, year] = date.split("-");
-        return `${year}-${month}-${day}`;
-    };
-
-    const handleSave = async (e) => {
-        e.preventDefault();
-
-        if (
-            !compOff ||
-            !Reason ||
-            !ReportingManager) {
-            setError(true);
-            toast.warning("Error: Missing required fields");
-            return;
-        }
-
-        const formData = {
-            HolidayDate: formatToBackendDate(compOff),
-            HolidayName: selectedCompOff ? selectedCompOff.holidayName : '',
-            LeaveFromDate: FromDate ? FromDate : null,
-            LeaveToDate: ToDate ? ToDate : null,
-            Reason,
-            RepManager: ReportingManager,
-            EmployeeId: sessionStorage.getItem("selectedUserCode"),
-            CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
-            CreatedBy: sessionStorage.getItem("selectedUserCode"),
-            ResPerson: AlternativeReponsablePerson,
-        };
-        setError(false);
-        setLoading(true);
-        try {
-
-            const response = await fetch(`${config.apiBaseUrl}/compOffRequestInsert`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Form Submitted Successfully", data);
-                toast.success("Data inserted successfully!", {
-                    onClose: () => window.location.reload(),
-                });
-            } else {
-                const errorResponse = await response.json();
-                console.error(errorResponse.message);
-                toast.warning(errorResponse.message, {
-                })
-            }
-        } catch (err) {
-            console.error("Error inserted data:", err);
-            toast.error('Error inserted data: ' + err.message, {
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const filteredOptionCopmOff = Array.isArray(compOffDrop)
-    ? compOffDrop.map((option) => ({
-        value: option.Holiday_Date,
-        label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
-        holidayName: option.Holiday_Name
-    }))
-    : [];
-
-    const handleChangeCompOff = (selectedCompOff) => {
-        setSelectedCompOff(selectedCompOff);
-        setCompOff(selectedCompOff ? selectedCompOff.value : '');
-    };
-
-    const filteredOptionManager = Managerdrop.map((option) => ({
-        value: option.EmployeeId,
-        label: `${option.EmployeeId}-${option.full_name}`,
-    }));
-
-    const handleChangeManager = (selectedOption) => {
-        setSelectedManager(selectedOption);
-        setReportingManager(selectedOption ? selectedOption.value : '');
     };
 
     const filterOptionStatusSc = [{ value: 'All', label: 'All' }, ...statusDropSc.map((option) => ({
@@ -198,19 +144,19 @@ const EmployeeCompOff = () => {
 
     const leaveColumnDefs = [
         {
-            headerName: "Holiday Date",
-            field: "HolidayDate",
+            headerName: "Date",
+            field: "effective_date",
             editable: false,
             cellStyle: { textAlign: "center" },
         },
         {
-            headerName: "Holiday Name",
+            headerName: "Current Shift Code",
             field: "HolidayName",
             editable: false,
             cellStyle: { textAlign: "center" },
         },
         {
-            headerName: "From Date",
+            headerName: "Requested Shift Code",
             field: "LeaveFromDate",
             editable: false,
             cellStyle: { textAlign: "center" },
@@ -293,19 +239,170 @@ const EmployeeCompOff = () => {
         setSelectedStatusSc('');
     };
 
-    const handleReloadAdd = () => {
-        clearInputsAdd([]);
+    useEffect(() => {
+        const today = new Date();
+
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        };
+
+        const from = formatDate(firstDay);
+        const to = formatDate(lastDay);
+
+        setFromDate(from);
+        setToDate(to);
+
+        handleEmpShiftReportSearch(from, to);
+
+    }, []);
+
+    const handleEmpShiftReportSearch = async (fromDate, toDate) => {
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    From_Date: fromDate || ToDate,
+                    To_Date: toDate || ToDate,
+                    Employee_ID: sessionStorage.getItem('selectedUserCode'),
+                    company_code: sessionStorage.getItem('selectedCompanyCode')
+                }),
+            });
+
+            if (response.ok) {
+                const searchData = await response.json();
+                setEmpShiftRowData(searchData);
+            } else if (response.status === 404) {
+                setEmpShiftRowData([]);
+                toast.warning("Data not found");
+            } else {
+                const errorResponse = await response.json();
+                toast.warning(errorResponse.message || "Failed to fetch data");
+                setEmpShiftRowData([]);
+            }
+        } catch (error) {
+            console.error("Error fetching search data:", error);
+            toast.error("Error fetching search data: " + error.message);
+        }
     };
 
-    const clearInputsAdd = () => {
-        setFromDate('');
-        setToDate('');
-        setReason('');
-        setReasponsiblePerson('');
-        setSelectedManager('');
-        setReportingManager('');
-        setSelectedCompOff('');
-        setCompOff('');
+    const empShiftCols = [
+        {
+            headerName: "Date",
+            field: "Date",
+            minWidth: 130
+        },
+        {
+            headerName: "Shift",
+            field: "Shift_Code",
+            minWidth: 130,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: shiftIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
+        },
+        {
+            headerName: "Employee ID",
+            field: "Employee_ID",
+            minWidth: 130,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: employeeIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = employeeIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
+        },
+        {
+            headerName: "Department",
+            field: "dept_id",
+            minWidth: 130,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: departmentDrop.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = departmentDrop.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
+        },
+        {
+            headerName: "Designation",
+            field: "desgination_id",
+            minWidth: 130
+        },
+        {
+            headerName: "Shift Pattern",
+            field: "Shift_Pattern_ID",
+            minWidth: 130,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: shiftPatternIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftPatternIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
+        },
+        {
+            headerName: "Start Time",
+            field: "Start_Time",
+            minWidth: 100
+        },
+        {
+            headerName: "End Time",
+            field: "End_Time",
+            minWidth: 100
+        },
+        {
+            headerName: "Action",
+            field: "action",
+            minWidth: 200,
+            maxWidth: 200,
+            cellClass: "d-flex align-items-center justify-content-center",
+            cellRenderer: (params) => {
+                const canRequest = params.data.Can_Request === 1;
+
+                return (
+                    <button
+                        className={`shift-action-btn ${canRequest ? 'active-btn' : 'locked-btn'}`}
+                        disabled={!canRequest}
+                        title={`${canRequest ? "Request Shift Change" : "Locked"}`}
+                        onClick={() => handleShiftRequest(params.data)}
+                    >
+                        <span className="btn-icon">
+                            {canRequest ? (
+                                <i className="bi bi-arrow-left-right"></i>
+                            ) : (
+                                <i className="bi bi-lock-fill"></i>
+                            )}
+                        </span>
+                        <span className="btn-text">
+                            {canRequest ? "Request Shift Change" : "Locked"}
+                        </span>
+                    </button>
+                );
+            }
+        }
+    ];
+
+    const handleShiftRequest = (rowData) => {
+        if (!rowData) return;
+        setSelectedRow(rowData);
+        setIsModalOpen(true);
     };
 
     return (
@@ -313,15 +410,11 @@ const EmployeeCompOff = () => {
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Comp Off Request</h1>
+                    <h1 className="page-title">Shift Change Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div className="action-icon reload" onClick={handleReloadAdd}>
+                        <div className="action-icon reload">
                             <span className="tooltip">Reload</span>
                             <i className="fa-solid fa-rotate-right"></i>
-                        </div>
-                        <div className="action-icon save" onClick={handleSave}>
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
                         </div>
                     </div>
                 </div>
@@ -330,30 +423,7 @@ const EmployeeCompOff = () => {
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
                 <div className="row g-3">
 
-                    <div className="col-md-3">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedCompOff ? "has-value" : ""} 
-                            ${isSelectedCompOff ? "is-focused" : ""}`}
-                            title="Please select the Comp Off Leave"
-                        >
-                            <Select
-                                value={selectedCompOff}
-                                options={filteredOptionCopmOff}
-                                onChange={handleChangeCompOff}
-                                placeholder=" "
-                                onFocus={() => setIsSelectedCompOff(true)}
-                                onBlur={() => setIsSelectedCompOff(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                            />
-                            <label className={`floating-label ${error && !compOff ? 'text-danger' : ''}`}>
-                                Comp Off Leaves<span className="text-danger">*</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 type="date"
@@ -370,7 +440,7 @@ const EmployeeCompOff = () => {
                         </div>
                     </div>
 
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                         <div className="inputGroup">
                             <input
                                 type="date"
@@ -378,7 +448,6 @@ const EmployeeCompOff = () => {
                                 value={ToDate}
                                 title="To Date will be same as From Date, Comp Off allows only single day"
                                 onChange={handleToDateChange}
-                                disabled
                                 placeholder=" "
                                 autoComplete="off"
                             />
@@ -388,71 +457,34 @@ const EmployeeCompOff = () => {
                         </div>
                     </div>
 
-                    <div className="col-md-12">
-                        <div className="inputGroup">
-                            <textarea
-                                className="form-control"
-                                value={Reason}
-                                title="Please enter the Reason"
-                                onChange={(e) => setReason(e.target.value)}
-                                rows="3"
-                                placeholder=" "
-                                autoComplete="off"
+                    <button
+                        className="btn btn-sm btn-primary mt-2"
+                        onClick={() => handleEmpShiftReportSearch()}
+                        style={{ height: "30px", width: "40px" }}
+                        title="Search"
+                    >
+                        <i className="fa-solid fa-magnifying-glass"></i>
+                    </button>
+
+                    <div className="col-12 mt-2">
+                        <div className="ag-theme-alpine" style={{ height: '350px', width: '100%' }}>
+                            <AgGridReact
+                                columnDefs={empShiftCols}
+                                rowData={rempShiftRowData}
+                                rowHeight={30}
+                                pagination={true}
+                                paginationAutoPageSize={true}
                             />
-                            <label className={`exp-form-labels ${error && !Reason ? 'text-danger' : ''}`}>
-                                Reason<span className="text-danger">*</span>
-                            </label>
+                            <ShiftRequestModal
+                                isOpen={isModalOpen}
+                                onClose={() => setIsModalOpen(false)}
+                                rowData={selectedRow}
+                                onSuccess={() => {
+                                    handleEmpShiftReportSearch();
+                                }}
+                            />
                         </div>
                     </div>
-
-                    <div className="col-md-6">
-                        <div
-                            className={`inputGroup selectGroup 
-                            ${selectedManager ? "has-value" : ""} 
-                            ${isSelectManager ? "is-focused" : ""}`}
-                            title="Please select the Reporting Manager"
-                        >
-                            <Select
-                                value={selectedManager}
-                                options={filteredOptionManager}
-                                onChange={handleChangeManager}
-                                placeholder=" "
-                                onFocus={() => setIsSelectManager(true)}
-                                onBlur={() => setIsSelectManager(false)}
-                                classNamePrefix="react-select"
-                                isClearable
-                            />
-                            <label className={`floating-label ${error && !ReportingManager ? 'text-danger' : ''}`}>
-                                Reporting Manager<span className="text-danger">*</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6">
-                        <div className="inputGroup">
-                            <input
-                                type="text"
-                                className="exp-input-field form-control"
-                                value={AlternativeReponsablePerson}
-                                title="Please enter the Responsible Person"
-                                onChange={(e) => setReasponsiblePerson(e.target.value)}
-                                placeholder=" "
-                                autoComplete="off"
-                            />
-                            <label className={`exp-form-labels`}>
-                                Responsible Person
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* <div class="col-12">
-                        <div className="search-btn-wrapper">
-                            <div className="icon-btn save" onClick={handleSave}>
-                                <span className="tooltip">Apply</span>
-                                <i class="fa-solid fa-floppy-disk"></i>
-                            </div>
-                        </div>
-                    </div> */}
 
                 </div>
             </div>
@@ -473,7 +505,7 @@ const EmployeeCompOff = () => {
                                 autoComplete="off"
                             />
                             <label className={`exp-form-labels`}>
-                                Holiday From Date
+                                From Date
                             </label>
                         </div>
                     </div>
@@ -490,7 +522,7 @@ const EmployeeCompOff = () => {
                                 autoComplete="off"
                             />
                             <label className={`exp-form-labels`}>
-                                Holiday To Date
+                                To Date
                             </label>
                         </div>
                     </div>
@@ -561,7 +593,7 @@ const EmployeeCompOff = () => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default EmployeeCompOff;
+export default ShiftChangeRequest

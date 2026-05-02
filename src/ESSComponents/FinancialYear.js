@@ -172,8 +172,8 @@ function Input() {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-          Start_Year: formatDate(matchedItem.Start_Year),
-          End_Year: formatDate(matchedItem.End_Year),
+          Start_Year: matchedItem.Start_Year,
+          End_Year: matchedItem.End_Year,
           Salary_Days: matchedItem.Salary_Days,
           status: matchedItem.status,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -355,35 +355,11 @@ function Input() {
       headerName: "Start Year",
       field: "Start_Year",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),  // Format the date for display
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-')); // Convert DD/MM/YYYY to a Date object
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "End Year",
       field: "End_Year",
       editable: true,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Eligibility Salary Days",

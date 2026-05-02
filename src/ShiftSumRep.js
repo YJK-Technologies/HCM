@@ -240,20 +240,14 @@ function ShiftSumRep() {
     {
       headerName: "Department",
       field: "dept_id",
-      filter: true,
     },
     {
       headerName: "Designation",
       field: "desgination_id",
-      filter: true,
     },
     {
       headerName: "Shift Date",
       field: "Shift_Date",
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return new Date(params.value).toLocaleDateString();
-      },
     },
     {
       headerName: "Shift Name",
@@ -314,7 +308,7 @@ function ShiftSumRep() {
   ];
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
+    // wrapText: true,
     editable: true,
   };
 
