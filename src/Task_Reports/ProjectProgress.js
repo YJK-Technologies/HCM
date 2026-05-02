@@ -87,7 +87,7 @@ const MyAgGridComponent = () => {
       headerName: 'Start Date',
       field: 'startdate',
       // filter: 'agTextColumnFilter',
-      valueFormatter: (params) => formatDate(params.value),
+      
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue.split('/').join('-'));
@@ -104,7 +104,6 @@ const MyAgGridComponent = () => {
       headerName: 'End date',
       field: 'enddate',
       // filter: 'agTextColumnFilter',
-      valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue.split('/').join('-'));

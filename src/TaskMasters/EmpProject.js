@@ -174,8 +174,6 @@ function Project({ }) {
     },
     {
       headerName: "Start Date", field: "StartDate", filter: 'agDateColumnFilter',
-      // minWidth: 150, maxWidth: 150,
-      valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue.split('/').join('-'));
@@ -190,8 +188,6 @@ function Project({ }) {
     },
     {
       headerName: "End Date", field: "EndDate", filter: 'agDateColumnFilter',
-      // minWidth: 150, maxWidth: 150,
-      valueFormatter: (params) => formatDate(params.value),
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue.split('/').join('-'));
