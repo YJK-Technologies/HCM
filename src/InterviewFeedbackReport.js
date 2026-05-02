@@ -276,18 +276,6 @@ function InterviewFeedbackReport() {
       headerName: "Submitted On",
       field: "submitted_on",
       editable: false,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Recommendation Mode",
@@ -508,7 +496,7 @@ function InterviewFeedbackReport() {
         <td>${row.schedule_id || ""}</td>
         <td>${row.interviewer_id || ""}</td>
         <td>${row.candidate_name || ""}</td>
-        <td>${row.submitted_on ? formatDate(row.submitted_on) : ""}</td>
+        <td>${row.submitted_on || ""}</td>
         <td>${row.recommendation || ""}</td>
         <td>${row.comments || ""}</td>
         <td>${row.role || ""}</td>

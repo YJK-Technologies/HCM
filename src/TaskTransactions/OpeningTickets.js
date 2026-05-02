@@ -419,35 +419,11 @@ function Input({}) {
       headerName: "Start Date",
       field: "StartDate",
       filter: "agDateColumnFilter",
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "End Date",
       field: "EndDate",
       filter: "agDateColumnFilter",
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "User ID",
