@@ -69,22 +69,12 @@ const columnDefs = [
     field: "DOJ",
     filter: 'agTextColumnFilter',
     editable: false,
-    valueFormatter: params => {
-      if (!params.value) return "";
-      const date = new Date(params.value);
-      return isNaN(date) ? "" : format(date, 'dd-MM-yyyy');
-    },
   },
   {
     headerName: "DOL",
     field: "DOL",
     filter: 'agTextColumnFilter',
     editable: false,
-    valueFormatter: params => {
-      if (!params.value) return "";
-      const date = new Date(params.value);
-      return isNaN(date) ? "" : format(date, 'dd-MM-yyyy');
-    },
   },
   {
     headerName: "Manager",

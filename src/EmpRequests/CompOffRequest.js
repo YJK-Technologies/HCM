@@ -202,10 +202,6 @@ const EmployeeCompOff = () => {
             field: "HolidayDate",
             editable: false,
             cellStyle: { textAlign: "center" },
-            valueFormatter: params => {
-                if (!params.value) return "";
-                return format(new Date(params.value), 'yyyy-MM-dd');
-            }
         },
         {
             headerName: "Holiday Name",
@@ -218,20 +214,12 @@ const EmployeeCompOff = () => {
             field: "LeaveFromDate",
             editable: false,
             cellStyle: { textAlign: "center" },
-            valueFormatter: params => {
-                if (!params.value) return "";
-                return format(new Date(params.value), 'yyyy-MM-dd');
-            }
         },
         {
             headerName: "To Date",
             field: "LeaveToDate",
             editable: false,
             cellStyle: { textAlign: "center" },
-            valueFormatter: params => {
-                if (!params.value) return "";
-                return format(new Date(params.value), 'yyyy-MM-dd');
-            }
         },
         {
             headerName: "Status",

@@ -30,6 +30,24 @@ function DepartmentInput({ }) {
   const [status, setStatus] = useState("");
   const [isSelectStatus, setIsSelectStatus] = useState(false);
 
+  const location = useLocation();
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
+
+  const clearInputFields = () => {
+    setDepartmentCode("");
+    setDepartmenntName("");
+    setSelectedStatus("");
+    setStatus("");
+  };
+
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
@@ -53,17 +71,6 @@ function DepartmentInput({ }) {
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : '');
-  };
-
-  const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
-  console.log(selectedRow);
-
-  const clearInputFields = () => {
-    setDepartmentCode("");
-    setDepartmenntName("");
-    setSelectedStatus("");
-    setStatus("");
   };
 
   useEffect(() => {
@@ -235,7 +242,7 @@ function DepartmentInput({ }) {
                     type="text"
                     placeholder=""
                     required
-                    title="Please enter the Department Code"
+                    title="Please Enter the Department Code"
                     value={departmentCode}
                     onChange={(e) => setDepartmentCode(e.target.value)}
                     maxLength={20}
@@ -257,7 +264,7 @@ function DepartmentInput({ }) {
                     placeholder=""
                     required
                     autoComplete="off"
-                    title="Please enter the Department Name"
+                    title="Please Enter the Department Name"
                     value={departmenntName}
                     maxLength={50}
                     onChange={(e) => setDepartmenntName(e.target.value)}
@@ -279,9 +286,9 @@ function DepartmentInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectStatus ? "is-focused" : ""}`}
-                  title="Please select the Status"
+                  ${selectedStatus ? "has-value" : ""} 
+                  ${isSelectStatus ? "is-focused" : ""}`}
+                  title="Please Select the Status"
                 >
                   <Select
                     id="status"

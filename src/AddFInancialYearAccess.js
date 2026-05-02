@@ -31,15 +31,21 @@ function StdAccInput({ }) {
   const lockType = useRef(null)
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const config = require('./Apiconfig');
-  const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
   const [isSelectedTransaction, setIsSelectedTransaction] = useState(false);
   const [isSelectedLockType, setIsSelectedLockType] = useState(false);
 
 
-  console.log(selectedRow);
+  const location = useLocation();
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
-  console.log(selectedRow);
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
+
   const clearInputFields = () => {
     setStartYear("");
     setEndYear("");
@@ -136,6 +142,7 @@ function StdAccInput({ }) {
     setSelectedLockType(selectedLockType);
     setLockType(selectedLockType ? selectedLockType.value : '');
   };
+
   const filteredOptionLockType = Lockdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -414,7 +421,7 @@ function StdAccInput({ }) {
                   }
                 }}
               />
-              <label className={`floating-label ${error && !base_accgroup_code ? 'text-danger' : ''}`}>Locked<span className="text-danger">*</span></label>
+              <label className={`floating-label ${error && !LockType ? 'text-danger' : ''}`}>Locked<span className="text-danger">*</span></label>
             </div>
           </div>
 

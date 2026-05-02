@@ -34,8 +34,16 @@ function UserScreenInput({ }) {
   const [isSelectScreen, setIsSelectScreen] = useState(false);
   const [isSelectPermission, setIsSelectPermission] = useState(false);
 
-  const location = useLocation()
-  const { mode, selectedRow } = location.state || {};
+  const location = useLocation();
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setselectedpermissions("");
@@ -68,7 +76,6 @@ function UserScreenInput({ }) {
       clearInputFields();
     }
   }, [mode, selectedRow, isUpdated]);
-
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -299,7 +306,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
-              title="Please select the Role ID"
+              title="Please Select the Role ID"
             >
               <Select
                 id="roleid"
@@ -324,7 +331,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedscreens ? "has-value" : ""} 
               ${isSelectScreen ? "is-focused" : ""}`}
-              title="Please select the Screen Type"
+              title="Please Select the Screen Type"
             >
               <Select
                 id="status"
@@ -349,7 +356,7 @@ function UserScreenInput({ }) {
               className={`inputGroup selectGroup 
               ${selectedpermissions ? "has-value" : ""} 
               ${isSelectPermission ? "is-focused" : ""}`}
-              title="Please select the Permission Type"
+              title="Please Select the Permission Type"
             >
               <Select
                 id="status"

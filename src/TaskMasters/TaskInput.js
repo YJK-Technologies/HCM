@@ -26,7 +26,7 @@ export default function TaskInputPopup({ open, handleClose, ProjectID }) {
   const [selectedPriortyLeavel, setSelectedPriortyLeavel] = useState('');
   const [PriorityLevel, setPriorityLevel] = useState('');
   const [PriorityDrop, setPriorityDrop] = useState([]);
-  const [selectedUser, setSelectedUser] = useState([]);
+  const [selectedUser, setSelectedUser] = useState('');
   const [userDrop, setUserDrop] = useState([]);
 
   const [isSelectUser, setIsSelectUser] = useState(false);

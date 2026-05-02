@@ -69,8 +69,7 @@ function BankAccInput({ }) {
   const [defaultBankDrop, setDefaultBankDrop] = useState([]);
   const [selectedDefaultBank, setselectedDefaultBank] = useState('');
   const [defaultBank, setDefaultBank] = useState('');
-  const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+
   const [isUpdated, setIsUpdated] = useState(false);
   const [base_accgroup_code, setbase_accgroup_code] = useState('');
   const [standard_accgroup_code, setstandard_accgroup_code] = useState('');
@@ -82,8 +81,17 @@ function BankAccInput({ }) {
   const [isSelectedDefaultBank, setIsSelectedDefaultBank] = useState(false);
   const logo = useRef(null);
 
+  const location = useLocation();
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
-  console.log(selectedRow)
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
+
   const clearInputFields = () => {
     setaccount_code("");
     setSelectedImage("");
@@ -391,11 +399,11 @@ function BankAccInput({ }) {
 
 
   const handleInsert = async () => {
-    if (!account_code) {
-      setError(true);
-      toast.warning("Missing Required Fields");
-      return;
-    }
+    // if (!account_code) {
+    //   setError(true);
+    //   toast.warning("Missing Required Fields");
+    //   return;
+    // }
     setError(false);
     setLoading(true);
     try {
@@ -653,18 +661,19 @@ function BankAccInput({ }) {
                   <input
                     id="cusad1"
                     className="exp-input-field form-control"
-                    title="Account code is generated based on the Account Name and User Account Code. It is a unique identifier for each bank account in the system."
+                    title="Account Code is generated based on the Account Name and User Account Code"
                     type="text"
                     placeholder=""
                     required
-                    title="Accountant code"
                     value={account_code}
                     maxLength={100}
                     ref={Accountant}
                     readOnly={mode === "update"}
                     onKeyDown={(e) => handleKeyDown(e, User, Accountant)}
                   />
-                  <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant code<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant Code
+                    {/* <span className="text-danger">*</span> */}
+                    </label>
                 </div>
               </div>
 
@@ -673,7 +682,7 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
                   ${selectedUser ? "has-value" : ""} 
                   ${isSelectedUser ? "is-focused" : ""}`}
-                  title="Please select the User Account Code"
+                  title="Please Select the User Account Code"
                 >
                   <Select
                     id="UserAccCode"
@@ -699,7 +708,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Bank Name"
+                    required title="Please Enter the Bank Name"
                     value={account_name}
                     onBlur={handleKeyPressRef}
                     onChange={handleChangeName}
@@ -718,7 +727,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Account Number"
+                    required title="Please Enter the Account Number"
                     value={account_number}
                     onChange={(e) => setaccount_number(e.target.value)}
                     maxLength={30}
@@ -736,7 +745,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the IFSC code"
+                    required title="Please Enter the IFSC code"
                     value={IFSC_code}
                     onChange={(e) => setIFSC_code(e.target.value)}
                     maxLength={11}
@@ -752,7 +761,7 @@ function BankAccInput({ }) {
                   className={`inputGroup selectGroup 
                   ${selectedAcctype ? "has-value" : ""} 
                   ${isSelectedAcctype ? "is-focused" : ""}`}
-                  title="Please select the Account Type"
+                  title="Please Select the Account Type"
                 >
                   <Select
                     id="acctype"
@@ -779,7 +788,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Branch "
+                    required title="Please Enter the Branch"
                     value={branch}
                     onChange={(e) => setbranch(e.target.value)}
                     maxLength={250}
@@ -797,7 +806,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Address1"
+                    required title="Please Enter the Address 1"
                     value={acc_addr_1}
                     onChange={(e) => setacc_addr_1(e.target.value)}
                     maxLength={250}
@@ -815,7 +824,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Address2"
+                    required title="Please Enter the Address 2"
                     value={acc_addr_2}
                     onChange={(e) => setacc_addr_2(e.target.value)}
                     maxLength={250}
@@ -833,7 +842,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Address3"
+                    required title="Please Enter the Address 3"
                     value={acc_addr_3}
                     onChange={(e) => setacc_addr_3(e.target.value)}
                     maxLength={250}
@@ -851,7 +860,7 @@ function BankAccInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Address4"
+                    required title="Please Enter the Address 4"
                     value={acc_addr_4}
                     onChange={(e) => setacc_addr_4(e.target.value)}
                     maxLength={250}
@@ -865,9 +874,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedCity ? "has-value" : ""} 
-      ${isSelectCity ? "is-focused" : ""}`}
-                  title="Please select the City"
+                  ${selectedCity ? "has-value" : ""} 
+                  ${isSelectCity ? "is-focused" : ""}`}
+                  title="Please Select the City"
                 >
                   <Select
                     id="city"
@@ -889,9 +898,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedState ? "has-value" : ""} 
-      ${isSelectState ? "is-focused" : ""}`}
-                  title="Please select the State"
+                  ${selectedState ? "has-value" : ""} 
+                  ${isSelectState ? "is-focused" : ""}`}
+                  title="Please Select the State"
 
                 >
                   <Select
@@ -914,9 +923,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedCountry ? "has-value" : ""} 
-      ${isSelectedCountry ? "is-focused" : ""}`}
-                  title="Please select the Country"
+                  ${selectedCountry ? "has-value" : ""} 
+                  ${isSelectedCountry ? "is-focused" : ""}`}
+                  title="Please Select the Country"
                 >
                   <Select
                     id="country"
@@ -938,9 +947,9 @@ function BankAccInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-      ${selectedDefaultBank ? "has-value" : ""} 
-      ${isSelectedDefaultBank ? "is-focused" : ""}`}
-                  title="Please select the Default Bank"
+                  ${selectedDefaultBank ? "has-value" : ""} 
+                  ${isSelectedDefaultBank ? "is-focused" : ""}`}
+                  title="Please Select the Default Bank"
                 >
                   <Select
                     id="officeType"

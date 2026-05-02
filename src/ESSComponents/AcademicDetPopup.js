@@ -76,7 +76,6 @@ const columnDefs = [
     headerName: "Academic Year",
     field: "academicYear",
     editable: false,
-    valueFormatter: params => format(new Date(params.value), 'yyyy-MM-dd'),
   },
   // {
   //   headerName: "Document",

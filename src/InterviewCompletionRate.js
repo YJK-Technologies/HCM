@@ -543,7 +543,7 @@ function InterviewCompletionRate({ }) {
         <td>${row.employee_id || ""}</td>
         <td>${row.rating || ""}</td>
         <td>${row.comments || ""}</td>
-        <td>${row.submitted_on ? formatDate(row.submitted_on) : ""}</td>
+        <td>${row.submitted_on || ""}</td>
         <td>${row.Recommendation || ""}</td>
       </tr>
     `);
@@ -686,7 +686,7 @@ function InterviewCompletionRate({ }) {
       "Employee ID": row.employee_id || "",
       Rating: row.rating || "",
       Comments: row.comments || "",
-      "Submitted On": row.submitted_on ? formatDate(row.submitted_on) : "",
+      "Submitted On": row.submitted_on || "",
       Recommendation: row.Recommendation || "",
     }));
   };

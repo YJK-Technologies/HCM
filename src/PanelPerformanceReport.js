@@ -155,7 +155,6 @@ function PanelPerformanceReport() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {

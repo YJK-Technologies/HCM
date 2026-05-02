@@ -47,9 +47,15 @@ function IntermediaryDetailInput({ }) {
   const modified_by = sessionStorage.getItem("selectedUserCode");
   const [isUpdated, setIsUpdated] = useState(false);
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
-  console.log(selectedRow);
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setSelectedHeader("");
@@ -454,8 +460,9 @@ function IntermediaryDetailInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedHeader ? "has-value" : ""} 
-              ${isSelectedHeader ? "is-focused" : ""}`}
+                  ${selectedHeader ? "has-value" : ""} 
+                  ${isSelectedHeader ? "is-focused" : ""}`}
+                  title="Please Select the Code"
                 >
                   <Select
                     id="ihcode"
@@ -497,7 +504,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the intermediary detail code"
+                    required title="Please Enter the Details Code"
                     value={codeDetails}
                     maxLength={250}
                     onChange={(e) => setCodeDetails(e.target.value)}
@@ -505,7 +512,7 @@ function IntermediaryDetailInput({ }) {
                     readOnly={mode === "update"}
                     onKeyDown={(e) => handleKeyDown(e, Address1, codeD)}
                   />
-                  <label for="rid" className={`exp-form-labels ${error && !codeDetails ? 'text-danger' : ''}`}>Code Details<span className="text-danger">*</span></label>
+                  <label for="rid" className={`exp-form-labels ${error && !codeDetails ? 'text-danger' : ''}`}>Details Code<span className="text-danger">*</span></label>
                 </div>
               </div>
 
@@ -516,7 +523,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please Enter the Address 1"
                     value={intermediary_addr_1}
                     maxLength={250}
                     onChange={(e) => setIntermediary_Addr_1(e.target.value)}
@@ -534,7 +541,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please Enter the Address 2"
                     value={intermediary_addr_2}
                     maxLength={250}
                     onChange={(e) => setIntermediary_Addr_2(e.target.value)}
@@ -552,7 +559,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please Enter the Address 3"
                     value={intermediary_addr_3}
                     maxLength={250}
                     onChange={(e) => setIntermediary_Addr_3(e.target.value)}
@@ -570,7 +577,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the address"
+                    required title="Please Enter the Address 4"
                     value={intermediary_addr_4}
                     maxLength={250}
                     onChange={(e) => setIntermediary_Addr_4(e.target.value)}
@@ -584,8 +591,9 @@ function IntermediaryDetailInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedCity ? "has-value" : ""} 
-              ${isSelectCity ? "is-focused" : ""}`}
+                  ${selectedCity ? "has-value" : ""} 
+                  ${isSelectCity ? "is-focused" : ""}`}
+                  title="Please Select the City"
                 >
                   <Select
                     id="city"
@@ -607,8 +615,9 @@ function IntermediaryDetailInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedState ? "has-value" : ""} 
-              ${isSelectState ? "is-focused" : ""}`}
+                  ${selectedState ? "has-value" : ""} 
+                  ${isSelectState ? "is-focused" : ""}`}
+                  title="Please Select the State"
                 >
                   <Select
                     id="state"
@@ -630,8 +639,9 @@ function IntermediaryDetailInput({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-              ${selectedCountry ? "has-value" : ""} 
-              ${isSelectCountry ? "is-focused" : ""}`}
+                  ${selectedCountry ? "has-value" : ""} 
+                  ${isSelectCountry ? "is-focused" : ""}`}
+                  title="Please Select the Country"
                 >
                   <Select
                     id="country"
@@ -659,7 +669,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the IMEX Number"
+                    required title="Please Enter the IMEX No"
                     value={intermediary_imex_no}
                     maxLength={10}
                     onChange={(e) => setIntermediary_Imex_No(e.target.value)}
@@ -677,7 +687,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="Number"
                     placeholder=""
-                    required title="Please enter the office contact number"
+                    required title="Please Enter the Office No"
                     value={intermediary_office_no}
                     maxLength={20}
                     ref={Office}
@@ -695,7 +705,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="Number"
                     placeholder=""
-                    required title="Please enter the residential contact number"
+                    required title="Please Enter the Residential No"
                     value={intermediary_resi_no}
                     maxLength={20}
                     ref={Residential}
@@ -713,7 +723,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="Number"
                     placeholder=""
-                    required title="Please enter the mobile number"
+                    required title="Please Enter the Mobile No"
                     value={intermediary_mobile_no}
                     maxLength={50}
                     ref={Mobile}
@@ -731,7 +741,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the fax number"
+                    required title="Please Enter the Fax No"
                     value={intermediary_fax_no}
                     maxLength={20}
                     ref={Fax}
@@ -749,7 +759,7 @@ function IntermediaryDetailInput({ }) {
                     class="exp-input-field form-control"
                     type="Email"
                     placeholder=""
-                    required title="Please enter the email ID"
+                    required title="Please Enter the Email ID"
                     value={intermediary_email_id}
                     maxLength={250}
                     ref={Email}
@@ -764,7 +774,7 @@ function IntermediaryDetailInput({ }) {
                     }}
                     onChange={(e) => setIntermediary_Email_Id(e.target.value)}
                   />
-                  <label for="idfaxno" className={`exp-form-labels ${error && !intermediary_email_id ? 'text-danger' : ''}`}> Email Id<span className="text-danger">*</span></label>
+                  <label for="idfaxno" className={`exp-form-labels ${error && !intermediary_email_id ? 'text-danger' : ''}`}> Email ID<span className="text-danger">*</span></label>
                 </div>
               </div>
 
