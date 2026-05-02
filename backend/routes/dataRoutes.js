@@ -1429,6 +1429,8 @@ router.post("/shiftRequestManagerApproval",dataController.shiftRequestManagerApp
 router.post("/getLoanDashboard",dataController.getLoanDashboard)
 router.post("/getAGES",dataController.getAGES)
 router.post("/getAGESTypes",dataController.getAGESTypes)
+router.post("/shiftChangeRequestSearch",dataController.shiftChangeRequestSearch)
+router.post("/shiftChangeRequestReport",dataController.shiftChangeRequestReport)
 
 
 

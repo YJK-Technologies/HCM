@@ -328,17 +328,6 @@ function HoliDays() {
       filter: "agDateColumnFilter",
       editable: true,
       cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-
-        const date = new Date(params.value);
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}-${month}-${year}`;
-      }
     },
     {
       headerName: "Holiday Type",

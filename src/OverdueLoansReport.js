@@ -277,18 +277,7 @@ const handleSearch = async () => {
       headerName: "Installment Date",
       field: "installment_date",
       editable: false,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },    },
+    },
     {
       headerName: "Total Installment",
       field: "total_installment",
@@ -309,7 +298,6 @@ const handleSearch = async () => {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {

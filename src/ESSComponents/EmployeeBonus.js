@@ -180,34 +180,10 @@ function Input({}) {
     {
       headerName: "Start Year",
       field: "Start_Year",
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "End Year",
       field: "End_Year",
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Grade ID",
@@ -343,8 +319,8 @@ function Input({}) {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-          Start_Year: formatDate(matchedItem.Start_Year),
-          End_Year: formatDate(matchedItem.End_Year),
+          Start_Year: matchedItem.Start_Year,
+          End_Year: matchedItem.End_Year,
           GradeID: matchedItem.GradeID,
           Annual_bonus: matchedItem.Annual_bonus,
           Referral_bonus: matchedItem.Referral_bonus,
