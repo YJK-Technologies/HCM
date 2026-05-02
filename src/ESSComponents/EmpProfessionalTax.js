@@ -400,8 +400,8 @@ function Input({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-          Start_Year: formatDate(matchedItem.Start_Year),
-          End_Year: formatDate(matchedItem.End_Year),
+          Start_Year: matchedItem.Start_Year,
+          End_Year: matchedItem.End_Year,
           Employee_Salary_From: matchedItem.Employee_Salary_From,
           Employee_Salary_To: matchedItem.Employee_Salary_To,
           Taxable_Amount: matchedItem.Taxable_Amount,

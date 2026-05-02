@@ -55,9 +55,9 @@ function LoanSummaryReports() {
 
   const filteredOptionLoanTypeSc = Array.isArray(loanTypeNameDropSc)
     ? loanTypeNameDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -80,45 +80,45 @@ function LoanSummaryReports() {
   };
 
   const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
-      ? [
-          { value: "All", label: "All" },
-          ...reqStatusDropSc.map((option) => ({
-              value: option?.attributedetails_name,
-              label: option?.attributedetails_name,
-          })),
-      ]
-      : [{ value: "All", label: "All" }];
+    ? [
+      { value: "All", label: "All" },
+      ...reqStatusDropSc.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      })),
+    ]
+    : [{ value: "All", label: "All" }];
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => setReqStatusDropSc(val))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-    
-    useEffect(() => {
-        const company_code = sessionStorage.getItem('selectedCompanyCode');
-        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ company_code })
-        })
-            .then((data) => data.json())
-            .then((val) => {
-                const reqStatus = val.map(option => option.attributedetails_name);
-                setReqStatusDropGrid(reqStatus);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => setReqStatusDropSc(val))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const reqStatus = val.map(option => option.attributedetails_name);
+        setReqStatusDropGrid(reqStatus);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -232,25 +232,13 @@ function LoanSummaryReports() {
       editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-          values: reqStatusDropGrid,
+        values: reqStatusDropGrid,
       },
     },
     {
       headerName: "Created Date",
       field: "created_date",
       editable: false,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
 
     {
@@ -268,7 +256,6 @@ function LoanSummaryReports() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {
@@ -276,18 +263,18 @@ function LoanSummaryReports() {
     gridApiRef.current = params.api;
   };
 
-const generateReport = () => {
-  if (!gridApi) return;
+  const generateReport = () => {
+    if (!gridApi) return;
 
-  const selectedRows = gridApi.getSelectedRows();
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to print");
-    return;
-  }
+    const selectedRows = gridApi.getSelectedRows();
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to print");
+      return;
+    }
 
-  const reportWindow = window.open("", "_blank");
+    const reportWindow = window.open("", "_blank");
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
     <html>
     <head>
       <title>Loan Summary Report</title>
@@ -321,8 +308,8 @@ const generateReport = () => {
         <tbody>
   `);
 
-  selectedRows.forEach((row) => {
-    reportWindow.document.write(`
+    selectedRows.forEach((row) => {
+      reportWindow.document.write(`
       <tr>
         <td>${row.request_number}</td>
         <td>${row.EmployeeId}</td>
@@ -336,9 +323,9 @@ const generateReport = () => {
         <td>${formatDate(row.created_date)}</td>
       </tr>
     `);
-  });
+    });
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
         </tbody>
       </table>
       <script>window.print()</script>
@@ -346,8 +333,8 @@ const generateReport = () => {
     </html>
   `);
 
-  reportWindow.document.close();
-};
+    reportWindow.document.close();
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -366,103 +353,90 @@ const generateReport = () => {
     return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
   };
 
-const exportToPDF = () => {
-  if (!gridApiRef.current || rowData.length === 0) {
-    toast.warning("No data to export");
-    return;
-  }
+  const exportToPDF = () => {
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("No data to export");
+      return;
+    }
 
-  const selectedRows = gridApiRef.current.getSelectedRows();
-  const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-  const doc = new jsPDF("l", "pt", "a4");
+    const doc = new jsPDF("l", "pt", "a4");
 
-  const headers = [[
-    "Request No",
-    "Employee ID",
-    "First Name",
-    "Last Name",
-    "Loan Type",
-    "Amount",
-    "Installment",
-    "Months",
-    "Status",
-    "Created Date"
-  ]];
+    const headers = [[
+      "Request No",
+      "Employee ID",
+      "First Name",
+      "Last Name",
+      "Loan Type",
+      "Amount",
+      "Installment",
+      "Months",
+      "Status",
+      "Created Date"
+    ]];
 
-  const body = dataSource.map(row => [
-    row.request_number,
-    row.EmployeeId,
-    row.First_Name,
-    row.Last_Name,
-    row.loan_type_name,
-    row.loan_amount,
-    row.monthly_installment,
-    row.repayment_months,
-    row.request_status,
-    formatDate(row.created_date)
-  ]);
+    const body = dataSource.map(row => [
+      row.request_number,
+      row.EmployeeId,
+      row.First_Name,
+      row.Last_Name,
+      row.loan_type_name,
+      row.loan_amount,
+      row.monthly_installment,
+      row.repayment_months,
+      row.request_status,
+      formatDate(row.created_date)
+    ]);
 
-  doc.text("Loan Summary Report", 40, 40);
+    doc.text("Loan Summary Report", 40, 40);
 
-  autoTable(doc, {
-    startY: 60,
-    head: headers,
-    body: body,
-  });
+    autoTable(doc, {
+      startY: 60,
+      head: headers,
+      body: body,
+    });
 
-  doc.save("Loan_Summary_Report.pdf");
-};
-
-  const transformRowData = (data) => {
-    return data.map((row) => ({
-      "Candidate Name": row.candidate_name || "",
-      "Schedule Date": row.scheduled_datetime
-        ? formatDate(row.scheduled_datetime)
-        : "",
-      Rating: row.rating || "",
-      "Final Status": row.Final_Status || "",
-      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
-      Remarks: row.remarks || "",
-    }));
+    doc.save("Loan_Summary_Report.pdf");
   };
 
-const handleExportToExcel = () => {
-  if (!gridApiRef.current) return;
+  const handleExportToExcel = () => {
+    if (!gridApiRef.current) return;
 
-  const selectedRows = gridApiRef.current.getSelectedRows();
+    const selectedRows = gridApiRef.current.getSelectedRows();
 
-  // ✅ Use selected rows OR fallback to all data
-  const dataSource =
-    selectedRows.length > 0 ? selectedRows : rowData;
+    // ✅ Use selected rows OR fallback to all data
+    const dataSource =
+      selectedRows.length > 0 ? selectedRows : rowData;
 
-  if (!dataSource || dataSource.length === 0) {
-    toast.warning("No data to export");
-    return;
-  }
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
+      return;
+    }
 
-  const transformedData = dataSource.map((row) => ({
-    "Request No": row.request_number,
-    "Employee ID": row.EmployeeId,
-    "First Name": row.First_Name,
-    "Last Name": row.Last_Name,
-    "Loan Type": row.loan_type_name,
-    "Loan Amount": row.loan_amount,
-    "Monthly Installment": row.monthly_installment,
-    "Repayment Months": row.repayment_months,
-    "Status": row.request_status,
-    "Created Date": formatDate(row.created_date),
-  }));
+    const transformedData = dataSource.map((row) => ({
+      "Request No": row.request_number,
+      "Employee ID": row.EmployeeId,
+      "First Name": row.First_Name,
+      "Last Name": row.Last_Name,
+      "Loan Type": row.loan_type_name,
+      "Loan Amount": row.loan_amount,
+      "Monthly Installment": row.monthly_installment,
+      "Repayment Months": row.repayment_months,
+      "Status": row.request_status,
+      "Created Date": row.created_date,
+    }));
 
-  const worksheet = XLSX.utils.json_to_sheet(transformedData);
-  const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(transformedData);
+    const workbook = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Summary");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Summary");
 
-  XLSX.writeFile(workbook, "Loan_Summary_Report.xlsx");
-};
+    XLSX.writeFile(workbook, "Loan_Summary_Report.xlsx");
+  };
 
-return (
+  return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
       <ToastContainer
@@ -478,27 +452,27 @@ return (
             {["all permission", "view"].some((p) =>
               companyPermissions.includes(p),
             ) && (
-              <div className="action-icon print" onClick={generateReport}>
-                <span className="tooltip">Print</span>
-                <i className="fa-solid fa-print"></i>
-              </div>
-            )}
+                <div className="action-icon print" onClick={generateReport}>
+                  <span className="tooltip">Print</span>
+                  <i className="fa-solid fa-print"></i>
+                </div>
+              )}
             {["all permission", "PDF"].some((p) =>
               companyPermissions.includes(p),
             ) && (
-              <div className="action-icon print" onClick={exportToPDF}>
-                <span className="tooltip">Pdf</span>
-                <i className="fa-solid fa-file-pdf"></i>
-              </div>
-            )}
+                <div className="action-icon print" onClick={exportToPDF}>
+                  <span className="tooltip">Pdf</span>
+                  <i className="fa-solid fa-file-pdf"></i>
+                </div>
+              )}
             {["all permission", "Excel"].some((p) =>
               companyPermissions.includes(p),
             ) && (
-              <div className="action-icon print" onClick={handleExportToExcel}>
-                <span className="tooltip">Excel</span>
-                <i class="fa-solid fa-file-excel"></i>
-              </div>
-            )}
+                <div className="action-icon print" onClick={handleExportToExcel}>
+                  <span className="tooltip">Excel</span>
+                  <i class="fa-solid fa-file-excel"></i>
+                </div>
+              )}
           </div>
 
           {/* Mobile Dropdown */}
@@ -514,24 +488,24 @@ return (
               {["all permission", "view"].some((p) =>
                 companyPermissions.includes(p),
               ) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
-                </li>
-              )}
+                  <li className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </li>
+                )}
               {["all permission", "Pdf"].some((p) =>
                 companyPermissions.includes(p),
               ) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
-                </li>
-              )}
+                  <li className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark"></i>
+                  </li>
+                )}
               {["all permission", "Excel"].some((p) =>
                 companyPermissions.includes(p),
               ) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
-                </li>
-              )}
+                  <li className="dropdown-item" onClick={handleExportToExcel}>
+                    <i class="fa-solid fa-file-excel text-success"></i>
+                  </li>
+                )}
             </ul>
           </div>
         </div>
@@ -539,7 +513,7 @@ return (
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-              
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input

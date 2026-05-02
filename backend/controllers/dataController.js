@@ -48269,8 +48269,8 @@ const shiftChangeRequestInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
-        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'',''`);
+      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
+        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'','','',''`);
 
     res.status(200).json({
       success: true,
@@ -48293,7 +48293,7 @@ const shiftChangeRequestEmployee = async (req, res) => {
       .input("mode", sql.NVarChar, "SRE")
       .input("company_code", sql.NVarChar, company_code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','',''`);
+      .query(`EXEC sp_shift_change_requests_test @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48372,7 +48372,7 @@ const shiftRequestEmployeeApproval = async (req, res) => {
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,''`);
+      .query(`EXEC sp_shift_change_requests_test @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,'','',''`);
 
     res.status(200).json({
       success: true,
@@ -48453,7 +48453,7 @@ const shiftChangeRequestManager = async (req, res) => {
       .input("mode", sql.NVarChar, "SRM")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','',''`);
+      .query(`EXEC sp_shift_change_requests_test @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48479,7 +48479,7 @@ const shiftRequestManagerApproval = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("request_status", sql.NVarChar, request_status)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,''`);
+      .query(`EXEC sp_shift_change_requests_test @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,'','',''`);
 
     res.status(200).json({
       success: true,
@@ -48581,6 +48581,65 @@ const getAGESTypes = async (req, res) => {
   }
 };
 // code ended by Sakthi on 29-04-2026
+
+//code added by pavun on 02-04-2026
+const shiftChangeRequestSearch = async (req, res) => {
+  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "SC")
+      .input("shift_from_date", sql.NVarChar, shift_from_date)
+      .input("shift_to_date", sql.NVarChar, shift_to_date)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("current_shift_id", sql.NVarChar, current_shift_id)
+      .input("requested_shift_id", sql.NVarChar, requested_shift_id)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','','','','','','','',@company_code,'','','','',@shift_from_date,@shift_to_date`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const shiftChangeRequestReport = async (req, res) => {
+  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, RepManager, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "ASC")
+      .input("shift_from_date", sql.NVarChar, shift_from_date)
+      .input("shift_to_date", sql.NVarChar, shift_to_date)
+      .input("employee_id", sql.NVarChar, employee_id)
+      .input("current_shift_id", sql.NVarChar, current_shift_id)
+      .input("requested_shift_id", sql.NVarChar, requested_shift_id)
+      .input("RepManager", sql.NVarChar, RepManager)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','','','','','','','',@company_code,@RepManager,'','','',@shift_from_date,@shift_to_date`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during Shift change request insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by pavun on 02-04-2026
 
 module.exports = {
   login,
@@ -49980,6 +50039,8 @@ module.exports = {
   shiftRequestManagerApproval,
   getLoanDashboard,
   getAGES,
-  getAGESTypes
+  getAGESTypes,
+  shiftChangeRequestSearch,
+  shiftChangeRequestReport
 
 };

@@ -446,16 +446,12 @@ const columnDefs = [
   {
     headerName: "Allocation Date",
     field: "AllocationDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
   {
     headerName: "Expected Return",
     field: "ExpectedReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
@@ -469,15 +465,12 @@ const columnDefs = [
   {
     headerName: "Last Allocation Date",
     field: "LastAllocationDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 ];
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
     editable: true,
   };
 
@@ -757,22 +750,13 @@ const exportToPDF = () => {
 
 const transformRowData = (data) => {
   return (data || []).map((row) => ({
-    "Asset ID": row?.AssetID || "",
-    "Asset Name": row?.AssetName || "",
-    Category: row?.AssetCategory || "",
-    "Allocation Status": row?.AllocationStatus || "",
-    "Employee ID": row?.EmployeeID || "",
-
-    "Allocation Date":
-      row?.AllocationDate && !isNaN(new Date(row.AllocationDate))
-        ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
-        : "",
-
-    "Expected Return":
-      row?.ExpectedReturnDate && !isNaN(new Date(row.ExpectedReturnDate))
-        ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
-        : "",
-
+    "Asset ID": row.AssetID || "",
+    "Asset Name": row.AssetName || "",
+    Category: row.AssetCategory || "",
+    "Allocation Status": row.AllocationStatus || "",
+    "Employee ID": row.EmployeeID || "",
+    "Allocation Date": row.AllocationDate || "",
+    "Expected Return": row.ExpectedReturnDate || "",
   }));
 };
 

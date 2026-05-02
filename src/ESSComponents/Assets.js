@@ -467,14 +467,12 @@ function Assets({ }) {
       filter: 'agTextColumnFilter',
       editable: true
     },
-
     {
       headerName: "Asset Category",
       field: "AssetCategory",
       filter: 'agTextColumnFilter',
       editable: true
     },
-
     {
       headerName: "Serial Number",
       field: "SerialNumber",
@@ -504,17 +502,6 @@ function Assets({ }) {
       field: "PurchaseDate",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-
-        const date = new Date(params.value);
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}-${month}-${year}`;
-      }
     },
     {
       headerName: "Purchase Cost",
@@ -542,36 +529,13 @@ function Assets({ }) {
       field: "WarrantyStart",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-
-        const date = new Date(params.value);
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}-${month}-${year}`;
-      }
     },
     {
       headerName: "Warranty End",
       field: "WarrantyEnd",
       editable: true,
       cellStyle: { textAlign: "left" },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-
-        const date = new Date(params.value);
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}-${month}-${year}`;
-      }
     },
-
     {
       headerName: "Asset Status",
       field: "AssetStatus",
@@ -616,7 +580,6 @@ function Assets({ }) {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
     editable: true,
   };
 

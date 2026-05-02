@@ -350,7 +350,6 @@ const handleSearch = async () => {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {
