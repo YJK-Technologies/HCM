@@ -30,7 +30,7 @@ const MyAgGridComponent = () => {
 
 
   const columnEmployee = [
-    { headerName: 'Date', field: 'work_date', sort: 'asc', valueFormatter: (params) => formatDate(params.value), width: '110' },
+    { headerName: 'Date', field: 'work_date', sort: 'asc', width: '110' },
     { headerName: 'Employee ID', field: 'user', editable: true, width: '170' },
     { headerName: 'Shift Code', field: 'Shift_Code', editable: true, width: '170' },
     // { headerName: 'Employee Name', field: 'user' },
@@ -51,10 +51,7 @@ const MyAgGridComponent = () => {
   };
 
   const columnTask = [
-    {
-      headerName: 'Task Date', field: 'TaskDate',
-      valueFormatter: (params) => formatDate(params.value), width: '150'
-    },
+    {headerName: 'Task Date', field: 'TaskDate', width: '150'},
     { headerName: 'Project ID', field: 'ProjectID', width: '150' },
     { headerName: 'Task Master ID', field: 'TaskMasterID', width: '150' },
     { headerName: 'Task ID', field: 'DailyTaskID', width: '150' },
@@ -65,9 +62,6 @@ const MyAgGridComponent = () => {
     { headerName: 'Task Hours Per Ticket', field: 'TotalHours_per_Ticket', width: '150' },
     { headerName: 'Status', field: 'TaskStauts' },
   ];
-
-
-
 
   const handleChangeUser = async (selectedUser) => {
     setSelectedUser(selectedUser);
@@ -417,7 +411,7 @@ const MyAgGridComponent = () => {
 
   const transformRowData = (data) => {
     return data.map(row => ({
-      "Date": new Date(row.work_date).toISOString().split('T')[0],
+      "Date": row.work_date,
       "Employee ID": row.user,
       "Check IN ": row.First_CheckIn,
       "Check Out": row.Last_CheckOut,
@@ -457,7 +451,7 @@ const MyAgGridComponent = () => {
 
   const transformData = (data) => {
     return data.map(row => ({
-      "Date": new Date(row.TaskDate).toISOString().split('T')[0], // 'YYYY-MM-DD'
+      "Date": row.TaskDate, // 'YYYY-MM-DD'
       "Project ID": row.ProjectID,
       "Task Master ID": row.TaskMasterID,
       "Task ID": row.DailyTaskID,
@@ -494,7 +488,7 @@ const MyAgGridComponent = () => {
   const [rowDataEmployeeTime, setRowDataEmployeeTime] = useState([]);
 
   const columnEmployeeTime = [
-    { headerName: 'Date', field: 'DayofLogin', valueFormatter: (params) => formatDate(params.value), width: '110' },
+    { headerName: 'Date', field: 'DayofLogin', width: '110' },
     { headerName: 'Employee ID', field: 'userID', width: '120' },
     { headerName: 'Check In', field: 'Checkin', sort: "asc", width: '120' },
     { headerName: 'Check Out', field: 'CheckOut', width: '120' },

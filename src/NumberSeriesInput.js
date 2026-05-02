@@ -50,9 +50,15 @@ function NumberSeriesInput({ }) {
   const modified_by = sessionStorage.getItem("selectedUserCode");
   
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
-  
-  console.log(selectedRow);
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setStart_Year("");
@@ -402,8 +408,7 @@ function NumberSeriesInput({ }) {
                     placeholder=""
                     required title="Please Enter the Start Year"
                     value={Start_Year}
-                    onChange={(e) => setStart_Year
-                      (e.target.value)}
+                    onChange={(e) => setStart_Year(e.target.value)}
                     maxLength={9}
                     // readOnly
                     ref={startyear}
@@ -422,8 +427,7 @@ function NumberSeriesInput({ }) {
                     placeholder=""
                     required title="Please Enter the End Year"
                     value={End_Year}
-                    onChange={(e) => setEnd_Year
-                      (e.target.value)}
+                    onChange={(e) => setEnd_Year(e.target.value)}
                     maxLength={9}
                     // readOnly
                     ref={endyear}
@@ -440,10 +444,9 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please Enter the Start Number"
+                    required title="Please Enter the Start No"
                     value={Start_No}
-                    onChange={(e) => setStart_No
-                      (e.target.value)}
+                    onChange={(e) => setStart_No(e.target.value)}
                     maxLength={9}
                     ref={strtno}
                     onKeyDown={(e) => handleKeyDown(e, runno, strtno)}
@@ -459,10 +462,9 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please Enter the Running Number"
+                    required title="Please Enter the Running No"
                     value={Running_No}
-                    onChange={(e) => setRunning_No
-                      (e.target.value)}
+                    onChange={(e) => setRunning_No(e.target.value)}
                     maxLength={9}
                     ref={runno}
                     onKeyDown={(e) => handleKeyDown(e, endno, runno)}
@@ -478,10 +480,9 @@ function NumberSeriesInput({ }) {
                     class="exp-input-field form-control"
                     type="number"
                     placeholder=""
-                    required title="Please Enter the End Number"
+                    required title="Please Enter the End No"
                     value={End_No}
-                    onChange={(e) => setEnd_No
-                      (e.target.value)}
+                    onChange={(e) => setEnd_No(e.target.value)}
                     maxLength={9}
                     ref={endno}
                     onKeyDown={(e) => handleKeyDown(e, text, endno)}
@@ -499,8 +500,7 @@ function NumberSeriesInput({ }) {
                     autoComplete="off"
                     placeholder=" "
                     value={comtext}
-                    onChange={(e) => secomtext
-                      (e.target.value)}
+                    onChange={(e) => secomtext(e.target.value)}
                     type="text"
                     ref={text}
                     onKeyDown={(e) => handleKeyDown(e, Status, text)}
@@ -539,7 +539,7 @@ function NumberSeriesInput({ }) {
                   className={`inputGroup selectGroup 
                   ${selectedBoolean ? "has-value" : ""} 
                   ${isSelectedBoolean ? "is-focused" : ""}`}
-                  title="Please Select the Number Prefix Status"
+                  title="Please Select the Number Prefix"
                 >
                   <Select
                     id="numpref"
@@ -551,7 +551,7 @@ function NumberSeriesInput({ }) {
                     onBlur={() => setIsSelectBoolean(false)}
                     classNamePrefix="react-select"
                     isClearable
-                    required title="Please select a Number Prefix status"
+                    required
                     ref={numpre}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {

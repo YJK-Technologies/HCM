@@ -39,7 +39,15 @@ function DesginationInput({ }) {
   const modified_by = sessionStorage.getItem("selectedUserCode");
 
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
 
 
@@ -290,7 +298,7 @@ function DesginationInput({ }) {
                   className={`inputGroup selectGroup 
               ${selecteddept ? "has-value" : ""} 
               ${isSelectdep ? "is-focused" : ""}`}
-                  title="Please select the Department"
+                  title="Please Select the Department ID"
                 >
                   <Select
                     id="deptid"
@@ -316,7 +324,7 @@ function DesginationInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Designation ID"
+                    required title="Please Enter the Designation ID"
                     value={desgination_id}
                     onChange={(e) => setdesgination_id(e.target.value)}
                     maxLength={10}
@@ -334,7 +342,7 @@ function DesginationInput({ }) {
                     class="exp-input-field form-control"
                     type="text"
                     placeholder=""
-                    required title="Please enter the Designation Name"
+                    required title="Please Enter the Designation Name"
                     value={desgination}
                     onChange={(e) => setdesgination(e.target.value)}
                     maxLength={50}
@@ -350,7 +358,7 @@ function DesginationInput({ }) {
                   className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-                  title="Please select the Status"
+                  title="Please Select the Status"
                 >
                   <Select
                     id="status"

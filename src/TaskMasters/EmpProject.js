@@ -174,31 +174,13 @@ function Project({ }) {
     },
     {
       headerName: "Start Date", field: "StartDate", filter: 'agDateColumnFilter',
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+      // minWidth: 150, maxWidth: 150,
+
     },
     {
       headerName: "End Date", field: "EndDate", filter: 'agDateColumnFilter',
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+      // minWidth: 150, maxWidth: 150,
+
     },
     {
       headerName: "Priority Level",

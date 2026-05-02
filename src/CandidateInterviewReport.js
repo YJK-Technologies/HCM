@@ -382,10 +382,10 @@ function CandidateInterviewReport() {
       reportWindow.document.write(`
       <tr>
         <td>${row.candidate_name || ""}</td>
-        <td>${row.scheduled_datetime ? formatDate(row.scheduled_datetime) : ""}</td>
+        <td>${row.scheduled_datetime || ""}</td>
         <td>${row.rating || ""}</td>
         <td>${row.Final_Status || ""}</td>
-        <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
+        <td>${row.decided_on || ""}</td>
         <td>${row.remarks || ""}</td>
       </tr>
     `);
@@ -533,10 +533,10 @@ function CandidateInterviewReport() {
   const transformRowData = (data) => {
     return data.map((row) => ({
       "Candidate Name": row.candidate_name || "",
-      "Schedule Date": row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
+      "Schedule Date": row.scheduled_datetime || "",
       "Rating": row.rating || "",
       "Final Status": row.Final_Status || "",
-      "Decided On": row.decided_on ? formatDate(row.decided_on) : "",
+      "Decided On": row.decided_on || "",
       Remarks: row.remarks || "",
 
     }));

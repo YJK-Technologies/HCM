@@ -24923,16 +24923,8 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("institution", sql.NVarChar, institution)
       .input("company_code", sql.NVarChar, company_code)
       .input("Name", sql.NVarChar, Name)
-      .input(
-        "academic_year_from",
-        sql.Date,
-        academic_year_from ? new Date(academic_year_from) : null
-      )
-      .input(
-        "academic_year_to",
-        sql.Date,
-        academic_year_to ? new Date(academic_year_to) : null
-      )
+      .input("academic_year_from", sql.Date, academic_year_from ? new Date(academic_year_from) : null)
+      .input("academic_year_to", sql.Date, academic_year_to ? new Date(academic_year_to) : null)
       .query(
         `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
@@ -41701,7 +41693,7 @@ const InterviewScheduleSearch = async (req, res) => {
       .input("location", sql.VarChar, location)
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
-      .query(` EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, '', @location, @meeting_link, @timezone, 
+      .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, @email, @panel_name, @Interview_Mode, @Status, '', @location, @meeting_link, @timezone, 
         '', '', '', '', 0, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date,'','' `);
 
     if (result.recordset.length > 0) {
@@ -41745,7 +41737,7 @@ const InterviewFeedbackSearch = async (req, res) => {
         .input("from_date", sql.NVarChar, from_date)
         .input("to_date", sql.NVarChar, to_date)
         .input("rating", sql.Int, rating)
-        .query(` EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, @candidate_name, '', '',
+        .query(` EXEC sp_interview_schedule_panel @mode, @schedule_id, @candidate_name, '', '',
       '', '', '', '', '', '', @employee_id, @role, @recommendation, '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date,'','' `);
 
     if (result.recordset.length > 0) {
@@ -41790,7 +41782,7 @@ const InterviewProgressSearch = async (req, res) => {
       .input("to_date", sql.NVarChar, to_date)
       .input("start_date", sql.NVarChar, start_date)
       .input("end_date", sql.NVarChar, end_date)
-      .query(` EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, '', '', '', '', '', '',
+      .query(` EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '',
          '', '', '', '', '', '', @rating, @Final_Status, '', @remarks, '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '',
          @from_date, @to_date, @start_date, @end_date `);
 
@@ -41823,7 +41815,7 @@ const PanelPerformanceSearch = async (req, res) => {
       .input("rating", sql.Int, rating ? rating : 0)
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
-      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
+      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', @panel_name, '', '', '', '', '', '', '', '',
          '', '', @rating, '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', 0, 0, 0, '', @from_date, @to_date, '', '' `);
 
     if (result.recordset.length > 0) {
@@ -41867,7 +41859,7 @@ const HiringDecisionSearch = async (req, res) => {
       .input("decided_by", sql.Int, decided_by)
       .input("start_date", sql.NVarChar, start_date)
       .input("end_date", sql.NVarChar, end_date)
-      .query(`EXEC sp_interview_schedule_panel_Test @mode, 0, @candidate_name, '', '', '', '', '', '', '',
+      .query(`EXEC sp_interview_schedule_panel @mode, 0, @candidate_name, '', '', '', '', '', '', '',
          '', '', '', '', '', 0, @final_status, '','', @department_id, @job_title, @country_code, @decided_by, 0, '', '', '', '', '', '', 0, 0, 0, '',
          '','',@start_date, @end_date`);
 
@@ -41964,7 +41956,7 @@ const TotalInterviewSchedule = async (req, res) => {
       .input("to_date", sql.NVarChar, to_date)
       .input("meeting_link", sql.VarChar, meeting_link)
       .input("timezone", sql.VarChar, timezone)
-      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', '', @Interview_Mode, @Status, '', @location, @meeting_link,
+      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', '', @Interview_Mode, @Status, '', @location, @meeting_link,
          @timezone, '', '', '', '', 0, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, @candidate_id, @panel_id, 0, '',
          @from_date, @to_date, '', '' `);
 
@@ -42008,7 +42000,7 @@ const InterviewCompletionRateSC = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_interview_schedule_panel_Test @mode, @schedule_id, '', '', '', '', '', '', '', '',
+      .query(`EXEC sp_interview_schedule_panel @mode, @schedule_id, '', '', '', '', '', '', '', '',
          '', @employee_id, '', @recommendation, '', @rating, '', '','', '', '', '', 0, '', '', '', '', '', '', @company_code, 0, 0, @feedback_id, @comments,
          @from_date, @to_date, '', ''`);
 

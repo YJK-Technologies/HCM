@@ -2453,18 +2453,6 @@ function RequestReport({ }) {
       headerName: "Created Date",
       field: "created_date",
       cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Detail ID",
@@ -2784,18 +2772,6 @@ function RequestReport({ }) {
       headerName: "Created Date",
       field: "created_date",
       cellStyle: { textAlign: "center" }
-      , valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "Detail ID",
@@ -3009,26 +2985,11 @@ function RequestReport({ }) {
       field: "created_by",
       cellStyle: { textAlign: "center" }
     },
-
     {
       headerName: "Created Date",
       field: "created_date",
       cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
-
     },
-
     {
       headerName: "Detail ID",
       field: "detail_id",
@@ -3211,27 +3172,27 @@ function RequestReport({ }) {
     { headerName: "Field Name", field: "FieldName", cellStyle: { textAlign: "center" } },
     {
       headerName: "Old Value", field: "OldValue", cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => {
-        const value = params.value;
-        if (value && !isNaN(Date.parse(value))) {
-          return formatDate(value);
-        }
-        return value;
-      },
+      // valueFormatter: (params) => {
+      //   const value = params.value;
+      //   if (value && !isNaN(Date.parse(value))) {
+      //     return formatDate(value);
+      //   }
+      //   return value;
+      // },
     },
     {
       headerName: "New Value", field: "NewValue", cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => {
-        const value = params.value;
-        if (value && !isNaN(Date.parse(value))) {
-          return formatDate(value);
-        }
-        return value;
-      },
+      // valueFormatter: (params) => {
+      //   const value = params.value;
+      //   if (value && !isNaN(Date.parse(value))) {
+      //     return formatDate(value);
+      //   }
+      //   return value;
+      // },
     },
     { headerName: "Status", field: "request_status", cellStyle: { textAlign: "center" } },
     { headerName: "Created By", field: "CreatedBy", cellStyle: { textAlign: "center" } },
-    { headerName: "Created Date", field: "CreatedDate", valueFormatter: (params) => formatDate(params.value), },
+    { headerName: "Created Date", field: "CreatedDate", },
   ];
 
 
@@ -3434,18 +3395,6 @@ function RequestReport({ }) {
       headerName: "Created Date",
       field: "created_date",
       cellStyle: { textAlign: "center" },
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split("/").join("-"));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
   ];
 
@@ -3517,10 +3466,6 @@ function RequestReport({ }) {
       field: "HolidayDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "Holiday Name",
@@ -3533,20 +3478,12 @@ function RequestReport({ }) {
       field: "LeaveFromDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "To Date",
       field: "LeaveToDate",
       editable: false,
       cellStyle: { textAlign: "center" },
-      valueFormatter: params => {
-        if (!params.value) return "";
-        return format(new Date(params.value), 'yyyy-MM-dd');
-      }
     },
     {
       headerName: "Status",

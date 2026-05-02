@@ -126,21 +126,27 @@ function Input({}) {
     }
   };
 
-  const convertBufferToBlobUrlAndFile = (
-    buffer,
-    fileName = "document.pdf",
-    mimeType = "application/pdf",
-  ) => {
-    if (buffer && buffer.type === "Buffer") {
-      const byteArray = new Uint8Array(buffer.data);
-      const blob = new Blob([byteArray], { type: mimeType });
-      const blobUrl = URL.createObjectURL(blob);
-      const file = new File([blob], fileName, { type: mimeType });
-      return { blobUrl, file };
-    }
-    return { blobUrl: null, file: null };
-  };
+const convertBufferToBlobUrlAndFile = (
+  buffer,
+  fileName = "document.pdf",
+  mimeType = "application/pdf"
+) => {
+  if (
+    buffer &&
+    buffer.type === "Buffer" &&
+    Array.isArray(buffer.data) &&
+    buffer.data.length > 0
+  ) {
+    const byteArray = new Uint8Array(buffer.data);
+    const blob = new Blob([byteArray], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    const file = new File([blob], fileName, { type: mimeType });
 
+    return { blobUrl, file };
+  }
+
+  return { blobUrl: "", file: null };
+};
   const handleDocuments = async (code) => {
     setLoading(true);
     try {

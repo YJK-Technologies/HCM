@@ -31,18 +31,19 @@ function AttriDetInput({ }) {
   const created_by = sessionStorage.getItem('selectedUserCode')
   const [isSelectCode, setIsSelectCode] = useState(false);
 
-
-
-
-  console.log(selectedRows);
   const modified_by = sessionStorage.getItem("selectedUserCode");
-
-  const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
   const [isUpdated, setIsUpdated] = useState(false);
 
+  const location = useLocation();
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
 
-  console.log(selectedRow)
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setSelectedHeader("");
@@ -287,7 +288,7 @@ function AttriDetInput({ }) {
               <input
                 id="adcode"
                 className="exp-input-field form-control"
-                title="Please fill the sub code"
+                title="Please Enter the Sub Code"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -299,7 +300,7 @@ function AttriDetInput({ }) {
                 readOnly={mode === "update"}
                 onKeyDown={(e) => handleKeyDown(e, detailname, subcode)}
               />
-              <label className={`exp-form-labels ${error && !attributedetails_code ? 'text-danger' : ''}`}>subcode<span className="text-danger">*</span></label>
+              <label className={`exp-form-labels ${error && !attributedetails_code ? 'text-danger' : ''}`}>Sub Code<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -308,7 +309,7 @@ function AttriDetInput({ }) {
               <input
                 id="adnames"
                 class="exp-input-field form-control"
-                title="Please fill the Detail Name"
+                title="Please Enter the Detail Name"
                 type="text"
                 autoComplete="off"
                 placeholder=" "
@@ -329,7 +330,7 @@ function AttriDetInput({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                title="Please fill the Description"
+                title="Please Enter the Description"
                 value={descriptions}
                 onChange={(e) => setDescriptions(e.target.value)}
                 maxLength={250}

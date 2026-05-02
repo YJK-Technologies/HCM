@@ -270,14 +270,31 @@ function RoleInfoGrid() {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+        @media print {
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
        `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">

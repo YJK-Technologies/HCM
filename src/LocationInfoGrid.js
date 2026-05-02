@@ -507,13 +507,30 @@ function LocInfoGrid() {
           }
   
           @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -833,7 +850,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=" "
-                  required title="Please fill the location number here"
+                  title="Please Enter the Location No"
                   value={location_no}
                   onChange={(e) => setlocation_no(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, LocationName)}
@@ -851,7 +868,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the location name here"
+                  title="Please Enter the Location Name"
                   value={location_name}
                   onChange={(e) => setlocation_name(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, City)} // No next field after this
@@ -869,7 +886,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=" "
-                  required title="Please fill the city here"
+                  title="Please Enter the City"
                   value={city}
                   onChange={(e) => setcity(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, State)}
@@ -887,7 +904,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=""
-                  required title="Please fill the state here"
+                  title="Please Enter the State"
                   value={state}
                   onChange={(e) => setstate(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, Pincode)}
@@ -905,7 +922,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="number"
                   placeholder=""
-                  required title="Please fill the Pin code here"
+                  title="Please Enter the Pin Code"
                   value={pincode}
                   onChange={(e) => setpincode(e.target.value.replace(/\D/g, '').slice(0, 13))}
                   onKeyDown={(e) => handleKeyDown(e, Country)}
@@ -923,7 +940,7 @@ function LocInfoGrid() {
                   className="exp-input-field form-control"
                   type="text"
                   placeholder=" "
-                  required title="Please fill the country here"
+                  title="Please Enter the Country"
                   value={country}
                   onChange={(e) => setcountry(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, Status)}
@@ -937,8 +954,9 @@ function LocInfoGrid() {
             <div className="col-md-2">
               <div
                 className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectFocused ? "is-focused" : ""}`}
+                ${selectedStatus ? "has-value" : ""} 
+                ${isSelectFocused ? "is-focused" : ""}`}
+                title="Please Select the Status"
               >
                 <Select
                   id="status"

@@ -73,7 +73,6 @@ const MyAgGridComponent = () => {
       headerName: 'Project ID & Name',
       field: 'projectid',
       //  filter: 'agTextColumnFilter',
-
       valueGetter: (params) => params.data.projectid_display
     },
     // { headerName: 'Project Name', field: 'projectname' },
@@ -87,34 +86,11 @@ const MyAgGridComponent = () => {
       headerName: 'Start Date',
       field: 'startdate',
       // filter: 'agTextColumnFilter',
-      
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: 'End date',
       field: 'enddate',
       // filter: 'agTextColumnFilter',
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: 'Manager',

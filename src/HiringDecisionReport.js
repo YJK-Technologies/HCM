@@ -252,7 +252,6 @@ function HiringDecisionReport() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {
@@ -431,7 +430,7 @@ function HiringDecisionReport() {
         <td>${row.country_code || ""}</td>
         <td>${row.final_status || ""}</td>
         <td>${row.decided_by || ""}</td>
-        <td>${row.decided_on ? formatDate(row.decided_on) : ""}</td>
+        <td>${row.decided_on || ""}</td>
       </tr>
     `);
     });

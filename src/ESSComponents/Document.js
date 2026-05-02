@@ -686,7 +686,7 @@ const handleUpdate = async (relationName, index) => {
     return;
   }
 
-  if (!member.documentName) {
+  if (!member.documentName || !member.document) {
     setError(true);
     toast.warning("Error: Missing required fields");
     return;

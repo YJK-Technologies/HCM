@@ -41,7 +41,6 @@ function TotalInterviewsScheduled({ }) {
   const gridApiRef = useRef(null);
   const [timeZone, setTimeZone] = useState('');
   const [meetingLink, setMeetingLink] = useState('');
-  const [test, setTest] = useState('');
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -552,7 +551,7 @@ function TotalInterviewsScheduled({ }) {
         <td>${row.schedule_id || ""}</td>
         <td>${row.candidate_id || ""}</td>
         <td>${row.panel_id || ""}</td>
-        <td>${formatDate(row.scheduled_datetime)}</td>
+        <td>${row.scheduled_datetime || ""}</td>
         <td>${row.timezone || ""}</td>
         <td>${row.location || ""}</td>
         <td>${row.Interview_Mode || ""}</td>
@@ -704,9 +703,7 @@ function TotalInterviewsScheduled({ }) {
       "Schedule ID": row.schedule_id || "",
       "Candidate ID": row.candidate_id || "",
       "Panel ID": row.panel_id || "",
-      "Schedule Date": row.scheduled_datetime
-        ? formatDate(row.scheduled_datetime)
-        : "",
+      "Schedule Date": row.scheduled_datetime || "",
       "Time Zone": row.timezone || "",
       Location: row.location || "",
       "Interview Mode": row.Interview_Mode || "",

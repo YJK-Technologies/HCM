@@ -483,7 +483,7 @@ const generateReport = () => {
       "User Status": safeValue(row.user_status),
       "Log In/Out": safeValue(row.log_in_out),
       "Email Id": safeValue(row.email_id),
-      "DOB": safeValue(formatDate(row.dob)),
+      "DOB": safeValue(row.dob),
       "Gender": safeValue(row.gender),
     };
   });
@@ -578,28 +578,27 @@ const generateReport = () => {
       cursor: pointer;
     }
 
-    /* ===== PRINT FIXES ===== */
     @media print {
       body {
         background: white;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-
+        
       th {
         background-color: ${tableHeaderBg} !important;
         color: white !important;
       }
-
+        
+      tr:nth-child(even) {
+        background-color: ${rowAltColor} !important;
+      }
+        
       .header {
         background: ${tableHeaderBg} !important;
         color: white !important;
       }
-
-      tr:nth-child(even) {
-        background-color: ${rowAltColor} !important;
-      }
-
+        
       .print-btn {
         display: none;
       }
@@ -647,7 +646,7 @@ const generateReport = () => {
   // PRINT BUTTON (WITH DELAY FIX)
   reportWindow.document.write(`
     <div style="text-align:center;">
-      <button class="print-btn" onclick="setTimeout(() => window.print(), 300)">
+      <button class="print-btn" onclick="window.print()">
         Print
       </button>
     </div>

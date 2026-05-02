@@ -301,13 +301,30 @@ function AttriDetGrid() {
           }
   
           @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
     `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -621,7 +638,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the code"
+                title="Please Enter the Code"
                 value={attributeheader_code}
                 maxLength={18}
                 onChange={(e) => setattributeheader_code(e.target.value)}
@@ -639,7 +656,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the sub code here"
+                title="Please Enter the Sub Code"
                 value={attributedetails_code}
                 maxLength={18}
                 onChange={(e) => setattributedetails_code(e.target.value)}
@@ -657,7 +674,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the detail name"
+                title="Please Enter the Detail Name"
                 value={attributedetails_name}
                 maxLength={250}
                 onChange={(e) => setattributedetails_name(e.target.value)}
@@ -675,7 +692,7 @@ function AttriDetGrid() {
                 type="text"
                 placeholder=""
                 required
-                title="Please fill the Description"
+                title="Please Enter the Description"
                 value={descriptions}
                 maxLength={250}
                 onChange={(e) => setdescriptions(e.target.value)}
