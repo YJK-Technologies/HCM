@@ -188,6 +188,10 @@ function Input({}) {
     });
   };
 
+  const isValidFile = (file) => {
+  return file && file instanceof File && file.size > 0;
+};
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleAcademic(EmployeeId);
@@ -204,20 +208,28 @@ function Input({}) {
   //   return '';
   // };
 
-  const convertBufferToBlobUrlAndFile = (
-    buffer,
-    fileName = "document.pdf",
-    mimeType = "application/pdf",
-  ) => {
-    if (buffer && buffer.type === "Buffer") {
-      const byteArray = new Uint8Array(buffer.data);
-      const blob = new Blob([byteArray], { type: mimeType });
-      const blobUrl = URL.createObjectURL(blob);
-      const file = new File([blob], fileName, { type: mimeType });
-      return { blobUrl, file };
-    }
-    return { blobUrl: null, file: null };
-  };
+const convertBufferToBlobUrlAndFile = (
+  buffer,
+  fileName = "document.pdf",
+  mimeType = "application/pdf"
+) => {
+  if (
+    buffer &&
+    buffer.type === "Buffer" &&
+    Array.isArray(buffer.data) &&
+    buffer.data.length > 0
+  ) {
+    const byteArray = new Uint8Array(buffer.data);
+    const blob = new Blob([byteArray], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    const file = new File([blob], fileName, { type: mimeType });
+
+    return { blobUrl, file };
+  }
+
+  // EMPTY BUFFER = NO FILE
+  return { blobUrl: null, file: null };
+};
 
   const handleAcademic = async (code) => {
     try {
@@ -615,6 +627,101 @@ function Input({}) {
   //   }
   // };
 
+// const handleUpdate = async (relationName, index) => {
+//   const relationGroup = Academic.find(
+//     (group) => group.relation === relationName,
+//   );
+
+//   const member = relationGroup ? relationGroup.members[index] : null;
+
+//   if (!member.keyfield) {
+//     setError(true);
+//     toast.warning("Error: Missing required keyfield");
+//     return;
+//   }
+
+//   if (!member) {
+//     setError(true);
+//     toast.warning("Error: Missing required fields");
+//     return;
+//   }
+
+//   if (
+//     !member.academicName ||
+//     !member.major ||
+//     !member.institution ||
+//     !member.academicYear
+//   ) {
+//     setError(true);
+//     toast.warning("Error: Missing required fields");
+//     return;
+//   }
+
+//   // SAME LOGIC - No changes detected
+//   const original = member.originalData;
+
+//   if (
+//     original &&
+//     original.academicName === member.academicName &&
+//     original.major === member.major &&
+//     original.institution === member.institution &&
+//     original.academicYear === member.academicYear &&
+//     member.isNewFile === false
+//   ) {
+//     toast.warning("No changes detected");
+//     return;
+//   }
+
+//   const fileBase64 = member.document
+//     ? await convertToBase64(member.document)
+//     : null;
+
+//   console.log(fileBase64);
+
+//   const editedData = {
+//     EmployeeId: EmployeeId,
+//     academicName: member.academicName,
+//     major: member.major,
+//     institution: member.institution,
+//     academicYear: member.academicYear,
+//     document: fileBase64,
+//     keyfield: member.keyfield,
+//     company_code: sessionStorage.getItem("selectedCompanyCode"),
+//     modified_by: sessionStorage.getItem("selectedUserCode"),
+//   };
+
+//   setError(false);
+
+//   try {
+//     setLoading(true);
+
+//     const response = await fetch(
+//       `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ editedData: [editedData] }),
+//       },
+//     );
+
+//     if (response.ok) {
+//       toast.success("Data updated successfully!", {
+//         onClose: () => window.location.reload(),
+//       });
+//     } else {
+//       const errorResponse = await response.json();
+//       console.error(errorResponse.message);
+//       toast.warning(errorResponse.message, {});
+//     }
+//   } catch (err) {
+//     console.error("Error delete data:", err);
+//     toast.error("Error delete data: " + err.message, {});
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const handleUpdate = async (relationName, index) => {
   const relationGroup = Academic.find(
     (group) => group.relation === relationName,
@@ -622,15 +729,15 @@ const handleUpdate = async (relationName, index) => {
 
   const member = relationGroup ? relationGroup.members[index] : null;
 
-  if (!member.keyfield) {
-    setError(true);
-    toast.warning("Error: Missing required keyfield");
-    return;
-  }
-
   if (!member) {
     setError(true);
     toast.warning("Error: Missing required fields");
+    return;
+  }
+
+  if (!member.keyfield) {
+    setError(true);
+    toast.warning("Error: Missing required keyfield");
     return;
   }
 
@@ -645,7 +752,6 @@ const handleUpdate = async (relationName, index) => {
     return;
   }
 
-  // SAME LOGIC - No changes detected
   const original = member.originalData;
 
   if (
@@ -654,17 +760,22 @@ const handleUpdate = async (relationName, index) => {
     original.major === member.major &&
     original.institution === member.institution &&
     original.academicYear === member.academicYear &&
-    member.isNewFile === false
+    member.isNewFile === false &&
+    !member.isFileRemoved
   ) {
     toast.warning("No changes detected");
     return;
   }
 
-  const fileBase64 = member.document
-    ? await convertToBase64(member.document)
-    : null;
+  let fileBase64 = null;
 
-  console.log(fileBase64);
+  if (isValidFile(member.document)) {
+    fileBase64 = await convertToBase64(member.document);
+  }
+
+  if (member.isFileRemoved) {
+    fileBase64 = null;
+  }
 
   const editedData = {
     EmployeeId: EmployeeId,
@@ -690,7 +801,9 @@ const handleUpdate = async (relationName, index) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ editedData: [editedData] }),
+        body: JSON.stringify({
+          editedData: [editedData],
+        }),
       },
     );
 
@@ -700,12 +813,10 @@ const handleUpdate = async (relationName, index) => {
       });
     } else {
       const errorResponse = await response.json();
-      console.error(errorResponse.message);
-      toast.warning(errorResponse.message, {});
+      toast.warning(errorResponse.message);
     }
   } catch (err) {
-    console.error("Error delete data:", err);
-    toast.error("Error delete data: " + err.message, {});
+    toast.error("Error update data: " + err.message);
   } finally {
     setLoading(false);
   }
@@ -935,20 +1046,28 @@ const handleUpdate = async (relationName, index) => {
     }
   }, [location.state]);
 
-  const handleRemovePdf = (relation, index) => {
-    setAcademic((prev) =>
-      prev.map((doc) =>
-        doc.relation === relation
-          ? {
-              ...doc,
-              members: doc.members.map((m, i) =>
-                i === index ? { ...m, document: null, documentUrl: "" } : m,
-              ),
-            }
-          : doc,
-      ),
-    );
-  };
+const handleRemovePdf = (relation, index) => {
+  setAcademic((prev) =>
+    prev.map((doc) =>
+      doc.relation === relation
+        ? {
+            ...doc,
+            members: doc.members.map((m, i) =>
+              i === index
+                ? {
+                    ...m,
+                    document: null,
+                    documentUrl: "",
+                    isNewFile: true,     // important
+                    isFileRemoved: true, // important
+                  }
+                : m,
+            ),
+          }
+        : doc,
+    ),
+  );
+};
 
   return (
     <div class="container-fluid Topnav-screen ">

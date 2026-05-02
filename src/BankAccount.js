@@ -671,7 +671,9 @@ function BankAccInput({ }) {
                     readOnly={mode === "update"}
                     onKeyDown={(e) => handleKeyDown(e, User, Accountant)}
                   />
-                  <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant Code<span className="text-danger">*</span></label>
+                  <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant Code
+                    {/* <span className="text-danger">*</span> */}
+                    </label>
                 </div>
               </div>
 

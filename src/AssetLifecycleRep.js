@@ -477,8 +477,6 @@ const columnDefs = [
   {
     headerName: "Purchase Date",
     field: "PurchaseDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
@@ -499,24 +497,18 @@ const columnDefs = [
   {
     headerName: "Allocation Date",
     field: "AllocationDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
   {
     headerName: "Expected Return",
     field: "ExpectedReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
   {
     headerName: "Actual Return",
     field: "ActualReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
@@ -537,16 +529,12 @@ const columnDefs = [
   {
     headerName: "First Allocation",
     field: "FirstAllocationDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
   {
     headerName: "Last Return",
     field: "LastReturnDate",
-    valueFormatter: (p) =>
-      p.value ? new Date(p.value).toLocaleDateString("en-GB") : "",
     editable: false,
   },
 
@@ -559,7 +547,6 @@ const columnDefs = [
 ];
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
     editable: true,
   };
 
@@ -903,15 +890,9 @@ const handleExportToExcel = () => {
     Category: row.AssetCategory || "",
     Status: row.AssetStatus || "",
     Employee: row.EmployeeID || "",
-    "Allocation Date": row.AllocationDate
-      ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
-      : "",
-    "Expected Return": row.ExpectedReturnDate
-      ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Actual Return": row.ActualReturnDate
-      ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB")
-      : "",
+    "Allocation Date": row.AllocationDate|| "",
+    "Expected Return": row.ExpectedReturnDate || "",
+    "Actual Return": row.ActualReturnDate || "",
     "Total Days Used": row.TotalDaysUsed || "",
   }));
 

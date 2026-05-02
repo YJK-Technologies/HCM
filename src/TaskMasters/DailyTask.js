@@ -461,18 +461,6 @@ function Input({ }) {
       filter: 'agDateColumnFilter',
       //  minWidth: 130, 
       //  maxWidth: 120,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
     },
     {
       headerName: "End Date",
@@ -480,18 +468,7 @@ function Input({ }) {
       filter: 'agDateColumnFilter',
       // minWidth: 130,
       //  maxWidth: 120,
-      valueFormatter: (params) => formatDate(params.value),
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+
     },
     {
       headerName: "Task Status",

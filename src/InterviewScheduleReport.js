@@ -297,7 +297,6 @@ function InterviewScheduleReport() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
   };
 
   const onGridReady = (params) => {
@@ -476,7 +475,7 @@ function InterviewScheduleReport() {
         <td>${row.panel_name || ""}</td>
         <td>${row.Interview_Mode || ""}</td>
         <td>${row.location || ""}</td>
-        <td>${row.scheduled_datetime ? formatDate(row.scheduled_datetime) : ""}</td>
+        <td>${row.scheduled_datetime || ""}</td>
         <td>${row.Status || ""}</td>
       </tr>
     `);
@@ -611,7 +610,7 @@ function InterviewScheduleReport() {
       row.panel_name || "",
       row.Interview_Mode || "",
       row.location || "",
-      row.scheduled_datetime ? formatDate(row.scheduled_datetime) : "",
+      row.scheduled_datetime || "",
       row.Status || "",
     ]);
 
