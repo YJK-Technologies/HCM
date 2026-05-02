@@ -77,7 +77,15 @@ function Input({ }) {
 
   const [isUpdated, setIsUpdated] = useState(false);
   const location = useLocation();
-  const { mode, selectedRow } = location.state || {};
+  const locationState = location.state || {};
+  const mode = locationState.mode || "create"; // ✅ default fallback
+  const selectedRow = locationState.selectedRow || null;
+
+  useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); // ensure fresh create mode
+    }
+  }, []);
 
   const clearInputFields = () => {
     setCompany_no("");
@@ -227,7 +235,7 @@ function Input({ }) {
 
   const handleRemoveLogo = () => {
     setSelectedImage(null);
-    setCompanyImage(null); 
+    setCompanyImage(null);
     if (logo.current) {
       logo.current.value = "";
     }
@@ -452,7 +460,7 @@ function Input({ }) {
       });
       if (response.ok) {
         console.log("Data inserted successfully");
-       toast.success("Data inserted successfully", {
+        toast.success("Data inserted successfully", {
           onClose: () => {
             clearInputFields();
             setError(false)
@@ -516,7 +524,7 @@ function Input({ }) {
       !email_id ||
       !selectedStatus ||
       !contact_no ||
-      !location_no 
+      !location_no
     ) {
       setError(true);
       toast.warning("Error: Missing required fields");
@@ -1043,7 +1051,10 @@ function Input({ }) {
                     <button
                       type="button"
                       className="delete-image-btn"
-                      onClick={handleRemoveSignature}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveSignature();
+                      }}
                     >
                       &times;
                     </button>
@@ -1062,14 +1073,20 @@ function Input({ }) {
                   className="exp-input-field form-control hidden-file-input"
                   accept="image/*"
                   ref={sign}
+                  style={{ pointerEvents: "none" }}
                   onChange={handleFileSignature}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      if (mode === "update") {
-                        handleUpdate();
+                      const fileInput = sign.current;
+                      if (fileInput && fileInput.files.length > 0) {
+                        if (mode === "update") {
+                          handleUpdate();
+                        } else {
+                          handleInsert();
+                        }
                       } else {
-                        handleInsert();
+                        fileInput.click();
                       }
                     }
                   }}

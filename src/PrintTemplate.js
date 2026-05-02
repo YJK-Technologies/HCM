@@ -436,7 +436,7 @@ function PrintTemplate() {
                             <input
                                 id="employeeId"
                                 className="exp-input-field form-control"
-                                title="Please fill the Template Name"
+                                title="Please Enter the Template Name"
                                 type="text"
                                 placeholder=""
                                 required
@@ -475,11 +475,11 @@ function PrintTemplate() {
                             <div key={index} className="row g-3">
                                 <div className="col-md-1 ">
                                     <div className="inputGroup">
-                                        <button type="button" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
+                                        <button type="button" title="Add Row" className="btn btn-primary ms-3" onClick={() => addRow(relationGroup.relation)}>
                                             <i className="fa-solid fa-circle-plus"></i>
                                         </button>
                                         {relationGroup.members.length > 1 && (
-                                            <button type="button" className="btn btn-danger ms-2"
+                                            <button type="button" title="Delete Row" className="btn btn-danger ms-2"
                                                 onClick={() => deleteRow(relationGroup.relation, index)}>
                                                 <FontAwesomeIcon icon={faMinus} />
                                             </button>
@@ -495,7 +495,7 @@ function PrintTemplate() {
                                             value={member.screenName}
                                             placeholder=" "
                                             maxLength={50}
-                                            title="Please enter the Screens"
+                                            title="Please Enter the Screens"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'screenName', e.target.value)}
                                         />
                                         <label className={` exp-form-labels ${error && !member.screenName ? 'text-danger' : ''}`}>Screens{showAsterisk && <span className="text-danger">*</span>}</label>
@@ -510,7 +510,7 @@ function PrintTemplate() {
                                             value={member.templatename}
                                             placeholder=" "
                                             maxLength={125}
-                                            title="Please enter the Template Name"
+                                            title="Please Enter the Template Name"
                                             onChange={(e) => RelationInputChange(relationGroup.relation, index, 'templatename', e.target.value)}
                                         />
                                         <label className={`exp-form-labels ${error && !member.templatename ? 'text-danger' : ''}`}>Template Name{showAsterisk && <span className="text-danger">*</span>}</label>

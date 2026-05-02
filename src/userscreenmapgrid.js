@@ -342,13 +342,30 @@ function UserScreenMapGrid() {
           }
   
           @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
+          body {
+            background: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
+            
+          th {
+            background-color: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+            
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+            
+          .print-btn {
+            display: none;
+          }
+        }
        `);
     reportWindow.document.write("</style></head><body>");
     reportWindow.document.write(`<div class="header">
@@ -651,7 +668,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please enter the Role Id"
+                required title="Please Enter the Role Id"
                 value={role_id}
                 onChange={(e) => setrole_id(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -668,7 +685,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please enter the Screen Type"
+                required title="Please Enter the Screen Type"
                 value={screen_type}
                 onChange={(e) => setscreen_type(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -684,7 +701,7 @@ function UserScreenMapGrid() {
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please enter the Permission Type "
+                required title="Please Enter the Permission Type"
                 value={permission_type}
                 onChange={(e) => setpermission_type(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

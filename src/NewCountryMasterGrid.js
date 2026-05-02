@@ -788,7 +788,7 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={50}
-                required title="Please Enter the Default Timezone"
+                required title="Please Enter the Default Time Zone"
                 value={TimeZone_Default}
                 onChange={(e) => setTimeZone_Default(e.target.value)}
               />
@@ -819,12 +819,12 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Weekend Days"
+                required title="Please Enter the Weekend Day"
                 value={Weekend_Days}
                 onChange={(e) => setWeekend_Days(e.target.value)}
                 maxLength={50}
               />
-              <label className="exp-form-labels">Week End Day</label>
+              <label className="exp-form-labels">Weekend Day</label>
             </div>
           </div>
 
@@ -833,7 +833,7 @@ function Input({ }) {
               <input
                 id="add3"
                 class="exp-input-field form-control"
-                title="Please Select the Max Hours Work Day"
+                title="Please Enter the Max Hours Work Day"
                 placeholder=""
                 type="time"
                 maxLength={2}
@@ -860,7 +860,7 @@ function Input({ }) {
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder=""
-                required title="Please Select the Max Hours Work Week"
+                required title="Please Enter the Max Hours Work Week"
                 value={Max_Work_Hours_Week}
                 onChange={(e) => {
                   // const value= e.target.value.replace(/\D/g, "");
@@ -996,11 +996,11 @@ function Input({ }) {
                 type="text"
                 placeholder=""
                 maxLength={50}
-                required title="Please Enter the Default Timezone"
+                required title="Please Enter the Default Time Zone"
                 value={TimeZone_DefaultSC}
                 onChange={(e) => setTimeZone_DefaultSC(e.target.value)}
               />
-              <label className="exp-form-labels">Time Zone Default</label>
+              <label className="exp-form-labels">Default Time Zone</label>
             </div>
           </div>
 
@@ -1027,12 +1027,12 @@ function Input({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Weekend Days"
+                required title="Please Enter the Weekend Day"
                 value={Weekend_DaysSC}
                 onChange={(e) => setWeekend_DaysSC(e.target.value)}
                 maxLength={50}
               />
-              <label className="exp-form-labels">Week End Day</label>
+              <label className="exp-form-labels">Weekend Day</label>
             </div>
           </div>
 
