@@ -48272,7 +48272,7 @@ const shiftChangeRequestInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
+      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
         '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'','','',''`);
 
     res.status(200).json({
@@ -48296,7 +48296,7 @@ const shiftChangeRequestEmployee = async (req, res) => {
       .input("mode", sql.NVarChar, "SRE")
       .input("company_code", sql.NVarChar, company_code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
-      .query(`EXEC sp_shift_change_requests_test @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','','','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48375,7 +48375,7 @@ const shiftRequestEmployeeApproval = async (req, res) => {
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests_test @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,'','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,'','',''`);
 
     res.status(200).json({
       success: true,
@@ -48456,7 +48456,7 @@ const shiftChangeRequestManager = async (req, res) => {
       .input("mode", sql.NVarChar, "SRM")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests_test @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','','','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48482,7 +48482,7 @@ const shiftRequestManagerApproval = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("request_status", sql.NVarChar, request_status)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests_test @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,'','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,'','',''`);
 
     res.status(200).json({
       success: true,
@@ -48587,7 +48587,7 @@ const getAGESTypes = async (req, res) => {
 
 //code added by pavun on 02-04-2026
 const shiftChangeRequestSearch = async (req, res) => {
-  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, company_code } = req.body;
+  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, is_swap_request, request_status, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48600,8 +48600,10 @@ const shiftChangeRequestSearch = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id)
       .input("current_shift_id", sql.NVarChar, current_shift_id)
       .input("requested_shift_id", sql.NVarChar, requested_shift_id)
+      .input("is_swap_request", sql.NVarChar, is_swap_request)
+      .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','','','','','','','',@company_code,'','','','',@shift_from_date,@shift_to_date`);
+      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'',@is_swap_request,'','','',@company_code,'','','','',@shift_from_date,@shift_to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48615,7 +48617,7 @@ const shiftChangeRequestSearch = async (req, res) => {
 };
 
 const shiftChangeRequestReport = async (req, res) => {
-  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, RepManager, company_code } = req.body;
+  const { request_id, shift_from_date, shift_to_date, employee_id, request_status, current_shift_id, requested_shift_id, RepManager, company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48623,14 +48625,16 @@ const shiftChangeRequestReport = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "ASC")
+      .input("request_id", sql.Int, request_id)
       .input("shift_from_date", sql.NVarChar, shift_from_date)
       .input("shift_to_date", sql.NVarChar, shift_to_date)
       .input("employee_id", sql.NVarChar, employee_id)
       .input("current_shift_id", sql.NVarChar, current_shift_id)
       .input("requested_shift_id", sql.NVarChar, requested_shift_id)
       .input("RepManager", sql.NVarChar, RepManager)
+      .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests_test @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','','','','','','','',@company_code,@RepManager,'','','',@shift_from_date,@shift_to_date`);
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'','','','','',@company_code,@RepManager,'','','',@shift_from_date,@shift_to_date`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
