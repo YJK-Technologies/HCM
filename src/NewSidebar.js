@@ -44,7 +44,8 @@ import {
   BsPersonPlus,
   BsBoxSeam,
   BsCalendarPlus,
-  BsHourglassSplit
+  BsHourglassSplit,
+  BsArrowLeftRight
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -160,6 +161,7 @@ export const leafIconMap = {
   "Loan Status History": TbHistory,
   "Loan Dashboard": AiOutlineDashboard,
   "Comp Off Request": BsCalendarPlus,
+  "Shift Request": BsArrowLeftRight,
 
   // --- INTERVIEW ---
   "Interview Master": BsPeople,
@@ -257,7 +259,7 @@ const menuData = [
           { label: "Visa Requests", path: "/VisaRequest" },
           { label: "Travel Request", path: "/TravelRequest" },
           { label: "Comp Off Request", path: "/CompOffRequest" },
-          { label: "Shift Change Request", path: "/ShiftChangeRequest" },
+          { label: "Shift Request", path: "/ShiftChangeRequest" },
         ],
       },
       {

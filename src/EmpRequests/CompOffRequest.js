@@ -554,6 +554,8 @@ const EmployeeCompOff = () => {
                                 defaultColDef={defaultColDef}
                                 rowSelection="single"
                                 ref={gridRef}
+                                pagination={true}
+                                paginationAutoPageSize={true}
                             />
                         </div>
                     </div>
