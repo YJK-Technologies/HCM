@@ -11,6 +11,29 @@ import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
+  const getFinancialYearDates = () => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
+  console.log(currentMonth)
+  let startYear, endYear;
+
+  if (currentMonth < 4) {
+    startYear = currentYear - 1;
+    endYear = currentYear;
+  } else {
+    startYear = currentYear;
+    endYear = currentYear + 1;
+  }
+
+  const FirstDate = `${startYear}-04-01`;
+  const LastDate = `${endYear}-03-31`;
+
+  return { FirstDate, LastDate };
+};
+
+const { FirstDate, LastDate } = getFinancialYearDates();
+
 function Input({ }) {
 
   const [error, setError] = useState("");
@@ -50,6 +73,88 @@ function Input({ }) {
   const [isSelecttypes, setIsSelecttypes] = useState(false);
   const [isSelectAL, setIsSelectAL] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [FromDate, setFromDate] = useState(FirstDate);
+  const [ToDate, setToDate] = useState(LastDate);
+  const [Start_Year, setStart_Year] = useState(FirstDate);
+  const [End_Year, setEnd_Year] = useState(LastDate);
+
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [Status, setStatus] = useState("");
+  const [statusdrop, setStatusdrop] = useState([]);
+
+  const [selectedStatusSC, setSelectedStatusSC] = useState(null);
+  const [StatusSC, setStatusSC] = useState("");
+  const [isSelectFocusedSC, setIsSelectFocusedSC] = useState(false);
+  const [statusdropSC, setStatusdropSC] = useState([]);
+
+  const [statusgriddrop, setStatusGriddrop] = useState([]);
+
+    const handleChangeStatus = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : "");
+  };
+
+    const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+    useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+  
+      fetch(`${config.apiBaseUrl}/status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+      })
+        .then((data) => data.json())
+        .then((val) => setStatusdrop(val))
+        .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+  const handleChangeStatusSC = (selectedStatusSC) => {
+    setSelectedStatusSC(selectedStatusSC);
+    setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
+  };
+
+    const filteredOptionStatusSC = statusdropSC.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdropSC(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const statusOption = data.map(option => option.attributedetails_name);
+        setStatusGriddrop(statusOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const searchClearInputFields = () => {
     setLeaveid("");
@@ -75,6 +180,9 @@ function Input({ }) {
           Type: type,
           Accrual: accrual,
           Exceed_Leave: Exceedleave,
+          Start_Year: Start_Year,
+          End_Year: End_Year,          
+          Status: StatusSC,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
         })
       });
@@ -219,6 +327,26 @@ function Input({ }) {
         maxLength: 250,
       },
     },
+      {
+      headerName: "Start Year",
+      field: "Start_Year",
+      editable: true,
+    },
+    {
+      headerName: "End Year",
+      field: "End_Year",
+      editable: true,
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: statusgriddrop,
+      },
+      editable: true,
+    },
+
   ];
 
   const gridOptions = {
@@ -387,7 +515,10 @@ function Input({ }) {
       !Accrual ||
       !TotalDaystoBeCredit ||
       !Exceed_Leave ||
-      !LeaveReason
+      !LeaveReason  ||
+      !FromDate ||  
+      !ToDate   ||
+      !Status 
 
     ) {
       setError(" ");
@@ -396,6 +527,9 @@ function Input({ }) {
     }
     setLoading(true);
     try {
+      const formattedFromDate = new Date(FromDate).toISOString().split("T")[0];
+      const formattedToDate = new Date(ToDate).toISOString().split("T")[0];
+
       const Header = {
         LeaveId,
         Description,
@@ -406,6 +540,9 @@ function Input({ }) {
         carryForward,
         Exceed_Leave,
         LeaveReason,
+        status: Status,
+        Start_Year: formattedFromDate,
+        End_Year: formattedToDate,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode'),
       };
@@ -901,6 +1038,60 @@ function Input({ }) {
             </div>
           </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                autoComplete="off"
+                value={FromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+              <label For="city" className={` exp-form-labels ${error && !FromDate ? 'text-danger' : ''}`}>Start Year<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                autoComplete="off"
+                value={ToDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+              <label For="city" className={` exp-form-labels ${error && !ToDate ? 'text-danger' : ''}`}>End Year<span className="text-danger">*</span></label>
+            </div>
+          </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectFocused ? "is-focused" : ""}`}
+              title="Please Select the Status"
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocused(true)}
+                  onBlur={() => setIsSelectFocused(false)}
+                />
+                <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
+              </div>
+            </div>
+
         </div>
       </div>
 
@@ -909,6 +1100,40 @@ function Input({ }) {
           <h5 className="">Search Criteria:</h5>
         </div>
         <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the Start Year"
+                autoComplete="off"
+                value={Start_Year}
+                onChange={(e) => setStart_Year(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <label For="city" className="exp-form-labels">Start Year</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="add3"
+                class="exp-input-field form-control"
+                type="Date"
+                placeholder=""
+                required title="Please Choose the End Year"
+                autoComplete="off"
+                value={End_Year}
+                onChange={(e) => setEnd_Year(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <label For="city" className="exp-form-labels">End Year</label>
+            </div>
+          </div>
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -994,6 +1219,28 @@ function Input({ }) {
               <label class="exp-form-labels">Exceed Leave</label>
             </div>
           </div>
+
+            <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+              ${selectedStatusSC ? "has-value" : ""} 
+              ${isSelectFocusedSC ? "is-focused" : ""}`}
+              title="Please Select the Status"
+              >
+                <Select
+                  id="status"
+                  isClearable
+                  value={selectedStatusSC}
+                  onChange={handleChangeStatusSC}
+                  options={filteredOptionStatusSC}
+                  classNamePrefix="react-select"
+                  placeholder=""
+                  onFocus={() => setIsSelectFocusedSC(true)}
+                  onBlur={() => setIsSelectFocusedSC(false)}
+                />
+                <label class="floating-label">Status</label>
+              </div>
+            </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">

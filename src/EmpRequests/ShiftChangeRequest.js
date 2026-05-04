@@ -20,13 +20,24 @@ const ShiftChangeRequest = () => {
     const [loading, setLoading] = useState(false);
 
     const [leaveRowData, setLeaveRowData] = useState([]);
-    const [holidayFromDate, setHolidayFromDate] = useState("");
-    const [holidayToDate, setHolidayToDate] = useState("");
-    const [holidayName, setHolidayName] = useState("");
-    const [statusDropSc, setstatusDropSc] = useState([]);
-    const [statusSc, setStatusSc] = useState("");
-    const [selectedStatusSc, setSelectedStatusSc] = useState("");
-    const [isSelectedStatusSc, setIsSelectedStatusSc] = useState(false);
+    const [effectiveFromDate, setEffectiveFromDate] = useState("");
+    const [effectiveToDate, setEffectiveToDate] = useState("");
+    const [curShiftDropSc, setCurShiftDropSc] = useState([]);
+    const [reqShiftDropSc, setReqShiftDropSc] = useState([]);
+    const [empStatusDropSc, setEmpStatusDropSc] = useState([]);
+    const [manStatusDropSc, setManStatusDropSc] = useState([]);
+    const [curShiftSc, setCurShiftSc] = useState("");
+    const [reqShiftSc, setReqShiftSc] = useState("");
+    const [empStatusSc, setEmpStatusSc] = useState("");
+    const [manStatusSc, setManStatusSc] = useState("");
+    const [selectedCurShiftSc, setSelectedCurShiftSc] = useState("");
+    const [selectedReqShiftSc, setSelectedReqShiftSc] = useState("");
+    const [selectedEmpStatusSc, setSelectedEmpStatusSc] = useState("");
+    const [selectedManStatusSc, setSelectedManStatusSc] = useState("");
+    const [isSelectedCurShiftSc, setIsSelectedCurShiftSc] = useState(false);
+    const [isSelectedReqShiftSc, setIsSelectedReqShiftSc] = useState(false);
+    const [isSelectedEmpStatusSc, setIsSelectedEmpStatusSc] = useState(false);
+    const [isSelectedManStatusSc, setIsSelectedManStatusSc] = useState(false);
     const gridRef = useRef()
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -132,14 +143,104 @@ const ShiftChangeRequest = () => {
         setToDate(selectedDate);
     };
 
-    const filterOptionStatusSc = [{ value: 'All', label: 'All' }, ...statusDropSc.map((option) => ({
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setCurShiftDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => setReqShiftDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => setEmpStatusDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+            }),
+        })
+            .then((data) => data.json())
+            .then((val) => setManStatusDropSc(val))
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    const filteredOptionCurrentShift = [{ value: 'All', label: 'All' }, ...curShiftDropSc.map((option) => ({
+        value: option.Shift_Code,
+        label: `${option.Shift_Code} - ${option.Shift_Name}`,
+    }))];
+
+    const filteredOptionRequestShift = [{ value: 'All', label: 'All' }, ...reqShiftDropSc.map((option) => ({
+        value: option.Shift_Code,
+        label: `${option.Shift_Code} - ${option.Shift_Name}`,
+    }))];
+
+    const filterOptionEmployeeStatus = [{ value: 'All', label: 'All' }, ...empStatusDropSc.map((option) => ({
         value: option.attributedetails_name,
         label: option.attributedetails_name,
     }))];
 
-    const handleChangeStatusSc = (SelectedStatusSc) => {
-        setSelectedStatusSc(SelectedStatusSc);
-        setStatusSc(SelectedStatusSc ? SelectedStatusSc.value : '');
+    const filterOptionManagerStatus = [{ value: 'All', label: 'All' }, ...manStatusDropSc.map((option) => ({
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+    }))];
+
+    const handleChangeCurShiftSc = (setSelectedCurShiftSc) => {
+        setSelectedCurShiftSc(setSelectedCurShiftSc);
+        setCurShiftSc(setSelectedCurShiftSc ? setSelectedCurShiftSc.value : '');
+    };
+
+    const handleChangeReqShiftSc = (setSelectedReqShiftSc) => {
+        setSelectedReqShiftSc(setSelectedReqShiftSc);
+        setReqShiftSc(setSelectedReqShiftSc ? setSelectedReqShiftSc.value : '');
+    };
+
+    const handleChangeEmpStatusSc = (selectedEmpStatusSc) => {
+        setSelectedEmpStatusSc(selectedEmpStatusSc);
+        setEmpStatusSc(selectedEmpStatusSc ? selectedEmpStatusSc.value : '');
+    };
+
+    const handleChangeManStatusSc = (selectedManStatusSc) => {
+        setSelectedManStatusSc(selectedManStatusSc);
+        setManStatusSc(selectedManStatusSc ? selectedManStatusSc.value : '');
     };
 
     const leaveColumnDefs = [
@@ -147,42 +248,72 @@ const ShiftChangeRequest = () => {
             headerName: "Date",
             field: "effective_date",
             editable: false,
-            cellStyle: { textAlign: "center" },
         },
         {
             headerName: "Current Shift Code",
-            field: "HolidayName",
+            field: "current_shift_id",
             editable: false,
-            cellStyle: { textAlign: "center" },
+            cellEditorParams: {
+                values: shiftIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
         },
         {
             headerName: "Requested Shift Code",
-            field: "LeaveFromDate",
+            field: "requested_shift_id",
             editable: false,
-            cellStyle: { textAlign: "center" },
+            cellEditorParams: {
+                values: shiftIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = shiftIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
         },
         {
-            headerName: "To Date",
-            field: "LeaveToDate",
+            headerName: "Swap Employe ID",
+            field: "swap_employee_id",
             editable: false,
-            cellStyle: { textAlign: "center" },
+            cellEditorParams: {
+                values: employeeIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = employeeIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
         },
         {
-            headerName: "Status",
-            field: "Status",
+            headerName: "Employee Approval Status",
+            field: "is_swap_request",
             editable: false,
-            cellStyle: { textAlign: "center" },
+        },
+        {
+            headerName: "Priority",
+            field: "priority",
+            editable: false,
+        },
+        {
+            headerName: "Reporting Manager",
+            field: "RepManager",
+            editable: false,
+        },
+        {
+            headerName: "Manager Approval Status",
+            field: "request_status",
+            editable: false,
         },
     ];
 
     const defaultColDef = {
         resizable: true,
-        wrapText: true,
     };
 
-    const handleCompOffSearch = async () => {
-        const from = new Date(holidayFromDate);
-        const to = new Date(holidayToDate);
+    const handleShiftRequestSearch = async () => {
+        const from = new Date(effectiveFromDate);
+        const to = new Date(effectiveToDate);
 
         if (from > to) {
             toast.warning("From Date should not be greater than To Date");
@@ -191,18 +322,20 @@ const ShiftChangeRequest = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${config.apiBaseUrl}/compOffSearchCriteria`, {
+            const response = await fetch(`${config.apiBaseUrl}/shiftChangeRequestSearch`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
-                    EmployeeId: sessionStorage.getItem('selectedUserCode'),
-                    FromDate: holidayFromDate,
-                    ToDate: holidayToDate,
-                    Status: statusSc,
-                    HolidayName: holidayName,
+                    company_code: sessionStorage.getItem('selectedCompanyCode'),
+                    employee_id: sessionStorage.getItem('selectedUserCode'),
+                    shift_from_date: effectiveFromDate,
+                    shift_to_date: effectiveToDate,
+                    current_shift_id: setCurShiftSc,
+                    requested_shift_id: setReqShiftSc,
+                    is_swap_request: empStatusSc,
+                    request_status: manStatusSc,
                 })
             });
             if (response.ok) {
@@ -232,11 +365,16 @@ const ShiftChangeRequest = () => {
     };
 
     const clearInputsSearch = () => {
-        setHolidayFromDate('');
-        setHolidayToDate('');
-        setHolidayName('');
-        setStatusSc('');
-        setSelectedStatusSc('');
+        setEffectiveFromDate('');
+        setEffectiveToDate('');
+        setCurShiftSc('');
+        setReqShiftSc('');
+        setEmpStatusSc('');
+        setManStatusSc('');
+        setSelectedCurShiftSc('');
+        setSelectedReqShiftSc('');
+        setSelectedEmpStatusSc('');
+        setSelectedManStatusSc('');
     };
 
     useEffect(() => {
@@ -499,8 +637,8 @@ const ShiftChangeRequest = () => {
                                 type="date"
                                 className="exp-input-field form-control"
                                 title="Please select the Holiday From Date"
-                                value={holidayFromDate}
-                                onChange={(e) => setHolidayFromDate(e.target.value)}
+                                value={effectiveFromDate}
+                                onChange={(e) => setEffectiveFromDate(e.target.value)}
                                 placeholder=" "
                                 autoComplete="off"
                             />
@@ -516,8 +654,8 @@ const ShiftChangeRequest = () => {
                                 type="date"
                                 className="exp-input-field form-control"
                                 title="Please select the Holiday To Date"
-                                value={holidayToDate}
-                                onChange={(e) => setHolidayToDate(e.target.value)}
+                                value={effectiveToDate}
+                                onChange={(e) => setEffectiveToDate(e.target.value)}
                                 placeholder=" "
                                 autoComplete="off"
                             />
@@ -528,46 +666,95 @@ const ShiftChangeRequest = () => {
                     </div>
 
                     <div className="col-md-2">
-                        <div className="inputGroup">
-                            <input
-                                type="text"
-                                className="exp-input-field form-control"
-                                title="Please enter the Holiday Name"
-                                value={holidayName}
-                                onChange={(e) => setHolidayName(e.target.value)}
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${isSelectedCurShiftSc ? "has-value" : ""} 
+                            ${isSelectedCurShiftSc ? "is-focused" : ""}`}
+                            title="Please select the Leave Status"
+                        >
+                            <Select
+                                id="Select_slots"
+                                value={isSelectedCurShiftSc}
                                 placeholder=" "
-                                autoComplete="off"
+                                options={filteredOptionCurrentShift}
+                                onChange={handleChangeCurShiftSc}
+                                onFocus={() => setIsSelectedCurShiftSc(true)}
+                                onBlur={() => setIsSelectedCurShiftSc(false)}
+                                classNamePrefix="react-select"
+                                isClearable
                             />
-                            <label className={`exp-form-labels`}>
-                                Holiday Name
-                            </label>
+                            <label className="floating-label">Current Shift Code</label>
                         </div>
                     </div>
 
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${selectedStatusSc ? "has-value" : ""} 
-                            ${isSelectedStatusSc ? "is-focused" : ""}`}
+                            ${isSelectedReqShiftSc ? "has-value" : ""} 
+                            ${isSelectedReqShiftSc ? "is-focused" : ""}`}
                             title="Please select the Leave Status"
                         >
                             <Select
                                 id="Select_slots"
-                                value={selectedStatusSc}
-                                onChange={handleChangeStatusSc}
-                                options={filterOptionStatusSc}
+                                value={isSelectedReqShiftSc}
                                 placeholder=" "
-                                onFocus={() => setIsSelectedStatusSc(true)}
-                                onBlur={() => setIsSelectedStatusSc(false)}
+                                options={filteredOptionRequestShift}
+                                onChange={handleChangeReqShiftSc}
+                                onFocus={() => setIsSelectedReqShiftSc(true)}
+                                onBlur={() => setIsSelectedReqShiftSc(false)}
                                 classNamePrefix="react-select"
                                 isClearable
                             />
-                            <label className="floating-label">Leave Status</label>
+                            <label className="floating-label">Request Shift Code</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedEmpStatusSc ? "has-value" : ""} 
+                            ${isSelectedEmpStatusSc ? "is-focused" : ""}`}
+                            title="Please select the Leave Status"
+                        >
+                            <Select
+                                id="Select_slots"
+                                value={selectedEmpStatusSc}
+                                placeholder=" "
+                                options={filterOptionEmployeeStatus}
+                                onChange={handleChangeEmpStatusSc}
+                                onFocus={() => setIsSelectedEmpStatusSc(true)}
+                                onBlur={() => setIsSelectedEmpStatusSc(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                            />
+                            <label className="floating-label">Employee Approval Status</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div
+                            className={`inputGroup selectGroup 
+                            ${selectedManStatusSc ? "has-value" : ""} 
+                            ${isSelectedManStatusSc ? "is-focused" : ""}`}
+                            title="Please select the Leave Status"
+                        >
+                            <Select
+                                id="Select_slots"
+                                value={selectedManStatusSc}
+                                placeholder=" "
+                                options={filterOptionManagerStatus}
+                                onChange={handleChangeManStatusSc}
+                                onFocus={() => setIsSelectedManStatusSc(true)}
+                                onBlur={() => setIsSelectedManStatusSc(false)}
+                                classNamePrefix="react-select"
+                                isClearable
+                            />
+                            <label className="floating-label">Manager Approval Status</label>
                         </div>
                     </div>
 
                     <div className="search-btn-wrapper">
-                        <div className="icon-btn search" onClick={handleCompOffSearch}>
+                        <div className="icon-btn search" onClick={handleShiftRequestSearch}>
                             <span className="tooltip">Search</span>
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </div>
@@ -586,6 +773,8 @@ const ShiftChangeRequest = () => {
                                 defaultColDef={defaultColDef}
                                 rowSelection="single"
                                 ref={gridRef}
+                                pagination={true}
+                                paginationAutoPageSize={true}
                             />
                         </div>
                     </div>
