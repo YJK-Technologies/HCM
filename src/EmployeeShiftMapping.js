@@ -1237,7 +1237,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
-                                    min={new Date().toISOString().split("T")[0]}
+                                    // min={new Date().toISOString().split("T")[0]}
                                     value={effectiveFrom}
                                     onChange={(e) => setEffectiveFrom(e.target.value)}
                                 />
@@ -1256,7 +1256,7 @@ function EmployeeTypeMaster() {
                                     placeholder=" "
                                     autoComplete="off"
                                     required
-                                    min={new Date().toISOString().split("T")[0]}
+                                    // min={new Date().toISOString().split("T")[0]}
                                     value={effectiveTo}
                                     onChange={(e) => setEffectiveTo(e.target.value)}
                                 />

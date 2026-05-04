@@ -22621,9 +22621,9 @@ const addLeaveType = async (req, res) => {
     created_by,
     modified_by,
     EmployeeId,
-    tempstr2,
-    tempstr3,
-    tempstr4,
+    Start_Year,
+    End_Year,
+    status,
     datetime1,
     datetime2,
     datetime3,
@@ -22648,14 +22648,14 @@ const addLeaveType = async (req, res) => {
       .input("created_by", sql.VarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("EmployeeId", sql.VarChar, EmployeeId)
-      .input("tempstr2", sql.VarChar, tempstr2)
-      .input("tempstr3", sql.VarChar, tempstr3)
-      .input("tempstr4", sql.VarChar, tempstr4)
+      .input("Start_Year", sql.Date, Start_Year)
+      .input("End_Year", sql.Date, End_Year)
+      .input("status", sql.NVarChar, status)
       .input("datetime1", sql.VarChar, datetime1)
       .input("datetime2", sql.VarChar, datetime2)
       .input("datetime3", sql.VarChar, datetime3)
       .input("datetime4", sql.VarChar, datetime4)
-      .query(`EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@Start_Year,@End_Year,@status,@datetime1,@datetime2,@datetime3,@datetime4`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -27023,7 +27023,7 @@ const getsearchLeavetypes = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "A")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_LeaveTypes 'A',@company_code,'','','','','',0,0,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+      .query(`EXEC sp_LeaveTypes 'A',@company_code,'','','','','',0,0,'','','','','','','','',NULL,NULL,NULL,NULL
 `);
 
     res.json(result.recordset);
@@ -27034,7 +27034,7 @@ const getsearchLeavetypes = async (req, res) => {
 };
 
 const getLeaveTypeSearch = async (req, res) => {
-  const { company_code, LeaveId, code, Type, Accrual, Exceed_Leave } = req.body;
+  const { company_code, LeaveId, code, Type, Accrual, Exceed_Leave, Start_Year, End_Year } = req.body;
 
   try {
     // Connect to the database
@@ -27050,9 +27050,10 @@ const getLeaveTypeSearch = async (req, res) => {
       .input("Type", sql.VarChar, Type)
       .input("Accrual", sql.NVarChar, Accrual)
       .input("Exceed_Leave", sql.VarChar, Exceed_Leave)
-
+      .input("Start_Year", sql.NVarChar, Start_Year)
+      .input("End_Year", sql.NVarChar, End_Year)
       .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','','',@Start_Year,@End_Year,'',NULL,NULL,NULL,NULL`,
       );
 
     // Send response
@@ -30325,7 +30326,7 @@ const deleteLeave = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'','','','','','','','','',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'','','','','','','','','',@Modified_by,'','','','',NULL,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -30360,9 +30361,11 @@ const UpdateLeaveType = async (req, res) => {
         .input("Exceed_Leave", sql.VarChar, updatedRow.Exceed_Leave)
         .input("LeaveReason", sql.VarChar, updatedRow.LeaveReason)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
-
+        .input("Start_Year", sql.Date, updatedRow.Start_Year)
+        .input("End_Year", sql.Date, updatedRow.End_Year)
+        .input("status", sql.NVarChar, updatedRow.status)
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,'',@Start_Year,@End_Year,@status,NULL,NULL,NULL,NULL`,
         );
     }
     res.json({ success: true, message: "Data inserted successfully" });
@@ -31901,7 +31904,7 @@ const getapplyLeavetype = async (req, res) => {
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
-      .query(`EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',@EmployeeId,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,'','','','','',0,0,'','','','',@EmployeeId,'','','',NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
