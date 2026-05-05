@@ -101,6 +101,90 @@ const handleShiftSearch = async () => {
     }
   };
 
+  useEffect(() => {
+      const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+      fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Company_Code }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const shiftPatternIdOption = data.map((option) => ({
+            value: option.Pattern_Code,
+            label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+          }));
+          setShiftPatternIdDropGrid(shiftPatternIdOption);
+        })
+        .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const shiftOption = data.map((option) => ({
+              value: option.Shift_Code,
+              label: `${option.Shift_Code} - ${option.Shift_Name}`,
+            }));
+            setShiftCodeDropGrid(shiftOption);
+          })
+          .catch((error) => console.error("Error fetching data:", error));
+      }, []);
+
+      useEffect(() => {
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+      
+          fetch(`${config.apiBaseUrl}/getDepartment`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const deptOptions = data.map((option) => ({
+                value: option.dept_id,
+                label: `${option.dept_id} - ${option.dept_name}`,
+              }));
+              setShiftDeptIdDropGrid(deptOptions);
+            })
+            // .then((val) => setDPTdrop(val))
+            .catch((error) =>
+              console.error("Error fetching department data:", error),
+            );
+        }, []);
+
+        useEffect(() => {
+            const company_code = sessionStorage.getItem("selectedCompanyCode");
+            fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ company_code }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                const employeeIdOption = data.map((option) => ({
+                  value: option.EmployeeId,
+                  label: `${option.EmployeeId} - ${option.First_Name}`,
+                }));
+                setShiftEmpIdDropGrid(employeeIdOption);
+              })
+              .catch((error) => console.error("Error fetching data:", error));
+          }, []);
+
   const filteredOptionEmpId = shiftEmpIdDrop.map((option) => ({
     value: option.EmployeeId,
     label: `${option.EmployeeId} - ${option.First_Name}`,
@@ -511,6 +595,8 @@ const handleShiftSearch = async () => {
             toast.error("Error fetching search data: " + error.message);
         }
     };
+
+    
     
 return (
 
