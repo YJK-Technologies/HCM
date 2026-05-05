@@ -153,6 +153,7 @@ function TravelRequest({ }) {
   const [selectedaccommodation_requiredSc, setSelectedaccommodation_requiredSc] = useState('');
   const [isSelectedaccommodation_requiredSc, setIsSelectedaccommodation_requiredSc] = useState(false);
   
+  const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
   
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -1026,6 +1027,28 @@ function TravelRequest({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  // Ag grid drop down For Employee ID
+      useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ company_code }),
+        })
+            .then((data) => data.json())
+            .then((val) => {
+                const emp = val.map((option) => ({
+                    value: option.EmployeeId,
+                    label: `${option.EmployeeId} - ${option.First_Name}`,
+                }));
+                setEmpIdDropGrid(emp);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
+
   const columnDefs = [
     {
       headerName: "Actions",
@@ -1063,6 +1086,14 @@ function TravelRequest({ }) {
       headerName: "Employee ID",
       field: "employee_id",
       editable: false,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: {
+                values: empIdDropGrid.map(d => d.value),
+            },
+            valueFormatter: (params) => {
+                const dept = empIdDropGrid.find(d => d.value === params.value);
+                return dept ? dept.label : params.value;
+            },
     },
     {
       headerName: "Department",
