@@ -145,14 +145,14 @@ function PendingAssReqRep({}) {
   }, []);
 
   useEffect(() => {
-    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
