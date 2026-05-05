@@ -50,7 +50,6 @@ function Input({ }) {
   const [Type, setType] = useState('');
   const [Accrual, setAccrual] = useState("");
   const [TotalDaystoBeCredit, setTotalDaystoBeCredit] = useState("");
-  const [carryForward, setcarryForward] = useState("");
   const [Exceed_Leave, setExceed_Leave] = useState("");
   const [LeaveReason, setLeaveReason] = useState("");
   const [TypeDrop, setTypeDrop] = useState([]);
@@ -89,6 +88,55 @@ function Input({ }) {
   const [statusdropSC, setStatusdropSC] = useState([]);
 
   const [statusgriddrop, setStatusGriddrop] = useState([]);
+
+  const [selectedcarryForward, setSelectedcarryForward] = useState('');
+  const [isSelectcarryForward, setIsSelectcarryForward] = useState(false);
+  const [carryForward, setcarryForward] = useState('');
+
+  const [carryForwardDrop, setcarryForwardDrop] = useState([]);
+  const [carryForwardDropGrid, setcarryForwardDropGrid] = useState([]);
+
+    const handleChangecarryForward = (selectedcarryForward) => {
+    setSelectedcarryForward(selectedcarryForward);
+    setcarryForward(selectedcarryForward ? selectedcarryForward.value : "");
+  };
+
+  const filteredOptioncarryForward = carryForwardDrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getboolean`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setcarryForwardDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getboolean`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const isPaidOption = data.map(option => option.attributedetails_name);
+        setcarryForwardDropGrid(isPaidOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
     const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -302,8 +350,10 @@ function Input({ }) {
       headerName: "Carry Forward",
       field: "carryForward",
       editable: true,
-      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellStyle: { textAlign: "center" },
       cellEditorParams: {
+        values: carryForwardDropGrid,
         maxLength: 250,
       },
     },
@@ -345,6 +395,12 @@ function Input({ }) {
         values: statusgriddrop,
       },
       editable: true,
+    },
+    {
+      headerName: "keyfield",
+      field: "keyfield",
+      editable: true,
+      hide: true,
     },
 
   ];
@@ -986,17 +1042,24 @@ function Input({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="carryForward"
-                class="exp-input-field form-control"
-                type="text"
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedcarryForward ? "has-value" : ""} 
+              ${isSelectcarryForward ? "is-focused" : ""}`}
+              title="Please Select the Carry Forward"
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedcarryForward}
+                onChange={handleChangecarryForward}
+                options={filteredOptioncarryForward}
+                classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Value for Carry Forward"
-                value={carryForward}
-                onChange={(e) => setcarryForward(e.target.value)}
+                onFocus={() => setIsSelectcarryForward(true)}
+                onBlur={() => setIsSelectcarryForward(false)}
               />
-              <label className={` exp-form-labels ${error && !carryForward ? 'text-danger' : ''}`}>Carry Forward{showAsterisk && <span className="text-danger">*</span>}</label>
+              <label className={`floating-label ${error && !carryForward ? 'text-danger' : ''}`}>Carry Forward<span className="text-danger">*</span></label>
             </div>
           </div>
 

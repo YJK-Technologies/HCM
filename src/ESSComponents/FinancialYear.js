@@ -499,6 +499,7 @@ function Input() {
       "Start Year": row.Start_Year || "",
       "End Year": row.End_Year || "",
       "Eligibility Salary Days": row.Salary_Days || "",
+      "Status": row.status || "",
     }));
   };
 

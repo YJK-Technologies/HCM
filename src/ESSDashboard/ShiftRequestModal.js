@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { toast, ToastContainer } from 'react-toastify';
 import config from '../Apiconfig';
 
-const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
+const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess, screenType }) => {
     const [shiftOptions, setShiftOptions] = useState([]);
     const [managerOptions, setManagerOptions] = useState([]);
     const [priorityOptions, setPriorityOptions] = useState([]);
@@ -70,11 +70,17 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
     const handleInternalSave = async () => {
 
         let newErrors = {};
-        if (!form.requested_shift_id) newErrors.requested_shift_id = true;
-        if (!form.rep_manager) newErrors.rep_manager = true;
-        if (!form.swap_employee_id) newErrors.swap_employee_id = true;
-        if (!form.priority) newErrors.priority = true;
-        if (!form.reason.trim()) newErrors.reason = true;
+
+if (!form.requested_shift_id) newErrors.requested_shift_id = true;
+if (!form.rep_manager) newErrors.rep_manager = true;
+
+// ✅ Only validate swap employee for Employee screen
+if (screenType !== "Admin" && !form.swap_employee_id) {
+    newErrors.swap_employee_id = true;
+}
+
+if (!form.priority) newErrors.priority = true;
+if (!form.reason.trim()) newErrors.reason = true;
 
         setErrors(newErrors);
 
@@ -93,7 +99,8 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
             effective_date: rowData?.Date,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
             RepManager: form.rep_manager?.value,
-            created_by: sessionStorage.getItem('selectedUserCode')
+            created_by: sessionStorage.getItem('selectedUserCode'),
+            screen_type: screenType   // ✅ important
         };
 
         setIsSubmitting(true);
@@ -201,13 +208,14 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess }) => {
                         <div className="mb-3">
                             <label className="form-label-bold" style={{ color: errors.swap_employee_id ? 'red' : 'inherit' }}>Swap Employee<span className="text-danger">*</span></label>
                             <Select
-                                styles={customSelectStyles}
-                                options={employeeOptions}
-                                isClearable
-                                value={form.swap_employee_id}
-                                onChange={(val) => handleFieldChange('swap_employee_id', val)}
-                                placeholder="Select Employee..."
-                            />
+    styles={customSelectStyles}
+    options={employeeOptions}
+    isClearable
+    isDisabled={screenType === "Admin"}   // ✅ disable here
+    value={form.swap_employee_id}
+    onChange={(val) => handleFieldChange('swap_employee_id', val)}
+    placeholder="Select Employee..."
+/>
                         </div>
 
                         <div className="mb-3">

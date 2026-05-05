@@ -209,44 +209,44 @@ function LoanSchedule({}) {
   };
 
   const columnDefs = [
-    {
-      headerName: "Actions",
-      field: "actions",
-      cellRenderer: (params) => {
-        const cellWidth = params.column.getActualWidth();
-        const isWideEnough = cellWidth > 20;
-        const showIcons = isWideEnough;
+    // {
+    //   headerName: "Actions",
+    //   field: "actions",
+    //   cellRenderer: (params) => {
+    //     const cellWidth = params.column.getActualWidth();
+    //     const isWideEnough = cellWidth > 20;
+    //     const showIcons = isWideEnough;
 
-        return (
-          <div
-            className="position-relative d-flex align-items-center"
-            style={{ minHeight: "100%", justifyContent: "center" }}
-          >
-            {showIcons && (
-              <>
-                <span
-                  className="icon mx-2"
-                  onClick={() => handleUpdate(params.data, params.node.data)}
-                  title="Update"
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="fa-regular fa-floppy-disk"></i>
-                </span>
+    //     return (
+    //       <div
+    //         className="position-relative d-flex align-items-center"
+    //         style={{ minHeight: "100%", justifyContent: "center" }}
+    //       >
+    //         {showIcons && (
+    //           <>
+    //             <span
+    //               className="icon mx-2"
+    //               onClick={() => handleUpdate(params.data, params.node.data)}
+    //               title="Update"
+    //               style={{ cursor: "pointer" }}
+    //             >
+    //               <i className="fa-regular fa-floppy-disk"></i>
+    //             </span>
 
-                <span
-                  className="icon mx-2"
-                  onClick={() => handleDelete(params.data)}
-                  title="Delete"
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </>
-            )}
-          </div>
-        );
-      },
-    },
+    //             <span
+    //               className="icon mx-2"
+    //               onClick={() => handleDelete(params.data)}
+    //               title="Delete"
+    //               style={{ cursor: "pointer" }}
+    //             >
+    //               <i className="fa-solid fa-trash"></i>
+    //             </span>
+    //           </>
+    //         )}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       headerName: "Schedule ID",
       field: "schedule_id",
@@ -680,15 +680,15 @@ function LoanSchedule({}) {
         <div className="header-flex">
           {/* <h1 className="page-title">Loan Repayment Schedule</h1> */}
           <h1 className="page-title">Loan Repayment Schedule</h1>
-          <div className="action-wrapper">
+          {/* <div className="action-wrapper">
             <div onClick={handleSave} className="action-icon add">
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
-      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      {/* <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
           <div className="col-md-2">
             <div className="inputGroup">
@@ -908,7 +908,7 @@ function LoanSchedule({}) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="header-flex">

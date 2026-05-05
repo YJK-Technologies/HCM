@@ -249,6 +249,7 @@ const menuData = [
         subMenus: [
           { label: "Employee Information", path: "/AddEmployeeInfo" },
           { label: "Employee Personal Details", path: "/ManualEmployeeInfo" },
+          { label: "Admin Shift Change", path: "/AdminShiftChange" },
         ],
       },
       {
