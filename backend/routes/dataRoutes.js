@@ -1431,6 +1431,8 @@ router.post("/getAGES",dataController.getAGES)
 router.post("/getAGESTypes",dataController.getAGESTypes)
 router.post("/shiftChangeRequestSearch",dataController.shiftChangeRequestSearch)
 router.post("/shiftChangeRequestReport",dataController.shiftChangeRequestReport)
+router.post("/LoanTypeIdDetails",dataController.LoanTypeIdDetails)
+router.post("/monthlyInstallmentCalculation",dataController.monthlyInstallmentCalculation)
 
 
 

@@ -27744,18 +27744,9 @@ const deleteProfessionalTax = async (req, res) => {
 };
 
 const addLoanType = async (req, res) => {
-  const {
-    company_code,
-    Loan_Type_Name,
-    Max_amount,
-    Max_repayment_months,
-    Default_interest_rate,
-    Start_Year,
-    End_Year,
-    Description,
-    Status,
-    Created_by,
-  } = req.body;
+  const { company_code, Loan_Type_Name, Max_amount, Max_repayment_months, Default_interest_rate, Start_Year, End_Year,
+  Description, Status, Min_repayment_months, Created_by } = req.body;
+
   let pool;
   try {
     pool = await sql.connect(dbConfig);
@@ -27771,8 +27762,10 @@ const addLoanType = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
+      .input("Min_repayment_months", sql.Int, Min_repayment_months)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', @Created_by,'',
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year,
+        @End_Year, '', @Min_repayment_months, @Created_by,'',
             '', '', '', '', '', '', '', ''`);
     res.status(200).json("Loan type data inserted successfully");
   } catch (err) {
@@ -27801,18 +27794,16 @@ const updateLoanType = async (req, res) => {
         .input("Loan_Type_Name", sql.VarChar, updatedRow.Loan_Type_Name)
         .input("Max_amount", sql.Decimal(12, 2), updatedRow.Max_amount)
         .input("Max_repayment_months", sql.Int, updatedRow.Max_repayment_months)
-        .input(
-          "Default_interest_rate",
-          sql.Decimal(12, 2),
-          updatedRow.Default_interest_rate,
-        )
+        .input("Default_interest_rate", sql.Decimal(12, 2),updatedRow.Default_interest_rate)
         .input("Description", sql.NVarChar, updatedRow.Description)
         .input("Status", sql.NVarChar, updatedRow.Status)
         .input("Start_Year", sql.Date, updatedRow.Start_Year)
         .input("End_Year", sql.Date, updatedRow.End_Year)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
+        .input("Min_repayment_months", sql.Int, updatedRow.Min_repayment_months)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
-        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, @keyfield, '', @Modified_by,
+        .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, 
+          @keyfield, @Min_repayment_months, '', @Modified_by,
             '', '', '', '', '', '', '', ''`);
     }
 
@@ -27826,9 +27817,8 @@ const updateLoanType = async (req, res) => {
 const allLoanType = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      `EXEC sp_Loan_Type 'A', '', 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`,
-    );
+    const result = await 
+    sql.query(`EXEC sp_Loan_Type 'A', '', 0, '', 0, 0, 0, '', '', '', '', '', '', 0, '', '', '', '', '', '', '', '', ''`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -27854,9 +27844,7 @@ const deleteLoanType = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
-        .query(
-          `EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', @keyfield, '',@Modified_by, '', '', '', '', '', '', '', ''`,
-        );
+        .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', @keyfield, 0, '',@Modified_by, '', '', '', '', '', '', '', ''`);
     }
 
     res.status(200).json("Data deleted successfully");
@@ -28077,18 +28065,8 @@ const getPFContribution = async (req, res) => {
 };
 //CODE ENDED BY PAVUN
 const getLoanType = async (req, res) => {
-  const {
-    company_code,
-    Loan_Type_ID,
-    Loan_Type_Name,
-    Max_amount,
-    Max_repayment_months,
-    Default_interest_rate,
-    Start_Year,
-    End_Year,
-    Description,
-    Status,
-  } = req.body;
+  const { company_code, Loan_Type_ID, Loan_Type_Name, Max_amount, Max_repayment_months, Default_interest_rate, Start_Year,
+  End_Year, Description, Status, Min_repayment_months } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -28104,8 +28082,9 @@ const getLoanType = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("Start_Year", sql.NVarChar, Start_Year)
       .input("End_Year", sql.NVarChar, End_Year)
-      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, @Start_Year, @End_Year, '', '','',
-            '', '', '', '', '', '', '', ''`);
+      .input("Min_repayment_months", sql.NVarChar, Min_repayment_months)
+      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, @Loan_Type_Name, @Max_amount, @Max_repayment_months, @Default_interest_rate, @Description, @Status, 
+        @Start_Year, @End_Year, '', @Min_repayment_months, '','', '', '', '', '', '', '', '', ''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -46389,15 +46368,15 @@ const EmployeeAssetsLoopDelete = async (req, res) => {
 
 //code added by sakthi 28-03-26
 const LoanTypeIdDropDown = async (req, res) => {
-  const { Company_Code } = req.body;
+  const { company_code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "F")
-      .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''`);
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Loan_Type @mode, @company_code, 0, '', 0, 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -48653,6 +48632,55 @@ const shiftChangeRequestReport = async (req, res) => {
 };
 //code ended by pavun on 02-04-2026
 
+//Code added by pavun on 05-05-2026
+const LoanTypeIdDetails = async (req, res) => {
+  const { Loan_Type_ID, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "FL")
+      .input("Loan_Type_ID", sql.Int, Loan_Type_ID)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`EXEC sp_Loan_Type @mode, @company_code, @Loan_Type_ID, '', 0, 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error during Shift_Pattern_Master insert:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
+const monthlyInstallmentCalculation = async (req, res) => {
+  const { loan_amount, interest_rate, repayment_months } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "EMI")
+      .input("loan_amount", sql.Decimal(10,2), loan_amount)
+      .input("interest_rate", sql.Decimal(5,2), interest_rate)
+      .input("repayment_months", sql.Int, repayment_months)
+      .query(`EXEC sp_loan_requests @mode, 0, '', '', 0, @loan_amount, @interest_rate, @repayment_months, 0, '', '', '', 0, '',  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error during loan_requests delete:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//Code ended by pavun on 05-05-2026
+
 module.exports = {
   login,
   forgetPassword,
@@ -50053,6 +50081,8 @@ module.exports = {
   getAGES,
   getAGESTypes,
   shiftChangeRequestSearch,
-  shiftChangeRequestReport
+  shiftChangeRequestReport,
+  LoanTypeIdDetails,
+  monthlyInstallmentCalculation
 
 };
