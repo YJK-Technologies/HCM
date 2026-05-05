@@ -22642,7 +22642,7 @@ const addLeaveType = async (req, res) => {
       .input("Type", sql.VarChar, Type)
       .input("Accrual", sql.VarChar, Accrual)
       .input("TotalDaystoBeCredit", sql.Int, TotalDaystoBeCredit)
-      .input("carryForward", sql.Int, carryForward)
+      .input("carryForward", sql.NVarChar, carryForward)
       .input("Exceed_Leave", sql.VarChar, Exceed_Leave)
       .input("LeaveReason", sql.VarChar, LeaveReason)
       .input("created_by", sql.VarChar, created_by)
@@ -30304,8 +30304,9 @@ const deleteLeave = async (req, res) => {
         .input("LeaveId", sql.NVarChar, updatedRow.LeaveId)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'','','','','','','','','',@Modified_by,'','','','',NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes_test @mode,@company_code,@LeaveId,'','','','','','','','','',@Modified_by,'','','','',@keyfield,NULL,NULL,NULL`,
         );
     }
     res.status(200).json("Data Deleted Successfully");
@@ -30336,15 +30337,16 @@ const UpdateLeaveType = async (req, res) => {
         .input("Type", sql.VarChar, updatedRow.Type)
         .input("Accrual", sql.VarChar, updatedRow.Accrual)
         .input("TotalDaystoBeCredit", sql.Int, updatedRow.TotalDaystoBeCredit)
-        .input("carryForward", sql.Int, updatedRow.carryForward)
+        .input("carryForward", sql.NVarChar, updatedRow.carryForward)
         .input("Exceed_Leave", sql.VarChar, updatedRow.Exceed_Leave)
         .input("LeaveReason", sql.VarChar, updatedRow.LeaveReason)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
         .input("Start_Year", sql.Date, updatedRow.Start_Year)
         .input("End_Year", sql.Date, updatedRow.End_Year)
         .input("status", sql.NVarChar, updatedRow.status)
+        .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .query(
-          `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,'',@Start_Year,@End_Year,@status,NULL,NULL,NULL,NULL`,
+          `EXEC sp_LeaveTypes_test @mode,@company_code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,'',@Start_Year,@End_Year,@status,@keyfield,NULL,NULL,NULL`,
         );
     }
     res.json({ success: true, message: "Data inserted successfully" });
@@ -48233,7 +48235,7 @@ const getSettings = async (req, res) => {
 
 //Code added by pavun on 24-04-2026
 const shiftChangeRequestInsert = async (req, res) => {
-  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code, RepManager, created_by } = req.body;
+  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code, RepManager, created_by, screen_type } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48251,8 +48253,9 @@ const shiftChangeRequestInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("created_by", sql.NVarChar, created_by)
+      .input("screen_type", sql.NVarChar, screen_type)
       .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
-        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'','','',''`);
+        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,@created_by,'','','','', @screen_type`);
 
     res.status(200).json({
       success: true,
@@ -48275,7 +48278,7 @@ const shiftChangeRequestEmployee = async (req, res) => {
       .input("mode", sql.NVarChar, "SRE")
       .input("company_code", sql.NVarChar, company_code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','','','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'','','','','','', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48341,7 +48344,7 @@ const GetLoanTypeID = async (req, res) => {
 
 //Code added by pavun on 25-04-2026
 const shiftRequestEmployeeApproval = async (req, res) => {
-  const { request_id, company_code, swap_employee_id, is_swap_request, modified_by } = req.body;
+  const { request_id, company_code, swap_employee_id, is_swap_request, modified_by, screen_type} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48354,7 +48357,8 @@ const shiftRequestEmployeeApproval = async (req, res) => {
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,'','',''`);
+      .input("screen_type", sql.NVarChar, screen_type)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'','',@modified_by,'','','', @screen_type`);
 
     res.status(200).json({
       success: true,
@@ -48435,7 +48439,7 @@ const shiftChangeRequestManager = async (req, res) => {
       .input("mode", sql.NVarChar, "SRM")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','','','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,'','','','','', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48461,7 +48465,7 @@ const shiftRequestManagerApproval = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("request_status", sql.NVarChar, request_status)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,'','',''`);
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'','',@modified_by,'','','', ''`);
 
     res.status(200).json({
       success: true,
@@ -48582,7 +48586,7 @@ const shiftChangeRequestSearch = async (req, res) => {
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'',@is_swap_request,'','','',@company_code,'','','','',@shift_from_date,@shift_to_date`);
+      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'',@is_swap_request,'','','',@company_code,'','','','',@shift_from_date,@shift_to_date, ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48596,7 +48600,7 @@ const shiftChangeRequestSearch = async (req, res) => {
 };
 
 const shiftChangeRequestReport = async (req, res) => {
-  const { request_id, shift_from_date, shift_to_date, employee_id, request_status, current_shift_id, requested_shift_id, RepManager, company_code } = req.body;
+  const { request_id, shift_from_date, shift_to_date, employee_id, request_status, current_shift_id, requested_shift_id, RepManager, company_code, screen_type} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48613,7 +48617,8 @@ const shiftChangeRequestReport = async (req, res) => {
       .input("RepManager", sql.NVarChar, RepManager)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'','','','','',@company_code,@RepManager,'','','',@shift_from_date,@shift_to_date`);
+      .input("screen_type", sql.NVarChar, screen_type)
+      .query(`EXEC sp_shift_change_requests @mode,@request_id,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'','','','','',@company_code,@RepManager,'','','',@shift_from_date,@shift_to_date, @screen_type`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);

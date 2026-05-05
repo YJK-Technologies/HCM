@@ -1732,6 +1732,7 @@ const Dashboard = (payslip) => {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     rowData={selectedRow}
+                    screenType="Employee"
                     onSuccess={() => {
                       // Fetch fresh data for your grid here
                       handleEmpShiftReportSearch();
