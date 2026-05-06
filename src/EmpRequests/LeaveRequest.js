@@ -290,9 +290,13 @@ const LeaveRequestPage = () => {
   };
 
   const [columnDefs] = useState([
-    { headerName: 'Leave Type', field: 'leavetype', sortable: true},
-    { headerName: 'No of Leaves', field: 'creditedleave', sortable: true},
-    { headerName: 'No of Available Leaves', field: 'availableleave', sortable: true},
+    { headerName: 'Leave Type', field: 'LeaveId', sortable: true, filter: true, },
+    { headerName: 'Current No of Leaves', field: 'CurrentYearCredit', sortable: true, filter: true },
+    { headerName: 'Taken Current Year', field: 'TakenCurrentYear', sortable: true, filter: true },
+    { headerName: 'Previous Year Balance', field: 'PreviousYearBalance', sortable: true, filter: true },
+    { headerName: 'Taken Previous Year', field: 'TakenPreviousYear', sortable: true, filter: true },
+    { headerName: 'No of Available Leaves', field: 'AvailableLeave', sortable: true, filter: true },
+    { headerName: 'Non CarryForward Balance', field: 'NonCarryForwardBalance', sortable: true, filter: true },
   ]);
 
   const filteredOptionManager = Managerdrop.map((option) => ({
@@ -640,7 +644,6 @@ const LeaveRequestPage = () => {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
     // flex: 1
   };
 
@@ -910,7 +913,7 @@ const LeaveRequestPage = () => {
                   rowData={rowData}
                   columnDefs={columnDefs}
                   defaultColDef={{
-                    flex: 1,
+                    minWidth: 180,
                     resizable: true,
                     sortable: true,
                     // filter: true,

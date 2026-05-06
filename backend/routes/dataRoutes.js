@@ -1433,6 +1433,7 @@ router.post("/shiftChangeRequestSearch",dataController.shiftChangeRequestSearch)
 router.post("/shiftChangeRequestReport",dataController.shiftChangeRequestReport)
 router.post("/LoanTypeIdDetails",dataController.LoanTypeIdDetails)
 router.post("/monthlyInstallmentCalculation",dataController.monthlyInstallmentCalculation)
+router.post("/getLoanNotification",dataController.getLoanNotification)
 
 
 
