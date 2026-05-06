@@ -22946,7 +22946,7 @@ const getEmployeeTotalLeaveBalance = async (req, res) => {
       .input("mode", sql.NVarChar, "TLB")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard @mode,@EmployeeId,@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test @mode,@EmployeeId,@company_code`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -26792,7 +26792,7 @@ const EmployeeDashboardNewJoinee = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard 'NJ','',@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test 'NJ','',@company_code`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -26812,7 +26812,7 @@ const EmployeeDashboardUpcomingBirthday = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard 'UB','',@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test 'UB','',@company_code`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -26833,7 +26833,7 @@ const EmployeeDashboardTotalLeave = async (req, res) => {
       .request()
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard 'TL',@EmployeeId,@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test 'TLA',@EmployeeId,@company_code`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -31219,7 +31219,7 @@ const GetClr = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "DD")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard @mode,'',@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test @mode,'',@company_code`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -31350,7 +31350,7 @@ const getHolidayDate = async (req, res) => {
       .input("mode", sql.NVarChar, "HD")
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_ess_Employee_dashboard @mode,@EmployeeId,@company_code`);
+      .query(`EXEC sp_ess_Employee_dashboard_Test @mode,@EmployeeId,@company_code`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
