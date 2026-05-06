@@ -550,7 +550,7 @@ const ShiftChangeRequest = () => {
                 <div className="header-flex">
                     <h1 className="page-title">Shift Change Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div className="action-icon reload">
+                        <div className="icon-btn reload">
                             <span className="tooltip">Reload</span>
                             <i className="fa-solid fa-rotate-right"></i>
                         </div>
@@ -671,7 +671,7 @@ const ShiftChangeRequest = () => {
                             className={`inputGroup selectGroup 
                             ${isSelectedCurShiftSc ? "has-value" : ""} 
                             ${isSelectedCurShiftSc ? "is-focused" : ""}`}
-                            title="Please select the Leave Status"
+                            title="Please select the Current Shift Code"
                         >
                             <Select
                                 id="Select_slots"
@@ -693,7 +693,7 @@ const ShiftChangeRequest = () => {
                             className={`inputGroup selectGroup 
                             ${isSelectedReqShiftSc ? "has-value" : ""} 
                             ${isSelectedReqShiftSc ? "is-focused" : ""}`}
-                            title="Please select the Leave Status"
+                            title="Please select the Request Shift Code"
                         >
                             <Select
                                 id="Select_slots"
@@ -715,7 +715,7 @@ const ShiftChangeRequest = () => {
                             className={`inputGroup selectGroup 
                             ${selectedEmpStatusSc ? "has-value" : ""} 
                             ${isSelectedEmpStatusSc ? "is-focused" : ""}`}
-                            title="Please select the Leave Status"
+                            title="Please select the Employee Approval Status"
                         >
                             <Select
                                 id="Select_slots"
@@ -737,7 +737,7 @@ const ShiftChangeRequest = () => {
                             className={`inputGroup selectGroup 
                             ${selectedManStatusSc ? "has-value" : ""} 
                             ${isSelectedManStatusSc ? "is-focused" : ""}`}
-                            title="Please select the Leave Status"
+                            title="Please select the Manager Approval Status"
                         >
                             <Select
                                 id="Select_slots"
