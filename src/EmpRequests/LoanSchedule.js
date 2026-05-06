@@ -10,7 +10,7 @@ import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 const config = require("../Apiconfig");
 
-function LoanSchedule({}) {
+function LoanSchedule({ }) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,6 +41,9 @@ function LoanSchedule({}) {
   const [selectedPaymentStatusSc, setSelectedPaymentStatusSc] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [employeeIdSc, setEmployeeIdSc] = useState('');
+  const [selectedEmployeeIdSc, setSelectedEmployeeIdSc] = useState('');
+  const [employeeIdDropSc, setEmployeeIdDropSc] = useState([]);
 
   const [loanReqIdDropGrid, setLoanReqIdDropGrid] = useState([]);
   const [paymentStatusDropGrid, setPaymentStatusDropGrid] = useState([]);
@@ -48,9 +51,11 @@ function LoanSchedule({}) {
   const [isSelectedLoanReqId, setIsSelectedLoanReqId] = useState("");
   const [isSelectedPaymentStatus, setIsSelectedPaymentStatus] = useState("");
 
-  const [isSelectedLoanReqIdSc, setIsSelectedLoanReqIdSc] = useState("");
-  const [isSelectedPaymentStatusSc, setIsSelectedPaymentStatusSc] =
-    useState("");
+  const [isSelectedEmployeeIdSc, setIsSelectEmployeeIdSc] = useState(false);
+  const [isSelectedLoanReqIdSc, setIsSelectedLoanReqIdSc] = useState(false);
+  const [isSelectedPaymentStatusSc, setIsSelectedPaymentStatusSc] = useState(false);
+
+  const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -83,16 +88,16 @@ function LoanSchedule({}) {
 
   const filteredOptionLoanReqId = Array.isArray(loanReqIdDrop)
     ? loanReqIdDrop.map((option) => ({
-        value: option?.loan_request_id,
-        label: option?.loan_request_id,
-      }))
+      value: option?.loan_request_id,
+      label: option?.loan_request_id,
+    }))
     : [];
 
   const filteredOptionPaymentStatus = Array.isArray(paymentStatusDrop)
     ? paymentStatusDrop.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const handleChangeLoanReqId = (selectedLoanReqId) => {
@@ -136,16 +141,16 @@ function LoanSchedule({}) {
 
   const filteredOptionLoanReqIdSc = Array.isArray(loanReqIdDropSc)
     ? loanReqIdDropSc.map((option) => ({
-        value: option?.loan_request_id,
-        label: option?.loan_request_id,
-      }))
+      value: option?.loan_request_id,
+      label: option?.loan_request_id,
+    }))
     : [];
 
   const filteredOptionPaymentStatusSc = Array.isArray(paymentStatusDropSc)
     ? paymentStatusDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const handleChangeLoanReqIdSc = (selectedLoanReqIdSc) => {
@@ -208,6 +213,51 @@ function LoanSchedule({}) {
     setToDate("");
   };
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmployeeIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmployeeIdDropSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const filteredOptionEmployeeIdSc = employeeIdDropSc.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.First_Name}`,
+  }));
+
+  const handleChangeEmployeeIdSc = (selectedEmployeeIdSc) => {
+    setSelectedEmployeeIdSc(selectedEmployeeIdSc);
+    setEmployeeIdSc(selectedEmployeeIdSc ? selectedEmployeeIdSc.value : "");
+  };
+
   const columnDefs = [
     // {
     //   headerName: "Actions",
@@ -255,21 +305,34 @@ function LoanSchedule({}) {
     {
       headerName: "Loan Request ID",
       field: "loan_request_id",
-      editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: loanReqIdDropGrid,
       },
+      editable: false,
+    },
+    {
+      headerName: "Employee ID",
+      field: "employee_id",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: employeeIdDropGrid.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeIdDropGrid.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
+      editable: false,
     },
     {
       headerName: "Installment No",
       field: "installment_number",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Installment Date",
       field: "installment_date",
-      editable: true,
+      editable: false,
       cellEditor: "agDateCellEditor",
       valueFormatter: (params) => {
         if (!params.value) return "";
@@ -280,22 +343,22 @@ function LoanSchedule({}) {
     {
       headerName: "Principle Amount",
       field: "principal_amount",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Interest Amount",
       field: "interest_amount",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Total Installment",
       field: "total_installment",
-      editable: true,
+      editable: false,
     },
     {
       headerName: "Payment Status",
       field: "payment_status",
-      editable: true,
+      editable: false,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: paymentStatusDropGrid,
@@ -304,7 +367,7 @@ function LoanSchedule({}) {
     {
       headerName: "Keyfield",
       field: "keyfield",
-      editable: true,
+      editable: false,
       hide: true,
     },
   ];
@@ -385,6 +448,7 @@ function LoanSchedule({}) {
         total_installment: totalInstallmentSc ? totalInstallmentSc : 0,
         FromDate: fromDate,
         ToDate: toDate,
+        EmployeeId: employeeIdSc,
         payment_status: paymentStatusSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
@@ -436,17 +500,17 @@ function LoanSchedule({}) {
           const dataToSend = {
             loan_repayment_scheduleData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -491,17 +555,17 @@ function LoanSchedule({}) {
           const dataToSend = {
             loan_repayment_scheduleData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modified_by
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modified_by
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modified_by
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -543,9 +607,18 @@ function LoanSchedule({}) {
 
   const transformRowData = (data) => {
     return data.map((row) => {
+      const empObj = employeeIdDropGrid.find(
+        (d) => d.value === row.employee_id
+      );
+
+      const empName = empObj
+        ? empObj.label.split(" - ").slice(1).join(" - ")
+        : "";
+
       return {
         "Schedule ID": row.schedule_id || "",
         "Loan Request ID": row.loan_request_id || "",
+        "Employee ID": `${row.employee_id} - ${empName}` || "",
         "Installment No": row.installment_number || "",
         "Installment Date": row.installment_date || "",
         "Principle Amount": row.principal_amount || "",
@@ -943,8 +1016,8 @@ function LoanSchedule({}) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                            ${selectedLoanReqIdSc ? "has-value" : ""} 
-                            ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
+              ${selectedLoanReqIdSc ? "has-value" : ""} 
+              ${isSelectedLoanReqIdSc ? "is-focused" : ""}`}
               title="Please select the Loan Request ID"
             >
               <Select
@@ -962,6 +1035,27 @@ function LoanSchedule({}) {
               <label htmlFor="selecteddpt" className={`floating-label`}>
                 Loan Request ID
               </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedEmployeeIdSc ? "has-value" : ""} 
+              ${isSelectedEmployeeIdSc ? "is-focused" : ""}`}
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedEmployeeIdSc}
+                onChange={handleChangeEmployeeIdSc}
+                options={filteredOptionEmployeeIdSc}
+                classNamePrefix="react-select"
+                placeholder=" "
+                onFocus={() => setIsSelectEmployeeIdSc(true)}
+                onBlur={() => setIsSelectEmployeeIdSc(false)}
+              />
+              <label className={`floating-label`}>Employee ID</label>
             </div>
           </div>
 
@@ -1106,8 +1200,8 @@ function LoanSchedule({}) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                            ${selectedPaymentStatusSc ? "has-value" : ""} 
-                            ${isSelectedPaymentStatusSc ? "is-focused" : ""}`}
+              ${selectedPaymentStatusSc ? "has-value" : ""} 
+              ${isSelectedPaymentStatusSc ? "is-focused" : ""}`}
               title="Please select the Payment Status"
             >
               <Select
