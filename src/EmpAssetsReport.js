@@ -419,21 +419,21 @@ const columnDefs = [
   {
     headerName: "Asset Name",
     field: "AssetName",
-    filter: "agTextColumnFilter",
+    // filter: "agTextColumnFilter",
     editable: false,
   },
 
   {
     headerName: "Asset Category",
     field: "AssetCategory",
-    filter: "agTextColumnFilter",
+    // filter: "agTextColumnFilter",
     editable: false,
   },
   {
     headerName: "Employee ID",
     field: "EmployeeID",
     editable: false,
-    cellEditor: "agSelectCellEditor",
+    // cellEditor: "agSelectCellEditor",
     cellEditorParams: {
         values: EmployeeIDDropGrid,
     },
@@ -460,8 +460,6 @@ const columnDefs = [
     field: "AllocationStatus",
     editable: false,
   },
-
-
   {
     headerName: "Last Allocation Date",
     field: "LastAllocationDate",

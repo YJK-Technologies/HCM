@@ -19,67 +19,67 @@ const columnDefs = [
     checkboxSelection: true,
     headerName: "Employee ID",
     field: "EmployeeId",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "First Name",
     field: "first_name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Middle Name",
     field: "middle_name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Last Name",
     field: "Last_Name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Phone Number",
     field: "phone1",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Email",
     field: "email",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Department",
     field: "department_ID",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Designation",
     field: "designation_ID",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "DOJ",
     field: "DOJ",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "DOL",
     field: "DOL",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Manager",
     field: "manager",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
@@ -90,20 +90,19 @@ const columnDefs = [
   {
     headerName: "Status",
     field: "status",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
   {
     headerName: "Employee Type",
     field: "Employee_Type",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: false,
   },
 ];
 
 const gridOptions = {
   pagination: true,
-  paginationPageSize: 10,
 };
 
 export default function Companydetailpopup({ open, handleClose, CompanyDetails }) {

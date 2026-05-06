@@ -20,31 +20,31 @@ const columnDefs = [
   {
     headerName: "First Name",
     field: "first_name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: true,
   },
   {
     headerName: "Middle Name",
     field: "middle_name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: true,
   },
   {
     headerName: "Last Name",
     field: "Last_Name",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: true,
   },
   {
     headerName: "Phone Number",
     field: "phone1",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: true,
   },
   {
     headerName: "Email",
     field: "email",
-    filter: 'agTextColumnFilter',
+    // filter: 'agTextColumnFilter',
     editable: true,
   },
   {

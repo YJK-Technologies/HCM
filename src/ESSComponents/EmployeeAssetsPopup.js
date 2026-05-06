@@ -66,61 +66,61 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
     {
       headerName: "Asset ID",
       field: "AssetID",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Allocation Date",
       field: "AllocationDate",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Expected Return Date",
       field: "ExpectedReturnDate",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
     {
       headerName: "Actual Return Date",
       field: "ActualReturnDate",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Allocation Status",
       field: "AllocationStatus",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
     {
       headerName: "Condition At Issue",
       field: "ConditionAtIssue",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Condition At Return",
       field: "ConditionAtReturn",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Approved By",
       field: "ApprovedBy",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 
     {
       headerName: "Remarks",
       field: "Remarks",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
     },
 

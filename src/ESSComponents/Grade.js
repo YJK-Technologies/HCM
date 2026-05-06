@@ -231,79 +231,79 @@ function Input({ }) {
     {
       headerName: "Grade Name",
       field: "GradeName",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Salary Range From",
       field: "salary_range_from",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Salary Range To",
       field: "salary_range_to",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Basic",
       field: "Basic",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "HRA",
       field: "HRA",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Conveyance",
       field: "Conveyance",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Medical",
       field: "Medical",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Special Allowance",
       field: "Special_Allowance",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Company PF Contribution",
       field: "Company_Pf_Contribution",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Bonus/Arrears",
       field: "Bonus_Arrears",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Other Allowance",
       field: "Other_Allowance",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Leave Deductions",
       field: "LeaveDeduction",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Other Deductions",
       field: "otherDeductions",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
@@ -318,7 +318,7 @@ function Input({ }) {
     {
       headerName: "Minimum Take Salary",
       field: "minimum_take_salary",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
   ]
