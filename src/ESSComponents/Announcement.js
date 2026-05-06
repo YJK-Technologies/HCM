@@ -178,7 +178,7 @@ function Input({ }) {
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: MsgTypeGridDrop,
-        maxLength: 10,
+        maxLength: 25,
       },
     },
     {
