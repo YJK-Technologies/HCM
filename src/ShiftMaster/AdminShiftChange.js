@@ -17,7 +17,7 @@ const config = require("../Apiconfig");
 
 function AdminShiftChange() {
 
-const [shiftEmpId, setShiftEmpId] = useState("");
+  const [shiftEmpId, setShiftEmpId] = useState("");
   const [selectedShiftEmpId, setSelectedShiftEmpId] = useState("");
   const [shiftEmpIdDrop, setShiftEmpIdDrop] = useState([]);
   const [shiftEmpIdDropGrid, setShiftEmpIdDropGrid] = useState([]);
@@ -47,7 +47,7 @@ const [shiftEmpId, setShiftEmpId] = useState("");
   const [isSelectedShiftDeptId, setIsSelectedShiftDeptId] = useState(false);
   const [isSelectedShiftDesigId, setIsSelectedShiftDesigId] = useState(false);
   const [isSelectedShiftPatternId, setIsSelectedShiftPatternId] =
-      useState(false);
+    useState(false);
   const [isSelectedShiftCode, setIsSelectedShiftCode] = useState(false);
   const [rowData, setRowData] = useState([]);
   const gridApiRef = useRef(null);
@@ -62,7 +62,7 @@ const [shiftEmpId, setShiftEmpId] = useState("");
 
 
 
-const handleShiftSearch = async () => {
+  const handleShiftSearch = async () => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/getAdEmpShiftReport`, {
         method: "POST",
@@ -102,88 +102,154 @@ const handleShiftSearch = async () => {
   };
 
   useEffect(() => {
-      const Company_Code = sessionStorage.getItem("selectedCompanyCode");
-      fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Company_Code }),
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftPatternIdOption = data.map((option) => ({
+          value: option.Pattern_Code,
+          label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
+        }));
+        setShiftPatternIdDropGrid(shiftPatternIdOption);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          const shiftPatternIdOption = data.map((option) => ({
-            value: option.Pattern_Code,
-            label: `${option.Pattern_Code} - ${option.Pattern_Name}`,
-          }));
-          setShiftPatternIdDropGrid(shiftPatternIdOption);
-        })
-        .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-    useEffect(() => {
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ company_code }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            const shiftOption = data.map((option) => ({
-              value: option.Shift_Code,
-              label: `${option.Shift_Code} - ${option.Shift_Name}`,
-            }));
-            setShiftCodeDropGrid(shiftOption);
-          })
-          .catch((error) => console.error("Error fetching data:", error));
-      }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const shiftOption = data.map((option) => ({
+          value: option.Shift_Code,
+          label: `${option.Shift_Code} - ${option.Shift_Name}`,
+        }));
+        setShiftCodeDropGrid(shiftOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-      useEffect(() => {
-          const company_code = sessionStorage.getItem("selectedCompanyCode");
-      
-          fetch(`${config.apiBaseUrl}/getDepartment`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              const deptOptions = data.map((option) => ({
-                value: option.dept_id,
-                label: `${option.dept_id} - ${option.dept_name}`,
-              }));
-              setShiftDeptIdDropGrid(deptOptions);
-            })
-            // .then((val) => setDPTdrop(val))
-            .catch((error) =>
-              console.error("Error fetching department data:", error),
-            );
-        }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-        useEffect(() => {
-            const company_code = sessionStorage.getItem("selectedCompanyCode");
-            fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ company_code }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                const employeeIdOption = data.map((option) => ({
-                  value: option.EmployeeId,
-                  label: `${option.EmployeeId} - ${option.First_Name}`,
-                }));
-                setShiftEmpIdDropGrid(employeeIdOption);
-              })
-              .catch((error) => console.error("Error fetching data:", error));
-          }, []);
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const deptOptions = data.map((option) => ({
+          value: option.dept_id,
+          label: `${option.dept_id} - ${option.dept_name}`,
+        }));
+        setShiftDeptIdDropGrid(deptOptions);
+      })
+      // .then((val) => setDPTdrop(val))
+      .catch((error) =>
+        console.error("Error fetching department data:", error),
+      );
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setShiftEmpIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftEmpIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getDepartment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftDeptIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/ShiftPatternMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Company_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftPatternIdDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setShiftCodeDrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const handleChangeDeptId = (selectedShiftDeptId) => {
+    setSelectedShiftDeptId(selectedShiftDeptId);
+    setShiftDeptId(selectedShiftDeptId ? selectedShiftDeptId.value : "");
+    fetchDesignation(selectedShiftDeptId ? selectedShiftDeptId.value : "");
+  };
 
   const filteredOptionEmpId = shiftEmpIdDrop.map((option) => ({
     value: option.EmployeeId,
@@ -199,12 +265,6 @@ const handleShiftSearch = async () => {
     value: option.dept_id,
     label: `${option.dept_id} - ${option.dept_name}`,
   }));
-
-  const handleChangeDeptId = (selectedShiftDeptId) => {
-    setSelectedShiftDeptId(selectedShiftDeptId);
-    setShiftDeptId(selectedShiftDeptId ? selectedShiftDeptId.value : "");
-    fetchDesignation(selectedShiftDeptId ? selectedShiftDeptId.value : "");
-  };
 
   const fetchDesignation = async (selectedValue) => {
     try {
@@ -287,71 +347,91 @@ const handleShiftSearch = async () => {
   };
 
   const handleExportToExcelShift = () => {
-      if (!shiftRowData || shiftRowData.length === 0) {
-        toast.warning("There is no data to export.");
-        return;
-      }
-  
-      const screenName = "Employee Shift Detail Search Report";
-      const company = sessionStorage.getItem("selectedCompanyName") || "";
-  
-      /* ================= THEME COLORS ================= */
-  
-      const titleBg = getCSSVariable("--but").replace("#", "");
-      const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
-      const fontColor = getCSSVariable("--font-color").replace("#", "");
-      const altRowBg = getCSSVariable("--ag-row").replace("#", "");
-  
-      /* ================= HEADER ================= */
-  
-      const headerData = [
-        [screenName],
-        company ? [`Company Name: ${company}`] : [],
-        [],
-      ];
-  
-      const worksheet = XLSX.utils.aoa_to_sheet(headerData);
-  
-      /* ================= TABLE DATA ================= */
-  
-      const transformedData = transformShiftRowData(shiftRowData);
-  
-      XLSX.utils.sheet_add_json(worksheet, transformedData, {
-        origin: `A${headerData.length + 1}`,
-      });
-  
-      const range = XLSX.utils.decode_range(worksheet["!ref"]);
-      const headerRowIndex = headerData.length;
-  
-      /* ================= TITLE STYLE ================= */
-  
-      worksheet["A1"].s = {
-        font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-        fill: { fgColor: { rgb: titleBg } },
-        alignment: { horizontal: "center", vertical: "center" },
-      };
-  
-      worksheet["!merges"] = [
-        {
-          s: { r: 0, c: 0 },
-          e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+    if (!shiftRowData || shiftRowData.length === 0) {
+      toast.warning("There is no data to export.");
+      return;
+    }
+
+    const screenName = "Employee Shift Detail Search Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformShiftRowData(shiftRowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
         },
-      ];
-  
-      /* ================= TABLE HEADER STYLE ================= */
-  
-      const totalColumns = Object.keys(transformedData[0]).length;
-  
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell =
-          worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
-  
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
         if (!cell) continue;
-  
+
         cell.s = {
-          font: { bold: true, color: { rgb: "FFFFFF" } },
-          fill: { fgColor: { rgb: tableHeaderBg } },
-          alignment: { horizontal: "center" },
+          font: { color: { rgb: fontColor } },
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -360,41 +440,21 @@ const handleShiftSearch = async () => {
           },
         };
       }
-  
-      /* ================= TABLE BODY STYLE ================= */
-  
-      for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
-        for (let C = 0; C < totalColumns; C++) {
-          const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
-  
-          if (!cell) continue;
-  
-          cell.s = {
-            font: { color: { rgb: fontColor } },
-            fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
-            border: {
-              top: { style: "thin" },
-              bottom: { style: "thin" },
-              left: { style: "thin" },
-              right: { style: "thin" },
-            },
-          };
-        }
-      }
-  
-      /* ================= COLUMN WIDTH ================= */
-  
-      worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
-  
-      /* ================= EXPORT ================= */
-  
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Shift Detail");
-  
-      XLSX.writeFile(workbook, "Employee_Shift_Detail_Search_Report.xlsx");
-    };
+    }
 
-    const getCSSVariable = (variableName) => {
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Shift Detail");
+
+    XLSX.writeFile(workbook, "Employee_Shift_Detail_Search_Report.xlsx");
+  };
+
+  const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
       .trim();
@@ -565,40 +625,40 @@ const handleShiftSearch = async () => {
   };
 
   const handleEmpShiftReportSearch = async (fromDate, toDate) => {
-        try {
-            const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    From_Date: fromDate || ToDate,
-                    To_Date: toDate || ToDate,
-                    Employee_ID: sessionStorage.getItem('selectedUserCode'),
-                    company_code: sessionStorage.getItem('selectedCompanyCode')
-                }),
-            });
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getEmpShiftReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          From_Date: fromDate || ToDate,
+          To_Date: toDate || ToDate,
+          Employee_ID: sessionStorage.getItem('selectedUserCode'),
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
 
-            if (response.ok) {
-                const searchData = await response.json();
-                setEmpShiftRowData(searchData);
-            } else if (response.status === 404) {
-                setEmpShiftRowData([]);
-                toast.warning("Data not found");
-            } else {
-                const errorResponse = await response.json();
-                toast.warning(errorResponse.message || "Failed to fetch data");
-                setEmpShiftRowData([]);
-            }
-        } catch (error) {
-            console.error("Error fetching search data:", error);
-            toast.error("Error fetching search data: " + error.message);
-        }
-    };
+      if (response.ok) {
+        const searchData = await response.json();
+        setEmpShiftRowData(searchData);
+      } else if (response.status === 404) {
+        setEmpShiftRowData([]);
+        toast.warning("Data not found");
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message || "Failed to fetch data");
+        setEmpShiftRowData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search data:", error);
+      toast.error("Error fetching search data: " + error.message);
+    }
+  };
 
-    
-    
-return (
+
+
+  return (
 
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
@@ -607,263 +667,263 @@ return (
         className="toast-design"
         theme="colored"
       />
- <div className="shadow-lg p-1 bg-light rounded main-header-box">
-                <div className="header-flex">
-                    <h1 className="page-title">Admin Shift Change</h1>
-                </div>
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Admin Shift Change</h1>
+        </div>
+      </div>
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+
+
+        <div className="row g-3">
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="status"
+                className="exp-input-field form-control"
+                type="date"
+                autoComplete="off"
+                placeholder=" "
+                value={shiftFromDate}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                onChange={(e) => setShiftFromDate(e.target.value)}
+              />
+              <label className="exp-form-labels">From Date</label>
             </div>
-    <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-            
+          </div>
 
-            <div className="row g-3">
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    id="status"
-                    className="exp-input-field form-control"
-                    type="date"
-                    autoComplete="off"
-                    placeholder=" "
-                    value={shiftFromDate}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    onChange={(e) => setShiftFromDate(e.target.value)}
-                  />
-                  <label className="exp-form-labels">From Date</label>
-                </div>
-              </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="status"
+                className="exp-input-field form-control"
+                type="date"
+                autoComplete="off"
+                placeholder=" "
+                value={shiftToDate}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                onChange={(e) => setShiftToDate(e.target.value)}
+              />
+              <label className="exp-form-labels">To Date</label>
+            </div>
+          </div>
 
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    id="status"
-                    className="exp-input-field form-control"
-                    type="date"
-                    autoComplete="off"
-                    placeholder=" "
-                    value={shiftToDate}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    onChange={(e) => setShiftToDate(e.target.value)}
-                  />
-                  <label className="exp-form-labels">To Date</label>
-                </div>
-              </div>
-
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
                   ${selectedShiftEmpId ? "has-value" : ""} 
                   ${isSelectedShiftEmpId ? "is-focused" : ""}`}
-                >
-                  <Select
-                    id="status"
-                    placeholder=" "
-                    onFocus={() => setIsSelectedShiftEmpId(true)}
-                    onBlur={() => setIsSelectedShiftEmpId(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                    type="text"
-                    options={filteredOptionEmpId}
-                    onChange={handleChangeEmpId}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    value={selectedShiftEmpId}
-                  />
-                  <label className="floating-label">Employee ID</label>
-                </div>
-              </div>
+            >
+              <Select
+                id="status"
+                placeholder=" "
+                onFocus={() => setIsSelectedShiftEmpId(true)}
+                onBlur={() => setIsSelectedShiftEmpId(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                options={filteredOptionEmpId}
+                onChange={handleChangeEmpId}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                value={selectedShiftEmpId}
+              />
+              <label className="floating-label">Employee ID</label>
+            </div>
+          </div>
 
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
                   ${selectedShiftDeptId ? "has-value" : ""} 
                   ${isSelectedShiftDeptId ? "is-focused" : ""}`}
-                >
-                  <Select
-                    id="status"
-                    placeholder=" "
-                    onFocus={() => setIsSelectedShiftDeptId(true)}
-                    onBlur={() => setIsSelectedShiftDeptId(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                    type="text"
-                    options={filteredOptionDeptId}
-                    onChange={handleChangeDeptId}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    value={selectedShiftDeptId}
-                  />
-                  <label className="floating-label">Department ID</label>
-                </div>
-              </div>
+            >
+              <Select
+                id="status"
+                placeholder=" "
+                onFocus={() => setIsSelectedShiftDeptId(true)}
+                onBlur={() => setIsSelectedShiftDeptId(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                options={filteredOptionDeptId}
+                onChange={handleChangeDeptId}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                value={selectedShiftDeptId}
+              />
+              <label className="floating-label">Department ID</label>
+            </div>
+          </div>
 
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
                   ${selectedShiftDesigId ? "has-value" : ""} 
                   ${isSelectedShiftDesigId ? "is-focused" : ""}`}
-                >
-                  <Select
-                    id="status"
-                    placeholder=" "
-                    onFocus={() => setIsSelectedShiftDesigId(true)}
-                    onBlur={() => setIsSelectedShiftDesigId(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                    type="text"
-                    options={shiftDesigIdDrop}
-                    onChange={handleChangeDesigId}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    value={selectedShiftDesigId}
-                  />
-                  <label className="floating-label">Designation ID</label>
-                </div>
-              </div>
+            >
+              <Select
+                id="status"
+                placeholder=" "
+                onFocus={() => setIsSelectedShiftDesigId(true)}
+                onBlur={() => setIsSelectedShiftDesigId(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                options={shiftDesigIdDrop}
+                onChange={handleChangeDesigId}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                value={selectedShiftDesigId}
+              />
+              <label className="floating-label">Designation ID</label>
+            </div>
+          </div>
 
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
                   ${selectedShiftPatternId ? "has-value" : ""} 
                   ${isSelectedShiftPatternId ? "is-focused" : ""}`}
-                >
-                  <Select
-                    id="status"
-                    placeholder=" "
-                    onFocus={() => setIsSelectedShiftPatternId(true)}
-                    onBlur={() => setIsSelectedShiftPatternId(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                    type="text"
-                    options={filteredOptionShiftPatternId}
-                    onChange={handleChangeShiftPatternId}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    value={selectedShiftPatternId}
-                  />
-                  <label className="floating-label">Shift Pattern ID</label>
-                </div>
-              </div>
+            >
+              <Select
+                id="status"
+                placeholder=" "
+                onFocus={() => setIsSelectedShiftPatternId(true)}
+                onBlur={() => setIsSelectedShiftPatternId(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                options={filteredOptionShiftPatternId}
+                onChange={handleChangeShiftPatternId}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                value={selectedShiftPatternId}
+              />
+              <label className="floating-label">Shift Pattern ID</label>
+            </div>
+          </div>
 
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
                   ${selectedShiftCode ? "has-value" : ""} 
                   ${isSelectedShiftCode ? "is-focused" : ""}`}
-                >
-                  <Select
-                    id="status"
-                    placeholder=" "
-                    onFocus={() => setIsSelectedShiftCode(true)}
-                    onBlur={() => setIsSelectedShiftCode(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                    type="text"
-                    options={filteredOptionShiftCode}
-                    onChange={handleChangeShiftCode}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    value={selectedShiftCode}
-                  />
-                  <label className="floating-label">Shift Code</label>
-                </div>
-              </div>
-
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    id="status"
-                    className="exp-input-field form-control"
-                    type="number"
-                    autoComplete="off"
-                    placeholder=" "
-                    value={shiftDay}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    onChange={(e) => setShiftDay(e.target.value)}
-                  />
-                  <label className="exp-form-labels">Day Sequence</label>
-                </div>
-              </div>
-
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    id="status"
-                    className="exp-input-field form-control"
-                    type="time"
-                    autoComplete="off"
-                    placeholder=" "
-                    value={shiftStartTime}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    onChange={(e) => setShiftStartTime(e.target.value)}
-                  />
-                  <label className="exp-form-labels">Start Time</label>
-                </div>
-              </div>
-
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
-                    id="status"
-                    className="exp-input-field form-control"
-                    type="time"
-                    autoComplete="off"
-                    placeholder=" "
-                    value={shiftEndTime}
-                    onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
-                    onChange={(e) => setShiftEndTime(e.target.value)}
-                  />
-                  <label className="exp-form-labels">End Time</label>
-                </div>
-              </div>
-
-              <div className="ms-2">
-                <div className="search-btn-wrapper">
-                  <div className="icon-btn search" onClick={handleShiftSearch}>
-                    <span className="tooltip">Search</span>
-                    <i className="fa-solid fa-magnifying-glass"></i>
-                  </div>
-                  <div className="icon-btn reload" onClick={reloadGridDatas}>
-                    <span className="tooltip">Reload</span>
-                    <i className="fa-solid fa-rotate-right"></i>
-                  </div>
-                  <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelShift}
-                  >
-                    <span className="tooltip">Excel</span>
-                    <i className="fa-solid fa-file-excel"></i>
-                  </div>
-                </div>
-              </div>
+            >
+              <Select
+                id="status"
+                placeholder=" "
+                onFocus={() => setIsSelectedShiftCode(true)}
+                onBlur={() => setIsSelectedShiftCode(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                options={filteredOptionShiftCode}
+                onChange={handleChangeShiftCode}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                value={selectedShiftCode}
+              />
+              <label className="floating-label">Shift Code</label>
             </div>
-        </div>
+          </div>
 
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="status"
+                className="exp-input-field form-control"
+                type="number"
+                autoComplete="off"
+                placeholder=" "
+                value={shiftDay}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                onChange={(e) => setShiftDay(e.target.value)}
+              />
+              <label className="exp-form-labels">Day Sequence</label>
+            </div>
+          </div>
 
-            <div
-                    className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
-                    style={{ width: "100%" }}
-                >
-              <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
-                <AgGridReact
-                  columnDefs={ShiftColDefs}
-                  rowData={shiftRowData}
-                  suppressRowClickSelection={true}
-                  pagination={true}
-                   paginationAutoPageSize={true}    
-                  onGridReady={(params) => {
-                    gridApiRef.current = params.api;
-                    gridColumnApiRef.current = params.columnApi;
-                  }}
-                />
-                <ShiftRequestModal
-    isOpen={isModalOpen}
-    onClose={() => setIsModalOpen(false)}
-    rowData={selectedRow}
-    screenType="Admin"
-    onSuccess={handleEmpShiftReportSearch}
-/>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="status"
+                className="exp-input-field form-control"
+                type="time"
+                autoComplete="off"
+                placeholder=" "
+                value={shiftStartTime}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                onChange={(e) => setShiftStartTime(e.target.value)}
+              />
+              <label className="exp-form-labels">Start Time</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="status"
+                className="exp-input-field form-control"
+                type="time"
+                autoComplete="off"
+                placeholder=" "
+                value={shiftEndTime}
+                onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
+                onChange={(e) => setShiftEndTime(e.target.value)}
+              />
+              <label className="exp-form-labels">End Time</label>
+            </div>
+          </div>
+
+          <div className="ms-2">
+            <div className="search-btn-wrapper">
+              <div className="icon-btn search" onClick={handleShiftSearch}>
+                <span className="tooltip">Search</span>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+              <div className="icon-btn reload" onClick={reloadGridDatas}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-rotate-right"></i>
+              </div>
+              <div
+                className="icon-btn excel"
+                onClick={handleExportToExcelShift}
+              >
+                <span className="tooltip">Excel</span>
+                <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>
-        
-      
-      );
+        </div>
+      </div>
 
-      }
+
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
+        <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
+          <AgGridReact
+            columnDefs={ShiftColDefs}
+            rowData={shiftRowData}
+            suppressRowClickSelection={true}
+            pagination={true}
+            paginationAutoPageSize={true}
+            onGridReady={(params) => {
+              gridApiRef.current = params.api;
+              gridColumnApiRef.current = params.columnApi;
+            }}
+          />
+          <ShiftRequestModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            rowData={selectedRow}
+            screenType="Admin"
+            onSuccess={handleEmpShiftReportSearch}
+          />
+        </div>
+      </div>
+    </div>
+
+
+  );
+
+}
 
 export default AdminShiftChange;
