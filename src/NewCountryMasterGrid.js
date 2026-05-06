@@ -265,49 +265,49 @@ function Input({ }) {
     {
       headerName: "Country Name",
       field: "Country_Name",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "ISO Code",
       field: "ISO_Code",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Time Zone Default",
       field: "TimeZone_Default",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Week Start Day",
       field: "Week_Start_Day",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Week End Day",
       field: "Weekend_Days",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Max Work Hours Day",
       field: "Max_Work_Hours_Day",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Max Work Hours Week",
       field: "Max_Work_Hours_Week",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Overtime Allowed",
       field: "Overtime_Allowed",
-      cellEditor: "agSelectCellEditor",
+      // cellEditor: "agSelectCellEditor",
       editable: true,
       cellEditorParams: {
         values: overTimeDropGrid,
@@ -316,13 +316,13 @@ function Input({ }) {
     {
       headerName: "Currency Code",
       field: "Currency_Code",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Status",
       field: "Status",
-      cellEditor: "agSelectCellEditor",
+      // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: statusGridDrop,
       },

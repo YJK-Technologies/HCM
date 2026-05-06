@@ -3381,7 +3381,7 @@
 .ag-theme-alpine .ag-cell {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 }
 
 .status-action-wrapper {

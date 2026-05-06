@@ -418,7 +418,6 @@ function Input({ }) {
     {
       headerName: "Project ID",
       field: "ProjectID",
-      filter: 'agNumberColumnFilter',
       // minWidth: 200,
       //  maxWidth: 200,
       editable: false
@@ -434,7 +433,6 @@ function Input({ }) {
     {
       headerName: "User ID",
       field: "userID",
-      filter: 'agDateColumnFilter',
       // minWidth: 140, 
       // maxWidth: 140,
       editable: true   // Format the date for display  
@@ -442,7 +440,6 @@ function Input({ }) {
     {
       headerName: "User Name",
       field: "First_Name",
-      filter: 'agDateColumnFilter',
       // minWidth: 140, 
       // maxWidth: 140,
       editable: true   // Format the date for display  
@@ -450,7 +447,6 @@ function Input({ }) {
     {
       headerName: " Task Title",
       field: "TaskTitle",
-      filter: 'agDateColumnFilter',
       //  minWidth: 170,
       //   maxWidth: 170,
       editable: true
@@ -458,14 +454,12 @@ function Input({ }) {
     {
       headerName: "Start Date",
       field: "StartDate",
-      filter: 'agDateColumnFilter',
       //  minWidth: 130, 
       //  maxWidth: 120,
     },
     {
       headerName: "End Date",
       field: "EndDate",
-      filter: 'agDateColumnFilter',
       // minWidth: 130,
       //  maxWidth: 120,
 
@@ -493,7 +487,6 @@ function Input({ }) {
     {
       headerName: "Buffer Hours",
       field: "BufferHours",
-      filter: 'agNumberColumnFilter',
       //  minWidth: 150,
       //   maxWidth: 150,
       editable: true
@@ -501,7 +494,6 @@ function Input({ }) {
     {
       headerName: "Task Description",
       field: "Description",
-      filter: 'agNumberColumnFilter',
       //  minWidth: 400,
       editable: true,
       // maxWidth: 400 },

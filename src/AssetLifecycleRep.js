@@ -456,21 +456,21 @@ const columnDefs = [
   {
     headerName: "Asset Name",
     field: "AssetName",
-    filter: "agTextColumnFilter",
+    // filter: "agTextColumnFilter",
     editable: false,
   },
 
   {
     headerName: "Asset Category",
     field: "AssetCategory",
-    filter: "agTextColumnFilter",
+    // filter: "agTextColumnFilter",
     editable: false,
   },
 
   {
     headerName: "Status",
     field: "AssetStatus",
-    filter: "agTextColumnFilter",
+    // filter: "agTextColumnFilter",
     editable: false,
   },
 
@@ -483,7 +483,7 @@ const columnDefs = [
   {
     headerName: "Purchase Cost",
     field: "PurchaseCost",
-    filter: "agNumberColumnFilter",
+    // filter: "agNumberColumnFilter",
     editable: false,
   },
 
@@ -523,7 +523,7 @@ const columnDefs = [
     headerName: "Total Allocations",
     field: "TotalAllocations",
     editable: false,
-    filter: "agNumberColumnFilter",
+    // filter: "agNumberColumnFilter",
   },
 
   {
@@ -541,7 +541,7 @@ const columnDefs = [
   {
     headerName: "Total Days Used",
     field: "TotalDaysUsed",
-    filter: "agNumberColumnFilter",
+    // filter: "agNumberColumnFilter",
     editable: false,
   },
 ];
@@ -552,10 +552,6 @@ const columnDefs = [
 
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/Assets", { state: { mode: "update", selectedRow } });
-  };
-
-  const gridOptions = {
-    pagination: true,
   };
 
   const onGridReady = (params) => {
@@ -1375,7 +1371,7 @@ return (
             onGridReady={onGridReady}
             rowSelection="multiple"
             paginationAutoPageSize={true}
-            gridOptions={gridOptions}
+            pagination={true}
             pagination={true}
           />
         </div>

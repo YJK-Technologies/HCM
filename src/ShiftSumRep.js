@@ -232,7 +232,7 @@ function ShiftSumRep() {
     {
       headerName: "Employee ID",
       field: "Employee_ID",
-      filter: true,
+      // filter: true,
       sortable: true,
       headerCheckboxSelection: true,
       checkboxSelection: true,

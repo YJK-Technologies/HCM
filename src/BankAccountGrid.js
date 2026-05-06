@@ -418,7 +418,7 @@ function BankAccGrid() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
+    // wrapText: true,
     // sortable: true,
     //editable: true,
     // flex: 1,
