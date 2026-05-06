@@ -153,40 +153,40 @@ function Input({}) {
     {
       headerName: "Project ID",
       field: "ProjectID",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
       // minWidth: 200,
       // maxWidth: 200
     },
     {
       headerName: "Project Name",
       field: "ProjectName",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
       // minWidth: 200,
     },
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
       // minWidth: 200,
       // maxWidth: 200
     },
     {
       headerName: "Priority Level",
       field: "PriorityLevel",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
       // minWidth: 150,
       // maxWidth: 150
     },
     {
       headerName: "Description",
       field: "Description",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
       // minWidth: 200,
     },
     {
       headerName: "Links",
       field: "EMIAmount",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
       // minWidth: 400,
       // maxWidth: 400,
       hide: true,
@@ -398,62 +398,62 @@ function Input({}) {
     {
       headerName: "Project ID",
       field: "ProjectID",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
     },
     {
       headerName: "Project Name",
       field: "ProjectName",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Title",
       field: "TaskTitle",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
     },
     {
       headerName: "Start Date",
       field: "StartDate",
-      filter: "agDateColumnFilter",
+      // filter: "agDateColumnFilter",
     },
     {
       headerName: "End Date",
       field: "EndDate",
-      filter: "agDateColumnFilter",
+      // filter: "agDateColumnFilter",
     },
     {
       headerName: "User ID",
       field: "userID",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
     },
     {
       headerName: "User Name",
       field: "userName",
-      filter: "agTextColumnFilter",
+      // filter: "agTextColumnFilter",
     },
     {
       headerName: "Task Status",
       field: "TaskStatus",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
     },
     {
       headerName: "Priority Level",
       field: "PriorityLevel",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
     },
     {
       headerName: "Description",
       field: "Description",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
     },
     {
       headerName: "Links",
       field: "EMIAmount",
-      filter: "agNumberColumnFilter",
+      // filter: "agNumberColumnFilter",
       hide: true,
       // cellRenderer: (params) => {
       //   const handleClick = () => {
@@ -853,7 +853,7 @@ function Input({}) {
             headerHeight={27}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
-            suppressRowClickSelection={true}
+            // suppressRowClickSelection={true}
             onGridReady={(params) => {
               gridApiRef.current = params.api;
               gridColumnApiRef.current = params.columnApi;
@@ -1061,7 +1061,7 @@ function Input({}) {
             rowHeight={27}
             headerHeight={27}
             paginationAutoPageSize={true}
-            suppressRowClickSelection={true}
+            // suppressRowClickSelection={true}
             onGridReady={(params) => {
               gridApiRef.current = params.api;
               gridColumnApiRef.current = params.columnApi;

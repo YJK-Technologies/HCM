@@ -47,6 +47,7 @@ function LoanType({ }) {
     const [selectedLoanTypeName, setSelectedLoanTypeName] = useState('');
     const [maxAmount, setMaxAmount] = useState('');
     const [maxRepaymentMonths, setMaxRepaymentMonths] = useState('');
+    const [minRepaymentMonths, setMinRepaymentMonths] = useState('');
     const [defaultInterestRate, setDefaultInterestRate] = useState('');
     const [description, setDescription] = useState('');
     const [statusDrop, setStatusDrop] = useState([]);
@@ -61,6 +62,7 @@ function LoanType({ }) {
     const [selectedLoanTypeNameSc, setSelectedLoanTypeNameSc] = useState('');
     const [maxAmountSc, setMaxAmountSc] = useState('');
     const [maxRepaymentMonthsSc, setMaxRepaymentMonthsSc] = useState('');
+    const [minRepaymentMonthsSc, setMinRepaymentMonthsSc] = useState('');
     const [defaultInterestRateSc, setDefaultInterestRateSc] = useState('');
     const [descriptionSc, setDescriptionSc] = useState('');
     const [statusDropSc, setStatusDropSc] = useState([]);
@@ -300,6 +302,11 @@ function LoanType({ }) {
             editable: true,
         },
         {
+            headerName: "Min Repayment Months",
+            field: "Min_repayment_months",
+            editable: true,
+        },
+        {
             headerName: "Default Interest Rate",
             field: "Default_interest_rate",
             editable: true,
@@ -354,6 +361,7 @@ function LoanType({ }) {
                 Status: statusSc,
                 Start_Year: startYearSc,
                 End_Year: endYearSc,
+                Min_repayment_months: minRepaymentMonthsSc,
             };
 
             const response = await fetch(`${config.apiBaseUrl}/getLoanType`, {
@@ -386,7 +394,8 @@ function LoanType({ }) {
     };
 
     const handleInsert = async () => {
-        if (!loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status || !startYear || !endYear) {
+        if (!loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status 
+            || !startYear || !endYear || !maxRepaymentMonths) {
             setError(true);
             toast.warning("Error: Missing required fields");
             return;
@@ -405,6 +414,7 @@ function LoanType({ }) {
                 Status: status,
                 Start_Year: startYear,
                 End_Year: endYear,
+                Min_repayment_months: minRepaymentMonths,
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
                 Created_by: sessionStorage.getItem("selectedUserCode"),
             };
@@ -557,6 +567,7 @@ function LoanType({ }) {
             "Loan Type Name": row.Loan_Type_Name || "",
             "Max Amount": row.Max_amount || "",
             "Max Repayment Months": row.Max_repayment_months || "",
+            "Min Repayment Months": row.Min_repayment_months || "",
             "Default Interest Rate": row.Default_interest_rate || "",
             "Description": row.Description || "",
             "Status": row.Status || "",
@@ -805,6 +816,29 @@ function LoanType({ }) {
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 required
+                                title="Please enter the Min Repayment Months"
+                                value={minRepaymentMonths}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMinRepaymentMonths(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels ${error && !minRepaymentMonths ? 'text-danger' : ''}`}>Min Repayment Months<span className="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
                                 title="Please enter the Max Repayment Months"
                                 value={maxRepaymentMonths}
                                 autoComplete="off"
@@ -991,6 +1025,29 @@ function LoanType({ }) {
                                 }}
                             />
                             <label for="sname" className={`exp-form-labels`}>Max Amount</label>
+                        </div>
+                    </div>
+
+                    <div className="col-md-2">
+                        <div className="inputGroup">
+                            <input
+                                id="Loan_Eligible_Amount"
+                                class="exp-input-field form-control"
+                                type="text"
+                                placeholder=""
+                                maxLength={5}
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                required
+                                title="Please enter the Min Repayment Months"
+                                value={minRepaymentMonthsSc}
+                                autoComplete="off"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, "");
+                                    setMinRepaymentMonthsSc(value);
+                                }}
+                            />
+                            <label for="sname" className={`exp-form-labels`}>Min Repayment Months</label>
                         </div>
                     </div>
 

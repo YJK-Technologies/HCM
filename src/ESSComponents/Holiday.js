@@ -325,7 +325,7 @@ function HoliDays() {
     {
       headerName: "Holiday Date",
       field: "Holiday_Date",
-      filter: "agDateColumnFilter",
+      // filter: "agDateColumnFilter",
       editable: true,
       cellStyle: { textAlign: "center" },
     },

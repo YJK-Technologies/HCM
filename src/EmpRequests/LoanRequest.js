@@ -144,14 +144,14 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-        const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
 
         fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, { // match backend route name
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ Company_Code }),
+            body: JSON.stringify({ company_code }),
         })
             .then((res) => res.json())
             .then((data) => setLoanTypeIdDrop(data))
@@ -220,9 +220,39 @@ function LoanRequest({ }) {
         setEmpId(selectedEmpId ? selectedEmpId.value : "");
     };
 
-    const handleChangeLoanType = (selectedLoanTypeId) => {
-        setSelectedLoanIypeId(selectedLoanTypeId);
-        setLoanTypeId(selectedLoanTypeId ? selectedLoanTypeId.value : "");
+    const handleChangeLoanType = async (selectedOption) => {
+        setSelectedLoanIypeId(selectedOption);
+        const loanTypeId = selectedOption ? selectedOption.value : "";
+        setLoanTypeId(loanTypeId);
+
+        if (loanTypeId) {
+            try {
+                const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+                const res = await fetch(`${config.apiBaseUrl}/LoanTypeIdDetails`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        Loan_Type_ID: loanTypeId,
+                        company_code,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.length > 0) {
+                    setInterestRate(data[0].Default_interest_rate);
+                    setRepayMonth(data[0].Max_repayment_months);
+                }
+            } catch (error) {
+                console.error("Error fetching loan details:", error);
+            }
+        } else {
+            setInterestRate("");
+            setRepayMonth("");
+        }
     };
 
     const handleChangeReqStatus = (selectedReqStatus) => {
@@ -256,13 +286,13 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-        const Company_Code = sessionStorage.getItem('selectedCompanyCode');
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
         fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ Company_Code })
+            body: JSON.stringify({ company_code })
         })
             .then((data) => data.json())
             .then((val) => setLoanTypeIdDropSc(val))
@@ -398,19 +428,19 @@ function LoanRequest({ }) {
     }, []);
 
     useEffect(() => {
-        const Company_Code = sessionStorage.getItem('selectedCompanyCode');
+        const company_code = sessionStorage.getItem('selectedCompanyCode');
 
         fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ Company_Code })
+            body: JSON.stringify({ company_code })
         })
             .then((response) => response.json())
             .then((data) => {
                 const loanTypeOptions = data.map((option) => ({
-                    value: option.Loan_Type_ID,           // adjust based on your DB column
+                    value: option.Loan_Type_ID,
                     label: `${option.Loan_Type_ID} - ${option.Loan_Type_Name}`,
                 }));
 
@@ -533,7 +563,6 @@ function LoanRequest({ }) {
                 );
             },
         },
-
         {
             headerName: "Loan Request ID",
             field: "loan_request_id",
@@ -1021,6 +1050,45 @@ function LoanRequest({ }) {
         XLSX.writeFile(workbook, "Loan_Request_Search_Report.xlsx");
     };
 
+    const fetchEMI = async (loan_amount, interest_rate, repayment_months) => {
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/monthlyInstallmentCalculation`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    loan_amount,
+                    interest_rate,
+                    repayment_months,
+                }),
+            });
+
+            if (response.ok) {
+                const fetchedData = await response.json();
+                const [{ Monthly_Installment }] = fetchedData
+                setMonthlyInstallment(Monthly_Installment);
+            } else {
+                const errorResponse = await response.json();
+                setMonthlyInstallment('');
+                toast.warning(errorResponse.message || "Delete failed");
+            }
+        } catch (error) {
+            console.error("Error deleting loan request rows:", error);
+            toast.error("Error deleting loan request data: " + error.message);
+        }
+    };
+
+    const handleEMICalculation = () => {
+        if (!loanAmount || !interestRate || !repayMonth) {
+            setMonthlyInstallment("");
+            toast.warning("Please fill all required fields");
+            return;
+        }
+
+        fetchEMI(loanAmount, interestRate, repayMonth);
+    };
+
     return (
         <div class="container-fluid Topnav-screen ">
             {loading && <LoadingScreen />}
@@ -1136,7 +1204,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={10}
@@ -1148,6 +1216,11 @@ function LoanRequest({ }) {
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "");
                                     setLoanAmount(value);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleEMICalculation();
+                                    }
                                 }}
                             />
                             <label for="sname" className={`exp-form-labels ${error && !loanAmount ? 'text-danger' : ''}`}>Loan Amount<span className="text-danger">*</span></label>
@@ -1163,20 +1236,7 @@ function LoanRequest({ }) {
                                 inputMode="numeric"
                                 title="Please enter the Interest Rate"
                                 value={interestRate}
-                                onChange={(e) => {
-                                    let value = e.target.value;
-                                    value = value.replace(/[^0-9.]/g, "");
-                                    let parts = value.split(".");
-                                    if (parts.length > 2) {
-                                        parts = [parts[0], parts[1]];
-                                    }
-                                    parts[0] = parts[0].slice(0, 5);
-                                    if (parts[1]) {
-                                        parts[1] = parts[1].slice(0, 2);
-                                    }
-                                    value = parts.join(".");
-                                    setInterestRate(value);
-                                }}
+                                readOnly
                             />
                             <label for="sname" className={`exp-form-labels ${error && !interestRate ? 'text-danger' : ''}`}>Interest Rate<span className="text-danger">*</span></label>
                         </div>
@@ -1186,7 +1246,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={5}
@@ -1196,10 +1256,7 @@ function LoanRequest({ }) {
                                 title="Please enter the Repayment Months"
                                 autoComplete="off"
                                 value={repayMonth}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setRepayMonth(value);
-                                }}
+                                readOnly
                             />
                             <label for="sname" className={`exp-form-labels ${error && !repayMonth ? 'text-danger' : ''}`}>Repayment Months<span className="text-danger">*</span></label>
                         </div>
@@ -1209,7 +1266,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={10}
@@ -1218,10 +1275,7 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Monthly Installment"
                                 autoComplete="off"
                                 value={monthlyInstallment}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
-                                    setMonthlyInstallment(value);
-                                }}
+                                readOnly
                             />
                             <label for="sname" className={`exp-form-labels ${error && !monthlyInstallment ? 'text-danger' : ''}`}>Monthly Installment<span className="text-danger">*</span></label>
                         </div>
@@ -1274,7 +1328,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 required title="Please Enter the Purpose"
@@ -1314,7 +1368,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={2}
@@ -1387,7 +1441,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={15}
@@ -1480,7 +1534,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={10}
@@ -1502,7 +1556,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={5}
@@ -1511,7 +1565,7 @@ function LoanRequest({ }) {
                                 required title="Please Enter the Interest Rate"
                                 autoComplete="off"
                                 value={interestRateSc}
-                                 onChange={(e) => {
+                                onChange={(e) => {
                                     let value = e.target.value;
                                     value = value.replace(/[^0-9.]/g, "");
                                     let parts = value.split(".");
@@ -1534,7 +1588,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={5}
@@ -1556,7 +1610,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={10}
@@ -1621,7 +1675,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 required title="Please Enter the Purpose"
@@ -1661,7 +1715,7 @@ function LoanRequest({ }) {
                         <div className="inputGroup">
                             <input
                                 id="fdate"
-                                class="exp-input-field form-control"
+                                className="exp-input-field form-control"
                                 type="text"
                                 placeholder=""
                                 maxLength={2}

@@ -617,6 +617,7 @@ const ShiftChangeRequest = () => {
                                 isOpen={isModalOpen}
                                 onClose={() => setIsModalOpen(false)}
                                 rowData={selectedRow}
+                                screenType="Employee"
                                 onSuccess={() => {
                                     handleEmpShiftReportSearch();
                                 }}

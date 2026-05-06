@@ -145,14 +145,14 @@ function PendingAssReqRep({}) {
   }, []);
 
   useEffect(() => {
-    const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/LoanTypeIdDropDown`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -226,7 +226,7 @@ function PendingAssReqRep({}) {
       headerName: "Request ID",
       field: "info_request_id",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 130,
       checkboxSelection: true,
     },
@@ -234,14 +234,14 @@ function PendingAssReqRep({}) {
       headerName: "Employee ID",
       field: "EmployeeId",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 140,
     },
     {
       headerName: "Purpose",
       field: "purpose",
       sortable: true,
-      filter: true,
+      // filter: true,
     },
     {
       headerName: "Request Status",
@@ -256,28 +256,28 @@ function PendingAssReqRep({}) {
       headerName: "Total Items",
       field: "TotalItems",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 140,
     },
     {
       headerName: "Pending Items",
       field: "PendingItems",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 150,
     },
     {
       headerName: "Approved Items",
       field: "ApprovedItems",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 160,
     },
     {
       headerName: "Company Code",
       field: "company_code",
       sortable: true,
-      filter: true,
+      // filter: true,
       hide: true,
       width: 140,
     },
@@ -285,7 +285,7 @@ function PendingAssReqRep({}) {
       headerName: "Created Date",
       field: "created_date",
       sortable: true,
-      filter: true,
+      // filter: true,
       width: 150,
       hide: true,
       valueFormatter: (params) => {

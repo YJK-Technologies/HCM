@@ -146,6 +146,7 @@ import LateReport from './AttendanceReport/LateReport.js';
 import OvertimeReport from './AttendanceReport/OvertimeReport.js';
 import AgesReport from './AgesReport.js';
 import ShiftChangeRequest from './EmpRequests/ShiftChangeRequest.js'
+import AdminShiftChange from './ShiftMaster/AdminShiftChange.js'
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -363,6 +364,7 @@ function Main() {
     { path: "/AbsentReport", component: <AbsentReport /> },
     { path: "/AgesReport", component: <AgesReport /> },
     { path: "/ShiftChangeRequest", component: <ShiftChangeRequest /> },
+    { path: "/AdminShiftChange", component: <AdminShiftChange /> },
 
   
   ];

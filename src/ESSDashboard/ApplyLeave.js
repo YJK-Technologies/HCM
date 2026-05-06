@@ -921,7 +921,7 @@ const ApplyLeave = () => {
                     minWidth: 180,
                     resizable: true,
                     sortable: true,
-                    filter: true,
+                    // filter: true,
                   }}
                 />
               </div>
