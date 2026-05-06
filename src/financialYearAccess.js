@@ -393,7 +393,7 @@ function Grid() {
         );
       },
       valueFormatter: (params) => formatDate(params.value),
-      filter: "agDateColumnFilter",
+      // filter: "agDateColumnFilter",
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const cellDate = new Date(cellValue);

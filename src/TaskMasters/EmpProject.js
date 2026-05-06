@@ -155,7 +155,6 @@ function Project({ }) {
     {
       headerName: "Project Description",
       field: "ProjectDescription",
-      filter: 'agNumberColumnFilter',
       // minWidth: 250, maxWidth: 250,
       editable: true,
       // maxLength: 255
@@ -164,7 +163,6 @@ function Project({ }) {
       headerName:
         "Project Manager",
       field: "ProjectManager",
-      filter: 'agTextColumnFilter',
       // minWidth: 200, maxWidth: 250,
       editable: true,
       cellEditor: "agSelectCellEditor",
@@ -173,19 +171,18 @@ function Project({ }) {
       }
     },
     {
-      headerName: "Start Date", field: "StartDate", filter: 'agDateColumnFilter',
+      headerName: "Start Date", field: "StartDate",
       // minWidth: 150, maxWidth: 150,
 
     },
     {
-      headerName: "End Date", field: "EndDate", filter: 'agDateColumnFilter',
+      headerName: "End Date", field: "EndDate",
       // minWidth: 150, maxWidth: 150,
 
     },
     {
       headerName: "Priority Level",
       field: "PriorityLevel",
-      filter: 'agNumberColumnFilter',
       // minWidth: 130,
       // maxWidth: 130,
       // maxLength: 15,
@@ -198,7 +195,6 @@ function Project({ }) {
     {
       headerName: "Status",
       field: "TaskStatus",
-      filter: 'agNumberColumnFilter',
       // minWidth: 130,
       // maxWidth: 130,
       editable: true,

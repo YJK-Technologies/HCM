@@ -583,43 +583,31 @@ const Dashboard = (payslip) => {
     {
       headerName: "Date",
       field: "work_date",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Check In",
       field: "First_CheckIn",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Check Out",
       field: "Last_CheckOut",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Total Worked Hours",
       field: "total_worked_hours",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Total Login  Hours",
       field: "Total_login_Hours",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Status",
       field: "Status",
-      sortable: true,
-      filter: true,
       cellRenderer: StatusCellRenderer,
     },
   ];
@@ -2007,6 +1995,55 @@ const Dashboard = (payslip) => {
             <div className="leave-grid-container">
               {leaveData.length > 0 ? (
                 leaveData.map((leave, index) => {
+                  const total = leave.Current_Total || 0;
+                  const available = leave.Current_Balance || 0;
+
+                  const percentage = total > 0 ? (available / total) * 100 : 0;
+                  const strokeDasharray = `${percentage}, 100`;
+
+                  return (
+                    <div key={index} className="leave-status-item" title={leave.leavetype} >
+                      <div className="leave-progress-wrapper">
+                        <svg viewBox="0 0 36 36" className="circular-chart">
+                          <path className="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, '-')}`}
+                            strokeDasharray={strokeDasharray}
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <text x="18" y="20.35" className="percentage">{available} </text>
+                        </svg>
+                      </div>
+                      <div className="leave-info-text">
+                        <span className="leave-label">{ leave.LeaveId}</span>
+                        <span className="leave-total-sub">of {total} Days</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-4 w-100">
+                  <p className="text-muted">No leave data available.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* <div className="grid-col-lg-6">
+          <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 className="card-title-heading mb-0">Leave Balance</h6>
+              </div>
+              <button className="btn-apply-modern" title="Apply Leave" onClick={handleLeave}>
+                Apply Leave
+              </button>
+            </div>
+
+            <div className="leave-grid-container">
+              {leaveData.length > 0 ? (
+                leaveData.map((leave, index) => {
                   const percentage = (leave.availableleave / leave.totalleave) * 100;
                   const strokeDasharray = `${percentage}, 100`;
 
@@ -2038,7 +2075,7 @@ const Dashboard = (payslip) => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
 
       </div>
 
@@ -2102,7 +2139,7 @@ const Dashboard = (payslip) => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={Employeecol}
                   rowData={rowData}

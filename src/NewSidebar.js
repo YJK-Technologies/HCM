@@ -268,7 +268,7 @@ const menuData = [
         isDropdown: true,
         subMenus: [
           { label: "Grade", path: "/EmployeeGrade" },
-          { label: "Leave", path: "/EmpLeave" },
+          { label: "Leave Type", path: "/EmpLeave" },
           { label: "Announcement", path: "/Announce" },
           { label: "Employee Holiday", path: "/HoliDays" },
           { label: "Settings", path: "/WeekOff" },
