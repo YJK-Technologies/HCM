@@ -249,7 +249,6 @@ function AgesReport() {
   const defaultColDef = {
     resizable: true,
     sortable: true,
-    filter: true,
   };
 
   const onGridReady = (params) => {

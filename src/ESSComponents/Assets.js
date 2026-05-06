@@ -458,43 +458,43 @@ function Assets({ }) {
     {
       headerName: "Asset Code",
       field: "Asset_Code",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: false
     },
     {
       headerName: "Asset Name",
       field: "AssetName",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Asset Category",
       field: "AssetCategory",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Serial Number",
       field: "SerialNumber",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Barcode",
       field: "Bar_code",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Brand",
       field: "Brand",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Model",
       field: "Model",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
@@ -506,14 +506,14 @@ function Assets({ }) {
     {
       headerName: "Purchase Cost",
       field: "PurchaseCost",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Currency Code",
       field: "CurrencyCode",
       editable: true,
-      cellEditor: "agSelectCellEditor",
+      // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: currencyDropGrid,
       },
@@ -521,7 +521,7 @@ function Assets({ }) {
     {
       headerName: "Vendor Name",
       field: "VendorName",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
@@ -541,7 +541,7 @@ function Assets({ }) {
       field: "AssetStatus",
       filter: 'agTextColumnFilter',
       editable: true,
-      cellEditor: "agSelectCellEditor",
+      // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: statusDropGrid,
       },
@@ -549,7 +549,7 @@ function Assets({ }) {
     {
       headerName: "Location",
       field: "Location",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
@@ -557,7 +557,7 @@ function Assets({ }) {
       field: "Country",
       filter: 'agTextColumnFilter',
       editable: true,
-      cellEditor: "agSelectCellEditor",
+      // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: CountrydropGrid.map(d => d.value),
       },
@@ -569,7 +569,7 @@ function Assets({ }) {
     {
       headerName: "Status",
       field: "Status",
-      filter: 'agTextColumnFilter',
+      // filter: 'agTextColumnFilter',
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {

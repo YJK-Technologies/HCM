@@ -290,9 +290,9 @@ const LeaveRequestPage = () => {
   };
 
   const [columnDefs] = useState([
-    { headerName: 'Leave Type', field: 'leavetype', sortable: true, filter: true },
-    { headerName: 'No of Leaves', field: 'creditedleave', sortable: true, filter: true },
-    { headerName: 'No of Available Leaves', field: 'availableleave', sortable: true, filter: true },
+    { headerName: 'Leave Type', field: 'leavetype', sortable: true},
+    { headerName: 'No of Leaves', field: 'creditedleave', sortable: true},
+    { headerName: 'No of Available Leaves', field: 'availableleave', sortable: true},
   ]);
 
   const filteredOptionManager = Managerdrop.map((option) => ({
@@ -913,7 +913,7 @@ const LeaveRequestPage = () => {
                     flex: 1,
                     resizable: true,
                     sortable: true,
-                    filter: true,
+                    // filter: true,
                   }}
                 />
               </div>

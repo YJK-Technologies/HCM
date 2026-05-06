@@ -583,43 +583,31 @@ const Dashboard = (payslip) => {
     {
       headerName: "Date",
       field: "work_date",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Check In",
       field: "First_CheckIn",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Check Out",
       field: "Last_CheckOut",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Total Worked Hours",
       field: "total_worked_hours",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Total Login  Hours",
       field: "Total_login_Hours",
-      sortable: true,
-      filter: true,
       cellStyle: { textAlign: "left" }
     },
     {
       headerName: "Status",
       field: "Status",
-      sortable: true,
-      filter: true,
       cellRenderer: StatusCellRenderer,
     },
   ];
@@ -2102,7 +2090,7 @@ const Dashboard = (payslip) => {
             </div>
 
             <div className="card-body">
-              <div className="app-grid-theme ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
+              <div className="ag-theme-alpine mt-2 rounded-xl" style={{ height: 440, width: '100%' }}>
                 <AgGridReact
                   columnDefs={Employeecol}
                   rowData={rowData}
