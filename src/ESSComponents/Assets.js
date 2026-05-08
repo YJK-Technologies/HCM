@@ -1,41 +1,40 @@
-
 import { useState, useEffect } from "react";
 import "../input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { showConfirmationToast } from '../ToastConfirmation';
-import LoadingScreen from '../Loading';
+import { showConfirmationToast } from "../ToastConfirmation";
+import LoadingScreen from "../Loading";
 import * as XLSX from "xlsx-js-style";
 import Select from "react-select";
 
-const config = require('../Apiconfig');
+const config = require("../Apiconfig");
 
-function Assets({ }) {
+function Assets({}) {
   const [loading, setLoading] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
-  const [Asset_Code, setAsset_Code] = useState('');
-  const [AssetName, setAssetName] = useState('');
-  const [AssetCategory, setAssetCategory] = useState('');
-  const [SerialNumber, setSerialNumber] = useState('');
-  const [Bar_code, setBar_code] = useState('');
-  const [Brand, setBrand] = useState('');
-  const [Model, setModel] = useState('');
-  const [PurchaseDate, setPurchaseDate] = useState('');
-  const [PurchaseCost, setPurchaseCost] = useState('');
-  const [CurrencyCode, setCurrencyCode] = useState('');
-  const [VendorName, setVendorName] = useState('');
-  const [WarrantyStart, setWarrantyStart] = useState('');
-  const [WarrantyEnd, setWarrantyEnd] = useState('');
-  const [AssetStatus, setAssetStatus] = useState('');
-  const [Location, setLocation] = useState('');
-  const [Country, setCountry] = useState('');
-  const [Status, setStatus] = useState('');
-  const [error, setError] = useState('');
+  const [Asset_Code, setAsset_Code] = useState("");
+  const [AssetName, setAssetName] = useState("");
+  const [AssetCategory, setAssetCategory] = useState("");
+  const [SerialNumber, setSerialNumber] = useState("");
+  const [Bar_code, setBar_code] = useState("");
+  const [Brand, setBrand] = useState("");
+  const [Model, setModel] = useState("");
+  const [PurchaseDate, setPurchaseDate] = useState("");
+  const [PurchaseCost, setPurchaseCost] = useState("");
+  const [CurrencyCode, setCurrencyCode] = useState("");
+  const [VendorName, setVendorName] = useState("");
+  const [WarrantyStart, setWarrantyStart] = useState("");
+  const [WarrantyEnd, setWarrantyEnd] = useState("");
+  const [AssetStatus, setAssetStatus] = useState("");
+  const [Location, setLocation] = useState("");
+  const [Country, setCountry] = useState("");
+  const [Status, setStatus] = useState("");
+  const [error, setError] = useState("");
   const [rowData, setrowData] = useState([]);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const [gridApi, setGridApi] = useState(null);
@@ -46,9 +45,9 @@ function Assets({ }) {
   const [CountrydropGrid, setCountrydropGrid] = useState([]);
   const [selectedCountrySC, setselectedCountrySC] = useState("");
   const [isSelectCountrySC, setIsSelectCountrySC] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState("");
   const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
-  const [selectedCurrencySc, setSelectedCurrencySc] = useState('');
+  const [selectedCurrencySc, setSelectedCurrencySc] = useState("");
   const [isSelectedCurrencySc, setIsSelectedCurrencySc] = useState(false);
   const [currencyDrop, setCurrencyDrop] = useState([]);
   const [currencyDropSc, setCurrencyDropSc] = useState([]);
@@ -63,30 +62,30 @@ function Assets({ }) {
   const [StatusDrop, setStatusDrop] = useState([]);
   const [statusdrop, setstatusdrop] = useState([]);
   const [statusgriddrop, setStatusGriddrop] = useState([]);
-  const [status, setstatus] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedStatusSC, setSelectedStatusSC] = useState('');
+  const [status, setstatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatusSC, setSelectedStatusSC] = useState("");
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [isSelectstatusSC, setIsSelectstatusSC] = useState(false);
-  const [selectedstatus, setselectedStatus] = useState('');
-  const [AssetIDSC, setAssetIDSC] = useState('');
-  const [Asset_CodeSC, setAsset_CodeSC] = useState('');
-  const [AssetNameSC, setAssetNameSC] = useState('');
-  const [AssetCategorySC, setAssetCategorySC] = useState('');
-  const [SerialNumberSC, setSerialNumberSC] = useState('');
-  const [Bar_codeSC, setBar_codeSC] = useState('');
-  const [BrandSC, setBrandSC] = useState('');
-  const [ModelSC, setModelSC] = useState('');
-  const [PurchaseDateSC, setPurchaseDateSC] = useState('');
-  const [PurchaseCostSC, setPurchaseCostSC] = useState('');
-  const [CurrencyCodeSC, setCurrencyCodeSC] = useState('');
-  const [VendorNameSC, setVendorNameSC] = useState('');
-  const [WarrantyStartSC, setWarrantyStartSC] = useState('');
-  const [WarrantyEndSC, setWarrantyEndSC] = useState('');
-  const [AssetStatusSC, setAssetStatusSC] = useState('');
-  const [LocationSC, setLocationSC] = useState('');
-  const [CountrySC, setCountrySC] = useState('');
-  const [StatusSC, setStatusSC] = useState('');
+  const [selectedstatus, setselectedStatus] = useState("");
+  const [AssetIDSC, setAssetIDSC] = useState("");
+  const [Asset_CodeSC, setAsset_CodeSC] = useState("");
+  const [AssetNameSC, setAssetNameSC] = useState("");
+  const [AssetCategorySC, setAssetCategorySC] = useState("");
+  const [SerialNumberSC, setSerialNumberSC] = useState("");
+  const [Bar_codeSC, setBar_codeSC] = useState("");
+  const [BrandSC, setBrandSC] = useState("");
+  const [ModelSC, setModelSC] = useState("");
+  const [PurchaseDateSC, setPurchaseDateSC] = useState("");
+  const [PurchaseCostSC, setPurchaseCostSC] = useState("");
+  const [CurrencyCodeSC, setCurrencyCodeSC] = useState("");
+  const [VendorNameSC, setVendorNameSC] = useState("");
+  const [WarrantyStartSC, setWarrantyStartSC] = useState("");
+  const [WarrantyEndSC, setWarrantyEndSC] = useState("");
+  const [AssetStatusSC, setAssetStatusSC] = useState("");
+  const [LocationSC, setLocationSC] = useState("");
+  const [CountrySC, setCountrySC] = useState("");
+  const [StatusSC, setStatusSC] = useState("");
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
@@ -123,9 +122,9 @@ function Assets({ }) {
 
   const filterOptionStatusSC = Array.isArray(statusDropSC)
     ? statusDropSC.map((option) => ({
-      value: option.attributedetails_name,
-      label: option.attributedetails_name,
-    }))
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
     : [];
 
   useEffect(() => {
@@ -142,53 +141,51 @@ function Assets({ }) {
       .then((val) => setstatusDropSC(val));
   }, []);
 
-
   const handleCountryChange = (selectedCountry) => {
     setselectedCountry(selectedCountry);
-    setCountry(selectedCountry ? selectedCountry.value : '');
+    setCountry(selectedCountry ? selectedCountry.value : "");
   };
-  const filteredOptionCountry = Countrydrop.map(option => ({
+  const filteredOptionCountry = Countrydrop.map((option) => ({
     value: option.Country_Code,
-    label: `${option.Country_Code} - ${option.Country_Name}`
+    label: `${option.Country_Code} - ${option.Country_Name}`,
   }));
 
-
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCountrydrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setCountrydropSC(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  const filteredOptionCountrySC = CountrydropSC.map(option => ({
+  const filteredOptionCountrySC = CountrydropSC.map((option) => ({
     value: option.Country_Code,
-    label: `${option.Country_Code} - ${option.Country_Name}`
+    label: `${option.Country_Code} - ${option.Country_Name}`,
   }));
 
   const handleCountryChangeSC = (selectedCountrySC) => {
     setselectedCountrySC(selectedCountrySC);
-    setCountry(selectedCountrySC ? selectedCountrySC.value : '');
+    setCountry(selectedCountrySC ? selectedCountrySC.value : "");
   };
 
   const handleChangeCurrency = (selectedCurrency) => {
@@ -198,9 +195,9 @@ function Assets({ }) {
 
   const filteredOptionCurrency = Array.isArray(currencyDrop)
     ? currencyDrop.map((option) => ({
-      value: option?.attributedetails_name,
-      label: option?.attributedetails_name,
-    }))
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      }))
     : [];
 
   useEffect(() => {
@@ -234,47 +231,47 @@ function Assets({ }) {
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const CurrencyDrop = data.map(option => option.attributedetails_name);
+        const CurrencyDrop = data.map((option) => option.attributedetails_name);
         setCurrencyDropGrid(CurrencyDrop);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusDrop = data.map(option => option.attributedetails_name);
+        const statusDrop = data.map((option) => option.attributedetails_name);
         setstatusDropGrid(statusDrop);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/GetCountry`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -284,32 +281,31 @@ function Assets({ }) {
         }));
         setCountrydropGrid(Countrydrop);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
     fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusDrop = data.map(option => option.attributedetails_name);
+        const statusDrop = data.map((option) => option.attributedetails_name);
         setStatusGriddrop(statusDrop);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
-
 
   const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
     ? currencyDropSc.map((option) => ({
-      value: option?.attributedetails_name,
-      label: option?.attributedetails_name,
-    }))
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      }))
     : [];
 
   const handleChangeCurrencySc = (selectedCurrencySc) => {
@@ -323,14 +319,12 @@ function Assets({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
       }),
     })
       .then((data) => data.json())
       .then((val) => {
-        setStatusDrop(val)
-        setstatusdrop(val)
-
+        setStatusDrop(val);
+        setstatusdrop(val);
       });
   }, []);
 
@@ -345,31 +339,31 @@ function Assets({ }) {
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusOption = data.map(option => option.attributedetails_name);
+        const statusOption = data.map((option) => option.attributedetails_name);
         setStatusGriddrop(statusOption);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleChangeStatus = (Status) => {
     setSelectedStatus(Status);
-    setStatus(Status ? Status.value : '');
+    setStatus(Status ? Status.value : "");
   };
 
   const handlechangestatusSC = (status) => {
     setSelectedStatusSC(status);
-    setStatusSC(status ? status.value : '');
+    setStatusSC(status ? status.value : "");
   };
 
   const searchClearInputFields = () => {
@@ -408,13 +402,16 @@ function Assets({ }) {
         const isWideEnough = cellWidth > 20;
         const showIcons = isWideEnough;
         return (
-          <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
+          <div
+            className="position-relative d-flex align-items-center"
+            style={{ minHeight: "100%", justifyContent: "center" }}
+          >
             {showIcons && (
               <>
                 <span
                   className="icon mx-2"
                   onClick={() => handleUpdate(params.data, params.node.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-regular fa-floppy-disk"></i>
                 </span>
@@ -422,7 +419,7 @@ function Assets({ }) {
                 <span
                   className="icon mx-2"
                   onClick={() => handleDelete(params.data)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-solid fa-trash"></i>
                 </span>
@@ -446,10 +443,7 @@ function Assets({ }) {
           handleNavigateWithRowData(params.data);
         };
         return (
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={handleClick}
-          >
+          <span style={{ cursor: "pointer" }} onClick={handleClick}>
             {params.value}
           </span>
         );
@@ -459,43 +453,43 @@ function Assets({ }) {
       headerName: "Asset Code",
       field: "Asset_Code",
       // filter: 'agTextColumnFilter',
-      editable: false
+      editable: false,
     },
     {
       headerName: "Asset Name",
       field: "AssetName",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Asset Category",
       field: "AssetCategory",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Serial Number",
       field: "SerialNumber",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Barcode",
       field: "Bar_code",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Brand",
       field: "Brand",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Model",
       field: "Model",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Purchase Date",
@@ -507,7 +501,7 @@ function Assets({ }) {
       headerName: "Purchase Cost",
       field: "PurchaseCost",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Currency Code",
@@ -522,7 +516,7 @@ function Assets({ }) {
       headerName: "Vendor Name",
       field: "VendorName",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Warranty Start",
@@ -539,7 +533,7 @@ function Assets({ }) {
     {
       headerName: "Asset Status",
       field: "AssetStatus",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
       editable: true,
       // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
@@ -550,19 +544,19 @@ function Assets({ }) {
       headerName: "Location",
       field: "Location",
       // filter: 'agTextColumnFilter',
-      editable: true
+      editable: true,
     },
     {
       headerName: "Country",
       field: "Country",
-      filter: 'agTextColumnFilter',
+      filter: "agTextColumnFilter",
       editable: true,
       // cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: CountrydropGrid.map(d => d.value),
+        values: CountrydropGrid.map((d) => d.value),
       },
       valueFormatter: (params) => {
-        const dept = CountrydropGrid.find(d => d.value === params.value);
+        const dept = CountrydropGrid.find((d) => d.value === params.value);
         return dept ? dept.label : params.value;
       },
     },
@@ -576,7 +570,7 @@ function Assets({ }) {
         values: statusgriddrop,
       },
     },
-  ]
+  ];
 
   const defaultColDef = {
     resizable: true,
@@ -634,7 +628,10 @@ function Assets({ }) {
       alignment: { horizontal: "center", vertical: "center" },
     };
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
+      },
     ];
     /* ================= TABLE HEADER STYLE ================= */
     const totalColumns = Object.keys(transformedData[0]).length;
@@ -657,17 +654,13 @@ function Assets({ }) {
     /* ================= TABLE BODY STYLE ================= */
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell =
-          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
         if (!cell) continue;
 
         cell.s = {
           font: { color: { rgb: fontColor } },
-          fill:
-            R % 2 === 0
-              ? { fgColor: { rgb: altRowBg } }
-              : undefined,
+          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -694,19 +687,18 @@ function Assets({ }) {
       "Asset Category": row.AssetCategory || "",
       "Serial Number": row.SerialNumber || "",
       "Bar code": row.Bar_code || "",
-      "Brand": row.Brand || "",
-      "Model": row.Model || "",
+      Brand: row.Brand || "",
+      Model: row.Model || "",
       "Purchase Date": row.PurchaseDate || "",
       "Purchase Cost": row.PurchaseCost || "",
       "Currency Code": row.CurrencyCode || "",
       " VendorName": row.VendorName || "",
       "Warranty Start": row.WarrantyStart || "",
       "Warranty End": row.WarrantyEnd || "",
-      "AssetStatus": row.AssetStatus || "",
-      "Location": row.Location || "",
-      "Country": row.Country || "",
-      "Status": row.Status || "",
-
+      AssetStatus: row.AssetStatus || "",
+      Location: row.Location || "",
+      Country: row.Country || "",
+      Status: row.Status || "",
     }));
   };
 
@@ -718,7 +710,7 @@ function Assets({ }) {
 
   const handleReload = () => {
     window.location.reload();
-  }
+  };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -759,7 +751,6 @@ function Assets({ }) {
         const fetchedData = await response.json();
 
         setrowData(fetchedData);
-
       } else if (response.status === 404) {
         toast.warning("Data Not found");
         setrowData([]);
@@ -768,7 +759,6 @@ function Assets({ }) {
         toast.error(errorResponse.message || "Something went wrong");
         setrowData([]);
       }
-
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching data");
@@ -778,16 +768,28 @@ function Assets({ }) {
   };
 
   const handleSave = async () => {
-    if (!Asset_Code || !AssetName || !AssetCategory ||
-      !SerialNumber || !Bar_code || !Brand || !Model || !PurchaseDate || !PurchaseCost
-      || !CurrencyCode || !VendorName || !WarrantyStart || !WarrantyEnd || !Location) {
+    if (
+      !Asset_Code ||
+      !AssetName ||
+      !AssetCategory ||
+      !SerialNumber ||
+      !Bar_code ||
+      !Brand ||
+      !Model ||
+      !PurchaseDate ||
+      !PurchaseCost ||
+      !CurrencyCode ||
+      !VendorName ||
+      !WarrantyStart ||
+      !WarrantyEnd ||
+      !Location
+    ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
     }
     setLoading(true);
     try {
-
       const Header = {
         Asset_Code: Asset_Code,
         AssetName: AssetName,
@@ -802,21 +804,24 @@ function Assets({ }) {
         VendorName: VendorName,
         WarrantyStart: WarrantyStart,
         WarrantyEnd: WarrantyEnd,
-        AssetStatus: 'Not Allocated',
+        AssetStatus: "Not Allocated",
         Location: Location,
         Country: Country,
         Status: Status,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-        CreatedBy: sessionStorage.getItem("selectedUserCode")
+        CreatedBy: sessionStorage.getItem("selectedUserCode"),
       };
 
-      const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrInsert`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.apiBaseUrl}/EmployeeAssets_HdrInsert`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Header),
         },
-        body: JSON.stringify(Header),
-      });
+      );
       if (response.status === 200) {
         console.log("Data inserted successfully");
         setTimeout(() => {
@@ -831,7 +836,7 @@ function Assets({ }) {
       }
     } catch (error) {
       console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error("Error inserting data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -853,17 +858,17 @@ function Assets({ }) {
           const dataToSend = {
             EmployeeAssets_HdrData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                ...row,
-                company_code,
-                modify_by,
-              }))
-              : [
-                {
-                  ...rowData,
+                  ...row,
                   company_code,
                   modify_by,
-                },
-              ],
+                }))
+              : [
+                  {
+                    ...rowData,
+                    company_code,
+                    modify_by,
+                  },
+                ],
           };
 
           // const dataToSend = {
@@ -899,14 +904,15 @@ function Assets({ }) {
           //   })),
           // };
 
-          const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`,
+          const response = await fetch(
+            `${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(dataToSend),
-            }
+            },
           );
 
           if (response.ok) {
@@ -926,7 +932,7 @@ function Assets({ }) {
       },
       () => {
         toast.info("Update cancelled");
-      }
+      },
     );
   };
 
@@ -946,17 +952,17 @@ function Assets({ }) {
           const dataToSend = {
             EmployeeAssets_HdrData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                ...row,
-                company_code,
-                modify_by,
-              }))
-              : [
-                {
-                  ...rowData,
+                  ...row,
                   company_code,
                   modify_by,
-                },
-              ],
+                }))
+              : [
+                  {
+                    ...rowData,
+                    company_code,
+                    modify_by,
+                  },
+                ],
           };
 
           // const dataToSend = {
@@ -974,7 +980,7 @@ function Assets({ }) {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(dataToSend),
-            }
+            },
           );
 
           if (response.ok) {
@@ -994,30 +1000,30 @@ function Assets({ }) {
       },
       () => {
         toast.info("Data delete cancelled.");
-      }
+      },
     );
   };
 
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Assets Master</h1>
 
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible && (
-              <div className="action-icon add"
-                onClick={handleSave}
-              >
+              <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
-            <div className="action-icon print"
-              onClick={handleReload}
-            >
+            <div className="action-icon print" onClick={handleReload}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
@@ -1025,35 +1031,31 @@ function Assets({ }) {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle p-1"
+              data-bs-toggle="dropdown"
+            >
               <i className="fa-solid fa-list"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
               {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
               {saveButtonVisible && (
-                <li className="dropdown-item"
-                  onClick={handleSave}
-                >
+                <li className="dropdown-item" onClick={handleSave}>
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
               )}
               {/*})}*/}
 
-              <li className="dropdown-item"
-                onClick={handleReload}
-              >
+              <li className="dropdown-item" onClick={handleReload}>
                 <i className="fa-solid fa-arrow-rotate-right"></i>
               </li>
-
             </ul>
           </div>
         </div>
       </div>
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -1061,12 +1063,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Code"
+                required
+                title="Please Enter the Asset Code"
                 value={Asset_Code}
                 onChange={(e) => setAsset_Code(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Asset_Code ? 'text-danger' : ''}`}> Asset Code<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !Asset_Code ? "text-danger" : ""}`}
+              >
+                {" "}
+                Asset Code<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1077,12 +1085,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Name"
+                required
+                title="Please Enter the Asset Name"
                 value={AssetName}
                 onChange={(e) => setAssetName(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetName ? 'text-danger' : ''}`}> Asset Name<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !AssetName ? "text-danger" : ""}`}
+              >
+                {" "}
+                Asset Name<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
           <div className="col-md-2">
@@ -1092,12 +1106,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Category"
+                required
+                title="Please Enter the Asset Category"
                 value={AssetCategory}
                 onChange={(e) => setAssetCategory(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !AssetCategory ? 'text-danger' : ''}`}> Asset Category<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !AssetCategory ? "text-danger" : ""}`}
+              >
+                {" "}
+                Asset Category<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
           <div className="col-md-2">
@@ -1107,12 +1127,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Serial Number"
+                required
+                title="Please Enter the Serial Number"
                 value={SerialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !SerialNumber ? 'text-danger' : ''}`}> Serial Number<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !SerialNumber ? "text-danger" : ""}`}
+              >
+                {" "}
+                Serial Number<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1123,12 +1149,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Barcode"
+                required
+                title="Please Enter the Barcode"
                 value={Bar_code}
                 onChange={(e) => setBar_code(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Bar_code ? 'text-danger' : ''}`}> Barcode<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !Bar_code ? "text-danger" : ""}`}
+              >
+                {" "}
+                Barcode<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1139,12 +1171,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Brand"
+                required
+                title="Please Enter the Brand"
                 value={Brand}
                 onChange={(e) => setBrand(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Brand ? 'text-danger' : ''}`}> Brand<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !Brand ? "text-danger" : ""}`}
+              >
+                {" "}
+                Brand<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1155,12 +1193,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Model"
+                required
+                title="Please Enter the Model"
                 value={Model}
                 onChange={(e) => setModel(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Model ? 'text-danger' : ''}`}> Model<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !Model ? "text-danger" : ""}`}
+              >
+                {" "}
+                Model<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
           <div className="col-md-2">
@@ -1170,12 +1214,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Purchase Date"
+                required
+                title="Please Enter the Purchase Date"
                 value={PurchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !PurchaseDate ? 'text-danger' : ''}`}> Purchase Date<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !PurchaseDate ? "text-danger" : ""}`}
+              >
+                {" "}
+                Purchase Date<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1186,17 +1236,24 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Purchase Cost"
+                required
+                title="Please Enter the Purchase Cost"
                 value={PurchaseCost}
                 onChange={(e) => setPurchaseCost(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !PurchaseCost ? 'text-danger' : ''}`}> Purchase Cost<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !PurchaseCost ? "text-danger" : ""}`}
+              >
+                {" "}
+                Purchase Cost<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedCurrency ? "has-value" : ""} 
               ${isSelectedCurrency ? "is-focused" : ""}`}
               title="Please select the Currency Code"
@@ -1215,7 +1272,12 @@ function Assets({ }) {
                 maxLength={100}
                 isClearable
               />
-              <label for="sname" className={`floating-label ${error && !CurrencyCode ? 'text-danger' : ''}`}>Currency Code<span className="text-danger">*</span></label>
+              <label
+                for="sname"
+                className={`floating-label ${error && !CurrencyCode ? "text-danger" : ""}`}
+              >
+                Currency Code<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1226,12 +1288,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Vendor Name"
+                required
+                title="Please Enter the Vendor Name"
                 value={VendorName}
                 onChange={(e) => setVendorName(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !VendorName ? 'text-danger' : ''}`}> Vendor Name<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !VendorName ? "text-danger" : ""}`}
+              >
+                {" "}
+                Vendor Name<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1242,12 +1310,18 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Warranty Start Date"
+                required
+                title="Please Enter the Warranty Start Date"
                 value={WarrantyStart}
                 onChange={(e) => setWarrantyStart(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !WarrantyStart ? 'text-danger' : ''}`}> Warranty Start<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !WarrantyStart ? "text-danger" : ""}`}
+              >
+                {" "}
+                Warranty Start<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1258,13 +1332,19 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Warranty End Date"
+                required
+                title="Please Enter the Warranty End Date"
                 isClearable
                 value={WarrantyEnd}
                 onChange={(e) => setWarrantyEnd(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !WarrantyEnd ? 'text-danger' : ''}`}> Warranty End<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !WarrantyEnd ? "text-danger" : ""}`}
+              >
+                {" "}
+                Warranty End<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -1275,17 +1355,23 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Location"
+                required
+                title="Please Enter the Location"
                 value={Location}
                 onChange={(e) => setLocation(e.target.value)}
                 maxLength={100}
               />
-              <label className={` exp-form-labels ${error && !Location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
+              <label
+                className={` exp-form-labels ${error && !Location ? "text-danger" : ""}`}
+              >
+                Location<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedCountry ? "has-value" : ""} 
               ${isSelectCountry ? "is-focused" : ""}`}
               title="Please select the Country"
@@ -1304,14 +1390,18 @@ function Assets({ }) {
                 maxLength={100}
                 isClearable
               />
-              <label for="sname" className={`floating-label ${error && !Country ? 'text-danger' : ''}`}>Country<span className="text-danger">*</span></label>
+              <label
+                for="sname"
+                className={`floating-label ${error && !Country ? "text-danger" : ""}`}
+              >
+                Country<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
-
-
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectstatus ? "is-focused" : ""}`}
               title="Please select the Status"
@@ -1327,21 +1417,23 @@ function Assets({ }) {
                 options={filteredOptionStatus}
                 isClearable
               />
-              <label for="sname" className={`floating-label ${error && !Status ? 'text-danger' : ''}`}>Status<span className="text-danger">*</span></label>
+              <label
+                for="sname"
+                className={`floating-label ${error && !Status ? "text-danger" : ""}`}
+              >
+                Status<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
         </div>
       </div>
-
 
       <div className="shadow-lg p-3 bg-light rounded  container-form-box mt-2">
         <div className="header-flex">
           <h5 className="">Search Criteria:</h5>
         </div>
 
-
         <div className="row g-3">
-
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -1349,11 +1441,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Asset ID"
+                required
+                title="Please Enter the Asset ID"
                 value={AssetIDSC}
                 onChange={(e) => setAssetIDSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset ID</label>
@@ -1367,11 +1459,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Code"
+                required
+                title="Please Enter the Asset Code"
                 value={Asset_CodeSC}
                 onChange={(e) => setAsset_CodeSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Code</label>
@@ -1385,10 +1477,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Name"
+                required
+                title="Please Enter the Asset Name"
                 value={AssetNameSC}
                 onChange={(e) => setAssetNameSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Name</label>
@@ -1401,10 +1494,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Asset Category"
+                required
+                title="Please Enter the Asset Category"
                 value={AssetCategorySC}
                 onChange={(e) => setAssetCategorySC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Asset Category</label>
@@ -1417,10 +1511,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Serial Number"
+                required
+                title="Please Enter the Serial Number"
                 value={SerialNumberSC}
                 onChange={(e) => setSerialNumberSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Serial Number</label>
@@ -1434,10 +1529,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Bar Code"
+                required
+                title="Please Enter the Bar Code"
                 value={Bar_codeSC}
                 onChange={(e) => setBar_codeSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Bar Code</label>
@@ -1451,10 +1547,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Brand"
+                required
+                title="Please Enter the Brand"
                 value={BrandSC}
                 onChange={(e) => setBrandSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Brand</label>
@@ -1468,10 +1565,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Text"
                 placeholder=""
-                required title="Please Enter the Model"
+                required
+                title="Please Enter the Model"
                 value={ModelSC}
                 onChange={(e) => setModelSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Model</label>
@@ -1484,10 +1582,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Purchase Date"
+                required
+                title="Please Enter the Purchase Date"
                 value={PurchaseDateSC}
                 onChange={(e) => setPurchaseDateSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Purchase Date</label>
@@ -1501,19 +1600,20 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="Number"
                 placeholder=""
-                required title="Please Enter the Purchase Cost"
+                required
+                title="Please Enter the Purchase Cost"
                 value={PurchaseCostSC}
                 onChange={(e) => setPurchaseCostSC(e.target.value)}
                 maxLength={100}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <label className="exp-form-labels">Purchase Cost</label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
                             ${selectedCurrencySc ? "has-value" : ""} 
                             ${isSelectedCurrencySc ? "is-focused" : ""}`}
               title="Please select the Currency Code"
@@ -1524,17 +1624,20 @@ function Assets({ }) {
                 type="date"
                 classNamePrefix="react-select"
                 placeholder=""
-                required title="Please Enter the Grade Name"
+                required
+                title="Please Enter the Grade Name"
                 onFocus={() => setIsSelectedCurrencySc(true)}
                 onBlur={() => setIsSelectedCurrencySc(false)}
                 value={selectedCurrencySc}
                 onChange={handleChangeCurrencySc}
                 options={filteredOptionCurrencySc}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
                 isClearable
               />
-              <label for="sname" className={`floating-label`}>Currency Code</label>
+              <label for="sname" className={`floating-label`}>
+                Currency Code
+              </label>
             </div>
           </div>
 
@@ -1545,10 +1648,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Vendor Name"
+                required
+                title="Please Enter the Vendor Name"
                 value={VendorNameSC}
                 onChange={(e) => setVendorNameSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Vendor Name</label>
@@ -1562,10 +1666,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Warranty Start Date"
+                required
+                title="Please Enter the Warranty Start Date"
                 value={WarrantyStartSC}
                 onChange={(e) => setWarrantyStartSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty Start</label>
@@ -1579,10 +1684,11 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="date"
                 placeholder=""
-                required title="Please Enter the Warranty End Date"
+                required
+                title="Please Enter the Warranty End Date"
                 value={WarrantyEndSC}
                 onChange={(e) => setWarrantyEndSC(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={100}
               />
               <label className="exp-form-labels">Warranty End</label>
@@ -1590,7 +1696,8 @@ function Assets({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedAssetStatusSC ? "has-value" : ""} 
               ${isSelectedAssetStatusSC ? "is-focused" : ""}`}
               title="Please enter the Asset Status"
@@ -1608,7 +1715,9 @@ function Assets({ }) {
                 maxLength={100}
                 isClearable
               />
-              <label for="sname" className={`floating-label`}>Asset Status </label>
+              <label for="sname" className={`floating-label`}>
+                Asset Status{" "}
+              </label>
             </div>
           </div>
 
@@ -1619,19 +1728,20 @@ function Assets({ }) {
                 class="exp-input-field form-control"
                 type="text"
                 placeholder=""
-                required title="Please Enter the Location"
+                required
+                title="Please Enter the Location"
                 value={LocationSC}
                 onChange={(e) => setLocationSC(e.target.value)}
                 maxLength={100}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <label className="exp-form-labels">Location</label>
             </div>
           </div>
 
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedCountrySC ? "has-value" : ""} 
               ${isSelectCountrySC ? "is-focused" : ""}`}
               title="Please select the Country"
@@ -1645,19 +1755,20 @@ function Assets({ }) {
                 value={selectedCountrySC}
                 onChange={handleCountryChangeSC}
                 options={filteredOptionCountrySC}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 classNamePrefix="react-select"
                 maxLength={100}
                 isClearable
               />
-              <label for="sname" className={`floating-label`}>Country</label>
+              <label for="sname" className={`floating-label`}>
+                Country
+              </label>
             </div>
           </div>
 
-
-
           <div className="col-md-2">
-            <div className={`inputGroup selectGroup 
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectstatusSC ? "is-focused" : ""}`}
               title="Please select the Status"
@@ -1667,7 +1778,7 @@ function Assets({ }) {
                 value={selectedStatusSC}
                 onChange={handlechangestatusSC}
                 options={filteredoptionstatus}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 placeholder=" "
                 onFocus={() => setIsSelectstatusSC(true)}
                 onBlur={() => setIsSelectstatusSC(false)}
@@ -1679,33 +1790,29 @@ function Assets({ }) {
           </div>
           <div className="col-12">
             <div className="search-btn-wrapper">
-              <div className="icon-btn search"
-                onClick={handleSearch}
-              >
+              <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload"
-                onClick={reloadGridData}
-              >
+              <div className="icon-btn reload" onClick={reloadGridData}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
 
-              <div className="icon-btn excel"
-                onClick={handleExportToExcel}
-              >
+              <div className="icon-btn excel" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i className="fa-solid fa-file-excel"></i>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+      <div
+        className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
         <div class="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
           <AgGridReact
             rowData={rowData}
@@ -1721,18 +1828,8 @@ function Assets({ }) {
           />
         </div>
       </div>
-
-
     </div>
-
-
-
-
-
-
-
-
-  )
+  );
 }
 
 export default Assets;

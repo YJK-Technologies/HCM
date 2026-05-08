@@ -179,8 +179,6 @@ const ApplyLeave = () => {
 
       if (fromDateObj > toDateObj) {
         toast.warning("From Date should not be after To Date");
-      } else {
-        setError(false);
       }
     }
   };
@@ -291,8 +289,7 @@ const ApplyLeave = () => {
         ? selectedCompOff.label
         : null
     };
-    setError(false);
-    setLoading(true);
+      setLoading(true);
     try {
 
       const response = await fetch(`${config.apiBaseUrl}/addEmployeeLeave`, {

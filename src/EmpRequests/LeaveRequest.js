@@ -157,8 +157,6 @@ const LeaveRequestPage = () => {
 
       if (fromDateObj > toDateObj) {
         toast.warning("From Date should not be after To Date");
-      } else {
-        setError(false);
       }
     }
   };
@@ -198,6 +196,7 @@ const LeaveRequestPage = () => {
       !FromDate ||
       !ToDate ||
       !Reason ||
+      !Select_slots ||
       !ReportingManager ||
       !AlternativeReponsablePerson) {
       setError(true);
@@ -215,7 +214,9 @@ const LeaveRequestPage = () => {
     const appliedDays = calculateLeaveDays(FromDate, ToDate);
 
     const selectedLeaveBalance = rowData.find(
-      (item) => item.leavetype === LeaveType
+      (item) =>
+        item.LeaveId === LeaveType ||
+        item.LeaveName === LeaveType
     );
 
     if (!selectedLeaveBalance) {
@@ -223,7 +224,7 @@ const LeaveRequestPage = () => {
       return;
     }
 
-    const available = selectedLeaveBalance.availableleave;
+    const available = selectedLeaveBalance.AvailableLeave || 0;
 
     if (appliedDays > available) {
       toast.warning(
@@ -256,7 +257,6 @@ const LeaveRequestPage = () => {
         ? selectedCompOff.label
         : null
     };
-    setError(false);
     setLoading(true);
     try {
 
@@ -832,6 +832,7 @@ const LeaveRequestPage = () => {
                   <textarea
                     className="form-control"
                     title="Please Enter the Reason"
+                    type="text"
                     value={Reason}
                     onChange={(e) => setReason(e.target.value)}
                     rows="3"

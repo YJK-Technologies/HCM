@@ -48493,7 +48493,7 @@ const getLoanDashboard = async (req, res) => {
 
 //code added by Sakthi on 29-04-2026
 const getAGES = async (req, res) => {
-  const {mode, company_code, fromDate, toDate, department_id, age_group, employee_id, first_name, designation_id, DOB } = req.body;
+  const {mode, company_code, from_date, to_date, department_id, age_group, employee_id, first_name, designation_id, DOB } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -48502,8 +48502,8 @@ const getAGES = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "AGES")
       .input("company_code", sql.NVarChar, company_code)
-      .input("from_date", sql.Date, fromDate || null)
-      .input("to_date", sql.Date, toDate || null)
+      .input("from_date", sql.Date, from_date|| null)
+      .input("to_date", sql.Date, to_date|| null)
       .input("department_id", sql.NVarChar, department_id || null)
       .input("age_group", sql.NVarChar, age_group || null)
       .input("employee_id", sql.NVarChar, employee_id || null)
