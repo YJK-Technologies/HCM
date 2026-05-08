@@ -3579,6 +3579,10 @@ function RequestReport({ }) {
     clearInputsSearch([])
     setLeaveRowData([])
   };
+  const handleReloadShift = () => {
+    setShiftRowData([])
+    clearRequestInputsSearch([])
+  };
 
   const clearInputsSearch = () => {
     setHolidayFromDate('');
@@ -3607,6 +3611,7 @@ function RequestReport({ }) {
   const [isSelectedEmpStatusSc, setIsSelectedEmpStatusSc] = useState(false);
   const [isSelectedManStatusSc, setIsSelectedManStatusSc] = useState(false);
   const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
+  const [employeeIdDropGridAG, setEmployeeIdDropGridAG] = useState([]);
   const [shiftIdDropGrid, setShiftIdDropGrid] = useState([]);
   const [departmentDrop, setDepartmentDrop] = useState([]);
   const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
@@ -3627,6 +3632,26 @@ function RequestReport({ }) {
           label: `${option.EmployeeId} - ${option.First_Name}`,
         }));
         setEmployeeIdDropGrid(employeeIdOption);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const employeeIdOption = data.map((option) => ({
+          value: option.EmployeeId,
+          label: `${option.EmployeeId} - ${option.First_Name}`,
+        }));
+        setEmployeeIdDropGridAG(employeeIdOption);
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
@@ -3775,14 +3800,14 @@ function RequestReport({ }) {
     label: option.attributedetails_name,
   }))];
 
-  const handleChangeCurShiftSc = (setSelectedCurShiftSc) => {
-    setSelectedCurShiftSc(setSelectedCurShiftSc);
-    setCurShiftSc(setSelectedCurShiftSc ? setSelectedCurShiftSc.value : '');
+  const handleChangeCurShiftSc = (selectedCurShiftSc) => {
+    setSelectedCurShiftSc(selectedCurShiftSc);
+    setCurShiftSc(selectedCurShiftSc ? selectedCurShiftSc.value : '');
   };
 
-  const handleChangeReqShiftSc = (setSelectedReqShiftSc) => {
-    setSelectedReqShiftSc(setSelectedReqShiftSc);
-    setReqShiftSc(setSelectedReqShiftSc ? setSelectedReqShiftSc.value : '');
+  const handleChangeReqShiftSc = (selectedReqShiftSc) => {
+    setSelectedReqShiftSc(selectedReqShiftSc);
+    setReqShiftSc(selectedReqShiftSc ? selectedReqShiftSc.value : '');
   };
 
   const handleChangeEmpStatusSc = (selectedEmpStatusSc) => {
@@ -3850,6 +3875,18 @@ function RequestReport({ }) {
       headerName: "Date",
       field: "effective_date",
       editable: false,
+    },
+    {
+      headerName: "Employee ID",
+      field: "employee_id",
+      editable: false,
+            cellEditorParams: {
+        values: employeeIdDropGridAG.map(d => d.value),
+      },
+      valueFormatter: (params) => {
+        const dept = employeeIdDropGridAG.find(d => d.value === params.value);
+        return dept ? dept.label : params.value;
+      },
     },
     {
       headerName: "Current Shift Code",
@@ -3931,8 +3968,8 @@ function RequestReport({ }) {
           RepManager: sessionStorage.getItem('selectedUserCode'),
           shift_from_date: effectiveFromDate,
           shift_to_date: effectiveToDate,
-          current_shift_id: setCurShiftSc,
-          requested_shift_id: setReqShiftSc,
+          current_shift_id: curShiftSc,
+          requested_shift_id: reqShiftSc,
           is_swap_request: empStatusSc,
           request_status: 'Pending',
         })
@@ -6075,13 +6112,13 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${isSelectedCurShiftSc ? "has-value" : ""} 
+                            ${selectedCurShiftSc ? "has-value" : ""} 
                             ${isSelectedCurShiftSc ? "is-focused" : ""}`}
                   title="Please select the Leave Status"
                 >
                   <Select
                     id="Select_slots"
-                    value={isSelectedCurShiftSc}
+                    value={selectedCurShiftSc}
                     placeholder=" "
                     options={filteredOptionCurrentShift}
                     onChange={handleChangeCurShiftSc}
@@ -6097,13 +6134,13 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${isSelectedReqShiftSc ? "has-value" : ""} 
+                            ${selectedReqShiftSc ? "has-value" : ""} 
                             ${isSelectedReqShiftSc ? "is-focused" : ""}`}
                   title="Please select the Leave Status"
                 >
                   <Select
                     id="Select_slots"
-                    value={isSelectedReqShiftSc}
+                    value={selectedReqShiftSc}
                     placeholder=" "
                     options={filteredOptionRequestShift}
                     onChange={handleChangeReqShiftSc}
@@ -6116,57 +6153,13 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
-                            ${selectedEmpStatusSc ? "has-value" : ""} 
-                            ${isSelectedEmpStatusSc ? "is-focused" : ""}`}
-                  title="Please select the Leave Status"
-                >
-                  <Select
-                    id="Select_slots"
-                    value={selectedEmpStatusSc}
-                    placeholder=" "
-                    options={filterOptionEmployeeStatus}
-                    onChange={handleChangeEmpStatusSc}
-                    onFocus={() => setIsSelectedEmpStatusSc(true)}
-                    onBlur={() => setIsSelectedEmpStatusSc(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                  />
-                  <label className="floating-label">Employee Approval Status</label>
-                </div>
-              </div>
-
-              <div className="col-md-2">
-                <div
-                  className={`inputGroup selectGroup 
-                            ${selectedManStatusSc ? "has-value" : ""} 
-                            ${isSelectedManStatusSc ? "is-focused" : ""}`}
-                  title="Please select the Leave Status"
-                >
-                  <Select
-                    id="Select_slots"
-                    value={selectedManStatusSc}
-                    placeholder=" "
-                    options={filterOptionManagerStatus}
-                    onChange={handleChangeManStatusSc}
-                    onFocus={() => setIsSelectedManStatusSc(true)}
-                    onBlur={() => setIsSelectedManStatusSc(false)}
-                    classNamePrefix="react-select"
-                    isClearable
-                  />
-                  <label className="floating-label">Manager Approval Status</label>
-                </div>
-              </div>
-
               <div className="search-btn-wrapper">
                 <div className="icon-btn search" onClick={handleShiftRequestSearch}>
                   <span className="tooltip">Search</span>
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={handleReloadSearch}>
+                <div className="icon-btn reload" onClick={handleReloadShift}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>

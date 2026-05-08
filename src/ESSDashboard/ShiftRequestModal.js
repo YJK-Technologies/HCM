@@ -168,7 +168,7 @@ if (!form.reason.trim()) newErrors.reason = true;
                     </div>
 
                     <div className="form-section">
-                        <div className="mb-3">
+                        <div className="mb-3" title='Please enter the Requested New Shift'>
                             <label className="form-label-bold" style={{ color: errors.requested_shift_id ? 'red' : 'inherit' }}>Requested New Shift<span className="text-danger">*</span></label>
                             <Select
                                 styles={customSelectStyles}
@@ -181,7 +181,7 @@ if (!form.reason.trim()) newErrors.reason = true;
                         </div>
 
                         <div className="row">
-                            <div className="col-6 mb-3">
+                            <div className="col-6 mb-3" title='Please select the Priority'>
                                 <label className="form-label-bold" style={{ color: errors.priority ? 'red' : 'inherit' }}>Priority<span className="text-danger">*</span></label>
                                 <Select
                                     styles={customSelectStyles}
@@ -190,35 +190,38 @@ if (!form.reason.trim()) newErrors.reason = true;
                                     placeholder="Select Priority..."
                                     value={form.priority}
                                     onChange={(val) => handleFieldChange('priority', val)}
+                                    title="Please select the Priority"
                                 />
                             </div>
-                            <div className="col-6 mb-3">
+                            <div className="col-6 mb-3" title='Please select the Reporting Manager'>
                                 <label className="form-label-bold" style={{ color: errors.rep_manager ? 'red' : 'inherit' }}>Reporting Manager<span className="text-danger">*</span></label>
                                 <Select
                                     styles={customSelectStyles}
                                     options={managerOptions}
                                     isClearable
                                     value={form.rep_manager}
+                                    title="Please select the Reporting Manager"
                                     onChange={(val) => handleFieldChange('rep_manager', val)}
                                     placeholder="Select Manager..."
                                 />
                             </div>
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-3" title='Please select the Swap Employee'>
                             <label className="form-label-bold" style={{ color: errors.swap_employee_id ? 'red' : 'inherit' }}>Swap Employee<span className="text-danger">*</span></label>
                             <Select
-    styles={customSelectStyles}
-    options={employeeOptions}
-    isClearable
-    isDisabled={screenType === "Admin"}   // ✅ disable here
-    value={form.swap_employee_id}
-    onChange={(val) => handleFieldChange('swap_employee_id', val)}
-    placeholder="Select Employee..."
-/>
+                                styles={customSelectStyles}
+                                options={employeeOptions}
+                                isClearable
+                                isDisabled={screenType === "Admin"}   // disable here
+                                value={form.swap_employee_id}
+                                onChange={(val) => handleFieldChange('swap_employee_id', val)}
+                                placeholder="Select Employee..."
+                                title="Please select the Swap Employee"
+                            />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-3" title='Please enter the Reason for Change'>
                             <label className="form-label-bold" style={{ color: errors.reason ? 'red' : 'inherit' }}>Reason for Change<span className="text-danger">*</span></label>
                             <textarea
                                 className="form-control"

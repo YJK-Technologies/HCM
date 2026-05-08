@@ -30,7 +30,6 @@ function Input({ }) {
   const [ProjectID, setProjectID] = useState('');
   const [projectID, setprojectID] = useState('');
   const [UserID, setUserID] = useState('');
-  const [userID, setuserID] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [SelectedUser, SetSelectedUser] = useState('');
   const [Endtime, setEndtime] = useState('');
@@ -107,12 +106,19 @@ function Input({ }) {
     setUser(selectedUser ? selectedUser.value : '');
   };
 
+  // const filteredOptionUser = Array.isArray(userDrop)
+  //   ? userDrop.map((option) => ({
+  //     value: option.user_code,
+  //     label: `${option.user_code} - ${option.user_name}`,
+  //   }))
+  //   : [];
+
   const filteredOptionUser = Array.isArray(userDrop)
-    ? userDrop.map((option) => ({
-      value: option.user_code,
-      label: `${option.user_code} - ${option.user_name}`,
+  ? userDrop.map((option) => ({
+      value: option.user_code || option.userID,
+      label: `${option.user_code || option.userID} - ${option.user_name}`,
     }))
-    : [];
+  : [];
 
   // useEffect(() => {
   //   const fetchUserCodes = async () => {
@@ -169,13 +175,18 @@ function Input({ }) {
 
 
 
-  const filteredOptionuser = Array.isArray(userDrop)
-    ? userDrop.map((option) => ({
-      value: option.user_code,
-      label: `${option.user_code} - ${option.user_name}`,
+  // const filteredOptionuser = Array.isArray(userDrop)
+  //   ? userDrop.map((option) => ({
+  //     value: option.user_code,
+  //     label: `${option.user_code} - ${option.user_name}`,
+  //   }))
+  //   : [];
+const filteredOptionuser = Array.isArray(userDrop)
+  ? userDrop.map((option) => ({
+      value: option.user_code || option.userID,
+      label: `${option.user_code || option.userID} - ${option.user_name}`,
     }))
-    : [];
-
+  : [];
   // const filteredOptionuser = userdrop.map((option) => ({
   //   value: option.user_code,
   //   label: `${option.user_code} - ${option.user_Name}`,

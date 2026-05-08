@@ -173,12 +173,12 @@ function Project({ }) {
     {
       headerName: "Start Date", field: "StartDate",
       // minWidth: 150, maxWidth: 150,
-
+      editable: true,
     },
     {
       headerName: "End Date", field: "EndDate",
       // minWidth: 150, maxWidth: 150,
-
+      editable: true,
     },
     {
       headerName: "Priority Level",

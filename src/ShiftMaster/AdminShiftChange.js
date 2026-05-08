@@ -63,6 +63,7 @@ function AdminShiftChange() {
 
 
   const handleShiftSearch = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/getAdEmpShiftReport`, {
         method: "POST",
@@ -98,6 +99,8 @@ function AdminShiftChange() {
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -326,6 +329,7 @@ function AdminShiftChange() {
   const reloadGridDatas = () => {
     clearInputsField([])
     setRowData([])
+    setShiftRowData([])
   };
 
   const clearInputsField = () => {
@@ -681,6 +685,7 @@ function AdminShiftChange() {
               <input
                 id="status"
                 className="exp-input-field form-control"
+                title="Please enter the From Date"
                 type="date"
                 autoComplete="off"
                 placeholder=" "
@@ -697,6 +702,7 @@ function AdminShiftChange() {
               <input
                 id="status"
                 className="exp-input-field form-control"
+                title="Please enter the To Date"
                 type="date"
                 autoComplete="off"
                 placeholder=" "
@@ -713,6 +719,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftEmpId ? "has-value" : ""} 
                   ${isSelectedShiftEmpId ? "is-focused" : ""}`}
+                  title="Please select the Employee ID"
             >
               <Select
                 id="status"
@@ -736,6 +743,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftDeptId ? "has-value" : ""} 
                   ${isSelectedShiftDeptId ? "is-focused" : ""}`}
+                  title="Please select the Department ID"
             >
               <Select
                 id="status"
@@ -759,6 +767,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftDesigId ? "has-value" : ""} 
                   ${isSelectedShiftDesigId ? "is-focused" : ""}`}
+                  title="Please select the Designation ID"
             >
               <Select
                 id="status"
@@ -782,6 +791,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftPatternId ? "has-value" : ""} 
                   ${isSelectedShiftPatternId ? "is-focused" : ""}`}
+                  title="Please select the Shift Pattern ID"
             >
               <Select
                 id="status"
@@ -805,6 +815,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftCode ? "has-value" : ""} 
                   ${isSelectedShiftCode ? "is-focused" : ""}`}
+                  title="Please select the Shift Code"
             >
               <Select
                 id="status"
@@ -828,6 +839,7 @@ function AdminShiftChange() {
               <input
                 id="status"
                 className="exp-input-field form-control"
+                title="Please enter the Day Sequence"
                 type="number"
                 autoComplete="off"
                 placeholder=" "
@@ -844,6 +856,7 @@ function AdminShiftChange() {
               <input
                 id="status"
                 className="exp-input-field form-control"
+                title="Please enter the Start Time"
                 type="time"
                 autoComplete="off"
                 placeholder=" "
@@ -860,6 +873,7 @@ function AdminShiftChange() {
               <input
                 id="status"
                 className="exp-input-field form-control"
+                title="Please enter the End Time"
                 type="time"
                 autoComplete="off"
                 placeholder=" "
