@@ -36,18 +36,42 @@ const TopBar = () => {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/shiftChangeRequestEmployee`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company_code: company_code,
-          swap_employee_id: user_code
-        }),
-      });
-      if (response.status === 200) {
-        const data = await response.json();
-        setNotifications(data);
-      }
+      const payload = {
+        company_code: company_code,
+        CompanyCode: company_code,   // For CompOff 
+        employee_id: user_code,      // For Loan, Visa, Travel, Shift
+        EmployeeId: user_code,       // For Leave & CompOff
+        swap_employee_id: user_code  // For Shift
+      };
+
+      const [shiftChangeRes, loanRes, leaveRes, visaRes, travelRes, compOffRes, shiftRes] = await Promise.all([
+        fetch(`${config.apiBaseUrl}/shiftChangeRequestEmployee`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getLoanNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getLeaveNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getVisaNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getTravelNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getComOffNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+        fetch(`${config.apiBaseUrl}/getShiftNotification`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+      ]);
+
+      let combinedData = [];
+
+      const process = async (res, type) => {
+        if (res.status === 200) {
+          const data = await res.json();
+          combinedData = [...combinedData, ...data.map(item => ({ ...item, type }))];
+        }
+      };
+
+      await process(shiftChangeRes, 'SHIFT CHANGE');
+      await process(loanRes, 'LOAN');
+      await process(leaveRes, 'LEAVE');
+      await process(visaRes, 'VISA');
+      await process(travelRes, 'TRAVEL');
+      await process(compOffRes, 'COMPOFF');
+      await process(shiftRes, 'SHIFT NOTIFICATION');
+
+      setNotifications(combinedData);
     } catch (err) {
       console.error("Error fetching notifications:", err);
     }
@@ -67,31 +91,33 @@ const TopBar = () => {
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
-const handleRequestAction = async (requestId, actionStatus) => {
-  try {
-    const response = await fetch(`${config.apiBaseUrl}/shiftRequestEmployeeApproval`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        request_id: requestId,
-        company_code: sessionStorage.getItem('selectedCompanyCode'),
-        swap_employee_id: sessionStorage.getItem('selectedUserCode'),
-        modified_by: sessionStorage.getItem('selectedUserCode'),
-        is_swap_request: actionStatus 
-      }),
-    });
+  const handleRequestAction = async (requestId, actionStatus) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/shiftRequestEmployeeApproval`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          request_id: requestId,
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          swap_employee_id: sessionStorage.getItem('selectedUserCode'),
+          modified_by: sessionStorage.getItem('selectedUserCode'),
+          is_swap_request: actionStatus
+        }),
+      });
 
-    if (response.ok) {
-      toast.success(`Request ${actionStatus} successfully!`);
-      fetchNotifications();
-    } else {
-      toast.error("Process failed. Please try again.");
+      if (response.ok) {
+        toast.success(`Request ${actionStatus} successfully!`);
+        fetchNotifications();
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error processing request:", err);
+      toast.error("Internal Server Error");
     }
-  } catch (err) {
-    console.error("Error processing request:", err);
-    toast.error("Internal Server Error");
-  }
-};
+  };
 
   // const handleLogout = () => {
   //   localStorage.clear();
@@ -289,6 +315,159 @@ const handleRequestAction = async (requestId, actionStatus) => {
     window.open(DocumentPdf, '_blank');
   };
 
+  const handleLoanSeen = async (loanRequestId) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/loanNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          loan_request_id: loanRequestId,
+          is_notification_seen: 1,
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking notification as seen:", err);
+    }
+  };
+
+  const handleLeaveSeen = async (empId, fromDate) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/leaveNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          EmployeeId: empId,
+          FromDate: fromDate,
+          is_notification_seen: 1,
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Leave notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking leave as seen:", err);
+    }
+  };
+
+  const handleVisaSeen = async (visaRequestId) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/visaNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          visa_request_id: visaRequestId,
+          is_notification_seen: 1,
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking notification as seen:", err);
+    }
+  };
+
+  const handleTravelSeen = async (travelRequestId) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/travelNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          travel_request_id: travelRequestId,
+          is_notification_seen: 1,
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking notification as seen:", err);
+    }
+  };
+
+  const handleCompOffSeen = async (empId, holidayDate, keyField) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/compOffNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          EmployeeId: empId,
+          HolidayDate: holidayDate,
+          Keyfield: keyField,
+          is_notification_seen: 1,
+          CompanyCode: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking Comp Off as seen:", err);
+    }
+  };
+
+  const handleShiftSeen = async (shiftRequestId) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/shiftNotificationSeen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          request_id: shiftRequestId,
+          is_notification_seen: 1,
+          company_code: sessionStorage.getItem('selectedCompanyCode')
+        }),
+      });
+
+      if (response.ok) {
+        fetchNotifications();
+        toast.success("Notification marked as seen");
+      } else {
+        const errorResponse = await response.json();
+        console.error(errorResponse.message);
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      console.error("Error marking notification as seen:", err);
+    }
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand bg-dark Topnav">
@@ -436,52 +615,212 @@ const handleRequestAction = async (requestId, actionStatus) => {
 
                 <div className="notification-scroll-area">
                   {notifications.length > 0 ? (
-                    // SHOW ONLY FIRST 2 NOTIFICATIONS IN DROPDOWN
-                    notifications.slice(0, 2).map((req) => (
-                      <li key={req.request_id} className="w-100 border-bottom border-secondary p-3">
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div className="d-flex align-items-center">
-                            <div className="req-avatar-small me-3">
-                              {req.EmployeeName.charAt(0)}
-                            </div>
-                            <div>
-                              <div className="d-flex align-items-center gap-2">
-                                <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>{req.EmployeeName}</p>
-                                <span className="badge bg-soft-purple text-purple x-small">Shift</span>
+                    notifications.slice(0, 2).map((noti) => (
+                      <li key={noti.type === 'LOAN' ? `loan-${noti.loan_request_id}` : noti.request_id} className="w-100 border-bottom border-secondary p-3">
+                        {noti.type === 'LOAN' ? (
+                          /* LOAN NOTIFICATION DESIGN */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #FFD700 0%, #B8860B 100%)' }}>
+                                <i className="bi bi-cash-stack text-white"></i>
                               </div>
-                              <small className="d-block text-white">ID: {req.employee_id}</small>
-                              <div className="mt-1 d-flex align-items-center text-white" style={{ fontSize: '11px' }}>
-                                <i className="bi bi-calendar3 me-1"></i>
-                                {new Date(req.FromDate).toLocaleDateString()}
-                                <i className="bi bi-arrow-right mx-1"></i>
-                                {req.requested_shift_name}
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Loan Update</p>
+                                  <span className="badge bg-soft-warning text-warning x-small">Loan</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                  {noti.message}
+                                </p>
                               </div>
                             </div>
+                            <div className="d-flex flex-column">
+                              <button
+                                className="action-btn-circle seen-btn"
+                                title="Mark as Seen"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleLoanSeen(noti.loan_request_id);
+                                }}
+                              >
+                                <i className="bi bi-eye-fill"></i>
+                              </button>
+                            </div>
+                          </div>
+                        ) : noti.type === 'LEAVE' ? (
+                          /* LEAVE NOTIFICATION DESIGN */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #20c997 0%, #087f5b 100%)' }}>
+                                <i className="bi bi-calendar-check text-white"></i>
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small">Leave Update</p>
+                                  <span className="badge bg-soft-success text-success-light x-small">Leave</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px' }}>
+                                  {noti.message} ({new Date(noti.FromDate).toLocaleDateString()})
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              className="action-btn-circle seen-btn"
+                              title="Mark as Seen"
+                              style={{ color: '#20c997', border: '1px solid rgba(32, 201, 151, 0.3)' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLeaveSeen(noti.EmployeeId, noti.FromDate);
+                              }}
+                            >
+                              <i className="bi bi-eye-fill"></i>
+                            </button>
                           </div>
 
-                          <div className="d-flex flex-column gap-2">
+                        ) : noti.type === 'VISA' ? (
+                          /* VISA NOTIFICATION DESIGN */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}>
+                                <i className="bi bi-globe2 text-white"></i>
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Visa Update</p>
+                                  <span className="badge bg-soft-info text-info x-small">Visa</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                  {noti.message} ({new Date(noti.travel_start_date).toLocaleDateString()})
+                                </p>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-column">
+                              <button className="action-btn-circle seen-btn" title="Mark as Seen"
+                                style={{ color: '#4e73df', border: '1px solid rgba(78, 115, 223, 0.3)' }}
+                                onClick={(e) => { e.stopPropagation(); handleVisaSeen(noti.visa_request_id); }}>
+                                <i className="bi bi-eye-fill"></i>
+                              </button>
+                            </div>
+                          </div>
+                        ) : noti.type === 'TRAVEL' ? (
+                          /* TRAVEL NOTIFICATION DESIGN (DROPDOWN) */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%)' }}>
+                                <i className="bi bi-map text-white"></i>
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Travel Update</p>
+                                  <span className="badge bg-soft-cyan text-cyan x-small">Travel</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                  {noti.message} ({new Date(noti.travel_start_date).toLocaleDateString()})
+                                </p>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-column">
+                              <button className="action-btn-circle seen-btn" title="Mark as Seen"
+                                style={{ color: '#0dcaf0', border: '1px solid rgba(13, 202, 240, 0.3)' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTravelSeen(noti.travel_request_id);
+                                }}>
+                                <i className="bi bi-eye-fill"></i>
+                              </button>
+                            </div>
+                          </div>
+                        ) : noti.type === 'COMPOFF' ? (
+                          /* COMP OFF NOTIFICATION DESIGN */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #fd7e14 0%, #e65100 100%)' }}>
+                                <i className="bi bi-sun-fill text-white"></i>
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small">Comp Off Update</p>
+                                  <span className="badge bg-soft-orange text-orange x-small">Comp Off</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px' }}>
+                                  {noti.message} ({new Date(noti.HolidayDate).toLocaleDateString()})
+                                </p>
+                              </div>
+                            </div>
                             <button
-                              className="action-btn-circle approve"
-                              title="Approve"
+                              className="action-btn-circle seen-btn"
+                              title="Mark as Seen"
+                              style={{ color: '#fd7e14', border: '1px solid rgba(253, 126, 20, 0.3)' }}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleRequestAction(req.request_id, "Approved");
+                                handleCompOffSeen(noti.EmployeeId, noti.HolidayDate, noti.Keyfield);
                               }}
                             >
-                              <i className="bi bi-check-lg"></i>
-                            </button>
-                            <button
-                              className="action-btn-circle reject"
-                              title="Reject"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRequestAction(req.request_id, "Rejected");
-                              }}
-                            >
-                              <i className="bi bi-x-lg"></i>
+                              <i className="bi bi-eye-fill"></i>
                             </button>
                           </div>
-                        </div>
+                        ) : noti.type === 'SHIFT NOTIFICATION' ? (
+                          /* SHIFT NOTIFICATION DESIGN (DROPDOWN) */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3" style={{ background: 'linear-gradient(135deg, #6610f2 0%, #4e0891 100%)' }}>
+                                <i className="bi bi-clock-fill text-white"></i>
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Shift Update</p>
+                                  <span className="badge bg-soft-indigo text-indigo x-small">Shift</span>
+                                </div>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                  {noti.message} ({new Date(noti.effective_date).toLocaleDateString()})
+                                </p>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-column">
+                              <button
+                                className="action-btn-circle seen-btn"
+                                title="Mark as Seen"
+                                style={{ color: '#6610f2', border: '1px solid rgba(102, 16, 242, 0.3)' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleShiftSeen(noti.request_id);
+                                }}
+                              >
+                                <i className="bi bi-eye-fill"></i>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* EXISTING SHIFT REQUEST DESIGN */
+                          <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                              <div className="req-avatar-small me-3">
+                                {noti.EmployeeName.charAt(0)}
+                              </div>
+                              <div>
+                                <div className="d-flex align-items-center gap-2">
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>{noti.EmployeeName}</p>
+                                  <span className="badge bg-soft-purple text-purple x-small">Shift</span>
+                                </div>
+                                <small className="d-block text-white">ID: {noti.employee_id}</small>
+                                <div className="mt-1 d-flex align-items-center text-white" style={{ fontSize: '11px' }}>
+                                  <i className="bi bi-calendar3 me-1"></i>
+                                  {new Date(noti.FromDate).toLocaleDateString()}
+                                  <i className="bi bi-arrow-right mx-1"></i>
+                                  {noti.requested_shift_name}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-column gap-2">
+                              <button className="action-btn-circle approve" title='Approved' onClick={(e) => { e.stopPropagation(); handleRequestAction(noti.request_id, "Approved"); }}>
+                                <i className="bi bi-check-lg"></i>
+                              </button>
+                              <button className="action-btn-circle reject" title='Rejected' onClick={(e) => { e.stopPropagation(); handleRequestAction(noti.request_id, "Rejected"); }}>
+                                <i className="bi bi-x-lg"></i>
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </li>
                     ))
                   ) : (
@@ -539,53 +878,225 @@ const handleRequestAction = async (requestId, actionStatus) => {
       <div className={`notification-side-drawer ${showNotificationsDrawer ? 'show' : ''}`}>
         <div className="drawer-header p-3 d-flex justify-content-between align-items-center border-bottom border-secondary">
           <h5 className="mb-0 text-white fw-bold">All Notifications ({notifications.length})</h5>
-          <button className="btn-close btn-close-white" onClick={toggleDrawer}></button>
+          <button className="btn-close btn-close-white" title='Close' onClick={toggleDrawer}></button>
         </div>
 
         <div className="drawer-body">
           {notifications.length > 0 ? (
-            notifications.map((req) => (
-              <div key={req.request_id} className="notification-item-box border-bottom border-secondary p-3 drawer-item">
-                <div className="d-flex align-items-center justify-content-between">
-
-                  {/* Left Side: Avatar + Content */}
-                  <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
-                    <div className="req-avatar-small flex-shrink-0 me-3">
-                      {req.EmployeeName.charAt(0)}
-                    </div>
-
-                    <div className="notification-content" style={{ minWidth: 0 }}>
-                      <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                        <h6 className="text-white mb-0 fw-bold">{req.EmployeeName}</h6>
-                        <span className="badge bg-soft-purple text-purple x-small">Shift Change Request</span>
+            notifications.map((noti) => (
+              <div
+                key={
+                  noti.type === 'LOAN' ? `loan-drawer-${noti.loan_request_id}` :
+                    noti.type === 'LEAVE' ? `leave-drawer-${noti.EmployeeId}-${noti.FromDate}` :
+                      noti.request_id
+                }
+                className="notification-item-box border-bottom border-secondary p-3 drawer-item"
+              >
+                {noti.type === 'LOAN' ? (
+                  /* LOAN DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #FFD700 0%, #B8860B 100%)' }}>
+                        <i className="bi bi-cash-stack text-white"></i>
                       </div>
-
-                      <p className="text-white-50 small mb-1 text-truncate-2" style={{ paddingLeft: "0px" }}>
-                        Requested <strong>{req.requested_shift_name}</strong> for {new Date(req.FromDate).toLocaleDateString()}.
-                      </p>
-
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Loan Notification</h6>
+                          <span className="badge bg-soft-warning text-warning x-small">Status Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button className="action-btn-circle seen-btn" title="Mark as Seen"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLoanSeen(noti.loan_request_id);
+                        }}>
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Right Side: Action Buttons */}
-                  <div className="d-flex gap-2 ms-3 flex-shrink-0">
-                    <button
-                      className="action-btn-circle approve-btn"
-                      title="Approve"
-                      onClick={() => handleRequestAction(req.request_id, "Approved")}
-                    >
-                      <i className="bi bi-check-lg"></i>
-                    </button>
-                    <button
-                      className="action-btn-circle reject-btn"
-                      title="Reject"
-                      onClick={() => handleRequestAction(req.request_id, "Rejected")}
-                    >
-                      <i className="bi bi-x-lg"></i>
-                    </button>
+                ) : noti.type === 'LEAVE' ? (
+                  /* LEAVE DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #20c997 0%, #087f5b 100%)' }}>
+                        <i className="bi bi-calendar-check text-white"></i>
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Leave Notification</h6>
+                          <span className="badge bg-soft-success text-success-light x-small">Status Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message} for <strong>{new Date(noti.FromDate).toLocaleDateString()}</strong>.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button
+                        className="action-btn-circle seen-btn"
+                        title="Mark as Seen"
+                        style={{ color: '#20c997', border: '1px solid rgba(32, 201, 151, 0.3)' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLeaveSeen(noti.EmployeeId, noti.FromDate);
+                        }}
+                      >
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
                   </div>
 
-                </div>
+                ) : noti.type === 'VISA' ? (
+                  /* VISA DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #4e73df 0%, #224abe 100%)' }}>
+                        <i className="bi bi-passport text-white"></i>
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Visa Notification</h6>
+                          <span className="badge bg-soft-info text-info x-small">Status Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message} for <strong>{new Date(noti.travel_start_date).toLocaleDateString()}</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button className="action-btn-circle seen-btn" title="Mark as Seen"
+                        style={{ color: '#4e73df', border: '1px solid rgba(78, 115, 223, 0.3)' }}
+                        onClick={(e) => { e.stopPropagation(); handleVisaSeen(noti.visa_request_id); }}>
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                ) : noti.type === 'TRAVEL' ? (
+                  /* TRAVEL DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      {/* Icon with Cyan/Blue Sky Gradient */}
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%)' }}>
+                        <i className="bi bi-airplane-engines text-white"></i>
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Travel Notification</h6>
+                          <span className="badge bg-soft-cyan text-cyan x-small">Status Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message} for <strong>{new Date(noti.travel_start_date).toLocaleDateString()}</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button className="action-btn-circle seen-btn" title="Mark as Seen"
+                        style={{ color: '#0dcaf0', border: '1px solid rgba(13, 202, 240, 0.3)' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTravelSeen(noti.travel_request_id);
+                        }}>
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                ) : noti.type === 'COMPOFF' ? (
+                  /* COMP OFF DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #fd7e14 0%, #e65100 100%)' }}>
+                        <i className="bi bi-calendar-plus text-white"></i>
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Comp Off Notification</h6>
+                          <span className="badge bg-soft-orange text-orange x-small">Status Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message} for holiday on <strong>{new Date(noti.HolidayDate).toLocaleDateString()}</strong>.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button
+                        className="action-btn-circle seen-btn"
+                        title="Mark as Seen"
+                        style={{ color: '#fd7e14', border: '1px solid rgba(253, 126, 20, 0.3)' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCompOffSeen(noti.EmployeeId, noti.HolidayDate, noti.Keyfield);
+                        }}
+                      >
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                ) : noti.type === 'SHIFT NOTIFICATION' ? (
+                  /* SHIFT NOTIFICATION DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3" style={{ background: 'linear-gradient(135deg, #6610f2 0%, #4e0891 100%)' }}>
+                        <i className="bi bi-arrow-left-right text-white"></i>
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">Shift Notification</h6>
+                          <span className="badge bg-soft-indigo text-indigo x-small">Roster Updated</span>
+                        </div>
+                        <p className="text-white-50 small mb-0" style={{ paddingLeft: "0px" }}>
+                          {noti.message} effective from <strong>{new Date(noti.effective_date).toLocaleDateString()}</strong>.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button
+                        className="action-btn-circle seen-btn"
+                        title="Mark as Seen"
+                        style={{ color: '#6610f2', border: '1px solid rgba(102, 16, 242, 0.3)' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShiftSeen(noti.request_id);
+                        }}
+                      >
+                        <i className="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* EXISTING SHIFT DRAWER DESIGN */
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="req-avatar-small flex-shrink-0 me-3">
+                        {noti.EmployeeName.charAt(0)}
+                      </div>
+                      <div className="notification-content" style={{ minWidth: 0 }}>
+                        <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                          <h6 className="text-white mb-0 fw-bold">{noti.EmployeeName}</h6>
+                          <span className="badge bg-soft-purple text-purple x-small">Shift Change Request</span>
+                        </div>
+                        <p className="text-white-50 small mb-1 text-truncate-2" style={{ paddingLeft: "0px" }}>
+                          Requested <strong>{noti.requested_shift_name}</strong> for {new Date(noti.FromDate).toLocaleDateString()}.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="d-flex gap-2 ms-3 flex-shrink-0">
+                      <button className="action-btn-circle approve-btn" title="Approved" onClick={() => handleRequestAction(noti.request_id, "Approved")}>
+                        <i className="bi bi-check-lg"></i>
+                      </button>
+                      <button className="action-btn-circle reject-btn" title='Rejected' onClick={() => handleRequestAction(noti.request_id, "Rejected")}>
+                        <i className="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           ) : (

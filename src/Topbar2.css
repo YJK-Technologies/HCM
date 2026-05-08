@@ -538,3 +538,85 @@
         font-size: 0.85rem;
     }
 }
+
+/* Loan Notification specific styling */
+.bg-soft-warning {
+    background-color: rgba(217, 180, 102, 0.15);
+}
+.text-warning {
+    color: #D9B466; 
+}
+
+.seen-btn {
+    color: #0dcaf0 !important;
+    border-color: rgba(13, 202, 240, 0.3) !important;
+    background: transparent;
+}
+
+.seen-btn:hover {
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    color: #fff !important;
+    border-color: #0dcaf0 !important;
+}
+
+.bg-soft-success {
+    background-color: rgba(32, 201, 151, 0.15) !important;
+}
+
+.text-success-light {
+    color: #20c997 !important;
+}
+
+.bi-calendar-check {
+    font-size: 1.1rem;
+}
+
+.bg-soft-info {
+    background-color: rgba(78, 115, 223, 0.15) !important;
+}
+
+.text-info {
+    color: #4e73df !important;
+}
+
+.bi-passport, .bi-globe2 {
+    font-size: 1.1rem;
+}
+
+.bg-soft-cyan {
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    border: 1px solid rgba(13, 202, 240, 0.2);
+}
+
+.text-cyan {
+    color: #0dcaf0 !important;
+}
+
+.bi-airplane-engines {
+    font-size: 1.1rem;
+}
+
+.bg-soft-orange {
+    background-color: rgba(253, 126, 20, 0.15) !important;
+}
+
+.text-orange {
+    color: #fd7e14 !important;
+}
+
+.bi-sun-fill, .bi-holiday-village {
+    font-size: 1.1rem;
+}
+
+.bg-soft-indigo {
+    background-color: rgba(102, 16, 242, 0.15) !important;
+    border: 1px solid rgba(102, 16, 242, 0.1);
+}
+
+.text-indigo {
+    color: #ae7fff !important;
+}
+
+.bi-clock-fill, .bi-arrow-left-right {
+    font-size: 1.1rem;
+}
