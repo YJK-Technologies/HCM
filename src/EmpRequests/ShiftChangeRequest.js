@@ -223,14 +223,14 @@ const ShiftChangeRequest = () => {
         label: option.attributedetails_name,
     }))];
 
-    const handleChangeCurShiftSc = (setSelectedCurShiftSc) => {
-        setSelectedCurShiftSc(setSelectedCurShiftSc);
-        setCurShiftSc(setSelectedCurShiftSc ? setSelectedCurShiftSc.value : '');
+    const handleChangeCurShiftSc = (selectedCurShiftSc) => {
+        setSelectedCurShiftSc(selectedCurShiftSc);
+        setCurShiftSc(selectedCurShiftSc ? selectedCurShiftSc.value : '');
     };
 
-    const handleChangeReqShiftSc = (setSelectedReqShiftSc) => {
-        setSelectedReqShiftSc(setSelectedReqShiftSc);
-        setReqShiftSc(setSelectedReqShiftSc ? setSelectedReqShiftSc.value : '');
+    const handleChangeReqShiftSc = (SelectedReqShiftSc) => {
+        setSelectedReqShiftSc(SelectedReqShiftSc);
+        setReqShiftSc(SelectedReqShiftSc ? SelectedReqShiftSc.value : '');
     };
 
     const handleChangeEmpStatusSc = (selectedEmpStatusSc) => {
@@ -330,8 +330,8 @@ const ShiftChangeRequest = () => {
                 body: JSON.stringify({
                     company_code: sessionStorage.getItem('selectedCompanyCode'),
                     employee_id: sessionStorage.getItem('selectedUserCode'),
-                    shift_from_date: effectiveFromDate,
-                    shift_to_date: effectiveToDate,
+                    shift_from_date: effectiveFromDate ? effectiveFromDate : null,
+                    shift_to_date: effectiveToDate ? effectiveToDate : null,
                     current_shift_id: setCurShiftSc,
                     requested_shift_id: setReqShiftSc,
                     is_swap_request: empStatusSc,
@@ -408,7 +408,7 @@ const ShiftChangeRequest = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    From_Date: fromDate || ToDate,
+                    From_Date: fromDate || FromDate,
                     To_Date: toDate || ToDate,
                     Employee_ID: sessionStorage.getItem('selectedUserCode'),
                     company_code: sessionStorage.getItem('selectedCompanyCode')
@@ -543,6 +543,10 @@ const ShiftChangeRequest = () => {
         setIsModalOpen(true);
     };
 
+    const reloadGridData = () => {
+   window.location.reload();
+};
+
     return (
         <div className="container-fluid Topnav-screen">
             <ToastContainer position="top-right" className="toast-design" theme="colored" />
@@ -550,7 +554,7 @@ const ShiftChangeRequest = () => {
                 <div className="header-flex">
                     <h1 className="page-title">Shift Change Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div className="icon-btn reload">
+                        <div className="icon-btn reload"  >
                             <span className="tooltip">Reload</span>
                             <i className="fa-solid fa-rotate-right"></i>
                         </div>
@@ -669,13 +673,13 @@ const ShiftChangeRequest = () => {
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${isSelectedCurShiftSc ? "has-value" : ""} 
+                            ${selectedCurShiftSc ? "has-value" : ""} 
                             ${isSelectedCurShiftSc ? "is-focused" : ""}`}
                             title="Please select the Current Shift Code"
                         >
                             <Select
                                 id="Select_slots"
-                                value={isSelectedCurShiftSc}
+                                value={selectedCurShiftSc}
                                 placeholder=" "
                                 options={filteredOptionCurrentShift}
                                 onChange={handleChangeCurShiftSc}
@@ -691,13 +695,13 @@ const ShiftChangeRequest = () => {
                     <div className="col-md-2">
                         <div
                             className={`inputGroup selectGroup 
-                            ${isSelectedReqShiftSc ? "has-value" : ""} 
+                            ${selectedReqShiftSc ? "has-value" : ""} 
                             ${isSelectedReqShiftSc ? "is-focused" : ""}`}
                             title="Please select the Request Shift Code"
                         >
                             <Select
                                 id="Select_slots"
-                                value={isSelectedReqShiftSc}
+                                value={selectedReqShiftSc}
                                 placeholder=" "
                                 options={filteredOptionRequestShift}
                                 onChange={handleChangeReqShiftSc}

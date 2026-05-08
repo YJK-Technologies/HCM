@@ -22,11 +22,11 @@ function AgesReport() {
   const gridApiRef = useRef(null);
 
   // Filters
-  const [First_Name, setFirst_Name] = useState("");
+  const [first_name, setfirst_name] = useState("");
   const [department_id, setDepartmentId] = useState("");
-  const [designation_id, setDesignationId] = useState("");
-  const [FromDate, setFromDate] = useState("");
-  const [ToDate, setToDate] = useState("");
+  const [designation_id, setdesignation_id] = useState("");
+  const [from_date, setfrom_date] = useState("");
+  const [to_date, setto_date] = useState("");
   const [age_group, setAgeGroup] = useState("");
 
   const [selectedAGESTypeSc, setSelectedAGESTypeSc] = useState("");
@@ -50,7 +50,7 @@ function AgesReport() {
 
   const handleDPT = (selectedDPT) => {
     setselecteddept(selectedDPT);
-    setdpt(selectedDPT ? selectedDPT.value : "");
+    setDepartmentId(selectedDPT ? selectedDPT.value : "");
   };
 
   const filteredOptionDPt = DPTdrop.map((option) => ({
@@ -152,8 +152,12 @@ function AgesReport() {
     
 
   const handleSearch = async () => {
+  // To Date earlier than From Date
+  if (new Date(to_date) < new Date(from_date)) {
+    toast.warning("To Date should not be earlier than From Date");
+    return;
+  }
     setLoading(true);
-
     try {
       const response = await fetch(`${config.apiBaseUrl}/getAGES`, {
         method: "POST",
@@ -163,24 +167,28 @@ function AgesReport() {
         body: JSON.stringify({
           mode: "AGES",
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-
           employee_id: empIdSc,
-          first_name: First_Name,
-          department_id: dpt,
+          first_name: first_name,
+          department_id: department_id, 
           designation_id,
-          from_date: FromDate,
-          to_date: ToDate,
+          from_date: from_date,
+          to_date: to_date,
           age_group: AGESTypeSc,
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
         setRowData(data);
       } else {
-        toast.warning("No Data Found");
         setRowData([]);
+        toast.warning("Data Not Found");
       }
+    } else {
+      toast.warning("No Data Found");
+      setRowData([]);
+    }
     } catch (error) {
       toast.error("Error fetching data");
     } finally {
@@ -298,100 +306,142 @@ const generateReport = () => {
   <html>
   <head>
     <title>AGES Report</title>
-    <style>
-      body{
-        font-family:'Segoe UI',sans-serif;
-        margin:0;
-        padding:20px;
-        background:#f4f6f9;
-        color:${fontColor};
-      }
+<style>
+  body{
+    font-family:'Segoe UI',sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f4f6f9;
+    color:${fontColor};
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 
-      .header{
-        display:flex;
-        align-items:center;
-        background:${tableHeaderBg};
-        padding:15px 20px;
-        color:white;
-        border-radius:8px;
-      }
+  .header{
+    display:flex;
+    align-items:center;
+    background:${tableHeaderBg};
+    padding:15px 20px;
+    color:white;
+    border-radius:8px;
+  }
 
-      .logo{
-        height:55px;
-      }
+  .logo{
+    height:55px;
+  }
 
-      .title-section{
-        flex:1;
-        text-align:center;
-      }
+  .title-section{
+    flex:1;
+    text-align:center;
+  }
 
-      .title-section h2{
-        margin:0;
-      }
+  .title-section h2{
+    margin:0;
+  }
 
-      .sub-info{
-        margin:15px 0;
-        font-size:14px;
-        display:flex;
-        justify-content:space-between;
-      }
+  .sub-info{
+    margin:15px 0;
+    font-size:14px;
+    display:flex;
+    justify-content:space-between;
+  }
 
-      table{
-        width:100%;
-        border-collapse:collapse;
-        background:white;
-        border-radius:8px;
-        overflow:hidden;
-        box-shadow:0 4px 8px rgba(0,0,0,0.1);
-      }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+  }
 
-      th{
-        background:${tableHeaderBg};
-        color:white;
-        padding:10px;
-        text-align:left;
-      }
+  th{
+    background:${tableHeaderBg};
+    color:white;
+    padding:10px;
+    text-align:left;
+  }
 
-      td{
-        padding:8px;
-        border-bottom:1px solid #ddd;
-      }
+  td{
+    padding:8px;
+    border-bottom:1px solid #ddd;
+  }
 
-      tr:nth-child(even){
-        background:${rowAltColor};
-      }
+  tr:nth-child(even){
+    background:${rowAltColor};
+  }
 
-      tr:hover{
-        background:${hoverColor};
-      }
+  tr:hover{
+    background:${hoverColor};
+  }
 
-      .footer{
-        margin-top:30px;
-        text-align:center;
-        font-size:13px;
-        opacity:0.7;
-      }
+  .footer{
+    margin-top:30px;
+    text-align:center;
+    font-size:13px;
+    opacity:0.7;
+  }
 
-      .print-btn{
-        margin-top:20px;
-        padding:10px 20px;
-        background:${headerGradientStart};
-        color:white;
-        border:none;
-        border-radius:5px;
-        cursor:pointer;
-        font-size:14px;
-      }
+  .print-btn{
+    margin-top:20px;
+    padding:10px 20px;
+    background:${headerGradientStart};
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:14px;
+  }
 
-      .print-btn:hover{
-        opacity:.85;
-      }
+  .print-btn:hover{
+    opacity:.85;
+  }
 
-      @media print{
-        .print-btn{display:none;}
-        body{background:white;}
-      }
-    </style>
+  @page{
+    size:auto;
+    margin:12mm;
+  }
+
+  @media print{
+
+    html,body{
+      width:100%;
+      background:white !important;
+    }
+
+    body{
+      padding:0;
+      margin:0;
+    }
+
+    .print-btn{
+      display:none !important;
+    }
+
+    .header{
+      background:${tableHeaderBg} !important;
+      color:white !important;
+    }
+
+    th{
+      background:${tableHeaderBg} !important;
+      color:white !important;
+    }
+
+    tr:nth-child(even){
+      background:${rowAltColor} !important;
+    }
+
+    table{
+      box-shadow:none !important;
+    }
+
+    *{
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+  }
+</style>
   </head>
 
   <body>
@@ -661,14 +711,17 @@ const handleExportToExcel = () => {
 
           <div className="action-wrapper">
             <div className="action-icon print" onClick={generateReport}>
+              <span className="tooltip">Print</span>
               <i className="fa-solid fa-print"></i>
             </div>
 
             <div className="action-icon print" onClick={exportToPDF}>
+              <span className="tooltip">Pdf</span>
               <i className="fa-solid fa-file-pdf"></i>
             </div>
-
+ 
             <div className="action-icon print" onClick={handleExportToExcel}>
+              <span className="tooltip">Excel</span>
               <i className="fa-solid fa-file-excel"></i>
             </div>
           </div>
@@ -710,8 +763,8 @@ const handleExportToExcel = () => {
                 type="Text"
                 title="Please Enter the First Name"
                 placeholder=""
-                value={First_Name}
-                onChange={(e) => setFirst_Name(e.target.value)}
+                value={first_name}
+                onChange={(e) => setfirst_name(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 First Name
@@ -751,7 +804,7 @@ const handleExportToExcel = () => {
                 title="Please Enter the Designation"
                 placeholder=""
                 value={designation_id}
-                onChange={(e) => setDesignationId(e.target.value)}
+                onChange={(e) => setdesignation_id(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 Designation
@@ -791,8 +844,8 @@ const handleExportToExcel = () => {
                 type="date"
                 className="exp-input-field form-control"
                 title="Please Enter the From Date"
-                value={FromDate}
-                onChange={(e) => setFromDate(e.target.value)}
+                value={from_date}
+                onChange={(e) => setfrom_date(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 From Date
@@ -806,8 +859,8 @@ const handleExportToExcel = () => {
                 type="date"
                 className="exp-input-field form-control"
                 title="Please Enter the To Date"
-                value={ToDate}
-                onChange={(e) => setToDate(e.target.value)}
+                value={to_date}
+                onChange={(e) => setto_date(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
                 To Date
@@ -818,10 +871,12 @@ const handleExportToExcel = () => {
           <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
+                <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
               <div className="icon-btn reload" onClick={reloadGridData}>
+                <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
             </div>
