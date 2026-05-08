@@ -1434,6 +1434,17 @@ router.post("/shiftChangeRequestReport",dataController.shiftChangeRequestReport)
 router.post("/LoanTypeIdDetails",dataController.LoanTypeIdDetails)
 router.post("/monthlyInstallmentCalculation",dataController.monthlyInstallmentCalculation)
 router.post("/getLoanNotification",dataController.getLoanNotification)
+router.post("/loanNotificationSeen",dataController.loanNotificationSeen)
+router.post("/getLeaveNotification",dataController.getLeaveNotification)
+router.post("/leaveNotificationSeen",dataController.leaveNotificationSeen)
+router.post("/getVisaNotification",dataController.getVisaNotification)
+router.post("/visaNotificationSeen",dataController.visaNotificationSeen)
+router.post("/getTravelNotification",dataController.getTravelNotification)
+router.post("/travelNotificationSeen",dataController.travelNotificationSeen)
+router.post("/getComOffNotification",dataController.getComOffNotification)
+router.post("/compOffNotificationSeen",dataController.compOffNotificationSeen)
+router.post("/getShiftNotification",dataController.getShiftNotification)
+router.post("/shiftNotificationSeen",dataController.shiftNotificationSeen)
 
 
 
