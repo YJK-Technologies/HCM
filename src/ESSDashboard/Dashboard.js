@@ -111,7 +111,9 @@ const Dashboard = () => {
   const [shiftPatternIdDrop, setShiftPatternIdDrop] = useState([]);
   const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
   const [shiftDay, setShiftDay] = useState("");
+  const [TRFromDate, setTRFromDate] = useState("");
   const [shiftFromDate, setShiftFromDate] = useState("");
+  const [TRToDate, setTRToDate] = useState("");
   const [shiftToDate, setShiftToDate] = useState("");
   const [shiftCode, setShiftCode] = useState("");
   const [selectedShiftCode, setSelectedShiftCode] = useState("");
@@ -226,17 +228,21 @@ const Dashboard = () => {
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
 
-    setShiftFromDate(today);
-    setShiftToDate(today);
+    setTRFromDate(today);
+    setTRToDate(today);
 
     fetchTHRSGridData(today, today, "All");
   }, []);
 
   const fetchTHRSGridData = async (
-    fromDate = shiftFromDate,
-    toDate = shiftToDate,
+    fromDate = TRFromDate,
+    toDate = TRToDate,
     userId = user
   ) => {
+      if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+        toast.warning("To Date should not be earlier than From Date");
+        return;
+      }
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -246,8 +252,8 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start_date: fromDate || null,
-          end_date: toDate || null,
+          start_date: TRFromDate || null,
+          end_date: TRToDate || null,
           userid: userId || "All",
           company_code,
           Status: "Active",
@@ -2693,7 +2699,9 @@ const Dashboard = () => {
     setSelectedShiftEmpId('');
     setShiftEmpId('');
     setShiftToDate('');
+    setTRToDate('');
     setShiftFromDate('');
+    setTRFromDate('');
   };
 
   const reloadGridData = () => {
@@ -3348,8 +3356,8 @@ const Dashboard = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
-                    value={shiftFromDate}
-                    onChange={(e) => setShiftFromDate(e.target.value)}
+                    value={TRFromDate}
+                    onChange={(e) => setTRFromDate(e.target.value)}
                   />
                   <label className="exp-form-labels">From Date</label>
                 </div>
@@ -3360,8 +3368,9 @@ const Dashboard = () => {
                   <input
                     type="date"
                     className="exp-input-field form-control"
-                    value={shiftToDate}
-                    onChange={(e) => setShiftToDate(e.target.value)}
+                    value={TRToDate}
+                    min={TRFromDate}
+                    onChange={(e) => setTRToDate(e.target.value)}
                   />
                   <label className="exp-form-labels">To Date</label>
                 </div>
