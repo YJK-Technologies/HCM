@@ -265,16 +265,15 @@ function Input({}) {
             created_by,
           };
 
-          const headerRes = await fetch(
-            `${config.apiBaseUrl}/AcademicRequestHdr`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ headerData: [headerPayload] }),
-            },
-          );
+    const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ headerData: [headerPayload] }),
+      }
+    );
 
           if (!headerRes.ok) {
             const err = await headerRes.json();

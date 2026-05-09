@@ -197,16 +197,15 @@ function EmpFamPersonalDetail({}) {
             created_by,
           };
 
-          const headerRes = await fetch(
-            `${config.apiBaseUrl}/FamilyRequestHdr`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ headerData: [headerPayload] }),
-            },
-          );
+      const headerRes = await fetch(`${config.apiBaseUrl}/FamilyRequestHdr`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ headerData: [headerPayload] }),
+        }
+      );
 
           if (!headerRes.ok) {
             const err = await headerRes.json();
