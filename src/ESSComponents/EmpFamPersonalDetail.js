@@ -193,8 +193,7 @@ function EmpFamPersonalDetail({ }) {
         created_by,
       };
 
-      const headerRes = await fetch(
-        `${config.apiBaseUrl}/FamilyRequestHdr`,
+      const headerRes = await fetch(`${config.apiBaseUrl}/FamilyRequestHdr`,
         {
           method: "POST",
           headers: {

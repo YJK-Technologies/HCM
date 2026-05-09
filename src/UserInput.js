@@ -50,7 +50,6 @@ function UserInput({ }) {
 
   const modified_by = sessionStorage.getItem("selectedUserCode");
 
-  const [isUpdated, setIsUpdated] = useState(false);
   const [isSelectGender, setIsSelectGender] = useState(false);
   const [isSelectLog, setIsSelectLog] = useState(false);
   const [isSelectRole, setIsSelectRole] = useState(false);
@@ -105,7 +104,7 @@ function UserInput({ }) {
   };
 
   useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
+    if (mode === "update" && selectedRow) {
       setUser_code(selectedRow.user_code || "");
       setUser_name(selectedRow.user_name || "");
       setFirst_name(selectedRow.first_name || "");
@@ -153,7 +152,7 @@ function UserInput({ }) {
     } else if (mode === "create") {
       clearInputFields();
     }
-  }, [mode, selectedRow, isUpdated]);
+  }, [mode, selectedRow]);
 
   const base64ToFile = (base64Data, fileName) => {
     if (!base64Data || !base64Data.startsWith("data:")) {

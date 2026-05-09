@@ -989,11 +989,11 @@ const Dashboard = () => {
 
       /* ---------- Employee Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequest`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ RepManager: user_code, company_code }),
           },
         );
 
@@ -1004,11 +1004,11 @@ const Dashboard = () => {
 
       /* ---------- Employee Family Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequest`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, RepManager: user_code, }),
           },
         );
 
@@ -1019,11 +1019,11 @@ const Dashboard = () => {
 
       /* ---------- Academic ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequest`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, RepManager: user_code, }),
           },
         );
 
@@ -1034,11 +1034,11 @@ const Dashboard = () => {
 
       /* ---------- Documents ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequest`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, RepManager: user_code, }),
           },
         );
 
@@ -1065,11 +1065,12 @@ const Dashboard = () => {
 
       /* ---------- Employee Assets ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequestDetails`,
+        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequest`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code,
+            RepManager: user_code, }),
           },
         );
 
@@ -1188,7 +1189,7 @@ const Dashboard = () => {
             type: "Employee",
             id: row.Info_request_id,
             EmployeeId: row.EmployeeId,
-            EmployeeName: row.Employee_Name,
+            EmployeeName: row.EmployeeName,
             title: "Detail Changes",
             status: row.request_status,
           };

@@ -56,7 +56,7 @@ function EmployeeAssets({}) {
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const EmpAssetsPermissions = permissions
-    .filter((permission) => permission.screen_type === "Family")
+    .filter((permission) => permission.screen_type === "EmpAssetsRequest")
     .map((permission) => permission.permission_type.toLowerCase());
 
     const EmployeeID = sessionStorage.getItem("selectedUserCode");

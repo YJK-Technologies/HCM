@@ -629,7 +629,7 @@ const TopBar = () => {
                                   <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Loan Update</p>
                                   <span className="badge bg-soft-warning text-warning x-small">Loan</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4', paddingLeft: "0px" }}>
                                   {noti.message}
                                 </p>
                               </div>
@@ -656,10 +656,10 @@ const TopBar = () => {
                               </div>
                               <div>
                                 <div className="d-flex align-items-center gap-2">
-                                  <p className="mb-0 fw-bold text-white small">Leave Update</p>
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Leave Update</p>
                                   <span className="badge bg-soft-success text-success-light x-small">Leave</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', paddingLeft: "0px" }}>
                                   {noti.message} ({new Date(noti.FromDate).toLocaleDateString()})
                                 </p>
                               </div>
@@ -689,7 +689,7 @@ const TopBar = () => {
                                   <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Visa Update</p>
                                   <span className="badge bg-soft-info text-info x-small">Visa</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4', paddingLeft: "0px" }}>
                                   {noti.message} ({new Date(noti.travel_start_date).toLocaleDateString()})
                                 </p>
                               </div>
@@ -714,7 +714,7 @@ const TopBar = () => {
                                   <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Travel Update</p>
                                   <span className="badge bg-soft-cyan text-cyan x-small">Travel</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4', paddingLeft: "0px" }}>
                                   {noti.message} ({new Date(noti.travel_start_date).toLocaleDateString()})
                                 </p>
                               </div>
@@ -739,10 +739,10 @@ const TopBar = () => {
                               </div>
                               <div>
                                 <div className="d-flex align-items-center gap-2">
-                                  <p className="mb-0 fw-bold text-white small">Comp Off Update</p>
+                                  <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Comp Off Update</p>
                                   <span className="badge bg-soft-orange text-orange x-small">Comp Off</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', paddingLeft: "0px" }}>
                                   {noti.message} ({new Date(noti.HolidayDate).toLocaleDateString()})
                                 </p>
                               </div>
@@ -771,7 +771,7 @@ const TopBar = () => {
                                   <p className="mb-0 fw-bold text-white small" style={{ paddingLeft: "0px" }}>Shift Update</p>
                                   <span className="badge bg-soft-indigo text-indigo x-small">Shift</span>
                                 </div>
-                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                <p className="text-white-50 small mb-0 mt-1" style={{ fontSize: '11px', lineHeight: '1.4', paddingLeft: "0px" }}>
                                   {noti.message} ({new Date(noti.effective_date).toLocaleDateString()})
                                 </p>
                               </div>

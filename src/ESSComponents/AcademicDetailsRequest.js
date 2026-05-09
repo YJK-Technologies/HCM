@@ -218,8 +218,7 @@ const handleSave = async () => {
       created_by
     };
 
-    const headerRes = await fetch(
-      `${config.apiBaseUrl}/AcademicRequestHdr`,
+    const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
       {
         method: "POST",
         headers: {

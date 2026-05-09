@@ -1445,6 +1445,11 @@ router.post("/getComOffNotification",dataController.getComOffNotification)
 router.post("/compOffNotificationSeen",dataController.compOffNotificationSeen)
 router.post("/getShiftNotification",dataController.getShiftNotification)
 router.post("/shiftNotificationSeen",dataController.shiftNotificationSeen)
+router.post("/GetPersonalRequest",dataController.GetPersonalRequest)
+router.post("/GetFamilyRequest",dataController.GetFamilyRequest)
+router.post("/GetAcademicRequest",dataController.GetAcademicRequest)
+router.post("/GetDocumentsRequest",dataController.GetDocumentsRequest)
+router.post("/GetAssetRequest",dataController.GetAssetRequest)
 
 
 

@@ -210,8 +210,7 @@ function ManualEmployeeInfo({}) {
       created_by,
     };
 
-    const headerRes = await fetch(
-      `${config.apiBaseUrl}/PersonalRequestHdr`,
+    const headerRes = await fetch(`${config.apiBaseUrl}/PersonalRequestHdr`,
       {
         method: "POST",
         headers: {
