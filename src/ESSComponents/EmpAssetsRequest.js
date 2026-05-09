@@ -14,7 +14,7 @@ const config = require("../Apiconfig");
 
 function EmployeeAssets({}) {
   const [loading, setLoading] = useState(false);
-  
+
   const [error, setError] = useState(false);
   const [showAsterisk, setShowAsterisk] = useState(true);
   const navigate = useNavigate();
@@ -31,6 +31,9 @@ function EmployeeAssets({}) {
   const [selectedAssetID, setselectedAssetID] = useState("");
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
+  
+  const [Managerdrop, setManagerdrop] = useState([]);
+  const [isSelectRepManager, setIsSelectRepManager] = useState({});
 
   const [Assetvalue, setAssetvalue] = useState([
     {
@@ -48,6 +51,8 @@ function EmployeeAssets({}) {
           ApprovedBy: "",
           Remarks: "",
           keyfield: "",
+          RepManager: "",
+          selectRepManager: null,
         },
       ],
     },
@@ -59,13 +64,12 @@ function EmployeeAssets({}) {
     .filter((permission) => permission.screen_type === "Family")
     .map((permission) => permission.permission_type.toLowerCase());
 
-    const EmployeeID = sessionStorage.getItem("selectedUserCode");
-      useEffect(() => {
-        if (AssetIDDrop.length > 0 && EmployeeID
-        ) {
-          handleEmployeeAssets(EmployeeID);
-        }
-      }, [AssetIDDrop, EmployeeID]);
+  const EmployeeID = sessionStorage.getItem("selectedUserCode");
+  useEffect(() => {
+    if (AssetIDDrop.length > 0 && EmployeeID) {
+      handleEmployeeAssets(EmployeeID);
+    }
+  }, [AssetIDDrop, EmployeeID]);
 
   const AcademicDet = () => {
     navigate("/AcademicDetReq");
@@ -88,10 +92,10 @@ function EmployeeAssets({}) {
   };
 
   const tabs = [
-    { label: 'Personal Details' },
-    { label: 'Family' },
-    { label: 'Academic Details' },
-    { label: 'Documents' },
+    { label: "Personal Details" },
+    { label: "Family" },
+    { label: "Academic Details" },
+    { label: "Documents" },
     { label: "Assets" },
   ];
 
@@ -103,20 +107,20 @@ function EmployeeAssets({}) {
       case "Personal Details":
         EmployeeLoan();
         break;
-        case 'Family':
-          Insurance1();
-          break;
-        case 'Academic Details':
-          AcademicDet();
-          break;
-        case 'Documents':
-          Documents();
-          break;
+      case "Family":
+        Insurance1();
+        break;
+      case "Academic Details":
+        AcademicDet();
+        break;
+      case "Documents":
+        Documents();
+        break;
       case "Assets":
         EmployeeAssets();
         break;
 
-          default:
+      default:
         break;
     }
   };
@@ -139,6 +143,8 @@ function EmployeeAssets({}) {
                   ConditionAtReturn: "",
                   ApprovedBy: "",
                   Remarks: "",
+                  RepManager: "",
+                  selectRepManager: null,
                 },
               ],
             }
@@ -227,7 +233,7 @@ function EmployeeAssets({}) {
 
     if (data && data.length > 0) {
       // const selected = data[0]; // since single select
-      const [{EmployeeID }] = data;
+      const [{ EmployeeID }] = data;
       handleEmployeeAssets(EmployeeID);
       // Example: set into your form
       // setAssetvalue((prev) =>
@@ -251,84 +257,125 @@ function EmployeeAssets({}) {
     }
   };
 
-  const handleSave = async () => {
-  if (!EmployeeID?.trim()) {
-    toast.warning("Employee ID is required");
-    return;
-  }
+  const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
 
-  // Validate required fields
-  for (const group of Assetvalue) {
-    for (const member of group.members) {
-      if (
-        !member.AssetID ||
-        !member.ExpectedReturnDate ||
-        !member.selectedStatus
-      ) {
-        toast.warning("Please fill all required fields");
-        return;
+  const handleChangeRepManager = (selectedRepManager, relation, index) => {
+    setAssetvalue((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      RepManager: selectedRepManager
+                        ? selectedRepManager.value
+                        : "",
+                      selectRepManager: selectedRepManager,
+                    }
+                  : member,
+              ),
+            }
+          : doc,
+      ),
+    );
+  };
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching manager:", error));
+  }, []);
+
+  const handleSave = async () => {
+    if (!EmployeeID?.trim()) {
+      toast.warning("Employee ID is required");
+      return;
+    }
+
+    // Validate required fields
+    for (const group of Assetvalue) {
+      for (const member of group.members) {
+        if (
+          !member.AssetID ||
+          !member.ExpectedReturnDate ||
+          !member.selectedStatus
+        ) {
+          toast.warning("Please fill all required fields");
+          return;
+        }
       }
     }
-  }
-  showConfirmationToast(
+    showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
+        try {
+          setLoading(true);
 
-  try {
-    setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const created_by = sessionStorage.getItem("selectedUserCode");
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
+          /* ---------------- HEADER ---------------- */
+          const headerPayload = {
+            company_code,
+            EmployeeId: EmployeeID,
+            purpose: "Asset Request", // or bind from UI if needed
+            request_status: "Pending",
+            created_by,
+          };
 
-    /* ---------------- HEADER ---------------- */
-    const headerPayload = {
-      company_code,
-      EmployeeId: EmployeeID,
-      purpose: "Asset Request", // or bind from UI if needed
-      request_status: "Pending",
-      created_by,
-    };
+          const headerRes = await fetch(
+            `${config.apiBaseUrl}/AssetRequestHdr`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            },
+          );
 
-    const headerRes = await fetch(
-      `${config.apiBaseUrl}/AssetRequestHdr`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ headerData: [headerPayload] }),
-      }
-    );
+          if (!headerRes.ok) {
+            const err = await headerRes.json();
+            throw new Error(err.message);
+          }
 
-    if (!headerRes.ok) {
-      const err = await headerRes.json();
-      throw new Error(err.message);
-    }
+          const headerResult = await headerRes.json();
+          const info_request_id = headerResult?.[0]?.info_request_id;
 
-    const headerResult = await headerRes.json();
-    const info_request_id = headerResult?.[0]?.info_request_id;
+          if (!info_request_id) {
+            throw new Error("info_request_id not returned from backend");
+          }
 
-    if (!info_request_id) {
-      throw new Error("info_request_id not returned from backend");
-    }
+          /* ---------------- DETAILS ---------------- */
+          await saveAssetDetails(info_request_id);
 
-    /* ---------------- DETAILS ---------------- */
-    await saveAssetDetails(info_request_id);
-
-    toast.success("Asset request submitted successfully!", {
-      onClose: () => window.location.reload(),
-    });
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Error: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-  },
-            () => {
-              toast.info("Data updated cancelled.");
-            }
+          toast.success("Asset request submitted successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        } catch (error) {
+          console.error(error);
+          toast.error("Error: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      },
     );
   };
 
@@ -349,21 +396,18 @@ function EmployeeAssets({}) {
           ExpectedReturnDate: row.ExpectedReturnDate || null,
           ActualReturnDate: row.ActualReturnDate || null,
           Remarks: row.Remarks || "",
-
+          RepManager: row.RepManager || "",
           CreatedBy: created_by,
-        }))
+        })),
       );
 
-      const res = await fetch(
-        `${config.apiBaseUrl}/AssetRequestDetails`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ detailsData }),
-        }
-      );
+      const res = await fetch(`${config.apiBaseUrl}/AssetRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ detailsData }),
+      });
 
       if (!res.ok) {
         const err = await res.json();
@@ -371,7 +415,6 @@ function EmployeeAssets({}) {
       }
 
       console.log("Asset Details inserted successfully");
-
     } catch (error) {
       console.error(error);
       toast.error("Error inserting asset details: " + error.message);
@@ -434,7 +477,7 @@ function EmployeeAssets({}) {
       ),
     );
   };
-  
+
   const handleEmployeeAssets = async (code) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/getEmployeeAssets`, {
@@ -451,13 +494,13 @@ function EmployeeAssets({}) {
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
-        const emp = data[0];
+          const emp = data[0];
 
-        // setEmployeeID(emp.EmployeeID || "");
-        setFirst_Name(emp.First_Name || "");
-        setdepartment_id(emp.department_id || "");
-        setdesignation_id(emp.designation_id || "");
-      }
+          // setEmployeeID(emp.EmployeeID || "");
+          setFirst_Name(emp.First_Name || "");
+          setdepartment_id(emp.department_id || "");
+          setdesignation_id(emp.designation_id || "");
+        }
         console.log("Fetched Employee Assets:", data);
 
         if (!data || data.length === 0) {
@@ -478,6 +521,8 @@ function EmployeeAssets({}) {
                   ApprovedBy: "",
                   Remarks: "",
                   keyfield: "",
+                  RepManager: "",
+                  selectRepManager: null,
                 },
               ],
             },
@@ -510,14 +555,19 @@ function EmployeeAssets({}) {
               ConditionAtReturn: item.ConditionAtReturn || "",
               ApprovedBy: item.ApprovedBy || "",
               Remarks: item.Remarks || "",
-              keyfield: item.Keyfield  || "",
+              keyfield: item.Keyfield || "",
+              RepManager: item.RepManager || "",
+              selectRepManager: item.RepManager
+                ? filteredOptionManager.find(
+                    (opt) => opt.value === item.RepManager,
+                  )
+                : null,
             })),
           },
         ];
 
         setAssetvalue(mappedAssets);
-                console.log(mappedAssets);
-
+        console.log(mappedAssets);
       } else if (response.status === 404) {
         toast.warning("Data not found");
 
@@ -536,6 +586,8 @@ function EmployeeAssets({}) {
                 ApprovedBy: "",
                 Remarks: "",
                 keyfield: "",
+                RepManager: "",
+                selectRepManager: null,
               },
             ],
           },
@@ -631,7 +683,6 @@ function EmployeeAssets({}) {
       fetchAssetId();
     }
   }, []);
-
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -732,7 +783,7 @@ function EmployeeAssets({}) {
                   className={`inputGroup selectGroup 
                    ${member.AssetID ? "has-value" : ""} 
                    ${isSelectAssetID[index] ? "is-focused" : ""}`}
-                    title="Please Select the Asset ID"
+                  title="Please Select the Asset ID"
                 >
                   <Select
                     type="number"
@@ -740,14 +791,18 @@ function EmployeeAssets({}) {
                     placeholder=" "
                     autoComplete="off"
                     inputMode="numeric"
-                    onFocus={() => setIsisSelectAssetID((prev) => ({
+                    onFocus={() =>
+                      setIsisSelectAssetID((prev) => ({
                         ...prev,
                         [index]: true,
-                      }))}
-                    onBlur={() => setIsisSelectAssetID((prev) => ({
-                      ...prev,
-                      [index]: false,
-                    }))}
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsisSelectAssetID((prev) => ({
+                        ...prev,
+                        [index]: false,
+                      }))
+                    }
                     value={member.AssetID}
                     classNamePrefix="react-select"
                     onChange={(selectedOption) =>
@@ -814,9 +869,9 @@ function EmployeeAssets({}) {
                 <div className="inputGroup">
                   <input
                     type="date"
-                      name="ActualReturnDate"
+                    name="ActualReturnDate"
                     className="exp-input-field form-control"
-                      title="Please Enter the Actual Return Date"
+                    title="Please Enter the Actual Return Date"
                     value={member.ActualReturnDate}
                     maxLength={18}
                     placeholder=" "
@@ -843,7 +898,7 @@ function EmployeeAssets({}) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                      title="Please Enter the Remarks"
+                    title="Please Enter the Remarks"
                     placeholder=" "
                     value={member.Remarks}
                     pattern="[A-Za-z]+"
@@ -871,7 +926,7 @@ function EmployeeAssets({}) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                      title="Please Enter the Purpose"
+                    title="Please Enter the Purpose"
                     placeholder=" "
                     value={member.Purpose}
                     pattern="[A-Za-z]+"
@@ -894,6 +949,43 @@ function EmployeeAssets({}) {
                 </div>
               </div>
 
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectRepManager ? "has-value" : ""} 
+                  ${isSelectRepManager[`${relationGroup.relation}-${index}`]? "is-focused": ""}`}
+                  title="Please Select the Reporting Manager"
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: false,
+                      }))
+                    }
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRepManager}
+                    options={filteredOptionManager}
+                    onChange={(selectRepManager) =>
+                      handleChangeRepManager(
+                        selectRepManager,
+                        relationGroup.relation,
+                        index,
+                      )
+                    }
+                  />
+
+                  <label className="floating-label">Reporting Manager</label>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -901,7 +993,7 @@ function EmployeeAssets({}) {
       <EmployeeAssetsPopup
         open={open}
         handleClose={handleClose}
-        onSelectAssets={handleAssetSelect} 
+        onSelectAssets={handleAssetSelect}
       />
     </div>
   );

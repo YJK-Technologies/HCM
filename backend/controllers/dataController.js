@@ -45325,10 +45325,11 @@ const AcademicRequestDetails = async (req, res) => {
         .input("academicYear", sql.Date, insertRow.academicYear)
         .input("document", sql.VarBinary, document)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(`EXEC sp_ess_employee_academic_request_dtls 
+        .input("RepManager", sql.NVarChar, insertRow.RepManager)
+        .query(`EXEC sp_ess_employee_academic_request_dtls_test 
           @mode, @detail_id, @info_request_id, '', @company_code, 
           @EmployeeId, @request_status, @academicName, @major, 
-          @institution, @academicYear, @document, @created_by, '', '', '', ''`);
+          @institution, @academicYear, @document, @created_by, '', '', '', '', @RepManager`);
     }
 
     res.status(200).json("Details inserted successfully");
@@ -45369,7 +45370,7 @@ const GetAcademicRequestDetails = async (req, res) => {
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
       .query(
-        ` EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name, @from_date, @to_date`,
+        ` EXEC sp_ess_employee_academic_request_dtls_test 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name, @from_date, @to_date, ''`,
       );
 
     if (result.recordset.length > 0) {
@@ -45414,8 +45415,8 @@ const ApproveAcademicRequest = async (req, res) => {
         .input("document", sql.VarBinary, null)
         .input("created_by", sql.NVarChar, row.created_by)
         .input("modified_by", sql.NVarChar, row.modified_by)
-        .query(` EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, @modified_by, '', '', '' `);
+        .query(` EXEC sp_ess_employee_academic_request_dtls_test @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
+        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, @modified_by, '', '', '', '' `);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
@@ -45570,8 +45571,9 @@ const PersonalRequestDetails = async (req, res) => {
         .input("Other_Id_Type", sql.NVarChar, row.Other_Id_Type)
         .input("Other_Id_No", sql.NVarChar, row.Other_Id_No) // :point_down: Created
 
-        .input("created_by", sql.NVarChar, row.created_by).query(`
-          EXEC sp_ess_employee_personal_request_dtls
+        .input("created_by", sql.NVarChar, row.created_by)
+        .input("RepManager", sql.NVarChar, row.RepManager)
+        .query(` EXEC sp_ess_employee_personal_request_dtls_test
           @mode, @detail_id, @info_request_id, @keyfield, @company_code,
           @EmployeeId, @request_status,
           @First_Name, @Middle_Name, @Last_Name, @father_name, @mother_name,
@@ -45588,7 +45590,7 @@ const PersonalRequestDetails = async (req, res) => {
           @City, @State, @Postal_Code, @Country,
           @Passport_No, @Passport_Expiry_Date,
           @Other_Id_Type, @Other_Id_No,
-          @created_by, '', '', '', ''
+          @created_by, '', '', '', '', @RepManager
         `);
     }
 
@@ -45688,7 +45690,7 @@ const ApprovePersonalRequest = async (req, res) => {
         .input("modified_by", sql.NVarChar, row.modified_by)
 
         .query(`
-          EXEC sp_ess_employee_personal_request_dtls
+          EXEC sp_ess_employee_personal_request_dtls_test
           @mode, @detail_id, @info_request_id, @keyfield, @company_code,
           @EmployeeId, @request_status,
           @First_Name, @Middle_Name, @Last_Name, @father_name, @mother_name,
@@ -45705,7 +45707,7 @@ const ApprovePersonalRequest = async (req, res) => {
           @City, @State, @Postal_Code, @Country,
           @Passport_No, @Passport_Expiry_Date,
           @Other_Id_Type, @Other_Id_No,
-          @created_by, @modified_by, '', '', ''
+          @created_by, @modified_by, '', '', '',''
         `);
     }
 
@@ -45739,9 +45741,9 @@ const GetPersonalRequestDetails = async (req, res) => {
       .input("column_name", sql.NVarChar, column_name || "")
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
-      .query(`EXEC sp_ess_employee_personal_request_dtls @mode, @detail_id, @info_request_id, '',  @company_code, @EmployeeId, 
+      .query(`EXEC sp_ess_employee_personal_request_dtls_test @mode, @detail_id, @info_request_id, '',  @company_code, @EmployeeId, 
     '', '', '', '', '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', NULL, '', '', '', 0, 
-    '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', '', '', '', '', NULL, '', '', '', '', @column_name, @from_date, @to_date;`);
+    '', '', '', '', '', '', 0, 0, '', '', '', '', '', '', '', '', '', '', NULL, '', '', '', '', @column_name, @from_date, @to_date, '';`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -45827,8 +45829,8 @@ const GetFamilyRequestDetails = async (req, res) => {
       .input("column_name", sql.NVarChar, column_name || "")
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
-      .query(` EXEC sp_ess_employee_family_request_dtls 'SC', 0,  @Info_request_id, '', @company_code, @EmployeeId, '',  
-        '', '', NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', @column_name, @from_date, @to_date 
+      .query(` EXEC sp_ess_employee_family_request_dtls_test 'SC', 0,  @Info_request_id, '', @company_code, @EmployeeId, '',  
+        '', '', NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', @column_name, @from_date, @to_date, ''
       `);
 
     if (result.recordset.length > 0) {
@@ -45889,9 +45891,9 @@ const ApproveFamilyRequest = async (req, res) => {
         .input("column_name", sql.NVarChar, "")
         .input("from_date", sql.Date, null)
         .input("to_date", sql.Date, null)
-        .query(` EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status,
+        .query(` EXEC sp_ess_employee_family_request_dtls_test @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status,
           @Relation, @Name, @DOB, @AGE, @aadhar_no, @Sex, @Nationality, @CPR_No, @CPR_Expiry_Date, 
-          @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, @modified_by, @column_name, @from_date, @to_date `);
+          @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, @modified_by, @column_name, @from_date, @to_date, '' `);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -45948,9 +45950,10 @@ const FamilyRequestDetails = async (req, res) => {
         .input("column_name", sql.NVarChar, "")
         .input("from_date", sql.Date, null)
         .input("to_date", sql.Date, null)
-        .query(` EXEC sp_ess_employee_family_request_dtls @mode, @detail_id, @info_request_id, @keyfield, 
+        .input("RepManager", sql.NVarChar, insertRow.RepManager)
+        .query(` EXEC sp_ess_employee_family_request_dtls_test @mode, @detail_id, @info_request_id, @keyfield, 
           @company_code, @EmployeeId, @request_status, @Relation, @Name, @DOB, @AGE, @aadhar_no, @Sex, @Nationality, @CPR_No, 
-          @CPR_Expiry_Date, @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, '', @column_name, @from_date, @to_date `);
+          @CPR_Expiry_Date, @Passport_No, @Passport_Expiry_Date, @Visa_Entitled, @Visa_Expiry_Date, @Air_Ticket_Entitled, @created_by, '', @column_name, @from_date, @to_date, @RepManager `);
     }
 
     res.status(200).json("Family request details inserted successfully");
@@ -45996,9 +45999,10 @@ const DocumentRequestDetails = async (req, res) => {
         .input("document_Name", sql.NVarChar, insertRow.document_Name)
         .input("document_files", sql.VarBinary, document_files)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(`EXEC sp_ess_employee_document_request_dtls
+        .input("RepManager", sql.NVarChar, insertRow.RepManager)
+        .query(`EXEC sp_ess_employee_document_request_dtls_test
           @mode, @detail_id, @info_request_id, @keyfield, @company_code,
-          @EmployeeId, @request_status, @document_Name, @document_files, @created_by, '', '', '', ''`);
+          @EmployeeId, @request_status, @document_Name, @document_files, @created_by, '', '', '', '', @RepManager`);
     }
 
     res.status(200).json("Details inserted successfully");
@@ -46039,7 +46043,7 @@ const GetDocumentsRequestDetails = async (req, res) => {
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
       .query(
-        ` EXEC sp_ess_employee_document_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', Null, '', '', @column_name, @from_date, @to_date`,
+        ` EXEC sp_ess_employee_document_request_dtls_test 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', Null, '', '', @column_name, @from_date, @to_date, ''`,
       );
 
     if (result.recordset.length > 0) {
@@ -46081,8 +46085,8 @@ const ApproveDocumentRequest = async (req, res) => {
         .input("document_files", sql.VarBinary, null)
         .input("created_by", sql.NVarChar, row.created_by)
         .input("modified_by", sql.NVarChar, row.modified_by)
-        .query(` EXEC sp_ess_employee_document_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @document_Name, @document_files, @created_by, @modified_by, '', '', '' `);
+        .query(` EXEC sp_ess_employee_document_request_dtls_test @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
+        @request_status, @document_Name, @document_files, @created_by, @modified_by, '', '', '', '' `);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
@@ -47324,7 +47328,7 @@ const GetAssetRequestDetails = async (req, res) => {
       .input("FieldName", sql.NVarChar, FieldName || "")
       .input("FromDate", sql.Date, FromDate || null) 
       .input("ToDate", sql.Date, ToDate || null)
-      .query(` EXEC sp_employee_assets_request_dtls 'SC',0, @info_request_id, '', @EmployeeId, @company_code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate;
+      .query(` EXEC sp_employee_assets_request_dtls_test 'SC',0, @info_request_id, '', @EmployeeId, @company_code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate, '';
       `);
 
     if (result.recordset.length > 0) {
@@ -47372,8 +47376,8 @@ const ApproveAssetRequest = async (req, res) => {
         .input("CreatedBy", sql.NVarChar, row.CreatedBy)
         .input("ModifiedBy", sql.NVarChar, row.ModifiedBy)
         .query(` 
-          EXEC sp_employee_assets_request_dtls 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, @ModifiedBy, '', '', ''`);
+          EXEC sp_employee_assets_request_dtls_test 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, @ModifiedBy, '', '', '', ''`);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -47416,8 +47420,9 @@ const AssetRequestDetails = async (req, res) => {
         .input("ActualReturnDate", sql.Date, insertRow.ActualReturnDate)
         .input("Remarks", sql.NVarChar, insertRow.Remarks)
         .input("CreatedBy", sql.NVarChar, insertRow.CreatedBy)
-        .query(`sp_employee_assets_request_dtls 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-              @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', ''`);
+        .input("RepManager", sql.NVarChar, insertRow.RepManager)
+        .query(`sp_employee_assets_request_dtls_test 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, 
+              @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', '', @RepManager`);
     }
 
     res.status(200).json("Asset request details inserted successfully");
@@ -50342,6 +50347,6 @@ module.exports = {
   getComOffNotification,
   compOffNotificationSeen,
   getShiftNotification,
-  shiftNotificationSeen
+  shiftNotificationSeen,
 
 };

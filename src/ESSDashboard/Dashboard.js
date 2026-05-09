@@ -988,19 +988,32 @@ const Dashboard = () => {
       }
 
       /* ---------- Employee Change ---------- */
-      try {
-        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code }),
-          },
-        );
+      // try {
+      //   const res = await fetch(`${config.apiBaseUrl}/GetEmployeeRequest`,
+      //     {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify({ RepManager: user_code, company_code }),
+      //     },
+      //   );
 
-        if (res.ok) empData = await res.json();
-      } catch (err) {
-        console.log("Employee API failed");
-      }
+      //   if (res.ok) travelData = await res.json();
+      // } catch (err) {
+      //   console.log("Travel API failed");
+      // }
+      try {
+         const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
+           {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ company_code }),
+           },
+         );
+
+         if (res.ok) empData = await res.json();
+       } catch (err) {
+         console.log("Employee API failed");
+       }
 
       /* ---------- Employee Family Change ---------- */
       try {

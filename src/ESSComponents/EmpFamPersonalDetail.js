@@ -11,7 +11,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function EmpFamPersonalDetail({ }) {
+function EmpFamPersonalDetail({}) {
   const [familyMembers, setFamilyMembers] = useState([
     {
       relation: "familyMembers",
@@ -32,6 +32,7 @@ function EmpFamPersonalDetail({ }) {
           visaExpiryDate: "",
           airTicketEntitled: "",
           keyfield: "",
+          RepManager: "",
         },
       ],
     },
@@ -57,9 +58,12 @@ function EmpFamPersonalDetail({ }) {
   const [isSelectNationality, setIsSelectNationality] = useState({});
   const [isSelectAirTicket, setIsSelectAirTicket] = useState({});
   const [isSelectVisa, setIsSelectVisa] = useState({});
+  const [isSelectRepManager, setIsSelectRepManager] = useState({});
   const [loading, setLoading] = useState(false);
   const [purpose, setpurpose] = useState("");
   const [familyData, setFamilyData] = useState([]);
+
+  const [Managerdrop, setManagerdrop] = useState([]);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -69,7 +73,8 @@ function EmpFamPersonalDetail({ }) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-    if (relativedrop.length > 0 &&
+    if (
+      relativedrop.length > 0 &&
       sexDrop.length > 0 &&
       nationalityDrop.length > 0 &&
       booleanDrop.length > 0
@@ -100,12 +105,12 @@ function EmpFamPersonalDetail({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: [
-              ...item.members,
-              { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
-            ],
-          }
+              ...item,
+              members: [
+                ...item.members,
+                { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
+              ],
+            }
           : item,
       ),
     );
@@ -126,11 +131,11 @@ function EmpFamPersonalDetail({ }) {
       prev.map((item) =>
         item.relation === relation
           ? {
-            ...item,
-            members: item.members.map((member, i) =>
-              i === index ? { ...member, [field]: value } : member,
-            ),
-          }
+              ...item,
+              members: item.members.map((member, i) =>
+                i === index ? { ...member, [field]: value } : member,
+              ),
+            }
           : item,
       ),
     );
@@ -150,7 +155,7 @@ function EmpFamPersonalDetail({ }) {
       case "Academic Details":
         AcademicDet();
         break;
-      case 'Documents':
+      case "Documents":
         Documents();
         break;
       case "Assets":
@@ -164,7 +169,7 @@ function EmpFamPersonalDetail({ }) {
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
-    { label: 'Documents' },
+    { label: "Documents" },
     { label: "Assets" },
   ];
 
@@ -175,65 +180,63 @@ function EmpFamPersonalDetail({ }) {
     }
 
     showConfirmationToast(
-        "Are you sure you want to update the data ?",
-        async () => {
+      "Are you sure you want to update the data ?",
+      async () => {
+        try {
+          setLoading(true);
 
-    try {
-      setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const created_by = sessionStorage.getItem("selectedUserCode");
 
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
-      const created_by = sessionStorage.getItem("selectedUserCode");
+          /* ---------------- HEADER ---------------- */
+          const headerPayload = {
+            company_code,
+            EmployeeId,
+            purpose: purpose,
+            request_status: "Pending",
+            created_by,
+          };
 
-      /* ---------------- HEADER ---------------- */
-      const headerPayload = {
-        company_code,
-        EmployeeId,
-        purpose: purpose,
-        request_status: "Pending",
-        created_by,
-      };
+          const headerRes = await fetch(
+            `${config.apiBaseUrl}/FamilyRequestHdr`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            },
+          );
 
-      const headerRes = await fetch(
-        `${config.apiBaseUrl}/FamilyRequestHdr`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ headerData: [headerPayload] }),
+          if (!headerRes.ok) {
+            const err = await headerRes.json();
+            throw new Error(err.message);
+          }
+
+          const headerResult = await headerRes.json();
+          const info_request_id = headerResult?.[0]?.info_request_id;
+
+          if (!info_request_id) {
+            throw new Error("info_request_id not returned from backend");
+          }
+
+          /* ---------------- DETAILS ---------------- */
+          await saveFamilyDetails(info_request_id);
+
+          toast.success("Family details submitted successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        } catch (err) {
+          console.error(err);
+          toast.error("Error: " + err.message);
+        } finally {
+          setLoading(false);
         }
-      );
-
-      if (!headerRes.ok) {
-        const err = await headerRes.json();
-        throw new Error(err.message);
-      }
-
-      const headerResult = await headerRes.json();
-      const info_request_id = headerResult?.[0]?.info_request_id;
-
-      if (!info_request_id) {
-        throw new Error("info_request_id not returned from backend");
-      }
-
-      /* ---------------- DETAILS ---------------- */
-      await saveFamilyDetails(info_request_id);
-
-      toast.success("Family details submitted successfully!", {
-        onClose: () => window.location.reload(),
-      });
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-    },
-              () => {
-                toast.info("Data updated cancelled.");
-              }
-      );
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      },
+    );
   };
 
   const saveFamilyDetails = async (info_request_id) => {
@@ -263,21 +266,19 @@ function EmpFamPersonalDetail({ }) {
           Visa_Entitled: row.visaEntitled || 0,
           Visa_Expiry_Date: row.visaExpiryDate || null,
           Air_Ticket_Entitled: row.airTicketEntitled === "1" ? true : false,
+          RepManager: row.RepManager,
 
           created_by,
-        }))
+        })),
       );
 
-      const res = await fetch(
-        `${config.apiBaseUrl}/FamilyRequestDetails`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ detailsData }),
-        }
-      );
+      const res = await fetch(`${config.apiBaseUrl}/FamilyRequestDetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ detailsData }),
+      });
 
       if (!res.ok) {
         const err = await res.json();
@@ -285,7 +286,6 @@ function EmpFamPersonalDetail({ }) {
       }
 
       console.log("Family Details inserted successfully");
-
     } catch (error) {
       console.error(error);
       toast.error("Error inserting family details: " + error.message);
@@ -352,7 +352,7 @@ function EmpFamPersonalDetail({ }) {
           const formattedvisaExpiryDate = formatDate(Visa_Expiry_Date);
 
           const airTicketValue = Air_Ticket_Entitled === true ? "1" : "0";
-          console.log(Visa_Entitled)
+          console.log(Visa_Entitled);
           const memberData = {
             relationName: Relation || "",
             selectRelation: Relation
@@ -458,6 +458,26 @@ function EmpFamPersonalDetail({ }) {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getrelation`, {
       method: "POST",
@@ -511,19 +531,19 @@ function EmpFamPersonalDetail({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  relationName: selectedRelation
-                    ? selectedRelation.value
-                    : "",
-                  selectRelation: selectedRelation,
-                }
-                : member,
-            ),
-          }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      relationName: selectedRelation
+                        ? selectedRelation.value
+                        : "",
+                      selectRelation: selectedRelation,
+                    }
+                  : member,
+              ),
+            }
           : doc,
       ),
     );
@@ -534,19 +554,19 @@ function EmpFamPersonalDetail({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  airTicketEntitled: selectedAirTicket
-                    ? selectedAirTicket.value
-                    : "",
-                  selectAirTicket: selectedAirTicket,
-                }
-                : member,
-            ),
-          }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      airTicketEntitled: selectedAirTicket
+                        ? selectedAirTicket.value
+                        : "",
+                      selectAirTicket: selectedAirTicket,
+                    }
+                  : member,
+              ),
+            }
           : doc,
       ),
     );
@@ -557,17 +577,17 @@ function EmpFamPersonalDetail({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  visaEntitled: selectedVisa ? selectedVisa.value : "",
-                  selectVisa: selectedVisa,
-                }
-                : member,
-            ),
-          }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      visaEntitled: selectedVisa ? selectedVisa.value : "",
+                      selectVisa: selectedVisa,
+                    }
+                  : member,
+              ),
+            }
           : doc,
       ),
     );
@@ -578,17 +598,17 @@ function EmpFamPersonalDetail({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  sex: selectedSex ? selectedSex.value : "",
-                  selectSex: selectedSex,
-                }
-                : member,
-            ),
-          }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      sex: selectedSex ? selectedSex.value : "",
+                      selectSex: selectedSex,
+                    }
+                  : member,
+              ),
+            }
           : doc,
       ),
     );
@@ -599,19 +619,42 @@ function EmpFamPersonalDetail({ }) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-            ...doc,
-            members: doc.members.map((member, i) =>
-              i === index
-                ? {
-                  ...member,
-                  nationality: selectedNationality
-                    ? selectedNationality.value
-                    : "",
-                  selectNationality: selectedNationality,
-                }
-                : member,
-            ),
-          }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      nationality: selectedNationality
+                        ? selectedNationality.value
+                        : "",
+                      selectNationality: selectedNationality,
+                    }
+                  : member,
+              ),
+            }
+          : doc,
+      ),
+    );
+  };
+
+  const handleChangeRepManager = (selectedRepManager, relation, index) => {
+    setFamilyMembers((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      RepManager: selectedRepManager
+                        ? selectedRepManager.value
+                        : "",
+                      selectRepManager: selectedRepManager,
+                    }
+                  : member,
+              ),
+            }
           : doc,
       ),
     );
@@ -763,81 +806,84 @@ function EmpFamPersonalDetail({ }) {
               </div>
 
               <div className="col-md-2">
-  <div
-    className={`inputGroup selectGroup 
+                <div
+                  className={`inputGroup selectGroup 
       ${member.selectRelation ? "has-value" : ""} 
       ${isSelectRelation[index] ? "is-focused" : ""}`}
-    title="Please Select the Relation"
-  >
-    <Select
-      placeholder=" "
-      classNamePrefix="react-select"
-      isClearable
-      value={member.selectRelation}
-      options={filteredOptionrelation}
-      onFocus={() =>
-        setIsSelectRelation((prev) => ({
-          ...prev,
-          [index]: true,
-        }))
-      }
-      onBlur={() =>
-        setIsSelectRelation((prev) => ({
-          ...prev,
-          [index]: false,
-        }))
-      }
-      onChange={(selectedRelation) =>
-        RelationInputChange(
-          relationGroup.relation,
-          index,
-          "selectRelation", // ✅ IMPORTANT (match state)
-          selectedRelation
-        )
-      }
-    />
+                  title="Please Select the Relation"
+                >
+                  <Select
+                    placeholder=" "
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRelation}
+                    options={filteredOptionrelation}
+                    onFocus={() =>
+                      setIsSelectRelation((prev) => ({
+                        ...prev,
+                        [index]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectRelation((prev) => ({
+                        ...prev,
+                        [index]: false,
+                      }))
+                    }
+                    onChange={(selectedRelation) =>
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "selectRelation", // ✅ IMPORTANT (match state)
+                        selectedRelation,
+                      )
+                    }
+                  />
 
-    <label
-      className={`floating-label ${
-        error && !member.selectRelation ? "text-danger" : ""
-      }`}
-    >
-      Relation <span className="text-danger">*</span>
-    </label>
-  </div>
-</div>
+                  <label
+                    className={`floating-label ${
+                      error && !member.selectRelation ? "text-danger" : ""
+                    }`}
+                  >
+                    Relation <span className="text-danger">*</span>
+                  </label>
+                </div>
+              </div>
 
               <div className="col-md-2">
-  <div className="inputGroup">
-    <input
-      type="text"
-      className="exp-input-field form-control"
-      title="Please Enter the Name"
-      placeholder=" "
-      autoComplete="off"
-      value={member.name}
-      pattern="[A-Za-z]+"
-      maxLength={250}
-      onChange={(e) => {
-        const onlyLetters = e.target.value.replace(/[^A-Za-z\s]/g, "");
-        RelationInputChange(
-          relationGroup.relation,
-          index,
-          "name",
-          onlyLetters
-        );
-      }}
-    />
+                <div className="inputGroup">
+                  <input
+                    type="text"
+                    className="exp-input-field form-control"
+                    title="Please Enter the Name"
+                    placeholder=" "
+                    autoComplete="off"
+                    value={member.name}
+                    pattern="[A-Za-z]+"
+                    maxLength={250}
+                    onChange={(e) => {
+                      const onlyLetters = e.target.value.replace(
+                        /[^A-Za-z\s]/g,
+                        "",
+                      );
+                      RelationInputChange(
+                        relationGroup.relation,
+                        index,
+                        "name",
+                        onlyLetters,
+                      );
+                    }}
+                  />
 
-    <label
-      className={`exp-form-labels ${
-        error && !member.name ? "text-danger" : ""
-      }`}
-    >
-      Name <span className="text-danger">*</span>
-    </label>
-  </div>
-</div>
+                  <label
+                    className={`exp-form-labels ${
+                      error && !member.name ? "text-danger" : ""
+                    }`}
+                  >
+                    Name <span className="text-danger">*</span>
+                  </label>
+                </div>
+              </div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
@@ -874,7 +920,7 @@ function EmpFamPersonalDetail({ }) {
                     readOnly
                     inputMode="numeric"
                     pattern="[0-9]*"
-                  // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
+                    // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
                   />
                   <label
                     for="cno"
@@ -1199,7 +1245,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     id="passportNo"
                     className="exp-input-field form-control"
-                      title="Please Enter the Purpose"
+                    title="Please Enter the Purpose"
                     type="text"
                     placeholder=""
                     value={purpose}
@@ -1213,6 +1259,46 @@ function EmpFamPersonalDetail({ }) {
                 </div>
               </div>
 
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectRepManager ? "has-value" : ""} 
+                  ${isSelectRepManager[index] ? "is-focused" : ""}`}
+                  title="Please Select the Reporting Manager"
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [index]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [index]: false,
+                      }))
+                    }
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRepManager}
+                    options={filteredOptionManager}
+                    maxLength={50}
+                    onChange={(selectRepManager) =>
+                      handleChangeRepManager(
+                        selectRepManager,
+                        relationGroup.relation,
+                        index,
+                      )
+                    }
+                  />
+                  <label for="cno" className={`floating-label`}>
+                    Reporting Manager
+                  </label>
+                </div>
+              </div>
+              
             </div>
           ))}
         </div>
