@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import TabButtons from "./Tabs";
+import Select from "react-select";
 import AcademicDetails from "./AcademicDetPopup.js";
 import PdfPreview from "./PdfPreviewHelp";
 import LoadingScreen from "../Loading";
@@ -26,6 +27,7 @@ function Input({}) {
           documentUrl: "",
           keyfield: "",
           purpose: "",
+          RepManager: "",
         },
       ],
     },
@@ -49,6 +51,9 @@ function Input({}) {
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [isSelectRepManager, setIsSelectRepManager] = useState({});
+  const [Managerdrop, setManagerdrop] = useState([]);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
@@ -106,117 +111,159 @@ function Input({}) {
     );
   };
 
-//   const handleSave = async () => {
-//     if (!EmployeeId) {
-//       setError(true);
-//       toast.warning("Error: Missing required fields");
-//       return;
-//     }
+  //   const handleSave = async () => {
+  //     if (!EmployeeId) {
+  //       setError(true);
+  //       toast.warning("Error: Missing required fields");
+  //       return;
+  //     }
 
-//     for (const relationGroup of Academic) {
-//       for (const member of relationGroup.members) {
-//         if (
-//           !member.academicName ||
-//           !member.major ||
-//           !member.institution ||
-//           !member.academicYear ||
-//           !member.purpose
-//         ) {
-//           setError(true);
-//           toast.warning("Error: Missing required fields");
-//           return;
-//         }
-//       }
-//     }
+  //     for (const relationGroup of Academic) {
+  //       for (const member of relationGroup.members) {
+  //         if (
+  //           !member.academicName ||
+  //           !member.major ||
+  //           !member.institution ||
+  //           !member.academicYear ||
+  //           !member.purpose
+  //         ) {
+  //           setError(true);
+  //           toast.warning("Error: Missing required fields");
+  //           return;
+  //         }
+  //       }
+  //     }
 
-//     const employeeData = await Promise.all(
-//       Academic.flatMap((relationGroup) =>
-//         relationGroup.members.map(async (member) => {
+  //     const employeeData = await Promise.all(
+  //       Academic.flatMap((relationGroup) =>
+  //         relationGroup.members.map(async (member) => {
 
-//   let fileBase64 = null;
+  //   let fileBase64 = null;
 
-//   if (member.document) {
-//     const fileSize = member.document.size;
-//     const maxSize = 1 * 1024 * 1024;
+  //   if (member.document) {
+  //     const fileSize = member.document.size;
+  //     const maxSize = 1 * 1024 * 1024;
 
-//     if (fileSize > maxSize) {
-//       toast.warning("File size exceeds 1MB");
-//       return null;
-//     }
+  //     if (fileSize > maxSize) {
+  //       toast.warning("File size exceeds 1MB");
+  //       return null;
+  //     }
 
-//     fileBase64 = await convertToBase64(member.document);
-//   }
+  //     fileBase64 = await convertToBase64(member.document);
+  //   }
 
-//   return {
-//     EmployeeId: EmployeeId,
-//     academicName: member.academicName,
-//     major: member.major,
-//     institution: member.institution,
-//     academicYear: member.academicYear,
-//     document: fileBase64,
-//     company_code: sessionStorage.getItem("selectedCompanyCode"),
-//     created_by: sessionStorage.getItem("selectedUserCode"),
-//     purpose: member.purpose
-//   };
+  //   return {
+  //     EmployeeId: EmployeeId,
+  //     academicName: member.academicName,
+  //     major: member.major,
+  //     institution: member.institution,
+  //     academicYear: member.academicYear,
+  //     document: fileBase64,
+  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //     created_by: sessionStorage.getItem("selectedUserCode"),
+  //     purpose: member.purpose
+  //   };
 
-// })
-//       )
+  // })
+  //       )
 
-//     );
-//     setError(false);
-//     setLoading(true);
+  //     );
+  //     setError(false);
+  //     setLoading(true);
 
-//     try {
-//       const response = await fetch(
-//         `${config.apiBaseUrl}/AcademicDetailsRequest`,
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({ employeeData }),
-//         },
-//       );
-//       if (response.ok) {
-//         toast.success("Data inserted successfully!", {
-//           onClose: () => window.location.reload(),
-//         });
-//       } else {
-//         const errorResponse = await response.json();
-//         console.error(errorResponse.message);
-//         toast.warning(errorResponse.message, {});
-//       }
-//     } catch (err) {
-//       console.error("Error delete data:", err);
-//       toast.error("Error delete data: " + err.message, {});
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  //     try {
+  //       const response = await fetch(
+  //         `${config.apiBaseUrl}/AcademicDetailsRequest`,
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({ employeeData }),
+  //         },
+  //       );
+  //       if (response.ok) {
+  //         toast.success("Data inserted successfully!", {
+  //           onClose: () => window.location.reload(),
+  //         });
+  //       } else {
+  //         const errorResponse = await response.json();
+  //         console.error(errorResponse.message);
+  //         toast.warning(errorResponse.message, {});
+  //       }
+  //     } catch (err) {
+  //       console.error("Error delete data:", err);
+  //       toast.error("Error delete data: " + err.message, {});
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-const handleSave = async () => {
-  if (!EmployeeId) {
-    toast.warning("Error: Missing required fields");
-    return;
-  }
+  const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
 
-  showConfirmationToast(
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
+  const handleChangeRepManager = (selectedRepManager, relation, index) => {
+    setAcademic((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                      ...member,
+                      RepManager: selectedRepManager
+                        ? selectedRepManager.value
+                        : "",
+                      selectRepManager: selectedRepManager,
+                    }
+                  : member,
+              ),
+            }
+          : doc,
+      ),
+    );
+  };
+
+  const handleSave = async () => {
+    if (!EmployeeId) {
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
+        try {
+          setLoading(true);
 
-  try {
-    setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const created_by = sessionStorage.getItem("selectedUserCode");
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
-
-    const headerPayload = {
-      company_code,
-      EmployeeId,
-      purpose: Academic[0]?.members[0]?.purpose,
-      request_status: "Pending",
-      created_by
-    };
+          const headerPayload = {
+            company_code,
+            EmployeeId,
+            purpose: Academic[0]?.members[0]?.purpose,
+            request_status: "Pending",
+            created_by,
+          };
 
     const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
       {
@@ -228,113 +275,109 @@ const handleSave = async () => {
       }
     );
 
-    if (!headerRes.ok) {
-      const err = await headerRes.json();
-      throw new Error(err.message);
-    }
-
-    const headerResult = await headerRes.json();
-
-    // ✅ ONLY DB VALUE
-    const info_request_id = headerResult?.[0]?.info_request_id;
-
-    if (!info_request_id) {
-      throw new Error("info_request_id not returned from backend");
-    }
-
-    await saveAcademicDetails(info_request_id);
-
-    toast.success("Data inserted successfully!", {
-      onClose: () => window.location.reload(),
-    });
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Error: " + err.message);
-  } finally {
-    setLoading(false);
-  }
-  },
-            () => {
-              toast.info("Data updated cancelled.");
-            }
-    );
-};
-const saveAcademicDetails = async (info_request_id) => {
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
-
-    const detailsData = await Promise.all(
-      Academic.flatMap((group) =>
-        group.members.map(async (member) => {
-          if (
-            !member.academicName ||
-            !member.major ||
-            !member.institution ||
-            !member.academicYear
-          ) {
-            return null;
+          if (!headerRes.ok) {
+            const err = await headerRes.json();
+            throw new Error(err.message);
           }
 
-          let fileBase64 = null;
+          const headerResult = await headerRes.json();
 
-          if (member.document) {
-            if (member.document.size > 1 * 1024 * 1024) {
-              toast.warning("File size exceeds 1MB");
+          // ✅ ONLY DB VALUE
+          const info_request_id = headerResult?.[0]?.info_request_id;
+
+          if (!info_request_id) {
+            throw new Error("info_request_id not returned from backend");
+          }
+
+          await saveAcademicDetails(info_request_id);
+
+          toast.success("Data inserted successfully!", {
+            onClose: () => window.location.reload(),
+          });
+        } catch (err) {
+          console.error(err);
+          toast.error("Error: " + err.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      },
+    );
+  };
+  const saveAcademicDetails = async (info_request_id) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
+
+      const detailsData = await Promise.all(
+        Academic.flatMap((group) =>
+          group.members.map(async (member) => {
+            if (
+              !member.academicName ||
+              !member.major ||
+              !member.institution ||
+              !member.academicYear
+            ) {
               return null;
             }
-            fileBase64 = await convertToBase64(member.document);
-          }
 
-          return {
-            info_request_id,
-            company_code,
-            EmployeeId,
-            request_status: "Pending",
-            academicName: member.academicName,
-            major: member.major,
-            institution: member.institution,
-            academicYear: member.academicYear,
-            document: fileBase64,
-            created_by,
-          };
-        })
-      )
-    );
+            let fileBase64 = null;
 
-    const filteredData = detailsData.filter(Boolean);
+            if (member.document) {
+              if (member.document.size > 1 * 1024 * 1024) {
+                toast.warning("File size exceeds 1MB");
+                return null;
+              }
+              fileBase64 = await convertToBase64(member.document);
+            }
 
-    if (filteredData.length === 0) {
-      toast.warning("No valid academic details found");
-      return;
-    }
+            return {
+              info_request_id,
+              company_code,
+              EmployeeId,
+              request_status: "Pending",
+              academicName: member.academicName,
+              major: member.major,
+              institution: member.institution,
+              academicYear: member.academicYear,
+              RepManager: member.RepManager,
+              document: fileBase64,
+              created_by,
+            };
+          }),
+        ),
+      );
 
-    const res = await fetch(
-      `${config.apiBaseUrl}/AcademicRequestDetails`,
-      {
+      const filteredData = detailsData.filter(Boolean);
+
+      if (filteredData.length === 0) {
+        toast.warning("No valid academic details found");
+        return;
+      }
+
+      const res = await fetch(`${config.apiBaseUrl}/AcademicRequestDetails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ detailsData: filteredData }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
       }
-    );
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message);
+      console.log("Academic Details inserted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error inserting details: " + error.message);
     }
+  };
 
-    console.log("Academic Details inserted successfully");
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Error inserting details: " + error.message);
-  }
-};
-
-const convertToBase64 = (file) => {
+  const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -526,7 +569,7 @@ const convertToBase64 = (file) => {
   const EmployeeLoan = () => {
     navigate("/ManualEmployeeInfo");
   };
-    const Documents = () => {
+  const Documents = () => {
     navigate("/EmpDocumentReq");
   };
   const EmployeeAssets = () => {
@@ -547,13 +590,13 @@ const convertToBase64 = (file) => {
       case "Academic Details":
         AcademicDet();
         break;
-      case 'Documents':
+      case "Documents":
         Documents();
         break;
       case "Assets":
         EmployeeAssets();
         break;
-        default:
+      default:
         break;
     }
   };
@@ -562,7 +605,7 @@ const convertToBase64 = (file) => {
     { label: "Personal Details" },
     { label: "Family" },
     { label: "Academic Details" },
-    { label: 'Documents' },
+    { label: "Documents" },
     { label: "Assets" },
   ];
 
@@ -753,7 +796,7 @@ const convertToBase64 = (file) => {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                      title="Please Enter the Institution"
+                    title="Please Enter the Institution"
                     value={member.institution}
                     maxLength={225}
                     placeholder=" "
@@ -780,7 +823,7 @@ const convertToBase64 = (file) => {
                   <input
                     id="fdate"
                     class="exp-input-field form-control"
-                      title="Please Enter the Academic Year"
+                    title="Please Enter the Academic Year"
                     type="date"
                     placeholder=" "
                     autoComplete="off"
@@ -819,13 +862,46 @@ const convertToBase64 = (file) => {
                       )
                     }
                   />
-                  <label
-                    className={`exp-form-labels`}
-                  >
-                    Purpose
-                  </label>
+                  <label className={`exp-form-labels`}>Purpose</label>
                 </div>
               </div>
+
+              <div className="col-md-2">
+              <div
+                className={`inputGroup selectGroup 
+                ${member.selectRepManager ? "has-value" : ""} 
+                ${isSelectRepManager[`${relationGroup.relation}-${index}`] ? "is-focused" : ""}`}
+                title="Please Select the Reporting Manager"
+              >
+                <Select
+                  placeholder=" "
+                  onFocus={() =>
+                    setIsSelectRepManager((prev) => ({
+                      ...prev,
+                      [`${relationGroup.relation}-${index}`]: true,
+                    }))
+                  }
+                  onBlur={() =>
+                    setIsSelectRepManager((prev) => ({
+                      ...prev,
+                      [`${relationGroup.relation}-${index}`]: false,
+                    }))
+                  }
+                  classNamePrefix="react-select"
+                  isClearable
+                  value={member.selectRepManager}
+                  options={filteredOptionManager}
+                  onChange={(selectRepManager) =>
+                    handleChangeRepManager(
+                      selectRepManager,
+                      relationGroup.relation,
+                      index,
+                    )
+                  }
+                />
+                <label className="floating-label">Reporting Manager</label>
+              </div>
+            </div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
@@ -874,7 +950,6 @@ const convertToBase64 = (file) => {
                   </div>
                 </div>
               </div>
-
             </div>
           ))}
         </div>

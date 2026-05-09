@@ -19,7 +19,8 @@ function EmpDocumentReq({ }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
+  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'', RepManager: '', selectRepManager: null,}] }]);
+  // const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
   const [documentNameDrop, setDocumentNameDrop] = useState([]);
   const [documentUrl, setDocumentUrl] = useState({});
   const [isAcademicDataLoaded, setIsAcademicDataLoaded] = useState(false);
@@ -31,8 +32,10 @@ function EmpDocumentReq({ }) {
   const [designation_id, setdesignation_id] = useState("");
   const [purpose, setpurpose] = useState("");
   
-
   const [isSelectDocument, setIsSelectDocument] = useState({});
+  const [Managerdrop, setManagerdrop] = useState([]);
+  const [isSelectRepManager, setIsSelectRepManager] = useState({});
+
   const [loading, setLoading] = useState(false);
 
     const employeeId = sessionStorage.getItem("selectedUserCode");
@@ -118,6 +121,55 @@ function EmpDocumentReq({ }) {
       reader.onerror = (error) => reject(error);
     });
   };
+
+const filteredOptionManager = Managerdrop.map((option) => ({
+  value: option.EmployeeId,
+  label: `${option.EmployeeId}-${option.full_name}`,
+}));
+
+const handleChangeRepManager = (
+  selectedRepManager,
+  relation,
+  index
+) => {
+  setDocuments((prevDocuments) =>
+    prevDocuments.map((doc) =>
+      doc.relation === relation
+        ? {
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                    ...member,
+                    RepManager: selectedRepManager
+                      ? selectedRepManager.value
+                      : "",
+                    selectRepManager: selectedRepManager,
+                  }
+                : member
+            ),
+          }
+        : doc
+    )
+  );
+};
+
+  useEffect(() => {
+  fetch(`${config.apiBaseUrl}/ESSManager`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+    }),
+  })
+    .then((response) => response.json())
+    .then(setManagerdrop)
+    .catch((error) =>
+      console.error("Error fetching manager:", error)
+    );
+}, []);
 
   const handleSave = async () => {
     if (!EmployeeId) {
@@ -221,7 +273,7 @@ const saveDocumentDetails = async (info_request_id) => {
 
           document_Name: row.documentName,
           document_files: base64File,
-
+          RepManager: row.RepManager,
           created_by,
         };
       })
@@ -336,7 +388,7 @@ const saveDocumentDetails = async (info_request_id) => {
         setIsAcademicDataLoaded(true);
 
         const updatedDocument = searchData.reduce((acc, item) => {
-          const { document_name, document_files, keyfield } = item;
+          const { document_name, document_files, keyfield, RepManager } = item;
 
           console.log(document_files)
           let documentUrl = null;
@@ -362,7 +414,13 @@ const saveDocumentDetails = async (info_request_id) => {
               : null,
             documentUrl: documentUrl,
             document: documentFile,
-            keyfield: keyfield
+            keyfield: keyfield,
+            RepManager: RepManager || "",
+            selectRepManager: RepManager
+              ? filteredOptionManager.find(
+                  (opt) => opt.value === RepManager
+                )
+              : null,
           };
 
           const existingRelation = acc.find(group => group.relation === document_name);
@@ -411,7 +469,8 @@ const saveDocumentDetails = async (info_request_id) => {
     setDocuments((prev) =>
       prev.map((item) =>
         item.relation === relation
-          ? { ...item, members: [...item.members, { documentType: '', documentNo: '', issueDate: '', expiryDate: '' }] }
+          // ? { ...item, members: [...item.members, { documentType: '', documentNo: '', issueDate: '', expiryDate: '' }] }
+          ? { ...item, members: [...item.members, {documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }
           : item
       )
     );
@@ -713,6 +772,46 @@ const saveDocumentDetails = async (info_request_id) => {
                   Purpose
                 </label>
               </div>
+              </div>
+
+              <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${member.selectRepManager ? "has-value" : ""} 
+                  ${isSelectRepManager[`${relationGroup.relation}-${index}`]? "is-focused": ""}`}
+                  title="Please Select the Reporting Manager"
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: false,
+                      }))
+                    }
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRepManager}
+                    options={filteredOptionManager}
+                    onChange={(selectRepManager) =>
+                      handleChangeRepManager(
+                        selectRepManager,
+                        relationGroup.relation,
+                        index
+                      )
+                    }
+                  />
+
+                  <label className="floating-label">
+                    Reporting Manager
+                  </label>
+                </div>
               </div>
 
               <div className="col-md-2">
