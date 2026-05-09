@@ -113,6 +113,12 @@ function ManualEmployeeInfo({}) {
   const [isSelectState, setIsSelectState] = useState(false);
   const [isSelectCountry, setIsSelectCountry] = useState(false);
   const [isSelectOtherType, setIsSelectOtherType] = useState(false);
+
+  const [selectedmanager, setselectedmanager] = useState('');
+  const [RepManager, setReportingManager] = useState("");
+  const [Managerdrop, setManagerdrop] = useState([]);
+  const [isSelectManager, setIsSelectManager] = useState(false);
+
   const logo = useRef(null);
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
@@ -185,6 +191,7 @@ function ManualEmployeeInfo({}) {
       !city ||
       !state ||
       !country ||
+      !RepManager ||
       !postalCode
     ) {
       setError(true);
@@ -210,8 +217,7 @@ function ManualEmployeeInfo({}) {
       created_by,
     };
 
-    const headerRes = await fetch(
-      `${config.apiBaseUrl}/PersonalRequestHdr`,
+    const headerRes = await fetch(`${config.apiBaseUrl}/PersonalRequestHdr`,
       {
         method: "POST",
         headers: {
@@ -276,7 +282,7 @@ const savePersonalDetails = async (info_request_id) => {
         EmployeeId,
         request_status: "Pending",
 
-        // ✅ Personal
+        // Personal
         First_Name,
         Middle_Name,
         Last_Name,
@@ -288,63 +294,64 @@ const savePersonalDetails = async (info_request_id) => {
         phone1: Phone1,
         phone2: Phone2,
 
-        // ✅ Address
+        // Address
         Address1: address1,
         address2,
         address3,
         PermanantAddress: permanantAddress,
 
-        // ✅ Reference
+        // Reference
         Reference_name: reference_Name,
         Reference_Phone: reference_Phone,
 
-        // ✅ IDs
+        // IDs
         Pan_No: pan_No,
         Aadhar_no: Aadhaar_no,
         Photos: photoBase64,
 
-        // ✅ Family
+        // Family
         marital_status: selectedmartial,
         Kids: selectedkids,
 
-        // ✅ Job
+        // Job
         Grade_id: selectedgradeid,
         Title: title,
 
-        // ✅ Extra
+        // Extra
         Place_of_Birth: placeOfBirth,
         Nationality: nationality,
         Religion: religion,
         Blood_Group: bloodGroup,
 
-        // ✅ Family Details
+        // Family Details
         Spouse_Name: spouseName,
         Number_of_Siblings: noOfSiblings,
         Number_of_Children: noOfChildren,
 
-        // ✅ Contact
+        // Contact
         Email_Business: businessEmail,
         Phone_Alternate: Phone2,
 
-        // ✅ Emergency
+        // Emergency
         Emergency_Contact_Name: emergencyContactName,
         Emergency_Contact_Relationship: emergencyContactRelation,
         Emergency_Contact_Phone: emergencyContactPhone,
         Siblings: Siblings,
 
-        // ✅ Location
+        // Location
         City: city,
         State: state,
         Postal_Code: postalCode,
         Country: country,
 
-        // ✅ Passport
+        // Passport
         Passport_No: passportNo,
         Passport_Expiry_Date: passportExpiryDate,
 
-        // ✅ Other ID
+        // Other ID
         Other_Id_Type: otherIdType,
         Other_Id_No: otherIdNo,
+        RepManager,
 
         created_by,
       },
@@ -722,6 +729,31 @@ const savePersonalDetails = async (info_request_id) => {
     })
       .then((data) => data.json())
       .then((val) => setOtherDrop(val));
+  }, []);
+
+  const handleChangemanager = (selectedOption) => {
+    setselectedmanager(selectedOption);
+    setReportingManager(selectedOption ? selectedOption.value : '');
+  };
+
+  const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
   }, []);
 
   const handleRemoveLogo = () => {
@@ -2098,6 +2130,29 @@ const savePersonalDetails = async (info_request_id) => {
               />
               <label htmlFor="passportNo" className="exp-form-labels">
                 Purpose
+              </label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedmanager ? "has-value" : ""} 
+              ${isSelectManager ? "is-focused" : ""}`}
+              title="Please Select the Reporting Manager"
+            >
+              <Select
+                value={selectedmanager}
+                options={filteredOptionManager}
+                onChange={handleChangemanager}
+                placeholder=" "
+                onFocus={() => setIsSelectManager(true)}
+                onBlur={() => setIsSelectManager(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label className={`floating-label ${error && !RepManager ? 'text-danger' : ''}`}>
+                Reporting Manager<span className="text-danger">*</span>
               </label>
             </div>
           </div>

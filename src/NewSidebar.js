@@ -45,7 +45,12 @@ import {
   BsBoxSeam,
   BsCalendarPlus,
   BsHourglassSplit,
-  BsArrowLeftRight
+  BsArrowLeftRight,
+  BsFileEarmarkBarGraph,
+  BsClipboardData,
+  BsCashCoin,
+  BsExclamationTriangle,
+  BsCalendar2Week
 } from "react-icons/bs";
 import {
   MdOutlineEventNote,
@@ -63,7 +68,7 @@ import {
   MdOutlineAccountBalance,
   MdOutlineEventBusy
 } from "react-icons/md";
-import { 
+import {
   HiOutlineUserGroup
 } from "react-icons/hi";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
@@ -142,7 +147,7 @@ export const leafIconMap = {
   "Time Zone Master": BsClock,
   "Shift Master": BsClockHistory,
   Grade: BsAward,
-  Leave: BsCalendar3,
+  "Leave Type": BsCalendar3,
   Loan: BsCashStack,
   Announcement: BsBell,
   "Employee Holiday": BsSun,
@@ -174,6 +179,11 @@ export const leafIconMap = {
   "Total Candidates Applied": MdOutlineGroupAdd,
   "Total Interviews Scheduled": MdOutlineEventAvailable,
   "Interview Completion Rate": AiOutlinePercentage,
+  "Loan Summary Report": BsFileEarmarkBarGraph,
+  "Pending Approvals Report": BsClipboardData,
+  "Loan Disbursement Report": BsCashCoin,
+  "Overdue Loans Report": BsExclamationTriangle,
+  "Repayment Schedule Report": BsCalendar2Week,
 
   // --- PMS ---
   Project: BsKanban,
@@ -261,6 +271,7 @@ const menuData = [
           { label: "Travel Request", path: "/TravelRequest" },
           { label: "Comp Off Request", path: "/CompOffRequest" },
           { label: "Shift Request", path: "/ShiftChangeRequest" },
+          { label: "Loan Request", path: "/LoanRequest" },
         ],
       },
       {
@@ -288,7 +299,7 @@ const menuData = [
       },
     ],
   },
-  
+
   {
     label: "Payroll",
     icon: RiMoneyDollarCircleLine,
@@ -300,7 +311,6 @@ const menuData = [
       // { label: "Loan", path: "/EmployeeLoan" },
       { label: "Loan Type", path: "/LoanType" },
       { label: "Loan Documents", path: "/LoanDocuments" },
-      { label: "Loan Request", path: "/LoanRequest" },
       { label: "Loan Approvals", path: "/LoanApprovals" },
       { label: "Loan Payment", path: "/LoanPayment" },
       { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
@@ -310,18 +320,18 @@ const menuData = [
         label: "Others",
         isDropdown: true,
         subMenus: [
-         
+
           { label: "Settings", path: "/PayrollSettings" },
         ],
       },
     ],
   },
-    {
+  {
     label: "Assets",
     icon: BsBoxSeam,
     isDropdown: true,
     subMenus: [
-          { label: "Assets Master", path: "/Assets" },
+      { label: "Assets Master", path: "/Assets" },
       {
         label: "Reports",
         isDropdown: true,
@@ -330,7 +340,7 @@ const menuData = [
           { label: "Pending Asset Requests Report", path: "/PendingAssReqRep" },
           { label: "Asset Lifecycle Report", path: "/AssetLifecycleRep" },
         ],
-      },          
+      },
     ],
   },
   {
@@ -371,11 +381,11 @@ const menuData = [
           { label: "Leave Summary Report", path: "/AbsentReport" },
         ],
       },
-        {
+      {
         label: "Others",
         isDropdown: true,
         subMenus: [
-         
+
           { label: "Settings", path: "/PMSsettings" },
         ],
       },
@@ -396,7 +406,7 @@ const menuData = [
       { label: "Total Candidates Applied", path: "/TotalCandidatesAppli" },
       { label: "Total Interviews Scheduled", path: "/TotalInterviewsSched" },
       { label: "Interview Completion Rate", path: "/InterviewCompletionR" },
-      
+
     ],
   },
 ];
