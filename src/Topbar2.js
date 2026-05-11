@@ -492,7 +492,7 @@ const TopBar = () => {
 
             {/* Company and Location Info - Hidden on very small screens */}
             <div className="d-none d-sm-block"></div>
-            <div className="company-info d-none d-sm-block mb-2 text-center">
+            <div className="company-info d-none d-sm-block mb-0 text-center me-2"> {/* Added me-4 for space */}
               <p className="company-name-text mb-0">{companyName}</p>
               <span className="location-name-text">{locationName}</span>
             </div>
@@ -505,8 +505,10 @@ const TopBar = () => {
             </div>
 
             {/* Welcome Message */}
-            <div className="welcome-message d-none d-md-block">
-              <p className="text-white mb-0">Welcome, {user_name}</p>
+            <div className="welcome-message d-none d-md-flex flex-column align-items-center justify-content-center ms-auto me-2"> 
+              {/* ms-auto will push this group to the right, creating a gap from the company info */}
+               <span className="user-name-text">Welcome</span>
+              <span className="welcome-subtext">{user_name}</span>
             </div>
 
             {/* Profile Dropdown */}
