@@ -1450,6 +1450,8 @@ router.post("/GetFamilyRequest",dataController.GetFamilyRequest)
 router.post("/GetAcademicRequest",dataController.GetAcademicRequest)
 router.post("/GetDocumentsRequest",dataController.GetDocumentsRequest)
 router.post("/GetAssetRequest",dataController.GetAssetRequest)
+router.post("/visaCancellation",dataController.visaCancellation)
+router.post("/travelCancellation",dataController.travelCancellation)
 
 
 
