@@ -928,7 +928,7 @@ const handleUpdate = async (relationName, index) => {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn  btn-primary dropdown-toggle p-1"
               data-bs-toggle="dropdown"
             >
               <i className="fa-solid fa-list"></i>
@@ -943,10 +943,11 @@ const handleUpdate = async (relationName, index) => {
                     <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                   </li>
                 )}
-
+              {['all permission', 'reload'].some(p => documentsPermissions.includes(p)) && (
               <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
               </li>
+              )}
             </ul>
           </div>
         </div>
