@@ -141,8 +141,13 @@ function AttriDetInput({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/Attribute");
-  };
+  navigate("/Attribute", {
+    state: {
+      preservedRowData: locationState.preservedRowData,
+      preservedInputs: locationState.preservedInputs
+    }
+  });
+};
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {

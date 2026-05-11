@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";  
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +18,7 @@ function AttriDetGrid() {
 
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedRows, setSelectedRows] = useState([]);
   const [attributeheader_code, setattributeheader_code] = useState("");
   const [attributedetails_code, setattributedetails_code] = useState("");
@@ -40,7 +41,17 @@ function AttriDetGrid() {
 
 
   useEffect(() => {
-  }, []);
+  if (location.state?.preservedRowData) {
+    setRowData(location.state.preservedRowData);
+  }
+
+  if (location.state?.preservedInputs) {
+    setattributeheader_code(location.state.preservedInputs.attributeheader_code || "");
+    setattributedetails_code(location.state.preservedInputs.attributedetails_code || "");
+    setattributedetails_name(location.state.preservedInputs.attributedetails_name || "");
+    setdescriptions(location.state.preservedInputs.descriptions || "");
+  }
+}, [location.state]);
 
   // const fetchData = async () => {
   //   try {
@@ -53,7 +64,21 @@ function AttriDetGrid() {
   // };   
   // Define the function to reload the grid data
   const reloadGridData = () => {
-    window.location.reload();
+  clearInputFields();
+
+  navigate("/Attribute", {
+    replace: true,
+    state: {}
+  });
+
+  window.location.reload();
+};
+
+    const clearInputFields = () => {
+    setattributeheader_code("");
+    setattributedetails_code("");
+    setattributedetails_name("");
+    setdescriptions("");
   };
 
 
@@ -378,8 +403,21 @@ function AttriDetGrid() {
     navigate("/AddAttributeDetail", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddAttributeDetail", { state: { mode: "update", selectedRow } });
-  };
+  navigate("/AddAttributeDetail", {
+    state: {
+      mode: "update",
+      selectedRow,
+      preservedRowData: rowData,
+
+      preservedInputs: {
+        attributeheader_code,
+        attributedetails_code,
+        attributedetails_name,
+        descriptions
+      }
+    }
+  });
+};
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);

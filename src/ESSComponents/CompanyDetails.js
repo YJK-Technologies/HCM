@@ -636,7 +636,7 @@ function Input() {
     { label: 'Academic Details' },
     { label: 'Family' },
     { label: 'Documents' },
-    { label: 'EmployeeAssets' }
+    { label: 'Employee Assets' }
   ];
 
   const handleKeyPress = (e) => {

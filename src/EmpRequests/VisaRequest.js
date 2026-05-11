@@ -985,7 +985,7 @@ function VisaRequest({ }) {
                 "Travel Start Date": row.travel_start_date || "",
                 "Travel End Date": row.travel_end_date || "",
                 "Request Status": row.request_status || "",
-                "Request Number": row.request_number || "",
+                // "Request Number": row.request_number || "",
                 "Priority Level": row.priority_level || "",
                 "Sponsor Name": row.sponsor_name || "",
                 "Estimated Cost": row.estimated_cost || "",
@@ -1111,12 +1111,28 @@ function VisaRequest({ }) {
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
                     <h1 className="page-title">Visa Request</h1>
-                    <div className="action-wrapper">
+                    <div className="action-wrapper desktop-actions">
                         <div onClick={handleSave} className="action-icon add">
                             <span className="tooltip">Save</span>
                             <i class="fa-solid fa-floppy-disk"></i>
                         </div>
                     </div>
+
+                    <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {/* <li className="dropdown-item" onClick={handleReloadAdd}>
+                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+              </li> */}
+              <li className="dropdown-item" onClick={handleSave}>
+                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+              </li>
+            </ul>
+          </div>
+
                 </div>
             </div>
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
