@@ -66,7 +66,7 @@ const EmployeeCompOff = () => {
             }),
         })
             .then((response) => response.json())
-             .then((val) => setCompOffDrop(val))
+            .then((val) => setCompOffDrop(val))
             .catch((error) => console.error("Error fetching warehouse:", error));
     }, []);
 
@@ -164,12 +164,12 @@ const EmployeeCompOff = () => {
     };
 
     const filteredOptionCopmOff = Array.isArray(compOffDrop)
-    ? compOffDrop.map((option) => ({
-        value: option.Holiday_Date,
-        label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
-        holidayName: option.Holiday_Name
-    }))
-    : [];
+        ? compOffDrop.map((option) => ({
+            value: option.Holiday_Date,
+            label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
+            holidayName: option.Holiday_Name
+        }))
+        : [];
 
     const handleChangeCompOff = (selectedCompOff) => {
         setSelectedCompOff(selectedCompOff);
@@ -323,6 +323,21 @@ const EmployeeCompOff = () => {
                             <span className="tooltip">Save</span>
                             <i class="fa-solid fa-floppy-disk"></i>
                         </div>
+                    </div>
+
+                    <div className="dropdown mobile-actions">
+                        <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+                            <i className="fa-solid fa-list"></i>
+                        </button>
+
+                        <ul className="dropdown-menu dropdown-menu-end text-center">
+                            <li className="dropdown-item" onClick={handleReloadAdd}>
+                                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+                            </li>
+                            <li className="dropdown-item" onClick={handleSave}>
+                                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
