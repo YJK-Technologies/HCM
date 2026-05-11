@@ -947,13 +947,11 @@ const handleDeleteAsset = async (relation, index) => {
                     <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                   </li>
                 )}
-
-              <li
-                className="dropdown-item"
-                // onClick={reloadGridData}
-              >
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              {['all permission', 'reload'].some(p => EmpAssetsPermissions.includes(p)) && (
+              <li className="dropdown-item" onClick={reloadGridData}>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
               </li>
+              )}
             </ul>
           </div>
         </div>

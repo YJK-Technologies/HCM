@@ -231,7 +231,7 @@ function Input({}) {
     { label: "Academic Details" },
     { label: "Family" },
     { label: "Documents" },
-    { label: "EmployeeAssets" },
+    { label: "Employee Assets" },
   ];
 
   useEffect(() => {
@@ -737,15 +737,13 @@ function Input({}) {
                 financePermissions.includes(p),
               ) && (
                 <li className="dropdown-item" onClick={handleDelete}>
-                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                  <i className="fa-solid fa-trash text-danger fs-4"></i>
                 </li>
               )}
 
-              {["all permission", "reload"].some((p) =>
-                financePermissions.includes(p),
-              ) && (
+              {["all permission", "reload"].some((p) => financePermissions.includes(p), ) && ( 
                 <li className="dropdown-item" onClick={reloadGridData}>
-                  <i className="fa-solid fa-arrow-rotate-right"></i>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
                 </li>
               )}
             </ul>

@@ -620,3 +620,50 @@
 .bi-clock-fill, .bi-arrow-left-right {
     font-size: 1.1rem;
 }
+
+/* Stacking and centering the welcome message */
+.welcome-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2; /* Tightens the gap between Name and Welcome */
+    margin-right: 10px; /* Optional: space before the profile dropdown */
+}
+
+.user-name-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-color); /* Uses your gold/accent color for the name */
+    text-transform: capitalize;
+}
+
+.welcome-subtext {
+    font-size: 0.90rem;
+    color: var(--navbar-text);
+    opacity: 0.8;
+}
+
+.topbar-right-content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1px; /* This creates a consistent 25px gap between ALL items in the right section */
+}
+
+/* Adjusting the company info to be more compact */
+.company-info {
+    line-height: 1.1;
+    padding: 0 10px;
+    border-right: 1px solid var(--divider-color); /* Optional: Adds a subtle divider line */
+}
+
+.welcome-message {
+    padding: 0 2px;
+}
+
+/* Ensure it is hidden in the specific range you defined earlier if needed */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .welcome-message { 
+        display: none !important; 
+    }
+}

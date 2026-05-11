@@ -176,7 +176,7 @@ function Input({ }) {
     { label: 'Academic Details' },
     { label: 'Family' },
     { label: 'Documents' },
-    { label: 'EmployeeAssets' }
+    { label: 'Employee Assets' }
   ];
 
   const handleChangeAccountType = (selectedAccountType) => {
@@ -861,13 +861,13 @@ function Input({ }) {
 
             {['delete', 'all permission'].some(p => bankPermissions.includes(p)) && (
               <li className="dropdown-item" onClick={handleDelete}>
-                <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                <i className="fa-solid fa-trash text-danger fs-4"></i>
               </li>
             )}
 
             {['all permission', 'reload'].some(p => bankPermissions.includes(p)) && (
               <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
               </li>
             )}
 

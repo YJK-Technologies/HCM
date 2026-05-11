@@ -10,6 +10,7 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from 'react-select';
 import * as XLSX from "xlsx-js-style";
+import { XCircle } from 'lucide-react';
 // import { FormInput, FormSelect } from "../Utils/Tooltip.js";
 const config = require('../Apiconfig');
 
@@ -551,41 +552,65 @@ function VisaRequest({ }) {
         setProjectManagerSC("");
     };
 
+    const CancelActionRenderer = (params) => {
+        const { data } = params;
+
+        const handleCancel = async () => {
+            if (data.request_status === 'Cancelled') return;
+
+            showConfirmationToast("Are you sure you want to cancel this visa request?",
+                async () => {
+
+                    try {
+                        const response = await fetch(`${config.apiBaseUrl}/visaCancellation`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                Modified_by: sessionStorage.getItem('selectedUserCode'),
+                                request_status: "Cancelled",
+                                visa_request_id: data.visa_request_id,
+                                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                                travel_start_date: data.travel_start_date
+                            }),
+                        });
+
+                        const result = await response.json();
+                        if (response.ok) {
+                            toast.success("Visa request cancelled successfully!");
+                            await handleSearch();
+                        } else {
+                            console.error(result.message);
+                            toast.warning(result.message || "Failed to cancel leave");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        toast.error('Error: ' + err.message);
+                    }
+                },
+                () => {
+                    toast.info("Data updated cancelled.");
+                }
+            );
+        };
+
+        const isCancelled = data.LeaveStatus === 'Cancelled';
+
+        return (
+            <div className="action-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <button
+                    onClick={handleCancel}
+                    disabled={isCancelled}
+                    className={`icon-cancel-btn ${isCancelled ? 'disabled' : ''}`}
+                >
+                    <XCircle size={18} strokeWidth={2.5} />
+                </button>
+            </div>
+        );
+    };
+
     const columnDefs = [
-        {
-            headerName: "Actions",
-            field: "actions",
-            cellRenderer: (params) => {
-                const cellWidth = params.column.getActualWidth();
-                const isWideEnough = cellWidth > 20;
-                const showIcons = isWideEnough;
-
-                return (
-                    <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
-                        {showIcons && (
-                            <>
-                                <span
-                                    className="icon mx-2"
-                                    onClick={() => handleUpdate(params.data, params.node.data)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <i className="fa-regular fa-floppy-disk"></i>
-                                </span>
-
-                                <span
-                                    className="icon mx-2"
-                                    onClick={() => handleDelete(params.data)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <i className="fa-solid fa-trash"></i>
-                                </span>
-                            </>
-                        )}
-                    </div>
-                );
-            },
-        },
-
         {
             headerName: "Visa Request ID",
             field: "visa_request_id",
@@ -607,12 +632,12 @@ function VisaRequest({ }) {
         {
             headerName: "Passport ID",
             field: "passport_id",
-            editable: true
+            editable: false
         },
         {
             headerName: "Country ID",
             field: "destination_country_id",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -626,7 +651,7 @@ function VisaRequest({ }) {
         {
             headerName: "Visa Type",
             field: "visa_type_id",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -636,17 +661,17 @@ function VisaRequest({ }) {
         {
             headerName: "Purpose",
             field: "purpose",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Travel Start Date",
             field: "travel_start_date",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Travel End Date",
             field: "travel_end_date",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Request Status",
@@ -666,7 +691,7 @@ function VisaRequest({ }) {
         {
             headerName: "Priority Level",
             field: "priority_level",
-            editable: true,
+            editable: false,
             cellStyle: { textAlign: "left" },
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
@@ -676,22 +701,22 @@ function VisaRequest({ }) {
         {
             headerName: "Sponsor Name",
             field: "sponsor_name",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Estimated Cost",
             field: "estimated_cost",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Remarks",
             field: "Remarks",
-            editable: true
+            editable: false,
         },
         {
             headerName: "Manager",
             field: "manager_id",
-            editable: true,
+            editable: false,
             cellEditor: "agSelectCellEditor",
             cellEditorParams: {
                 values: ManagerdropAG.map((d) => d.value),
@@ -702,16 +727,36 @@ function VisaRequest({ }) {
             },
         },
         {
+            headerName: "Action",
+            field: "action",
+            width: 100,
+            cellStyle: { textAlign: "center" },
+            sortable: false,
+            filter: false,
+            cellRenderer: (params) => {
+                const row = params.data;
+                if (row.request_status !== "Cancelled") {
+                    return <CancelActionRenderer {...params} />;
+                }
+
+                return null;
+            },
+            tooltipValueGetter: (params) => {
+                return params.data.request_status === 'Cancelled'
+                    ? "This request has already been cancelled."
+                    : "Click to cancel this visa request.";
+            }
+        },
+        {
             headerName: "Keyfield",
             field: "keyfield",
-            editable: true,
+            editable: false,
             hide: true
         }
     ]
 
     const gridOptions = {
         pagination: true,
-        paginationPageSize: 10,
     };
 
     const handleSave = async () => {
@@ -985,7 +1030,7 @@ function VisaRequest({ }) {
                 "Travel Start Date": row.travel_start_date || "",
                 "Travel End Date": row.travel_end_date || "",
                 "Request Status": row.request_status || "",
-                "Request Number": row.request_number || "",
+                // "Request Number": row.request_number || "",
                 "Priority Level": row.priority_level || "",
                 "Sponsor Name": row.sponsor_name || "",
                 "Estimated Cost": row.estimated_cost || "",
@@ -1111,12 +1156,28 @@ function VisaRequest({ }) {
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
                     <h1 className="page-title">Visa Request</h1>
-                    <div className="action-wrapper">
+                    <div className="action-wrapper desktop-actions">
                         <div onClick={handleSave} className="action-icon add">
                             <span className="tooltip">Save</span>
                             <i class="fa-solid fa-floppy-disk"></i>
                         </div>
                     </div>
+
+                    <div className="dropdown mobile-actions">
+            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+              <i className="fa-solid fa-list"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {/* <li className="dropdown-item" onClick={handleReloadAdd}>
+                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+              </li> */}
+              <li className="dropdown-item" onClick={handleSave}>
+                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+              </li>
+            </ul>
+          </div>
+
                 </div>
             </div>
             <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">

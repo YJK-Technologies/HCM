@@ -506,7 +506,7 @@ const convertBufferToBlobUrlAndFile = (
     { label: "Academic Details" },
     { label: "Family" },
     { label: "Documents" },
-    { label: "EmployeeAssets" },
+    { label: "Employee Assets" },
   ];
 
   // const handleInputChange = (index, field, value) => {
@@ -918,10 +918,13 @@ const convertBufferToBlobUrlAndFile = (
                   <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
                 </li>
               )}
-
+              {["reload", "all permission"].some((p) =>
+                identityPermissions.includes(p),
+              ) && (
               <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
               </li>
+              )}
             </ul>
           </div>
         </div>
