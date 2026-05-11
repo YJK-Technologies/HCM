@@ -399,7 +399,6 @@
 
 /* ---------------- MOBILE RESPONSIVE SIDEBAR ---------------- */
 @media (max-width: 768px) {
-  /* Mobile Menu Button */
   .mobile-menu-btn.show {
     display: flex !important;
   }
@@ -415,9 +414,7 @@
     top: 12px;
     height: 38px;
     width: 38px;
-    /* BACKGROUND: #010f4b -> var(--sidenav-menu) */
     background: var(--sidenav-menu);
-    /* COLOR: #fff -> var(--font-hover) */
     color: var(--font-hover);
     border-radius: 8px;
     z-index: 2001;
@@ -574,4 +571,105 @@
 
 .sidebar.collapsed .primary-nav {
   overflow: visible;
+}
+
+/* SIDEBAR MOBILE VIEW FLOATING MODEL BUG FIXING */
+@media (max-width: 768px) {
+  .sidebar.collapsed .dropdown-list {
+    position: static !important;
+    visibility: hidden !important;
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: none !important;
+    min-width: unset !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar.mobile-open .dropdown-list.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* SIDEBAR SUBMENU OVERLAPPING BUG FIXING */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; 
+}
+
+.sidebar .primary-nav {
+  flex: 1; 
+  overflow-y: auto; 
+  overflow-x: visible; 
+  padding-bottom: 20px;
+}
+
+.sidebar-footer {
+  flex-shrink: 0; 
+  background: var(--sidenav-menu);
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 10; 
+}
+
+/* SIDEBAR CLOSED HOVER TO SUBMENUS IS DISPLAYED BUG FIXING */
+.sidebar.collapsed .nav-item:hover > .dropdown-list {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  transform: translateY(10px);
+}
+
+.sidebar.collapsed .dropdown-list.show {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  transform: translateX(0); 
+}
+
+.sidebar.collapsed .primary-nav {
+  overflow: visible;
+  width: 85px; 
+}
+
+.nav-item {
+  position: relative;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Changed from space-between to center */
+  padding: 10px 20px;
+  position: relative;      /* Important for absolute child */
+  min-height: 65px;        /* Ensures consistent height */
+}
+
+.sidebar-header .sidebar-toggler {
+  position: absolute;      /* This takes the button out of the flow */
+  right: 15px;             /* Locks it to the right side */
+  height: 35px;
+  width: 35px;
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.4s ease;
+}
+
+/* Maintain your existing collapsed logic for the button */
+.sidebar.collapsed .sidebar-header .sidebar-toggler {
+  transform: translate(-4px, 65px);
+  right: 20px;
 }

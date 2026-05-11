@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NewSideBar.css";
 import logo from './main.png'
@@ -307,20 +307,30 @@ const menuData = [
     subMenus: [
       { label: "Payslip Master", path: "/PayslipSalaryDays" },
       { label: "Salary Process", path: "/salarypath" },
-      { label: "Loan Dashboard", path: "/LoanDashboard" },
+      // { label: "Loan Dashboard", path: "/LoanDashboard" },
       // { label: "Loan", path: "/EmployeeLoan" },
-      { label: "Loan Type", path: "/LoanType" },
-      { label: "Loan Documents", path: "/LoanDocuments" },
-      { label: "Loan Approvals", path: "/LoanApprovals" },
-      { label: "Loan Payment", path: "/LoanPayment" },
-      { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
-      { label: "Loan Status History", path: "/LoanStatusHistory" },
-
+      // { label: "Loan Type", path: "/LoanType" },
+      // { label: "Loan Documents", path: "/LoanDocuments" },
+      // { label: "Loan Approvals", path: "/LoanApprovals" },
+      // { label: "Loan Payment", path: "/LoanPayment" },
+      // { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+      // { label: "Loan Status History", path: "/LoanStatusHistory" },
+      {
+        label: "Loan",
+        isDropdown: true,
+        subMenus: [
+          { label: "Loan Dashboard", path: "/LoanDashboard" },
+          { label: "Loan Type", path: "/LoanType" },
+          { label: "Loan Documents", path: "/LoanDocuments" },
+          { label: "Loan Approvals", path: "/LoanApprovals" },
+          { label: "Loan Payment", path: "/LoanPayment" },
+          { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+        ],
+      },
       {
         label: "Others",
         isDropdown: true,
         subMenus: [
-
           { label: "Settings", path: "/PayrollSettings" },
         ],
       },
@@ -385,7 +395,6 @@ const menuData = [
         label: "Others",
         isDropdown: true,
         subMenus: [
-
           { label: "Settings", path: "/PMSsettings" },
         ],
       },
@@ -420,6 +429,10 @@ const Sidebar = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
+
+  useEffect(() => {
+    setOpenMenus({});
+  }, [collapsed]);
 
   const allowedPaths = useMemo(() => {
     try {
@@ -534,6 +547,10 @@ const Sidebar = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              /* ADD THESE THREE LINES */
+              margin: collapsed ? "0" : "0 auto",
+              transition: "margin 0.4s ease",
+              zIndex: 1
             }}
           >
             <img
