@@ -563,6 +563,12 @@ function LoanRequest({ }) {
                 );
             },
         },
+        // {
+        //   headerName: "S.No",
+        //   field: "S.No",
+        //   valueGetter: (params) => params.node.rowIndex + 1,
+        //   width: 80,
+        // },
         {
             headerName: "Loan Request ID",
             field: "loan_request_id",

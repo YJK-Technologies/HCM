@@ -1110,6 +1110,12 @@ function TravelRequest({ }) {
 
   const columnDefs = [
     {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+    },
+    {
       headerName: "Travel Request ID",
       field: "travel_request_id",
       editable: false,

@@ -49005,6 +49005,51 @@ const travelCancellation = async (req, res) => {
 };
 //Code ended by pavun on 11-05-2026
 
+//code added by sakthi on 12-05-26
+const getFEM = async (req, res) => {
+  const { company_code } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        "EXEC sp_attribute_Info 'F',@company_code,'FEM','','', '' , '','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL",
+      );
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi on 12-05-26
+
+//code added by sakthi on 12-05-26
+const getMappedEmployeeDropdown = async (req, res) => {
+  const { company_code, MappedType } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("MappedType", sql.NVarChar, MappedType)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(`
+        EXEC sp_Employee_shift_mapping_Test
+        'FEM','','','','','',@MappedType,'',@company_code,'','','',''
+      `);
+
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//code ended by sakthi on 12-05-26
 module.exports = {
   login,
   forgetPassword,
@@ -50426,6 +50471,8 @@ module.exports = {
   GetDocumentsRequest,
   GetAssetRequest,
   visaCancellation,
-  travelCancellation
+  travelCancellation,
+  getFEM,
+  getMappedEmployeeDropdown
 
 };

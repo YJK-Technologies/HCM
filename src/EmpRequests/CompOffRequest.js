@@ -198,6 +198,12 @@ const EmployeeCompOff = () => {
 
     const leaveColumnDefs = [
         {
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 80,
+        },   
+         {
             headerName: "Holiday Date",
             field: "HolidayDate",
             editable: false,

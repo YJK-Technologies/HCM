@@ -245,6 +245,12 @@ const ShiftChangeRequest = () => {
 
     const leaveColumnDefs = [
         {
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 80,
+        },
+        {
             headerName: "Date",
             field: "effective_date",
             editable: false,
@@ -433,6 +439,12 @@ const ShiftChangeRequest = () => {
     };
 
     const empShiftCols = [
+        {
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 80,
+        },
         {
             headerName: "Date",
             field: "Date",
