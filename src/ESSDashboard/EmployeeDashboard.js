@@ -597,6 +597,12 @@ const Dashboard = (payslip) => {
 
   const Employeecol = [
     {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+    },
+    {
       headerName: "Date",
       field: "work_date",
       cellStyle: { textAlign: "left" },
@@ -629,6 +635,12 @@ const Dashboard = (payslip) => {
   ];
 
   const empShiftCols = [
+    {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+    },
     {
       headerName: "Date",
       field: "Date",

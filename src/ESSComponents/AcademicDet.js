@@ -524,7 +524,7 @@ function Input({ }) {
       case "Documents":
         Documents();
         break;
-      case "EmployeeAssets":
+      case "Employee Assets":
         EmployeeAssets();
         break;
 

@@ -383,6 +383,12 @@ const LeaveRequestPage = () => {
 
   const leaveColumnDefs = [
     {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+    },
+    {
       // checkboxSelection: true,
       headerName: "Request Type",
       field: "RequestType",

@@ -618,6 +618,12 @@ function VisaRequest({ }) {
 
     const columnDefs = [
         {
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 80,
+        },
+        {
             headerName: "Visa Request ID",
             field: "visa_request_id",
             editable: false

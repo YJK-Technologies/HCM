@@ -77,9 +77,6 @@ const AccountInformation = () => {
   console.log(TaskMasterID)
   console.log(projectid)
 
-
-
-
   const [taskDetails, setTaskDetails] = useState([{ taskDate: '', taskMasterID: '', dailyTaskTitle: '', userId: '', userName: '', taskDescription: '', hoursTaken: '', PriorityLevel: '', TaskStauts: '', fileBuffer: '' }]);
 
 
@@ -526,6 +523,12 @@ const AccountInformation = () => {
   };
 
   const columnDefs = [
+    {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 100,
+    },     
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",

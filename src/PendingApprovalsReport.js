@@ -239,6 +239,12 @@ function PendingApprovalsReport() {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 100,
+    },    
+    {
       headerName: "Request Number",
       field: "request_number",
       editable: false,

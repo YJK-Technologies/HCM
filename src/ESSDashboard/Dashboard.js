@@ -1859,6 +1859,12 @@ const Dashboard = () => {
 
   const columnDefs = [
     {
+      headerName: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+      cellStyle: { textAlign: "center" },
+    },
+    {
       headerName: "Employee ID",
       field: "Employeeid",
     },
@@ -1910,6 +1916,8 @@ const Dashboard = () => {
 
   // AG Grid columns For Time and Hours
   const columnDefsTHRS = [
+    { headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,cellStyle: { textAlign: "center" },},
     { headerName: "User", field: "user_name" },
     {
       headerName: "Working Date",
@@ -2943,7 +2951,7 @@ const Dashboard = () => {
               <div className="app-card-base shift-pattern-wrapper rounded app-shadow-lg height-full">
                 <div className="display-flex flex-between-center">
                   <h6 className="card-title-heading spacing-mb-0">
-                    Shift Pattern
+                    Shift Name
                   </h6>
                 </div>
 
@@ -3591,7 +3599,7 @@ const Dashboard = () => {
                     onKeyDown={(e) => e.key === "Enter" && handleShiftSearch()}
                     value={selectedShiftCode}
                   />
-                  <label className="floating-label">Shift Code</label>
+                  <label className="floating-label">Shift Name</label>
                 </div>
               </div>
 
