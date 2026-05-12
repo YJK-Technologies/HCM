@@ -488,7 +488,7 @@ const convertBufferToBlobUrlAndFile = (
       case "Documents":
         Documents();
         break;
-      case "EmployeeAssets":
+      case "Employee Assets":
         EmployeeAssets();
         break;
 
