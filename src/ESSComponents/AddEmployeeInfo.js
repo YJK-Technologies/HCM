@@ -171,7 +171,7 @@ function Input({ }) {
     console.log("permanantAddress:", permanantAddress);
     console.log("pan_No:", pan_No);
     console.log("Aadhaar_no:", Aadhaar_no);
-      console.log("Marital_Status:", selectedmartial);
+    console.log("Marital_Status:", selectedmartial);
     console.log("Kids:", selectedkids);
     console.log("Siblings:", Siblings);
     console.log("Grade_id:", selectedgradeid);
@@ -187,7 +187,7 @@ function Input({ }) {
     console.log("state:", state);
     console.log("country:", country);
     console.log("postalCode:", postalCode);
-    
+
 
     if (!validateEmail(Email)) {
       setError(true);
@@ -394,11 +394,11 @@ function Input({ }) {
       toast.warning("No changes detected");
       return;
     }
-    
-      if (JSON.stringify(currentData) === JSON.stringify(originalData) && !user_images?.name) {
-        toast.warning("No changes detected");
-        return;
-      }
+
+    if (JSON.stringify(currentData) === JSON.stringify(originalData) && !user_images?.name) {
+      toast.warning("No changes detected");
+      return;
+    }
 
     showConfirmationToast(
       "Are you sure you want to update the data ?",
@@ -508,7 +508,7 @@ function Input({ }) {
   const EmployeeAssets = () => {
     navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
-  
+
 
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
@@ -542,7 +542,7 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
-        case 'EmployeeAssets':
+      case 'EmployeeAssets':
         EmployeeAssets();
         break;
       default:
@@ -559,7 +559,7 @@ function Input({ }) {
     { label: 'Academic Details' },
     { label: 'Family' },
     { label: 'Documents' },
-   { label: 'Employee Assets' }
+    { label: 'Employee Assets' }
   ];
 
   const handleGradeID = (selectedgradeid) => {
@@ -921,7 +921,7 @@ function Input({ }) {
           Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name,
           Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
           Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
-          console.log(searchData);
+        console.log(searchData);
 
         setEmployeeId(EmployeeId);
         setFirst_Name(First_Name);
@@ -1037,30 +1037,30 @@ function Input({ }) {
           marital_Status: Marital_Status,
           kids: Kids,
           Grade_id,
-                
+
           title: Title,
           placeOfBirth: Place_of_Birth,
           nationality: Nationality,
           religion: Religion,
           bloodGroup: Blood_Group,
-                
+
           spouseName: Spouse_Name,
           noOfChildren: Number_of_Children,
           noOfSiblings: Number_of_Siblings,
           businessEmail: Email_Business,
-                
+
           emergencyContactName: Emergency_Contact_Name,
           emergencyContactPhone: Emergency_Contact_Phone,
           emergencyContactRelation: Emergency_Contact_Relationship,
-                
+
           city: City,
           state: State,
           country: Country,
           postalCode: Postal_Code,
-                
+
           passportNo: Passport_No,
           passportExpiryDate: formatDate(Passport_Expiry_Date),
-                
+
           otherIdType: Other_Id_Type,
           otherIdNo: Other_Id_No
         });
@@ -1269,55 +1269,55 @@ function Input({ }) {
     setSelectedOtherIdType(selectedOtherIdType);
     setOtherIdType(selectedOtherIdType?.value || null);
 
-setOriginalData({
-  First_Name,
-  Middle_Name,
-  Last_Name,
-  Father_Name,
-  Mother_Name,
-  DOB: formatDate(DOB),
-  Gender,
-  Email,
-  Phone1: phone1,
-  Phone2: phone2,
-  address1: Address1,
-  address2: Address2,
-  address3: Address3,
-  permanantAddress: PermanantAddress,
-  reference_Name: Reference_Name,
-  reference_Phone: Reference_Phone,
-  pan_No: Pan_No,
-  Aadhaar_no: Aadhar_no,
-  marital_Status: Marital_Status,
-  kids: Kids,
-  Grade_id,
+    setOriginalData({
+      First_Name,
+      Middle_Name,
+      Last_Name,
+      Father_Name,
+      Mother_Name,
+      DOB: formatDate(DOB),
+      Gender,
+      Email,
+      Phone1: phone1,
+      Phone2: phone2,
+      address1: Address1,
+      address2: Address2,
+      address3: Address3,
+      permanantAddress: PermanantAddress,
+      reference_Name: Reference_Name,
+      reference_Phone: Reference_Phone,
+      pan_No: Pan_No,
+      Aadhaar_no: Aadhar_no,
+      marital_Status: Marital_Status,
+      kids: Kids,
+      Grade_id,
 
-  title: Title,
-  placeOfBirth: Place_of_Birth,
-  nationality: Nationality,
-  religion: Religion,
-  bloodGroup: Blood_Group,
+      title: Title,
+      placeOfBirth: Place_of_Birth,
+      nationality: Nationality,
+      religion: Religion,
+      bloodGroup: Blood_Group,
 
-  spouseName: Spouse_Name,
-  noOfChildren: Number_of_Children,
-  noOfSiblings: Number_of_Siblings,
-  businessEmail: Email_Business,
+      spouseName: Spouse_Name,
+      noOfChildren: Number_of_Children,
+      noOfSiblings: Number_of_Siblings,
+      businessEmail: Email_Business,
 
-  emergencyContactName: Emergency_Contact_Name,
-  emergencyContactPhone: Emergency_Contact_Phone,
-  emergencyContactRelation: Emergency_Contact_Relationship,
+      emergencyContactName: Emergency_Contact_Name,
+      emergencyContactPhone: Emergency_Contact_Phone,
+      emergencyContactRelation: Emergency_Contact_Relationship,
 
-  city: City,
-  state: State,
-  country: Country,
-  postalCode: Postal_Code,
+      city: City,
+      state: State,
+      country: Country,
+      postalCode: Postal_Code,
 
-  passportNo: Passport_No,
-  passportExpiryDate: formatDate(Passport_Expiry_Date),
+      passportNo: Passport_No,
+      passportExpiryDate: formatDate(Passport_Expiry_Date),
 
-  otherIdType: Other_Id_Type,
-  otherIdNo: Other_Id_No
-});
+      otherIdType: Other_Id_Type,
+      otherIdNo: Other_Id_No
+    });
     console.log("Popup data mapped successfully");
   };
 
@@ -1403,34 +1403,47 @@ setOriginalData({
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleInsert}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleInsert}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {updateButtonVisible && ['update', 'all permission'].some(p => employeePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleUpdate}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleUpdate}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {['delete', 'all permission'].some(p => employeePermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleDelete}>
-                  <i className="fa-solid fa-trash text-danger fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleDelete}>
+                    <i className="fa-solid fa-trash delete fs-4"></i>
+                  </button>
                 </li>
               )}
-              {['all permission', 'reload'].some(p => employeePermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
+
             </ul>
           </div>
 

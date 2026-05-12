@@ -38,6 +38,12 @@ const LeaveRequestPage = () => {
   const [selectedCompOff, setSelectedCompOff] = useState(null);
   const [isSelectCompOff, setIsSelectCompOff] = useState(false);
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const leaveRequestPermissions = permissions
+    .filter(permission => permission.screen_type === 'LeaveRequest')
+    .map(permission => permission.permission_type.toLowerCase());
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/ESSManager`, {
       method: 'POST',
@@ -684,27 +690,41 @@ const LeaveRequestPage = () => {
         <div className="header-flex">
           <h1 className="page-title">Leave Request</h1>
           <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => leaveRequestPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={handleReloadAdd}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
-            <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
-            </div>
           </div>
 
+          {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              <li className="dropdown-item" onClick={handleReloadAdd}>
-                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
-              </li>
-              <li className="dropdown-item" onClick={handleSave}>
-                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {['add', 'all permission'].some(p => leaveRequestPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>

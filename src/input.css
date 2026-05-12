@@ -1633,3 +1633,87 @@
   background: #fff !important;
   outline: none;
 }
+
+/* =================================================
+   MODERN HORIZONTAL ACTION BAR (MOBILE ONLY)
+==================================================== */
+@media (max-width: 768px) {
+  /* The Container - Now horizontal */
+  .mobile-actions .dropdown-menu {
+    display: flex !important;
+    flex-direction: row !important;
+    min-width: auto !important;
+    width: fit-content !important;
+    padding: 6px !important;
+    border-radius: 30px !important; /* Pill shape */
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.85) !important; /* Glass effect */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
+    margin-top: 10px !important;
+    gap: 5px;
+    left: auto !important;
+    right: 0 !important;
+  }
+
+  /* Remove default Bootstrap arrow and list markers */
+  .mobile-actions .dropdown-menu::before,
+  .mobile-actions .dropdown-menu::after {
+    display: none !important;
+  }
+
+  /* Circular Action Items */
+  .mobile-actions .dropdown-item {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .mobile-actions .dropdown-item:hover,
+  .mobile-actions .dropdown-item:active {
+    transform: scale(1.1) translateY(-2px);
+    background-color: var(--bg-color) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-actions .dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    line-height: 1 !important;
+  }
+
+  /* Divider removal for horizontal layout */
+  .mobile-actions li {
+    border: none !important;
+  }
+
+  /* Main Toggle Button Styling */
+  .mobile-actions .btn-primary {
+    background: var(--but) !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s ease;
+  }
+
+  /* Rotate the list icon when menu is open */
+  .mobile-actions.show .btn-primary {
+    transform: rotate(90deg);
+  }
+}

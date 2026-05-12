@@ -41,6 +41,12 @@ const { FirstDate, LastDate } = getFinancialYearDates();
 
 function Input() {
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const payslipSalaryDaysPermissions = permissions
+    .filter(permission => permission.screen_type === 'PayslipSalaryDays')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [FromDate, setFromDate] = useState(FirstDate);
   const [ToDate, setToDate] = useState(LastDate);
   const [Start_Year, setStart_Year] = useState(FirstDate);
@@ -63,40 +69,40 @@ function Input() {
   const [statusdropSC, setStatusdropSC] = useState([]);
 
   const [statusgriddrop, setStatusGriddrop] = useState([]);
-  
+
   const navigate = useNavigate();
 
-    const handleChangeStatus = (selectedStatus) => {
+  const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
-    const filteredOptionStatus = statusdrop.map((option) => ({
+  const filteredOptionStatus = statusdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
   useEffect(() => {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-      fetch(`${config.apiBaseUrl}/status`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-      })
-        .then((data) => data.json())
-        .then((val) => setStatusdrop(val))
-        .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
   };
 
-    const filteredOptionStatusSC = statusdropSC.map((option) => ({
+  const filteredOptionStatusSC = statusdropSC.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
@@ -209,20 +215,20 @@ function Input() {
           // const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
 
           const dataToSend = {
-                        editedData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/UpdateSalary`, {
             method: "POST",
@@ -267,20 +273,20 @@ function Input() {
           // const dataToSend = { editedData: Array.isArray(rowData) ? rowData : [rowData] };
 
           const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/salaryDelete`, {
             method: "POST",
@@ -612,6 +618,18 @@ function Input() {
     XLSX.writeFile(workbook, "Salary_Eligibility_Days_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setFromDate('');
+    setToDate('');
+    setEligibledays('');
+    setSelectedStatus('');
+    setStatus('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -619,11 +637,46 @@ function Input() {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Salary Eligibility Days</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => payslipSalaryDaysPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {['add', 'all permission'].some(p => payslipSalaryDaysPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+
+            </ul>
           </div>
 
         </div>
@@ -680,27 +733,27 @@ function Input() {
             </div>
           </div>
 
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
               title="Please Select the Status"
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
-                />
-                <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectFocused(true)}
+                onBlur={() => setIsSelectFocused(false)}
+              />
+              <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
             </div>
+          </div>
 
         </div>
       </div>
@@ -762,27 +815,27 @@ function Input() {
             </div>
           </div>
 
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
               title="Please Select the Status"
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatusSC}
-                  onChange={handleChangeStatusSC}
-                  options={filteredOptionStatusSC}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocusedSC(true)}
-                  onBlur={() => setIsSelectFocusedSC(false)}
-                />
-                <label class="floating-label">Status</label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatusSC}
+                onChange={handleChangeStatusSC}
+                options={filteredOptionStatusSC}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectFocusedSC(true)}
+                onBlur={() => setIsSelectFocusedSC(false)}
+              />
+              <label class="floating-label">Status</label>
             </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">

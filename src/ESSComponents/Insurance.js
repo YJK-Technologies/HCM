@@ -1004,9 +1004,7 @@ useEffect(() => {
           <h1 className="page-title">Family</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) =>
-              familyPermissions.includes(permission),
-            ) && (
+            {["add", "all permission"].some((permission) => familyPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -1020,27 +1018,27 @@ useEffect(() => {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["add", "all permission"].some((p) =>
-                familyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {["add", "all permission"].some((p) => familyPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["reload", "all permission"].some((p) =>
-                familyPermissions.includes(p),
-              ) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
             </ul>
           </div>
         </div>

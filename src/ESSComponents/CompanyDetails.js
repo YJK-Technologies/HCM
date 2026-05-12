@@ -444,77 +444,77 @@ function Input() {
 
   // Handle tab navigation
   const handleUpdate = async () => {
-  if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  setError(false);
-
-  const currentData = {
-    EmployeeId: EmployeeId || "",
-    department_ID: dpt || "",
-    designation_ID: selecteddesg || "",
-    DOJ: DOJ || "",
-    DOL: DOL || "",
-    manager: manager || "",
-    shift: Shift || "",
-    status: status || "",
-    Section: section || "",
-    Work_Location: workLocation || "",
-    Employee_Type: empType || ""
-  };
-
-  // compare old vs new
-  const isChanged =
-    JSON.stringify(originalData) !== JSON.stringify(currentData);
-
-  if (!isChanged) {
-    toast.warning("No changes detected");
-    return;
-  }
-
-  showConfirmationToast(
-    "Are you sure you want to update the data?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const Header = {
-          ...currentData,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          modified_by: sessionStorage.getItem("selectedUserCode")
-        };
-
-        const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(Header)
-        });
-
-        if (response.ok) {
-          toast.success("Data updated successfully!", {
-            onClose: () => window.location.reload()
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Update failed");
-        }
-
-      } catch (error) {
-        toast.error("Error updating data: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    () => {
-      toast.info("Update cancelled");
+    if (!EmployeeId || !dpt || !selecteddesg || !DOJ || !manager || !Shift || !status || !empType) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  );
-};
+
+    setError(false);
+
+    const currentData = {
+      EmployeeId: EmployeeId || "",
+      department_ID: dpt || "",
+      designation_ID: selecteddesg || "",
+      DOJ: DOJ || "",
+      DOL: DOL || "",
+      manager: manager || "",
+      shift: Shift || "",
+      status: status || "",
+      Section: section || "",
+      Work_Location: workLocation || "",
+      Employee_Type: empType || ""
+    };
+
+    // compare old vs new
+    const isChanged =
+      JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+    if (!isChanged) {
+      toast.warning("No changes detected");
+      return;
+    }
+
+    showConfirmationToast(
+      "Are you sure you want to update the data?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const Header = {
+            ...currentData,
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode")
+          };
+
+          const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(Header)
+          });
+
+          if (response.ok) {
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload()
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+
+        } catch (error) {
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Update cancelled");
+      }
+    );
+  };
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
     switch (tabLabel) {
@@ -542,7 +542,7 @@ function Input() {
       case 'Documents':
         navigate("/Documents", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
         break;
-         case 'EmployeeAssets':
+      case 'EmployeeAssets':
         navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
         break;
       default:
@@ -604,25 +604,25 @@ function Input() {
       const selectedStatus = filteredOptionStatus.find(option => option.value === status);
       setSelectedStatus(selectedStatus);
       setStatus(selectedStatus?.value || null);
-          if (data && data.length > 0) {
-            const row = data[0];
-          
-            setOriginalData({
-              EmployeeId: row.EmployeeId || "",
-              department_ID: row.department_ID || "",
-              designation_ID: row.designation_ID || "",
-              DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
-              DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
-              manager: row.manager || "",
-              shift: row.shift || "",
-              status: row.status || "",
-              Section: row.Section || "",
-              Work_Location: row.Work_Location || "",
-              Employee_Type: row.Employee_Type || ""
-            });
-          }
+      if (data && data.length > 0) {
+        const row = data[0];
 
-      
+        setOriginalData({
+          EmployeeId: row.EmployeeId || "",
+          department_ID: row.department_ID || "",
+          designation_ID: row.designation_ID || "",
+          DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
+          DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
+          manager: row.manager || "",
+          shift: row.shift || "",
+          status: row.status || "",
+          Section: row.Section || "",
+          Work_Location: row.Work_Location || "",
+          Employee_Type: row.Employee_Type || ""
+        });
+      }
+
+
       console.log(data);
     };
   }
@@ -703,7 +703,7 @@ function Input() {
 
           if (searchData && searchData.length > 0) {
             const row = searchData[0];
-          
+
             setOriginalData({
               EmployeeId: row.EmployeeId || "",
               department_ID: row.department_ID || "",
@@ -761,7 +761,7 @@ function Input() {
       statusdrop?.length > 0 &&
       Managerdrop?.length > 0 &&
       Shiftdrop?.length > 0 &&
-      empTypeDrop?.length > 0 
+      empTypeDrop?.length > 0
     ) {
       handleRefNO(employeeId);
     }
@@ -822,36 +822,46 @@ function Input() {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {saveButtonVisible && ['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {updateButtonVisible && ['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleUpdate}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleUpdate}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleDelete}>
-                  <i className="fa-solid fa-trash text-danger fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleDelete}>
+                    <i className="fa-solid fa-trash delete fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              {['all permission', 'reload'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={reloadGridData}>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
                   <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
-                </li>
-              )}
-
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -1093,16 +1103,16 @@ function Input() {
                 value={selectedEmpType}
                 onChange={handleChangeEmpType}
                 options={filteredOptionEmpType}
-                 placeholder=" "
+                placeholder=" "
                 onFocus={() => setIsSelectEmpType(true)}
                 onBlur={() => setIsSelectEmpType(false)}
                 classNamePrefix="react-select"
                 isClearable
               />
-          
-            <label htmlFor="selectedshift" className={`floating-label ${error && !empType ? 'text-danger' : ''}`}>
-              Employee Type<span className="text-danger">*</span>
-            </label>
+
+              <label htmlFor="selectedshift" className={`floating-label ${error && !empType ? 'text-danger' : ''}`}>
+                Employee Type<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 

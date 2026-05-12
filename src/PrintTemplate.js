@@ -10,6 +10,12 @@ const config = require('./Apiconfig');
 
 function PrintTemplate() {
 
+    //code added by Pavun purpose of set user permisssion
+    const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+    const templatePermissions = permissions
+        .filter(permission => permission.screen_type === 'TemplateDesign')
+        .map(permission => permission.permission_type.toLowerCase());
+
     const [Academic, setAcademic] = useState([{ relation: 'Screens', members: [{ screenName: '', templatename: '', Templates: null, documentUrl: '' }] }]);
     const [Screens, setScreens] = useState("");
     const [templatename, settemplatename] = useState("");
@@ -381,28 +387,42 @@ function PrintTemplate() {
                     <h1 className="page-title">Print Templates</h1>
 
                     <div className="action-wrapper desktop-actions">
-                        {saveButtonVisible &&
+                        <div className="action-icon reload" onClick={reloadGridData}>
+                            <span className="tooltip">Reload</span>
+                            <i className="fa-solid fa-rotate-right"></i>
+                        </div>
+                        {saveButtonVisible && ['add', 'all permission'].some(p => templatePermissions.includes(p)) && (
                             <div onClick={handleSave} className="action-icon add">
                                 <span className="tooltip">Save</span>
                                 <i className="fa-solid fa-floppy-disk"></i>
                             </div>
-                        }
+                        )}
                     </div>
 
                     {/* Mobile Dropdown */}
                     <div className="dropdown mobile-actions">
-                        <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                            <i className="fa-solid fa-list"></i>
+                        <button
+                            className="btn btn-primary dropdown-toggle p-0"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
 
-                        <ul className="dropdown-menu dropdown-menu-end text-center">
-                            {/* {['add', 'all permission'].some(p => companyPermissions.includes(p)) && ( */}
-                            {saveButtonVisible &&
-                                <li className="dropdown-item" onClick={handleSave}>
-                                    <i className="fa-solid fa-floppy-disk"></i>
+                        <ul className="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <button className="dropdown-item" onClick={reloadGridData}>
+                                    <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+                                </button>
+                            </li>
+                            {saveButtonVisible && ['add', 'all permission'].some(p => templatePermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleSave}>
+                                        <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                    </button>
                                 </li>
-                            }
-                            {/* )} */}
+                            )}
                         </ul>
                     </div>
                 </div>

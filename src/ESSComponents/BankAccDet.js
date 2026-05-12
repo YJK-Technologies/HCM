@@ -121,7 +121,7 @@ function Input({ }) {
     navigate("/Documents", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
 
-   const EmployeeAssets = () => {
+  const EmployeeAssets = () => {
     navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: First_Name, department_id: department_id, designation_id: designation_id } });
   };
 
@@ -158,7 +158,7 @@ function Input({ }) {
       case 'Documents':
         Documents();
         break;
-     case 'EmployeeAssets':
+      case 'EmployeeAssets':
         EmployeeAssets();
         break;
 
@@ -431,21 +431,21 @@ function Input({ }) {
           salaryCurrency: Salary_Currency || "",
           WPSEnabled:
             WPS_Enabled === true ? "1" :
-            WPS_Enabled === false ? "0" :
-            WPS_Enabled || "",
+              WPS_Enabled === false ? "0" :
+                WPS_Enabled || "",
           WPSMemberId: WPS_Member_Id || "",
           isPrimaryAccount:
             Is_Primary_Account === true ? "1" :
-            Is_Primary_Account === false ? "0" :
-            Is_Primary_Account || "",
+              Is_Primary_Account === false ? "0" :
+                Is_Primary_Account || "",
           isActive:
             Is_Active === true ? "1" :
-            Is_Active === false ? "0" :
-            Is_Active || "",
+              Is_Active === false ? "0" :
+                Is_Active || "",
           isDelete:
             Is_Deleted === true ? "1" :
-            Is_Deleted === false ? "0" :
-            Is_Deleted || "",
+              Is_Deleted === false ? "0" :
+                Is_Deleted || "",
           sNo: S_NO || "",
         });
 
@@ -583,8 +583,8 @@ function Input({ }) {
       formData.append("Is_Active", isActive);
       formData.append("Is_Deleted", isDelete);
       formData.append("S_NO", sNo);
-      formData.append("company_code",sessionStorage.getItem("selectedCompanyCode"));
-      formData.append("modified_by",sessionStorage.getItem("selectedUserCode"));
+      formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
       if (passBookImg) {
         formData.append("Bankbook_img", passBookImg);
       }
@@ -660,11 +660,11 @@ function Input({ }) {
       const [{ AccountHolderName, designation_id, department_id, First_Name, Account_NO, EmployeeId, bankName,
         IFSC_Code, branchName, Bankbook_img, Bank_City, Bank_Country, Salary_Currency, WPS_Enabled, WPS_Member_Id,
         Is_Primary_Account, Is_Active, Is_Deleted, S_NO }] = data;
-    // :white_check_mark: Run button logic only if AccountHolderName has value
-    if (AccountHolderName && AccountHolderName.trim() !== "") {
-      setSaveButtonVisible(false);
-      setUpdateButtonVisible(true);
-    }
+      // :white_check_mark: Run button logic only if AccountHolderName has value
+      if (AccountHolderName && AccountHolderName.trim() !== "") {
+        setSaveButtonVisible(false);
+        setUpdateButtonVisible(true);
+      }
       if (Bankbook_img) {
         const imageBlob = base64ToBlob(Bankbook_img);
         setPassBookImg(imageBlob);
@@ -688,8 +688,8 @@ function Input({ }) {
       setSNo(S_NO);
 
       const selectedCurrency = filteredOptionCurrency.find(option => option.value === Salary_Currency);
-        setSelectedCurrency(selectedCurrency);
-        setSalaryCurrency(selectedCurrency?.value || null);
+      setSelectedCurrency(selectedCurrency);
+      setSalaryCurrency(selectedCurrency?.value || null);
 
       setBooleanSelect(WPS_Enabled, setSelectedWPSEnabled, setWPSEnabled);
       setBooleanSelect(Is_Primary_Account, setSelectedIsPrimaryAccount, setIsPrimaryAccount);
@@ -708,21 +708,21 @@ function Input({ }) {
         salaryCurrency: Salary_Currency || "",
         WPSEnabled:
           WPS_Enabled === true ? "1" :
-          WPS_Enabled === false ? "0" :
-          WPS_Enabled || "",
+            WPS_Enabled === false ? "0" :
+              WPS_Enabled || "",
         WPSMemberId: WPS_Member_Id || "",
         isPrimaryAccount:
           Is_Primary_Account === true ? "1" :
-          Is_Primary_Account === false ? "0" :
-          Is_Primary_Account || "",
+            Is_Primary_Account === false ? "0" :
+              Is_Primary_Account || "",
         isActive:
           Is_Active === true ? "1" :
-          Is_Active === false ? "0" :
-          Is_Active || "",
+            Is_Active === false ? "0" :
+              Is_Active || "",
         isDelete:
           Is_Deleted === true ? "1" :
-          Is_Deleted === false ? "0" :
-          Is_Deleted || "",
+            Is_Deleted === false ? "0" :
+              Is_Deleted || "",
         sNo: S_NO || "",
       });
 
@@ -789,14 +789,14 @@ function Input({ }) {
     }
 
     if (
-       employeeId &&
-       currencyDrop.length > 0 &&
-       booleanDrop.length > 0 &&
-       accountTypeDrop.length > 0
-      ) {
+      employeeId &&
+      currencyDrop.length > 0 &&
+      booleanDrop.length > 0 &&
+      accountTypeDrop.length > 0
+    ) {
       handleRefNo(employeeId);
     }
-  }, [location.state,currencyDrop, booleanDrop, accountTypeDrop]);
+  }, [location.state, currencyDrop, booleanDrop, accountTypeDrop]);
 
   const handleRemoveLogo = () => {
     setSelectedImage(null);
@@ -809,7 +809,7 @@ function Input({ }) {
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
-      <div className="shadow-lg p-1 bg-body-tertiary rounded main-header-box">
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Bank Account Details</h1>
 
@@ -837,41 +837,48 @@ function Input({ }) {
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
-        </div>
 
-        {/* Mobile Dropdown */}
-        <div className="dropdown mobile-actions">
-          <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-            <i className="fa-solid fa-list"></i>
-          </button>
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
 
-          <ul className="dropdown-menu dropdown-menu-end text-center">
-
-            {saveButtonVisible && ['add', 'all permission'].some(p => bankPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={handleInsert}>
-                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {saveButtonVisible && ['add', 'all permission'].some(p => bankPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleInsert}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              {updateButtonVisible && ['update', 'all permission'].some(p => bankPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleUpdate}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
+                </li>
+              )}
+              {['delete', 'all permission'].some(p => bankPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleDelete}>
+                    <i className="fa-solid fa-trash delete fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-            )}
+            </ul>
 
-            {updateButtonVisible && ['update', 'all permission'].some(p => bankPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={handleUpdate}>
-                <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-              </li>
-            )}
-
-            {['delete', 'all permission'].some(p => bankPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={handleDelete}>
-                <i className="fa-solid fa-trash text-danger fs-4"></i>
-              </li>
-            )}
-
-            {['all permission', 'reload'].some(p => bankPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
-              </li>
-            )}
-
-          </ul>
+          </div>
         </div>
 
       </div>
@@ -1010,7 +1017,7 @@ function Input({ }) {
               <input
                 id="bankName"
                 class="exp-input-field form-control"
-                  title="Please Enter the Bank Name"
+                title="Please Enter the Bank Name"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1070,7 +1077,7 @@ function Input({ }) {
               <input
                 id="bankCity"
                 class="exp-input-field form-control"
-                  title="Please Enter the Bank City"
+                title="Please Enter the Bank City"
                 type="text"
                 placeholder=" "
                 autoComplete="off"
@@ -1168,7 +1175,7 @@ function Input({ }) {
               <input
                 id="WPSMemberId"
                 class="exp-input-field form-control"
-                  title="Please Enter the WPS Member Id"
+                title="Please Enter the WPS Member Id"
                 type="text"
                 placeholder=" "
                 autoComplete="off"

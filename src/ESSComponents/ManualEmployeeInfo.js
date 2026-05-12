@@ -14,7 +14,7 @@ import LoadingScreen from "../Loading";
 
 const config = require("../Apiconfig");
 
-function ManualEmployeeInfo({}) {
+function ManualEmployeeInfo({ }) {
   const [activeTab, setActiveTab] = useState("Personal Details");
   const [EmployeeId, setEmployeeId] = useState("");
   const [First_Name, setFirst_Name] = useState("");
@@ -123,7 +123,7 @@ function ManualEmployeeInfo({}) {
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
   useEffect(() => {
-    if(IDdrop.length > 0 &&
+    if (IDdrop.length > 0 &&
       genderdrop.length > 0 &&
       KidsDrop.length > 0 &&
       titleDrop.length > 0 &&
@@ -135,29 +135,29 @@ function ManualEmployeeInfo({}) {
       countryDrop.length > 0 &&
       stateDrop.length > 0 &&
       otherDrop.length > 0 &&
-       employeeId
-    ){
+      employeeId
+    ) {
       handleRefNo(employeeId);
     }
-    
+
   }, [employeeId, IDdrop, genderdrop, KidsDrop, titleDrop, nationalityDrop, religionDrop,
-     Marital_StatusDrop, emergencyContactRelationDrop, cityDrop, countryDrop, stateDrop, otherDrop
+    Marital_StatusDrop, emergencyContactRelationDrop, cityDrop, countryDrop, stateDrop, otherDrop
   ]);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const employeePermissions = permissions
-    .filter((permission) => permission.screen_type === "AddEmployeeInfo")
+    .filter((permission) => permission.screen_type === "ManualEmployeeInfo")
     .map((permission) => permission.permission_type.toLowerCase());
 
-    const convertToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = (error) => reject(error);
-  });
-};
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   const handleSave = async () => {
     if (
@@ -199,187 +199,187 @@ function ManualEmployeeInfo({}) {
       return;
     }
     showConfirmationToast(
-    "Are you sure you want to update the data ?",
-    async () => {
-    
-  try {
-    setLoading(true);
+      "Are you sure you want to update the data ?",
+      async () => {
 
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
+        try {
+          setLoading(true);
 
-    /* ---------------- HEADER ---------------- */
-    const headerPayload = {
-      company_code,
-      EmployeeId,
-      purpose: purpose,
-      request_status: "Pending",
-      created_by,
-    };
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const created_by = sessionStorage.getItem("selectedUserCode");
 
-    const headerRes = await fetch(`${config.apiBaseUrl}/PersonalRequestHdr`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ headerData: [headerPayload] }),
-      }
-    );
+          /* ---------------- HEADER ---------------- */
+          const headerPayload = {
+            company_code,
+            EmployeeId,
+            purpose: purpose,
+            request_status: "Pending",
+            created_by,
+          };
 
-    if (!headerRes.ok) {
-      const err = await headerRes.json();
-      throw new Error(err.message);
-    }
+          const headerRes = await fetch(`${config.apiBaseUrl}/PersonalRequestHdr`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            }
+          );
 
-    const headerResult = await headerRes.json();
-    const info_request_id = headerResult?.[0]?.info_request_id;
-
-    if (!info_request_id) {
-      throw new Error("info_request_id not returned from backend");
-    }
-
-    /* ---------------- DETAILS ---------------- */
-    await savePersonalDetails(info_request_id);
-
-    toast.success("Personal details submitted successfully!", {
-      onClose: () => window.location.reload(),
-    });
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Error: " + err.message);
-  } finally {
-    setLoading(false);
-  }
-
-    },
-          () => {
-            toast.info("Data updated cancelled.");
+          if (!headerRes.ok) {
+            const err = await headerRes.json();
+            throw new Error(err.message);
           }
-  );
-};
 
-const savePersonalDetails = async (info_request_id) => {
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
+          const headerResult = await headerRes.json();
+          const info_request_id = headerResult?.[0]?.info_request_id;
 
-    let photoBase64 = null;
+          if (!info_request_id) {
+            throw new Error("info_request_id not returned from backend");
+          }
 
-    if (user_images) {
-      if (user_images.size > 1 * 1024 * 1024) {
-        toast.warning("Photo size exceeds 1MB");
-        return;
-      }
-      photoBase64 = await convertToBase64(user_images);
-    }
+          /* ---------------- DETAILS ---------------- */
+          await savePersonalDetails(info_request_id);
 
-    const detailsData = [
-      {
-        info_request_id,
-        company_code,
-        EmployeeId,
-        request_status: "Pending",
+          toast.success("Personal details submitted successfully!", {
+            onClose: () => window.location.reload(),
+          });
 
-        // Personal
-        First_Name,
-        Middle_Name,
-        Last_Name,
-        father_name: Father_Name,
-        mother_name: Mother_Name,
-        DOB,
-        Gender: selectedGender,
-        email: Email,
-        phone1: Phone1,
-        phone2: Phone2,
+        } catch (err) {
+          console.error(err);
+          toast.error("Error: " + err.message);
+        } finally {
+          setLoading(false);
+        }
 
-        // Address
-        Address1: address1,
-        address2,
-        address3,
-        PermanantAddress: permanantAddress,
-
-        // Reference
-        Reference_name: reference_Name,
-        Reference_Phone: reference_Phone,
-
-        // IDs
-        Pan_No: pan_No,
-        Aadhar_no: Aadhaar_no,
-        Photos: photoBase64,
-
-        // Family
-        marital_status: selectedmartial,
-        Kids: selectedkids,
-
-        // Job
-        Grade_id: selectedgradeid,
-        Title: title,
-
-        // Extra
-        Place_of_Birth: placeOfBirth,
-        Nationality: nationality,
-        Religion: religion,
-        Blood_Group: bloodGroup,
-
-        // Family Details
-        Spouse_Name: spouseName,
-        Number_of_Siblings: noOfSiblings,
-        Number_of_Children: noOfChildren,
-
-        // Contact
-        Email_Business: businessEmail,
-        Phone_Alternate: Phone2,
-
-        // Emergency
-        Emergency_Contact_Name: emergencyContactName,
-        Emergency_Contact_Relationship: emergencyContactRelation,
-        Emergency_Contact_Phone: emergencyContactPhone,
-        Siblings: Siblings,
-
-        // Location
-        City: city,
-        State: state,
-        Postal_Code: postalCode,
-        Country: country,
-
-        // Passport
-        Passport_No: passportNo,
-        Passport_Expiry_Date: passportExpiryDate,
-
-        // Other ID
-        Other_Id_Type: otherIdType,
-        Other_Id_No: otherIdNo,
-        RepManager,
-
-        created_by,
       },
-    ];
-
-    const res = await fetch(
-      `${config.apiBaseUrl}/PersonalRequestDetails`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ detailsData }),
+      () => {
+        toast.info("Data updated cancelled.");
       }
     );
+  };
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message);
+  const savePersonalDetails = async (info_request_id) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const created_by = sessionStorage.getItem("selectedUserCode");
+
+      let photoBase64 = null;
+
+      if (user_images) {
+        if (user_images.size > 1 * 1024 * 1024) {
+          toast.warning("Photo size exceeds 1MB");
+          return;
+        }
+        photoBase64 = await convertToBase64(user_images);
+      }
+
+      const detailsData = [
+        {
+          info_request_id,
+          company_code,
+          EmployeeId,
+          request_status: "Pending",
+
+          // Personal
+          First_Name,
+          Middle_Name,
+          Last_Name,
+          father_name: Father_Name,
+          mother_name: Mother_Name,
+          DOB,
+          Gender: selectedGender,
+          email: Email,
+          phone1: Phone1,
+          phone2: Phone2,
+
+          // Address
+          Address1: address1,
+          address2,
+          address3,
+          PermanantAddress: permanantAddress,
+
+          // Reference
+          Reference_name: reference_Name,
+          Reference_Phone: reference_Phone,
+
+          // IDs
+          Pan_No: pan_No,
+          Aadhar_no: Aadhaar_no,
+          Photos: photoBase64,
+
+          // Family
+          marital_status: selectedmartial,
+          Kids: selectedkids,
+
+          // Job
+          Grade_id: selectedgradeid,
+          Title: title,
+
+          // Extra
+          Place_of_Birth: placeOfBirth,
+          Nationality: nationality,
+          Religion: religion,
+          Blood_Group: bloodGroup,
+
+          // Family Details
+          Spouse_Name: spouseName,
+          Number_of_Siblings: noOfSiblings,
+          Number_of_Children: noOfChildren,
+
+          // Contact
+          Email_Business: businessEmail,
+          Phone_Alternate: Phone2,
+
+          // Emergency
+          Emergency_Contact_Name: emergencyContactName,
+          Emergency_Contact_Relationship: emergencyContactRelation,
+          Emergency_Contact_Phone: emergencyContactPhone,
+          Siblings: Siblings,
+
+          // Location
+          City: city,
+          State: state,
+          Postal_Code: postalCode,
+          Country: country,
+
+          // Passport
+          Passport_No: passportNo,
+          Passport_Expiry_Date: passportExpiryDate,
+
+          // Other ID
+          Other_Id_Type: otherIdType,
+          Other_Id_No: otherIdNo,
+          RepManager,
+
+          created_by,
+        },
+      ];
+
+      const res = await fetch(
+        `${config.apiBaseUrl}/PersonalRequestDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ detailsData }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+
+      console.log("Personal Details inserted successfully");
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Error inserting details: " + error.message);
     }
-
-    console.log("Personal Details inserted successfully");
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Error inserting details: " + error.message);
-  }
-};
+  };
   function validateEmail(email) {
     const emailRegex = /^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/;
     return emailRegex.test(email);
@@ -410,15 +410,15 @@ const savePersonalDetails = async (info_request_id) => {
       case "Personal Details":
         EmployeeLoan();
         break;
-        case 'Family':
-          Insurance1();
-          break;
-        case 'Academic Details':
-          AcademicDet();
-          break;
-        case 'Documents':
-          Documents();
-          break;
+      case 'Family':
+        Insurance1();
+        break;
+      case 'Academic Details':
+        AcademicDet();
+        break;
+      case 'Documents':
+        Documents();
+        break;
       case "Assets":
         EmployeeAssets();
         break;
@@ -444,11 +444,11 @@ const savePersonalDetails = async (info_request_id) => {
 
   const filteredOptionGradeid = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
-        value: option.GradeID,
-        label: option.GradeID,
-      }))
+      value: option.GradeID,
+      label: option.GradeID,
+    }))
     : [];
-    
+
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getID`, {
@@ -757,7 +757,7 @@ const savePersonalDetails = async (info_request_id) => {
   }, []);
 
   const handleRemoveLogo = () => {
-    setSelectedImage(null); 
+    setSelectedImage(null);
     setuser_image('')
     if (logo.current) {
       logo.current.value = "";
@@ -900,9 +900,9 @@ const savePersonalDetails = async (info_request_id) => {
           const imageBlob = new Blob([new Uint8Array(Photos.data)], {
             type: "image/jpeg",
           });
-        
+
           setuser_image(imageBlob);
-        
+
           const imageUrl = URL.createObjectURL(imageBlob);
           setSelectedImage(imageUrl);
         } else {
@@ -1016,15 +1016,12 @@ const savePersonalDetails = async (info_request_id) => {
         <div className="header-flex">
           <h1 className="page-title">Employee Personal Details</h1>
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                employeePermissions.includes(permission),
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {saveButtonVisible && ["add", "all permission"].some((permission) => employeePermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -1034,24 +1031,27 @@ const savePersonalDetails = async (info_request_id) => {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  employeePermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {saveButtonVisible && ["add", "all permission"].some((p) => employeePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>
@@ -1408,7 +1408,7 @@ const savePersonalDetails = async (info_request_id) => {
             <div className="inputGroup">
               <input
                 id="permanantAddress"
-                  title="Please Enter the Permanent Address"
+                title="Please Enter the Permanent Address"
                 className="exp-input-field form-control"
                 type="text"
                 placeholder=""
@@ -1710,7 +1710,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="bloodGroup"
                 className="exp-input-field form-control"
-                  title="Please Enter the Blood Group"
+                title="Please Enter the Blood Group"
                 type="text"
                 placeholder=""
                 value={bloodGroup}
@@ -1733,7 +1733,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="spouseName"
                 className="exp-input-field form-control"
-                  title="Please Enter the Spouse Name"
+                title="Please Enter the Spouse Name"
                 type="text"
                 placeholder=""
                 value={spouseName}
@@ -1752,7 +1752,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="noOfChildren"
                 className="exp-input-field form-control"
-                  title="Please Enter the Number of Children"
+                title="Please Enter the Number of Children"
                 type="text"
                 placeholder=""
                 value={noOfChildren}
@@ -1776,7 +1776,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="noOfSiblings"
                 className="exp-input-field form-control"
-                  title="Please Enter the Number of Siblings"
+                title="Please Enter the Number of Siblings"
                 type="text"
                 placeholder=""
                 value={noOfSiblings}
@@ -1800,7 +1800,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="businessEmail"
                 className="exp-input-field form-control"
-                  title="Please Enter the Business Email"
+                title="Please Enter the Business Email"
                 type="email"
                 placeholder=""
                 value={businessEmail}
@@ -1819,7 +1819,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="emergencyContactName"
                 className="exp-input-field form-control"
-                  title="Please Enter the Emergency Contact Name"
+                title="Please Enter the Emergency Contact Name"
                 type="text"
                 placeholder=""
                 value={emergencyContactName}
@@ -2009,7 +2009,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="postalCode"
                 className="exp-input-field form-control"
-                  title="Please Enter the Postal Code"
+                title="Please Enter the Postal Code"
                 type="text"
                 placeholder=""
                 value={postalCode}
@@ -2037,7 +2037,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportNo"
                 className="exp-input-field form-control"
-                  title="Please Enter the Passport Number"
+                title="Please Enter the Passport Number"
                 type="text"
                 placeholder=""
                 value={passportNo}
@@ -2056,7 +2056,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportExpiryDate"
                 className="exp-input-field form-control"
-                  title="Please Enter the Passport Expiry Date"
+                title="Please Enter the Passport Expiry Date"
                 type="date"
                 placeholder=""
                 value={passportExpiryDate}
@@ -2101,7 +2101,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="otherIdNo"
                 className="exp-input-field form-control"
-                  title="Please Enter the Other ID Number"
+                title="Please Enter the Other ID Number"
                 type="text"
                 placeholder=""
                 value={otherIdNo}
@@ -2120,7 +2120,7 @@ const savePersonalDetails = async (info_request_id) => {
               <input
                 id="passportNo"
                 className="exp-input-field form-control"
-                  title="Please Enter the Purpose"
+                title="Please Enter the Purpose"
                 type="text"
                 placeholder=""
                 value={purpose}

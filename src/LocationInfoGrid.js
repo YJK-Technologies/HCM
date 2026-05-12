@@ -565,7 +565,7 @@ function LocInfoGrid() {
 
     reportWindow.document.write("</tbody></table>");
 
-     reportWindow.document.write(`
+    reportWindow.document.write(`
   <div style="text-align:center;">
     <button class="print-btn" onclick="window.print()">Print</button>
   </div>
@@ -806,33 +806,46 @@ function LocInfoGrid() {
 
             {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
               </button>
 
               <ul className="dropdown-menu dropdown-menu-end text-center">
 
                 {['add', 'all permission'].some(p => LocationPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigateToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                  <li>
+                    <button className="dropdown-item" onClick={handleNavigateToForm}>
+                      <i className="fa-solid fa-user-plus add fs-4"></i>
+                    </button>
                   </li>
                 )}
 
                 {['delete', 'all permission'].some(p => LocationPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                  <li>
+                    <button className="dropdown-item" onClick={deleteSelectedRows}>
+                      <i className="fa-solid fa-user-minus delete fs-4"></i>
+                    </button>
                   </li>
                 )}
 
                 {['update', 'all permission'].some(p => LocationPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                  <li>
+                    <button className="dropdown-item" onClick={saveEditedData}>
+                      <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                    </button>
                   </li>
                 )}
 
                 {['all permission', 'view'].some(p => LocationPermissions.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
+                  <li>
+                    <button className="dropdown-item" onClick={generateReport}>
+                      <i className="fa-solid fa-print text-dark fs-4"></i>
+                    </button>
                   </li>
                 )}
 
@@ -842,7 +855,7 @@ function LocInfoGrid() {
         </div>
         <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
           <div className="row g-3">
-            
+
             <div className="col-md-2">
               <div class="inputGroup">
                 <input

@@ -11,7 +11,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [EmployeeId, setEmployeeId] = useState("");
   const [salaryType, setSalaryType] = useState("");
   const [payscale, setPayscale] = useState("");
@@ -694,11 +694,11 @@ function Input({}) {
             {["delete", "all permission"].some((permission) =>
               financePermissions.includes(permission),
             ) && (
-              <div className="action-icon delete" onClick={handleDelete}>
-                <span className="tooltip">Delete</span>
-                <i class="fa-solid fa-trash"></i>
-              </div>
-            )}
+                <div className="action-icon delete" onClick={handleDelete}>
+                  <span className="tooltip">Delete</span>
+                  <i class="fa-solid fa-trash"></i>
+                </div>
+              )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -708,44 +708,42 @@ function Input({}) {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  financePermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
-
-              {updateButtonVisible &&
-                ["update", "all permission"].some((p) =>
-                  financePermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleUpdate}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
-
-              {["delete", "all permission"].some((p) =>
-                financePermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleDelete}>
-                  <i className="fa-solid fa-trash text-danger fs-4"></i>
+              {saveButtonVisible && ["add", "all permission"].some((p) => financePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              {["all permission", "reload"].some((p) => financePermissions.includes(p), ) && ( 
-                <li className="dropdown-item" onClick={reloadGridData}>
-                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              {updateButtonVisible && ["update", "all permission"].some((p) => financePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleUpdate}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
                 </li>
               )}
+
+              {["delete", "all permission"].some((p) => financePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleDelete}>
+                    <i className="fa-solid fa-trash delete fs-4"></i>
+                  </button>
+                </li>
+              )}
+
+              <li className="dropdown-item" onClick={reloadGridData}>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              </li>
             </ul>
           </div>
         </div>

@@ -97,6 +97,12 @@ function VisaRequest({ }) {
     const [reqStatusDropGrid, setReqStatusDropGrid] = useState([]);
     const [priorityDropGrid, setPriorityDropGrid] = useState([]);
 
+    //code added by Pavun purpose of set user permisssion
+    const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+    const visaRequestPermissions = permissions
+        .filter(permission => permission.screen_type === 'VisaRequest')
+        .map(permission => permission.permission_type.toLowerCase());
+
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -1149,6 +1155,33 @@ function VisaRequest({ }) {
         XLSX.writeFile(workbook, "Visa_Request_Search_Report.xlsx");
     };
 
+    const handleReloadAdd = () => {
+        clearInputsAdd([]);
+    };
+
+    const clearInputsAdd = () => {
+        setEmpId('');
+        setSelectedEmpId('');
+        setPassportId('');
+        setCountryId('');
+        setSelectedCountryId('');
+        setVisaType('');
+        setSelectedVisaType('');
+        setPurpose('');
+        setTravelStartDate('');
+        setTravelEndDate('');
+        setReqStatus('');
+        setSelectedReqStatus('');
+        setReqNumber('');
+        setPriority('');
+        setSelectedPriority('');
+        setSponsorName('');
+        setEstimatedCost('');
+        setRemarks('');
+        setselectedmanager('');
+        setProjectManager('');
+    };
+
     return (
         <div class="container-fluid Topnav-screen ">
             {loading && <LoadingScreen />}
@@ -1157,26 +1190,40 @@ function VisaRequest({ }) {
                 <div className="header-flex">
                     <h1 className="page-title">Visa Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div onClick={handleSave} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
+                        {['add', 'all permission'].some(permission => visaRequestPermissions.includes(permission)) && (
+                            <div onClick={handleSave} className="action-icon add">
+                                <span className="tooltip">Save</span>
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </div>
+                        )}
+                        <div className="action-icon print" onClick={handleReloadAdd}>
+                            <span className="tooltip">Reload</span>
+                            <i className="fa-solid fa-arrow-rotate-right"></i>
                         </div>
                     </div>
 
+                    {/* Mobile Dropdown */}
                     <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
-            </button>
+                        <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
+                            <i className="fa-solid fa-list"></i>
+                        </button>
 
-            <ul className="dropdown-menu dropdown-menu-end text-center">
-              {/* <li className="dropdown-item" onClick={handleReloadAdd}>
-                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
-              </li> */}
-              <li className="dropdown-item" onClick={handleSave}>
-                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
-              </li>
-            </ul>
-          </div>
+                        <ul className="dropdown-menu dropdown-menu-end text-center">
+                            {['add', 'all permission'].some(permission => visaRequestPermissions.includes(permission)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleSave}>
+                                        <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                    </button>
+                                </li>
+                            )}
+
+                            <li>
+                                <button className="dropdown-item" onClick={handleReloadAdd}>
+                                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
 
                 </div>
             </div>

@@ -13,7 +13,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [Academic, setAcademic] = useState([
     {
       relation: "Academic",
@@ -58,7 +58,7 @@ function Input({}) {
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const academicPermissions = permissions
-    .filter((permission) => permission.screen_type === "AcademicDet")
+    .filter((permission) => permission.screen_type === "AcademicDetReq")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const handlePdfClick = (url) => {
@@ -81,21 +81,21 @@ function Input({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-                  academicName: "",
-                  major: "",
-                  institution: "",
-                  academicYear: "",
-                  document: null,
-                  documentUrl: "",
-                  keyfield: "",
-                  purpose: "",
-                },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                academicName: "",
+                major: "",
+                institution: "",
+                academicYear: "",
+                document: null,
+                documentUrl: "",
+                keyfield: "",
+                purpose: "",
+              },
+            ],
+          }
           : item,
       ),
     );
@@ -224,19 +224,19 @@ function Input({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      RepManager: selectedRepManager
-                        ? selectedRepManager.value
-                        : "",
-                      selectRepManager: selectedRepManager,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  RepManager: selectedRepManager
+                    ? selectedRepManager.value
+                    : "",
+                  selectRepManager: selectedRepManager,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -265,15 +265,15 @@ function Input({}) {
             created_by,
           };
 
-    const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ headerData: [headerPayload] }),
-      }
-    );
+          const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            }
+          );
 
           if (!headerRes.ok) {
             const err = await headerRes.json();
@@ -516,11 +516,11 @@ function Input({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -535,17 +535,17 @@ function Input({}) {
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-                ...doc,
-                members: doc.members.map((member, i) =>
-                  i === index
-                    ? {
-                        ...member,
-                        document: file,
-                        documentUrl: fileUrl,
-                      }
-                    : member,
-                ),
-              }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                  }
+                  : member,
+              ),
+            }
             : doc,
         ),
       );
@@ -637,11 +637,11 @@ function Input({}) {
       prev.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((m, i) =>
-                i === index ? { ...m, document: null, documentUrl: "" } : m,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((m, i) =>
+              i === index ? { ...m, document: null, documentUrl: "" } : m,
+            ),
+          }
           : doc,
       ),
     );
@@ -660,41 +660,42 @@ function Input({}) {
           <h1 className="page-title">Academic Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                academicPermissions.includes(permission),
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {saveButtonVisible && ["add", "all permission"].some((permission) => academicPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
 
+          {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  academicPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {saveButtonVisible && ["add", "all permission"].some((p) => academicPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>
@@ -867,41 +868,41 @@ function Input({}) {
               </div>
 
               <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+                <div
+                  className={`inputGroup selectGroup 
                 ${member.selectRepManager ? "has-value" : ""} 
                 ${isSelectRepManager[`${relationGroup.relation}-${index}`] ? "is-focused" : ""}`}
-                title="Please Select the Reporting Manager"
-              >
-                <Select
-                  placeholder=" "
-                  onFocus={() =>
-                    setIsSelectRepManager((prev) => ({
-                      ...prev,
-                      [`${relationGroup.relation}-${index}`]: true,
-                    }))
-                  }
-                  onBlur={() =>
-                    setIsSelectRepManager((prev) => ({
-                      ...prev,
-                      [`${relationGroup.relation}-${index}`]: false,
-                    }))
-                  }
-                  classNamePrefix="react-select"
-                  isClearable
-                  value={member.selectRepManager}
-                  options={filteredOptionManager}
-                  onChange={(selectRepManager) =>
-                    handleChangeRepManager(
-                      selectRepManager,
-                      relationGroup.relation,
-                      index,
-                    )
-                  }
-                />
-                <label className="floating-label">Reporting Manager</label>
+                  title="Please Select the Reporting Manager"
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectRepManager((prev) => ({
+                        ...prev,
+                        [`${relationGroup.relation}-${index}`]: false,
+                      }))
+                    }
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectRepManager}
+                    options={filteredOptionManager}
+                    onChange={(selectRepManager) =>
+                      handleChangeRepManager(
+                        selectRepManager,
+                        relationGroup.relation,
+                        index,
+                      )
+                    }
+                  />
+                  <label className="floating-label">Reporting Manager</label>
+                </div>
               </div>
-            </div>
 
               <div className="col-md-2">
                 <div className="inputGroup">
