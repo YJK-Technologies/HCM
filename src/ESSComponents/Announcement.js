@@ -926,7 +926,7 @@ function Input({ }) {
               {/* )} */}
 
               <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
               </li>
 
             </ul>

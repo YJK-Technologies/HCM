@@ -542,7 +542,7 @@ function Input() {
       case 'Documents':
         navigate("/Documents", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
         break;
-         case 'EmployeeAssets':
+         case 'Employee Assets':
         navigate("/EmployeeAssets", { state: { employeeId: EmployeeId, firstName: first_Name, department_id: department_id, designation_id: designation_id } });
         break;
       default:
