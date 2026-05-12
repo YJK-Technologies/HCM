@@ -15,6 +15,12 @@ const config = require('./Apiconfig');
 
 function Input({ }) {
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const countryMasterPermissions = permissions
+    .filter(permission => permission.screen_type === 'CountryMaster')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [Country_Code, setCountry_Code] = useState('');
   const [Country_Name, setCountry_Name] = useState('');
   const [ISO_Code, setISO_Code] = useState('');
@@ -446,7 +452,7 @@ function Input({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to update the selected Country Master?",
       async () => {
@@ -456,20 +462,20 @@ function Input({ }) {
           const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-          sp_Country_MasterData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            sp_Country_MasterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
                 Modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   Company_Code,
                   Modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopUpdate`,
             {
@@ -501,7 +507,7 @@ function Input({ }) {
   };
 
   const handleDelete = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to delete the selected employee shift mapping data?",
       async () => {
@@ -511,20 +517,20 @@ function Input({ }) {
           const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-          sp_Country_MasterData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            sp_Country_MasterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
                 Modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   Company_Code,
                   Modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/Country_MasterLoopDelete`,
             {
@@ -700,31 +706,42 @@ function Input({ }) {
           <h1 className="page-title">Country Master</h1>
 
           <div className="action-wrapper desktop-actions">
-            <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
-            </div>
             <div className="action-icon print" onClick={handleReload}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+            {['add', 'all permission'].some(p => countryMasterPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              <li className="dropdown-item" onClick={handleSave}>
-                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={handleReload}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
 
-              <li className="dropdown-item" onClick={handleReload}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
-              </li>
-
+              {['add', 'all permission'].some(p => countryMasterPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </div>

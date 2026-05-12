@@ -14,6 +14,13 @@ const getTodayDate = () => {
 };
 
 function HoliDays() {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const holiDaysPermissions = permissions
+    .filter(permission => permission.screen_type === 'HoliDays')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [HolidayDate, setHolidayDate] = useState("");
   const [error, setError] = useState("");
   const [Description, setDescription] = useState("");
@@ -708,10 +715,12 @@ function HoliDays() {
         <div className="header-flex">
           <h1 className="page-title">Employee Holiday</h1>
           <div className="action-wrapper desktop-actions">
-            <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
-            </div>
+            {['add', 'all permission'].some(permission => holiDaysPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={handleReload}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -720,20 +729,29 @@ function HoliDays() {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(permission => holiDaysPermissions.includes(permission)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
 
-              <li className="dropdown-item" onClick={handleSave}>
-                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={handleReload}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-
-              <li className="dropdown-item" onClick={handleReload}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
-              </li>
-
             </ul>
           </div>
         </div>

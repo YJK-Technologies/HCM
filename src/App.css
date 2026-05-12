@@ -171,6 +171,13 @@
   color: var(--font-hover);
 }
 
+.action-icon.reload:hover,
+.action-icon.reload:hover .tooltip,
+.action-icon.reload:hover .tooltip::before {
+  background-color: #000;
+  color: var(--font-hover);
+}
+
 .action-icon.search:hover,
 .action-icon.search:hover .tooltip,
 .action-icon.search:hover .tooltip::before {
@@ -290,3 +297,10 @@ body::-webkit-scrollbar {
   -ms-user-select: none;     
   user-select: none;         
 } */
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 18px; 
+    max-width: 100%; 
+  }
+}

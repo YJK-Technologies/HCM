@@ -12,7 +12,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [EmployeeId, setEmployeeId] = useState("");
   const [documentUrl, setDocumentUrl] = useState({});
   const [error, setError] = useState(false);
@@ -82,9 +82,9 @@ function Input({}) {
 
   const filteredOptionDocumentType = Array.isArray(documentTypeDrop)
     ? documentTypeDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   const handleChangeDocumentType = (selectedDocumentType, relation, index) => {
@@ -92,19 +92,19 @@ function Input({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      documentType: selectedDocumentType
-                        ? selectedDocumentType.value
-                        : "",
-                      selectDocumentType: selectedDocumentType,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  documentType: selectedDocumentType
+                    ? selectedDocumentType.value
+                    : "",
+                  selectDocumentType: selectedDocumentType,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -126,27 +126,27 @@ function Input({}) {
     }
   };
 
-const convertBufferToBlobUrlAndFile = (
-  buffer,
-  fileName = "document.pdf",
-  mimeType = "application/pdf"
-) => {
-  if (
-    buffer &&
-    buffer.type === "Buffer" &&
-    Array.isArray(buffer.data) &&
-    buffer.data.length > 0
-  ) {
-    const byteArray = new Uint8Array(buffer.data);
-    const blob = new Blob([byteArray], { type: mimeType });
-    const blobUrl = URL.createObjectURL(blob);
-    const file = new File([blob], fileName, { type: mimeType });
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf"
+  ) => {
+    if (
+      buffer &&
+      buffer.type === "Buffer" &&
+      Array.isArray(buffer.data) &&
+      buffer.data.length > 0
+    ) {
+      const byteArray = new Uint8Array(buffer.data);
+      const blob = new Blob([byteArray], { type: mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      const file = new File([blob], fileName, { type: mimeType });
 
-    return { blobUrl, file };
-  }
+      return { blobUrl, file };
+    }
 
-  return { blobUrl: "", file: null };
-};
+    return { blobUrl: "", file: null };
+  };
   const handleDocuments = async (code) => {
     setLoading(true);
     try {
@@ -520,11 +520,11 @@ const convertBufferToBlobUrlAndFile = (
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -535,20 +535,20 @@ const convertBufferToBlobUrlAndFile = (
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-                  documentType: "",
-                  documentNo: "",
-                  issueDate: "",
-                  expiryDate: "",
-                  document: null,
-                  documentUrl: "",
-                  keyfield: "",
-                },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                documentType: "",
+                documentNo: "",
+                issueDate: "",
+                expiryDate: "",
+                document: null,
+                documentUrl: "",
+                keyfield: "",
+              },
+            ],
+          }
           : item,
       ),
     );
@@ -609,18 +609,18 @@ const convertBufferToBlobUrlAndFile = (
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-                ...doc,
-                members: doc.members.map((member, i) =>
-                  i === index
-                    ? {
-                        ...member,
-                        document: file,
-                        documentUrl: fileUrl,
-                        isNewFile: true,
-                      }
-                    : member,
-                ),
-              }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                    isNewFile: true,
+                  }
+                  : member,
+              ),
+            }
             : doc,
         ),
       );
@@ -693,10 +693,10 @@ const convertBufferToBlobUrlAndFile = (
     console.log(fileBase64);
 
     const editedData = {
-      keyfield: member.keyfield, 
+      keyfield: member.keyfield,
       EmployeeId: EmployeeId,
       documentType: member.documentType,
-      documentNo: member.documentNo, 
+      documentNo: member.documentNo,
       issueDate: member.issueDate,
       expiryDate: member.expiryDate,
       document: fileBase64,
@@ -865,11 +865,11 @@ const convertBufferToBlobUrlAndFile = (
       prev.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((m, i) =>
-                i === index ? { ...m, document: null, documentUrl: "" } : m,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((m, i) =>
+              i === index ? { ...m, document: null, documentUrl: "" } : m,
+            ),
+          }
           : doc,
       ),
     );
@@ -888,9 +888,7 @@ const convertBufferToBlobUrlAndFile = (
           <h1 className="page-title">Identity Documents</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) =>
-              identityPermissions.includes(permission),
-            ) && (
+            {["add", "all permission"].some((permission) => identityPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -904,27 +902,27 @@ const convertBufferToBlobUrlAndFile = (
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["add", "all permission"].some((p) =>
-                identityPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {["add", "all permission"].some((p) => identityPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["reload", "all permission"].some((p) =>
-                identityPermissions.includes(p),
-              ) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
             </ul>
           </div>
         </div>
@@ -948,9 +946,8 @@ const convertBufferToBlobUrlAndFile = (
               />
               <label
                 for="cno"
-                className={`exp-form-labels ${
-                  error && !EmployeeId ? "text-danger" : ""
-                }`}
+                className={`exp-form-labels ${error && !EmployeeId ? "text-danger" : ""
+                  }`}
               >
                 Employee ID<span className="text-danger">*</span>
               </label>
@@ -1039,7 +1036,7 @@ const convertBufferToBlobUrlAndFile = (
                   className={`inputGroup selectGroup 
               ${member.selectDocumentType ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
-               title="Please Select the Document Type"
+                  title="Please Select the Document Type"
                 >
                   <Select
                     id={`cname-${index}`}
@@ -1071,9 +1068,8 @@ const convertBufferToBlobUrlAndFile = (
                   />
                   <label
                     htmlFor={`cname-${index}`}
-                    className={`floating-label ${
-                      error && !member.documentType ? "text-danger" : ""
-                    }`}
+                    className={`floating-label ${error && !member.documentType ? "text-danger" : ""
+                      }`}
                   >
                     Doc Type<span className="text-danger">*</span>
                   </label>
@@ -1102,9 +1098,8 @@ const convertBufferToBlobUrlAndFile = (
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.documentNo ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.documentNo ? "text-danger" : ""
+                      }`}
                   >
                     Doc No<span className="text-danger">*</span>
                   </label>
@@ -1143,9 +1138,8 @@ const convertBufferToBlobUrlAndFile = (
                   />
                   <label
                     htmlFor={`add1-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.issueDate ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.issueDate ? "text-danger" : ""
+                      }`}
                   >
                     Issue Date<span className="text-danger">*</span>
                   </label>
@@ -1186,9 +1180,8 @@ const convertBufferToBlobUrlAndFile = (
                   />
                   <label
                     htmlFor={`add2-${index}`}
-                    className={`exp-form-labels ${
-                      error && !member.expiryDate ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.expiryDate ? "text-danger" : ""
+                      }`}
                   >
                     Expiry Date<span className="text-danger">*</span>
                   </label>
@@ -1249,31 +1242,31 @@ const convertBufferToBlobUrlAndFile = (
                     {["update", "all permission"].some((permission) =>
                       identityPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        title="Update"
-                        onClick={() =>
-                          handleUpdate(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-pen-to-square"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          title="Update"
+                          onClick={() =>
+                            handleUpdate(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-pen-to-square"></i>
+                        </button>
+                      )}
                     {["delete", "all permission"].some((permission) =>
                       identityPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        title="Delete"
-                        onClick={() =>
-                          handleDelete(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            handleDelete(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      )}
                   </div>
                 )}
               </div>

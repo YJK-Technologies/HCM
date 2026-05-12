@@ -33,8 +33,8 @@ function Department() {
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const attributePermission = permissions
-    .filter((permission) => permission.screen_type === "Attribute")
+  const departmentPermission = permissions
+    .filter((permission) => permission.screen_type === "Department")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const reloadGridData = () => {
@@ -558,25 +558,25 @@ function Department() {
             <h1 className="page-title">Department</h1>
 
             <div className="action-wrapper desktop-actions">
-              {["add", "all permission"].some((permission) => attributePermission.includes(permission)) && (
+              {["add", "all permission"].some((permission) => departmentPermission.includes(permission)) && (
                 <div className="action-icon add" onClick={handleNavigatesToForm}>
                   <span className="tooltip">Add</span>
                   <i class="fa-solid fa-user-plus"></i>
                 </div>
               )}
-              {["delete", "all permission"].some((permission) => attributePermission.includes(permission)) && (
+              {["delete", "all permission"].some((permission) => departmentPermission.includes(permission)) && (
                 <div className="action-icon delete" onClick={deleteSelectedRows}>
                   <span className="tooltip">Delete</span>
                   <i class="fa-solid fa-user-minus"></i>
                 </div>
               )}
-              {["update", "all permission"].some((permission) => attributePermission.includes(permission)) && (
+              {["update", "all permission"].some((permission) => departmentPermission.includes(permission)) && (
                 <div className="action-icon update" onClick={saveEditedData}>
                   <span className="tooltip">Update</span>
                   <i class="fa-solid fa-pen-to-square"></i>
                 </div>
               )}
-              {["all permission", "view"].some((permission) => attributePermission.includes(permission)) && (
+              {["all permission", "view"].some((permission) => departmentPermission.includes(permission)) && (
                 <div className="action-icon print" onClick={generateReport}>
                   <span className="tooltip">Print</span>
                   <i class="fa-solid fa-print"></i>
@@ -586,33 +586,46 @@ function Department() {
 
             {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
               </button>
 
               <ul className="dropdown-menu dropdown-menu-end text-center">
 
-                {['add', 'all permission'].some(p => attributePermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigatesToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                {['add', 'all permission'].some(p => departmentPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={handleNavigatesToForm}>
+                      <i className="fa-solid fa-user-plus add fs-4"></i>
+                    </button>
                   </li>
                 )}
 
-                {['delete', 'all permission'].some(p => attributePermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                {['delete', 'all permission'].some(p => departmentPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={deleteSelectedRows}>
+                      <i className="fa-solid fa-user-minus delete fs-4"></i>
+                    </button>
                   </li>
                 )}
 
-                {['update', 'all permission'].some(p => attributePermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                {['update', 'all permission'].some(p => departmentPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={saveEditedData}>
+                      <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                    </button>
                   </li>
                 )}
 
-                {['all permission', 'view'].some(p => attributePermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
+                {['all permission', 'view'].some(p => departmentPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={generateReport}>
+                      <i className="fa-solid fa-print text-dark fs-4"></i>
+                    </button>
                   </li>
                 )}
 
@@ -666,7 +679,7 @@ function Department() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please Select the Status"
+                title="Please Select the Status"
               >
                 <Select
                   id="status"

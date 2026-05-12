@@ -12,6 +12,12 @@ const config = require('../Apiconfig');
 
 function Input({ }) {
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const announcePermissions = permissions
+    .filter(permission => permission.screen_type === 'Announce')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [error, setError] = useState("");
   const [StatusDrop, setStatusDrop] = useState([]);
   const [statusdrop, setstatusdrop] = useState([]);
@@ -413,27 +419,27 @@ function Input({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-        
+
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem('selectedCompanyCode');
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
-        const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const dataToSend = {
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
           const response = await fetch(`${config.apiBaseUrl}/updateAnnouncementDetails`, {
             method: "POST",
             headers: {
@@ -469,25 +475,25 @@ function Input({ }) {
     const modified_by = sessionStorage.getItem('selectedUserCode');
 
     const dataToSend = {
-                        editedData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
+      editedData: Array.isArray(rowData)
+        ? rowData.map((row) => ({
+          ...row,
+          company_code,
+          modified_by,
+        }))
+        : [
+          {
+            ...rowData,
+            company_code,
+            modified_by,
+          },
+        ],
+    };
 
     showConfirmationToast(
       "Are you sure you want to delete the data in the selected rows?",
       async () => {
-        
+
         try {
           setLoading(true);
           const response = await fetch(`${config.apiBaseUrl}/deleteAnnouncement`, {
@@ -896,7 +902,7 @@ function Input({ }) {
           <h1 className="page-title">Add Announcement</h1>
           <div className="action-wrapper desktop-actions">
             <div class=" d-flex justify-content-end  me-3">
-              {saveButtonVisible && (
+              {saveButtonVisible && ['add', 'all permission'].some(permission => announcePermissions.includes(permission)) && (
                 <div className="action-icon add" onClick={handleSave}>
                   <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
@@ -911,22 +917,29 @@ function Input({ }) {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              {saveButtonVisible && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {saveButtonVisible && ['add', 'all permission'].some(permission => announcePermissions.includes(permission)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {/* )} */}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
 
             </ul>

@@ -546,7 +546,7 @@ function WeekOff() {
   return (
     <div className="container-fluid Topnav-screen">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
-      <div className="shadow-lg p-2 bg-body-tertiary rounded main-header-box">
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Settings</h1>
           <div className="action-wrapper desktop-actions">
@@ -563,22 +563,29 @@ function WeekOff() {
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {saveButtonVisible && ['add', 'all permission'].some(p => weekOffPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  <span className="tooltip">Save</span>
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
-                <span className="tooltip">Reload</span>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
 
             </ul>
@@ -594,7 +601,7 @@ function WeekOff() {
               className={`inputGroup selectGroup 
               ${selectedgenerate ? "has-value" : ""} 
                ${isSelectEmployee ? "is-focused" : ""}`}
-               title="Please Select the Employee ID"
+              title="Please Select the Employee ID"
             >
               <Select
                 placeholder=" "
@@ -708,7 +715,7 @@ function WeekOff() {
                   className={`inputGroup selectGroup 
               ${member.selectRelation ? "has-value" : ""} 
                ${isSelectWeek[index] ? "is-focused" : ""}`}
-                title="Please Select the Week Off Day"
+                  title="Please Select the Week Off Day"
                 >
                   <Select
                     value={member.selectRelation}
@@ -735,7 +742,7 @@ function WeekOff() {
                   className={`inputGroup selectGroup 
               ${member.selectedStatus ? "has-value" : ""} 
                ${isSelectStatus[index] ? "is-focused" : ""}`}
-                title="Please Select the Status"
+                  title="Please Select the Status"
                 >
                   <Select
                     placeholder=" "

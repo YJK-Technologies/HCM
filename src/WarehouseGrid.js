@@ -640,191 +640,204 @@ function WarehouseGrid() {
 
   return (
     <div className="container-fluid Topnav-screen">
-        {loading && <LoadingScreen />}
-        <ToastContainer position="top-right" className="toast-design" theme="colored" />
-        <div className="shadow-lg p-1 bg-light rounded main-header-box">
-          <div className="header-flex">
-            <h1 className="page-title">Warehouse</h1>
+      {loading && <LoadingScreen />}
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">Warehouse</h1>
 
-            <div className="action-wrapper desktop-actions">
-              {['add', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
-                <div className="action-icon add" onClick={handleNavigateToForm}>
-                  <span className="tooltip">Add</span>
-                  <i class="fa-solid fa-user-plus"></i> 
-                  </div>
-              )}
-              {['delete', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
-                <div className="action-icon delete" onClick={deleteSelectedRows}>
-                  <span className="tooltip">Delete</span>
-                  <i class="fa-solid fa-user-minus"></i>
-                </div>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
+              <div className="action-icon add" onClick={handleNavigateToForm}>
+                <span className="tooltip">Add</span>
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+            )}
+            {['delete', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
+              <div className="action-icon delete" onClick={deleteSelectedRows}>
+                <span className="tooltip">Delete</span>
+                <i class="fa-solid fa-user-minus"></i>
+              </div>
+            )}
+
+            {['update', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
+              <div className="action-icon update" onClick={saveEditedData}>
+                <span className="tooltip">Update</span>
+                <i class="fa-solid fa-pen-to-square"></i>
+              </div>
+            )}
+
+            {['all permission', 'view'].some(permission => warehouseGridPermision.includes(permission)) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i class="fa-solid fa-print"></i>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              {['add', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleNavigateToForm}>
+                    <i className="fa-solid fa-user-plus add fs-4"></i>
+                  </button>
+                </li>
               )}
 
-              {['update', 'all permission'].some(permission => warehouseGridPermision.includes(permission)) && (
-                <div className="action-icon update" onClick={saveEditedData}>
-                  <span className="tooltip">Update</span>
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </div>
+              {['delete', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={deleteSelectedRows}>
+                    <i className="fa-solid fa-user-minus delete fs-4"></i>
+                  </button>
+                </li>
               )}
 
-              {['all permission', 'view'].some(permission => warehouseGridPermision.includes(permission)) && (
-                <div className="action-icon print" onClick={generateReport}>
-                  <span className="tooltip">Print</span>
-                  <i class="fa-solid fa-print"></i>
-                </div>
+              {['update', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={saveEditedData}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
+                </li>
               )}
+
+              {['all permission', 'view'].some(p => warehouseGridPermision.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
+                </li>
+              )}
+
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+        <div className="row g-3">
+
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="wcode"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Warehouse Code"
+                value={warehouse_code}
+                onChange={(e) => setwarehouse_code(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={18}
+              />
+              <label for="wcode" class="exp-form-labels">Warehouse Code</label>
             </div>
-
-            {/* Mobile Dropdown */}
-            <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end text-center">
-
-                {['add', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigateToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                  </li>
-                )}
-
-                {['delete', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
-                )}
-
-                {['update', 'all permission'].some(p => warehouseGridPermision.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
-                )}
-
-                {['all permission', 'view'].some(p => warehouseGridPermision.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
-                  </li>
-                )}
-
-              </ul>
+          </div>
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="wname"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Warehouse Name"
+                value={warehouse_name}
+                onChange={(e) => setwarehouse_name(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={250}
+              />
+              <label for="wname" class="exp-form-labels">Warehouse Name</label>
             </div>
           </div>
 
-        </div>
-
-
-        <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
-          <div className="row g-3">
-
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="wcode"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please Enter the Warehouse Code"
-                  value={warehouse_code}
-                  onChange={(e) => setwarehouse_code(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="wcode" class="exp-form-labels">Warehouse Code</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="wname"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please Enter the Warehouse Name"
-                  value={warehouse_name}
-                  onChange={(e) => setwarehouse_name(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={250}
-                />
-                <label for="wname" class="exp-form-labels">Warehouse Name</label>
-              </div>
-            </div>
-
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectStatus ? "is-focused" : ""}`}
               title="Please Select the Status"
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectStatus(true)}
-                  onBlur={() => setIsSelectStatus(false)}
-                />
-                <label for="status" class="floating-label">Status</label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                options={filteredOptionStatus}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+              />
+              <label for="status" class="floating-label">Status</label>
             </div>
-
-            <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="wloc"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  required title="Please Enter the Location No"
-                  value={location_no}
-                  onChange={(e) => setlocation_no(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  maxLength={18}
-                />
-                <label for="wloc" class="exp-form-labels">Location No</label>
-              </div>
-            </div>
-
-            {/* Search + Reload Buttons */}
-            <div className="col-12">
-              <div className="search-btn-wrapper">
-                <div className="icon-btn search" onClick={handleSearch}>
-                  <span className="tooltip">Search</span>
-                  <i className="fa-solid fa-magnifying-glass"></i>
-                </div>
-
-                <div className="icon-btn reload" onClick={reloadGridData}>
-                  <span className="tooltip">Reload</span>
-                  <i className="fa-solid fa-rotate-right"></i>
-                </div>
-              </div>
-            </div>
-
           </div>
-        </div>
 
-        <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div class="ag-theme-alpine" style={{ height: 550, width: "100%" }}>
-            <AgGridReact
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              onGridReady={onGridReady}
-              onCellValueChanged={onCellValueChanged}
-              rowSelection="multiple"
-              onSelectionChanged={onSelectionChanged}
-              pagination={true}
-              paginationAutoPageSize={true}
-              onRowSelected={onRowSelected}
-            />
+          <div className="col-md-2">
+            <div className="inputGroup">
+              <input
+                id="wloc"
+                className="exp-input-field form-control"
+                type="text"
+                placeholder=""
+                required title="Please Enter the Location No"
+                value={location_no}
+                onChange={(e) => setlocation_no(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                maxLength={18}
+              />
+              <label for="wloc" class="exp-form-labels">Location No</label>
+            </div>
+          </div>
+
+          {/* Search + Reload Buttons */}
+          <div className="col-12">
+            <div className="search-btn-wrapper">
+              <div className="icon-btn search" onClick={handleSearch}>
+                <span className="tooltip">Search</span>
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <div className="icon-btn reload" onClick={reloadGridData}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-rotate-right"></i>
+              </div>
+            </div>
           </div>
 
         </div>
+      </div>
+
+      <div className="shadow-lg pt-3 pb-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+        <div class="ag-theme-alpine" style={{ height: 550, width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            onGridReady={onGridReady}
+            onCellValueChanged={onCellValueChanged}
+            rowSelection="multiple"
+            onSelectionChanged={onSelectionChanged}
+            pagination={true}
+            paginationAutoPageSize={true}
+            onRowSelected={onRowSelected}
+          />
+        </div>
+
+      </div>
       {/* <div className="shadow-lg p-2 bg-body-tertiary rounded mt-2 mb-2">
         <div className="row ms-2">
           <div className="d-flex justify-content-start">

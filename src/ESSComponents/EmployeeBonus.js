@@ -35,7 +35,14 @@ const getFinancialYearDates = () => {
 
 const { FirstDate, LastDate } = getFinancialYearDates();
 
-function Input({}) {
+function Input({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const payslipEmpBonusPermissions = permissions
+    .filter(permission => permission.screen_type === 'PayslipEmpBonus')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [annualBonus, setAnnualBonus] = useState("");
   const [referralBonus, setReferralBonus] = useState("");
@@ -67,34 +74,34 @@ function Input({}) {
     setReferral_bonus(0);
   };
 
-    useEffect(() => {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-      const fetchDept = async () => {
-        try {
-          const response = await fetch(`${config.apiBaseUrl}/getID`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ company_code }),
-          });
-  
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-  
-          const val = await response.json();
-          setIDdrop(val);
-        } catch (error) {
-          console.error("Error fetching departments:", error);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    const fetchDept = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ company_code }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-      };
-  
-      if (company_code) {
-        fetchDept();
+
+        const val = await response.json();
+        setIDdrop(val);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
       }
-    }, []);
+    };
+
+    if (company_code) {
+      fetchDept();
+    }
+  }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -122,9 +129,9 @@ function Input({}) {
 
   const filteredOptionGrade = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
-        value: option.GradeID,
-        label: option.GradeID,
-      }))
+      value: option.GradeID,
+      label: option.GradeID,
+    }))
     : [];
 
   const handleChangeGrade = (selectedGrade) => {
@@ -411,20 +418,20 @@ function Input({}) {
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/DelBonusDetails`, {
             method: "POST",
@@ -653,6 +660,23 @@ function Input({}) {
     XLSX.writeFile(workbook, "Bonus_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setStartYear('');
+    setEndYear('');
+    setSelectedGrade('');
+    setGrade('');
+    setAnnualBonus('');
+    setReferralBonus('');
+    setRetentionBonus('');
+    setHolidayBonus('');
+    setPerformanceBonus('');
+    setDiscretionaryBonus('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -664,11 +688,45 @@ function Input({}) {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Bonus</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => payslipEmpBonusPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => payslipEmpBonusPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
+            
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
 const config = require('../Apiconfig');
 
-  const getFinancialYearDates = () => {
+const getFinancialYearDates = () => {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1; // getMonth() is 0-based
@@ -35,6 +35,12 @@ const config = require('../Apiconfig');
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function Input({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const empLeavePermissions = permissions
+    .filter(permission => permission.screen_type === 'EmpLeave')
+    .map(permission => permission.permission_type.toLowerCase());
 
   const [error, setError] = useState("");
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
@@ -96,7 +102,7 @@ function Input({ }) {
   const [carryForwardDrop, setcarryForwardDrop] = useState([]);
   const [carryForwardDropGrid, setcarryForwardDropGrid] = useState([]);
 
-    const handleChangecarryForward = (selectedcarryForward) => {
+  const handleChangecarryForward = (selectedcarryForward) => {
     setSelectedcarryForward(selectedcarryForward);
     setcarryForward(selectedcarryForward ? selectedcarryForward.value : "");
   };
@@ -138,37 +144,37 @@ function Input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-    const handleChangeStatus = (selectedStatus) => {
+  const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : "");
   };
 
-    const filteredOptionStatus = statusdrop.map((option) => ({
+  const filteredOptionStatus = statusdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
-    useEffect(() => {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
-  
-      fetch(`${config.apiBaseUrl}/status`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ company_code }),
-      })
-        .then((data) => data.json())
-        .then((val) => setStatusdrop(val))
-        .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
   };
 
-    const filteredOptionStatusSC = statusdropSC.map((option) => ({
+  const filteredOptionStatusSC = statusdropSC.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
@@ -229,7 +235,7 @@ function Input({ }) {
           Accrual: accrual,
           Exceed_Leave: Exceedleave,
           Start_Year: Start_Year,
-          End_Year: End_Year,          
+          End_Year: End_Year,
           Status: StatusSC,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
         })
@@ -377,7 +383,7 @@ function Input({ }) {
         maxLength: 250,
       },
     },
-      {
+    {
       headerName: "Start Year",
       field: "Start_Year",
       editable: true,
@@ -571,10 +577,10 @@ function Input({ }) {
       !Accrual ||
       !TotalDaystoBeCredit ||
       !Exceed_Leave ||
-      !LeaveReason  ||
-      !FromDate ||  
-      !ToDate   ||
-      !Status 
+      !LeaveReason ||
+      !FromDate ||
+      !ToDate ||
+      !Status
 
     ) {
       setError(" ");
@@ -642,20 +648,20 @@ function Input({ }) {
           const Modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-                        editedData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                Modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    Modified_by,
-                                },
-                            ],
-                    };
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                Modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  Modified_by,
+                },
+              ],
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/UpdateLeaveType `, {
             method: "POST",
@@ -698,20 +704,20 @@ function Input({ }) {
           const Modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-                        LeaveIdToDelete: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                Modified_by
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    Modified_by
-                                },
-                            ],
-                    };
+            LeaveIdToDelete: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                Modified_by
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  Modified_by
+                },
+              ],
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/deleteLeave`, {
             method: "POST",
@@ -890,7 +896,7 @@ function Input({ }) {
           <h1 className="page-title">Add Leave Type</h1>
           <div className="action-wrapper desktop-actions">
             <div class=" d-flex justify-content-end  me-3">
-              {saveButtonVisible && (
+              {saveButtonVisible && ['add', 'all permission'].some(permission => empLeavePermissions.includes(permission)) && (
                 <div className="action-icon add" onClick={handleSave}>
                   <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
@@ -905,22 +911,29 @@ function Input({ }) {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              {saveButtonVisible && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {saveButtonVisible && ['add', 'all permission'].some(permission => empLeavePermissions.includes(permission)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {/* )} */}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
 
             </ul>
@@ -985,7 +998,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedType ? "has-value" : ""} 
               ${isSelectedType ? "is-focused" : ""}`}
-              title = "Please select the Type"
+              title="Please select the Type"
             >
               <Select
                 id="Type"
@@ -1008,7 +1021,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedAccrual ? "has-value" : ""} 
               ${isSelectedAccrual ? "is-focused" : ""}`}
-              title = "Please select the Accrual"
+              title="Please select the Accrual"
             >
               <Select
                 id="Accrual	"
@@ -1083,7 +1096,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${SelectedLeaveReason ? "has-value" : ""} 
               ${isSelectedLeaveReason ? "is-focused" : ""}`}
-              title = "Please select the Leave Reason"
+              title="Please select the Leave Reason"
             >
               <Select
                 id="LeaveReason"
@@ -1133,27 +1146,27 @@ function Input({ }) {
             </div>
           </div>
 
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
               title="Please Select the Status"
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatus}
-                  onChange={handleChangeStatus}
-                  options={filteredOptionStatus}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocused(true)}
-                  onBlur={() => setIsSelectFocused(false)}
-                />
-                <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatus}
+                onChange={handleChangeStatus}
+                options={filteredOptionStatus}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectFocused(true)}
+                onBlur={() => setIsSelectFocused(false)}
+              />
+              <label className={`floating-label ${error && !Status ? "text-danger" : ""}`}>Status<span className="text-danger">*</span></label>
             </div>
+          </div>
 
         </div>
       </div>
@@ -1230,7 +1243,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedtype ? "has-value" : ""} 
               ${isSelecttypes ? "is-focused" : ""}`}
-              title = "Please select the Type"
+              title="Please select the Type"
             >
               <Select type="text"
                 required
@@ -1252,7 +1265,7 @@ function Input({ }) {
               className={`inputGroup selectGroup 
               ${selectedaccrual ? "has-value" : ""} 
               ${isSelectAL ? "is-focused" : ""}`}
-              title = "Please select the Accrual"
+              title="Please select the Accrual"
             >
               <Select type="text"
                 required
@@ -1273,9 +1286,9 @@ function Input({ }) {
             <div className="inputGroup">
               <input type="text"
                 className="exp-input-field form-control"
-                required 
+                required
                 placeholder=""
-                title = "Please Enter the Exceed Leave Value"
+                title="Please Enter the Exceed Leave Value"
                 value={Exceedleave}
                 onChange={(e) => setExceedleave(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
@@ -1283,27 +1296,27 @@ function Input({ }) {
             </div>
           </div>
 
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
               title="Please Select the Status"
-              >
-                <Select
-                  id="status"
-                  isClearable
-                  value={selectedStatusSC}
-                  onChange={handleChangeStatusSC}
-                  options={filteredOptionStatusSC}
-                  classNamePrefix="react-select"
-                  placeholder=""
-                  onFocus={() => setIsSelectFocusedSC(true)}
-                  onBlur={() => setIsSelectFocusedSC(false)}
-                />
-                <label class="floating-label">Status</label>
-              </div>
+            >
+              <Select
+                id="status"
+                isClearable
+                value={selectedStatusSC}
+                onChange={handleChangeStatusSC}
+                options={filteredOptionStatusSC}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectFocusedSC(true)}
+                onBlur={() => setIsSelectFocusedSC(false)}
+              />
+              <label class="floating-label">Status</label>
             </div>
+          </div>
 
           {/* Search + Reload Buttons */}
           <div className="col-12">

@@ -779,7 +779,7 @@ function OvertimeReport() {
                             </div>
                         )}
                         {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                            <div className="action-icon print" onClick={handleExportToExcel}>
+                            <div className="action-icon add" onClick={handleExportToExcel}>
                                 <span className="tooltip">Excel</span>
                                 <i class="fa-solid fa-file-excel"></i>
                             </div>

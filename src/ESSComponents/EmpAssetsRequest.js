@@ -12,7 +12,7 @@ import EmployeeAssetsPopup from "./EmployeeAssetsPopup";
 import { DateTimeField } from "@mui/x-date-pickers";
 const config = require("../Apiconfig");
 
-function EmployeeAssets({}) {
+function EmployeeAssets({ }) {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState(false);
@@ -31,7 +31,7 @@ function EmployeeAssets({}) {
   const [selectedAssetID, setselectedAssetID] = useState("");
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
-  
+
   const [Managerdrop, setManagerdrop] = useState([]);
   const [isSelectRepManager, setIsSelectRepManager] = useState({});
 
@@ -130,24 +130,24 @@ function EmployeeAssets({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-                  AssetID: "",
-                  AllocationDate: "",
-                  ExpectedReturnDate: "",
-                  ActualReturnDate: "",
-                  AllocationStatus: "",
-                  ConditionAtIssue: "",
-                  ConditionAtReturn: "",
-                  ApprovedBy: "",
-                  Remarks: "",
-                  RepManager: "",
-                  selectRepManager: null,
-                },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                AssetID: "",
+                AllocationDate: "",
+                ExpectedReturnDate: "",
+                ActualReturnDate: "",
+                AllocationStatus: "",
+                ConditionAtIssue: "",
+                ConditionAtReturn: "",
+                ApprovedBy: "",
+                Remarks: "",
+                RepManager: "",
+                selectRepManager: null,
+              },
+            ],
+          }
           : item,
       ),
     );
@@ -267,19 +267,19 @@ function EmployeeAssets({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      RepManager: selectedRepManager
-                        ? selectedRepManager.value
-                        : "",
-                      selectRepManager: selectedRepManager,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  RepManager: selectedRepManager
+                    ? selectedRepManager.value
+                    : "",
+                  selectRepManager: selectedRepManager,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -468,11 +468,11 @@ function EmployeeAssets({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -535,9 +535,9 @@ function EmployeeAssets({}) {
             members: data.map((item) => ({
               AssetID: item.AssetID
                 ? {
-                    label: item.AssetID,
-                    value: item.AssetID,
-                  }
+                  label: item.AssetID,
+                  value: item.AssetID,
+                }
                 : null,
 
               AllocationDate: formatDate(item.AllocationDate),
@@ -546,9 +546,9 @@ function EmployeeAssets({}) {
 
               selectedStatus: item.AllocationStatus
                 ? {
-                    label: item.AllocationStatus,
-                    value: item.AllocationStatus,
-                  }
+                  label: item.AllocationStatus,
+                  value: item.AllocationStatus,
+                }
                 : null,
 
               ConditionAtIssue: item.ConditionAtIssue || "",
@@ -559,8 +559,8 @@ function EmployeeAssets({}) {
               RepManager: item.RepManager || "",
               selectRepManager: item.RepManager
                 ? filteredOptionManager.find(
-                    (opt) => opt.value === item.RepManager,
-                  )
+                  (opt) => opt.value === item.RepManager,
+                )
                 : null,
             })),
           },
@@ -634,11 +634,11 @@ function EmployeeAssets({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -696,45 +696,44 @@ function EmployeeAssets({}) {
         <div className="header-flex ">
           <h1 className="page-title">Assets</h1>
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                EmpAssetsPermissions.includes(permission),
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {saveButtonVisible && ["add", "all permission"].some((permission) => EmpAssetsPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
 
+          {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  EmpAssetsPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {saveButtonVisible && ["add", "all permission"].some((p) => EmpAssetsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
 
-              <li
-                className="dropdown-item"
-                // onClick={reloadGridData}
-              >
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
+
             </ul>
           </div>
         </div>
@@ -953,7 +952,7 @@ function EmployeeAssets({}) {
                 <div
                   className={`inputGroup selectGroup 
                   ${member.selectRepManager ? "has-value" : ""} 
-                  ${isSelectRepManager[`${relationGroup.relation}-${index}`]? "is-focused": ""}`}
+                  ${isSelectRepManager[`${relationGroup.relation}-${index}`] ? "is-focused" : ""}`}
                   title="Please Select the Reporting Manager"
                 >
                   <Select

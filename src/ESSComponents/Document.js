@@ -912,9 +912,7 @@ const handleUpdate = async (relationName, index) => {
           <h1 className="page-title">Documents</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) =>
-              documentsPermissions.includes(permission),
-            ) && (
+            {["add", "all permission"].some((permission) => documentsPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -928,26 +926,28 @@ const handleUpdate = async (relationName, index) => {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn  btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
               {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  documentsPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
+                ["add", "all permission"].some((p) => documentsPermissions.includes(p)) && (
+                  <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
                 )}
-              {['all permission', 'reload'].some(p => documentsPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
             </ul>
           </div>
         </div>
