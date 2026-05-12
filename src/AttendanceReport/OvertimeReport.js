@@ -169,8 +169,14 @@ function OvertimeReport() {
 
     const columnDefs = [
         {
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
+          headerCheckboxSelection: true,
+          checkboxSelection: true,
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 100,
+        }, 
+        {
             headerName: "Attendance Date",
             field: "AttendanceDate",
             editable: false,
