@@ -12,6 +12,13 @@ import { XCircle } from 'lucide-react';
 const config = require("../Apiconfig");
 
 function TravelRequest({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const travelRequestPermissions = permissions
+    .filter(permission => permission.screen_type === 'TravelRequest')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [Country_Code, setCountry_Code] = useState("");
   const [error, setError] = useState("");
@@ -43,7 +50,6 @@ function TravelRequest({ }) {
   const [visaTypeDrop, setVisaTypeDrop] = useState([]);
   const [travelStartDate, setTravelStartDate] = useState("");
   const [travelEndDate, setTravelEndDate] = useState("");
-
 
   const [estimated_cost, setestimated_cost] = useState("");
   const [Currency_Code, setCurrency_Code] = useState("");
@@ -1110,6 +1116,12 @@ function TravelRequest({ }) {
 
   const columnDefs = [
     {
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+    },
+    {
       headerName: "Travel Request ID",
       field: "travel_request_id",
       editable: false,
@@ -1691,6 +1703,35 @@ function TravelRequest({ }) {
     XLSX.writeFile(workbook, "Travel_Requests_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setselecteddept('');
+    setdpt('');
+    setSelectedtravel_type('');
+    settravel_type('');
+    setSelectedCountryId('');
+    setCountryId('');
+    setdestination_city('');
+    setpurpose_of_travel('');
+    setTravelStartDate('');
+    setTravelEndDate('');
+    setSelectedtransport_mode('');
+    settransport_mode('');
+    setSelectedaccommodation_required('');
+    setaccommodation_required('');
+    setestimated_cost('');
+    setSelectedCurrency('');
+    setCurrency_Code('');
+    setRemarks('');
+    setSelectedPriority('');
+    setPriority('');
+    setselectedmanager('');
+    setProjectManager('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -1703,23 +1744,40 @@ function TravelRequest({ }) {
         <div className="header-flex">
           <h1 className="page-title">Travel Request</h1>
           <div className="action-wrapper desktop-actions">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+            {['add', 'all permission'].some(permission => travelRequestPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
 
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {/* <li className="dropdown-item" onClick={handleReloadAdd}>
-                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
-              </li> */}
-              <li className="dropdown-item" onClick={handleSave}>
-                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {['add', 'all permission'].some(permission => travelRequestPermissions.includes(permission)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>
@@ -2424,8 +2482,8 @@ function TravelRequest({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                            ${selectedCountryIdSc ? "has-value" : ""} 
-                            ${isSelectedCountryIdSc ? "is-focused" : ""}`}
+              ${selectedCountryIdSc ? "has-value" : ""} 
+              ${isSelectedCountryIdSc ? "is-focused" : ""}`}
               title="Please select the Destination Country ID"
             >
               <Select

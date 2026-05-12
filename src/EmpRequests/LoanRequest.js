@@ -12,6 +12,12 @@ const config = require('../Apiconfig');
 
 function LoanRequest({ }) {
 
+    //code added by Pavun purpose of set user permisssion
+    const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+    const loanRequestPermissions = permissions
+        .filter(permission => permission.screen_type === 'LoanRequest')
+        .map(permission => permission.permission_type.toLowerCase());
+
     const [rowData, setRowData] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -563,6 +569,12 @@ function LoanRequest({ }) {
                 );
             },
         },
+        // {
+        //   headerName: "S.No",
+        //   field: "S.No",
+        //   valueGetter: (params) => params.node.rowIndex + 1,
+        //   width: 80,
+        // },
         {
             headerName: "Loan Request ID",
             field: "loan_request_id",
@@ -1089,6 +1101,24 @@ function LoanRequest({ }) {
         fetchEMI(loanAmount, interestRate, repayMonth);
     };
 
+    const handleReloadAdd = () => {
+        clearInputsAdd([]);
+    };
+
+    const clearInputsAdd = () => {
+        setSelectedLoanIypeId('');
+        setLoanTypeId('');
+        setLoanAmount('');
+        setMonthlyInstallment('');
+        setInterestRate('');
+        setRepayMonth('');
+        setSelectedCurrency('');
+        setCurrencyCode('');
+        setPurpose('');
+        setselectedmanager('');
+        setProjectManager('');
+    };
+
     return (
         <div class="container-fluid Topnav-screen ">
             {loading && <LoadingScreen />}
@@ -1096,11 +1126,44 @@ function LoanRequest({ }) {
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
                     <h1 className="page-title">Loan Request</h1>
-                    <div className="action-wrapper">
-                        <div onClick={handleSave} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
+                    <div className="action-wrapper desktop-actions">
+                        {['add', 'all permission'].some(permission => loanRequestPermissions.includes(permission)) && (
+                            <div onClick={handleSave} className="action-icon add">
+                                <span className="tooltip">Save</span>
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </div>
+                        )}
+                        <div className="action-icon print" onClick={handleReloadAdd}>
+                            <span className="tooltip">Reload</span>
+                            <i className="fa-solid fa-arrow-rotate-right"></i>
                         </div>
+                    </div>
+
+                    {/* Mobile Dropdown */}
+                    <div className="dropdown mobile-actions">
+                        <button
+                            className="btn btn-primary dropdown-toggle p-0"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i className="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+
+                        <ul className="dropdown-menu dropdown-menu-end text-center">
+                            {['add', 'all permission'].some(p => loanRequestPermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleSave}>
+                                        <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                    </button>
+                                </li>
+                            )}
+                            <li>
+                                <button className="dropdown-item" onClick={handleReloadAdd}>
+                                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

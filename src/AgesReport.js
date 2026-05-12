@@ -707,7 +707,7 @@ const handleExportToExcel = () => {
 
       <div className="shadow-lg p-2 bg-light rounded main-header-box">
         <div className="header-flex">
-          <h1 className="page-title">AGES Report</h1>
+          <h1 className="page-title">Age Group Employee Count</h1>
 
           <div className="action-wrapper">
             <div className="action-icon print" onClick={generateReport}>
@@ -833,7 +833,7 @@ const handleExportToExcel = () => {
                 options={filteredOptionAGESTypesSc}
               />
               <label for="sname" className={`floating-label`}>
-                AGES
+                Ages
               </label>
             </div>
           </div>

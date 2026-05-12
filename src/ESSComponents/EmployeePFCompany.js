@@ -35,6 +35,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function Input({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const pFContributionPermissions = permissions
+    .filter(permission => permission.screen_type === 'PFContribution')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
@@ -283,20 +290,20 @@ function Input({ }) {
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-          editedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            editedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/deletePfDetail`, {
             method: "POST",
@@ -519,6 +526,17 @@ function Input({ }) {
     XLSX.writeFile(workbook, "PF_Contribution_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setStartYear('');
+    setEndYear('');
+    setCompanyContribution('');
+    setEmployeePF('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -526,11 +544,44 @@ function Input({ }) {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">PF Contribution</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => pFContributionPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => pFContributionPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ function EmpDocumentReq({ }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'', RepManager: '', selectRepManager: null,}] }]);
+  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }]);
   // const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
   const [documentNameDrop, setDocumentNameDrop] = useState([]);
   const [documentUrl, setDocumentUrl] = useState({});
@@ -31,22 +31,22 @@ function EmpDocumentReq({ }) {
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
   const [purpose, setpurpose] = useState("");
-  
+
   const [isSelectDocument, setIsSelectDocument] = useState({});
   const [Managerdrop, setManagerdrop] = useState([]);
   const [isSelectRepManager, setIsSelectRepManager] = useState({});
 
   const [loading, setLoading] = useState(false);
 
-    const employeeId = sessionStorage.getItem("selectedUserCode");
-    useEffect(() => {
-      handleRefNo(employeeId);
-    }, []);
+  const employeeId = sessionStorage.getItem("selectedUserCode");
+  useEffect(() => {
+    handleRefNo(employeeId);
+  }, []);
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const documentsPermissions = permissions
-    .filter(permission => permission.screen_type === 'Documents')
+    .filter(permission => permission.screen_type === 'EmpDocumentReq')
     .map(permission => permission.permission_type.toLowerCase());
 
   const handlePdfClick = (url) => {
@@ -87,20 +87,20 @@ function EmpDocumentReq({ }) {
       case "Personal Details":
         EmployeeLoan();
         break;
-        case 'Family':
-          Insurance1();
-          break;
-        case 'Academic Details':
-          AcademicDet();
-          break;
-        case 'Documents':
-          Documents();
-          break;
+      case 'Family':
+        Insurance1();
+        break;
+      case 'Academic Details':
+        AcademicDet();
+        break;
+      case 'Documents':
+        Documents();
+        break;
       case "Assets":
         EmployeeAssets();
         break;
 
-          default:
+      default:
         break;
     }
   };
@@ -122,54 +122,54 @@ function EmpDocumentReq({ }) {
     });
   };
 
-const filteredOptionManager = Managerdrop.map((option) => ({
-  value: option.EmployeeId,
-  label: `${option.EmployeeId}-${option.full_name}`,
-}));
+  const filteredOptionManager = Managerdrop.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
 
-const handleChangeRepManager = (
-  selectedRepManager,
-  relation,
-  index
-) => {
-  setDocuments((prevDocuments) =>
-    prevDocuments.map((doc) =>
-      doc.relation === relation
-        ? {
+  const handleChangeRepManager = (
+    selectedRepManager,
+    relation,
+    index
+  ) => {
+    setDocuments((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.relation === relation
+          ? {
             ...doc,
             members: doc.members.map((member, i) =>
               i === index
                 ? {
-                    ...member,
-                    RepManager: selectedRepManager
-                      ? selectedRepManager.value
-                      : "",
-                    selectRepManager: selectedRepManager,
-                  }
+                  ...member,
+                  RepManager: selectedRepManager
+                    ? selectedRepManager.value
+                    : "",
+                  selectRepManager: selectedRepManager,
+                }
                 : member
             ),
           }
-        : doc
-    )
-  );
-};
+          : doc
+      )
+    );
+  };
 
   useEffect(() => {
-  fetch(`${config.apiBaseUrl}/ESSManager`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
-    }),
-  })
-    .then((response) => response.json())
-    .then(setManagerdrop)
-    .catch((error) =>
-      console.error("Error fetching manager:", error)
-    );
-}, []);
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdrop)
+      .catch((error) =>
+        console.error("Error fetching manager:", error)
+      );
+  }, []);
 
   const handleSave = async () => {
     if (!EmployeeId) {
@@ -178,138 +178,138 @@ const handleChangeRepManager = (
     }
 
     showConfirmationToast(
-        "Are you sure you want to update the data ?",
-        async () => {
-  
+      "Are you sure you want to update the data ?",
+      async () => {
+
+        try {
+          setLoading(true);
+
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const created_by = sessionStorage.getItem("selectedUserCode");
+
+          /* ---------------- HEADER ---------------- */
+          const headerPayload = {
+            company_code,
+            EmployeeId,
+            purpose,
+            request_status: "Pending",
+            created_by,
+          };
+
+          const headerRes = await fetch(
+            `${config.apiBaseUrl}/DocumentRequestHdr`, // ✅ FIXED
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            }
+          );
+
+          if (!headerRes.ok) {
+            const err = await headerRes.json();
+            throw new Error(err.message);
+          }
+
+          const headerResult = await headerRes.json();
+          const info_request_id = headerResult?.[0]?.info_request_id;
+
+          if (!info_request_id) {
+            throw new Error("info_request_id not returned from backend");
+          }
+
+          /* ---------------- DETAILS ---------------- */
+          await saveDocumentDetails(info_request_id); // ✅ FIXED
+
+          toast.success("Document request submitted successfully!", {
+            onClose: () => window.location.reload(),
+          });
+
+        } catch (err) {
+          console.error(err);
+          toast.error("Error: " + err.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data updated cancelled.");
+      }
+    );
+  };
+
+  const saveDocumentDetails = async (info_request_id) => {
     try {
-      setLoading(true);
-  
       const company_code = sessionStorage.getItem("selectedCompanyCode");
       const created_by = sessionStorage.getItem("selectedUserCode");
-  
-      /* ---------------- HEADER ---------------- */
-      const headerPayload = {
-        company_code,
-        EmployeeId,
-        purpose,
-        request_status: "Pending",
-        created_by,
-      };
-  
-      const headerRes = await fetch(
-        `${config.apiBaseUrl}/DocumentRequestHdr`, // ✅ FIXED
+
+      // 🔥 Flatten documents → members
+      const allRows = documents.flatMap(group => group.members);
+
+      const detailsData = await Promise.all(
+        allRows.map(async (row) => {
+          // ❌ Skip empty rows
+          if (!row.documentName || !row.document) {
+            return null;
+          }
+
+          let base64File = null;
+
+          if (row.document) {
+            if (row.document.size > 2 * 1024 * 1024) {
+              toast.warning(`File "${row.documentName}" exceeds 2MB`);
+              return null;
+            }
+
+            base64File = await convertToBase64(row.document);
+          }
+
+          return {
+            info_request_id,
+            company_code,
+            EmployeeId,
+            request_status: "Pending",
+
+            document_Name: row.documentName,
+            document_files: base64File,
+            RepManager: row.RepManager,
+            created_by,
+          };
+        })
+      );
+
+      const filteredData = detailsData.filter(Boolean);
+
+      // ❌ No valid rows
+      if (filteredData.length === 0) {
+        toast.warning("Please upload at least one document");
+        return;
+      }
+
+      const res = await fetch(
+        `${config.apiBaseUrl}/DocumentRequestDetails`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ headerData: [headerPayload] }),
+          body: JSON.stringify({ detailsData: filteredData }),
         }
       );
-  
-      if (!headerRes.ok) {
-        const err = await headerRes.json();
+
+      if (!res.ok) {
+        const err = await res.json();
         throw new Error(err.message);
       }
-  
-      const headerResult = await headerRes.json();
-      const info_request_id = headerResult?.[0]?.info_request_id;
-  
-      if (!info_request_id) {
-        throw new Error("info_request_id not returned from backend");
-      }
-  
-      /* ---------------- DETAILS ---------------- */
-      await saveDocumentDetails(info_request_id); // ✅ FIXED
-  
-      toast.success("Document request submitted successfully!", {
-        onClose: () => window.location.reload(),
-      });
-  
-    } catch (err) {
-      console.error(err);
-      toast.error("Error: " + err.message);
-    } finally {
-      setLoading(false);
+
+      console.log("Document details inserted successfully");
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Error inserting document details: " + error.message);
     }
-    },
-              () => {
-                toast.info("Data updated cancelled.");
-              }
-      );
-  };
-
-const saveDocumentDetails = async (info_request_id) => {
-  try {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-    const created_by = sessionStorage.getItem("selectedUserCode");
-
-    // 🔥 Flatten documents → members
-    const allRows = documents.flatMap(group => group.members);
-
-    const detailsData = await Promise.all(
-      allRows.map(async (row) => {
-        // ❌ Skip empty rows
-        if (!row.documentName || !row.document) {
-          return null;
-        }
-
-        let base64File = null;
-
-        if (row.document) {
-          if (row.document.size > 2 * 1024 * 1024) {
-            toast.warning(`File "${row.documentName}" exceeds 2MB`);
-            return null;
-          }
-
-          base64File = await convertToBase64(row.document);
-        }
-
-        return {
-          info_request_id,
-          company_code,
-          EmployeeId,
-          request_status: "Pending",
-
-          document_Name: row.documentName,
-          document_files: base64File,
-          RepManager: row.RepManager,
-          created_by,
-        };
-      })
-    );
-
-    const filteredData = detailsData.filter(Boolean);
-
-    // ❌ No valid rows
-    if (filteredData.length === 0) {
-      toast.warning("Please upload at least one document");
-      return;
-    }
-
-    const res = await fetch(
-      `${config.apiBaseUrl}/DocumentRequestDetails`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ detailsData: filteredData }),
-      }
-    );
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message);
-    }
-
-    console.log("Document details inserted successfully");
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Error inserting document details: " + error.message);
-  }
-};  // const handleDelete = async () => {
+  };  // const handleDelete = async () => {
   //   if (
   //     !employeeId) {
   //     setError("Please fill all required fields.");
@@ -418,8 +418,8 @@ const saveDocumentDetails = async (info_request_id) => {
             RepManager: RepManager || "",
             selectRepManager: RepManager
               ? filteredOptionManager.find(
-                  (opt) => opt.value === RepManager
-                )
+                (opt) => opt.value === RepManager
+              )
               : null,
           };
 
@@ -470,7 +470,7 @@ const saveDocumentDetails = async (info_request_id) => {
       prev.map((item) =>
         item.relation === relation
           // ? { ...item, members: [...item.members, { documentType: '', documentNo: '', issueDate: '', expiryDate: '' }] }
-          ? { ...item, members: [...item.members, {documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }
+          ? { ...item, members: [...item.members, { documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }
           : item
       )
     );
@@ -683,21 +683,31 @@ const saveDocumentDetails = async (info_request_id) => {
             </div>
           </div>
 
+          {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {saveButtonVisible && ['add', 'all permission'].some(p => documentsPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
 
             </ul>
@@ -732,7 +742,7 @@ const saveDocumentDetails = async (info_request_id) => {
                   className={`inputGroup selectGroup 
               ${member.selectDocumentName ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
-               title="Please Select the Document Name"
+                  title="Please Select the Document Name"
                 >
                   <Select
                     id={`cname-${index}`}
@@ -756,29 +766,29 @@ const saveDocumentDetails = async (info_request_id) => {
               </div>
 
               <div className="col-md-2">
-              <div className="inputGroup">
-                <input
-                  id="passportNo"
-                  className="exp-input-field form-control"
-                  type="text"
-                  placeholder=""
-                  value={purpose}
-                  onChange={(e) => setpurpose(e.target.value)}
-                  maxLength={30}
-                  autoComplete="off"
-                  title="Please Enter the Purpose"
-                />
-                <label htmlFor="passportNo" className="exp-form-labels">
-                  Purpose
-                </label>
-              </div>
+                <div className="inputGroup">
+                  <input
+                    id="passportNo"
+                    className="exp-input-field form-control"
+                    type="text"
+                    placeholder=""
+                    value={purpose}
+                    onChange={(e) => setpurpose(e.target.value)}
+                    maxLength={30}
+                    autoComplete="off"
+                    title="Please Enter the Purpose"
+                  />
+                  <label htmlFor="passportNo" className="exp-form-labels">
+                    Purpose
+                  </label>
+                </div>
               </div>
 
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${member.selectRepManager ? "has-value" : ""} 
-                  ${isSelectRepManager[`${relationGroup.relation}-${index}`]? "is-focused": ""}`}
+                  ${isSelectRepManager[`${relationGroup.relation}-${index}`] ? "is-focused" : ""}`}
                   title="Please Select the Reporting Manager"
                 >
                   <Select

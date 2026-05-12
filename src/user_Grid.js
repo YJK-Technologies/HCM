@@ -464,50 +464,50 @@ function UserGrid() {
       .trim();
   };
 
-const generateReport = () => {
-  const selectedRows = gridApi.getSelectedRows();
+  const generateReport = () => {
+    const selectedRows = gridApi.getSelectedRows();
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to generate a report");
-    return;
-  }
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to generate a report");
+      return;
+    }
 
-  const reportData = selectedRows.map((row) => {
-    const safeValue = (val) => (val !== undefined && val !== null ? val : "");
+    const reportData = selectedRows.map((row) => {
+      const safeValue = (val) => (val !== undefined && val !== null ? val : "");
 
-    return {
-      "User Code": safeValue(row.user_code),
-      "User Name": safeValue(row.user_name),
-      "First Name": safeValue(row.first_name),
-      "Last Name": safeValue(row.last_name),
-      "User Status": safeValue(row.user_status),
-      "Log In/Out": safeValue(row.log_in_out),
-      "Email Id": safeValue(row.email_id),
-      "DOB": safeValue(row.dob),
-      "Gender": safeValue(row.gender),
-    };
-  });
+      return {
+        "User Code": safeValue(row.user_code),
+        "User Name": safeValue(row.user_name),
+        "First Name": safeValue(row.first_name),
+        "Last Name": safeValue(row.last_name),
+        "User Status": safeValue(row.user_status),
+        "Log In/Out": safeValue(row.log_in_out),
+        "Email Id": safeValue(row.email_id),
+        "DOB": safeValue(row.dob),
+        "Gender": safeValue(row.gender),
+      };
+    });
 
-  /* ===== READ THEME COLORS ===== */
-  const headerGradientStart = getCSSVariable("--but");
-  const tableHeaderBg = getCSSVariable("--ag-header");
-  const fontColor = getCSSVariable("--font-color");
-  const rowAltColor = getCSSVariable("--ag-row");
-  const hoverColor = getCSSVariable("--ag-hover");
+    /* ===== READ THEME COLORS ===== */
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
 
-  const logoUrl = window.location.origin + "/favicon.ico";
-  const reportWindow = window.open("", "_blank");
+    const logoUrl = window.location.origin + "/favicon.ico";
+    const reportWindow = window.open("", "_blank");
 
-  const link = reportWindow.document.createElement("link");
-  link.rel = "icon";
-  link.type = "image/x-icon";
-  link.href = logoUrl;
-  reportWindow.document.head.appendChild(link);
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+    reportWindow.document.head.appendChild(link);
 
-  reportWindow.document.write("<html><head><title>User Report</title>");
+    reportWindow.document.write("<html><head><title>User Report</title>");
 
-  reportWindow.document.write("<style>");
-  reportWindow.document.write(`
+    reportWindow.document.write("<style>");
+    reportWindow.document.write(`
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
@@ -604,10 +604,10 @@ const generateReport = () => {
       }
     }
   `);
-  reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write("</style></head><body>");
 
-  // HEADER
-  reportWindow.document.write(`
+    // HEADER
+    reportWindow.document.write(`
     <div class="header">
       <img src="${logoUrl}" class="logo" />
       <div class="title-section">
@@ -616,8 +616,8 @@ const generateReport = () => {
     </div>
   `);
 
-  // INFO
-  reportWindow.document.write(`
+    // INFO
+    reportWindow.document.write(`
     <div style="margin-top:10px;">
       <strong>Total Records: ${selectedRows.length}</strong>
       <span style="float:right;">
@@ -626,25 +626,25 @@ const generateReport = () => {
     </div>
   `);
 
-  // TABLE
-  reportWindow.document.write("<table><thead><tr>");
-  Object.keys(reportData[0]).forEach((key) => {
-    reportWindow.document.write(`<th>${key}</th>`);
-  });
-  reportWindow.document.write("</tr></thead><tbody>");
-
-  reportData.forEach((row) => {
-    reportWindow.document.write("<tr>");
-    Object.values(row).forEach((value) => {
-      reportWindow.document.write(`<td>${value}</td>`);
+    // TABLE
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
     });
-    reportWindow.document.write("</tr>");
-  });
+    reportWindow.document.write("</tr></thead><tbody>");
 
-  reportWindow.document.write("</tbody></table>");
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value}</td>`);
+      });
+      reportWindow.document.write("</tr>");
+    });
 
-  // PRINT BUTTON (WITH DELAY FIX)
-  reportWindow.document.write(`
+    reportWindow.document.write("</tbody></table>");
+
+    // PRINT BUTTON (WITH DELAY FIX)
+    reportWindow.document.write(`
     <div style="text-align:center;">
       <button class="print-btn" onclick="window.print()">
         Print
@@ -652,16 +652,16 @@ const generateReport = () => {
     </div>
   `);
 
-  reportWindow.document.write("</body></html>");
-  reportWindow.document.close();
+    reportWindow.document.write("</body></html>");
+    reportWindow.document.close();
 
-  // AUTO PRINT OPTION (optional but smooth UX)
-  reportWindow.onload = () => {
-    setTimeout(() => {
-      reportWindow.print();
-    }, 500);
+    // AUTO PRINT OPTION (optional but smooth UX)
+    reportWindow.onload = () => {
+      setTimeout(() => {
+        reportWindow.print();
+      }, 500);
+    };
   };
-};
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
@@ -886,33 +886,46 @@ const generateReport = () => {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
 
               {['add', 'all permission'].some(p => userPermission.includes(p)) && (
-                <li className="dropdown-item" onClick={handleNavigateToForm}>
-                  <i className="fa-solid fa-user-plus text-success fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={handleNavigateToForm}>
+                    <i className="fa-solid fa-user-plus add fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {['delete', 'all permission'].some(p => userPermission.includes(p)) && (
-                <li className="dropdown-item" onClick={deleteSelectedRows}>
-                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={deleteSelectedRows}>
+                    <i className="fa-solid fa-user-minus delete fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {['update', 'all permission'].some(p => userPermission.includes(p)) && (
-                <li className="dropdown-item" onClick={saveEditedData}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={saveEditedData}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
                 </li>
               )}
 
               {['all permission', 'view'].some(p => userPermission.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
 
@@ -1061,8 +1074,8 @@ const generateReport = () => {
               ${selectedGender ? "has-value" : ""} 
               ${isSelectGender ? "is-focused" : ""}`}
               title="Please Select the Gender"
-            >                
-            <Select
+            >
+              <Select
                 id="gender"
                 isClearable
                 value={selectedGender}
@@ -1108,7 +1121,7 @@ const generateReport = () => {
             onSelectionChanged={onSelectionChanged}
             pagination={true}
             onRowSelected={onRowSelected}
-            paginationPageSizeSelector={false}  
+            paginationPageSizeSelector={false}
           />
         </div>
       </div>

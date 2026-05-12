@@ -35,6 +35,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function Input({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const payslipEmpTDSPermissions = permissions
+    .filter(permission => permission.screen_type === 'PayslipEmpTDS')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [Employee_Salary, setEmployee_Salary] = useState(0);
   const [Employee_Salarys, setEmployee_Salarys] = useState(0);
   const [Taxable_Amounts, setTaxable_Amounts] = useState(0);
@@ -280,20 +287,20 @@ function Input({ }) {
           const modified_by = sessionStorage.getItem('selectedUserCode');
 
           const dataToSend = {
-          deletedData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+            deletedData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
           const response = await fetch(`${config.apiBaseUrl}/deleteTDS`, {
             method: "POST",
@@ -521,6 +528,17 @@ function Input({ }) {
     XLSX.writeFile(workbook, "TDS_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setStart_Year('');
+    setEnd_Year('');
+    setEmployee_Salary(0);
+    setTaxable_Amount(0);
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -528,12 +546,46 @@ function Input({ }) {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">TDS</h1>
-          <div className="action-wrapper">
-            <div onClick={handleInsert} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => payslipEmpTDSPermissions.includes(permission)) && (
+              <div onClick={handleInsert} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => payslipEmpTDSPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleInsert}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </div>
       <TabButtons tabs={tabs} activeTab={activeTab} onTabClick={handleTabClick} />

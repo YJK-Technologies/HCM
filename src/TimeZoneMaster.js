@@ -695,11 +695,45 @@ function TimeZoneMaster() {
                 <div className="shadow-lg p-1 bg-light rounded main-header-box">
                     <div className="header-flex">
                         <h1 className="page-title">Time Zone Master</h1>
-                        <div className="action-wrapper">
-                            <div onClick={handleSave} className="action-icon add">
-                                <span className="tooltip">Save</span>
-                                <i class="fa-solid fa-floppy-disk"></i>
+                        <div className="action-wrapper desktop-actions">
+                            <div className="action-icon reload" onClick={reloadGridData}>
+                                <span className="tooltip">Reload</span>
+                                <i className="fa-solid fa-rotate-right"></i>
                             </div>
+                            {['add', 'all permission'].some(p => timeZoneGridPermission.includes(p)) && (
+                                <div onClick={handleSave} className="action-icon add">
+                                    <span className="tooltip">Save</span>
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mobile Action Bar */}
+                        <div className="dropdown mobile-actions">
+                            <button
+                                className="btn btn-primary dropdown-toggle p-0"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <i className="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+
+                            <ul className="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <button className="dropdown-item" onClick={reloadGridData}>
+                                        <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+                                    </button>
+                                </li>
+
+                                {['add', 'all permission'].some(p => timeZoneGridPermission.includes(p)) && (
+                                    <li>
+                                        <button className="dropdown-item" onClick={handleSave}>
+                                            <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                        </button>
+                                    </li>
+                                )}
+                            </ul>
                         </div>
                     </div>
                 </div>

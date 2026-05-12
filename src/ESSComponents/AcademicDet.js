@@ -11,7 +11,7 @@ import LoadingScreen from "../Loading";
 
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [Academic, setAcademic] = useState([
     {
       relation: "Academic",
@@ -69,20 +69,20 @@ function Input({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-                  academicName: "",
-                  major: "",
-                  institution: "",
-                  academicYear: "",
-                  document: null,
-                  documentUrl: "",
-                  keyfield: "",
-                },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                academicName: "",
+                major: "",
+                institution: "",
+                academicYear: "",
+                document: null,
+                documentUrl: "",
+                keyfield: "",
+              },
+            ],
+          }
           : item,
       ),
     );
@@ -189,8 +189,8 @@ function Input({}) {
   };
 
   const isValidFile = (file) => {
-  return file && file instanceof File && file.size > 0;
-};
+    return file && file instanceof File && file.size > 0;
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -208,28 +208,28 @@ function Input({}) {
   //   return '';
   // };
 
-const convertBufferToBlobUrlAndFile = (
-  buffer,
-  fileName = "document.pdf",
-  mimeType = "application/pdf"
-) => {
-  if (
-    buffer &&
-    buffer.type === "Buffer" &&
-    Array.isArray(buffer.data) &&
-    buffer.data.length > 0
-  ) {
-    const byteArray = new Uint8Array(buffer.data);
-    const blob = new Blob([byteArray], { type: mimeType });
-    const blobUrl = URL.createObjectURL(blob);
-    const file = new File([blob], fileName, { type: mimeType });
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf"
+  ) => {
+    if (
+      buffer &&
+      buffer.type === "Buffer" &&
+      Array.isArray(buffer.data) &&
+      buffer.data.length > 0
+    ) {
+      const byteArray = new Uint8Array(buffer.data);
+      const blob = new Blob([byteArray], { type: mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      const file = new File([blob], fileName, { type: mimeType });
 
-    return { blobUrl, file };
-  }
+      return { blobUrl, file };
+    }
 
-  // EMPTY BUFFER = NO FILE
-  return { blobUrl: null, file: null };
-};
+    // EMPTY BUFFER = NO FILE
+    return { blobUrl: null, file: null };
+  };
 
   const handleAcademic = async (code) => {
     try {
@@ -351,11 +351,11 @@ const convertBufferToBlobUrlAndFile = (
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -370,18 +370,18 @@ const convertBufferToBlobUrlAndFile = (
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-                ...doc,
-                members: doc.members.map((member, i) =>
-                  i === index
-                    ? {
-                        ...member,
-                        document: file,
-                        documentUrl: fileUrl,
-                        isNewFile: true,
-                      }
-                    : member,
-                ),
-              }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                    isNewFile: true,
+                  }
+                  : member,
+              ),
+            }
             : doc,
         ),
       );
@@ -627,200 +627,200 @@ const convertBufferToBlobUrlAndFile = (
   //   }
   // };
 
-// const handleUpdate = async (relationName, index) => {
-//   const relationGroup = Academic.find(
-//     (group) => group.relation === relationName,
-//   );
+  // const handleUpdate = async (relationName, index) => {
+  //   const relationGroup = Academic.find(
+  //     (group) => group.relation === relationName,
+  //   );
 
-//   const member = relationGroup ? relationGroup.members[index] : null;
+  //   const member = relationGroup ? relationGroup.members[index] : null;
 
-//   if (!member.keyfield) {
-//     setError(true);
-//     toast.warning("Error: Missing required keyfield");
-//     return;
-//   }
+  //   if (!member.keyfield) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required keyfield");
+  //     return;
+  //   }
 
-//   if (!member) {
-//     setError(true);
-//     toast.warning("Error: Missing required fields");
-//     return;
-//   }
+  //   if (!member) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-//   if (
-//     !member.academicName ||
-//     !member.major ||
-//     !member.institution ||
-//     !member.academicYear
-//   ) {
-//     setError(true);
-//     toast.warning("Error: Missing required fields");
-//     return;
-//   }
+  //   if (
+  //     !member.academicName ||
+  //     !member.major ||
+  //     !member.institution ||
+  //     !member.academicYear
+  //   ) {
+  //     setError(true);
+  //     toast.warning("Error: Missing required fields");
+  //     return;
+  //   }
 
-//   // SAME LOGIC - No changes detected
-//   const original = member.originalData;
+  //   // SAME LOGIC - No changes detected
+  //   const original = member.originalData;
 
-//   if (
-//     original &&
-//     original.academicName === member.academicName &&
-//     original.major === member.major &&
-//     original.institution === member.institution &&
-//     original.academicYear === member.academicYear &&
-//     member.isNewFile === false
-//   ) {
-//     toast.warning("No changes detected");
-//     return;
-//   }
+  //   if (
+  //     original &&
+  //     original.academicName === member.academicName &&
+  //     original.major === member.major &&
+  //     original.institution === member.institution &&
+  //     original.academicYear === member.academicYear &&
+  //     member.isNewFile === false
+  //   ) {
+  //     toast.warning("No changes detected");
+  //     return;
+  //   }
 
-//   const fileBase64 = member.document
-//     ? await convertToBase64(member.document)
-//     : null;
+  //   const fileBase64 = member.document
+  //     ? await convertToBase64(member.document)
+  //     : null;
 
-//   console.log(fileBase64);
+  //   console.log(fileBase64);
 
-//   const editedData = {
-//     EmployeeId: EmployeeId,
-//     academicName: member.academicName,
-//     major: member.major,
-//     institution: member.institution,
-//     academicYear: member.academicYear,
-//     document: fileBase64,
-//     keyfield: member.keyfield,
-//     company_code: sessionStorage.getItem("selectedCompanyCode"),
-//     modified_by: sessionStorage.getItem("selectedUserCode"),
-//   };
+  //   const editedData = {
+  //     EmployeeId: EmployeeId,
+  //     academicName: member.academicName,
+  //     major: member.major,
+  //     institution: member.institution,
+  //     academicYear: member.academicYear,
+  //     document: fileBase64,
+  //     keyfield: member.keyfield,
+  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //     modified_by: sessionStorage.getItem("selectedUserCode"),
+  //   };
 
-//   setError(false);
+  //   setError(false);
 
-//   try {
-//     setLoading(true);
+  //   try {
+  //     setLoading(true);
 
-//     const response = await fetch(
-//       `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
-//       {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ editedData: [editedData] }),
-//       },
-//     );
+  //     const response = await fetch(
+  //       `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ editedData: [editedData] }),
+  //       },
+  //     );
 
-//     if (response.ok) {
-//       toast.success("Data updated successfully!", {
-//         onClose: () => window.location.reload(),
-//       });
-//     } else {
-//       const errorResponse = await response.json();
-//       console.error(errorResponse.message);
-//       toast.warning(errorResponse.message, {});
-//     }
-//   } catch (err) {
-//     console.error("Error delete data:", err);
-//     toast.error("Error delete data: " + err.message, {});
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-const handleUpdate = async (relationName, index) => {
-  const relationGroup = Academic.find(
-    (group) => group.relation === relationName,
-  );
-
-  const member = relationGroup ? relationGroup.members[index] : null;
-
-  if (!member) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  if (!member.keyfield) {
-    setError(true);
-    toast.warning("Error: Missing required keyfield");
-    return;
-  }
-
-  if (
-    !member.academicName ||
-    !member.major ||
-    !member.institution ||
-    !member.academicYear
-  ) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  const original = member.originalData;
-
-  if (
-    original &&
-    original.academicName === member.academicName &&
-    original.major === member.major &&
-    original.institution === member.institution &&
-    original.academicYear === member.academicYear &&
-    member.isNewFile === false &&
-    !member.isFileRemoved
-  ) {
-    toast.warning("No changes detected");
-    return;
-  }
-
-  let fileBase64 = null;
-
-  if (isValidFile(member.document)) {
-    fileBase64 = await convertToBase64(member.document);
-  }
-
-  if (member.isFileRemoved) {
-    fileBase64 = null;
-  }
-
-  const editedData = {
-    EmployeeId: EmployeeId,
-    academicName: member.academicName,
-    major: member.major,
-    institution: member.institution,
-    academicYear: member.academicYear,
-    document: fileBase64,
-    keyfield: member.keyfield,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
-    modified_by: sessionStorage.getItem("selectedUserCode"),
-  };
-
-  setError(false);
-
-  try {
-    setLoading(true);
-
-    const response = await fetch(
-      `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          editedData: [editedData],
-        }),
-      },
+  //     if (response.ok) {
+  //       toast.success("Data updated successfully!", {
+  //         onClose: () => window.location.reload(),
+  //       });
+  //     } else {
+  //       const errorResponse = await response.json();
+  //       console.error(errorResponse.message);
+  //       toast.warning(errorResponse.message, {});
+  //     }
+  //   } catch (err) {
+  //     console.error("Error delete data:", err);
+  //     toast.error("Error delete data: " + err.message, {});
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleUpdate = async (relationName, index) => {
+    const relationGroup = Academic.find(
+      (group) => group.relation === relationName,
     );
 
-    if (response.ok) {
-      toast.success("Data updated successfully!", {
-        onClose: () => window.location.reload(),
-      });
-    } else {
-      const errorResponse = await response.json();
-      toast.warning(errorResponse.message);
+    const member = relationGroup ? relationGroup.members[index] : null;
+
+    if (!member) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  } catch (err) {
-    toast.error("Error update data: " + err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+
+    if (!member.keyfield) {
+      setError(true);
+      toast.warning("Error: Missing required keyfield");
+      return;
+    }
+
+    if (
+      !member.academicName ||
+      !member.major ||
+      !member.institution ||
+      !member.academicYear
+    ) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    const original = member.originalData;
+
+    if (
+      original &&
+      original.academicName === member.academicName &&
+      original.major === member.major &&
+      original.institution === member.institution &&
+      original.academicYear === member.academicYear &&
+      member.isNewFile === false &&
+      !member.isFileRemoved
+    ) {
+      toast.warning("No changes detected");
+      return;
+    }
+
+    let fileBase64 = null;
+
+    if (isValidFile(member.document)) {
+      fileBase64 = await convertToBase64(member.document);
+    }
+
+    if (member.isFileRemoved) {
+      fileBase64 = null;
+    }
+
+    const editedData = {
+      EmployeeId: EmployeeId,
+      academicName: member.academicName,
+      major: member.major,
+      institution: member.institution,
+      academicYear: member.academicYear,
+      document: fileBase64,
+      keyfield: member.keyfield,
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem("selectedUserCode"),
+    };
+
+    setError(false);
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${config.apiBaseUrl}/updateEmployeeAcademicDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            editedData: [editedData],
+          }),
+        },
+      );
+
+      if (response.ok) {
+        toast.success("Data updated successfully!", {
+          onClose: () => window.location.reload(),
+        });
+      } else {
+        const errorResponse = await response.json();
+        toast.warning(errorResponse.message);
+      }
+    } catch (err) {
+      toast.error("Error update data: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (relationName, index) => {
     const relationGroup = Academic.find(
@@ -1046,28 +1046,28 @@ const handleUpdate = async (relationName, index) => {
     }
   }, [location.state]);
 
-const handleRemovePdf = (relation, index) => {
-  setAcademic((prev) =>
-    prev.map((doc) =>
-      doc.relation === relation
-        ? {
+  const handleRemovePdf = (relation, index) => {
+    setAcademic((prev) =>
+      prev.map((doc) =>
+        doc.relation === relation
+          ? {
             ...doc,
             members: doc.members.map((m, i) =>
               i === index
                 ? {
-                    ...m,
-                    document: null,
-                    documentUrl: "",
-                    isNewFile: true,     // important
-                    isFileRemoved: true, // important
-                  }
+                  ...m,
+                  document: null,
+                  documentUrl: "",
+                  isNewFile: true,     // important
+                  isFileRemoved: true, // important
+                }
                 : m,
             ),
           }
-        : doc,
-    ),
-  );
-};
+          : doc,
+      ),
+    );
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1082,9 +1082,7 @@ const handleRemovePdf = (relation, index) => {
           <h1 className="page-title">Academic Details</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["add", "all permission"].some((permission) =>
-              academicPermissions.includes(permission),
-            ) && (
+            {["add", "all permission"].some((permission) => academicPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -1098,27 +1096,27 @@ const handleRemovePdf = (relation, index) => {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["add", "all permission"].some((p) =>
-                academicPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {["add", "all permission"].some((p) => academicPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["reload", "all permission"].some((p) =>
-                academicPermissions.includes(p),
-              ) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
             </ul>
           </div>
         </div>
@@ -1390,31 +1388,31 @@ const handleRemovePdf = (relation, index) => {
                     {["update", "all permission"].some((permission) =>
                       academicPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        title="Update"
-                        onClick={() =>
-                          handleUpdate(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-pen-to-square"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          title="Update"
+                          onClick={() =>
+                            handleUpdate(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-pen-to-square"></i>
+                        </button>
+                      )}
                     {["delete", "all permission"].some((permission) =>
                       academicPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        title="Delete"
-                        onClick={() =>
-                          handleDelete(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            handleDelete(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      )}
                   </div>
                 )}
               </div>

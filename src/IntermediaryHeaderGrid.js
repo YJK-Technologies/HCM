@@ -729,27 +729,35 @@ function IntermediaryGrid() {
               <ul className="dropdown-menu dropdown-menu-end text-center">
 
                 {['add', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={handleNavigatesToForm}>
-                    <i className="fa-solid fa-user-plus text-success fs-4"></i>
-                  </li>
+                  <li>
+                  <button className="dropdown-item" onClick={handleNavigatesToForm}>
+                    <i className="fa-solid fa-user-plus add fs-4"></i>
+                  </button>
+                </li>
                 )}
 
                 {['delete', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus text-danger fs-4"></i>
-                  </li>
+                  <li>
+                  <button className="dropdown-item" onClick={deleteSelectedRows}>
+                    <i className="fa-solid fa-user-minus delete fs-4"></i>
+                  </button>
+                </li>
                 )}
 
                 {['update', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
-                  </li>
+                  <li>
+                  <button className="dropdown-item" onClick={saveEditedData}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
+                </li>
                 )}
 
                 {['all permission', 'view'].some(p => intermediaryHeaderPermission.includes(p)) && (
-                  <li className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print fs-4"></i>
-                  </li>
+                  <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
+                </li>
                 )}
 
               </ul>

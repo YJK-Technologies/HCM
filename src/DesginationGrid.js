@@ -37,8 +37,8 @@ function Desgination() {
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
-  const companyPermissions = permissions
-    .filter(permission => permission.screen_type === 'Company')
+  const desgiantionInfoPermissions = permissions
+    .filter(permission => permission.screen_type === 'DesgiantionInfo')
     .map(permission => permission.permission_type.toLowerCase());
 
 
@@ -406,7 +406,7 @@ function Desgination() {
 
     reportWindow.document.write("</tbody></table>");
 
-     reportWindow.document.write(`
+    reportWindow.document.write(`
   <div style="text-align:center;">
     <button class="print-btn" onclick="window.print()">Print</button>
   </div>
@@ -519,7 +519,7 @@ function Desgination() {
               "Content-Type": "application/json",
               "Modified-By": modified_by
             },
-            body: JSON.stringify({ keyfield: keyfieldsToDelete, company_code: company_code, modified_by: modified_by})
+            body: JSON.stringify({ keyfield: keyfieldsToDelete, company_code: company_code, modified_by: modified_by })
           });
 
           if (response.ok) {
@@ -593,13 +593,13 @@ function Desgination() {
           <h1 className="page-title">Designation Info</h1>
 
           <div className="action-wrapper desktop-actions">
-            {['add', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+            {['add', 'all permission'].some(permission => desgiantionInfoPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleNavigateToForm}>
                 <span className="tooltip">Add</span>
                 <i class="fa-solid fa-user-plus"></i>
               </div>
             )}
-            {['delete', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+            {['delete', 'all permission'].some(permission => desgiantionInfoPermissions.includes(permission)) && (
               <div className="action-icon delete"
                 onClick={deleteSelectedRows}
               >
@@ -607,7 +607,7 @@ function Desgination() {
                 <i class="fa-solid fa-user-minus"></i>
               </div>
             )}
-            {['update', 'all permission'].some(permission => companyPermissions.includes(permission)) && (
+            {['update', 'all permission'].some(permission => desgiantionInfoPermissions.includes(permission)) && (
               <div className="action-icon update"
                 onClick={saveEditedData}
               >
@@ -617,7 +617,7 @@ function Desgination() {
             )}
 
 
-            {['all permission', 'view'].some(permission => companyPermissions.includes(permission)) && (
+            {['all permission', 'view'].some(permission => desgiantionInfoPermissions.includes(permission)) && (
               <div className="action-icon print"
                 onClick={generateReport}
               >
@@ -629,33 +629,46 @@ function Desgination() {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
-            <ul className="dropdown-menu dropdown-menu-end text-center">
+            <ul className="dropdown-menu dropdown-menu-end">
 
-              {['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleNavigateToForm}>
-                  <i className="fa-solid fa-user-plus text-success fs-4"></i>
+              {['add', 'all permission'].some(p => desgiantionInfoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleNavigateToForm}>
+                    <i className="fa-solid fa-user-plus add fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={deleteSelectedRows}>
-                  <i className="fa-solid fa-user-minus text-danger fs-4"></i>
+              {['delete', 'all permission'].some(p => desgiantionInfoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={deleteSelectedRows}>
+                    <i className="fa-solid fa-user-minus delete fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              {['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={saveEditedData}>
-                  <i className="fa-solid fa-pen-to-square text-primary fs-4"></i>
+              {['update', 'all permission'].some(p => desgiantionInfoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={saveEditedData}>
+                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                  </button>
                 </li>
               )}
 
-              {['all permission', 'view'].some(p => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print fs-4"></i>
+              {['all permission', 'view'].some(p => desgiantionInfoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
 

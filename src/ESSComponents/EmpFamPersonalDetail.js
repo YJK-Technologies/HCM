@@ -11,7 +11,7 @@ import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
 const config = require("../Apiconfig");
 
-function EmpFamPersonalDetail({}) {
+function EmpFamPersonalDetail({ }) {
   const [familyMembers, setFamilyMembers] = useState([
     {
       relation: "familyMembers",
@@ -68,7 +68,7 @@ function EmpFamPersonalDetail({}) {
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const familyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Family")
+    .filter((permission) => permission.screen_type === "EmpFamPersonalDetail")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
@@ -105,12 +105,12 @@ function EmpFamPersonalDetail({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              { relationName: "", name: "", dob: "", Age: "", aadharNo: "" },
+            ],
+          }
           : item,
       ),
     );
@@ -131,11 +131,11 @@ function EmpFamPersonalDetail({}) {
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: item.members.map((member, i) =>
-                i === index ? { ...member, [field]: value } : member,
-              ),
-            }
+            ...item,
+            members: item.members.map((member, i) =>
+              i === index ? { ...member, [field]: value } : member,
+            ),
+          }
           : item,
       ),
     );
@@ -197,15 +197,15 @@ function EmpFamPersonalDetail({}) {
             created_by,
           };
 
-      const headerRes = await fetch(`${config.apiBaseUrl}/FamilyRequestHdr`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ headerData: [headerPayload] }),
-        }
-      );
+          const headerRes = await fetch(`${config.apiBaseUrl}/FamilyRequestHdr`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ headerData: [headerPayload] }),
+            }
+          );
 
           if (!headerRes.ok) {
             const err = await headerRes.json();
@@ -530,19 +530,19 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      relationName: selectedRelation
-                        ? selectedRelation.value
-                        : "",
-                      selectRelation: selectedRelation,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  relationName: selectedRelation
+                    ? selectedRelation.value
+                    : "",
+                  selectRelation: selectedRelation,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -553,19 +553,19 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      airTicketEntitled: selectedAirTicket
-                        ? selectedAirTicket.value
-                        : "",
-                      selectAirTicket: selectedAirTicket,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  airTicketEntitled: selectedAirTicket
+                    ? selectedAirTicket.value
+                    : "",
+                  selectAirTicket: selectedAirTicket,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -576,17 +576,17 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      visaEntitled: selectedVisa ? selectedVisa.value : "",
-                      selectVisa: selectedVisa,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  visaEntitled: selectedVisa ? selectedVisa.value : "",
+                  selectVisa: selectedVisa,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -597,17 +597,17 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      sex: selectedSex ? selectedSex.value : "",
-                      selectSex: selectedSex,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  sex: selectedSex ? selectedSex.value : "",
+                  selectSex: selectedSex,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -618,19 +618,19 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      nationality: selectedNationality
-                        ? selectedNationality.value
-                        : "",
-                      selectNationality: selectedNationality,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  nationality: selectedNationality
+                    ? selectedNationality.value
+                    : "",
+                  selectNationality: selectedNationality,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -641,19 +641,19 @@ function EmpFamPersonalDetail({}) {
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      RepManager: selectedRepManager
-                        ? selectedRepManager.value
-                        : "",
-                      selectRepManager: selectedRepManager,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  RepManager: selectedRepManager
+                    ? selectedRepManager.value
+                    : "",
+                  selectRepManager: selectedRepManager,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -727,15 +727,12 @@ function EmpFamPersonalDetail({}) {
           <h1 className="page-title">Family</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                familyPermissions.includes(permission),
-              ) && (
-                <div className="action-icon add" onClick={handleSave}>
-                  <span className="tooltip">Save</span>
-                  <i class="fa-solid fa-floppy-disk"></i>
-                </div>
-              )}
+            {saveButtonVisible && ["add", "all permission"].some((permission) => familyPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
@@ -744,24 +741,27 @@ function EmpFamPersonalDetail({}) {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  familyPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
-                )}
+              {saveButtonVisible && ["add", "all permission"].some((p) => familyPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
 
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>
@@ -840,9 +840,8 @@ function EmpFamPersonalDetail({}) {
                   />
 
                   <label
-                    className={`floating-label ${
-                      error && !member.selectRelation ? "text-danger" : ""
-                    }`}
+                    className={`floating-label ${error && !member.selectRelation ? "text-danger" : ""
+                      }`}
                   >
                     Relation <span className="text-danger">*</span>
                   </label>
@@ -875,9 +874,8 @@ function EmpFamPersonalDetail({}) {
                   />
 
                   <label
-                    className={`exp-form-labels ${
-                      error && !member.name ? "text-danger" : ""
-                    }`}
+                    className={`exp-form-labels ${error && !member.name ? "text-danger" : ""
+                      }`}
                   >
                     Name <span className="text-danger">*</span>
                   </label>
@@ -919,7 +917,7 @@ function EmpFamPersonalDetail({}) {
                     readOnly
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
+                  // onChange={(e) => RelationInputChange(relationGroup.relation, index, 'Age', e.target.value)}
                   />
                   <label
                     for="cno"
@@ -1297,7 +1295,7 @@ function EmpFamPersonalDetail({}) {
                   </label>
                 </div>
               </div>
-              
+
             </div>
           ))}
         </div>

@@ -42,8 +42,8 @@ function LoanSummaryReports() {
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "CandidateInterviewRe")
+  const loanSummaryReportsPermissions = permissions
+    .filter((permission) => permission.screen_type === "LoanSummaryReports")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const handleChangeLoanTypeSc = (selectedLoanTypeNameSc) => {
@@ -187,6 +187,12 @@ function LoanSummaryReports() {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
+      headerName: "S.No",
+      field: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 100,
+    },
+    {
       headerName: "Request Number",
       field: "request_number",
       editable: false,
@@ -264,75 +270,205 @@ function LoanSummaryReports() {
   };
 
   const generateReport = () => {
-    if (!gridApi) return;
-
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to print");
+      toast.warning("Please select at least one row to generate a report");
       return;
     }
 
-    const reportWindow = window.open("", "_blank");
+    const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
 
-    reportWindow.document.write(`
-    <html>
-    <head>
-      <title>Loan Summary Report</title>
-      <style>
-        body { font-family: Arial; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px; border: 1px solid #ccc; }
-        th { background: #333; color: white; }
-      </style>
-    </head>
-    <body>
-
-      <h2 style="text-align:center;">Loan Summary Report</h2>
-      <p>Total Records: ${selectedRows.length}</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Request No</th>
-            <th>Employee ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Loan Type</th>
-            <th>Amount</th>
-            <th>Installment</th>
-            <th>Months</th>
-            <th>Status</th>
-            <th>Created Date</th>
-          </tr>
-        </thead>
-        <tbody>
-  `);
-
-    selectedRows.forEach((row) => {
-      reportWindow.document.write(`
-      <tr>
-        <td>${row.request_number}</td>
-        <td>${row.EmployeeId}</td>
-        <td>${row.First_Name}</td>
-        <td>${row.Last_Name}</td>
-        <td>${row.loan_type_name}</td>
-        <td>${row.loan_amount}</td>
-        <td>${row.monthly_installment}</td>
-        <td>${row.repayment_months}</td>
-        <td>${row.request_status}</td>
-        <td>${formatDate(row.created_date)}</td>
-      </tr>
-    `);
+      return {
+        "Request Number": formatValue(row.request_number),
+        "Employee ID": formatValue(row.EmployeeId),
+        "First Name": formatValue(row.First_Name),
+        "Last Name": formatValue(row.Last_Name),
+        "Loan Type Name": formatValue(row.loan_type_name),
+        "Loan Amount": formatValue(row.loan_amount),
+        "Monthly Installment": formatValue(row.monthly_installment),
+        "Repayment Months": formatValue(row.repayment_months),
+        "Request Status": formatValue(row.request_status),
+        "Created Date": formatValue(row.created_date)
+      };
     });
 
-    reportWindow.document.write(`
-        </tbody>
-      </table>
-      <script>window.print()</script>
-    </body>
-    </html>
-  `);
+    /* ================= READ THEME COLORS ================= */
 
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
+    const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write(`<html><head><title>Loan Summary Report</title>`);
+    reportWindow.document.write("<style>");
+    reportWindow.document.write(`
+        body {
+              font-family: 'Segoe UI', sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #f4f6f9;
+              color: ${fontColor};
+            }
+    
+            .header {
+              display: flex;
+              align-items: center;
+              background: ${tableHeaderBg};
+              padding: 15px 20px;
+              color: white;
+              border-radius: 8px;
+            }
+            
+            .logo {
+              height: 60px;
+            }
+            
+            .title-section {
+              flex: 1;
+              text-align: center;
+            }
+          
+            .title-section h2 {
+              margin: 0;
+            }
+    
+            .sub-info {
+              margin: 15px 0;
+              font-size: 14px;
+              color: #555;
+              display: flex;
+              justify-content: space-between;
+            }
+    
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+    
+            th {
+              background-color: ${tableHeaderBg};
+              color: white;
+              padding: 10px;
+              text-align: left;
+            }
+    
+            td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+    
+            tr:nth-child(even) {
+              text-align: left;
+              background-color: ${rowAltColor};
+            }
+    
+            tr:hover {
+              background-color: ${hoverColor};
+            }
+    
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 13px;
+              color: #777;
+            }
+    
+            .print-btn {
+              margin-top: 20px;
+              padding: 10px 20px;
+              background: ${headerGradientStart};
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+    
+            .print-btn:hover {
+              opacity: 0.85;
+            }
+    
+          @media print {
+            body {
+              background: white;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+              
+            th {
+              background-color: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            tr:nth-child(even) {
+              background-color: ${rowAltColor} !important;
+            }
+              
+            .header {
+              background: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            .print-btn {
+              display: none;
+            }
+          }
+      `);
+
+    reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write(`<div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Loan Summary Report</h2>
+      </div>
+      </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>`);
+    // reportWindow.document.write("<h1><u>Company Information</u></h1>");
+
+    // Create table with headers
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
+    });
+    reportWindow.document.write("</tr></thead><tbody>");
+
+    // Populate the rows with safe empty strings
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value || ''}</td>`);
+      });
+      reportWindow.document.write("</tr>");
+    });
+
+    reportWindow.document.write("</tbody></table>");
+    reportWindow.document.write(`
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+  `);
+    reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
 
@@ -362,43 +498,125 @@ function LoanSummaryReports() {
     const selectedRows = gridApiRef.current.getSelectedRows();
     const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
+
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
+
+    const headerRGB = hexToRgb(headerBg);
+
     const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.width;
 
-    const headers = [[
-      "Request No",
-      "Employee ID",
-      "First Name",
-      "Last Name",
-      "Loan Type",
-      "Amount",
-      "Installment",
-      "Months",
-      "Status",
-      "Created Date"
-    ]];
+    /* ================= HEADER DESIGN ================= */
 
-    const body = dataSource.map(row => [
-      row.request_number,
-      row.EmployeeId,
-      row.First_Name,
-      row.Last_Name,
-      row.loan_type_name,
-      row.loan_amount,
-      row.monthly_installment,
-      row.repayment_months,
-      row.request_status,
-      formatDate(row.created_date)
-    ]);
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
 
-    doc.text("Loan Summary Report", 40, 40);
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
 
-    autoTable(doc, {
-      startY: 60,
-      head: headers,
-      body: body,
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Loan Summary Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Loan_Summary_Report.pdf");
     });
+  };
 
-    doc.save("Loan_Summary_Report.pdf");
+  const transformRowData = (data) => {
+    return data.map((row) => ({
+      "Request No": row.request_number || "",
+      "Employee ID": row.EmployeeId || "",
+      "First Name": row.First_Name || "",
+      "Last Name": row.Last_Name || "",
+      "Loan Type": row.loan_type_name || "",
+      "Loan Amount": row.loan_amount || "",
+      "Monthly Installment": row.monthly_installment || "",
+      "Repayment Months": row.repayment_months || "",
+      "Status": row.request_status || "",
+      "Created Date": row.created_date || "",
+    }));
   };
 
   const handleExportToExcel = () => {
@@ -406,31 +624,111 @@ function LoanSummaryReports() {
 
     const selectedRows = gridApiRef.current.getSelectedRows();
 
-    // ✅ Use selected rows OR fallback to all data
-    const dataSource =
-      selectedRows.length > 0 ? selectedRows : rowData;
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
     if (!dataSource || dataSource.length === 0) {
       toast.warning("No data to export");
       return;
     }
 
-    const transformedData = dataSource.map((row) => ({
-      "Request No": row.request_number,
-      "Employee ID": row.EmployeeId,
-      "First Name": row.First_Name,
-      "Last Name": row.Last_Name,
-      "Loan Type": row.loan_type_name,
-      "Loan Amount": row.loan_amount,
-      "Monthly Installment": row.monthly_installment,
-      "Repayment Months": row.repayment_months,
-      "Status": row.request_status,
-      "Created Date": row.created_date,
-    }));
+    const screenName = "Loan Summary";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    const worksheet = XLSX.utils.json_to_sheet(transformedData);
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
     const workbook = XLSX.utils.book_new();
-
     XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Summary");
 
     XLSX.writeFile(workbook, "Loan_Summary_Report.xlsx");
@@ -449,63 +747,59 @@ function LoanSummaryReports() {
           <h1 className="page-title">Loan Summary Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
-                <div className="action-icon print" onClick={generateReport}>
-                  <span className="tooltip">Print</span>
-                  <i className="fa-solid fa-print"></i>
-                </div>
-              )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
-                <div className="action-icon print" onClick={exportToPDF}>
-                  <span className="tooltip">Pdf</span>
-                  <i className="fa-solid fa-file-pdf"></i>
-                </div>
-              )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
-                <div className="action-icon print" onClick={handleExportToExcel}>
-                  <span className="tooltip">Excel</span>
-                  <i class="fa-solid fa-file-excel"></i>
-                </div>
-              )}
+            {["all permission", "view"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i className="fa-solid fa-print"></i>
+              </div>
+            )}
+            {["all permission", "PDF"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+              <div className="action-icon print" onClick={exportToPDF}>
+                <span className="tooltip">Pdf</span>
+                <i className="fa-solid fa-file-pdf"></i>
+              </div>
+            )}
+            {["all permission", "Excel"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+            )}
           </div>
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                  <li className="dropdown-item" onClick={generateReport}>
+              {["all permission", "view"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
                     <i className="fa-solid fa-print text-dark fs-4"></i>
-                  </li>
-                )}
-              {["all permission", "Pdf"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                  <li className="dropdown-item" onClick={exportToPDF}>
-                    <i className="fa-solid fa-file-pdf text-dark"></i>
-                  </li>
-                )}
-              {["all permission", "Excel"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                  <li className="dropdown-item" onClick={handleExportToExcel}>
-                    <i class="fa-solid fa-file-excel text-success"></i>
-                  </li>
-                )}
+                  </button>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => loanSummaryReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </div>

@@ -59,7 +59,7 @@ function EmployeeAssets({}) {
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const EmpAssetsPermissions = permissions
-    .filter((permission) => permission.screen_type === "Family")
+    .filter((permission) => permission.screen_type === "EmployeeAssets")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const NavigatecomDet = () => {
@@ -916,9 +916,7 @@ const handleDeleteAsset = async (relation, index) => {
           <h1 className="page-title">Employee Assets</h1>
           <div className="action-wrapper desktop-actions">
             {saveButtonVisible &&
-              ["add", "all permission"].some((permission) =>
-                EmpAssetsPermissions.includes(permission),
-              ) && (
+              ["add", "all permission"].some((permission) => EmpAssetsPermissions.includes(permission)) && (
                 <div className="action-icon add" onClick={handleSave}>
                   <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
@@ -932,26 +930,28 @@ const handleDeleteAsset = async (relation, index) => {
 
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
               {saveButtonVisible &&
-                ["add", "all permission"].some((p) =>
-                  EmpAssetsPermissions.includes(p),
-                ) && (
-                  <li className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-                  </li>
+                ["add", "all permission"].some((p) => EmpAssetsPermissions.includes(p)) && (
+                  <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
                 )}
-              {['all permission', 'reload'].some(p => EmpAssetsPermissions.includes(p)) && (
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              )}
             </ul>
           </div>
         </div>

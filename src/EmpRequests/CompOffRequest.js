@@ -14,6 +14,13 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 const config = require('../Apiconfig');
 
 const EmployeeCompOff = () => {
+
+    //code added by Pavun purpose of set user permisssion
+    const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+    const compOffRequestPermissions = permissions
+        .filter(permission => permission.screen_type === 'CompOffRequest')
+        .map(permission => permission.permission_type.toLowerCase());
+
     const [FromDate, setFromDate] = useState("");
     const [ToDate, setToDate] = useState("");
     const [Reason, setReason] = useState("");
@@ -198,6 +205,12 @@ const EmployeeCompOff = () => {
 
     const leaveColumnDefs = [
         {
+          headerName: "S.No",
+          field: "S.No",
+          valueGetter: (params) => params.node.rowIndex + 1,
+          width: 80,
+        },   
+         {
             headerName: "Holiday Date",
             field: "HolidayDate",
             editable: false,
@@ -315,27 +328,36 @@ const EmployeeCompOff = () => {
                 <div className="header-flex">
                     <h1 className="page-title">Comp Off Request</h1>
                     <div className="action-wrapper desktop-actions">
+                        {['add', 'all permission'].some(permission => compOffRequestPermissions.includes(permission)) && (
+                            <div className="action-icon save" onClick={handleSave}>
+                                <span className="tooltip">Save</span>
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </div>
+                        )}
                         <div className="action-icon reload" onClick={handleReloadAdd}>
                             <span className="tooltip">Reload</span>
                             <i className="fa-solid fa-rotate-right"></i>
                         </div>
-                        <div className="action-icon save" onClick={handleSave}>
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
-                        </div>
                     </div>
 
+                    {/* Mobile Dropdown */}
                     <div className="dropdown mobile-actions">
                         <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
                             <i className="fa-solid fa-list"></i>
                         </button>
 
                         <ul className="dropdown-menu dropdown-menu-end text-center">
-                            <li className="dropdown-item" onClick={handleReloadAdd}>
-                                <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
-                            </li>
-                            <li className="dropdown-item" onClick={handleSave}>
-                                <i class="fa-solid fa-floppy-disk text-success fs-4"></i>
+                            {['add', 'all permission'].some(permission => compOffRequestPermissions.includes(permission)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleSave}>
+                                        <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                    </button>
+                                </li>
+                            )}
+                            <li>
+                                <button className="dropdown-item" onClick={handleReloadAdd}>
+                                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                                </button>
                             </li>
                         </ul>
                     </div>
