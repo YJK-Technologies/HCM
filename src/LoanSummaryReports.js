@@ -491,7 +491,7 @@ function LoanSummaryReports() {
 
   const exportToPDF = () => {
     if (!gridApiRef.current || rowData.length === 0) {
-      toast.warning("No data to export");
+      toast.warning("Please select at least one row to export pdf");
       return;
     }
 
@@ -631,7 +631,7 @@ function LoanSummaryReports() {
       return;
     }
 
-    const screenName = "Loan Summary";
+    const screenName = "Loan Summary Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
 
     /* ================= THEME COLORS ================= */

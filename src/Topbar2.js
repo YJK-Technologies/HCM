@@ -158,7 +158,7 @@ const TopBar = () => {
 
     showConfirmationToast("Are you sure you want to logout?",
       performLogout,
-      () => console.log("Logout cancelled")
+      () => toast.info("Logout cancelled")
     );
   };
 
@@ -505,9 +505,9 @@ const TopBar = () => {
             </div>
 
             {/* Welcome Message */}
-            <div className="welcome-message d-none d-md-flex flex-column align-items-center justify-content-center ms-auto me-2"> 
+            <div className="welcome-message d-none d-md-flex flex-column align-items-center justify-content-center ms-auto me-2">
               {/* ms-auto will push this group to the right, creating a gap from the company info */}
-               <span className="user-name-text">Welcome</span>
+              <span className="user-name-text">Welcome</span>
               <span className="welcome-subtext">{user_name}</span>
             </div>
 
@@ -856,7 +856,7 @@ const TopBar = () => {
               </a>
               <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                 <ThemeProvider>
-                  <AppContent />
+                  <AppContent layout="vertical" />
                 </ThemeProvider>
               </ul>
             </div>

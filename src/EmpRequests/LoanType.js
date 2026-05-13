@@ -35,6 +35,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function LoanType({ }) {
+
+    //code added by Pavun purpose of set user permisssion
+    const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+    const loanTypePermissions = permissions
+        .filter(permission => permission.screen_type === 'LoanType')
+        .map(permission => permission.permission_type.toLowerCase());
+
     const [error, setError] = useState(false);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState([]);
@@ -394,7 +401,7 @@ function LoanType({ }) {
     };
 
     const handleInsert = async () => {
-        if (!loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status 
+        if (!loanTypeName || !maxAmount || !maxRepaymentMonths || !defaultInterestRate || !status
             || !startYear || !endYear || !maxRepaymentMonths) {
             setError(true);
             toast.warning("Error: Missing required fields");
@@ -683,6 +690,24 @@ function LoanType({ }) {
         XLSX.writeFile(workbook, "Loan_Type_Search_Report.xlsx");
     };
 
+    const handleReloadAdd = () => {
+        clearInputsAdd([]);
+    };
+
+    const clearInputsAdd = () => {
+        setStartYear('');
+        setEndYear('');
+        setSelectedLoanTypeName('');
+        setLoanTypeName('');
+        setMaxAmount('');
+        setMinRepaymentMonths('');
+        setMaxRepaymentMonths('');
+        setDefaultInterestRate('');
+        setDescription('');
+        setSelectedStatus('');
+        setStatus('');
+    };
+
     return (
         <div class="container-fluid Topnav-screen ">
             {loading && <LoadingScreen />}
@@ -690,11 +715,44 @@ function LoanType({ }) {
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
                     <h1 className="page-title">Loan Type</h1>
-                    <div className="action-wrapper">
-                        <div onClick={handleInsert} className="action-icon add">
-                            <span className="tooltip">Save</span>
-                            <i class="fa-solid fa-floppy-disk"></i>
+                    <div className="action-wrapper desktop-actions">
+                        {['add', 'all permission'].some(permission => loanTypePermissions.includes(permission)) && (
+                            <div onClick={handleInsert} className="action-icon add">
+                                <span className="tooltip">Save</span>
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </div>
+                        )}
+                        <div className="action-icon print" onClick={handleReloadAdd}>
+                            <span className="tooltip">Reload</span>
+                            <i className="fa-solid fa-arrow-rotate-right"></i>
                         </div>
+                    </div>
+
+                    {/* Mobile Dropdown */}
+                    <div className="dropdown mobile-actions">
+                        <button
+                            className="btn btn-primary dropdown-toggle p-0"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i className="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+
+                        <ul className="dropdown-menu dropdown-menu-end text-center">
+                            {['add', 'all permission'].some(p => loanTypePermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleInsert}>
+                                        <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                                    </button>
+                                </li>
+                            )}
+                            <li>
+                                <button className="dropdown-item" onClick={handleReloadAdd}>
+                                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

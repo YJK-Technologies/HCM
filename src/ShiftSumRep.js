@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -11,6 +11,8 @@ import { showConfirmationToast } from "./ToastConfirmation";
 import LoadingScreen from "./Loading";
 import TabButtons from "./ESSComponents/Tabs";
 import Select from "react-select";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx-js-style";
 
 const config = require("./Apiconfig");
@@ -24,6 +26,7 @@ function ShiftSumRep() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const gridApiRef = useRef(null);
 
   const [employeeIdDrop, setEmployeeIdDrop] = useState([]);
 
@@ -52,8 +55,8 @@ function ShiftSumRep() {
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyMappingPermission = permissions
-    .filter((permission) => permission.screen_type === "Company Mapping")
+  const shiftSumRepPermission = permissions
+    .filter((permission) => permission.screen_type === "ShiftSumRep")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const searchClearInputFields = () => {
@@ -140,47 +143,6 @@ function ShiftSumRep() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  // const handleSearch = async () => {
-  //     setLoading(true);
-
-  //     try {
-  //         const Company_Code = sessionStorage.getItem("selectedCompanyCode");
-
-  //         const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingSc`, {
-  //             method: "POST",
-  //             headers: {
-  //                 "Content-Type": "application/json",
-  //             },
-  //             body: JSON.stringify({
-  //                 // Emp_Shift_ID: employeeShiftIdSc,
-  //                 Employee_ID: employeeIdSc,
-  //                 Shift_Pattern_ID: shiftPatternIdSc,
-  //                 Effective_From: effectiveFromSc,
-  //                 Effective_To: effectiveToSc,
-  //                 Is_Current: statusSc,
-  //                 Company_Code,
-  //             }),
-  //         });
-
-  //         if (response.ok) {
-  //             const searchData = await response.json();
-  //             setRowData(searchData);
-  //             console.log("data fetched successfully");
-  //         } else if (response.status === 404) {
-  //             toast.warning("Data not found");
-  //             setRowData([]);
-  //         } else {
-  //             const errorResponse = await response.json();
-  //             toast.warning(errorResponse.message || "Search failed");
-  //         }
-  //     } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //         toast.error("Error fetching data: " + error.message);
-  //     } finally {
-  //         setLoading(false);
-  //     }
-  // };
-
   const handleSearch = async () => {
     setLoading(true);
 
@@ -233,10 +195,10 @@ function ShiftSumRep() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "S.No",
-      field: "S.No",
+      field: "SNo",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 100,
-    },     
+    },
     {
       headerName: "Employee ID",
       field: "Employee_ID",
@@ -298,18 +260,18 @@ function ShiftSumRep() {
     {
       headerName: "Attendance Status",
       field: "Attendance_Status",
-    //   cellStyle: (params) => {
-    //     if (params.value === "ABSENT") {
-    //       return { color: "red", fontWeight: "bold" };
-    //     }
-    //     if (params.value === "PRESENT") {
-    //       return { color: "green", fontWeight: "bold" };
-    //     }
-    //     if (params.value === "WEEK OFF") {
-    //       return { color: "orange", fontWeight: "bold" };
-    //     }
-    //     return null;
-    //   },
+      //   cellStyle: (params) => {
+      //     if (params.value === "ABSENT") {
+      //       return { color: "red", fontWeight: "bold" };
+      //     }
+      //     if (params.value === "PRESENT") {
+      //       return { color: "green", fontWeight: "bold" };
+      //     }
+      //     if (params.value === "WEEK OFF") {
+      //       return { color: "orange", fontWeight: "bold" };
+      //     }
+      //     return null;
+      //   },
     },
   ];
   const defaultColDef = {
@@ -321,6 +283,7 @@ function ShiftSumRep() {
   const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const onSelectionChanged = () => {
@@ -391,12 +354,13 @@ function ShiftSumRep() {
   };
 
   const transformRowData = (data) => {
-    return data.map((row) => {
+    return data.map((row, index) => {
 
       return {
+        "S.No": index + 1,
         "Employee ID": row.Employee_ID || "",
-        "Department ID": row.dept_id || "", 
-        "Designation ID": row.desgination_id || "",
+        "Department": row.dept_id || "",
+        "Designation": row.desgination_id || "",
         "Shift Date": row.Shift_Date || "",
         "Shift Name": row.Shift_Name || "",
         "Shift Start": row.Shift_Start_Time || "",
@@ -408,22 +372,20 @@ function ShiftSumRep() {
         "Early Checkout": row.Early_CheckOut || "",
         "Late Checkout": row.Late_CheckOut || "",
         "Worked Hours": row.Worked_Hours || "",
-        "Attendance Status": row.Attendance_Status || "",   
+        "Attendance Status": row.Attendance_Status || "",
       };
     });
   };
 
   const handleExportToExcel = () => {
+    if (!gridApiRef.current) return;
 
-    if (!gridApi) {
-    toast.warning("Grid not ready.");
-    return;
-  }
+    const selectedRows = gridApiRef.current.getSelectedRows();
 
-     const selectedData = gridApi.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    if (!selectedData  || selectedData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
       return;
     }
 
@@ -449,7 +411,7 @@ function ShiftSumRep() {
 
     /* ================= TABLE DATA ================= */
 
-    const transformedData = transformRowData(selectedData);
+    const transformedData = transformRowData(rowData);
 
     XLSX.utils.sheet_add_json(worksheet, transformedData, {
       origin: `A${headerData.length + 1}`,
@@ -529,19 +491,399 @@ function ShiftSumRep() {
     XLSX.writeFile(workbook, "Shift_Summary_Report.xlsx");
   };
 
+  const generateReport = () => {
+    const selectedRows = gridApi.getSelectedRows();
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to generate a report");
+      return;
+    }
+
+    const reportData = selectedRows.map((row, index) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
+      return {
+        "S.No": index + 1,
+        "Employee ID": formatValue(row.Employee_ID),
+        "Department": formatValue(row.dept_id),
+        "Designation": formatValue(row.desgination_id),
+        "Shift Date": formatValue(row.Shift_Date),
+        "Shift Name": formatValue(row.Shift_Name),
+        "Shift Start": formatValue(row.Shift_Start_Time),
+        "Shift End": formatValue(row.Shift_End_Time),
+        "First Checkin": formatValue(row.First_Checkin),
+        "Last Checkout": formatValue(row.Last_Checkout),
+        "Early Checkin": formatValue(row.Early_Checkin),
+        "Late Checkin": formatValue(row.Late_Checkin),
+        "Early Checkout": formatValue(row.Early_CheckOut),
+        "Late Checkout": formatValue(row.Late_CheckOut),
+        "Worked Hours": formatValue(row.Worked_Hours),
+        "Attendance Status": formatValue(row.Attendance_Status),
+      };
+    });
+
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
+    const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write(`<html><head><title>Shift Summary Report</title>`);
+    reportWindow.document.write("<style>");
+    reportWindow.document.write(`
+        body {
+              font-family: 'Segoe UI', sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #f4f6f9;
+              color: ${fontColor};
+            }
+    
+            .header {
+              display: flex;
+              align-items: center;
+              background: ${tableHeaderBg};
+              padding: 15px 20px;
+              color: white;
+              border-radius: 8px;
+            }
+            
+            .logo {
+              height: 60px;
+            }
+            
+            .title-section {
+              flex: 1;
+              text-align: center;
+            }
+          
+            .title-section h2 {
+              margin: 0;
+            }
+    
+            .sub-info {
+              margin: 15px 0;
+              font-size: 14px;
+              color: #555;
+              display: flex;
+              justify-content: space-between;
+            }
+    
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+    
+            th {
+              background-color: ${tableHeaderBg};
+              color: white;
+              padding: 10px;
+              text-align: left;
+            }
+    
+            td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+    
+            tr:nth-child(even) {
+              text-align: left;
+              background-color: ${rowAltColor};
+            }
+    
+            tr:hover {
+              background-color: ${hoverColor};
+            }
+    
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 13px;
+              color: #777;
+            }
+    
+            .print-btn {
+              margin-top: 20px;
+              padding: 10px 20px;
+              background: ${headerGradientStart};
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+    
+            .print-btn:hover {
+              opacity: 0.85;
+            }
+    
+          @media print {
+            body {
+              background: white;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+              
+            th {
+              background-color: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            tr:nth-child(even) {
+              background-color: ${rowAltColor} !important;
+            }
+              
+            .header {
+              background: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            .print-btn {
+              display: none;
+            }
+          }
+      `);
+
+    reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write(`<div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Shift Summary Report</h2>
+      </div>
+      </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>`);
+    // reportWindow.document.write("<h1><u>Company Information</u></h1>");
+
+    // Create table with headers
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
+    });
+    reportWindow.document.write("</tr></thead><tbody>");
+
+    // Populate the rows with safe empty strings
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value || ''}</td>`);
+      });
+      reportWindow.document.write("</tr>");
+    });
+
+    reportWindow.document.write("</tbody></table>");
+    reportWindow.document.write(`
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+  `);
+    reportWindow.document.write("</body></html>");
+    reportWindow.document.close();
+  };
+
+  const exportToPDF = () => {
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
+      return;
+    }
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
+
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
+
+    const headerRGB = hexToRgb(headerBg);
+
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.width;
+
+    /* ================= HEADER DESIGN ================= */
+
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
+
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Shift Summary Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map((row, index) =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => {
+            if (col.field === "SNo") {
+              return index + 1;
+            }
+            return row[col.field] ?? "";
+          })
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Shift_Summary_Report.pdf");
+    });
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
         {loading && <LoadingScreen />}
-        <ToastContainer
-          position="top-right"
-          className="toast-design"
-          theme="colored"
-        />
+        <ToastContainer position="top-right" className="toast-design" theme="colored" />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Shift Summary Report</h1>
-            <div className="action-wrapper"></div>
+            <div className="action-wrapper desktop-actions">
+              {["all permission", "view"].some((p) => shiftSumRepPermission.includes(p)) && (
+                <div className="action-icon print" onClick={generateReport}>
+                  <span className="tooltip">Print</span>
+                  <i className="fa-solid fa-print"></i>
+                </div>
+              )}
+              {["all permission", "PDF"].some((p) => shiftSumRepPermission.includes(p)) && (
+                <div className="action-icon print" onClick={exportToPDF}>
+                  <span className="tooltip">Pdf</span>
+                  <i className="fa-solid fa-file-pdf"></i>
+                </div>
+              )}
+              {["all permission", "Excel"].some((p) => shiftSumRepPermission.includes(p)) && (
+                <div className="action-icon add" onClick={handleExportToExcel}>
+                  <span className="tooltip">Excel</span>
+                  <i class="fa-solid fa-file-excel"></i>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Dropdown */}
+            <div className="dropdown mobile-actions">
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+
+              <ul className="dropdown-menu dropdown-menu-end text-center">
+                {["all permission", "view"].some((p) => shiftSumRepPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={generateReport}>
+                      <i className="fa-solid fa-print text-dark fs-4"></i>
+                    </button>
+                  </li>
+                )}
+                {["all permission", "Pdf"].some((p) => shiftSumRepPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={exportToPDF}>
+                      <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                    </button>
+                  </li>
+                )}
+                {["all permission", "Excel"].some((p) => shiftSumRepPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={handleExportToExcel}>
+                      <i className="fa-solid fa-file-excel add fs-4"></i>
+                    </button>
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -635,10 +977,6 @@ function ShiftSumRep() {
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>
 
-                <div className="icon-btn excel" onClick={handleExportToExcel}>
-                  <span className="tooltip">Excel</span>
-                  <i className="fa-solid fa-file-excel"></i>
-                </div>
               </div>
             </div>
           </div>

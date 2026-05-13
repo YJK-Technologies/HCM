@@ -62,6 +62,12 @@ function Project({ }) {
   const [isSearchStatus, setIsSearchStatus] = useState(false);
   const [ManagerGridDrop, setManagerGridDrop] = useState([]);
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const projectPermissions = permissions
+    .filter(permission => permission.screen_type === 'Project')
+    .map(permission => permission.permission_type.toLowerCase());
+
   // const options = [
   //   { value: 'add', label: 'Add' },
   //   { value: 'update', label: 'Update ' }
@@ -701,12 +707,12 @@ function Project({ }) {
           <h1 className="page-title">Project</h1>
 
           <div className="action-wrapper desktop-actions">
-            {/* {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && ( */}
+             {['add', 'all permission'].some(permission => projectPermissions.includes(permission)) && (
             <div className="action-icon add" onClick={handleSave}>
               <span className="tooltip">Save</span>
               <i class="fa-solid fa-floppy-disk"></i>
             </div>
-            {/*})}*/}
+            )}
 
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
@@ -716,23 +722,28 @@ function Project({ }) {
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              <li className="dropdown-item" onClick={handleSave}>
-                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {['add', 'all permission'].some(p => projectPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-              {/* )} */}
-
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
-                <span className="tooltip">Reload</span>
-              </li>
-
             </ul>
           </div>
 

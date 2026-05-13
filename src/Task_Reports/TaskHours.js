@@ -502,16 +502,33 @@ const MyAgGridComponent = () => {
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-
           <h1 className="page-title">Task Hours & Time Tracking</h1>
-
-          <div className="action-wrapper">
-            <div className="icon-btn excel" onClick={handleExportToExcel}>
+          <div className="action-wrapper desktop-actions">
+            <div className="action-icon add" onClick={handleExportToExcel}>
               <span className="tooltip">Excel</span>
               <i className="fa-solid fa-file-excel"></i>
             </div>
           </div>
 
+          {/* Mobile Action Bar */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i> 
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end">
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
+                </li>
+            </ul>
+          </div>
         </div>
       </div>
 

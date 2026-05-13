@@ -74,8 +74,8 @@ function ShiftMasterGrid() {
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyMappingPermission = permissions
-    .filter((permission) => permission.screen_type === "Company Mapping")
+  const shiftMasterGridPermission = permissions
+    .filter((permission) => permission.screen_type === "ShiftMasterGrid")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const searchClearInputFields = () => {
@@ -899,24 +899,74 @@ function ShiftMasterGrid() {
     XLSX.writeFile(workbook, "Shift_Master_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setShift_Code('');
+    setShift_Name('');
+    setStart_Time('');
+    setShift_Hours('');
+    setEnd_Time('');
+    setSelectedNightShift('');
+    setIs_Night_Shift('');
+    setGrace_In_Min('');
+    setGrace_Out_Min('');
+    setSelectedCrossNight('');
+    setCross_Midnight('');
+    setSelectedStatus('');
+    setStatus('');
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
         {loading && <LoadingScreen />}
-        <ToastContainer
-          position="top-right"
-          className="toast-design"
-          theme="colored"
-        />
+        <ToastContainer position="top-right" className="toast-design" theme="colored" />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Shift Master</h1>
-            <div className="action-wrapper">
-              <div onClick={handleSave} className="action-icon add">
-                <span className="tooltip">Save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
+            <div className="action-wrapper desktop-actions">
+              {['add', 'all permission'].some(permission => shiftMasterGridPermission.includes(permission)) && (
+                <div onClick={handleSave} className="action-icon add">
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
+              <div className="action-icon print" onClick={handleReloadAdd}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-arrow-rotate-right"></i>
               </div>
             </div>
+
+            {/* Mobile Dropdown */}
+            <div className="dropdown mobile-actions">
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+
+              <ul className="dropdown-menu dropdown-menu-end text-center">
+                {['add', 'all permission'].some(p => shiftMasterGridPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={handleSave}>
+                      <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                    </button>
+                  </li>
+                )}
+                <li>
+                  <button className="dropdown-item" onClick={handleReloadAdd}>
+                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
           </div>
         </div>
 
@@ -1043,7 +1093,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedNightShift ? "has-value" : ""} 
               ${isSelectedNightShift ? "is-focused" : ""}`}
-              title="Please select if it's a Night Shift"
+                title="Please select if it's a Night Shift"
               >
                 <Select
                   id="status"
@@ -1100,7 +1150,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedCrossNight ? "has-value" : ""} 
               ${isSelectedCrossNight ? "is-focused" : ""}`}
-              title="Please select if it's a Cross Midnight Shift"
+                title="Please select if it's a Cross Midnight Shift"
               >
                 <Select
                   id="status"
@@ -1121,7 +1171,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatus ? "has-value" : ""} 
               ${isSelectFocused ? "is-focused" : ""}`}
-              title="Please select the Status"
+                title="Please select the Status"
               >
                 <Select
                   id="status"
@@ -1195,7 +1245,7 @@ function ShiftMasterGrid() {
                 <input
                   id="UTC_Offset"
                   class="exp-input-field form-control"
-                    title="Please Enter the Shift Name"
+                  title="Please Enter the Shift Name"
                   type="text"
                   maxLength={50}
                   placeholder=""
@@ -1216,7 +1266,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                    title="Please Enter the Start Time"
+                  title="Please Enter the Start Time"
                   type="time"
                   value={Start_TimeSC}
                   onChange={(e) => {
@@ -1234,7 +1284,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                    title="Please Enter the End Time"
+                  title="Please Enter the End Time"
                   type="time"
                   value={End_TimeSC}
                   onChange={(e) => setEnd_TimeSC(e.target.value)}
@@ -1249,7 +1299,7 @@ function ShiftMasterGrid() {
               <div className="inputGroup">
                 <input
                   className="exp-input-field form-control"
-                    title="Please Enter the Shift Hours"
+                  title="Please Enter the Shift Hours"
                   type="number"
                   value={Shift_HoursSC}
                   onChange={(e) => {
@@ -1270,7 +1320,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedNightShiftSc ? "has-value" : ""} 
               ${isSelectedNightShiftSc ? "is-focused" : ""}`}
-              title="Please select if it's a Night Shift"
+                title="Please select if it's a Night Shift"
               >
                 <Select
                   id="status"
@@ -1327,7 +1377,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedCrossNightSc ? "has-value" : ""} 
               ${isSelectedCrossNightSc ? "is-focused" : ""}`}
-              title="Please select if it's a Cross Midnight Shift"
+                title="Please select if it's a Cross Midnight Shift"
               >
                 <Select
                   id="status"
@@ -1348,7 +1398,7 @@ function ShiftMasterGrid() {
                 className={`inputGroup selectGroup 
               ${selectedStatusSC ? "has-value" : ""} 
               ${isSelectFocusedSC ? "is-focused" : ""}`}
-              title="Please select the Status"
+                title="Please select the Status"
               >
                 <Select
                   id="status"

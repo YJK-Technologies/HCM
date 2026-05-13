@@ -696,16 +696,16 @@ function TimeZoneMaster() {
                     <div className="header-flex">
                         <h1 className="page-title">Time Zone Master</h1>
                         <div className="action-wrapper desktop-actions">
-                            <div className="action-icon reload" onClick={reloadGridData}>
-                                <span className="tooltip">Reload</span>
-                                <i className="fa-solid fa-rotate-right"></i>
-                            </div>
                             {['add', 'all permission'].some(p => timeZoneGridPermission.includes(p)) && (
                                 <div onClick={handleSave} className="action-icon add">
                                     <span className="tooltip">Save</span>
                                     <i class="fa-solid fa-floppy-disk"></i>
                                 </div>
                             )}
+                            <div className="action-icon reload" onClick={reloadGridData}>
+                                <span className="tooltip">Reload</span>
+                                <i className="fa-solid fa-rotate-right"></i>
+                            </div>
                         </div>
 
                         {/* Mobile Action Bar */}
@@ -720,12 +720,6 @@ function TimeZoneMaster() {
                             </button>
 
                             <ul className="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <button className="dropdown-item" onClick={reloadGridData}>
-                                        <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
-                                    </button>
-                                </li>
-
                                 {['add', 'all permission'].some(p => timeZoneGridPermission.includes(p)) && (
                                     <li>
                                         <button className="dropdown-item" onClick={handleSave}>
@@ -733,6 +727,11 @@ function TimeZoneMaster() {
                                         </button>
                                     </li>
                                 )}
+                                <li>
+                                    <button className="dropdown-item" onClick={reloadGridData}>
+                                        <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
                     </div>

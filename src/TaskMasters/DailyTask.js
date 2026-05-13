@@ -72,6 +72,12 @@ function Input({ }) {
   const [isSearchUser, setIsSearchUser] = useState(false);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const taskPermissions = permissions
+    .filter(permission => permission.screen_type === 'Task')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [selectedFile, setSelectedFile] = useState([]);
   const navigate = useNavigate();
 
@@ -114,11 +120,11 @@ function Input({ }) {
   //   : [];
 
   const filteredOptionUser = Array.isArray(userDrop)
-  ? userDrop.map((option) => ({
+    ? userDrop.map((option) => ({
       value: option.user_code || option.userID,
       label: `${option.user_code || option.userID} - ${option.user_name}`,
     }))
-  : [];
+    : [];
 
   // useEffect(() => {
   //   const fetchUserCodes = async () => {
@@ -181,12 +187,12 @@ function Input({ }) {
   //     label: `${option.user_code} - ${option.user_name}`,
   //   }))
   //   : [];
-const filteredOptionuser = Array.isArray(userDrop)
-  ? userDrop.map((option) => ({
+  const filteredOptionuser = Array.isArray(userDrop)
+    ? userDrop.map((option) => ({
       value: option.user_code || option.userID,
       label: `${option.user_code || option.userID} - ${option.user_name}`,
     }))
-  : [];
+    : [];
   // const filteredOptionuser = userdrop.map((option) => ({
   //   value: option.user_code,
   //   label: `${option.user_code} - ${option.user_Name}`,
@@ -524,7 +530,7 @@ const filteredOptionuser = Array.isArray(userDrop)
   };
 
   const handleSave = async (e) => {
-    
+
     e.preventDefault();
 
     if (!ProjectID || !UserID || !Title || !StartDate || !EndDate || !Endtime || !Descriptions) {
@@ -616,12 +622,12 @@ const filteredOptionuser = Array.isArray(userDrop)
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
-    try {
-      const modified_by = sessionStorage.getItem('selectedUserCode');
-      
-      // const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.TaskMasterID === row.TaskMasterID) : [editedData];
+        try {
+          const modified_by = sessionStorage.getItem('selectedUserCode');
 
-      const dataToSend = {
+          // const selectedRowsData = Array.isArray(editedData) ? editedData.filter(row => row.TaskMasterID === row.TaskMasterID) : [editedData];
+
+          const dataToSend = {
             editedData: Array.isArray(rowData)
               ? rowData.map((row) => ({
                 ...row,
@@ -637,29 +643,29 @@ const filteredOptionuser = Array.isArray(userDrop)
               ],
           };
 
-      const response = await fetch(`${config.apiBaseUrl}/updateTask`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend), 
+          const response = await fetch(`${config.apiBaseUrl}/updateTask`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
 
-      });
+          });
 
-      if (response.status === 200) {
-        setTimeout(() => {
-          toast.success("Data Updated Successfully")
-          handleSearch();
-        }, 1000);
-        return;
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message);
-      }
-    } catch (error) {
-      console.error("Error saving data:", error);
-      toast.error("Error Updating Data: " + error.message);
-    }
+          if (response.status === 200) {
+            setTimeout(() => {
+              toast.success("Data Updated Successfully")
+              handleSearch();
+            }, 1000);
+            return;
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message);
+          }
+        } catch (error) {
+          console.error("Error saving data:", error);
+          toast.error("Error Updating Data: " + error.message);
+        }
       },
       () => {
         toast.info("Data updated cancelled.");
@@ -727,7 +733,7 @@ const filteredOptionuser = Array.isArray(userDrop)
     window.location.reload();
   };
 
-    const searchClearInputFields = () => {
+  const searchClearInputFields = () => {
     setTaskMasterID('');
     setprojectID('');
     setSelectedproject('');
@@ -782,7 +788,7 @@ const filteredOptionuser = Array.isArray(userDrop)
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -954,12 +960,12 @@ const filteredOptionuser = Array.isArray(userDrop)
           <h1 className="page-title">Task</h1>
 
           <div className="action-wrapper desktop-actions">
-            {/* {saveButtonVisible && ['add', 'all permission'].some(permission => employeePermissions.includes(permission)) && ( */}
-            <div className="action-icon add" onClick={handleSave}>
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
-            </div>
-            {/*})}*/}
+            {['add', 'all permission'].some(permission => taskPermissions.includes(permission)) && (
+              <div className="action-icon add" onClick={handleSave}>
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
 
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
@@ -969,19 +975,27 @@ const filteredOptionuser = Array.isArray(userDrop)
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              <li className="dropdown-item" onClick={handleSave}>
-                <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
-              </li>
-              {/* )} */}
-
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              {['add', 'all permission'].some(p => taskPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>

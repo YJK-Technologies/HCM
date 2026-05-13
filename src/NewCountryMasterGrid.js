@@ -706,16 +706,16 @@ function Input({ }) {
           <h1 className="page-title">Country Master</h1>
 
           <div className="action-wrapper desktop-actions">
-            <div className="action-icon print" onClick={handleReload}>
-              <span className="tooltip">Reload</span>
-              <i className="fa-solid fa-arrow-rotate-right"></i>
-            </div>
             {['add', 'all permission'].some(p => countryMasterPermissions.includes(p)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
+            <div className="action-icon print" onClick={handleReload}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
+            </div>
           </div>
 
           <div className="dropdown mobile-actions">
@@ -729,12 +729,6 @@ function Input({ }) {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              <li>
-                <button className="dropdown-item" onClick={handleReload}>
-                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
-                </button>
-              </li>
-
               {['add', 'all permission'].some(p => countryMasterPermissions.includes(p)) && (
                 <li>
                   <button className="dropdown-item" onClick={handleSave}>
@@ -742,6 +736,11 @@ function Input({ }) {
                   </button>
                 </li>
               )}
+              <li>
+                <button className="dropdown-item" onClick={handleReload}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
             </ul>
           </div>
         </div>

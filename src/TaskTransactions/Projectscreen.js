@@ -20,6 +20,13 @@ import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
 const AccountInformation = () => {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const taskPermissions = permissions
+    .filter(permission => permission.screen_type === 'Task')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [open2, setOpen2] = React.useState(false);
   const [ProjectID, setProjectCode] = useState("");
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -528,7 +535,7 @@ const AccountInformation = () => {
       field: "S.No",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 100,
-    },     
+    },
     {
       headerName: "Task Master ID",
       field: "TaskMasterID",
@@ -1338,12 +1345,34 @@ const AccountInformation = () => {
         <div className="header-flex">
           <h1 className="page-title">Project Details</h1>
           <div className="action-wrapper desktop-actions">
-            <div className=" d-flex justify-content-end  me-3">
+            {['add', 'all permission'].some(p => taskPermissions.includes(p)) && (
               <div className="action-icon add" onClick={handleClickOpen}>
                 <span className="tooltip">Add</span>
                 <i className="fa-solid fa-user-plus"></i>
               </div>
-            </div>
+            )}
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => taskPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleClickOpen}>
+                    <i className="fa-solid fa-user-plus add fs-4"></i>
+                  </button>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </div>

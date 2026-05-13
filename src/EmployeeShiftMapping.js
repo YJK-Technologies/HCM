@@ -87,11 +87,11 @@ function EmployeeTypeMaster() {
   const [AGESTypeSc, setAGESTypeSc] = useState("");
   const [AGESTypesDropSc, setAGESTypesDropSc] = useState([]);
 
-const [mappedType, setMappedType] = useState("ME");
-const [selectedMappedType, setSelectedMappedType] = useState({
-  value: "ME",
-  label: "Mapped Employee",
-});
+  const [mappedType, setMappedType] = useState("ME");
+  const [selectedMappedType, setSelectedMappedType] = useState({
+    value: "ME",
+    label: "Mapped Employee",
+  });
   const [isSelectedMappedType, setIsSelectedMappedType] = useState(false);
 
   const [createdBy, setCreatedBy] = useState("");
@@ -101,7 +101,7 @@ const [selectedMappedType, setSelectedMappedType] = useState({
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyMappingPermission = permissions
+  const employeeShiftMappingPermission = permissions
     .filter((permission) => permission.screen_type === "EmployeeShiftMapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
@@ -185,17 +185,17 @@ const [selectedMappedType, setSelectedMappedType] = useState({
     label: option.attributedetails_name,
   }));
 
-//   const filteredOptionEmployeeId = employeeIdDrop.map((option) => ({
-//     value: option.EmployeeId,
-//     label: `${option.EmployeeId}-${option.First_Name}`,
-//   }));
+  //   const filteredOptionEmployeeId = employeeIdDrop.map((option) => ({
+  //     value: option.EmployeeId,
+  //     label: `${option.EmployeeId}-${option.First_Name}`,
+  //   }));
 
-const filteredOptionEmployeeId = Array.isArray(employeeIdDrop)
-  ? employeeIdDrop.map((option) => ({
+  const filteredOptionEmployeeId = Array.isArray(employeeIdDrop)
+    ? employeeIdDrop.map((option) => ({
       value: option.EmployeeId,
       label: `${option.EmployeeId} - ${option.First_Name}`,
     }))
-  : [];
+    : [];
 
   const filteredOptionShiftId = shiftIdDrop.map((option) => ({
     value: option.Shift_ID,
@@ -237,22 +237,22 @@ const filteredOptionEmployeeId = Array.isArray(employeeIdDrop)
     label: `${option.Pattern_Code}-${option.Pattern_Name}`,
   }));
 
-//   const filteredOptionAGESTypesSc = Array.isArray(AGESTypesDropSc)
-//     ? AGESTypesDropSc.map((option) => ({
-//         value: option?.attributedetails_name,
-//         label: option?.attributedetails_name,
-//       }))
-//     : [];
-const filteredMappedTypeOptions = [
-{
-value: "ME",
-label: "Mapped Employee",
-},
-{
-value: "NME",
-label: "Not Mapped Employee",
-},
-];
+  //   const filteredOptionAGESTypesSc = Array.isArray(AGESTypesDropSc)
+  //     ? AGESTypesDropSc.map((option) => ({
+  //         value: option?.attributedetails_name,
+  //         label: option?.attributedetails_name,
+  //       }))
+  //     : [];
+  const filteredMappedTypeOptions = [
+    {
+      value: "ME",
+      label: "Mapped Employee",
+    },
+    {
+      value: "NME",
+      label: "Not Mapped Employee",
+    },
+  ];
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -411,20 +411,20 @@ label: "Not Mapped Employee",
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-//   useEffect(() => {
-//     const company_code = sessionStorage.getItem("selectedCompanyCode");
+  //   useEffect(() => {
+  //     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-//     fetch(`${config.apiBaseUrl}/getEmployeeId`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ company_code }),
-//     })
-//       .then((data) => data.json())
-//       .then((val) => setEmployeeIdDrop(val))
-//       .catch((error) => console.error("Error fetching data:", error));
-//   }, []);
+  //     fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ company_code }),
+  //     })
+  //       .then((data) => data.json())
+  //       .then((val) => setEmployeeIdDrop(val))
+  //       .catch((error) => console.error("Error fetching data:", error));
+  //   }, []);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -559,51 +559,51 @@ label: "Not Mapped Employee",
     }
   };
 
-const handleChangeMappedType = async (selectedOption) => {
-setSelectedMappedType(selectedOption);
+  const handleChangeMappedType = async (selectedOption) => {
+    setSelectedMappedType(selectedOption);
 
-const selectedValue = selectedOption?.value || "ME";
+    const selectedValue = selectedOption?.value || "ME";
 
-setMappedType(selectedValue);
+    setMappedType(selectedValue);
 
-// clear employee dropdown selection
-setSelectedEmployeeId(null);
+    // clear employee dropdown selection
+    setSelectedEmployeeId(null);
 
-setEmployeeId("");
+    setEmployeeId("");
 
-fetchEmployeesByMappedType(selectedValue);
-};
+    fetchEmployeesByMappedType(selectedValue);
+  };
 
-useEffect(() => {
-fetchEmployeesByMappedType("ME");
-}, []);
+  useEffect(() => {
+    fetchEmployeesByMappedType("ME");
+  }, []);
 
-const fetchEmployeesByMappedType = async (type) => {
-try {
-const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const fetchEmployeesByMappedType = async (type) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-const response = await fetch(
-  `${config.apiBaseUrl}/getMappedEmployeeDropdown`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      company_code,
-      MappedType: type,
-    }),
-  },
-);
+      const response = await fetch(
+        `${config.apiBaseUrl}/getMappedEmployeeDropdown`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code,
+            MappedType: type,
+          }),
+        },
+      );
 
-const data = await response.json();
+      const data = await response.json();
 
-setEmployeeIdDrop(data);
+      setEmployeeIdDrop(data);
 
-} catch (error) {
-console.error("Error fetching employee dropdown:", error);
-}
-};
+    } catch (error) {
+      console.error("Error fetching employee dropdown:", error);
+    }
+  };
 
   const reloadGridData = () => {
     setRowData([]);
@@ -907,17 +907,17 @@ console.error("Error fetching employee dropdown:", error);
           const dataToSend = {
             Employee_shift_mappingData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   Company_Code,
                   Modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    Company_Code,
-                    Modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -962,17 +962,17 @@ console.error("Error fetching employee dropdown:", error);
           const dataToSend = {
             Employee_shift_mappingData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                Company_Code,
+                Modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   Company_Code,
                   Modified_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    Company_Code,
-                    Modified_by,
-                  },
-                ],
+                },
+              ],
           };
 
           const response = await fetch(
@@ -1150,23 +1150,69 @@ console.error("Error fetching employee dropdown:", error);
     XLSX.writeFile(workbook, "Job_Master_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setSelectedMappedType('');
+    setMappedType('');
+    setSelectedEmployeeId('');
+    setEmployeeId('');
+    setSelectedShiftPatternId('');
+    setShiftPatternId('');
+    setEffectiveFrom('');
+    setEffectiveTo('');
+    setSelectedStatus('');
+    setStatus('');
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
         {loading && <LoadingScreen />}
-        <ToastContainer
-          position="top-right"
-          className="toast-design"
-          theme="colored"
-        />
+        <ToastContainer position="top-right" className="toast-design" theme="colored" />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Employee Shift Mapping</h1>
-            <div className="action-wrapper">
-              <div onClick={handleSave} className="action-icon add">
-                <span className="tooltip">Save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
+            <div className="action-wrapper desktop-actions">
+              {['add', 'all permission'].some(permission => employeeShiftMappingPermission.includes(permission)) && (
+                <div onClick={handleSave} className="action-icon add">
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
+              <div className="action-icon print" onClick={handleReloadAdd}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-arrow-rotate-right"></i>
               </div>
+            </div>
+
+            {/* Mobile Dropdown */}
+            <div className="dropdown mobile-actions">
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+
+              <ul className="dropdown-menu dropdown-menu-end text-center">
+                {['add', 'all permission'].some(p => employeeShiftMappingPermission.includes(p)) && (
+                  <li>
+                    <button className="dropdown-item" onClick={handleSave}>
+                      <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                    </button>
+                  </li>
+                )}
+                <li>
+                  <button className="dropdown-item" onClick={handleReloadAdd}>
+                    <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -1208,11 +1254,11 @@ console.error("Error fetching employee dropdown:", error);
               >
                 <Select
                   classNamePrefix="react-select"
-  placeholder=""
-  value={selectedMappedType}
-  onChange={handleChangeMappedType}
-  options={filteredMappedTypeOptions}
-  isClearable={false}
+                  placeholder=""
+                  value={selectedMappedType}
+                  onChange={handleChangeMappedType}
+                  options={filteredMappedTypeOptions}
+                  isClearable={false}
                   onFocus={() => setIsSelectedMappedType(true)}
                   onBlur={() => setIsSelectedMappedType(false)}
                 />

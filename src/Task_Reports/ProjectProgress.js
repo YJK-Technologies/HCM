@@ -194,7 +194,7 @@ const MyAgGridComponent = () => {
       // Catch any errors during the request
       console.error("Error fetching search data:", error);
       toast.error("Error occurred while fetching data");
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -419,14 +419,32 @@ const MyAgGridComponent = () => {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Project Progress</h1>
-
-            <div className="action-wrapper">
-              <div className="icon-btn excel" onClick={handleExportToExcel}>
+          <div className="action-wrapper desktop-actions">
+            <div className="action-icon add" onClick={handleExportToExcel}>
               <span className="tooltip">Excel</span>
               <i className="fa-solid fa-file-excel"></i>
             </div>
-            </div>
+          </div>
 
+          {/* Mobile Action Bar */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <button className="dropdown-item" onClick={handleExportToExcel}>
+                  <i className="fa-solid fa-file-excel add fs-4"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -442,7 +460,7 @@ const MyAgGridComponent = () => {
               <Select
                 id="ProjectID"
                 type="text"
-                 placeholder=" "
+                placeholder=" "
                 onFocus={() => setIsSelectProject(true)}
                 onBlur={() => setIsSelectProject(false)}
                 classNamePrefix="react-select"
@@ -454,7 +472,7 @@ const MyAgGridComponent = () => {
                 maxLength={50}
                 readOnly
               />
-                  <label className='floating-label'> Project ID</label>
+              <label className='floating-label'> Project ID</label>
             </div>
           </div>
 
@@ -471,9 +489,9 @@ const MyAgGridComponent = () => {
                 onChange={(e) => setProjectName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
-                <label htmlFor="EmployeeId" className={`${error && !ProjectName ? 'text-danger' : ''}`}>
-                  Project Name<span className="text-danger">*</span>
-                </label>
+              <label htmlFor="EmployeeId" className={`${error && !ProjectName ? 'text-danger' : ''}`}>
+                Project Name<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -486,7 +504,7 @@ const MyAgGridComponent = () => {
               <Select
                 id="LoanEligibleAmount"
                 type="text"
-                 placeholder=" "
+                placeholder=" "
                 onFocus={() => setIsSelectManager(true)}
                 onBlur={() => setIsSelectManager(false)}
                 classNamePrefix="react-select"
@@ -498,11 +516,11 @@ const MyAgGridComponent = () => {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label for="add1" className={`floating-label ${error && !ProjectManager ? 'red' : ''}`}>
-                  Project Manager
-                </label>
+                Project Manager
+              </label>
             </div>
           </div>
-         
+
           <div className="col-md-2">
             <div className="inputGroup">
               <input
@@ -516,13 +534,13 @@ const MyAgGridComponent = () => {
                 maxLength={100}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
- <label for="add2" className={`exp-form-labels ${error && !StartDate ? 'text-danger' : ''}`}>
-                  Start Date<span className="text-danger">*</span>
-                </label>
+              <label for="add2" className={`exp-form-labels ${error && !StartDate ? 'text-danger' : ''}`}>
+                Start Date<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
-           <div className="col-md-2">
+          <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="EndDate"
@@ -535,9 +553,9 @@ const MyAgGridComponent = () => {
                 maxLength={100}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
-                  <label for="add3" className={`exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>
-                    End Date<span className="text-danger">*</span>  
-                    </label>
+              <label for="add3" className={`exp-form-labels ${error && !EndDate ? 'text-danger' : ''}`}>
+                End Date<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
@@ -562,8 +580,8 @@ const MyAgGridComponent = () => {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <label for="tcode" className={`floating-label ${error && !PriorityLevel ? 'text-danger' : ''}`}>
-                  Priority Level<span className="text-danger">*</span> 
-                   </label>
+                Priority Level<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 

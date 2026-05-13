@@ -56,8 +56,8 @@ function ShiftPatternMaster() {
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyMappingPermission = permissions
-    .filter((permission) => permission.screen_type === "Company Mapping")
+  const shiftPatternMasterPermission = permissions
+    .filter((permission) => permission.screen_type === "ShiftPatternMaster")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const searchClearInputFields = () => {
@@ -460,7 +460,7 @@ function ShiftPatternMaster() {
   };
 
   const handleUpdate = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to update the selected Shift Pattern data?",
       async () => {
@@ -516,7 +516,7 @@ function ShiftPatternMaster() {
   };
 
   const handleDelete = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to delete the selected shift data?",
       async () => {
@@ -700,24 +700,66 @@ function ShiftPatternMaster() {
     XLSX.writeFile(workbook, "Shift_Pattern_Master_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setPattern_Code('');
+    setPattern_Name('');
+    setRotation_Days('');
+    setDescription('');
+    setSelectedStatus('');
+    setStatus('');
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       <div align="">
         {loading && <LoadingScreen />}
-        <ToastContainer
-          position="top-right"
-          className="toast-design"
-          theme="colored"
-        />
+        <ToastContainer position="top-right" className="toast-design" theme="colored" />
         <div className="shadow-lg p-1 bg-light rounded main-header-box">
           <div className="header-flex">
             <h1 className="page-title">Shift Pattern Master</h1>
-            <div className="action-wrapper">
-              <div onClick={handleSave} className="action-icon add">
-                <span className="tooltip">Save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
+            <div className="action-wrapper desktop-actions">
+              {['add', 'all permission'].some(permission => shiftPatternMasterPermission.includes(permission)) && (
+                <div onClick={handleSave} className="action-icon add">
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
+              <div className="action-icon print" onClick={handleReloadAdd}>
+                <span className="tooltip">Reload</span>
+                <i className="fa-solid fa-arrow-rotate-right"></i>
               </div>
             </div>
+
+            {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => shiftPatternMasterPermission.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
           </div>
         </div>
 

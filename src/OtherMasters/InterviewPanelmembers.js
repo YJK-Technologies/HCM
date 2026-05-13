@@ -35,6 +35,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function InterviewPanelMem({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const interviewPanelMemPermissions = permissions
+    .filter(permission => permission.screen_type === 'InterviewPanelMem')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [member_id, setmember_id] = useState("");
@@ -293,7 +300,7 @@ function InterviewPanelMem({ }) {
       field: "Role",
       editable: true,
       valueFormatter: (params) => {
-      return params.value ? params.value.replace(/[^a-zA-Z0-9 ]/g, "") : "";
+        return params.value ? params.value.replace(/[^a-zA-Z0-9 ]/g, "") : "";
       }
     },
     {
@@ -405,120 +412,120 @@ function InterviewPanelMem({ }) {
     searchClearInputFields();
   };
 
-const handleUpdate = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to update the data in the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+  const handleUpdate = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to update the data in the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-        const dataToSend = {
-          interview_panel_membersData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const dataToSend = {
+            interview_panel_membersData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/interview_panel_membersLoopUpdate`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_panel_membersLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data updated successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Update failed");
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Update error:", error);
-        toast.error("Error updating data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Update cancelled");
       }
-    },
-    () => {
-      toast.info("Update cancelled");
-    }
-  );
-};
+    );
+  };
 
-const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+  const handleDelete = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          interview_panel_membersData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            interview_panel_membersData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/interview_panel_membersLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_panel_membersLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
+    );
+  };
 
   const tabs = [
     { label: "Job Master" },
@@ -606,10 +613,10 @@ const handleDelete = async (rowData) => {
         : "";
 
       return {
-      "Member ID": row.member_id || "",
-      "Panel ID": `${row.panel_id} - ${panelName}` || "",
-      "Employee ID": row.employee_id || "",
-      "Role": row.Role || "",
+        "Member ID": row.member_id || "",
+        "Panel ID": `${row.panel_id} - ${panelName}` || "",
+        "Employee ID": row.employee_id || "",
+        "Role": row.Role || "",
       };
     });
   };
@@ -723,22 +730,63 @@ const handleDelete = async (rowData) => {
     XLSX.writeFile(workbook, "Panel_Members_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setselectedPanelID('');
+    setPanelID('');
+    setselectedEmployeeID('');
+    setEmployeeID('');
+    setRole('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer
-        position="top-right"
-        className="toast-design"
-        theme="colored"
-      />
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Panel Members</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => interviewPanelMemPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => interviewPanelMemPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -830,9 +878,10 @@ const handleDelete = async (rowData) => {
                 autoComplete="off"
                 value={Role}
                 maxLength={50}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setRole(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setRole(filteredValue);
                 }}
               />
               <label
@@ -862,9 +911,10 @@ const handleDelete = async (rowData) => {
                 title="Please Choose the Start Year"
                 autoComplete="off"
                 value={member_id}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setmember_id(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setmember_id(filteredValue);
                 }}
               />
               <label For="city" className="exp-form-labels">
@@ -933,9 +983,10 @@ const handleDelete = async (rowData) => {
                 required
                 autoComplete="off"
                 value={RoleSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setRoleSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setRoleSC(filteredValue);
                 }}
               />
               <label for="add1" className={`exp-form-labels`}>

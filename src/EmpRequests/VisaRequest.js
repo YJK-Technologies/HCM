@@ -618,10 +618,10 @@ function VisaRequest({ }) {
 
     const columnDefs = [
         {
-          headerName: "S.No",
-          field: "S.No",
-          valueGetter: (params) => params.node.rowIndex + 1,
-          width: 80,
+            headerName: "S.No",
+            field: "S.No",
+            valueGetter: (params) => params.node.rowIndex + 1,
+            width: 80,
         },
         {
             headerName: "Visa Request ID",
@@ -1210,8 +1210,13 @@ function VisaRequest({ }) {
 
                     {/* Mobile Dropdown */}
                     <div className="dropdown mobile-actions">
-                        <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                            <i className="fa-solid fa-list"></i>
+                        <button
+                            className="btn btn-primary dropdown-toggle p-0"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
 
                         <ul className="dropdown-menu dropdown-menu-end text-center">

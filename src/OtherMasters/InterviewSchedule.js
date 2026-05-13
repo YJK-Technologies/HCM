@@ -36,6 +36,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function InterviewSchedule({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const interviewSchedulePermissions = permissions
+    .filter(permission => permission.screen_type === 'InterviewSchedule')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [endYear, setEndYear] = useState(LastDate);
   const [error, setError] = useState("");
@@ -438,7 +445,7 @@ function InterviewSchedule({ }) {
       headerName: "Candidate Email",
       field: "email",
       editable: false,
-      hide: true  
+      hide: true
     },
     {
       headerName: "Candidate Phone No",
@@ -565,7 +572,7 @@ function InterviewSchedule({ }) {
         panel_id: PanelIDSC,
         department_id: department_idSC,
         Interview_Mode: InterviewModeSC,
-        location:locationSC,
+        location: locationSC,
         Status: statusSC,
         fromDate: fromDate,
         toDate: toDate,
@@ -620,117 +627,117 @@ function InterviewSchedule({ }) {
     searchClearInputFields();
   };
 
-    const handleUpdate = async (rowData) => {
-        showConfirmationToast(
-            "Are you sure you want to update the selected employee shift mapping data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+  const handleUpdate = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to update the selected employee shift mapping data?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-                    const dataToSend = {
-                        interview_scheduleData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
-
-                    const response = await fetch(`${config.apiBaseUrl}/interview_scheduleLoopUpdate`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Employee shift mapping updated successfully", {
-                            onClose: () => handleSearch(),
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Update failed");
-                    }
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Error updating data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Update cancelled"),
-        );
-    };
-
-const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          interview_scheduleData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const dataToSend = {
+            interview_scheduleData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/interview_scheduleLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(`${config.apiBaseUrl}/interview_scheduleLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
             },
-            body: JSON.stringify(dataToSend),
-          }
-        );
+          );
 
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+          if (response.ok) {
+            toast.success("Employee shift mapping updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => toast.info("Update cancelled"),
+    );
+  };
+
+  const handleDelete = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            interview_scheduleData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_scheduleLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
+          }
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
-  
+    );
+  };
+
 
   const tabs = [
     { label: 'Job Master' },
@@ -949,6 +956,25 @@ const handleDelete = async (rowData) => {
     XLSX.writeFile(workbook, "Interview_Schedule_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setSelectedcandidatename('');
+    set_candidatename('');
+    setselectedPanelID('');
+    setPanelID('');
+    setscheduled_datetime('');
+    settimezone('');
+    setselectedInterviewMode('');
+    setInterviewMode('');
+    setlocation('');
+    setmeeting_link('');
+    setSelectedStatus('');
+    setstatus('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -956,11 +982,44 @@ const handleDelete = async (rowData) => {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Interview Schedule</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => interviewSchedulePermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => interviewSchedulePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1081,9 +1140,10 @@ const handleDelete = async (rowData) => {
                 required
                 autoComplete="off"
                 value={location}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setlocation(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setlocation(filteredValue);
                 }}
               />
               <label for="sname" className={`exp-form-labels ${error && !location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
@@ -1272,9 +1332,10 @@ const handleDelete = async (rowData) => {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={locationSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setlocationSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setlocationSC(filteredValue);
                 }}
               />
               <label for="sname" className="exp-form-labels">Location</label>
