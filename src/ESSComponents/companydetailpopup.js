@@ -571,9 +571,9 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                 <div className="form-block col-md-3">
                   <div
                     className={`inputGroup selectGroup 
-              ${selectedStatus ? "has-value" : ""} 
-              ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please Select the Status"
+                    ${selectedStatus ? "has-value" : ""} 
+                    ${isSelectStatus ? "is-focused" : ""}`}
+                    title="Please Select the Status"
                   >
                     <Select
                       id="status"
