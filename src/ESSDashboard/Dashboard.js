@@ -1753,6 +1753,12 @@ const Dashboard = () => {
   // AG Grid columns
   const columnDefsList = [
     {
+      headerName: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+      cellStyle: { textAlign: "center" },
+    },    
+    {
       headerName: "Employee Id",
       field: "EmployeeId",
       onCellClicked: (params) => {
@@ -1776,6 +1782,12 @@ const Dashboard = () => {
 
   // AG Grid columns
   const ShiftColDefs = [
+    {
+      headerName: "S.No",
+      valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80,
+      cellStyle: { textAlign: "center" },
+    },      
     {
       headerName: "Date",
       field: "Date",
