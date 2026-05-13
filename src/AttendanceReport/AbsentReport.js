@@ -45,7 +45,7 @@ function AbsentReport() {
 
     //purpose of set user permisssion
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-    const companyPermissions = permissions
+    const absentReportPermissions = permissions
         .filter((permission) => permission.screen_type === "AbsentReport")
         .map((permission) => permission.permission_type.toLowerCase());
 
@@ -209,13 +209,13 @@ function AbsentReport() {
 
     const columnDefs = [
         {
-          headerCheckboxSelection: true,
-          checkboxSelection: true,
-          headerName: "S.No",
-          field: "S.No",
-          valueGetter: (params) => params.node.rowIndex + 1,
-          width: 100,
-        }, 
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            headerName: "S.No",
+            field: "S.No",
+            valueGetter: (params) => params.node.rowIndex + 1,
+            width: 100,
+        },
         {
             headerCheckboxSelection: true,
             checkboxSelection: true,
@@ -609,7 +609,7 @@ function AbsentReport() {
 
             const headers = [
                 columnDefs
-                    .filter(col => col.field) 
+                    .filter(col => col.field)
                     .map(col => col.headerName)
             ];
 
@@ -781,20 +781,20 @@ function AbsentReport() {
                     <h1 className="page-title">Leave Summary Report</h1>
 
                     <div className="action-wrapper desktop-actions">
-                        {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+                        {["all permission", "view"].some((p) => absentReportPermissions.includes(p)) && (
                             <div className="action-icon print" onClick={generateReport}>
                                 <span className="tooltip">Print</span>
                                 <i className="fa-solid fa-print"></i>
                             </div>
                         )}
-                        {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
+                        {["all permission", "PDF"].some((p) => absentReportPermissions.includes(p)) && (
                             <div className="action-icon print" onClick={exportToPDF}>
                                 <span className="tooltip">Pdf</span>
                                 <i className="fa-solid fa-file-pdf"></i>
                             </div>
                         )}
-                        {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                            <div className="action-icon print" onClick={handleExportToExcel}>
+                        {["all permission", "Excel"].some((p) => absentReportPermissions.includes(p)) && (
+                            <div className="action-icon add" onClick={handleExportToExcel}>
                                 <span className="tooltip">Excel</span>
                                 <i class="fa-solid fa-file-excel"></i>
                             </div>
@@ -804,26 +804,34 @@ function AbsentReport() {
                     {/* Mobile Dropdown */}
                     <div className="dropdown mobile-actions">
                         <button
-                            className="btn btn-primary dropdown-toggle p-1"
+                            className="btn btn-primary dropdown-toggle p-0"
+                            type="button"
                             data-bs-toggle="dropdown"
+                            aria-expanded="false"
                         >
-                            <i className="fa-solid fa-list"></i>
+                            <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
 
                         <ul className="dropdown-menu dropdown-menu-end text-center">
-                            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
-                                <li className="dropdown-item" onClick={generateReport}>
-                                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                            {["all permission", "view"].some((p) => absentReportPermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={generateReport}>
+                                        <i className="fa-solid fa-print text-dark fs-4"></i>
+                                    </button>
                                 </li>
                             )}
-                            {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
-                                <li className="dropdown-item" onClick={exportToPDF}>
-                                    <i className="fa-solid fa-file-pdf text-dark"></i>
+                            {["all permission", "Pdf"].some((p) => absentReportPermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={exportToPDF}>
+                                        <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                                    </button>
                                 </li>
                             )}
-                            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                                <li className="dropdown-item" onClick={handleExportToExcel}>
-                                    <i class="fa-solid fa-file-excel text-success"></i>
+                            {["all permission", "Excel"].some((p) => absentReportPermissions.includes(p)) && (
+                                <li>
+                                    <button className="dropdown-item" onClick={handleExportToExcel}>
+                                        <i className="fa-solid fa-file-excel add fs-4"></i>
+                                    </button>
                                 </li>
                             )}
                         </ul>

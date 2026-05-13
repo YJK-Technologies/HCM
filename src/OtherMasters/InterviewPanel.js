@@ -36,6 +36,13 @@ const getFinancialYearDates = () => {
 const { FirstDate, LastDate } = getFinancialYearDates();
 
 function InterviewPanel({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const interviewPanelPermissions = permissions
+    .filter(permission => permission.screen_type === 'InterviewPanel')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [startYear, setStartYear] = useState(FirstDate);
   const [endYear, setEndYear] = useState(LastDate);
@@ -454,117 +461,117 @@ function InterviewPanel({ }) {
     searchClearInputFields();
   };
 
-    const handleUpdate = async (rowData) => {
+  const handleUpdate = async (rowData) => {
 
-        showConfirmationToast(
-            "Are you sure you want to update the selected employee shift mapping data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+    showConfirmationToast(
+      "Are you sure you want to update the selected employee shift mapping data?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-                    const dataToSend = {
-                        interview_panelData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
-
-                    const response = await fetch(`${config.apiBaseUrl}/interview_panelLoopUpdate`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Employee shift mapping updated successfully", {
-                            onClose: () => handleSearch(),
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Update failed");
-                    }
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Error updating data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Update cancelled"),
-        );
-    };
-
-const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          interview_panelData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const dataToSend = {
+            interview_panelData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/interview_panelLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(`${config.apiBaseUrl}/interview_panelLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
             },
-            body: JSON.stringify(dataToSend),
-          }
-        );
+          );
 
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+          if (response.ok) {
+            toast.success("Employee shift mapping updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => toast.info("Update cancelled"),
+    );
+  };
+
+  const handleDelete = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            interview_panelData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_panelLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
+          }
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
+    );
+  };
 
   const tabs = [
     { label: 'Job Master' },
@@ -662,10 +669,10 @@ const handleDelete = async (rowData) => {
         : "";
 
       return {
-      "Panel Name": row.panel_name || "",
-      "Job ID": `${row.job_id} - ${jobName}` || "",
-      "Department ID": `${row.department_id} - ${deptName}` || "",
-      "Status": row.Status || "",
+        "Panel Name": row.panel_name || "",
+        "Job ID": `${row.job_id} - ${jobName}` || "",
+        "Department ID": `${row.department_id} - ${deptName}` || "",
+        "Status": row.Status || "",
       };
     });
   };
@@ -779,6 +786,20 @@ const handleDelete = async (rowData) => {
     XLSX.writeFile(workbook, "Interview_Panel_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setpanel_name('');
+    setselectedJobID('');
+    setJobID('');
+    setselecteddept('');
+    setdpt('');
+    setSelectedStatus('');
+    setstatus('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -786,11 +807,44 @@ const handleDelete = async (rowData) => {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Interview Panel</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => interviewPanelPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => interviewPanelPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -809,9 +863,10 @@ const handleDelete = async (rowData) => {
                 required
                 autoComplete="off"
                 value={panel_name}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setpanel_name(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setpanel_name(filteredValue);
                 }}
               />
               <label for="sname" className={`exp-form-labels ${error && !panel_name ? 'text-danger' : ''}`}>Panel Name<span className="text-danger">*</span></label>
@@ -905,9 +960,10 @@ const handleDelete = async (rowData) => {
                 required title="Please Choose the Start Year"
                 autoComplete="off"
                 value={panel_nameSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setpanel_nameSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setpanel_nameSC(filteredValue);
                 }}
               />
               <label For="city" className="exp-form-labels">Panel Name</label>

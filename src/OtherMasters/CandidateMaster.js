@@ -17,6 +17,12 @@ const config = require('../Apiconfig');
 
 function CandidateMaster() {
 
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const candidateMasterPermissions = permissions
+    .filter(permission => permission.screen_type === 'CandidateMaster')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [phone, setphone] = useState("");
   const [Education, setEducation] = useState("");
   const [Experience, setExperience] = useState("");
@@ -101,7 +107,7 @@ function CandidateMaster() {
     label: `${option.candidate_id} - ${option.candidate_name}`
   }));
 
-    useEffect(() => {
+  useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/CanditateID`, {
       method: 'POST',
@@ -353,58 +359,58 @@ function CandidateMaster() {
 
   const handleUpdate = async (rowData) => {
 
-        showConfirmationToast(
-            "Are you sure you want to update the selected employee shift mapping data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+    showConfirmationToast(
+      "Are you sure you want to update the selected employee shift mapping data?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-                    const dataToSend = {
-                        candidate_masterData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
+          const dataToSend = {
+            candidate_masterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
 
-                    const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopUpdate`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Candidate Master updated successfully", {
-                            onClose: () => handleSearch(),
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Update failed");
-                    }
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Error updating data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
+          const response = await fetch(`${config.apiBaseUrl}/candidate_masterLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
             },
-            () => toast.info("Update cancelled"),
-        );
-    };
+          );
+
+          if (response.ok) {
+            toast.success("Candidate Master updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => toast.info("Update cancelled"),
+    );
+  };
 
   // const handleDelete = async (rowData) => {
   //   showConfirmationToast(
@@ -447,61 +453,61 @@ function CandidateMaster() {
   // };
 
   const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          candidate_masterData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            candidate_masterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/candidate_masterLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          const response = await fetch(
+            `${config.apiBaseUrl}/candidate_masterLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
+    );
+  };
 
   const reloadGridData = () => {
     setRowData([]);
@@ -580,7 +586,7 @@ function CandidateMaster() {
       headerName: "Candidate ID",
       field: "candidate_id",
       editable: false,
-            cellEditorParams: {
+      cellEditorParams: {
         values: canditatenameGrid.map(d => d.value),
       },
       valueFormatter: (params) => {
@@ -936,6 +942,24 @@ function CandidateMaster() {
     XLSX.writeFile(workbook, "Candidate_Master_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setcandidate_name('');
+    setemail('');
+    setphone('');
+    setselectedJobID('');
+    setJobID('');
+    setEducation('');
+    setExperience('');
+    setRelated_experience('');
+    setJob_description('');
+    setSelectedCV('');
+    setCandidate_CV('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -943,11 +967,44 @@ function CandidateMaster() {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Candidate Master</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => candidateMasterPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => candidateMasterPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
 
         </div>
@@ -967,9 +1024,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={candidate_name}
                 maxLength={50}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setcandidate_name(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setcandidate_name(filteredValue);
                 }}
               />
               <label for="sname" className={` exp-form-labels ${error && !candidate_name ? 'text-danger' : ''}`}>Candidate Name<span className="text-danger">*</span></label>
@@ -1068,9 +1126,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Education}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setEducation(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setEducation(filteredValue);
                 }}
               />
               <label
@@ -1093,9 +1152,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Experience}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setExperience(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setExperience(filteredValue);
                 }}
               />
               <label
@@ -1118,9 +1178,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experience}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setRelated_experience(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setRelated_experience(filteredValue);
                 }}
               />
               <label
@@ -1143,9 +1204,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Job_description}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setJob_description(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setJob_description(filteredValue);
                 }}
               />
               <label
@@ -1343,9 +1405,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={EducationSC}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setEducationSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setEducationSC(filteredValue);
                 }}
               />
               <label
@@ -1368,9 +1431,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={ExperienceSC}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setExperienceSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setExperienceSC(filteredValue);
                 }}
               />
               <label
@@ -1393,9 +1457,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={Related_experienceSC}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setRelated_experienceSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setRelated_experienceSC(filteredValue);
                 }}
               />
               <label
@@ -1418,9 +1483,10 @@ function CandidateMaster() {
                 autoComplete="off"
                 value={JobDescriptionSC}
                 maxLength={100}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setJobDescriptionSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setJobDescriptionSC(filteredValue);
                 }}
               />
               <label

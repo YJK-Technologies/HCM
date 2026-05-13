@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,11 +12,12 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 const config = require("./Apiconfig");
 
-function PendingAssReqRep({}) {
+function PendingAssReqRep({ }) {
   const [rowData, setRowData] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [gridApi, setGridApi] = useState(null);
+  const gridApiRef = useRef(null);
   const [ReqIdSc, setReqIdSc] = useState("");
   const [reqNumberSc, setReqNumberSc] = useState("");
   const [empIdDropSc, setEmpIdDropSc] = useState([]);
@@ -49,9 +50,14 @@ function PendingAssReqRep({}) {
   const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
+  const pendingAssReqRepPermissions = permissions
     .filter((permission) => permission.screen_type === "PendingAssReqRep")
     .map((permission) => permission.permission_type.toLowerCase());
+
+  const onGridReady = (params) => {
+    setGridApi(params.api);
+    gridApiRef.current = params.api;
+  };
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -98,9 +104,9 @@ function PendingAssReqRep({}) {
 
   const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
     ? empIdDropSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
@@ -115,12 +121,12 @@ function PendingAssReqRep({}) {
 
   const filteredOptionReqStatusSc = Array.isArray(reqStatusDropSc)
     ? [
-        { value: "All", label: "All" },
-        ...reqStatusDropSc.map((option) => ({
-          value: option?.attributedetails_name,
-          label: option?.attributedetails_name,
-        })),
-      ]
+      { value: "All", label: "All" },
+      ...reqStatusDropSc.map((option) => ({
+        value: option?.attributedetails_name,
+        label: option?.attributedetails_name,
+      })),
+    ]
     : [{ value: "All", label: "All" }];
 
   useEffect(() => {
@@ -226,10 +232,10 @@ function PendingAssReqRep({}) {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "S.No",
-      field: "S.No",
+      field: "SNo",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 100,
-    },     
+    },
     {
       headerName: "Request ID",
       field: "info_request_id",
@@ -280,14 +286,14 @@ function PendingAssReqRep({}) {
       // filter: true,
       width: 160,
     },
-    {
-      headerName: "Company Code",
-      field: "company_code",
-      sortable: true,
-      // filter: true,
-      hide: true,
-      width: 140,
-    },
+    // {
+    //   headerName: "Company Code",
+    //   field: "company_code",
+    //   sortable: true,
+    //   // filter: true,
+    //   hide: true,
+    //   width: 140,
+    // },
     {
       headerName: "Created Date",
       field: "created_date",
@@ -383,7 +389,29 @@ function PendingAssReqRep({}) {
   };
 
   const generateReport = () => {
-    const dataSource = getSafeData();
+    const selectedRows = gridApi.getSelectedRows();
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to generate a report");
+      return;
+    }
+
+    const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
+      return {
+        "S.No": formatValue(row.SNo),
+        "Request ID": formatValue(row.info_request_id),
+        "Employee ID": formatValue(row.EmployeeId),
+        "Purpose": formatValue(row.purpose),
+        "Request Status": formatValue(row.request_status),
+        "Total Items": formatValue(row.TotalItems),
+        "Pending Items": formatValue(row.PendingItems),
+        "Approved Items": formatValue(row.ApprovedItems),
+        "Created Date": formatValue(row.created_date),
+      };
+    });
+
+    /* ================= READ THEME COLORS ================= */
 
     const headerGradientStart = getCSSVariable("--but");
     const tableHeaderBg = getCSSVariable("--ag-header");
@@ -391,115 +419,177 @@ function PendingAssReqRep({}) {
     const rowAltColor = getCSSVariable("--ag-row");
     const hoverColor = getCSSVariable("--ag-hover");
 
+    const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
 
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write(`<html><head><title>Pending Asset Requests Report</title>`);
+    reportWindow.document.write("<style>");
     reportWindow.document.write(`
-    <html>
-    <head>
-    <title>Pending Asset Requests</title>
-    <style>
-      body {
-        font-family: 'Segoe UI', sans-serif;
-        padding: 20px;
-        background-color: #f4f6f9;
-        color: ${fontColor};
-      }
-      .header {
-        background: ${tableHeaderBg};
-        padding: 15px;
-        color: white;
-        text-align: center;
-        border-radius: 8px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background: white;
-      }
-      th {
-        background-color: ${tableHeaderBg};
-        color: white;
-        padding: 10px;
-      }
-      td {
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
-      }
-      tr:nth-child(even) {
-        background-color: ${rowAltColor};
-      }
-      tr:hover {
-        background-color: ${hoverColor};
-      }
-      .print-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background: ${headerGradientStart};
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      @media print {
-        .print-btn { display: none; }
-      }
-    </style>
-    </head>
-    <body>
+        body {
+              font-family: 'Segoe UI', sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #f4f6f9;
+              color: ${fontColor};
+            }
+    
+            .header {
+              display: flex;
+              align-items: center;
+              background: ${tableHeaderBg};
+              padding: 15px 20px;
+              color: white;
+              border-radius: 8px;
+            }
+            
+            .logo {
+              height: 60px;
+            }
+            
+            .title-section {
+              flex: 1;
+              text-align: center;
+            }
+          
+            .title-section h2 {
+              margin: 0;
+            }
+    
+            .sub-info {
+              margin: 15px 0;
+              font-size: 14px;
+              color: #555;
+              display: flex;
+              justify-content: space-between;
+            }
+    
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+    
+            th {
+              background-color: ${tableHeaderBg};
+              color: white;
+              padding: 10px;
+              text-align: left;
+            }
+    
+            td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+    
+            tr:nth-child(even) {
+              text-align: left;
+              background-color: ${rowAltColor};
+            }
+    
+            tr:hover {
+              background-color: ${hoverColor};
+            }
+    
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 13px;
+              color: #777;
+            }
+    
+            .print-btn {
+              margin-top: 20px;
+              padding: 10px 20px;
+              background: ${headerGradientStart};
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+    
+            .print-btn:hover {
+              opacity: 0.85;
+            }
+    
+          @media print {
+            body {
+              background: white;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+              
+            th {
+              background-color: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            tr:nth-child(even) {
+              background-color: ${rowAltColor} !important;
+            }
+              
+            .header {
+              background: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            .print-btn {
+              display: none;
+            }
+          }
+      `);
 
-    <div class="header">
-      <h2>Pending Asset Requests Report</h2>
-      <p>Total Records: ${rowData.length || 0}</p>
-    </div>
+    reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write(`<div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Pending Asset Requests Report</h2>
+      </div>
+      </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>`);
+    // reportWindow.document.write("<h1><u>Company Information</u></h1>");
 
-    <table>
-      <thead>
-        <tr>
-          <th>Request ID</th>
-          <th>Employee ID</th>
-          <th>Purpose</th>
-          <th>Status</th>
-          <th>Total</th>
-          <th>Pending</th>
-          <th>Approved</th>
-          <th>Company</th>
-          <th>Created Date</th>
-        </tr>
-      </thead>
-      <tbody>
-  `);
+    // Create table with headers
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
+    });
+    reportWindow.document.write("</tr></thead><tbody>");
 
-    dataSource.forEach((row) => {
-      reportWindow.document.write(`
-      <tr>
-        <td>${row.info_request_id || ""}</td>
-        <td>${row.EmployeeId || ""}</td>
-        <td>${row.purpose || ""}</td>
-        <td>${row.request_status || ""}</td>
-        <td>${row.TotalItems || ""}</td>
-        <td>${row.PendingItems || ""}</td>
-        <td>${row.ApprovedItems || ""}</td>
-        <td>${row.company_code || ""}</td>
-        <td>${row.created_date || ""}</td>
-      </tr>
-    `);
+    // Populate the rows with safe empty strings
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value || ''}</td>`);
+      });
+      reportWindow.document.write("</tr>");
     });
 
+    reportWindow.document.write("</tbody></table>");
     reportWindow.document.write(`
-      </tbody>
-    </table>
-
     <div style="text-align:center;">
       <button class="print-btn" onclick="window.print()">Print</button>
     </div>
-
-    </body>
-    </html>
   `);
-
+    reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
+
   const hexToRgb = (hex) => {
     const cleanHex = hex.replace("#", "");
     const num = parseInt(cleanHex, 16);
@@ -507,96 +597,157 @@ function PendingAssReqRep({}) {
   };
 
   const exportToPDF = () => {
-    const dataSource = getSafeData();
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
+      return;
+    }
 
-    const headerBg = hexToRgb(getCSSVariable("--but"));
-    const tableHeader = hexToRgb(getCSSVariable("--ag-header"));
-    const fontColor = hexToRgb(getCSSVariable("--font-color"));
-    const altRow = hexToRgb(getCSSVariable("--ag-row"));
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    const headers = [
-      [
-        "Request ID",
-        "Employee ID",
-        "Purpose",
-        "Status",
-        "Total",
-        "Pending",
-        "Approved",
-        "Company",
-        "Created Date",
-      ],
-    ];
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    const body = dataSource.map((row) => [
-      row.info_request_id || "",
-      row.EmployeeId || "",
-      row.purpose || "",
-      row.request_status || "",
-      row.TotalItems || "",
-      row.PendingItems || "",
-      row.ApprovedItems || "",
-      row.company_code || "",
-      row.created_date || "",
-    ]);
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
+
+    const headerRGB = hexToRgb(headerBg);
 
     const doc = new jsPDF("l", "pt", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.width;
 
-    doc.setFillColor(...headerBg);
-    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+    /* ================= HEADER DESIGN ================= */
 
-    doc.setTextColor(255);
-    doc.setFontSize(18);
-    doc.text("Pending Asset Requests Report", pageWidth / 2, 40, {
-      align: "center",
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
+
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Pending Asset Requests Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Pending_Asset_Requests_Report.pdf");
     });
-
-    doc.setFontSize(10);
-    doc.text(
-      `Generated: ${new Date().toLocaleDateString()}`,
-      pageWidth / 2,
-      60,
-      { align: "center" },
-    );
-
-    autoTable(doc, {
-      startY: 90,
-      head: headers,
-      body: body,
-      styles: { fontSize: 9, textColor: fontColor },
-      headStyles: { fillColor: tableHeader, textColor: [255, 255, 255] },
-      alternateRowStyles: { fillColor: altRow },
-    });
-
-    doc.save("Pending_Asset_Requests.pdf");
   };
+
   const transformRowData = (data) => {
-    return data.map((row) => ({
+    return data.map((row, index) => ({
+      "S.No": index + 1,
       "Request ID": row.info_request_id || "",
       "Employee ID": row.EmployeeId || "",
-      Purpose: row.purpose || "",
+      "Purpose": row.purpose || "",
       "Request Status": row.request_status || "",
-      "Total Items": row.TotalItems || 0,
-      "Pending Items": row.PendingItems || 0,
-      "Approved Items": row.ApprovedItems || 0,
-      "Company Code": row.company_code || "",
-      "Created Date": row.created_date
-        ? new Date(row.created_date).toLocaleDateString("en-GB")
-        : "",
+      "Total Items": row.TotalItems || "",
+      "Pending Items": row.PendingItems || "",
+      "Approved Items": row.ApprovedItems || "",
+      "Created Date": row.created_date || "",
     }));
   };
 
   const handleExportToExcel = () => {
-    const dataSource = getSafeData();
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
+      return;
+    }
 
     const screenName = "Pending Asset Requests Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
 
     const titleBg = getCSSVariable("--but").replace("#", "");
     const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
     const fontColor = getCSSVariable("--font-color").replace("#", "");
     const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
 
     const headerData = [
       [screenName],
@@ -606,7 +757,9 @@ function PendingAssReqRep({}) {
 
     const worksheet = XLSX.utils.aoa_to_sheet(headerData);
 
-    const transformedData = transformRowData(dataSource);
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
 
     XLSX.utils.sheet_add_json(worksheet, transformedData, {
       origin: `A${headerData.length + 1}`,
@@ -615,6 +768,8 @@ function PendingAssReqRep({}) {
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
     const headerRowIndex = headerData.length;
 
+    /* ================= TITLE STYLE ================= */
+
     worksheet["A1"].s = {
       font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
       fill: { fgColor: { rgb: titleBg } },
@@ -622,17 +777,17 @@ function PendingAssReqRep({}) {
     };
 
     worksheet["!merges"] = [
-      {
-        s: { r: 0, c: 0 },
-        e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
-      },
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
     ];
+
+    /* ================= TABLE HEADER STYLE ================= */
 
     const totalColumns = Object.keys(transformedData[0]).length;
 
     for (let C = 0; C < totalColumns; C++) {
       const cell =
         worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
       if (!cell) continue;
 
       cell.s = {
@@ -648,14 +803,21 @@ function PendingAssReqRep({}) {
       };
     }
 
+    /* ================= TABLE BODY STYLE ================= */
+
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
         if (!cell) continue;
 
         cell.s = {
           font: { color: { rgb: fontColor } },
-          fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -666,13 +828,18 @@ function PendingAssReqRep({}) {
       }
     }
 
+    /* ================= COLUMN WIDTH ================= */
+
     worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
+    /* ================= EXPORT ================= */
+
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Asset Requests");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Pending Asset Requests Report");
 
     XLSX.writeFile(workbook, "Pending_Asset_Requests_Report.xlsx");
   };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -685,25 +852,19 @@ function PendingAssReqRep({}) {
         <div className="header-flex">
           <h1 className="page-title">Pending Asset Requests Report</h1>
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -714,32 +875,34 @@ function PendingAssReqRep({}) {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
-            <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+            <ul className="dropdown-menu dropdown-menu-end">
+              {["all permission", "view"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => pendingAssReqRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>
@@ -932,6 +1095,7 @@ function PendingAssReqRep({}) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onGridReady={onGridReady}
           />
         </div>
       </div>

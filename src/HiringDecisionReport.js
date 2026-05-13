@@ -38,7 +38,7 @@ function HiringDecisionReport() {
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
+  const hiringDecisionReportPermissions = permissions
     .filter((permission) => permission.screen_type === "HiringDecisionReport")
     .map((permission) => permission.permission_type.toLowerCase());
 
@@ -237,12 +237,6 @@ function HiringDecisionReport() {
     //   field: "meeting_link",
     //   editable: true
     // },
-    {
-      headerName: "Keyfield",
-      field: "keyfield",
-      editable: false,
-      hide: true,
-    },
   ];
 
   const gridOptions = {
@@ -476,104 +470,118 @@ function HiringDecisionReport() {
   };
 
   const exportToPDF = () => {
-    if (!gridApiRef.current) return;
-
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
       return;
     }
 
     const selectedRows = gridApiRef.current.getSelectedRows();
     const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    const headerBgColor = hexToRgb(getCSSVariable("--but"));
-    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
-    const fontColor = hexToRgb(getCSSVariable("--font-color"));
-    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    const headers = [
-      [
-        "Candidate Name",
-        "Job Title",
-        "Department ID",
-        "Country Code",
-        "Final Status",
-        "Decided By",
-        "Decided On",
-      ],
-    ];
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
 
-    // ✅ Table body
-    const body = dataSource.map((row) => [
-      row.candidate_name || "",
-      row.job_title || "",
-      row.department_id || "",
-      row.country_code || "",
-      row.final_status || "",
-      row.decided_by || "",
-      row.decided_on || "",
-    ]);
+    const headerRGB = hexToRgb(headerBg);
 
     const doc = new jsPDF("l", "pt", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.width;
 
     /* ================= HEADER DESIGN ================= */
 
-    // Header background bar
-    doc.setFillColor(...headerBgColor);
-    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
 
-    // Title (centered)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(255);
-    doc.text("Hiring Decision Report", pageWidth / 2, 40, {
-      align: "center",
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Hiring Decision Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Hiring_Decision_Report.pdf");
     });
-
-    // Sub-title
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
-      pageWidth / 2,
-      60,
-      { align: "center" }
-    );
-
-    /* ================= TABLE DESIGN ================= */
-
-    autoTable(doc, {
-      startY: 90,
-      head: headers,
-      body: body,
-
-      styles: {
-        fontSize: 10,
-        cellPadding: 8,
-        textColor: fontColor,
-        valign: "middle",
-      },
-
-      headStyles: {
-        fillColor: tableHeaderColor,
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        halign: "center",
-      },
-
-      alternateRowStyles: {
-        fillColor: rowAltColor,
-      },
-
-      columnStyles: {
-        7: { halign: "center", fontStyle: "bold" },
-      },
-
-      margin: { left: 20, right: 20 },
-    });
-
-    doc.save("Hiring_Decision_Report.pdf");
   };
 
   const transformRowData = (data) => {
@@ -589,15 +597,21 @@ function HiringDecisionReport() {
   };
 
   const handleExportToExcel = () => {
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
       return;
     }
 
     const screenName = "Hiring Decision Report";
     const company = sessionStorage.getItem("selectedCompanyName") || "";
 
-    /* ================= READ THEME COLORS ================= */
+    /* ================= THEME COLORS ================= */
 
     const titleBg = getCSSVariable("--but").replace("#", "");
     const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
@@ -624,7 +638,6 @@ function HiringDecisionReport() {
 
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
     const headerRowIndex = headerData.length;
-    const totalColumns = Object.keys(transformedData[0]).length;
 
     /* ================= TITLE STYLE ================= */
 
@@ -635,13 +648,12 @@ function HiringDecisionReport() {
     };
 
     worksheet["!merges"] = [
-      {
-        s: { r: 0, c: 0 },
-        e: { r: 0, c: totalColumns - 1 },
-      },
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
     ];
 
     /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
 
     for (let C = 0; C < totalColumns; C++) {
       const cell =
@@ -694,7 +706,7 @@ function HiringDecisionReport() {
     /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Hiring Decision");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hiring Decision Report");
 
     XLSX.writeFile(workbook, "Hiring_Decision_Report.xlsx");
   };
@@ -712,20 +724,20 @@ function HiringDecisionReport() {
           <h1 className="page-title">Hiring Decision Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "view"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "PDF"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-              <div className="action-icon print" onClick={handleExportToExcel}>
+            {["all permission", "Excel"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
               </div>
@@ -735,26 +747,34 @@ function HiringDecisionReport() {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+              {["all permission", "view"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => hiringDecisionReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>

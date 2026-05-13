@@ -598,7 +598,7 @@ const Dashboard = (payslip) => {
   const Employeecol = [
     {
       headerName: "S.No",
-      field: "S.No",
+      field: "S No",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
     },
@@ -637,7 +637,7 @@ const Dashboard = (payslip) => {
   const empShiftCols = [
     {
       headerName: "S.No",
-      field: "S.No",
+      field: "S No",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
     },
@@ -1186,8 +1186,8 @@ const Dashboard = (payslip) => {
     const interval = setInterval(fetchAnnouncement, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const [selectedPeriod, setSelectedPeriod] = useState("");
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const [selectedPeriod, setSelectedPeriod] = useState(currentMonth);
   const [showModal, setShowModal] = useState(false);
   const printRef = useRef();
 

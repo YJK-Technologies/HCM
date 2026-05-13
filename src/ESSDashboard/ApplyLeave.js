@@ -322,6 +322,7 @@ const ApplyLeave = () => {
   };
 
   const [columnDefs] = useState([
+    {headerName: "S.No",valueGetter: (params) => params.node.rowIndex + 1,width: 40,cellStyle: { textAlign: "center" },},
     { headerName: 'Leave Type', field: 'LeaveId', sortable: true, filter: true, },
     { headerName: 'Current No of Leaves', field: 'CurrentYearCredit', sortable: true, filter: true },
     { headerName: 'Taken Current Year', field: 'TakenCurrentYear', sortable: true, filter: true },
@@ -421,69 +422,48 @@ const ApplyLeave = () => {
 
   const leaveColumnDefs = [
     {
-      // checkboxSelection: true,
-      headerName: "Request Type",
-      field: "RequestType",
-      cellStyle: { textAlign: "center" },
-      editable: false,
+      headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80, cellStyle: { textAlign: "center" },
+    },    
+    {
+      headerName: "Request Type", field: "RequestType",
+      cellStyle: { textAlign: "center" }, editable: false,
     },
     {
-      headerName: "Leave Type",
-      field: "LeaveType",
-      cellStyle: { textAlign: "center" },
-      editable: false,
+      headerName: "Leave Type", field: "LeaveType", 
+      cellStyle: { textAlign: "center" }, editable: false,
     },
     {
-      headerName: "From Date",
-      field: "FromDate",
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "From Date", field: "FromDate", 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "To Date",
-      field: "ToDate",
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "To Date", field: "ToDate", 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Status",
-      field: "LeaveStatus",
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "Status", field: "LeaveStatus", 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Holiday Date",
-      field: "HolidayDate",
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "Holiday Date", field: "HolidayDate", 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Holiday Name",
-      field: "HolidayName",
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "Holiday Name", field: "HolidayName", 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Leave Used",
-      field: "LeaveUsed",
-      hide: true,
-      editable: false,
-      cellStyle: { textAlign: "center" },
+      headerName: "Leave Used", field: "LeaveUsed", hide: true, 
+      editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Is Leave Applied",
-      field: "IsLeaveApplied",
-      editable: false,
-      hide: true,
-      cellStyle: { textAlign: "center" },
+      headerName: "Is Leave Applied", field: "IsLeaveApplied", editable: false, 
+      hide: true, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Action",
-      field: "action",
-      width: 160,
-      cellStyle: { textAlign: "center" },
-      sortable: false,
-      filter: false,
+      headerName: "Action", field: "action", width: 160, 
+      cellStyle: { textAlign: "center" }, sortable: false, filter: false, 
       cellRenderer: (params) => {
         const row = params.data;
 

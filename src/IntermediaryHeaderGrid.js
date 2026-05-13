@@ -696,8 +696,8 @@ function IntermediaryGrid() {
               {['add', 'all permission'].some(permission => intermediaryHeaderPermission.includes(permission)) && (
                 <div className="action-icon add" onClick={handleNavigatesToForm}>
                   <span className="tooltip">Add</span>
-                  <i class="fa-solid fa-user-plus"></i> 
-                  </div>
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
               )}
               {['delete', 'all permission'].some(permission => intermediaryHeaderPermission.includes(permission)) && (
                 <div className="action-icon delete" onClick={deleteSelectedRows}>
@@ -722,42 +722,47 @@ function IntermediaryGrid() {
 
             {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
-              <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-                <i className="fa-solid fa-list"></i>
+              <button
+                className="btn btn-primary dropdown-toggle p-0"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fa-solid fa-ellipsis-vertical"></i>
               </button>
 
               <ul className="dropdown-menu dropdown-menu-end text-center">
 
                 {['add', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
                   <li>
-                  <button className="dropdown-item" onClick={handleNavigatesToForm}>
-                    <i className="fa-solid fa-user-plus add fs-4"></i>
-                  </button>
-                </li>
+                    <button className="dropdown-item" onClick={handleNavigatesToForm}>
+                      <i className="fa-solid fa-user-plus add fs-4"></i>
+                    </button>
+                  </li>
                 )}
 
                 {['delete', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
                   <li>
-                  <button className="dropdown-item" onClick={deleteSelectedRows}>
-                    <i className="fa-solid fa-user-minus delete fs-4"></i>
-                  </button>
-                </li>
+                    <button className="dropdown-item" onClick={deleteSelectedRows}>
+                      <i className="fa-solid fa-user-minus delete fs-4"></i>
+                    </button>
+                  </li>
                 )}
 
                 {['update', 'all permission'].some(p => intermediaryHeaderPermission.includes(p)) && (
                   <li>
-                  <button className="dropdown-item" onClick={saveEditedData}>
-                    <i className="fa-solid fa-pen-to-square update fs-4"></i>
-                  </button>
-                </li>
+                    <button className="dropdown-item" onClick={saveEditedData}>
+                      <i className="fa-solid fa-pen-to-square update fs-4"></i>
+                    </button>
+                  </li>
                 )}
 
                 {['all permission', 'view'].some(p => intermediaryHeaderPermission.includes(p)) && (
                   <li>
-                  <button className="dropdown-item" onClick={generateReport}>
-                    <i className="fa-solid fa-print text-dark fs-4"></i>
-                  </button>
-                </li>
+                    <button className="dropdown-item" onClick={generateReport}>
+                      <i className="fa-solid fa-print text-dark fs-4"></i>
+                    </button>
+                  </li>
                 )}
 
               </ul>

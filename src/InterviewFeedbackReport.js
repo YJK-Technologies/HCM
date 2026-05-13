@@ -42,8 +42,8 @@ function InterviewFeedbackReport() {
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Company")
+  const interviewFeedbackRepReportsPermissions = permissions
+    .filter((permission) => permission.screen_type === "InterviewFeedbackRep")
     .map((permission) => permission.permission_type.toLowerCase());
 
   const handleScheduleId = (selectedDPT) => {
@@ -258,12 +258,12 @@ function InterviewFeedbackReport() {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
-      headerName: "Schedule Id",
+      headerName: "Schedule ID",
       field: "schedule_id",
       editable: false,
     },
     {
-      headerName: "Interviewer Id",
+      headerName: "Interviewer ID",
       field: "interviewer_id",
       editable: false,
     },
@@ -298,18 +298,11 @@ function InterviewFeedbackReport() {
       field: "rating",
       editable: false,
     },
-
     // {
     //   headerName: "Meeting Link",
     //   field: "meeting_link",
     //   editable: true
     // },
-    {
-      headerName: "Keyfield",
-      field: "keyfield",
-      editable: false,
-      hide: true,
-    },
   ];
 
   const gridOptions = {
@@ -328,14 +321,26 @@ function InterviewFeedbackReport() {
   };
 
   const generateReport = () => {
-    if (!gridApi) return;
-
     const selectedRows = gridApi.getSelectedRows();
-
     if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to print");
+      toast.warning("Please select at least one row to generate a report");
       return;
     }
+
+    const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+
+      return {
+        "Schedule ID": formatValue(row.schedule_id),
+        "Interviewer ID": formatValue(row.interviewer_id),
+        "Candidate Name": formatValue(row.candidate_name),
+        "Submitted On": formatValue(row.submitted_on),
+        "Recommendation Mode": formatValue(row.recommendation),
+        "Comments": formatValue(row.comments),
+        "Role": formatValue(row.role),
+        "Rating": formatValue(row.rating),
+      };
+    });
 
     /* ================= READ THEME COLORS ================= */
 
@@ -355,172 +360,164 @@ function InterviewFeedbackReport() {
 
     // 🔥 append to HEAD
     reportWindow.document.head.appendChild(link);
-
+    reportWindow.document.write(`<html><head><title>Interview Feedback Report</title>`);
+    reportWindow.document.write("<style>");
     reportWindow.document.write(`
-    <html>
-    <head>
-      <title>Interview Feedback Report</title>
-      <style>
         body {
-          font-family: 'Segoe UI', sans-serif;
-          margin: 0;
-          padding: 20px;
-          background-color: #f4f6f9;
-          color: ${fontColor};
-        }
-
-        .header {
-          display: flex;
-          align-items: center;
-          background: ${tableHeaderBg};
-          padding: 15px 20px;
-          color: white;
-          border-radius: 8px;
-        }
-        
-        .logo {
-          height: 60px;
-        }
-        
-        .title-section {
-          flex: 1;
-          text-align: center;
-        }
-      
-        .title-section h2 {
-          margin: 0;
-        }
-
-        .sub-info {
-          margin: 15px 0;
-          font-size: 14px;
-          color: #555;
-          display: flex;
-          justify-content: space-between;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        th {
-          background-color: ${tableHeaderBg};
-          color: white;
-          padding: 10px;
-          text-align: left;
-        }
-
-        td {
-          padding: 8px;
-          border-bottom: 1px solid #ddd;
-        }
-
-        tr:nth-child(even) {
-          background-color: ${rowAltColor};
-        }
-
-        tr:hover {
-          background-color: ${hoverColor};
-        }
-
-        .footer {
-          margin-top: 30px;
-          text-align: center;
-          font-size: 13px;
-          color: #777;
-        }
-
-        .print-btn {
-          margin-top: 20px;
-          padding: 10px 20px;
-          background: ${headerGradientStart};
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .print-btn:hover {
-          opacity: 0.85;
-        }
-
-        @media print {
-          .print-btn {
-            display: none;
+              font-family: 'Segoe UI', sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #f4f6f9;
+              color: ${fontColor};
+            }
+    
+            .header {
+              display: flex;
+              align-items: center;
+              background: ${tableHeaderBg};
+              padding: 15px 20px;
+              color: white;
+              border-radius: 8px;
+            }
+            
+            .logo {
+              height: 60px;
+            }
+            
+            .title-section {
+              flex: 1;
+              text-align: center;
+            }
+          
+            .title-section h2 {
+              margin: 0;
+            }
+    
+            .sub-info {
+              margin: 15px 0;
+              font-size: 14px;
+              color: #555;
+              display: flex;
+              justify-content: space-between;
+            }
+    
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+    
+            th {
+              background-color: ${tableHeaderBg};
+              color: white;
+              padding: 10px;
+              text-align: left;
+            }
+    
+            td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+    
+            tr:nth-child(even) {
+              text-align: left;
+              background-color: ${rowAltColor};
+            }
+    
+            tr:hover {
+              background-color: ${hoverColor};
+            }
+    
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 13px;
+              color: #777;
+            }
+    
+            .print-btn {
+              margin-top: 20px;
+              padding: 10px 20px;
+              background: ${headerGradientStart};
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+    
+            .print-btn:hover {
+              opacity: 0.85;
+            }
+    
+          @media print {
+            body {
+              background: white;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+              
+            th {
+              background-color: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            tr:nth-child(even) {
+              background-color: ${rowAltColor} !important;
+            }
+              
+            .header {
+              background: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            .print-btn {
+              display: none;
+            }
           }
-          body {
-            background: white;
-          }
-        }
-      </style>
-    </head>
-    <body>
+      `);
 
-      <div class="header">
-        <img src="${logoUrl}" class="logo" />
-        <div class="title-section">
-          <h2>Interview Feedback Report</h2>
-        </div>
+    reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write(`<div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Interview Feedback Report</h2>
       </div>
+      </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>`);
+    // reportWindow.document.write("<h1><u>Company Information</u></h1>");
 
-      <div class="sub-info">
-        <div>Total Records: ${selectedRows.length}</div>
-        <div>Printed Date: ${new Date().toLocaleDateString()}</div>
-      </div>
+    // Create table with headers
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
+    });
+    reportWindow.document.write("</tr></thead><tbody>");
 
-      <table>
-        <thead>
-          <tr>
-            <th>Schedule ID</th>
-            <th>Interviewer Id</th>
-            <th>Candidate Name</th>
-            <th>Submitted On</th>
-            <th>Recommendation Mode</th>
-            <th>Comments</th>
-            <th>Role</th>
-            <th>Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-  `);
-
-    selectedRows.forEach((row) => {
-      reportWindow.document.write(`
-      <tr>
-        <td>${row.schedule_id || ""}</td>
-        <td>${row.interviewer_id || ""}</td>
-        <td>${row.candidate_name || ""}</td>
-        <td>${row.submitted_on || ""}</td>
-        <td>${row.recommendation || ""}</td>
-        <td>${row.comments || ""}</td>
-        <td>${row.role || ""}</td>
-        <td>${row.rating || ""}</td>
-      </tr>
-    `);
+    // Populate the rows with safe empty strings
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value || ''}</td>`);
+      });
+      reportWindow.document.write("</tr>");
     });
 
+    reportWindow.document.write("</tbody></table>");
     reportWindow.document.write(`
-        </tbody>
-      </table>
-
-      <div style="text-align:center;">
-        <button class="print-btn" onclick="window.print()">Print</button>
-      </div>
-
-      <div class="footer">
-        © ${new Date().getFullYear()} YJK Technologies | Confidential Report
-      </div>
-
-    </body>
-    </html>
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
   `);
-
+    reportWindow.document.write("</body></html>");
     reportWindow.document.close();
   };
 
@@ -546,115 +543,127 @@ function InterviewFeedbackReport() {
   };
 
   const exportToPDF = () => {
-    if (!gridApiRef.current) return;
-
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
       return;
     }
 
     const selectedRows = gridApiRef.current.getSelectedRows();
     const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    const headerBgColor = hexToRgb(getCSSVariable("--but"));
-    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
-    const fontColor = hexToRgb(getCSSVariable("--font-color"));
-    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    const headers = [
-      [
-        "Schedule ID",
-        "Interviewer Id",
-        "Candidate Name",
-        "Submitted On",
-        "Recommendation",
-        "Comments",
-        "Role",
-        "Rating",
-      ],
-    ];
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
 
-    // ✅ Table body
-    const body = dataSource.map((row) => [
-      row.schedule_id,
-      row.interviewer_id,
-      row.candidate_name,
-      row.submitted_on,
-      row.recommendation,
-      row.comments,
-      row.role,
-      row.rating,
-    ]);
+    const headerRGB = hexToRgb(headerBg);
 
     const doc = new jsPDF("l", "pt", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.width;
 
     /* ================= HEADER DESIGN ================= */
 
-    // Header background bar
-    doc.setFillColor(...headerBgColor);
-    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
 
-    // Title (centered)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(255);
-    doc.text("Interview Feedback Report", pageWidth / 2, 40, {
-      align: "center",
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Interview Feedback Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Interview_Feedback_Report.pdf");
     });
-
-    // Sub-title
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
-      pageWidth / 2,
-      60,
-      { align: "center" }
-    );
-
-    /* ================= TABLE DESIGN ================= */
-
-    autoTable(doc, {
-      startY: 90,
-      head: headers,
-      body: body,
-
-      styles: {
-        fontSize: 10,
-        cellPadding: 8,
-        textColor: fontColor,
-        valign: "middle",
-      },
-
-      headStyles: {
-        fillColor: tableHeaderColor,
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        halign: "center",
-      },
-
-      alternateRowStyles: {
-        fillColor: rowAltColor,
-      },
-
-      columnStyles: {
-        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
-      },
-
-      margin: { left: 20, right: 20 },
-    });
-
-    doc.save("Interview_Feedback_Report.pdf");
   };
 
   const transformRowData = (data) => {
     return data.map((row) => ({
       "Schedule ID": row.schedule_id || "",
-      "Interviewer Id": row.interviewer_id || "",
+      "Interviewer ID": row.interviewer_id || "",
       "Candidate Name": row.candidate_name || "",
       "Submitted On": row.submitted_on || "",
-      "Recommendation": row.recommendation || "",
+      "Recommendation Mode": row.recommendation || "",
       "Comments": row.comments || "",
       "Role": row.role || "",
       "Rating": row.rating || "",
@@ -662,8 +671,14 @@ function InterviewFeedbackReport() {
   };
 
   const handleExportToExcel = () => {
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
       return;
     }
 
@@ -765,7 +780,7 @@ function InterviewFeedbackReport() {
     /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Feedback");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Interview Feedback Report");
 
     XLSX.writeFile(workbook, "Interview_Feedback_Report.xlsx");
   };
@@ -783,20 +798,20 @@ function InterviewFeedbackReport() {
           <h1 className="page-title">Interview Feedback Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "view"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "PDF"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-              <div className="action-icon print" onClick={handleExportToExcel}>
+            {["all permission", "Excel"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
               </div>
@@ -806,26 +821,34 @@ function InterviewFeedbackReport() {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+              {["all permission", "view"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => interviewFeedbackRepReportsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>

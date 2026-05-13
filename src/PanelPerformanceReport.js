@@ -31,7 +31,7 @@ function PanelPerformanceReport() {
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
+  const panelPerformanceRepoPermissions = permissions
     .filter((permission) => permission.screen_type === "PanelPerformanceRepo")
     .map((permission) => permission.permission_type.toLowerCase());
 
@@ -324,7 +324,7 @@ function PanelPerformanceReport() {
       reportWindow.document.write(`
       <tr>
         <td>${row.panel_name || ""}</td>
-        <td>${row.avg_rating|| ""}</td>
+        <td>${row.avg_rating || ""}</td>
         <td>${row.total_interviews || ""}</td>
       </tr>
     `);
@@ -371,96 +371,118 @@ function PanelPerformanceReport() {
   };
 
   const exportToPDF = () => {
-    if (!gridApiRef.current) return;
-
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
       return;
     }
 
     const selectedRows = gridApiRef.current.getSelectedRows();
     const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    const headerBgColor = hexToRgb(getCSSVariable("--but"));
-    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
-    const fontColor = hexToRgb(getCSSVariable("--font-color"));
-    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    const headers = [
-      [
-        "Panel Name",
-        "Average Rating",
-        "Total Interviews",
-      ],
-    ];
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
 
-    // ✅ Table body
-    const body = dataSource.map((row) => [
-      row.panel_name || "",
-      row.avg_rating || "",
-      row.total_interviews || "",
-    ]);
+    const headerRGB = hexToRgb(headerBg);
 
     const doc = new jsPDF("l", "pt", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.width;
 
     /* ================= HEADER DESIGN ================= */
 
-    // Header background bar
-    doc.setFillColor(...headerBgColor);
-    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
 
-    // Title (centered)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(255);
-    doc.text("Panel Performance Report", pageWidth / 2, 40, {
-      align: "center",
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Panel Performance Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Panel_Performance_Report.pdf");
     });
-
-    // Sub-title
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
-      pageWidth / 2,
-      60,
-      { align: "center" }
-    );
-
-    /* ================= TABLE DESIGN ================= */
-
-    autoTable(doc, {
-      startY: 90,
-      head: headers,
-      body: body,
-
-      styles: {
-        fontSize: 10,
-        cellPadding: 8,
-        textColor: fontColor,
-        valign: "middle",
-      },
-
-      headStyles: {
-        fillColor: tableHeaderColor,
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        halign: "center",
-      },
-
-      alternateRowStyles: {
-        fillColor: rowAltColor,
-      },
-
-      columnStyles: {
-        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
-      },
-
-      margin: { left: 20, right: 20 },
-    });
-
-    doc.save("Panel_Performance_Report.pdf");
   };
 
   const transformRowData = (data) => {
@@ -468,12 +490,19 @@ function PanelPerformanceReport() {
       "Panel Name": row.panel_name || "",
       "Average Rating": row.avg_rating || "",
       "Total Interviews": row.total_interviews || "",
+      "Submitted On": row.submitted_on || "",
     }));
   };
 
   const handleExportToExcel = () => {
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
       return;
     }
 
@@ -505,9 +534,8 @@ function PanelPerformanceReport() {
       origin: `A${headerData.length + 1}`,
     });
 
-    const totalColumns = Object.keys(transformedData[0]).length;
-    const headerRowIndex = headerData.length;
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
 
     /* ================= TITLE STYLE ================= */
 
@@ -518,18 +546,16 @@ function PanelPerformanceReport() {
     };
 
     worksheet["!merges"] = [
-      {
-        s: { r: 0, c: 0 },
-        e: { r: 0, c: totalColumns - 1 },
-      },
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
     ];
 
     /* ================= TABLE HEADER STYLE ================= */
 
+    const totalColumns = Object.keys(transformedData[0]).length;
+
     for (let C = 0; C < totalColumns; C++) {
-      const cell = worksheet[
-        XLSX.utils.encode_cell({ r: headerRowIndex, c: C })
-      ];
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
 
       if (!cell) continue;
 
@@ -550,9 +576,8 @@ function PanelPerformanceReport() {
 
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
       for (let C = 0; C < totalColumns; C++) {
-        const cell = worksheet[
-          XLSX.utils.encode_cell({ r: R, c: C })
-        ];
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
         if (!cell) continue;
 
@@ -579,11 +604,7 @@ function PanelPerformanceReport() {
     /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Panel Performance"
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Panel Performance Report");
 
     XLSX.writeFile(workbook, "Panel_Performance_Report.xlsx");
   };
@@ -601,20 +622,20 @@ function PanelPerformanceReport() {
           <h1 className="page-title">Panel Performance Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "view"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "PDF"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-              <div className="action-icon print" onClick={handleExportToExcel}>
+            {["all permission", "Excel"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
               </div>
@@ -624,26 +645,34 @@ function PanelPerformanceReport() {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+              {["all permission", "view"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => panelPerformanceRepoPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>
