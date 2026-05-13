@@ -164,6 +164,11 @@ const columnDefs = [
     field: "designation_id",
     editable: false,
   },
+  {
+    headerName: "Status",
+    field: "Status",
+    editable: false,
+  },
 ];
 
 const gridOptions = {
@@ -192,6 +197,34 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
   const [designation_id, setdesignation_id] = useState("");
   const [department_id, setdepartment_id] = useState("");
 
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [Status, setStatus] = useState('');
+  const [statusdrop, setStatusdrop] = useState([]);
+
+
+  const handleStatusChange = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setStatus(selectedStatus ? selectedStatus.value : '');
+  };
+
+  const filteredOptionStatus = statusdrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setStatusdrop(val));
+  }, []);
 
   const filteredOptiongender = genderdrop.map((option) => ({
     value: option.attributedetails_name,
@@ -233,7 +266,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB, Gender: selectedGender, address, Phone, designation_id, department_id, company_code: sessionStorage.getItem('selectedCompanyCode') })
+        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB, Gender: selectedGender, address, Phone, designation_id, department_id, Status, company_code: sessionStorage.getItem('selectedCompanyCode') })
       });
       console.log("Payload:", { Gender, selectedGender });
       if (response.ok) {
@@ -267,6 +300,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
             selectedgradeid: item.Grade_id,
             address: item.address,
             Phone: item.Phone,
+            Status: item.Status || item.status || "",
             designation_id: item.designation_id,
             department_id: item.department_id,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
@@ -317,6 +351,8 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
     setPhone("");
     setdesignation_id("");
     setdepartment_id("");
+    setSelectedStatus("");
+    setStatus("");
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -369,10 +405,12 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
       State: row.State,
       Country: row.Country,
       Postal_Code: row.Postal_Code,
+      Status: row.Status || row.status || "",
       Passport_No: row.Passport_No,
       Passport_Expiry_Date: row.Passport_Expiry_Date,
       Other_Id_Type: row.Other_Id_Type,
       Other_Id_No: row.Other_Id_No
+      
     }));
 
     EmployeeInfo(selectedData);
@@ -569,6 +607,31 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     />
                     {/* <label htmlFor="ReferenceName" className="exp-form-labels">Reference Name</label> */}
                     <label for="ReferenceName" className={`exp-form-labels`}>Department ID</label>
+                  </div>
+                </div>
+
+                <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+                    ${selectedStatus ? "has-value" : ""} 
+                    ${isSelectStatus ? "is-focused" : ""}`}
+                    title="Please Select the Status"
+                  >
+                    <Select
+                      id="status"
+                      type="text"
+                      placeholder=" "
+                      onFocus={() => setIsSelectStatus(true)}
+                      onBlur={() => setIsSelectStatus(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      value={selectedStatus}
+                      onChange={handleStatusChange}
+                      options={filteredOptionStatus}
+                    />
+                    <label htmlFor="Status" className={`floating-label`}>
+                      Status
+                    </label>
                   </div>
                 </div>
 

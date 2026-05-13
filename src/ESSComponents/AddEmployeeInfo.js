@@ -110,6 +110,11 @@ function Input({ }) {
   const [isSelectCountry, setIsSelectCountry] = useState(false);
   const [isSelectOtherType, setIsSelectOtherType] = useState(false);
   const [originalData, setOriginalData] = useState(null);
+
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [isSelectStatus, setIsSelectStatus] = useState(false);
+  const [Status, setStatus] = useState('');
+  const [statusdrop, setStatusdrop] = useState([]);
   const logo = useRef(null)
 
   //code added by Pavun purpose of set user permisssion
@@ -150,6 +155,7 @@ function Input({ }) {
       !city ||
       !state ||
       !country ||
+      !Status ||
       !postalCode
     ) {
       setError(true);
@@ -227,6 +233,7 @@ function Input({ }) {
       formData.append("Marital_Status", selectedmartial);
       formData.append("Siblings", Siblings);
       formData.append("Kids", selectedkids);
+      formData.append("Status", Status);
       formData.append("Grade_id", selectedgradeid);
       formData.append("City", city);
       formData.append("State", state);
@@ -859,6 +866,29 @@ function Input({ }) {
       .then((val) => setOtherDrop(val));
   }, []);
 
+    const handleStatusChange = (selectedStatus) => {
+      setSelectedStatus(selectedStatus);
+      setStatus(selectedStatus ? selectedStatus.value : '');
+    };
+  
+    const filteredOptionStatus = statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }));
+  
+    useEffect(() => {
+      fetch(`${config.apiBaseUrl}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+  
+        }),
+      })
+        .then((data) => data.json())
+        .then((val) => setStatusdrop(val));
+    }, []);
+
   const handleRemoveLogo = () => {
     setSelectedImage(null);
     if (logo.current) {
@@ -917,7 +947,7 @@ function Input({ }) {
         const [{ EmployeeId, First_Name, Middle_Name, Last_Name, father_name, mother_name, DOB,
           email, Aadhar_no, Reference_Phone, phone1, phone2, Address1, address2, address3,
           PermanantAddress, designation_id, department_id, Reference_name, Pan_No, Photos, Grade_id, Gender,
-          Marital_Status, Kids, Title, Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
+          Marital_Status, Kids, Status, Title, Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
           Number_of_Siblings, Number_of_Children, Email_Business, Phone_Alternate, Emergency_Contact_Name,
           Emergency_Contact_Relationship, Emergency_Contact_Phone, City, State, Country, Postal_Code, Passport_No,
           Passport_Expiry_Date, Other_Id_Type, Other_Id_No }] = searchData;
@@ -981,6 +1011,10 @@ function Input({ }) {
         setKids(kids);
         setselectedkids(kids?.value || null);
 
+        const statusOption = filteredOptionStatus.find(option => option.value === (Status || ""));
+        setSelectedStatus(statusOption || null);
+        setStatus(statusOption?.value || "");
+
         const selectedTitle = filteredOptionTitle.find(option => option.value === Title);
         setSelectedTitle(selectedTitle);
         setTitle(selectedTitle?.value || null);
@@ -1036,6 +1070,7 @@ function Input({ }) {
           Aadhaar_no: Aadhar_no,
           marital_Status: Marital_Status,
           kids: Kids,
+          Status: Status,
           Grade_id,
 
           title: Title,
@@ -1168,7 +1203,7 @@ function Input({ }) {
       Email, Aadhar_no, Reference_Phone, phone1, phone2,
       Address1, Address2, Address3, PermanantAddress,
       designation_id, department_id, Reference_Name, Pan_No,
-      Photos, Grade_id, Gender, Marital_Status, Kids, Title,
+      Photos, Grade_id, Gender, Marital_Status, Kids, Status, Title,
       Place_of_Birth, Nationality, Religion, Blood_Group, Spouse_Name,
       Number_of_Siblings, Number_of_Children, Email_Business,
       Emergency_Contact_Name, Emergency_Contact_Phone,
@@ -1237,6 +1272,10 @@ function Input({ }) {
     setKids(selectedKids);
     setselectedkids(selectedKids?.value || null);
 
+    const statusOption = filteredOptionStatus.find(o => o.value === (Status || ""));
+    setSelectedStatus(statusOption || null);
+    setStatus(statusOption?.value || "");
+
     const selectedTitle = filteredOptionTitle.find(o => o.value === Title);
     setSelectedTitle(selectedTitle);
     setTitle(selectedTitle?.value || null);
@@ -1290,6 +1329,7 @@ function Input({ }) {
       Aadhaar_no: Aadhar_no,
       marital_Status: Marital_Status,
       kids: Kids,
+      Status: Status,
       Grade_id,
 
       title: Title,
@@ -2364,6 +2404,31 @@ function Input({ }) {
                 autoComplete="off"
               />
               <label htmlFor="otherIdNo" className="exp-form-labels">Other ID No</label>
+            </div>
+          </div> 
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedStatus ? "has-value" : ""} 
+              ${isSelectStatus ? "is-focused" : ""}`}
+              title="Please Select the Status"
+            >
+              <Select
+                id="status"
+                type="text"
+                placeholder=" "
+                onFocus={() => setIsSelectStatus(true)}
+                onBlur={() => setIsSelectStatus(false)}
+                classNamePrefix="react-select"
+                isClearable
+                value={selectedStatus}
+                onChange={handleStatusChange}
+                options={filteredOptionStatus}
+              />
+              <label htmlFor="Status" className={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>
+                Status {showAsterisk && <span className="text-danger">*</span>}
+              </label>
             </div>
           </div>
 
