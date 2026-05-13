@@ -18,6 +18,13 @@ const getTodayDate = () => {
 };
 
 function InterviewFeedback({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const interviewFeedbackPermissions = permissions
+    .filter(permission => permission.screen_type === 'InterviewFeedback')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [submitted_on, setsubmitted_on] = useState(getTodayDate());
   const [error, setError] = useState("");
@@ -367,7 +374,7 @@ function InterviewFeedback({ }) {
       headerName: "Schedule ID",
       field: "schedule_id",
       editable: true,
-            cellEditor: "agSelectCellEditor",
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: scheduleIDGrid.map(d => d.value),
       },
@@ -527,116 +534,116 @@ function InterviewFeedback({ }) {
     searchClearInputFields();
   };
 
-    const handleUpdate = async (rowData) => {
-        showConfirmationToast(
-            "Are you sure you want to update the selected employee shift mapping data?",
-            async () => {
-                try {
-                    setLoading(true);
-                    const company_code = sessionStorage.getItem("selectedCompanyCode");
-                    const modified_by = sessionStorage.getItem("selectedUserCode");
+  const handleUpdate = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to update the selected employee shift mapping data?",
+      async () => {
+        try {
+          setLoading(true);
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
-                    const dataToSend = {
-                        interview_feedbackData: Array.isArray(rowData)
-                            ? rowData.map((row) => ({
-                                ...row,
-                                company_code,
-                                modified_by,
-                            }))
-                            : [
-                                {
-                                    ...rowData,
-                                    company_code,
-                                    modified_by,
-                                },
-                            ],
-                    };
-
-                    const response = await fetch(`${config.apiBaseUrl}/interview_feedbackLoopUpdate`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(dataToSend),
-                        },
-                    );
-
-                    if (response.ok) {
-                        toast.success("Employee shift mapping updated successfully", {
-                            onClose: () => handleSearch(),
-                        });
-                    } else {
-                        const errorResponse = await response.json();
-                        toast.warning(errorResponse.message || "Update failed");
-                    }
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error("Error updating data: " + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => toast.info("Update cancelled"),
-        );
-    };
-  
-const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          interview_feedbackData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const dataToSend = {
+            interview_feedbackData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/interview_feedbackLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(`${config.apiBaseUrl}/interview_feedbackLoopUpdate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
             },
-            body: JSON.stringify(dataToSend),
-          }
-        );
+          );
 
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+          if (response.ok) {
+            toast.success("Employee shift mapping updated successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Update failed");
+          }
+        } catch (error) {
+          console.error("Update error:", error);
+          toast.error("Error updating data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => toast.info("Update cancelled"),
+    );
+  };
+
+  const handleDelete = async (rowData) => {
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            interview_feedbackData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
+                ...row,
+                company_code,
+                modified_by,
+              }))
+              : [
+                {
+                  ...rowData,
+                  company_code,
+                  modified_by,
+                },
+              ],
+          };
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/interview_feedbackLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
+          }
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
+    );
+  };
 
 
   const tabs = [
@@ -725,12 +732,12 @@ const handleDelete = async (rowData) => {
         : "";
 
       return {
-      "Schedule ID": row.schedule_id || "",
-      "Employee ID": `${row.employee_id} - ${empName}` || "",
-      "Rating": row.rating || "",
-      "Comments": row.comments || "",
-      "Recommendation": row.Recommendation || "",
-      "Submitted On": row.submitted_on || "",
+        "Schedule ID": row.schedule_id || "",
+        "Employee ID": `${row.employee_id} - ${empName}` || "",
+        "Rating": row.rating || "",
+        "Comments": row.comments || "",
+        "Recommendation": row.Recommendation || "",
+        "Submitted On": row.submitted_on || "",
       };
     });
   };
@@ -844,6 +851,22 @@ const handleDelete = async (rowData) => {
     XLSX.writeFile(workbook, "Interview_Feedback_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setselectedscheduleid('');
+    setscheduleid('');
+    setselectedEmployeeID('');
+    setEmployeeID('');
+    setrating('');
+    setcomments('');
+    setselectedRecommendation('');
+    setRecommendation('');
+    setsubmitted_on('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -851,11 +874,44 @@ const handleDelete = async (rowData) => {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Interview Feedback</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => interviewFeedbackPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => interviewFeedbackPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -921,9 +977,10 @@ const handleDelete = async (rowData) => {
                 required
                 autoComplete="off"
                 value={rating}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setrating(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setrating(filteredValue);
                 }}
               />
               <label for="add1" className={`exp-form-labels ${error && !rating ? 'text-danger' : ''}`}>Rating<span className="text-danger">*</span></label>
@@ -940,9 +997,10 @@ const handleDelete = async (rowData) => {
                 required
                 autoComplete="off"
                 value={comments}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setcomments(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setcomments(filteredValue);
                 }}
               />
               <label for="add1" className={`exp-form-labels ${error && !comments ? 'text-danger' : ''}`}>comments<span className="text-danger">*</span></label>
@@ -1154,9 +1212,10 @@ const handleDelete = async (rowData) => {
                 required title="Please Enter the Company Contribution"
                 autoComplete="off"
                 value={commentsSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setcommentsSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setcommentsSC(filteredValue);
                 }}
               />
               <label for="sname" className="exp-form-labels">Comments</label>

@@ -433,7 +433,7 @@ useEffect(() => {
                   </div>
                   <div className="col-md-3">
                     <div class="me-2">
-                      <div class=" d-flex justify-content-start">
+                      <div class=" d-flex justify-content-end justify-content-md-start">
                         <button className="Documents-btn mt-2" title="Generate Payslip" onClick={handleGeneratePayslip}>
                           <span class="folderContainer">
                             <svg

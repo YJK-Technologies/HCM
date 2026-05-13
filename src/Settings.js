@@ -234,9 +234,9 @@ const SettingsPage = () => {
                 </div>
 
                 <div className="theme-toggle-box">
-                  <label>Appearance Mode</label>
+                  <label className="mb-2">Appearance Mode</label>
                   <ThemeProvider>
-                    <AppContent />
+                    <AppContent layout="horizontal" />
                   </ThemeProvider>
                 </div>
               </div>

@@ -14,7 +14,14 @@ import Select from "react-select";
 
 const config = require("../Apiconfig");
 
-function Assets({}) {
+function Assets({ }) {
+
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const assetsRequestPermissions = permissions
+    .filter(permission => permission.screen_type === 'Assets')
+    .map(permission => permission.permission_type.toLowerCase());
+
   const [loading, setLoading] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [Asset_Code, setAsset_Code] = useState("");
@@ -122,9 +129,9 @@ function Assets({}) {
 
   const filterOptionStatusSC = Array.isArray(statusDropSC)
     ? statusDropSC.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -195,9 +202,9 @@ function Assets({}) {
 
   const filteredOptionCurrency = Array.isArray(currencyDrop)
     ? currencyDrop.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -303,9 +310,9 @@ function Assets({}) {
 
   const filteredOptionCurrencySc = Array.isArray(currencyDropSc)
     ? currencyDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   const handleChangeCurrencySc = (selectedCurrencySc) => {
@@ -734,7 +741,6 @@ function Assets({}) {
         AssetStatus: AssetStatus,
         Location: LocationSC,
         Country: Country,
-
         Status: StatusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
@@ -812,8 +818,7 @@ function Assets({}) {
         CreatedBy: sessionStorage.getItem("selectedUserCode"),
       };
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/EmployeeAssets_HdrInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrInsert`,
         {
           method: "POST",
           headers: {
@@ -853,56 +858,21 @@ function Assets({}) {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modify_by = sessionStorage.getItem("selectedUserCode");
 
-          // const rows = Array.isArray(rowData) ? rowData : [rowData];
-
           const dataToSend = {
             EmployeeAssets_HdrData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modify_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modify_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modify_by,
-                  },
-                ],
+                },
+              ],
           };
-
-          // const dataToSend = {
-          //   EmployeeAssets_HdrData: rows.map((row) => ({
-          //     AssetID: row.AssetID || 0,
-          //     Asset_Code: row.Asset_Code || null,
-          //     AssetName: row.AssetName || null,
-          //     AssetCategory: row.AssetCategory || null,
-          //     SerialNumber: row.SerialNumber || null,
-          //     Bar_code: row.Bar_code || null,
-          //     Brand: row.Brand || null,
-          //     Model: row.Model || null,
-          //     // Dates (safe handling)
-          //     PurchaseDate: row.PurchaseDate || null,
-          //     WarrantyStart: row.WarrantyStart || null,
-          //     WarrantyEnd: row.WarrantyEnd || null,
-          //     // Numbers
-          //     PurchaseCost: row.PurchaseCost
-          //       ? parseFloat(row.PurchaseCost)
-          //       : 0,
-          //     CurrencyCode: row.CurrencyCode || null,
-          //     VendorName: row.VendorName || null,
-          //     AssetStatus: row.AssetStatus || null,
-          //     Location: row.Location || null,
-          //     Country: row.Country || null,
-          //     Status: row.Status || null,
-
-          //     company_code:  sessionStorage.getItem("selectedCompanyCode"),
-          //     Keyfield: row.Keyfield || null,
-
-          //     modify_by: modify_by,
-          //     modify_date: new Date().toISOString(), // safer
-          //   })),
-          // };
 
           const response = await fetch(
             `${config.apiBaseUrl}/EmployeeAssets_HdrLoopUpdate`,
@@ -947,33 +917,23 @@ function Assets({}) {
           const company_code = sessionStorage.getItem("selectedCompanyCode");
           const modify_by = sessionStorage.getItem("selectedUserCode");
 
-          // const rows = Array.isArray(rowData) ? rowData : [rowData];
-
           const dataToSend = {
             EmployeeAssets_HdrData: Array.isArray(rowData)
               ? rowData.map((row) => ({
-                  ...row,
+                ...row,
+                company_code,
+                modify_by,
+              }))
+              : [
+                {
+                  ...rowData,
                   company_code,
                   modify_by,
-                }))
-              : [
-                  {
-                    ...rowData,
-                    company_code,
-                    modify_by,
-                  },
-                ],
+                },
+              ],
           };
 
-          // const dataToSend = {
-          //   EmployeeAssets_HdrData: rows.map((row) => ({
-          //     AssetID: row.AssetID,
-          //     company_code: company_code,
-          //   })),
-          // };
-
-          const response = await fetch(
-            `${config.apiBaseUrl}/EmployeeAssets_HdrLoopDelete`,
+          const response = await fetch(`${config.apiBaseUrl}/EmployeeAssets_HdrLoopDelete`,
             {
               method: "POST",
               headers: {
@@ -1007,17 +967,13 @@ function Assets({}) {
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
-      <ToastContainer
-        position="top-right"
-        className="toast-design"
-        theme="colored"
-      />
+      <ToastContainer position="top-right" className="toast-design" theme="colored" />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Assets Master</h1>
 
           <div className="action-wrapper desktop-actions">
-            {saveButtonVisible && (
+            {saveButtonVisible && ['add', 'all permission'].some(p => assetsRequestPermissions.includes(p)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">Save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
@@ -1032,23 +988,26 @@ function Assets({}) {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {/* {saveButtonVisible && ['add', 'all permission'].some(p => employeePermissions.includes(p)) && ( */}
-              {saveButtonVisible && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {saveButtonVisible && ['add', 'all permission'].some(p => assetsRequestPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-              {/*})}*/}
-
-              <li className="dropdown-item" onClick={handleReload}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={handleReload}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
             </ul>
           </div>

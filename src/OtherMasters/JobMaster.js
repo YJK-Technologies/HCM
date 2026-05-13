@@ -14,8 +14,13 @@ const config = require('../Apiconfig');
 
 function JobMaster({ }) {
 
-  const [rowData, setRowData] = useState([]);
+  //code added by Pavun purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const jobMasterPermissions = permissions
+    .filter(permission => permission.screen_type === 'JobMaster')
+    .map(permission => permission.permission_type.toLowerCase());
 
+  const [rowData, setRowData] = useState([]);
   const [job_titleSC, setjob_titleSC] = useState("");
   const [job_title, setjob_title] = useState("");
   const [Country_Code, setCountry_Code] = useState("");
@@ -563,7 +568,7 @@ function JobMaster({ }) {
   };
 
   const handleUpdate = async (rowData) => {
-    
+
     showConfirmationToast(
       "Are you sure you want to update the data in the selected rows?",
       async () => {
@@ -659,61 +664,61 @@ function JobMaster({ }) {
   // };
 
   const handleDelete = async (rowData) => {
-  showConfirmationToast(
-    "Are you sure you want to delete the selected rows?",
-    async () => {
-      try {
-        setLoading(true);
+    showConfirmationToast(
+      "Are you sure you want to delete the selected rows?",
+      async () => {
+        try {
+          setLoading(true);
 
-        const company_code = sessionStorage.getItem("selectedCompanyCode");
-        const modified_by = sessionStorage.getItem("selectedUserCode");
-        const dataToSend = {
-          job_masterData: Array.isArray(rowData)
-            ? rowData.map((row) => ({
+          const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const modified_by = sessionStorage.getItem("selectedUserCode");
+          const dataToSend = {
+            job_masterData: Array.isArray(rowData)
+              ? rowData.map((row) => ({
                 ...row,
                 company_code,
                 modified_by,
               }))
-            : [
+              : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
                 },
               ],
-        };
+          };
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/job_masterLoopDelete`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
+          const response = await fetch(
+            `${config.apiBaseUrl}/job_masterLoopDelete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data deleted successfully", {
+              onClose: () => handleSearch(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message || "Delete failed");
           }
-        );
-
-        if (response.ok) {
-          toast.success("Data deleted successfully", {
-            onClose: () => handleSearch(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message || "Delete failed");
+        } catch (error) {
+          console.error("Delete error:", error);
+          toast.error("Error deleting data: " + error.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Error deleting data: " + error.message);
-      } finally {
-        setLoading(false);
+      },
+      () => {
+        toast.info("Delete cancelled");
       }
-    },
-    () => {
-      toast.info("Delete cancelled");
-    }
-  );
-};
+    );
+  };
 
   const tabs = [
     { label: 'Job Master' },
@@ -928,6 +933,22 @@ function JobMaster({ }) {
     XLSX.writeFile(workbook, "Job_Master_Search_Report.xlsx");
   };
 
+  const handleReloadAdd = () => {
+    clearInputsAdd([]);
+  };
+
+  const clearInputsAdd = () => {
+    setjob_title('');
+    setselecteddept('');
+    setdpt('');
+    setselectedCountry('');
+    setCountry_Code('');
+    setlocation('');
+    setselectedemployment('');
+    setemployment_type('');
+    setupdated_on('');
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -935,11 +956,44 @@ function JobMaster({ }) {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Job Master</h1>
-          <div className="action-wrapper">
-            <div onClick={handleSave} className="action-icon add">
-              <span className="tooltip">Save</span>
-              <i class="fa-solid fa-floppy-disk"></i>
+          <div className="action-wrapper desktop-actions">
+            {['add', 'all permission'].some(permission => jobMasterPermissions.includes(permission)) && (
+              <div onClick={handleSave} className="action-icon add">
+                <span className="tooltip">Save</span>
+                <i class="fa-solid fa-floppy-disk"></i>
+              </div>
+            )}
+            <div className="action-icon print" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
+          </div>
+
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {['add', 'all permission'].some(p => jobMasterPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
+                </li>
+              )}
+              <li>
+                <button className="dropdown-item" onClick={handleReloadAdd}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -957,9 +1011,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={job_title}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setjob_title(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setjob_title(filteredValue);
                 }}
               />
               <label for="sname" className={`exp-form-labels ${error && !job_title ? 'text-danger' : ''}`}>Job Title<span className="text-danger">*</span></label>
@@ -1022,9 +1077,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={location}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setlocation(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setlocation(filteredValue);
                 }}
               />
               <label for="sname" className={`exp-form-labels ${error && !location ? 'text-danger' : ''}`}>Location<span className="text-danger">*</span></label>
@@ -1119,9 +1175,10 @@ function JobMaster({ }) {
                 required title="Please enter the Annual Bonus"
                 autoComplete="off"
                 value={job_titleSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setjob_titleSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setjob_titleSC(filteredValue);
                 }}
               />
               <label for="sname" className="exp-form-labels">Job Title</label>
@@ -1183,9 +1240,10 @@ function JobMaster({ }) {
                 required title="Please Enter the Annual Bonus"
                 autoComplete="off"
                 value={locationSC}
-                onChange={(e) => {const value = e.target.value;
-                const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
-                setlocationSC(filteredValue);
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const filteredValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+                  setlocationSC(filteredValue);
                 }}
               />
               <label for="sname" className={`exp-form-labels`}>Location</label>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./input.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 const config = require("./Apiconfig");
 
-function AssetLifecycleRep({}) {
+function AssetLifecycleRep({ }) {
   const [loading, setLoading] = useState(false);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [Asset_Code, setAsset_Code] = useState("");
@@ -52,7 +52,6 @@ function AssetLifecycleRep({}) {
   const [statusDropGrid, setstatusDropGrid] = useState([]);
   const [selectedAssetStatusSC, setselectedAssetStatusSC] = useState("");
   const [isSelectedAssetStatusSC, setIsSelectedAssetStatusSC] = useState(false);
-  //status
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [StatusDrop, setStatusDrop] = useState([]);
   const [statusgriddrop, setStatusGriddrop] = useState([]);
@@ -74,7 +73,7 @@ function AssetLifecycleRep({}) {
   const [AssetStatusSC, setAssetStatusSC] = useState("");
   const [CountrySC, setCountrySC] = useState("");
   const [StatusSC, setStatusSC] = useState("");
-
+  const gridApiRef = useRef(null);
   const [selectedAssetIDSc, setSelectedAssetIDSc] = useState("");
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
   const [isSelectedAssetIDSc, setIsSelectedAssetIDSc] = useState(false);
@@ -95,7 +94,7 @@ function AssetLifecycleRep({}) {
   const [TotalDaysUsedSC, setTotalDaysUsedSC] = useState("");
 
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
+  const assetLifecycleRepPermissions = permissions
     .filter((permission) => permission.screen_type === "AssetLifecycleRep")
     .map((permission) => permission.permission_type.toLowerCase());
 
@@ -135,9 +134,9 @@ function AssetLifecycleRep({}) {
 
   const filterOptionStatusSC = Array.isArray(statusDropSC)
     ? statusDropSC.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -180,9 +179,9 @@ function AssetLifecycleRep({}) {
 
   const filteredOptionCurrency = Array.isArray(currencyDrop)
     ? currencyDrop.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
   useEffect(() => {
@@ -278,7 +277,7 @@ function AssetLifecycleRep({}) {
     setAssetIDSC(selectedAssetIDSc ? selectedAssetIDSc.value : "");
   };
 
-    const filteredOptionAssetID = AssetIDDrop.map((option) => ({
+  const filteredOptionAssetID = AssetIDDrop.map((option) => ({
     value: option.AssetID,
     label: `${option.AssetID} - ${option.AssetName}`,
     data: option,
@@ -320,9 +319,9 @@ function AssetLifecycleRep({}) {
 
   const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
     ? empIdDropSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   useEffect(() => {
@@ -350,7 +349,7 @@ function AssetLifecycleRep({}) {
     label: option.attributedetails_name,
   }));
 
-    useEffect(() => {
+  useEffect(() => {
     fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -435,124 +434,124 @@ function AssetLifecycleRep({}) {
 
   const navigate = useNavigate();
 
-const columnDefs = [
+  const columnDefs = [
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "S.No",
-      field: "S.No",
+      field: "SNo",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 100,
-    },   
+    },
     {
-    headerName: "Asset ID",
-    field: "AssetID",
-    cellStyle: { textAlign: "left" },
-    editable: false,
-    // cellRenderer: (params) => {
-    //   return (
-    //     <span
-    //       style={{ cursor: "pointer", }}
-    //       onClick={() => handleNavigateWithRowData(params.data)}
-    //     >
-    //       {params.value}
-    //     </span>
-    //   );
-    // },
-  },
+      headerName: "Asset ID",
+      field: "AssetID",
+      cellStyle: { textAlign: "left" },
+      editable: false,
+      // cellRenderer: (params) => {
+      //   return (
+      //     <span
+      //       style={{ cursor: "pointer", }}
+      //       onClick={() => handleNavigateWithRowData(params.data)}
+      //     >
+      //       {params.value}
+      //     </span>
+      //   );
+      // },
+    },
 
-  {
-    headerName: "Asset Name",
-    field: "AssetName",
-    // filter: "agTextColumnFilter",
-    editable: false,
-  },
+    {
+      headerName: "Asset Name",
+      field: "AssetName",
+      // filter: "agTextColumnFilter",
+      editable: false,
+    },
 
-  {
-    headerName: "Asset Category",
-    field: "AssetCategory",
-    // filter: "agTextColumnFilter",
-    editable: false,
-  },
+    {
+      headerName: "Asset Category",
+      field: "AssetCategory",
+      // filter: "agTextColumnFilter",
+      editable: false,
+    },
 
-  {
-    headerName: "Status",
-    field: "AssetStatus",
-    // filter: "agTextColumnFilter",
-    editable: false,
-  },
+    {
+      headerName: "Status",
+      field: "AssetStatus",
+      // filter: "agTextColumnFilter",
+      editable: false,
+    },
 
-  {
-    headerName: "Purchase Date",
-    field: "PurchaseDate",
-    editable: false,
-  },
+    {
+      headerName: "Purchase Date",
+      field: "PurchaseDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Purchase Cost",
-    field: "PurchaseCost",
-    // filter: "agNumberColumnFilter",
-    editable: false,
-  },
+    {
+      headerName: "Purchase Cost",
+      field: "PurchaseCost",
+      // filter: "agNumberColumnFilter",
+      editable: false,
+    },
 
-  // 🔹 Allocation Info
-  {
-    headerName: "Employee ID",
-    field: "EmployeeID",
-    editable: false,
-  },
+    // 🔹 Allocation Info
+    {
+      headerName: "Employee ID",
+      field: "EmployeeID",
+      editable: false,
+    },
 
-  {
-    headerName: "Allocation Date",
-    field: "AllocationDate",
-    editable: false,
-  },
+    {
+      headerName: "Allocation Date",
+      field: "AllocationDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Expected Return",
-    field: "ExpectedReturnDate",
-    editable: false,
-  },
+    {
+      headerName: "Expected Return Date",
+      field: "ExpectedReturnDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Actual Return",
-    field: "ActualReturnDate",
-    editable: false,
-  },
+    {
+      headerName: "Actual Return Date",
+      field: "ActualReturnDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Allocation Status",
-    field: "AllocationStatus",
-    editable: false,
-  },
+    {
+      headerName: "Allocation Status",
+      field: "AllocationStatus",
+      editable: false,
+    },
 
-  // 🔹 Summary Fields
-  {
-    headerName: "Total Allocations",
-    field: "TotalAllocations",
-    editable: false,
-    // filter: "agNumberColumnFilter",
-  },
+    // 🔹 Summary Fields
+    {
+      headerName: "Total Allocations",
+      field: "TotalAllocations",
+      editable: false,
+      // filter: "agNumberColumnFilter",
+    },
 
-  {
-    headerName: "First Allocation",
-    field: "FirstAllocationDate",
-    editable: false,
-  },
+    {
+      headerName: "First Allocation Date",
+      field: "FirstAllocationDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Last Return",
-    field: "LastReturnDate",
-    editable: false,
-  },
+    {
+      headerName: "Last Return Date",
+      field: "LastReturnDate",
+      editable: false,
+    },
 
-  {
-    headerName: "Total Days Used",
-    field: "TotalDaysUsed",
-    // filter: "agNumberColumnFilter",
-    editable: false,
-  },
-];
+    {
+      headerName: "Total Days Used",
+      field: "TotalDaysUsed",
+      // filter: "agNumberColumnFilter",
+      editable: false,
+    },
+  ];
   const defaultColDef = {
     resizable: true,
     editable: true,
@@ -565,6 +564,7 @@ const columnDefs = [
   const onGridReady = (params) => {
     setGridApi(params.api);
     setGridColumnApi(params.columnApi);
+    gridApiRef.current = params.api;
   };
 
   const reloadGridData = () => {
@@ -578,379 +578,493 @@ const columnDefs = [
       .trim();
   };
 
-const handleSearch = async () => {
-  setLoading(true);
+  const handleSearch = async () => {
+    setLoading(true);
 
-  try {
-    const body = {
-      company_code: sessionStorage.getItem("selectedCompanyCode"),
+    try {
+      const body = {
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
 
-      AssetID: AssetIDSC,
-      AssetName: AssetNameSC,
-      AssetCategory: AssetCategorySC,
-      AssetStatus: AssetStatus,
+        AssetID: AssetIDSC,
+        AssetName: AssetNameSC,
+        AssetCategory: AssetCategorySC,
+        AssetStatus: AssetStatus,
 
-      EmployeeID: empIdSc,
-      AllocationStatus: AllocationStatusSc,
+        EmployeeID: empIdSc,
+        AllocationStatus: AllocationStatusSc,
 
-      PurchaseDate: PurchaseDateSC,
-      PurchaseCost: PurchaseCostSC,
+        PurchaseDate: PurchaseDateSC,
+        PurchaseCost: PurchaseCostSC,
 
-      AllocationDate: AllocationDateSC,
-      ExpectedReturnDate: ExpectedReturnDateSC,
-      ActualReturnDate: ActualReturnDateSC,
+        AllocationDate: AllocationDateSC,
+        ExpectedReturnDate: ExpectedReturnDateSC,
+        ActualReturnDate: ActualReturnDateSC,
 
-      TotalAllocations: TotalAllocationsSC,
-      FirstAllocationDate: FirstAllocationDateSC,
-      LastReturnDate: LastReturnDateSC,
-      TotalDaysUsed: TotalDaysUsedSC,
-    };
+        TotalAllocations: TotalAllocationsSC,
+        FirstAllocationDate: FirstAllocationDateSC,
+        LastReturnDate: LastReturnDateSC,
+        TotalDaysUsed: TotalDaysUsedSC,
+      };
 
-    const response = await fetch(`${config.apiBaseUrl}/AssetLifecycleReport_AS`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+      const response = await fetch(`${config.apiBaseUrl}/AssetLifecycleReport_AS`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      setRowData(data);
-    } else if (response.status === 404) {
-      toast.warning("Data Not Found");
+      if (response.ok) {
+        const data = await response.json();
+        setRowData(data);
+      } else if (response.status === 404) {
+        toast.warning("Data Not Found");
+        setRowData([]);
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Something went wrong");
+        setRowData([]);
+      }
+
+    } catch (error) {
+      console.error("Error fetching AS report:", error);
+      toast.error("Error fetching data");
       setRowData([]);
-    } else {
-      const err = await response.json();
-      toast.error(err.message || "Something went wrong");
-      setRowData([]);
+    } finally {
+      setLoading(false);
     }
-
-  } catch (error) {
-    console.error("Error fetching AS report:", error);
-    toast.error("Error fetching data");
-    setRowData([]);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const getSelectedOrAllData = () => {
-  if (gridApi) {
-    const selected = gridApi.getSelectedRows();
-    if (selected && selected.length > 0) {
-      return selected;
-    }
-  }
-  return rowData && rowData.length > 0 ? rowData : [];
-};
-
-const generateReport = () => {
-  const dataSource = getSelectedOrAllData();
-
-  if (!dataSource.length) {
-    toast.warning("No data to print");
-    return;
-  }
-
-  const headerGradientStart = getCSSVariable("--but");
-  const tableHeaderBg = getCSSVariable("--ag-header");
-  const fontColor = getCSSVariable("--font-color");
-  const rowAltColor = getCSSVariable("--ag-row");
-  const hoverColor = getCSSVariable("--ag-hover");
-
-  const reportWindow = window.open("", "_blank");
-
-  reportWindow.document.write(`
-  <html>
-  <head>
-  <title>Asset Lifecycle Report</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
-      background-color: #f4f6f9;
-      color: ${fontColor};
-    }
-    .header {
-      background: ${tableHeaderBg};
-      padding: 15px;
-      color: white;
-      text-align: center;
-      border-radius: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-    }
-    th {
-      background-color: ${tableHeaderBg};
-      color: white;
-      padding: 10px;
-    }
-    td {
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
-    }
-    tr:nth-child(even) {
-      background-color: ${rowAltColor};
-    }
-    tr:hover {
-      background-color: ${hoverColor};
-    }
-    .print-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: ${headerGradientStart};
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    @media print {
-      .print-btn { display: none; }
-    }
-  </style>
-  </head>
-  <body>
-
-  <div class="header">
-    <h2>Asset Lifecycle Report</h2>
-    <p>Total Records: ${dataSource.length}</p>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Asset ID</th>
-        <th>Asset Name</th>
-        <th>Category</th>
-        <th>Status</th>
-        <th>Employee</th>
-        <th>Allocation Date</th>
-        <th>Expected Return</th>
-        <th>Actual Return</th>
-        <th>Total Days</th>
-      </tr>
-    </thead>
-    <tbody>
-  `);
-
-  dataSource.forEach((row) => {
-    reportWindow.document.write(`
-      <tr>
-        <td>${row.AssetID || ""}</td>
-        <td>${row.AssetName || ""}</td>
-        <td>${row.AssetCategory || ""}</td>
-        <td>${row.AssetStatus || ""}</td>
-        <td>${row.EmployeeID || ""}</td>
-        <td>${row.AllocationDate ? new Date(row.AllocationDate).toLocaleDateString("en-GB") : ""}</td>
-        <td>${row.ExpectedReturnDate ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB") : ""}</td>
-        <td>${row.ActualReturnDate ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB") : ""}</td>
-        <td>${row.TotalDaysUsed || ""}</td>
-      </tr>
-    `);
-  });
-
-  reportWindow.document.write(`
-    </tbody>
-  </table>
-
-  <div style="text-align:center;">
-    <button class="print-btn" onclick="window.print()">Print</button>
-  </div>
-
-  </body>
-  </html>
-  `);
-
-  reportWindow.document.close();
-};
-
-const hexToRgb = (hex) => {
-      const cleanHex = hex.replace("#", "");
-      const num = parseInt(cleanHex, 16);
-      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
-    };
-  
-const exportToPDF = () => {
-  const dataSource = getSelectedOrAllData();
-
-  if (!dataSource.length) {
-    toast.warning("No data to export");
-    return;
-  }
-
-  const headerBg = hexToRgb(getCSSVariable("--but"));
-  const tableHeader = hexToRgb(getCSSVariable("--ag-header"));
-  const fontColor = hexToRgb(getCSSVariable("--font-color"));
-  const altRow = hexToRgb(getCSSVariable("--ag-row"));
-
-  const headers = [[
-    "Asset ID",
-    "Name",
-    "Category",
-    "Status",
-    "Employee",
-    "Allocation",
-    "Expected",
-    "Return",
-    "Days"
-  ]];
-
-  const body = dataSource.map((row) => [
-    row.AssetID || "",
-    row.AssetName || "",
-    row.AssetCategory || "",
-    row.AssetStatus || "",
-    row.EmployeeID || "",
-    row.AllocationDate ? new Date(row.AllocationDate).toLocaleDateString("en-GB") : "",
-    row.ExpectedReturnDate ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB") : "",
-    row.ActualReturnDate ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB") : "",
-    row.TotalDaysUsed || ""
-  ]);
-
-  const doc = new jsPDF("l", "pt", "a4");
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  doc.setFillColor(...headerBg);
-  doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
-
-  doc.setTextColor(255);
-  doc.setFontSize(18);
-  doc.text("Asset Lifecycle Report", pageWidth / 2, 40, { align: "center" });
-
-  doc.setFontSize(10);
-  doc.text(
-    `Generated: ${new Date().toLocaleDateString()}`,
-    pageWidth / 2,
-    60,
-    { align: "center" }
-  );
-
-  autoTable(doc, {
-    startY: 90,
-    head: headers,
-    body: body,
-    styles: { fontSize: 9, textColor: fontColor },
-    headStyles: { fillColor: tableHeader, textColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: altRow },
-  });
-
-  doc.save("Asset_Lifecycle_Report.pdf");
-};
-
-
-const transformRowData = (data) => {
-  return data.map((row) => ({
-    "Asset ID": row.AssetID,
-    "Asset Name": row.AssetName,
-    Category: row.AssetCategory,
-    Status: row.AssetStatus,
-    Employee: row.EmployeeID,
-    "Allocation Date": row.AllocationDate
-      ? new Date(row.AllocationDate).toLocaleDateString("en-GB")
-      : "",
-    "Expected Return": row.ExpectedReturnDate
-      ? new Date(row.ExpectedReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Actual Return": row.ActualReturnDate
-      ? new Date(row.ActualReturnDate).toLocaleDateString("en-GB")
-      : "",
-    "Total Days Used": row.TotalDaysUsed,
-  }));
-};
-
-const handleExportToExcel = () => {
-  const dataSource = getSelectedOrAllData();
-
-  if (!dataSource || dataSource.length === 0) {
-    toast.warning("No data to export");
-    return;
-  }
-
-  const screenName = "Asset Lifecycle Report";
-  const company = sessionStorage.getItem("selectedCompanyName") || "";
-
-  const titleBg = getCSSVariable("--but").replace("#", "");
-  const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
-  const fontColor = getCSSVariable("--font-color").replace("#", "");
-  const altRowBg = getCSSVariable("--ag-row").replace("#", "");
-
-  const headerData = [
-    [screenName],
-    company ? [`Company Name: ${company}`] : [],
-    [],
-  ];
-
-  const worksheet = XLSX.utils.aoa_to_sheet(headerData);
-
-  // 🔹 transform your current data
-  const transformedData = dataSource.map((row) => ({
-    "Asset ID": row.AssetID || "",
-    "Asset Name": row.AssetName || "",
-    Category: row.AssetCategory || "",
-    Status: row.AssetStatus || "",
-    Employee: row.EmployeeID || "",
-    "Allocation Date": row.AllocationDate|| "",
-    "Expected Return": row.ExpectedReturnDate || "",
-    "Actual Return": row.ActualReturnDate || "",
-    "Total Days Used": row.TotalDaysUsed || "",
-  }));
-
-  XLSX.utils.sheet_add_json(worksheet, transformedData, {
-    origin: `A${headerData.length + 1}`,
-  });
-
-  const range = XLSX.utils.decode_range(worksheet["!ref"]);
-  const headerRowIndex = headerData.length;
-
-  // 🔹 Title style (same as reference)
-  worksheet["A1"].s = {
-    font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-    fill: { fgColor: { rgb: titleBg } },
-    alignment: { horizontal: "center", vertical: "center" },
   };
 
-  worksheet["!merges"] = [
-    {
-      s: { r: 0, c: 0 },
-      e: { r: 0, c: Object.keys(transformedData[0]).length - 1 },
-    },
-  ];
+  const getSelectedOrAllData = () => {
+    if (gridApi) {
+      const selected = gridApi.getSelectedRows();
+      if (selected && selected.length > 0) {
+        return selected;
+      }
+    }
+    return rowData && rowData.length > 0 ? rowData : [];
+  };
 
-  const totalColumns = Object.keys(transformedData[0]).length;
+  const generateReport = () => {
+    const selectedRows = gridApi.getSelectedRows();
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to generate a report");
+      return;
+    }
 
-  // 🔹 Header style
-  for (let C = 0; C < totalColumns; C++) {
-    const cell =
-      worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
-    if (!cell) continue;
+    const reportData = selectedRows.map((row) => {
+      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
 
-    cell.s = {
-      font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: tableHeaderBg } },
-      alignment: { horizontal: "center" },
-      border: {
-        top: { style: "thin" },
-        bottom: { style: "thin" },
-        left: { style: "thin" },
-        right: { style: "thin" },
-      },
+      return {
+        "S.No": formatValue(row.SNo),
+        "Asset ID": formatValue(row.AssetID),
+        "Asset Name": formatValue(row.AssetName),
+        "Asset Category": formatValue(row.AssetCategory),
+        "Status": formatValue(row.AssetStatus),
+        "Purchase Date": formatValue(row.PurchaseDate),
+        "Purchase Cost": formatValue(row.PurchaseCost),
+        "Employee ID": formatValue(row.EmployeeID),
+        "Allocation Date": formatValue(row.AllocationDate),
+        "Expected Return": formatValue(row.ExpectedReturnDate),
+        "Actual Return": formatValue(row.ActualReturnDate),
+        "Allocation Status": formatValue(row.AllocationStatus),
+        "Total Allocations": formatValue(row.TotalAllocations),
+        "First Allocation Date": formatValue(row.FirstAllocationDate),
+        "Last Return Date": formatValue(row.LastReturnDate),
+        "Total Days Used": formatValue(row.TotalDaysUsed),
+      };
+    });
+
+    /* ================= READ THEME COLORS ================= */
+
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
+
+    const logoUrl = window.location.origin + "/favicon.ico";
+    const reportWindow = window.open("", "_blank");
+
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
+
+    // 🔥 append to HEAD
+    reportWindow.document.head.appendChild(link);
+    reportWindow.document.write(`<html><head><title>Asset Lifecycle Report</title>`);
+    reportWindow.document.write("<style>");
+    reportWindow.document.write(`
+        body {
+              font-family: 'Segoe UI', sans-serif;
+              margin: 0;
+              padding: 20px;
+              background-color: #f4f6f9;
+              color: ${fontColor};
+            }
+    
+            .header {
+              display: flex;
+              align-items: center;
+              background: ${tableHeaderBg};
+              padding: 15px 20px;
+              color: white;
+              border-radius: 8px;
+            }
+            
+            .logo {
+              height: 60px;
+            }
+            
+            .title-section {
+              flex: 1;
+              text-align: center;
+            }
+          
+            .title-section h2 {
+              margin: 0;
+            }
+    
+            .sub-info {
+              margin: 15px 0;
+              font-size: 14px;
+              color: #555;
+              display: flex;
+              justify-content: space-between;
+            }
+    
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+    
+            th {
+              background-color: ${tableHeaderBg};
+              color: white;
+              padding: 10px;
+              text-align: left;
+            }
+    
+            td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+    
+            tr:nth-child(even) {
+              text-align: left;
+              background-color: ${rowAltColor};
+            }
+    
+            tr:hover {
+              background-color: ${hoverColor};
+            }
+    
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 13px;
+              color: #777;
+            }
+    
+            .print-btn {
+              margin-top: 20px;
+              padding: 10px 20px;
+              background: ${headerGradientStart};
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+    
+            .print-btn:hover {
+              opacity: 0.85;
+            }
+    
+          @media print {
+            body {
+              background: white;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+              
+            th {
+              background-color: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            tr:nth-child(even) {
+              background-color: ${rowAltColor} !important;
+            }
+              
+            .header {
+              background: ${tableHeaderBg} !important;
+              color: white !important;
+            }
+              
+            .print-btn {
+              display: none;
+            }
+          }
+      `);
+
+    reportWindow.document.write("</style></head><body>");
+    reportWindow.document.write(`<div class="header">
+      <img src="${logoUrl}" class="logo" />
+      <div class="title-section">
+        <h2>Asset Lifecycle Report</h2>
+      </div>
+      </div>`);
+    reportWindow.document.write(`<div style="margin-top:10px;">
+      <strong>Total Records: ${selectedRows.length}</strong>
+      <span style="float:right;">
+        Printed Date: ${new Date().toLocaleDateString()}
+      </span>
+    </div>`);
+    // reportWindow.document.write("<h1><u>Company Information</u></h1>");
+
+    // Create table with headers
+    reportWindow.document.write("<table><thead><tr>");
+    Object.keys(reportData[0]).forEach((key) => {
+      reportWindow.document.write(`<th>${key}</th>`);
+    });
+    reportWindow.document.write("</tr></thead><tbody>");
+
+    // Populate the rows with safe empty strings
+    reportData.forEach((row) => {
+      reportWindow.document.write("<tr>");
+      Object.values(row).forEach((value) => {
+        reportWindow.document.write(`<td>${value || ''}</td>`);
+      });
+      reportWindow.document.write("</tr>");
+    });
+
+    reportWindow.document.write("</tbody></table>");
+    reportWindow.document.write(`
+    <div style="text-align:center;">
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+  `);
+    reportWindow.document.write("</body></html>");
+    reportWindow.document.close();
+  };
+
+  const hexToRgb = (hex) => {
+    const cleanHex = hex.replace("#", "");
+    const num = parseInt(cleanHex, 16);
+    return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+  };
+
+  const exportToPDF = () => {
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
+      return;
+    }
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
+
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
     };
-  }
 
-  // 🔹 Body styling (alternate rows)
-  for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+    const headerRGB = hexToRgb(headerBg);
+
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.width;
+
+    /* ================= HEADER DESIGN ================= */
+
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
+
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Asset Lifecycle Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Asset_Lifecycle_Report.pdf");
+    });
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row, index) => ({
+      "S.No": index + 1,
+      "Asset ID": row.AssetID || "",
+      "Asset Name": row.AssetName || "",
+      "Asset Category": row.AssetCategory || "",
+      "Status": row.AssetStatus || "",
+      "Purchase Date": row.PurchaseDate || "",
+      "Purchase Cost": row.PurchaseCost || "",
+      "Employee ID": row.EmployeeID || "",
+      "Allocation Date": row.AllocationDate || "",
+      "Expected Return Date": row.ExpectedReturnDate || "",
+      "Actual Return Date": row.ActualReturnDate || "",
+      "Allocation Status": row.AllocationStatus || "",
+      "Total Allocations": row.TotalAllocations || "",
+      "First Allocation Date": row.FirstAllocationDate || "",
+      "Last Return Date": row.LastReturnDate || "",
+      "Total Days Used": row.TotalDaysUsed || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
+      return;
+    }
+
+    const screenName = "Asset Lifecycle Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
     for (let C = 0; C < totalColumns; C++) {
-      const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
       if (!cell) continue;
 
       cell.s = {
-        font: { color: { rgb: fontColor } },
-        fill: R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
         border: {
           top: { style: "thin" },
           bottom: { style: "thin" },
@@ -959,17 +1073,45 @@ const handleExportToExcel = () => {
         },
       };
     }
-  }
 
-  worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+    /* ================= TABLE BODY STYLE ================= */
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Asset Report");
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
-  XLSX.writeFile(workbook, "Asset_Lifecycle_Report.xlsx");
-};
+        if (!cell) continue;
 
-return (
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Asset Lifecycle Report");
+
+    XLSX.writeFile(workbook, "Asset_Lifecycle_Report.xlsx");
+  };
+
+  return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
       <ToastContainer
@@ -981,25 +1123,19 @@ return (
         <div className="header-flex">
           <h1 className="page-title">Asset Lifecycle Report</h1>
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "view"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "PDF"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) =>
-              companyPermissions.includes(p),
-            ) && (
+            {["all permission", "Excel"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
               <div className="action-icon print" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
@@ -1010,32 +1146,34 @@ return (
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+              {["all permission", "view"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) =>
-                companyPermissions.includes(p),
-              ) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => assetLifecycleRepPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>
@@ -1071,7 +1209,7 @@ return (
                 isClearable
               />
               <label for="sname" className={`floating-label`}>
-                Asset ID 
+                Asset ID
               </label>
             </div>
           </div>
@@ -1251,7 +1389,7 @@ return (
               <label className="exp-form-labels">Actual Return Date</label>
             </div>
           </div>
-          
+
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 

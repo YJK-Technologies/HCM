@@ -1,6 +1,6 @@
 import { useTheme } from './ThemeContext';
 
-const ThemeSwitcher = () => {
+const ThemeSwitcher = ({ layout = "vertical" }) => {
   const { theme, setAppTheme } = useTheme();
 
   const themes = [
@@ -12,17 +12,24 @@ const ThemeSwitcher = () => {
   ];
 
   return (
-    /* We add a custom class here to target in CSS */
-    <div className="theme-dropdown-container d-flex flex-column align-items-center gap-3">
+    <div
+      className={`theme-dropdown-container ${
+        layout === "horizontal"
+          ? "d-flex flex-row align-items-center gap-3"
+          : "d-flex flex-column align-items-center gap-3"
+      }`}
+    >
       {themes.map((t) => (
-        <div 
+        <div
           key={t.name}
           className="theme-item-wrapper"
           onClick={() => setAppTheme(t.name)}
         >
-          <div 
+          <div
             title={t.name}
-            className={`theme-circle ${theme === t.name ? 'active' : ''}`}
+            className={`theme-circle ${
+              theme === t.name ? 'active' : ''
+            }`}
             style={{ backgroundColor: t.color }}
           />
         </div>

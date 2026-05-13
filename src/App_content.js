@@ -1,9 +1,7 @@
 import ThemeSwitcher from './ThemeSwitcher';
 
-const AppContent = () => {
-    return (
-        <ThemeSwitcher />
-    );
-  };
+const AppContent = ({ layout }) => {
+  return <ThemeSwitcher layout={layout} />;
+};
 
-  export default AppContent;
+export default AppContent;

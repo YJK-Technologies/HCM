@@ -18,8 +18,8 @@ function PMSsettings() {
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [loading, setLoading] = useState(false);
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const familyPermissions = permissions
-    .filter((permission) => permission.screen_type === "Family")
+  const pMSsettingsPermissions = permissions
+    .filter((permission) => permission.screen_type === "PMSsettings")
     .map((permission) => permission.permission_type.toLowerCase());
 
 
@@ -235,37 +235,42 @@ function PMSsettings() {
           <h1 className="page-title">PMS Setting Screen</h1>
 
           <div className="action-wrapper desktop-actions">
-            {!isUpdateVisible && ['add', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+            {!isUpdateVisible && ['add', 'all permission'].some(permission => pMSsettingsPermissions.includes(permission)) && (
               <div className="action-icon add" onClick={handleSave}>
                 <span className="tooltip">save</span>
                 <i class="fa-solid fa-floppy-disk"></i>
               </div>
             )}
-
             <div className="action-icon print" onClick={reloadGridData}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-arrow-rotate-right"></i>
             </div>
-
           </div>
 
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
-            <button className="btn btn-primary dropdown-toggle p-1" data-bs-toggle="dropdown">
-              <i className="fa-solid fa-list"></i>
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-             {!isUpdateVisible && ['add', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
-                <li className="dropdown-item" onClick={handleSave}>
-                  <i className="fa-solid fa-floppy-disk text-success fs-4"></i>
+              {!isUpdateVisible && ['add', 'all permission'].some(p => pMSsettingsPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleSave}>
+                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                  </button>
                 </li>
               )}
-
-              <li className="dropdown-item" onClick={reloadGridData}>
-                <i className="fa-solid fa-arrow-rotate-right"></i>
+              <li>
+                <button className="dropdown-item" onClick={reloadGridData}>
+                  <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>
+                </button>
               </li>
-
             </ul>
           </div>
         </div>
@@ -318,14 +323,14 @@ function PMSsettings() {
 
           <div className="col-12">
             <div className="search-btn-wrapper">
-              {isUpdateVisible && ['update', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+              {isUpdateVisible && ['update', 'all permission'].some(permission => pMSsettingsPermissions.includes(permission)) && (
                   <div className="icon-btn save" onClick={handleUpdate}>
                     <span className="tooltip">Update</span>
                     <i className="fa-solid fa-floppy-disk"></i>
                   </div>
                 )}
 
-              {isUpdateVisible && ['delete', 'all permission'].some(permission => familyPermissions.includes(permission)) && (
+              {isUpdateVisible && ['delete', 'all permission'].some(permission => pMSsettingsPermissions.includes(permission)) && (
                   <div className="icon-btn delete" onClick={handleDelete}>
                     <span className="tooltip">Delete</span>
                     <i className="fa-solid fa-trash"></i>

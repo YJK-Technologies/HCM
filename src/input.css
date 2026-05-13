@@ -179,11 +179,6 @@
   transform: translateX(-50%) rotate(45deg);
 }
 
-.icon-btn:hover .tooltip {
-  opacity: 1;
-  top: -23px;
-}
-
 .search {
   color: #0d6efd;
 }
@@ -206,48 +201,6 @@
 
 .reload {
   color: #000;
-}
-
-.icon-btn.search:hover,
-.icon-btn.search:hover .tooltip,
-.icon-btn.search:hover .tooltip::before {
-  background-color: #0d6efd;
-  color: var(--font-hover);
-}
-
-.icon-btn.save:hover,
-.icon-btn.save:hover .tooltip,
-.icon-btn.save:hover .tooltip::before {
-  background-color: rgb(58, 126, 35);
-  color: var(--font-hover);
-}
-
-.icon-btn.delete:hover,
-.icon-btn.delete:hover .tooltip,
-.icon-btn.delete:hover .tooltip::before {
-  background-color: rgb(255, 0, 0);
-  color: var(--font-hover);
-}
-
-.icon-btn.reload:hover,
-.icon-btn.reload:hover .tooltip,
-.icon-btn.reload:hover .tooltip::before {
-  background-color: #000;
-  color: var(--font-hover);
-}
-
-.icon-btn.update:hover,
-.icon-btn.update:hover .tooltip,
-.icon-btn.update:hover .tooltip::before {
-  background-color: #fb8500;
-  color: var(--font-hover);
-}
-
-.icon-btn.excel:hover,
-.icon-btn.excel:hover .tooltip,
-.icon-btn.excel:hover .tooltip::before {
-  background-color: rgb(58, 126, 35);
-  color: var(--font-hover);
 }
 
 .inputGroup {
@@ -1638,6 +1591,12 @@
    MODERN HORIZONTAL ACTION BAR (MOBILE ONLY)
 ==================================================== */
 @media (max-width: 768px) {
+
+  .mobile-actions {
+    position: relative;
+    margin-left: auto; /* pushes to right */
+  }
+  
   /* The Container - Now horizontal */
   .mobile-actions .dropdown-menu {
     display: flex !important;
@@ -1715,5 +1674,62 @@
   /* Rotate the list icon when menu is open */
   .mobile-actions.show .btn-primary {
     transform: rotate(90deg);
+  }
+}
+
+/* Desktop only Button Tooltip*/
+@media (hover: hover) and (pointer: fine) {
+
+  .icon-btn:hover .tooltip {
+    opacity: 1;
+    top: -23px;
+  }
+
+  .icon-btn.search:hover,
+  .icon-btn.search:hover .tooltip,
+  .icon-btn.search:hover .tooltip::before {
+    background-color: #0d6efd;
+    color: var(--font-hover);
+  }
+
+  .icon-btn.save:hover,
+  .icon-btn.save:hover .tooltip,
+  .icon-btn.save:hover .tooltip::before {
+    background-color: rgb(58, 126, 35);
+    color: var(--font-hover);
+  }
+
+  .icon-btn.delete:hover,
+  .icon-btn.delete:hover .tooltip,
+  .icon-btn.delete:hover .tooltip::before {
+    background-color: rgb(255, 0, 0);
+    color: var(--font-hover);
+  }
+
+  .icon-btn.reload:hover,
+  .icon-btn.reload:hover .tooltip,
+  .icon-btn.reload:hover .tooltip::before {
+    background-color: rgb(0, 0, 0);
+    color: var(--font-hover);
+  }
+
+  .icon-btn.update:hover,
+  .icon-btn.update:hover .tooltip,
+  .icon-btn.update:hover .tooltip::before {
+    background-color: #fb8500;
+    color: var(--font-hover);
+  }
+
+  .icon-btn.excel:hover,
+  .icon-btn.excel:hover .tooltip,
+  .icon-btn.excel:hover .tooltip::before {
+    background-color: rgb(58, 126, 35);
+    color: var(--font-hover);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .icon-btn .tooltip {
+    display: none;
   }
 }

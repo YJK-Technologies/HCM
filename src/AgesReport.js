@@ -16,6 +16,13 @@ import { min } from "date-fns";
 const config = require("./Apiconfig");
 
 function AgesReport() {
+
+  //purpose of set user permisssion
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
+  const agesReportPermissions = permissions
+    .filter((permission) => permission.screen_type === "AgesReport")
+    .map((permission) => permission.permission_type.toLowerCase());
+
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [gridApi, setGridApi] = useState(null);
@@ -94,9 +101,9 @@ function AgesReport() {
 
   const filteredOptionEmpIdSc = Array.isArray(empIdDropSc)
     ? empIdDropSc.map((option) => ({
-        value: option?.EmployeeId,
-        label: `${option?.EmployeeId}-${option?.First_Name}`,
-      }))
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
     : [];
 
   useEffect(() => {
@@ -144,19 +151,19 @@ function AgesReport() {
 
   const filteredOptionAGESTypesSc = Array.isArray(AGESTypesDropSc)
     ? AGESTypesDropSc.map((option) => ({
-        value: option?.attributedetails_name,
-        label: option?.attributedetails_name,
-      }))
+      value: option?.attributedetails_name,
+      label: option?.attributedetails_name,
+    }))
     : [];
 
-    
+
 
   const handleSearch = async () => {
-  // To Date earlier than From Date
-  if (new Date(to_date) < new Date(from_date)) {
-    toast.warning("To Date should not be earlier than From Date");
-    return;
-  }
+    // To Date earlier than From Date
+    if (new Date(to_date) < new Date(from_date)) {
+      toast.warning("To Date should not be earlier than From Date");
+      return;
+    }
     setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/getAGES`, {
@@ -169,7 +176,7 @@ function AgesReport() {
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           employee_id: empIdSc,
           first_name: first_name,
-          department_id: department_id, 
+          department_id: department_id,
           designation_id,
           from_date: from_date,
           to_date: to_date,
@@ -177,18 +184,18 @@ function AgesReport() {
         }),
       });
 
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setRowData(data);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setRowData(data);
+        } else {
+          setRowData([]);
+          toast.warning("Data Not Found");
+        }
       } else {
+        toast.warning("No Data Found");
         setRowData([]);
-        toast.warning("Data Not Found");
       }
-    } else {
-      toast.warning("No Data Found");
-      setRowData([]);
-    }
     } catch (error) {
       toast.error("Error fetching data");
     } finally {
@@ -217,7 +224,7 @@ function AgesReport() {
     },
     {
       headerName: "S.No",
-      field: "S.No",
+      field: "SNo",
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
     },
@@ -244,7 +251,6 @@ function AgesReport() {
     {
       headerName: "DOB",
       field: "DOB",
-      valueFormatter: (p) => formatDate(p.value),
       editable: false,
     },
     {
@@ -264,45 +270,45 @@ function AgesReport() {
     gridApiRef.current = params.api;
   };
 
-    const getCSSVariable = (variableName) => {
+  const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
       .trim();
   };
 
-    const hexToRgb = (hex) => {
+  const hexToRgb = (hex) => {
     const cleanHex = hex.replace("#", "");
     const num = parseInt(cleanHex, 16);
     return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
   };
 
-const generateReport = () => {
-  if (!gridApi) return;
+  const generateReport = () => {
+    if (!gridApi) return;
 
-  const selectedRows = gridApi.getSelectedRows();
+    const selectedRows = gridApi.getSelectedRows();
 
-  if (selectedRows.length === 0) {
-    toast.warning("Please select at least one row to print");
-    return;
-  }
+    if (selectedRows.length === 0) {
+      toast.warning("Please select at least one row to print");
+      return;
+    }
 
-  const headerGradientStart = getCSSVariable("--but");
-  const tableHeaderBg = getCSSVariable("--ag-header");
-  const fontColor = getCSSVariable("--font-color");
-  const rowAltColor = getCSSVariable("--ag-row");
-  const hoverColor = getCSSVariable("--ag-hover");
+    const headerGradientStart = getCSSVariable("--but");
+    const tableHeaderBg = getCSSVariable("--ag-header");
+    const fontColor = getCSSVariable("--font-color");
+    const rowAltColor = getCSSVariable("--ag-row");
+    const hoverColor = getCSSVariable("--ag-hover");
 
-  const logoUrl = window.location.origin + "/favicon.ico";
-  const reportWindow = window.open("", "_blank");
+    const logoUrl = window.location.origin + "/favicon.ico";
+    const reportWindow = window.open("", "_blank");
 
-  const link = reportWindow.document.createElement("link");
-  link.rel = "icon";
-  link.type = "image/x-icon";
-  link.href = logoUrl;
+    const link = reportWindow.document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/x-icon";
+    link.href = logoUrl;
 
-  reportWindow.document.head.appendChild(link);
+    reportWindow.document.head.appendChild(link);
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
   <html>
   <head>
     <title>AGES Report</title>
@@ -472,8 +478,8 @@ const generateReport = () => {
       <tbody>
   `);
 
-  selectedRows.forEach((row) => {
-    reportWindow.document.write(`
+    selectedRows.forEach((row) => {
+      reportWindow.document.write(`
       <tr>
         <td>${row.EmployeeId || ""}</td>
         <td>${row.First_Name || ""}</td>
@@ -483,9 +489,9 @@ const generateReport = () => {
         <td>${row.Age || ""}</td>
       </tr>
     `);
-  });
+    });
 
-  reportWindow.document.write(`
+    reportWindow.document.write(`
       </tbody>
     </table>
 
@@ -501,203 +507,255 @@ const generateReport = () => {
   </html>
   `);
 
-  reportWindow.document.close();
-};
-
-const exportToPDF = () => {
-  if (!gridApiRef.current) return;
-
-  if (!rowData || rowData.length === 0) {
-    toast.warning("There is no data to export.");
-    return;
-  }
-
-  const selectedRows = gridApiRef.current.getSelectedRows();
-  const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
-
-  const headerBgColor = hexToRgb(getCSSVariable("--but"));
-  const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
-  const fontColor = hexToRgb(getCSSVariable("--font-color"));
-  const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
-
-  const headers = [[
-    "Employee ID",
-    "First Name",
-    "Department",
-    "Designation",
-    "DOB",
-    "Age"
-  ]];
-
-  const body = dataSource.map((row) => [
-    row.EmployeeId || "",
-    row.First_Name || "",
-    row.department_ID || "",
-    row.designation_ID || "",
-    row.DOB ? formatDate(row.DOB) : "",
-    row.Age || ""
-  ]);
-
-  const doc = new jsPDF("l", "pt", "a4");
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  doc.setFillColor(...headerBgColor);
-  doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.setTextColor(255,255,255);
-  doc.text("AGES Report", pageWidth / 2, 40, { align:"center" });
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text(
-    `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
-    pageWidth / 2,
-    60,
-    { align:"center" }
-  );
-
-  autoTable(doc,{
-    startY:90,
-    head:headers,
-    body:body,
-
-    styles:{
-      fontSize:10,
-      cellPadding:8,
-      textColor:fontColor,
-      valign:"middle"
-    },
-
-    headStyles:{
-      fillColor:tableHeaderColor,
-      textColor:[255,255,255],
-      fontStyle:"bold",
-      halign:"center"
-    },
-
-    alternateRowStyles:{
-      fillColor:rowAltColor
-    },
-
-    margin:{ left:20,right:20 }
-  });
-
-  doc.save("AGES_Report.pdf");
-};
-
-const transformRowData = (data) => {
-  return data.map((row) => ({
-    "Employee ID": row.EmployeeId || "",
-    "First Name": row.First_Name || "",
-    Department: row.department_ID || "",
-    Designation: row.designation_ID || "",
-    DOB: row.DOB ? formatDate(row.DOB) : "",
-    Age: row.Age || "",
-  }));
-};
-
-const handleExportToExcel = () => {
-  if (!rowData || rowData.length === 0) {
-    toast.warning("There is no data to export.");
-    return;
-  }
-
-  const selectedRows = gridApiRef.current.getSelectedRows();
-  const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
-
-  const headerBg = getCSSVariable("--but").replace("#","");
-  const tableHeaderBg = getCSSVariable("--ag-header").replace("#","");
-  const fontColor = getCSSVariable("--font-color").replace("#","");
-  const altRowBg = getCSSVariable("--ag-row").replace("#","");
-
-  const title = "AGES Report";
-  const company = sessionStorage.getItem("selectedCompanyName") || "";
-
-  const headerData = [
-    [title],
-    company ? [`Company Name: ${company}`] : [],
-    []
-  ];
-
-  const worksheet = XLSX.utils.aoa_to_sheet(headerData);
-
-  XLSX.utils.sheet_add_json(
-    worksheet,
-    transformRowData(dataSource),
-    { origin:`A${headerData.length + 1}` }
-  );
-
-  const range = XLSX.utils.decode_range(worksheet["!ref"]);
-
-  worksheet["A1"].s = {
-    font:{ bold:true, sz:16, color:{ rgb:"FFFFFF" }},
-    fill:{ fgColor:{ rgb:headerBg }},
-    alignment:{ horizontal:"center", vertical:"center" }
+    reportWindow.document.close();
   };
 
-  worksheet["!merges"] = [
-    { s:{ r:0,c:0 }, e:{ r:0,c:5 } }
-  ];
+  const exportToPDF = () => {
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
+      return;
+    }
 
-  const headerRowIndex = headerData.length;
+    const selectedRows = gridApiRef.current.getSelectedRows();
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-  for(let C=0; C<=5; C++){
-    const cell =
-      worksheet[XLSX.utils.encode_cell({ r:headerRowIndex, c:C })];
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    if(!cell) continue;
-
-    cell.s = {
-      font:{ bold:true, color:{ rgb:"FFFFFF" }},
-      fill:{ fgColor:{ rgb:tableHeaderBg }},
-      alignment:{ horizontal:"center" },
-      border:{
-        top:{ style:"thin" },
-        bottom:{ style:"thin" },
-        left:{ style:"thin" },
-        right:{ style:"thin" }
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
       }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
     };
-  }
 
-  for(let R=headerRowIndex+1; R<=range.e.r; R++){
-    for(let C=0; C<=5; C++){
+    const headerRGB = hexToRgb(headerBg);
+
+    const doc = new jsPDF("l", "pt", "a4");
+    const pageWidth = doc.internal.pageSize.width;
+
+    /* ================= HEADER DESIGN ================= */
+
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
+
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Age Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map((row, index) =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => {
+            if (col.field === "SNo") {
+              return index + 1;
+            }
+            return row[col.field] ?? "";
+          })
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Age_Report.pdf");
+    });
+  };
+
+  const transformRowData = (data) => {
+    return data.map((row, index) => ({
+      "S.No": index + 1,
+      "Employee ID": row.EmployeeId || "",
+      "First Name": row.First_Name || "",
+      "Department": row.department_ID || "",
+      "Designation": row.designation_ID || "",
+      "DOB": row.DOB || "",
+      "Age": row.Age || "",
+    }));
+  };
+
+  const handleExportToExcel = () => {
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
+      return;
+    }
+
+    const screenName = "Age Report";
+    const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+    /* ================= THEME COLORS ================= */
+
+    const titleBg = getCSSVariable("--but").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+    const fontColor = getCSSVariable("--font-color").replace("#", "");
+    const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+    /* ================= HEADER ================= */
+
+    const headerData = [
+      [screenName],
+      company ? [`Company Name: ${company}`] : [],
+      [],
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+    /* ================= TABLE DATA ================= */
+
+    const transformedData = transformRowData(rowData);
+
+    XLSX.utils.sheet_add_json(worksheet, transformedData, {
+      origin: `A${headerData.length + 1}`,
+    });
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
+    ];
+
+    /* ================= TABLE HEADER STYLE ================= */
+
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
       const cell =
-        worksheet[XLSX.utils.encode_cell({ r:R, c:C })];
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
 
-      if(!cell) continue;
+      if (!cell) continue;
 
       cell.s = {
-        font:{ color:{ rgb:fontColor }},
-        fill:R % 2 === 0
-          ? { fgColor:{ rgb:altRowBg }}
-          : undefined,
-        border:{
-          top:{ style:"thin" },
-          bottom:{ style:"thin" },
-          left:{ style:"thin" },
-          right:{ style:"thin" }
-        }
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
       };
     }
-  }
 
-  worksheet["!cols"] = [
-    { wch:15 },
-    { wch:18 },
-    { wch:18 },
-    { wch:18 },
-    { wch:15 },
-    { wch:10 }
-  ];
+    /* ================= TABLE BODY STYLE ================= */
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "AGES");
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
 
-  XLSX.writeFile(workbook, "AGES_Report.xlsx");
-};
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+    /* ================= EXPORT ================= */
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Age Report");
+
+    XLSX.writeFile(workbook, "Age_Report.xlsx");
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -708,22 +766,61 @@ const handleExportToExcel = () => {
       <div className="shadow-lg p-2 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">Age Group Employee Count</h1>
+          <div className="action-wrapper desktop-actions">
+            {["all permission", "view"].some((p) => agesReportPermissions.includes(p)) && (
+              <div className="action-icon print" onClick={generateReport}>
+                <span className="tooltip">Print</span>
+                <i className="fa-solid fa-print"></i>
+              </div>
+            )}
+            {["all permission", "PDF"].some((p) => agesReportPermissions.includes(p)) && (
+              <div className="action-icon print" onClick={exportToPDF}>
+                <span className="tooltip">Pdf</span>
+                <i className="fa-solid fa-file-pdf"></i>
+              </div>
+            )}
+            {["all permission", "Excel"].some((p) => agesReportPermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
+                <span className="tooltip">Excel</span>
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+            )}
+          </div>
 
-          <div className="action-wrapper">
-            <div className="action-icon print" onClick={generateReport}>
-              <span className="tooltip">Print</span>
-              <i className="fa-solid fa-print"></i>
-            </div>
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
 
-            <div className="action-icon print" onClick={exportToPDF}>
-              <span className="tooltip">Pdf</span>
-              <i className="fa-solid fa-file-pdf"></i>
-            </div>
- 
-            <div className="action-icon print" onClick={handleExportToExcel}>
-              <span className="tooltip">Excel</span>
-              <i className="fa-solid fa-file-excel"></i>
-            </div>
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+              {["all permission", "view"].some((p) => agesReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
+                </li>
+              )}
+              {["all permission", "Pdf"].some((p) => agesReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
+                </li>
+              )}
+              {["all permission", "Excel"].some((p) => agesReportPermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </div>

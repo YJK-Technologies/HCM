@@ -36,7 +36,7 @@ function CandidateInterviewReport() {
 
   //purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
-  const companyPermissions = permissions
+  const candidateInterviewRePermissions = permissions
     .filter((permission) => permission.screen_type === "CandidateInterviewRe")
     .map((permission) => permission.permission_type.toLowerCase());
 
@@ -432,102 +432,118 @@ function CandidateInterviewReport() {
   };
 
   const exportToPDF = () => {
-    if (!gridApiRef.current) return;
-
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current || rowData.length === 0) {
+      toast.warning("Please select at least one row to export pdf");
       return;
     }
 
     const selectedRows = gridApiRef.current.getSelectedRows();
     const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
 
-    const headerBgColor = hexToRgb(getCSSVariable("--but"));
-    const tableHeaderColor = hexToRgb(getCSSVariable("--ag-header"));
-    const fontColor = hexToRgb(getCSSVariable("--font-color"));
-    const rowAltColor = hexToRgb(getCSSVariable("--ag-row"));
+    /* 🎨 Theme colors */
+    const headerBg = getCSSVariable("--ag-header") || "#6a1b9a";
+    const fontColor = getCSSVariable("--font-color") || "#000";
 
-    const headers = [
-      [
-        "Candidate Name",
-        "Schedule Date",
-        "Rating",
-        "Final Status",
-        "Decided On",
-        "Remarks",
-      ],
-    ];
+    const hexToRgb = (hex) => {
+      hex = hex.replace("#", "");
+      if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+      }
+      const bigint = parseInt(hex, 16);
+      return [
+        (bigint >> 16) & 255,
+        (bigint >> 8) & 255,
+        bigint & 255
+      ];
+    };
 
-    // ✅ Table body
-    const body = dataSource.map((row) => [
-      row.candidate_name || "",
-      row.scheduled_datetime || "",
-      row.rating || "",
-      row.Final_Status || "",
-      row.decided_on || "",
-      row.remarks || "",
-    ]);
+    const headerRGB = hexToRgb(headerBg);
 
     const doc = new jsPDF("l", "pt", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth = doc.internal.pageSize.width;
 
     /* ================= HEADER DESIGN ================= */
 
-    // Header background bar
-    doc.setFillColor(...headerBgColor);
-    doc.roundedRect(20, 15, pageWidth - 40, 55, 8, 8, "F");
+    // 🎨 Header background bar
+    doc.setFillColor(...headerRGB);
+    doc.rect(0, 0, pageWidth, 60, "F");
 
-    // Title (centered)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(255);
-    doc.text("Condidate Interview Report", pageWidth / 2, 40, {
-      align: "center",
+    // 🖼 Logo (left side)
+    const logoUrl = window.location.origin + "/favicon.ico";
+
+    // NOTE: image must be base64 for jsPDF
+    const loadImage = (url, callback) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        callback(dataURL);
+      };
+      img.src = url;
+    };
+
+    loadImage(logoUrl, (logoBase64) => {
+
+      // Add logo
+      doc.addImage(logoBase64, "PNG", 20, 10, 40, 40);
+
+      // 📝 Title (center)
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont(undefined, "bold");
+      doc.text("Condidate Interview Report", pageWidth / 2, 35, { align: "center" });
+
+      /* ================= SUB HEADER ================= */
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      doc.text(`Total Records: ${dataSource.length}`, 40, 80);
+
+      doc.text(
+        `Printed Date: ${new Date().toLocaleDateString()}`,
+        pageWidth - 180,
+        80
+      );
+
+      /* ================= TABLE ================= */
+
+      const headers = [
+        columnDefs
+          .filter(col => col.field)
+          .map(col => col.headerName)
+      ];
+
+      const body = dataSource.map(row =>
+        columnDefs
+          .filter(col => col.field)
+          .map(col => row[col.field] ?? "")
+      );
+
+      autoTable(doc, {
+        startY: 100,
+        head: headers,
+        body: body,
+
+        styles: {
+          fontSize: 9,
+        },
+
+        headStyles: {
+          fillColor: headerRGB,
+          textColor: [255, 255, 255],
+        },
+
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save("Condidate_Interview_Report.pdf");
     });
-
-    // Sub-title
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()} | Total Records: ${dataSource.length}`,
-      pageWidth / 2,
-      60,
-      { align: "center" }
-    );
-
-    /* ================= TABLE DESIGN ================= */
-
-    autoTable(doc, {
-      startY: 90,
-      head: headers,
-      body: body,
-
-      styles: {
-        fontSize: 10,
-        cellPadding: 8,
-        textColor: fontColor,
-        valign: "middle",
-      },
-
-      headStyles: {
-        fillColor: tableHeaderColor,
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        halign: "center",
-      },
-
-      alternateRowStyles: {
-        fillColor: rowAltColor,
-      },
-
-      columnStyles: {
-        7: { halign: "center", fontStyle: "bold" }, // Status column alignment only
-      },
-
-      margin: { left: 20, right: 20 },
-    });
-
-    doc.save("Condidate_Interview_Report.pdf");
   };
 
   const transformRowData = (data) => {
@@ -537,14 +553,19 @@ function CandidateInterviewReport() {
       "Rating": row.rating || "",
       "Final Status": row.Final_Status || "",
       "Decided On": row.decided_on || "",
-      Remarks: row.remarks || "",
-
+      "Remarks": row.remarks || "",
     }));
   };
 
   const handleExportToExcel = () => {
-    if (!rowData || rowData.length === 0) {
-      toast.warning("There is no data to export.");
+    if (!gridApiRef.current) return;
+
+    const selectedRows = gridApiRef.current.getSelectedRows();
+
+    const dataSource = selectedRows.length > 0 ? selectedRows : rowData;
+
+    if (!dataSource || dataSource.length === 0) {
+      toast.warning("No data to export");
       return;
     }
 
@@ -554,7 +575,7 @@ function CandidateInterviewReport() {
     /* ================= THEME COLORS ================= */
 
     const titleBg = getCSSVariable("--but").replace("#", "");
-    const headerBg = getCSSVariable("--ag-header").replace("#", "");
+    const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
     const fontColor = getCSSVariable("--font-color").replace("#", "");
     const altRowBg = getCSSVariable("--ag-row").replace("#", "");
 
@@ -576,9 +597,8 @@ function CandidateInterviewReport() {
       origin: `A${headerData.length + 1}`,
     });
 
-    const headerRowIndex = headerData.length;
-    const totalCols = Object.keys(transformedData[0]).length;
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    const headerRowIndex = headerData.length;
 
     /* ================= TITLE STYLE ================= */
 
@@ -589,18 +609,22 @@ function CandidateInterviewReport() {
     };
 
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
     ];
 
     /* ================= TABLE HEADER STYLE ================= */
 
-    for (let C = 0; C < totalCols; C++) {
-      const cell = worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+    const totalColumns = Object.keys(transformedData[0]).length;
+
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
       if (!cell) continue;
 
       cell.s = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
-        fill: { fgColor: { rgb: headerBg } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
         alignment: { horizontal: "center" },
         border: {
           top: { style: "thin" },
@@ -614,14 +638,18 @@ function CandidateInterviewReport() {
     /* ================= TABLE BODY STYLE ================= */
 
     for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
-      for (let C = 0; C < totalCols; C++) {
-        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
         if (!cell) continue;
 
         cell.s = {
           font: { color: { rgb: fontColor } },
           fill:
-            R % 2 === 0 ? { fgColor: { rgb: altRowBg } } : undefined,
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
@@ -634,12 +662,12 @@ function CandidateInterviewReport() {
 
     /* ================= COLUMN WIDTH ================= */
 
-    worksheet["!cols"] = Array(totalCols).fill({ wch: 22 });
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
 
     /* ================= EXPORT ================= */
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidate Interview");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidate Interview Report");
 
     XLSX.writeFile(workbook, "Candidate_Interview_Report.xlsx");
   };
@@ -657,20 +685,20 @@ function CandidateInterviewReport() {
           <h1 className="page-title">Candidate Interview Report</h1>
 
           <div className="action-wrapper desktop-actions">
-            {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "view"].some((p) => candidateInterviewRePermissions.includes(p)) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
               </div>
             )}
-            {["all permission", "PDF"].some((p) => companyPermissions.includes(p)) && (
+            {["all permission", "PDF"].some((p) => candidateInterviewRePermissions.includes(p)) && (
               <div className="action-icon print" onClick={exportToPDF}>
                 <span className="tooltip">Pdf</span>
                 <i className="fa-solid fa-file-pdf"></i>
               </div>
             )}
-            {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-              <div className="action-icon print" onClick={handleExportToExcel}>
+            {["all permission", "Excel"].some((p) => candidateInterviewRePermissions.includes(p)) && (
+              <div className="action-icon add" onClick={handleExportToExcel}>
                 <span className="tooltip">Excel</span>
                 <i class="fa-solid fa-file-excel"></i>
               </div>
@@ -680,26 +708,34 @@ function CandidateInterviewReport() {
           {/* Mobile Dropdown */}
           <div className="dropdown mobile-actions">
             <button
-              className="btn btn-primary dropdown-toggle p-1"
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
               data-bs-toggle="dropdown"
+              aria-expanded="false"
             >
-              <i className="fa-solid fa-list"></i>
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
-              {["all permission", "view"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={generateReport}>
-                  <i className="fa-solid fa-print text-dark fs-4"></i>
+              {["all permission", "view"].some((p) => candidateInterviewRePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={generateReport}>
+                    <i className="fa-solid fa-print text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Pdf"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={exportToPDF}>
-                  <i className="fa-solid fa-file-pdf text-dark"></i>
+              {["all permission", "Pdf"].some((p) => candidateInterviewRePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={exportToPDF}>
+                    <i className="fa-solid fa-file-pdf text-dark fs-4"></i>
+                  </button>
                 </li>
               )}
-              {["all permission", "Excel"].some((p) => companyPermissions.includes(p)) && (
-                <li className="dropdown-item" onClick={handleExportToExcel}>
-                  <i class="fa-solid fa-file-excel text-success"></i>
+              {["all permission", "Excel"].some((p) => candidateInterviewRePermissions.includes(p)) && (
+                <li>
+                  <button className="dropdown-item" onClick={handleExportToExcel}>
+                    <i className="fa-solid fa-file-excel add fs-4"></i>
+                  </button>
                 </li>
               )}
             </ul>
