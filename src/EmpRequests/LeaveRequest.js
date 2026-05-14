@@ -19,6 +19,7 @@ const LeaveRequestPage = () => {
   const [Select_slots, setSelect_Slots] = useState("");
   const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
   const [ReportingManager, setReportingManager] = useState("");
+  const [ReportingManagerSC, setReportingManagerSC] = useState("");
   const [LeaveDrop, setLeaveDrop] = useState([]);
   const [SelectedLeave, setSelectedLeave] = useState("");
   const [SlotDrop, setSlotDrop] = useState([]);
@@ -26,12 +27,15 @@ const LeaveRequestPage = () => {
   const [rowData, setrowData] = useState([]);
   const [error, setError] = useState(false);
   const [Managerdrop, setManagerdrop] = useState([]);
+  const [ManagerdropSC, setManagerdropSC] = useState([]);
   const [selectedmanager, setselectedmanager] = useState('');
+  const [selectedmanagerSC, setselectedmanagerSC] = useState('');
   const gridRef = useRef()
   const [loading, setLoading] = useState(false);
   const [isSelectLeave, setIsSelectLeave] = useState(false);
   const [isSelectSlot, setIsSelectSlot] = useState(false);
   const [isSelectManager, setIsSelectManager] = useState(false);
+  const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
   const [isSearchLeave, setIsSearchLeave] = useState(false);
   const [isSearchStatus, setIsSearchStatus] = useState(false);
   const [compOffOptions, setCompOffOptions] = useState([]);
@@ -59,6 +63,20 @@ const LeaveRequestPage = () => {
       .catch((error) => console.error("Error fetching warehouse:", error));
   }, []);
 
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((response) => response.json())
+      .then(setManagerdropSC)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getapplyLeavetype`, {
@@ -309,10 +327,18 @@ const LeaveRequestPage = () => {
     value: option.EmployeeId,
     label: `${option.EmployeeId}-${option.full_name}`,
   }));
+  const filteredOptionManagerSC = ManagerdropSC.map((option) => ({
+    value: option.EmployeeId,
+    label: `${option.EmployeeId}-${option.full_name}`,
+  }));
 
   const handleChangemanager = (selectedOption) => {
     setselectedmanager(selectedOption);
     setReportingManager(selectedOption ? selectedOption.value : '');
+  };
+  const handleChangemanagerSC = (selectedOption) => {
+    setselectedmanagerSC(selectedOption);
+    setReportingManagerSC(selectedOption ? selectedOption.value : '');
   };
 
   const [leaveRowData, setLeaveRowData] = useState([]);
@@ -383,6 +409,55 @@ const LeaveRequestPage = () => {
 
   const leaveColumnDefs = [
     {
+      headerName: "Action",
+      field: "action",
+      width: 160,
+      cellStyle: { textAlign: "center" },
+      sortable: false,
+      filter: false,
+      cellRenderer: (params) => {
+        const row = params.data;
+
+        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No") {
+          return (
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => handleConfirm(row)}
+            >
+              Apply
+            </button>
+          );
+        }
+
+        const reapplyStatuses = ["Cancelled", "Rejected"];
+
+        if (
+          row.RequestType === "Leave" &&
+          reapplyStatuses.includes(row.LeaveStatus)
+        ) {
+          return (
+            <button
+              className="btn btn-primary btn-sm w-100"
+              onClick={() => handleConfirm(row)}
+            >
+              Re-Apply
+            </button>
+          );
+        }
+
+        if (row.RequestType === "Leave" && row.LeaveStatus !== "Cancelled") {
+          return <CancelActionRenderer {...params} />;
+        }
+
+        return null;
+      },
+      tooltipValueGetter: (params) => {
+        return params.data.LeaveStatus === 'Cancelled'
+          ? "This request has already been cancelled."
+          : "Click to cancel this leave request.";
+      }
+    },    
+    {
       headerName: "S.No",
       field: "S.No",
       valueGetter: (params) => params.node.rowIndex + 1,
@@ -446,54 +521,12 @@ const LeaveRequestPage = () => {
       cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Action",
-      field: "action",
-      width: 160,
+      headerName: "Reporting Manager",
+      field: "ReportingManager",
+      editable: false,
       cellStyle: { textAlign: "center" },
-      sortable: false,
-      filter: false,
-      cellRenderer: (params) => {
-        const row = params.data;
-
-        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No") {
-          return (
-            <button
-              className="btn btn-success btn-sm"
-              onClick={() => handleConfirm(row)}
-            >
-              Apply
-            </button>
-          );
-        }
-
-        const reapplyStatuses = ["Cancelled", "Rejected"];
-
-        if (
-          row.RequestType === "Leave" &&
-          reapplyStatuses.includes(row.LeaveStatus)
-        ) {
-          return (
-            <button
-              className="btn btn-primary btn-sm w-100"
-              onClick={() => handleConfirm(row)}
-            >
-              Re-Apply
-            </button>
-          );
-        }
-
-        if (row.RequestType === "Leave" && row.LeaveStatus !== "Cancelled") {
-          return <CancelActionRenderer {...params} />;
-        }
-
-        return null;
-      },
-      tooltipValueGetter: (params) => {
-        return params.data.LeaveStatus === 'Cancelled'
-          ? "This request has already been cancelled."
-          : "Click to cancel this leave request.";
-      }
     },
+
   ];
 
   const handleSearchItem = async () => {
@@ -518,7 +551,8 @@ const LeaveRequestPage = () => {
           FromDate: fromDate ? fromDate : null,
           ToDate: toDate ? toDate : null,
           LeaveStatus: LeaveStatus,
-          LeaveType: leaveType
+          LeaveType: leaveType,
+          ReportingManager: ReportingManagerSC,
         })
       });
       if (response.ok) {
@@ -671,6 +705,8 @@ const LeaveRequestPage = () => {
     setselectedStatus('');
     setleaveType('');
     setselectedLeave('');
+    setselectedmanagerSC('');
+    setReportingManagerSC('');
   };
 
   const handleReloadAdd = () => {
@@ -685,7 +721,9 @@ const LeaveRequestPage = () => {
     setFromDate('');
     setToDate('');
     setselectedmanager('');
+    setselectedmanagerSC('');
     setReportingManager('');
+    setReportingManagerSC('');
     setReason('');
     setReasponsiblePerson('');
   };
@@ -1035,6 +1073,29 @@ const LeaveRequestPage = () => {
             </div>
           </div>
 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedmanagerSC ? "has-value" : ""} 
+              ${isSelectManagerSC ? "is-focused" : ""}`}
+              title="Please Select the Reporting Manager"
+            >
+              <Select
+                value={selectedmanagerSC}
+                options={filteredOptionManagerSC}
+                onChange={handleChangemanagerSC}
+                placeholder=" "
+                onFocus={() => setIsSelectManagerSC(true)}
+                onBlur={() => setIsSelectManagerSC(false)}
+                classNamePrefix="react-select"
+                isClearable
+              />
+              <label className="floating-label">
+                Reporting Manager
+              </label>
+            </div>
+          </div>
+              
           <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearchItem}>

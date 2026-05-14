@@ -1122,6 +1122,27 @@ function TravelRequest({ }) {
       width: 80,
     },
     {
+      headerName: "Action",
+      field: "action",
+      width: 100,
+      cellStyle: { textAlign: "center" },
+      sortable: false,
+      filter: false,
+      cellRenderer: (params) => {
+        const row = params.data;
+        if (row.request_status !== "Cancelled") {
+          return <CancelActionRenderer {...params} />;
+        }
+
+        return null;
+      },
+      tooltipValueGetter: (params) => {
+        return params.data.request_status === 'Cancelled'
+          ? "This request has already been cancelled."
+          : "Click to cancel this visa request.";
+      }
+    },    
+    {
       headerName: "Travel Request ID",
       field: "travel_request_id",
       editable: false,
@@ -1262,27 +1283,6 @@ function TravelRequest({ }) {
         const loan = ManagerdropAG.find((d) => d.value === params.value);
         return loan ? loan.label : params.value;
       },
-    },
-    {
-      headerName: "Action",
-      field: "action",
-      width: 100,
-      cellStyle: { textAlign: "center" },
-      sortable: false,
-      filter: false,
-      cellRenderer: (params) => {
-        const row = params.data;
-        if (row.request_status !== "Cancelled") {
-          return <CancelActionRenderer {...params} />;
-        }
-
-        return null;
-      },
-      tooltipValueGetter: (params) => {
-        return params.data.request_status === 'Cancelled'
-          ? "This request has already been cancelled."
-          : "Click to cancel this visa request.";
-      }
     },
     {
       headerName: "Keyfield",
