@@ -310,6 +310,7 @@ function Input({ }) {
       !address2 ||
       !address3 ||
       !permanantAddress ||
+      !Status ||
       !pan_No ||
       !Aadhaar_no ||
       !selectedmartial ||
@@ -367,7 +368,7 @@ function Input({ }) {
       marital_Status: selectedmartial,
       kids: selectedkids,
       Grade_id: selectedgradeid,
-
+      Status: Status,
       title,
       placeOfBirth,
       nationality,
@@ -433,6 +434,7 @@ function Input({ }) {
           formData.append("Aadhar_no", Aadhaar_no);
           formData.append("Marital_Status", selectedmartial);
           formData.append("Kids", selectedkids);
+          formData.append("Status", Status);
           formData.append("Grade_id", selectedgradeid);
           formData.append("City", city);
           formData.append("State", state);

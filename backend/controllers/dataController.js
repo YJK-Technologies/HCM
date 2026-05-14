@@ -22227,6 +22227,7 @@ const Employeedataupdate = async (req, res) => {
     Other_Id_Type,
     company_code,
     Modified_by,
+    Status,
   } = req.body;
 
   let Photos = null;
@@ -22296,6 +22297,7 @@ const Employeedataupdate = async (req, res) => {
       .input("Other_Id_No", sql.NVarChar, Other_Id_No)
 
       .input("Modified_by", sql.NVarChar, Modified_by)
+      .input("Status", sql.NVarChar, Status)
       .query(`EXEC sp_employee_personal_test
             @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name,
             @Father_Name, @Mother_Name, @DOB, @Gender,
@@ -22305,7 +22307,7 @@ const Employeedataupdate = async (req, res) => {
             @Aadhar_no, @Photos, @Marital_Status,
              @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No,'', @Modified_by,
              '', '', '', '',
-             '', null, null, null`);
+             @Status, null, null, null`);
     res.status(200).json("Employee personal data updated successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -22941,7 +22943,7 @@ const getEmployeeTotalLeaveBalance = async (req, res) => {
 };
 
 const getEmployeeLeavesearch = async (req, res) => {
-  const { FromDate, ToDate, LeaveType, LeaveStatus, company_code, EmployeeId } =
+  const { FromDate, ToDate, LeaveType, LeaveStatus, company_code, EmployeeId, ReportingManager } =
     req.body;
   try {
     const pool = await connection.connectToDatabase();
@@ -22954,7 +22956,8 @@ const getEmployeeLeavesearch = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'','','',@LeaveStatus,'','','',@company_code,'','',0,'','',null,null,null,null,null,null,null,null`);
+      .input("ReportingManager", sql.NVarChar, ReportingManager)
+      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','',0,'','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -46947,6 +46950,7 @@ const AssetIDDropoption = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
 //code Ended by mathu -08-04-2026//code added by Sakthi 08-04-2026
 const getTHRSReport = async (req, res) => {
   const { start_date, end_date, userid, company_code, Status } = req.body;
@@ -46962,7 +46966,7 @@ const getTHRSReport = async (req, res) => {
       .input("userid", sql.VarChar, userid)
       .input("company_code", sql.VarChar, company_code)
       .input("Status", sql.VarChar, Status)
-      .query(` EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
+      .query(`EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code, '', @Status `);
 
     if (result.recordset && result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47574,7 +47578,7 @@ const EmpCompOffList = async (req, res) => {
 };
 
 const compOffSearchCriteria = async (req, res) => {
-  const { FromDate, ToDate, HolidayName, Status, EmployeeId, CompanyCode } = req.body;
+  const { FromDate, ToDate, HolidayName, Status, EmployeeId, CompanyCode, RepManager } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -47587,7 +47591,8 @@ const compOffSearchCriteria = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','','','',@CompanyCode,0,'','','','',@FromDate,@ToDate`);
+      .input("RepManager", sql.NVarChar, RepManager)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,0,'','','','',@FromDate,@ToDate`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
