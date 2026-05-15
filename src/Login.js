@@ -195,7 +195,8 @@ const Login = () => {
           <div className="signup-panel login-input-area">
 
             <div className="panel-header">
-              <h2 className="signup-title">Welcome back</h2>
+              {/* <h2 className="signup-title">Welcome back</h2> */}
+              <h2 className="signup-title">Welcome</h2>
               <p className="signup-subtitle">Sign in to your YJK HCM account</p>
             </div>
 
@@ -261,7 +262,7 @@ const Login = () => {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && setOpen(true)}
                 >
-                  Forgot password?
+                  Forgot Password?
                 </span>
               </div>
               <button

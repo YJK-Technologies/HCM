@@ -7,31 +7,14 @@ import config from "../Apiconfig";
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  PointElement,
-  LineElement,
-} from "chart.js";
+import {Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,  } from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { publicIpv4 } from "public-ip";
 import ShiftRequestModal from "./ShiftRequestModal.js";
 
-ChartJS.register(
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  PointElement,
-  LineElement,
-);
+ChartJS.register( BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,);
 
 const Dashboard = (payslip) => {
   const navigate = useNavigate();
@@ -153,37 +136,12 @@ const Dashboard = (payslip) => {
   };
 
   const shiftConfig = {
-    S1: {
-      label: "Morning Shift",
-      icon: "fa-sun",
-      color: "#f59e0b",
-    },
-    S2: {
-      label: "General Shift",
-      icon: "fa-briefcase",
-      color: "#3b82f6",
-    },
-    S3: {
-      label: "Evening Shift",
-      icon: "fa-cloud-sun",
-      color: "#8b5cf6",
-    },
-    S4: {
-      label: "Night Shift",
-      icon: "fa-moon",
-      color: "#1e293b",
-    },
-    S5: {
-      label: "Split Shift",
-      icon: "fa-clock",
-      color: "#ec4899",
-    },
-    S6: {
-      label: "Week Off",
-      icon: "fa-couch",
-      color: "#22c55e",
-    },
-  };
+    S1: {label: "Morning Shift", icon: "fa-sun", color: "#f59e0b", },
+    S2: {label: "General Shift", icon: "fa-briefcase", color: "#3b82f6", },
+    S3: {label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6", },
+    S4: {label: "Night Shift", icon: "fa-moon", color: "#1e293b", },
+    S5: {label: "Split Shift", icon: "fa-clock", color: "#ec4899", },
+    S6: {label: "Week Off",icon: "fa-couch",color: "#22c55e",},};
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -1600,7 +1558,7 @@ const Dashboard = (payslip) => {
               </button>
             </div>
 
-            <div className="d-flex flex-row align-items-center gap-1 gap-md-2 spacing-mb-3 w-100">
+            <div className="d-flex flex-row align-items-center gap-1 gap-md-2 spacing-mb-3 w-100  mb-2">
               {/* From Date - On mobile width is restricted to 35% to give space for buttons */}
               <div
                 className="inputGroup"
