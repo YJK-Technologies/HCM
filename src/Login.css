@@ -172,12 +172,14 @@ img, picture { max-width: 100%; display: block; }
 .welcome-section { position: relative; z-index: 2; }
 
 .hcm-badge {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: flex; width: max-content; align-items: center; gap: 7px;
   background: var(--gold-dim);
   border: 1px solid var(--gold-border);
   border-radius: 100px;
   padding: 5px 14px;
   margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .hcm-badge-dot {
   width:7px; height:7px; border-radius:50%;
@@ -366,7 +368,8 @@ img, picture { max-width: 100%; display: block; }
   border-radius:var(--btn-radius);
   font-family:'DM Sans',sans-serif;
   font-size:.92rem; font-weight:700;
-  letter-spacing:.08em; text-transform:uppercase;
+  letter-spacing:.08em;
+  text-transform:uppercase;
   cursor:pointer;
   display:flex; align-items:center; justify-content:center; gap:10px;
   box-shadow: 0 4px 22px rgba(201,151,42,0.45), inset 0 1px 0 rgba(255,255,255,0.22);
