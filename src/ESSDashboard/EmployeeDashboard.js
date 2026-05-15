@@ -1600,7 +1600,7 @@ const Dashboard = (payslip) => {
               </button>
             </div>
 
-            <div className="d-flex flex-row align-items-center gap-1 gap-md-2 spacing-mb-3 w-100">
+            <div className="d-flex flex-row align-items-center gap-1 gap-md-2 spacing-mb-3 w-100  mb-2">
               {/* From Date - On mobile width is restricted to 35% to give space for buttons */}
               <div
                 className="inputGroup"

@@ -1,3 +1,4 @@
+//App_content.js
 import ThemeSwitcher from './ThemeSwitcher';
 
 const AppContent = ({ layout }) => {

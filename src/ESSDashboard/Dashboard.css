@@ -4047,7 +4047,7 @@
   /* 4. Align the Search button to the end of the User Code row */
   .spacing-mb-3 .btn-primary[title="Search"] {
     /* width: calc(20% - 4px) !important;  -- Commented for Mobile View - By Dinesh Gokul - 11-05-2026 */
-    height: 38px !important; /* Matches standard input height */
+    /* height: 38px !important;  */
     margin-top: 0 !important;
     display: flex;
     align-items: center;
