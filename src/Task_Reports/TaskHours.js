@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Select from 'react-select';
 import { useNavigate } from "react-router-dom";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx-js-style";
 import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
@@ -407,40 +407,139 @@ const MyAgGridComponent = () => {
     navigate("/ProjectDetails", { state: { selectedRow: cleanedRow } });
   };
 
-
-
-  const transformRowData = (data) => {
-    return data.map(row => ({
-      "Date": row.work_date,
-      "Employee ID": row.user,
-      "Check IN ": row.First_CheckIn,
-      "Check Out": row.Last_CheckOut,
-      "Total Login Hours": row.Total_login_Hours,
-      "Total Worked Hours": row.total_worked_hours,
-    }));
+  const getCSSVariable = (variableName) => {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(variableName)
+      .trim();
   };
 
+const transformRowData = (data) => {
+  return data.map((row) => ({
+    "Date": row.work_date || "",
+    "Employee ID": row.user || "",
+    "Check IN": row.First_CheckIn || "",
+    "Check Out": row.Last_CheckOut || "",
+    "Total Login Hours": row.Total_login_Hours || "",
+    "Total Worked Hours": row.total_worked_hours || "",
+  }));
+};
 
-  const handleExportToExcel = () => {
-    if (rowDataEmployee.length === 0) {
-      toast.warning('There is no data to export.');
-      return;
-    }
+const handleExportToExcel = () => {
+  if (!rowDataEmployee || rowDataEmployee.length === 0) {
+    toast.warning("There is no data to export.");
+    return;
+  }
 
-    const headerData = [
-      ['Task hours & Time Tracking'],
+  const screenName = "Task Hours & Time Tracking Report";
+  const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+  /* ================= THEME COLORS ================= */
+
+  const titleBg = getCSSVariable("--but").replace("#", "");
+  const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+  const fontColor = getCSSVariable("--font-color").replace("#", "");
+  const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+  /* ================= HEADER ================= */
+
+  const headerData = [
+    [screenName],
+    company ? [`Company Name: ${company}`] : [],
+    [],
+  ];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+  /* ================= TABLE DATA ================= */
+
+  const transformedData = transformRowData(rowDataEmployee);
+
+  XLSX.utils.sheet_add_json(worksheet, transformedData, {
+    origin: `A${headerData.length + 1}`,
+  });
+
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  const headerRowIndex = headerData.length;
+
+    /* ================= TITLE STYLE ================= */
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: titleBg } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: Object.keys(transformedData[0]).length - 1 } },
     ];
 
-    const transformedData = transformRowData(rowDataEmployee);
+    /* ================= TABLE HEADER STYLE ================= */
 
-    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+    const totalColumns = Object.keys(transformedData[0]).length;
 
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: 'A5' });
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Task hours & Time Tracking');
-    XLSX.writeFile(workbook, 'Task Hours & Time Tracking.xlsx');
-  };
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: tableHeaderBg } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ================= TABLE BODY STYLE ================= */
+
+    for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+      for (let C = 0; C < totalColumns; C++) {
+        const cell =
+          worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+        if (!cell) continue;
+
+        cell.s = {
+          font: { color: { rgb: fontColor } },
+          fill:
+            R % 2 === 0
+              ? { fgColor: { rgb: altRowBg } }
+              : undefined,
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    }
+
+    /* ================= COLUMN WIDTH ================= */
+
+    worksheet["!cols"] = Array(totalColumns).fill({ wch: 22 });
+
+  /* ================= EXPORT ================= */
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Task Hours & Time Tracking"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    "Task_Hours_&_Time_Tracking_Report.xlsx"
+  );
+};
 
   const getRowStyle = (params) => {
     if (params.data.Status?.toLowerCase() === 'Absent') {
@@ -449,40 +548,130 @@ const MyAgGridComponent = () => {
     return null;
   };
 
-  const transformData = (data) => {
-    return data.map(row => ({
-      "Date": row.TaskDate, // 'YYYY-MM-DD'
-      "Project ID": row.ProjectID,
-      "Task Master ID": row.TaskMasterID,
-      "Task ID": row.DailyTaskID,
-      "Daily Task Title": row.DailyTaskTiltle,
-      "Description": row.TaskDescription,
-      "User": row.userID,
-      "Spend Hours": row.HourseTaken,
-      "Status": row.TaskStauts,
-    }));
+const transformData = (data) => {
+  return data.map((row) => ({
+    "Date": row.TaskDate || "",
+    "Project ID": row.ProjectID || "",
+    "Task Master ID": row.TaskMasterID || "",
+    "Task ID": row.DailyTaskID || "",
+    "Daily Task Title": row.DailyTaskTiltle || "",
+    "Description": row.TaskDescription || "",
+    "User": row.userID || "",
+    "Spend Hours": row.HourseTaken || "",
+    "Status": row.TaskStauts || "",
+  }));
+};
+
+const handleExcel = () => {
+  if (!rowDataTask || rowDataTask.length === 0) {
+    toast.warning("There is no data to export.");
+    return;
+  }
+
+  const screenName = "Task Hours & Time Tracking Report";
+  const company = sessionStorage.getItem("selectedCompanyName") || "";
+
+  /* ================= THEME COLORS ================= */
+
+  const titleBg = getCSSVariable("--but").replace("#", "");
+  const tableHeaderBg = getCSSVariable("--ag-header").replace("#", "");
+  const fontColor = getCSSVariable("--font-color").replace("#", "");
+  const altRowBg = getCSSVariable("--ag-row").replace("#", "");
+
+  /* ================= HEADER ================= */
+
+  const headerData = [
+    [screenName],
+    company ? [`Company Name: ${company}`] : [],
+    [],
+  ];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+
+  /* ================= TABLE DATA ================= */
+
+  const transformedData = transformData(rowDataTask);
+
+  XLSX.utils.sheet_add_json(worksheet, transformedData, {
+    origin: `A${headerData.length + 1}`,
+  });
+
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  const headerRowIndex = headerData.length;
+
+  /* ================= TITLE STYLE ================= */
+
+  worksheet["A1"].s = {
+    font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: titleBg } },
+    alignment: { horizontal: "center", vertical: "center" },
   };
 
-  const handleExcel = () => {
-    if (rowDataTask.length === 0) {
-      toast.warning('There is no data to export.');
-      return;
+  worksheet["!merges"] = [
+    {
+      s: { r: 0, c: 0 },
+      e: {r: 0,c: Object.keys(transformedData[0]).length - 1,},
+    },
+  ];
+
+  /* ================= TABLE HEADER STYLE ================= */
+
+  const totalColumns = Object.keys(transformedData[0]).length;
+
+  for (let C = 0; C < totalColumns; C++) {
+    const cell =
+      worksheet[XLSX.utils.encode_cell({ r: headerRowIndex, c: C })];
+
+    if (!cell) continue;
+
+    cell.s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: tableHeaderBg } },
+      alignment: { horizontal: "center" },
+      border: {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" },
+      },
+    };
+  }
+
+  /* ================= TABLE BODY STYLE ================= */
+
+  for (let R = headerRowIndex + 1; R <= range.e.r; R++) {
+    for (let C = 0; C < totalColumns; C++) {
+      const cell =
+        worksheet[XLSX.utils.encode_cell({ r: R, c: C })];
+
+      if (!cell) continue;
+
+      cell.s = {
+        font: { color: { rgb: fontColor } },
+        fill:
+          R % 2 === 0
+            ? { fgColor: { rgb: altRowBg } }
+            : undefined,
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
     }
+  }
 
-    const headerData = [
-      ['Task hours & Time Tracking'],
-    ];
+  /* ================= COLUMN WIDTH ================= */
+  worksheet["!cols"] = [{ wch: 16 }, { wch: 18 }, { wch: 18 }, { wch: 16 }, { wch: 35 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 18 },];
+  /* ================= EXPORT ================= */
 
-    const transformedData = transformData(rowDataTask);
+  const workbook = XLSX.utils.book_new();
 
-    const worksheet = XLSX.utils.aoa_to_sheet(headerData);
+  XLSX.utils.book_append_sheet(workbook,worksheet,"Task Hours & Time Tracking");
 
-    XLSX.utils.sheet_add_json(worksheet, transformedData, { origin: 'A5' });
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Task hours & Time Tracking');
-    XLSX.writeFile(workbook, 'Task Hours & Time Tracking.xlsx');
-  };
+  XLSX.writeFile(workbook,"Task_Hours_&_Time_Tracking_Report.xlsx");
+};
 
   // Code for how many times check in and check out per employee
   const [rowDataEmployeeTime, setRowDataEmployeeTime] = useState([]);

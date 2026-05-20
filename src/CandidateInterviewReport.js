@@ -217,40 +217,40 @@ function CandidateInterviewReport() {
     gridApiRef.current = params.api;
   };
 
-  const generateReport = () => {
-    if (!gridApi) return;
+const generateReport = () => {
+  if (!gridApi) return;
 
-    const selectedRows = gridApi.getSelectedRows();
+  const selectedRows = gridApi.getSelectedRows();
 
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to print");
-      return;
-    }
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to print");
+    return;
+  }
 
-    /* ================= READ THEME COLORS ================= */
+  /* ================= READ THEME COLORS ================= */
 
-    const headerGradientStart = getCSSVariable("--but");
-    const tableHeaderBg = getCSSVariable("--ag-header");
-    const fontColor = getCSSVariable("--font-color");
-    const rowAltColor = getCSSVariable("--ag-row");
-    const hoverColor = getCSSVariable("--ag-hover");
+  const headerGradientStart = getCSSVariable("--but");
+  const tableHeaderBg = getCSSVariable("--ag-header");
+  const fontColor = getCSSVariable("--font-color");
+  const rowAltColor = getCSSVariable("--ag-row");
+  const hoverColor = getCSSVariable("--ag-hover");
 
-    const logoUrl = window.location.origin + "/favicon.ico";
-    const reportWindow = window.open("", "_blank");
+  const logoUrl = window.location.origin + "/favicon.ico";
 
-    const link = reportWindow.document.createElement("link");
-    link.rel = "icon";
-    link.type = "image/x-icon";
-    link.href = logoUrl;
+  const reportWindow = window.open("", "_blank");
 
-    // 🔥 append to HEAD
-    reportWindow.document.head.appendChild(link);
-
-    reportWindow.document.write(`
+  reportWindow.document.write(`
     <html>
     <head>
       <title>Candidate Interview Report</title>
+
+      <link rel="icon" type="image/x-icon" href="${logoUrl}" />
+
       <style>
+        *{
+          box-sizing:border-box;
+        }
+
         body {
           font-family: 'Segoe UI', sans-serif;
           margin: 0;
@@ -259,55 +259,74 @@ function CandidateInterviewReport() {
           color: ${fontColor};
         }
 
+        .report-container{
+          width:100%;
+        }
+
         .header {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           background: ${tableHeaderBg};
           padding: 15px 20px;
           color: white;
-          border-radius: 8px;
+          border-radius: 10px;
+          margin-bottom: 20px;
         }
-        
+
         .logo {
           height: 60px;
+          width: 60px;
+          object-fit: contain;
         }
-        
+
         .title-section {
           flex: 1;
           text-align: center;
         }
-      
+
         .title-section h2 {
           margin: 0;
+          font-size: 24px;
+          letter-spacing: 0.5px;
         }
 
         .sub-info {
-          margin: 15px 0;
+          margin: 15px 0 20px;
           font-size: 14px;
           color: #555;
           display: flex;
           justify-content: space-between;
+          font-weight: 600;
         }
 
         table {
           width: 100%;
           border-collapse: collapse;
           background: white;
-          border-radius: 8px;
+          border-radius: 10px;
           overflow: hidden;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        thead {
+          display: table-header-group;
         }
 
         th {
           background-color: ${tableHeaderBg};
           color: white;
-          padding: 10px;
+          padding: 12px 10px;
           text-align: left;
+          font-size: 14px;
+          border: 1px solid #dcdcdc;
         }
 
         td {
-          padding: 8px;
-          border-bottom: 1px solid #ddd;
+          padding: 10px;
+          border: 1px solid #e0e0e0;
+          font-size: 13px;
+          word-break: break-word;
         }
 
         tr:nth-child(even) {
@@ -319,96 +338,145 @@ function CandidateInterviewReport() {
         }
 
         .footer {
-          margin-top: 30px;
+          margin-top: 25px;
           text-align: center;
           font-size: 13px;
           color: #777;
+          font-weight: 500;
+        }
+
+        .print-btn-wrapper{
+          text-align:center;
+          margin-top:20px;
         }
 
         .print-btn {
-          margin-top: 20px;
-          padding: 10px 20px;
+          padding: 10px 24px;
           background: ${headerGradientStart};
           color: white;
           border: none;
-          border-radius: 5px;
+          border-radius: 6px;
           cursor: pointer;
           font-size: 14px;
+          font-weight: 600;
         }
 
         .print-btn:hover {
-          opacity: 0.85;
+          opacity: 0.9;
         }
 
+        /* ================= PRINT ================= */
+
         @media print {
-          .print-btn {
-            display: none;
+
+          @page {
+            size: auto;
+            margin: 12mm;
           }
+
           body {
-            background: white;
+            background: white !important;
+            padding: 0;
+            margin: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .print-btn-wrapper {
+            display: none !important;
+          }
+
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+            border-radius: 0;
+          }
+
+          table {
+            box-shadow: none;
+          }
+
+          th {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+
+          .footer {
+            margin-top: 15px;
           }
         }
       </style>
     </head>
+
     <body>
 
-      <div class="header">
-        <img src="${logoUrl}" class="logo" />
-        <div class="title-section">
-          <h2>Candidate Interview Report</h2>
+      <div class="report-container">
+
+        <div class="header">
+          <img src="${logoUrl}" class="logo" />
+
+          <div class="title-section">
+            <h2>Candidate Interview Report</h2>
+          </div>
+
+          <div style="width:60px;"></div>
         </div>
-      </div>
 
-      <div class="sub-info">
-        <div>Total Records: ${selectedRows.length}</div>
-        <div>Printed Date: ${new Date().toLocaleDateString()}</div>
-      </div>
+        <div class="sub-info">
+          <div>Total Records : ${selectedRows.length}</div>
+          <div>Printed Date : ${new Date().toLocaleDateString()}</div>
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Candidate Name</th>
-            <th>Schedule Date</th>
-            <th>Rating</th>
-            <th>Final Status</th>
-            <th>Decided On</th>
-            <th>Remarks</th>
-          </tr>
-        </thead>
-        <tbody>
-  `);
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th>Schedule Date</th>
+              <th>Rating</th>
+              <th>Final Status</th>
+              <th>Decided On</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
 
-    selectedRows.forEach((row) => {
-      reportWindow.document.write(`
-      <tr>
-        <td>${row.candidate_name || ""}</td>
-        <td>${row.scheduled_datetime || ""}</td>
-        <td>${row.rating || ""}</td>
-        <td>${row.Final_Status || ""}</td>
-        <td>${row.decided_on || ""}</td>
-        <td>${row.remarks || ""}</td>
-      </tr>
-    `);
-    });
+          <tbody>
 
-    reportWindow.document.write(`
-        </tbody>
-      </table>
+            ${selectedRows.map((row) => `
+              <tr>
+                <td>${row.candidate_name || ""}</td>
+                <td>${row.scheduled_datetime || ""}</td>
+                <td>${row.rating || ""}</td>
+                <td>${row.Final_Status || ""}</td>
+                <td>${row.decided_on || ""}</td>
+                <td>${row.remarks || ""}</td>
+              </tr>
+            `).join("")}
 
-      <div style="text-align:center;">
-        <button class="print-btn" onclick="window.print()">Print</button>
-      </div>
+          </tbody>
+        </table>
 
-      <div class="footer">
-        © ${new Date().getFullYear()} YJK Technologies | Confidential Report
+        <div class="print-btn-wrapper">
+          <button class="print-btn" onclick="window.print()">
+            Print
+          </button>
+        </div>
+
+        <div class="footer">
+          © ${new Date().getFullYear()} YJK Technologies | Confidential Report
+        </div>
+
       </div>
 
     </body>
     </html>
   `);
 
-    reportWindow.document.close();
-  };
+  reportWindow.document.close();
+};
 
   const reloadGridData = () => {
     window.location.reload();

@@ -292,27 +292,27 @@ function TotalCandidatesApplied() {
     },
   ];
 
-  const generateReport = () => {
-    if (!gridApi) return;
+const generateReport = () => {
+  if (!gridApi) return;
 
-    const selectedRows = gridApi
-      .getSelectedRows()
-      .filter((row) => row.candidate_id !== null);
+  const selectedRows = gridApi
+    .getSelectedRows()
+    .filter((row) => row.candidate_id !== null);
 
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to print");
-      return;
-    }
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to print");
+    return;
+  }
 
-    /* ================= READ THEME COLORS ================= */
+  /* ================= READ THEME COLORS ================= */
 
-    const headerGradientStart = getCSSVariable("--but");
-    const tableHeaderBg = getCSSVariable("--ag-header");
-    const fontColor = getCSSVariable("--font-color");
-    const rowAltColor = getCSSVariable("--ag-row");
-    const hoverColor = getCSSVariable("--ag-hover");
+  const headerGradientStart = getCSSVariable("--but");
+  const tableHeaderBg = getCSSVariable("--ag-header");
+  const fontColor = getCSSVariable("--font-color");
+  const rowAltColor = getCSSVariable("--ag-row");
+  const hoverColor = getCSSVariable("--ag-hover");
 
-    const logoUrl = window.location.origin + "/favicon.ico";
+      const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
 
     const link = reportWindow.document.createElement("link");
@@ -323,125 +323,214 @@ function TotalCandidatesApplied() {
     // 🔥 append to HEAD
     reportWindow.document.head.appendChild(link);
 
-    reportWindow.document.write(`
-      <html>
-      <head>
-        <title>Total Candidates Applied</title>
-        <style>
+  reportWindow.document.write(`
+    <html>
+    <head>
+
+      <title>Total Candidates Applied</title>
+
+      <link rel="icon" type="image/x-icon" href="${logoUrl}" />
+
+      <style>
+
+        *{
+          box-sizing:border-box;
+        }
+
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          margin: 0;
+          padding: 20px;
+          background-color: #f4f6f9;
+          color: ${fontColor};
+        }
+
+        .report-container{
+          width:100%;
+        }
+
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: ${tableHeaderBg};
+          padding: 15px 20px;
+          color: white;
+          border-radius: 10px;
+          margin-bottom: 20px;
+        }
+
+        .logo {
+          width: 60px;
+          height: 60px;
+          object-fit: contain;
+        }
+
+        .title-section {
+          flex: 1;
+          text-align: center;
+        }
+
+        .title-section h2 {
+          margin: 0;
+          font-size: 24px;
+          letter-spacing: 0.5px;
+        }
+
+        .sub-info {
+          margin: 15px 0 20px;
+          font-size: 14px;
+          color: #555;
+          display: flex;
+          justify-content: space-between;
+          font-weight: 600;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        thead {
+          display: table-header-group;
+        }
+
+        th {
+          background-color: ${tableHeaderBg};
+          color: white;
+          padding: 12px 10px;
+          text-align: left;
+          font-size: 14px;
+          border: 1px solid #dcdcdc;
+        }
+
+        td {
+          padding: 10px;
+          border: 1px solid #e0e0e0;
+          font-size: 13px;
+          word-break: break-word;
+          vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+          background-color: ${rowAltColor};
+        }
+
+        tr:hover {
+          background-color: ${hoverColor};
+        }
+
+        .footer {
+          margin-top: 25px;
+          text-align: center;
+          font-size: 13px;
+          color: #777;
+          font-weight: 500;
+        }
+
+        .print-btn-wrapper{
+          text-align:center;
+          margin-top:20px;
+        }
+
+        .print-btn {
+          padding: 10px 24px;
+          background: ${headerGradientStart};
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .print-btn:hover {
+          opacity: 0.9;
+        }
+
+        /* ================= PRINT ================= */
+
+        @media print {
+
+          @page {
+            size: landscape;
+            margin: 10mm;
+          }
+
           body {
-            font-family: 'Segoe UI', sans-serif;
+            background: white !important;
+            padding: 0;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f6f9;
-            color: ${fontColor};
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-  
+
+          .print-btn-wrapper {
+            display: none !important;
+          }
+
           .header {
-            display: flex;
-            align-items: center;
-            background: ${tableHeaderBg};
-            padding: 15px 20px;
-            color: white;
-            border-radius: 8px;
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+            border-radius: 0;
           }
-          
-          .logo {
-            height: 60px;
-          }
-          
-          .title-section {
-            flex: 1;
-            text-align: center;
-          }
-        
-          .title-section h2 {
-            margin: 0;
-          }
-  
-          .sub-info {
-            margin: 15px 0;
-            font-size: 14px;
-            color: #555;
-            display: flex;
-            justify-content: space-between;
-          }
-  
+
           table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: none;
           }
-  
+
           th {
-            background-color: ${tableHeaderBg};
-            color: white;
-            padding: 10px;
-            text-align: left;
+            background: ${tableHeaderBg} !important;
+            color: white !important;
           }
-  
-          td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-          }
-  
+
           tr:nth-child(even) {
-            background-color: ${rowAltColor};
+            background-color: ${rowAltColor} !important;
           }
-  
-          tr:hover {
-            background-color: ${hoverColor};
-          }
-  
+
           .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 13px;
-            color: #777;
+            margin-top: 15px;
           }
-  
-          .print-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: ${headerGradientStart};
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-          }
-  
-          .print-btn:hover {
-            opacity: 0.85;
-          }
-  
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
-          }
-        </style>
-      </head>
-      <body>
-  
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="report-container">
+
         <div class="header">
+
           <img src="${logoUrl}" class="logo" />
+
           <div class="title-section">
             <h2>Total Candidates Applied</h2>
           </div>
+
+          <div style="width:60px;"></div>
+
         </div>
-  
+
         <div class="sub-info">
-          <div>Total Records: ${selectedRows.length}</div>
-          <div>Printed Date: ${new Date().toLocaleDateString()}</div>
+
+          <div>
+            Total Records : ${selectedRows.length}
+          </div>
+
+          <div>
+            Printed Date : ${new Date().toLocaleDateString()}
+          </div>
+
         </div>
-  
+
         <table>
+
           <thead>
             <tr>
               <th>Candidate Id</th>
@@ -455,43 +544,51 @@ function TotalCandidatesApplied() {
               <th>Job Description</th>
             </tr>
           </thead>
+
           <tbody>
-    `);
 
-    selectedRows.forEach((row) => {
-      reportWindow.document.write(`
-        <tr>
-          <td>${row.candidate_id || ""}</td>
-          <td>${row.candidate_name || ""}</td>
-          <td>${row.email || ""}</td>
-          <td>${row.phone || ""}</td>
-          <td>${row.applied_job_id || ""}</td>
-          <td>${row.Education || ""}</td>
-          <td>${row.Experience || ""}</td>
-          <td>${row.Related_experience || ""}</td>
-          <td>${row.Job_description || ""}</td>
-        </tr>
-      `);
-    });
+            ${selectedRows
+              .map(
+                (row) => `
+                  <tr>
+                    <td>${row.candidate_id || ""}</td>
+                    <td>${row.candidate_name || ""}</td>
+                    <td>${row.email || ""}</td>
+                    <td>${row.phone || ""}</td>
+                    <td>${row.applied_job_id || ""}</td>
+                    <td>${row.Education || ""}</td>
+                    <td>${row.Experience || ""}</td>
+                    <td>${row.Related_experience || ""}</td>
+                    <td>${row.Job_description || ""}</td>
+                  </tr>
+                `
+              )
+              .join("")}
 
-    reportWindow.document.write(`
           </tbody>
+
         </table>
-  
-        <div style="text-align:center;">
-          <button class="print-btn" onclick="window.print()">Print</button>
+
+        <div class="print-btn-wrapper">
+
+          <button class="print-btn" onclick="window.print()">
+            Print
+          </button>
+
         </div>
-  
+
         <div class="footer">
           © ${new Date().getFullYear()} YJK Technologies | Confidential Report
         </div>
-  
-      </body>
-      </html>
-    `);
 
-    reportWindow.document.close();
-  };
+      </div>
+
+    </body>
+    </html>
+  `);
+
+  reportWindow.document.close();
+};
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
