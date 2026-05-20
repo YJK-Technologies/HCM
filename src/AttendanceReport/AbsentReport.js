@@ -217,8 +217,6 @@ function AbsentReport() {
             width: 100,
         },
         {
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
             headerName: "Attendance Date",
             field: "AttendanceDate",
             editable: false,
