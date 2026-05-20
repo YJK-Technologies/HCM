@@ -106,8 +106,10 @@ body {
   color: var(--font-color); /* Changed from rgb(0, 0, 0) to --font-color */
 }
 
-.ag-paging-row-summary-panel{ 
-  display: none;
+@media (max-width: 768px) {
+  .ag-paging-row-summary-panel {
+    display: none !important;
+  }
 }
 
 .ag-paging-panel {

@@ -597,48 +597,6 @@
   }
 }
 
-/* --- SCROLLBAR UNIFICATION FIX --- */
-
-/* 1. Target the main navigation container */
-.sidebar .primary-nav {
-  flex: 1;
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: hidden; /* Prevents horizontal layout breaking */
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* For Firefox */
-}
-
-/* 2. Chrome, Safari, and Edge styling (The "Yellow Box" look) */
-.sidebar .primary-nav::-webkit-scrollbar {
-  width: 6px; /* Match the width of your submenu scrollbar */
-}
-
-.sidebar .primary-nav::-webkit-scrollbar-track {
-  background: transparent; /* Keep it clean */
-}
-
-.sidebar .primary-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
-  border-radius: 10px;
-  transition: background 0.3s ease;
-}
-
-.sidebar .primary-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4); /* Brighten on hover */
-}
-
-/* 3. Ensure the main sidebar doesn't show the 'red' scrollbar */
-.sidebar {
-  overflow: hidden; /* This forces the scroll to happen ONLY in primary-nav */
-}
-
-/* 4. Mobile adjustment - Keep it thin but usable */
-@media (max-width: 768px) {
-  .sidebar .primary-nav::-webkit-scrollbar {
-    width: 4px; /* Even thinner on mobile to save space */
-  }
-}
-
 /* SIDEBAR SUBMENU OVERLAPPING BUG FIXING */
 .sidebar-nav {
   flex: 1;

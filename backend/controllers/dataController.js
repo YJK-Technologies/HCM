@@ -48789,7 +48789,7 @@ const GetAssetRequest = async (req, res) => {
       .input("mode", sql.NVarChar, "RA")
       .input("company_code", sql.NVarChar, company_code)
       .input("RepManager", sql.NVarChar, RepManager)
-      .query(` EXEC sp_employee_assets_request_dtls_test @mode,0, 0, '', '', @company_code, '', 0, '', '', '', '', '', '', '', '',@RepManager`);
+      .query(`EXEC sp_employee_assets_request_dtls_test @mode,0, 0, '', '', @company_code, '', 0, '', '', '', '', '', '', '', '',@RepManager`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
