@@ -615,7 +615,7 @@ function Input({ }) {
         </div>
       </div>
 
-      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box mb-2">
         <div className="row g-3">
 
           <div className="col-md-2">

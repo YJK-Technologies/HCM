@@ -32,14 +32,20 @@ const EmployeeCompOff = () => {
     useEffect(() => {
         if (location.state) {
             const { work_date, holiday_name } = location.state;
-            let formattedDate = "";
 
-            if (work_date) {
-                const parts = work_date.split("-");
-                formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            }
+            const formatDate = (date) => {
+                if (!date) return "";
 
-            setHolidayDate(formattedDate || "");
+                // convert / to -
+                date = date.replace(/\//g, "-");
+
+                const d = new Date(date);
+
+                // convert to yyyy-mm-dd for input type="date"
+                return !isNaN(d) ? d.toISOString().split("T")[0] : "";
+            };
+
+            setHolidayDate(formatDate(work_date));
             setHolidayName(holiday_name || "");
         }
     }, [location.state]);
@@ -70,7 +76,7 @@ const EmployeeCompOff = () => {
 
         if (FromDate && selectedDate !== FromDate) {
             toast.warning("Comp Off allows only single day");
-            setToDate(FromDate); 
+            setToDate(FromDate);
             return;
         }
         setToDate(selectedDate);
@@ -221,7 +227,7 @@ const EmployeeCompOff = () => {
                                 className="exp-input-field form-control"
                                 value={ToDate}
                                 onChange={handleToDateChange}
-                                disabled 
+                                disabled
                                 placeholder=" "
                                 autoComplete="off"
                             />

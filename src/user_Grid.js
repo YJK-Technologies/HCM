@@ -857,6 +857,7 @@ function UserGrid() {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">User</h1>
+          
           <div className="action-wrapper desktop-actions">
             {["add", "all permission"].some((permission) => userPermission.includes(permission)) && (
               <div className="action-icon add" onClick={handleNavigateToForm}>
@@ -1092,7 +1093,7 @@ function UserGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
@@ -1121,7 +1122,7 @@ function UserGrid() {
             onSelectionChanged={onSelectionChanged}
             pagination={true}
             onRowSelected={onRowSelected}
-            paginationPageSizeSelector={false}
+            paginationAutoPageSize={true}
           />
         </div>
       </div>
