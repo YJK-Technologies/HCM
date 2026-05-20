@@ -141,7 +141,7 @@ const Dashboard = () => {
 
   const hasStoppedRef = useRef(false);
   const intervalRef = useRef(null);
-  
+
 
   // useEffect(() => {
   //   fetchDashboardData();
@@ -239,10 +239,10 @@ const Dashboard = () => {
     toDate = TRToDate,
     userId = user
   ) => {
-      if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
-        toast.warning("To Date should not be earlier than From Date");
-        return;
-      }
+    if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+      toast.warning("To Date should not be earlier than From Date");
+      return;
+    }
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -1010,10 +1010,10 @@ const Dashboard = () => {
           },
         );
 
-         if (res.ok) empData = await res.json();
-       } catch (err) {
-         console.log("Employee API failed");
-       }
+        if (res.ok) empData = await res.json();
+      } catch (err) {
+        console.log("Employee API failed");
+      }
 
       /* ---------- Employee Family Change ---------- */
       try {
@@ -1082,8 +1082,10 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code,
-            RepManager: user_code, }),
+            body: JSON.stringify({
+              company_code,
+              RepManager: user_code,
+            }),
           },
         );
 
@@ -1460,8 +1462,8 @@ const Dashboard = () => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      } 
-      
+      }
+
       /* --------------- Asset Change -----------------*/
       else if (type === "Asset") {
         url = `${config.apiBaseUrl}/ApproveAssetRequest`;
@@ -1757,7 +1759,7 @@ const Dashboard = () => {
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
       cellStyle: { textAlign: "center" },
-    },    
+    },
     {
       headerName: "Employee Id",
       field: "EmployeeId",
@@ -1787,7 +1789,7 @@ const Dashboard = () => {
       valueGetter: (params) => params.node.rowIndex + 1,
       width: 80,
       cellStyle: { textAlign: "center" },
-    },      
+    },
     {
       headerName: "Date",
       field: "Date",
@@ -1928,8 +1930,10 @@ const Dashboard = () => {
 
   // AG Grid columns For Time and Hours
   const columnDefsTHRS = [
-    { headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1,
-      width: 80,cellStyle: { textAlign: "center" },},
+    {
+      headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1,
+      width: 80, cellStyle: { textAlign: "center" },
+    },
     { headerName: "User", field: "user_name" },
     {
       headerName: "Working Date",
@@ -2718,7 +2722,7 @@ const Dashboard = () => {
     setRowData([])
   };
 
-    const clearInputsField = () => {
+  const clearInputsField = () => {
     setShiftEndTime('');
     setShiftStartTime('');
     setShiftDay('');
@@ -2743,7 +2747,7 @@ const Dashboard = () => {
     setShiftRowData([])
   };
 
-    const clearInputs = () => {
+  const clearInputs = () => {
     setSelectedMaritalStatus('');
     setMaritalStatus('');
     setAccountNo('');
@@ -3377,14 +3381,14 @@ const Dashboard = () => {
         </div>
 
         <div className="col-6 spacing-mt-2 my-team-wrapper">
-          <div className="app-card-base rounded birthday-card-wrapper app-shadow-lg height-full">
+          <div className=" rounded birthday-card-wrapper app-shadow-lg height-full">
             {/* Header */}
             <div className="myteam-header">
               <h6 className="card-title-heading spacing-mb-2">Time Tracking</h6>
             </div>
 
             {/* Filters */}
-            <div className="d-flex flex-row align-items-center gap-2 spacing-mb-3 px-2">
+            <div className="row g-3 mb-2">
               <div className="col-md-3">
                 <div className="inputGroup">
                   <input
@@ -3434,14 +3438,16 @@ const Dashboard = () => {
               </div>
 
               {/* Search */}
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => fetchTHRSGridData()}
-                style={{ height: "30px", width: "40px" }}
-                title="Search"
-              >
-                <i className="fa-solid fa-magnifying-glass"></i>
-              </button>
+              <div className="col-md-3 mt-2 d-flex justify-content-end justify-content-md-start">
+                <button
+                  className="btn btn-sm btn-primary d-flex justify-content-center align-items-center"
+                  onClick={() => fetchTHRSGridData()}
+                  style={{ height: "30px", width: "40px" }}
+                  title="Search"
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </button>
+              </div>
 
             </div>
 
@@ -3467,8 +3473,8 @@ const Dashboard = () => {
               Employee Shift Details
             </h6>
 
-            <div className="dashboard-row mb-2-me-1">
-              <div className="grid-col-md-3">
+            <div className="row mb-2-me-1 g-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3484,7 +3490,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3500,7 +3506,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftEmpId ? "has-value" : ""} 
@@ -3523,7 +3529,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftDeptId ? "has-value" : ""} 
@@ -3546,7 +3552,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftDesigId ? "has-value" : ""} 
@@ -3569,7 +3575,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftPatternId ? "has-value" : ""} 
@@ -3592,7 +3598,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftCode ? "has-value" : ""} 
@@ -3615,7 +3621,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3631,7 +3637,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3647,7 +3653,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3663,7 +3669,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="ms-2">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleShiftSearch}>
                     <span className="tooltip">Search</span>
@@ -3711,8 +3717,8 @@ const Dashboard = () => {
               Employee Details
             </h6>
 
-            <div className="dashboard-row mb-2-me-1">
-              <div className="grid-col-md-3">
+            <div className="row mb-2-me-1 g-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3728,7 +3734,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3744,7 +3750,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3760,7 +3766,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3776,7 +3782,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3792,7 +3798,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3808,7 +3814,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3824,7 +3830,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     id="status"
@@ -3840,7 +3846,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="grid-col-md-5">
+              <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                 ${selectedMaritalStatus ? "has-value" : ""} 
@@ -3886,7 +3892,7 @@ const Dashboard = () => {
                 </div>
               </div> */}
 
-              <div className="ms-2">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleSearch}>
                     <span className="tooltip">Search</span>

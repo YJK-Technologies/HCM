@@ -783,7 +783,7 @@ function NumberSeriesGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>

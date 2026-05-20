@@ -302,11 +302,13 @@ function EmployeeAssets({ }) {
 
   const handleSave = async () => {
     if (!EmployeeID?.trim()) {
+      setError(true);
       toast.warning("Employee ID is required");
       return;
     }
 
     // Validate required fields
+    setError(false);
     for (const group of Assetvalue) {
       for (const member of group.members) {
         if (
@@ -314,11 +316,13 @@ function EmployeeAssets({ }) {
           !member.ExpectedReturnDate ||
           !member.selectedStatus
         ) {
+          setError(true);
           toast.warning("Please fill all required fields");
           return;
         }
       }
     }
+    setError(false); 
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {

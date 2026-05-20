@@ -615,7 +615,7 @@ function Input({ }) {
         </div>
       </div>
 
-      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box mb-2">
         <div className="row g-3">
 
           <div className="col-md-2">
@@ -755,6 +755,7 @@ function Input({ }) {
                 onBlur={() => setIsSelectCity(false)}
                 classNamePrefix="react-select"
                 isClearable
+                openMenuOnFocus
                 ref={City}
                 onKeyDown={(e) => handleKeyDown(e, State, City)}
               />
@@ -772,6 +773,7 @@ function Input({ }) {
               <Select
                 id="state"
                 isClearable
+                openMenuOnFocus
                 value={selectedState}
                 onChange={handleChangeState}
                 options={filteredOptionState}
@@ -816,6 +818,7 @@ function Input({ }) {
               <Select
                 id="country"
                 isClearable
+                openMenuOnFocus
                 value={selectedCountry}
                 onChange={handleChangeCountry}
                 options={filteredOptionCountry}
@@ -860,6 +863,7 @@ function Input({ }) {
               <Select
                 id="status"
                 isClearable
+                openMenuOnFocus
                 value={selectedStatus}
                 onChange={handleChangeStatus}
                 options={filteredOptionStatus}
@@ -983,6 +987,7 @@ function Input({ }) {
                 id="locno"
                 value={selectedLocation}
                 isClearable
+                openMenuOnFocus
                 onChange={handleChangeLocation}
                 options={filteredOptionLocation}
                 classNamePrefix="react-select"
@@ -998,7 +1003,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container">
+              <div className="image-upload-container"  onClick={() => logo.current.click()}>
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
@@ -1009,7 +1014,11 @@ function Input({ }) {
                     <button
                       type="button"
                       className="delete-image-btn"
-                      onClick={handleRemoveLogo}
+                      // onClick={handleRemoveLogo}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveLogo();
+                      }}
                     >
                       &times;
                     </button>
@@ -1030,6 +1039,7 @@ function Input({ }) {
                   accept="image/*"
                   onChange={handleFileSelect}
                   ref={logo}
+                  style={{ pointerEvents: "none" }}
                   onKeyDown={(e) => handleKeyDown(e, sign, logo)}
                 />
               </div>

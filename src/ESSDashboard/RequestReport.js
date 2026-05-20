@@ -3880,7 +3880,7 @@ function RequestReport({ }) {
       headerName: "Employee ID",
       field: "employee_id",
       editable: false,
-            cellEditorParams: {
+      cellEditorParams: {
         values: employeeIdDropGridAG.map(d => d.value),
       },
       valueFormatter: (params) => {
@@ -4462,7 +4462,7 @@ function RequestReport({ }) {
               </div>
 
               {/* Search + Reload Buttons */}
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handLoanSearch}>
                     <span className="tooltip">Search</span>
@@ -4474,13 +4474,10 @@ function RequestReport({ }) {
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
 
-                  <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelLoan}
-                  >
+                  {/* <div className="icon-btn excel" onClick={handleExportToExcelLoan}>
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -4540,8 +4537,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedEmpIdVisaSc ? "has-value" : ""} 
-                            ${isSelectedEmpIdVisaSc ? "is-focused" : ""}`}
+                  ${selectedEmpIdVisaSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdVisaSc ? "is-focused" : ""}`}
                 >
                   <Select
                     id="department"
@@ -4589,8 +4586,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedCountryIdVisaSc ? "has-value" : ""} 
-                            ${isSelectedCountryIdVisaSc ? "is-focused" : ""}`}
+                  ${selectedCountryIdVisaSc ? "has-value" : ""} 
+                  ${isSelectedCountryIdVisaSc ? "is-focused" : ""}`}
                 >
                   <Select
                     id="country"
@@ -4613,8 +4610,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedVisaTypeSc ? "has-value" : ""} 
-                            ${isSelectedVisaTypeSc ? "is-focused" : ""}`}
+                  ${selectedVisaTypeSc ? "has-value" : ""} 
+                  ${isSelectedVisaTypeSc ? "is-focused" : ""}`}
                 >
                   <Select
                     id="country"
@@ -4695,8 +4692,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedReqStatusVisaSc ? "has-value" : ""} 
-                            ${isSelectedReqStatusVisaSc ? "is-focused" : ""}`}
+                  ${selectedReqStatusVisaSc ? "has-value" : ""} 
+                  ${isSelectedReqStatusVisaSc ? "is-focused" : ""}`}
                 >
                   <Select
                     id="country"
@@ -4741,8 +4738,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedPriorityVisaSc ? "has-value" : ""} 
-                            ${isSelectedPriorityVisaSc ? "is-focused" : ""}`}
+                  ${selectedPriorityVisaSc ? "has-value" : ""} 
+                  ${isSelectedPriorityVisaSc ? "is-focused" : ""}`}
                 >
                   <Select
                     id="country"
@@ -4828,7 +4825,7 @@ function RequestReport({ }) {
               </div>
 
               {/* Search + Reload Buttons */}
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleVisaSearch}>
                     <span className="tooltip">Search</span>
@@ -4840,13 +4837,10 @@ function RequestReport({ }) {
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
 
-                  <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelVisa}
-                  >
+                  {/* <div className="icon-btn excel" onClick={handleExportToExcelVisa}>
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -4906,8 +4900,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                ${selectedEmpIdTravelSc ? "has-value" : ""} 
-                                ${isSelectedEmpIdTravelSc ? "is-focused" : ""}`}
+                  ${selectedEmpIdTravelSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdTravelSc ? "is-focused" : ""}`}
                   title="Please select the Employee ID"
                 >
                   <Select
@@ -4931,8 +4925,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                ${selectedDepTravelSc ? "has-value" : ""} 
-                                ${isSelectedDepTravelSc ? "is-focused" : ""}`}
+                  ${selectedDepTravelSc ? "has-value" : ""} 
+                  ${isSelectedDepTravelSc ? "is-focused" : ""}`}
                   title="Please select the Department"
                 >
                   <Select
@@ -5143,8 +5137,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                ${selectedCurrencyTravelSc ? "has-value" : ""} 
-                                ${isSelectedCurrencyTravelSc ? "is-focused" : ""}`}
+                  ${selectedCurrencyTravelSc ? "has-value" : ""} 
+                  ${isSelectedCurrencyTravelSc ? "is-focused" : ""}`}
                   title="Please select the Currency Code"
                 >
                   <Select
@@ -5188,8 +5182,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                ${selectedPriorityTravelSc ? "has-value" : ""} 
-                                ${isSelectedPriorityTravelSc ? "is-focused" : ""}`}
+                  ${selectedPriorityTravelSc ? "has-value" : ""} 
+                  ${isSelectedPriorityTravelSc ? "is-focused" : ""}`}
                   title="Please select the Priority Level"
                 >
                   <Select
@@ -5213,8 +5207,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                ${selectedManagerTravelSc ? "has-value" : ""} 
-                                ${isSelectedManagerTravelSc ? "is-focused" : ""}`}
+                  ${selectedManagerTravelSc ? "has-value" : ""} 
+                  ${isSelectedManagerTravelSc ? "is-focused" : ""}`}
                   title="Please select the Manager"
                 >
                   <Select
@@ -5237,28 +5231,22 @@ function RequestReport({ }) {
               </div>
 
               {/* Search + Reload Buttons */}
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleTravelSearch}>
                     <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
 
-                  <div
-                    className="icon-btn reload"
-                    onClick={reloadGridTravelData}
-                  >
+                  <div className="icon-btn reload" onClick={reloadGridTravelData}>
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
 
-                  <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelTravel}
-                  >
+                  {/* <div className="icon-btn excel" onClick={handleExportToExcelTravel}>
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -5324,8 +5312,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                                    ${selectedLeave ? "has-value" : ""} 
-                                    ${isSearchLeave ? "is-focused" : ""}`}
+                  ${selectedLeave ? "has-value" : ""} 
+                  ${isSearchLeave ? "is-focused" : ""}`}
                 >
                   <Select
                     id="LeaveType"
@@ -5343,7 +5331,7 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleSearchItem}>
                     <span className="tooltip">Search</span>
@@ -5355,13 +5343,10 @@ function RequestReport({ }) {
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
 
-                  <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelLeave}
-                  >
+                  {/* <div className="icon-btn excel" onClick={handleExportToExcelLeave}>
                     <span className="tooltip">Excel</span>
                     <i className="fa-solid fa-file-excel"></i>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -5450,6 +5435,7 @@ function RequestReport({ }) {
                 <div className="inputGroup">
                   <input
                     type="date"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={academicFromDate}
                     onChange={(e) => setAcademicFromDate(e.target.value)}
@@ -5466,6 +5452,7 @@ function RequestReport({ }) {
                 <div className="inputGroup">
                   <input
                     type="date"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={academicToDate}
                     onChange={(e) => setAcademicToDate(e.target.value)}
@@ -5478,31 +5465,17 @@ function RequestReport({ }) {
               </div>
 
               {/* Buttons */}
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
-                  <div
-                    className="icon-btn search"
-                    onClick={handleAcademicSearch}
-                  >
+                  <div className="icon-btn search" onClick={handleAcademicSearch}>
                     <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
 
-                  <div
-                    className="icon-btn reload"
-                    onClick={handleAcademicReset}
-                  >
+                  <div className="icon-btn reload" onClick={handleAcademicReset}>
                     <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
-
-                  {/* <div
-                    className="icon-btn excel"
-                    onClick={handleExportToExcelAcademic}
-                  >
-                    <span className="tooltip">Excel</span>
-                    <i className="fa-solid fa-file-excel"></i>
-                  </div>                   */}
                 </div>
               </div>
             </div>
@@ -5541,7 +5514,7 @@ function RequestReport({ }) {
             <div className="row g-3">
 
               {/* Request ID */}
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="number"
@@ -5558,7 +5531,7 @@ function RequestReport({ }) {
               </div>
 
               {/* Employee ID */}
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
@@ -5576,7 +5549,7 @@ function RequestReport({ }) {
 
 
               {/* Column Name */}
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
@@ -5591,7 +5564,7 @@ function RequestReport({ }) {
               </div>
 
               {/* From Date */}
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
@@ -5606,7 +5579,7 @@ function RequestReport({ }) {
               </div>
 
               {/* To Date */}
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
@@ -5621,7 +5594,7 @@ function RequestReport({ }) {
               </div>
 
               {/* Buttons */}
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
 
                   <div className="icon-btn search" onClick={handlePersonalSearch}>
@@ -5672,10 +5645,11 @@ function RequestReport({ }) {
 
             <div className="row g-3">
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="number"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={familyInfoId}
                     onChange={(e) => setFamilyInfoId(e.target.value)}
@@ -5685,10 +5659,11 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={familyEmpId}
                     onChange={(e) => setFamilyEmpId(e.target.value)}
@@ -5698,10 +5673,11 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={familyColumn}
                     onChange={(e) => setFamilyColumn(e.target.value)}
@@ -5711,10 +5687,11 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={familyFromDate}
                     onChange={(e) => setFamilyFromDate(e.target.value)}
@@ -5723,10 +5700,11 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
+                    placeholder=""
                     className="exp-input-field form-control"
                     value={familyToDate}
                     onChange={(e) => setFamilyToDate(e.target.value)}
@@ -5735,7 +5713,7 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
 
                   <div className="icon-btn search" onClick={handleFamilySearch}>
@@ -5784,12 +5762,13 @@ function RequestReport({ }) {
 
             <div className="row g-3">
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="number"
                     className="exp-input-field form-control"
                     value={assetInfoId}
+                    placeholder=""
                     onChange={(e) => setAssetInfoId(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
                   />
@@ -5797,12 +5776,13 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
                     className="exp-input-field form-control"
                     value={assetEmpId}
+                    placeholder=""
                     onChange={(e) => setAssetEmpId(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
                   />
@@ -5810,12 +5790,13 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
                     className="exp-input-field form-control"
                     value={assetFieldName}
+                    placeholder=""
                     onChange={(e) => setAssetFieldName(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
                   />
@@ -5823,37 +5804,41 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
                     className="exp-input-field form-control"
                     value={assetFromDate}
+                    placeholder=""
                     onChange={(e) => setAssetFromDate(e.target.value)}
                   />
                   <label className="exp-form-labels">From Date</label>
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
                     className="exp-input-field form-control"
                     value={assetToDate}
+                    placeholder=""
                     onChange={(e) => setAssetToDate(e.target.value)}
                   />
                   <label className="exp-form-labels">To Date</label>
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleAssetSearch}>
+                    <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
 
                   <div className="icon-btn reload" onClick={handleAssetReset}>
+                    <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
                 </div>
@@ -5886,79 +5871,85 @@ function RequestReport({ }) {
 
             <div className="row g-3">
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="number"
                     className="exp-input-field form-control"
                     value={docInfoId}
+                    placeholder=""
                     onChange={(e) => setDocInfoId(e.target.value)}
                   />
-                  <label>Request ID</label>
+                  <label className="exp-form-labels">Request ID</label>
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
                     className="exp-input-field form-control"
                     value={docEmpId}
+                    placeholder=""
                     onChange={(e) => setDocEmpId(e.target.value)}
                   />
-                  <label>Employee ID</label>
+                  <label className="exp-form-labels">Employee ID</label>
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
                     className="exp-input-field form-control"
                     value={docColumn}
+                    placeholder=""
                     onChange={(e) => setDocColumn(e.target.value)}
                   />
-                  <label>Field Name</label>
+                  <label className="exp-form-labels">Field Name</label>
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
                     className="exp-input-field form-control"
                     value={docFromDate}
+                    placeholder=""
                     onChange={(e) => setDocFromDate(e.target.value)}
                   />
-                  <label>From Date</label>
+                  <label className="exp-form-labels">From Date</label>
                 </div>
               </div>
 
-              <div className="col-md-3">
+              <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="date"
                     className="exp-input-field form-control"
                     value={docToDate}
+                    placeholder=""
                     onChange={(e) => setDocToDate(e.target.value)}
                   />
-                  <label>To Date</label>
+                  <label className="exp-form-labels">To Date</label>
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
-
                   <div className="icon-btn search" onClick={handleDocumentSearch}>
+                    <span className="tooltip">Search</span>
                     <i className="fa-solid fa-magnifying-glass"></i>
                   </div>
 
                   <div className="icon-btn reload" onClick={handleDocumentReset}>
+                    <span className="tooltip">Reload</span>
                     <i className="fa-solid fa-rotate-right"></i>
                   </div>
-
                 </div>
               </div>
+
             </div>
           </div>
         )}
@@ -6034,7 +6025,7 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
                   <div className="icon-btn search" onClick={handleCompOffSearch}>
                     <span className="tooltip">Search</span>
@@ -6112,8 +6103,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedCurShiftSc ? "has-value" : ""} 
-                            ${isSelectedCurShiftSc ? "is-focused" : ""}`}
+                  ${selectedCurShiftSc ? "has-value" : ""} 
+                  ${isSelectedCurShiftSc ? "is-focused" : ""}`}
                   title="Please select the Leave Status"
                 >
                   <Select
@@ -6134,8 +6125,8 @@ function RequestReport({ }) {
               <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
-                            ${selectedReqShiftSc ? "has-value" : ""} 
-                            ${isSelectedReqShiftSc ? "is-focused" : ""}`}
+                  ${selectedReqShiftSc ? "has-value" : ""} 
+                  ${isSelectedReqShiftSc ? "is-focused" : ""}`}
                   title="Please select the Leave Status"
                 >
                   <Select
@@ -6153,17 +6144,20 @@ function RequestReport({ }) {
                 </div>
               </div>
 
-              <div className="search-btn-wrapper">
-                <div className="icon-btn search" onClick={handleShiftRequestSearch}>
-                  <span className="tooltip">Search</span>
-                  <i className="fa-solid fa-magnifying-glass"></i>
-                </div>
+              <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
+                <div className="search-btn-wrapper">
+                  <div className="icon-btn search" onClick={handleShiftRequestSearch}>
+                    <span className="tooltip">Search</span>
+                    <i className="fa-solid fa-magnifying-glass"></i>
+                  </div>
 
-                <div className="icon-btn reload" onClick={handleReloadShift}>
-                  <span className="tooltip">Reload</span>
-                  <i className="fa-solid fa-rotate-right"></i>
+                  <div className="icon-btn reload" onClick={handleReloadShift}>
+                    <span className="tooltip">Reload</span>
+                    <i className="fa-solid fa-rotate-right"></i>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
         )}
