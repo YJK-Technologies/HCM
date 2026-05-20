@@ -386,7 +386,7 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
-          { label: "Late Report", path: "/LateReport" },
+          { label: "Late Arrival Report", path: "/LateReport" },
           { label: "Overtime Report", path: "/OvertimeReport" },
           { label: "Leave Summary Report", path: "/AbsentReport" },
         ],

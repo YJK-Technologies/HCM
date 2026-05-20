@@ -46398,7 +46398,7 @@ const GetRepaymentScheduleReport = async (req, res) => {
 //code added by mathu 01-04-2026
 
 const getAssetSearchCretria = async (req, res) => {
-  const { EmployeeID, AssetID, company_code } = req.body;
+  const { EmployeeID, AssetID, ConditionAtIssue, Remarks, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -46407,9 +46407,11 @@ const getAssetSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("AssetID", sql.BigInt, AssetID)
       .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','','','' ,'','',@company_code,'','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'' ,'',@Remarks,@company_code,'','','','',''`
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
