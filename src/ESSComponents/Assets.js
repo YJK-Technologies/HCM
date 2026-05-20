@@ -390,6 +390,7 @@ function Assets({ }) {
     setLocationSC("");
     setStatusSC("");
     setselectedAssetStatusSC("");
+    setAssetStatus("");
     setselectedCountrySC("");
     setSelectedStatusSC("");
     setSelectedCurrencySc("");

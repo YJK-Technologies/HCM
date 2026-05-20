@@ -29,6 +29,8 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
         },
         body: JSON.stringify({
           EmployeeID: EmployeeId,
+          ConditionAtIssue: ConditionAtIssue,
+          Remarks: Remarks,
           AssetID: AssetID,
           company_code: sessionStorage.getItem("selectedCompanyCode")
         })

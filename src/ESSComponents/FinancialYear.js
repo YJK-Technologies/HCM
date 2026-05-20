@@ -163,7 +163,7 @@ function Input() {
         Start_Year: Start_Year,
         End_Year: End_Year,
         Salary_Days: Salary_Days,
-        Status: StatusSC,
+        status: StatusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
       };
 

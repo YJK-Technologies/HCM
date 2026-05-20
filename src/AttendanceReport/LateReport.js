@@ -423,20 +423,57 @@ function LateReport() {
               }
             
               @media print {
-                .print-btn {
-                  display: none;
-                }
-                body {
-                  background: white;
-                }
+              body {
+                background: white !important;
+                margin: 0;
+                padding: 15px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
               }
+
+              .header {
+                background: ${tableHeaderBg} !important;
+                color: white !important;
+                border-radius: 8px;
+                padding: 15px 20px;
+              }
+
+              th {
+                background-color: ${tableHeaderBg} !important;
+                color: white !important;
+              }
+
+              tr:nth-child(even) {
+                background-color: ${rowAltColor} !important;
+              }
+
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                box-shadow: none;
+              }
+
+              td, th {
+                border: 1px solid #ccc;
+                padding: 8px;
+              }
+
+              .print-btn {
+                display: none !important;
+              }
+
+              @page {
+                size: auto;
+                margin: 10mm;
+              }
+            }
         `);
         reportWindow.document.write("</style></head><body>");
         reportWindow.document.write(`
         <div class="header">
             <img src="${logoUrl}" class="logo" />
             <div class="title-section">
-              <h2>Late Report</h2>
+              <h2>Late Arrival Report</h2>
             </div>
             </div>`);
         reportWindow.document.write(`<div style="margin-top:10px;">
@@ -749,7 +786,7 @@ function LateReport() {
             />
             <div className="shadow-lg p-1 bg-light rounded main-header-box">
                 <div className="header-flex">
-                    <h1 className="page-title">Late Report</h1>
+                    <h1 className="page-title">Late Arrival Report</h1>
 
                     <div className="action-wrapper desktop-actions">
                         {["all permission", "view"].some((p) => lateReportPermissions.includes(p)) && (

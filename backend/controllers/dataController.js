@@ -26899,7 +26899,7 @@ const getsearchLeavetypes = async (req, res) => {
 };
 
 const getLeaveTypeSearch = async (req, res) => {
-  const { company_code, LeaveId, code, Type, Accrual, Exceed_Leave, Start_Year, End_Year } = req.body;
+  const { company_code, LeaveId, code, Type, Accrual, Exceed_Leave, Start_Year, End_Year, status } = req.body;
 
   try {
     // Connect to the database
@@ -26917,8 +26917,9 @@ const getLeaveTypeSearch = async (req, res) => {
       .input("Exceed_Leave", sql.VarChar, Exceed_Leave)
       .input("Start_Year", sql.NVarChar, Start_Year)
       .input("End_Year", sql.NVarChar, End_Year)
+      .input("status", sql.NVarChar, status)
       .query(
-        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','','',@Start_Year,@End_Year,'',NULL,NULL,NULL,NULL`,
+        `EXEC sp_LeaveTypes @mode,@company_code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','','',@Start_Year,@End_Year,@status,NULL,NULL,NULL,NULL`,
       );
 
     // Send response
@@ -31519,7 +31520,7 @@ const sendPayslipEmails = async (req, res) => {
 
 //code added by mathu -12-04-2025
 const salarySearchoption = async (req, res) => {
-  const { Start_Year, End_Year, Salary_Days, company_code } = req.body;
+  const { Start_Year, End_Year, Salary_Days, company_code, status } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -31529,9 +31530,10 @@ const salarySearchoption = async (req, res) => {
       .input("End_Year", sql.NVarChar, End_Year)
       .input("Salary_Days", sql.NVarChar, Salary_Days)
       .input("company_code", sql.NVarChar, company_code)
+      .input("status", sql.NVarChar, status)
 
       .query(
-        `EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,'','','',null,null,null,null,null,null,null,null`,
+        `EXEC sp_ESS_Salary_days  @mode ,@Start_Year,@End_Year,@Salary_Days,@company_code,@status,'','',null,null,null,null,null,null,null,null`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); // 200 OK if data is found
@@ -46398,7 +46400,7 @@ const GetRepaymentScheduleReport = async (req, res) => {
 //code added by mathu 01-04-2026
 
 const getAssetSearchCretria = async (req, res) => {
-  const { EmployeeID, AssetID, company_code } = req.body;
+  const { EmployeeID, AssetID, ConditionAtIssue, Remarks, company_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -46407,9 +46409,11 @@ const getAssetSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("AssetID", sql.BigInt, AssetID)
       .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
+      .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
       .query(
-        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','','','' ,'','',@company_code,'','','','',''`
+        `EXEC sp_EmployeeAssets @mode,'', @AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'' ,'',@Remarks,@company_code,'','','','',''`
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
