@@ -66,13 +66,13 @@ function Department() {
       setdept_id(location.state.preservedInputs.dept_id || "");
       setdept_name(location.state.preservedInputs.dept_name || "");
       setStatus(location.state.preservedInputs.status || "");
-    }
-
-    if (location.state.preservedInputs.status) {
-      setSelectedStatus({
-        label: location.state.preservedInputs.status,
-        value: location.state.preservedInputs.status,
-      });
+      
+      if (location.state.preservedInputs.status) {
+        setSelectedStatus({
+          label: location.state.preservedInputs.status,
+          value: location.state.preservedInputs.status,
+        });
+      }
     }
   }, [location.state]);
 
