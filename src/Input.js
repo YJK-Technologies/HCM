@@ -347,30 +347,40 @@ function Input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionCity = drop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCity = Array.isArray(drop)
+    ? drop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionState = statedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionState = Array.isArray(statedrop)
+    ? statedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionCountry = condrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCountry = Array.isArray(condrop)
+    ? condrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionLocation = locationnodrop.map((option) => ({
-    value: option.location_no,
-    label: `${option.location_no} - ${option.location_name}`,
-  }));
+  const filteredOptionLocation = Array.isArray(locationnodrop)
+    ? locationnodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no} - ${option.location_name}`,
+    }))
+    : [];
 
   const handleChangeCity = (selectedCity) => {
     setSelectedCity(selectedCity);
@@ -487,7 +497,12 @@ function Input({ }) {
   }
 
   const handleNavigate = () => {
-    navigate("/Company");
+    navigate("/Company", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
@@ -577,7 +592,7 @@ function Input({ }) {
         console.log("Data Updated successfully");
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -1003,7 +1018,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container"  onClick={() => logo.current.click()}>
+              <div className="image-upload-container" onClick={() => logo.current.click()}>
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img

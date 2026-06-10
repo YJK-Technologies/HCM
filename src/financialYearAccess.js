@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import './App.css'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,9 +31,7 @@ function Grid() {
   const [LockType, setLockType] = useState("");
   const [editedData, setEditedData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-
   const [pincode, setPincode] = useState("");
-
   const [hasValueChanged, setHasValueChanged] = useState(false);
 
   const [createdBy, setCreatedBy] = useState("");
@@ -43,11 +41,67 @@ function Grid() {
   const [isSelectedTransaction, setIsSelectedTransaction] = useState(false);
   const [isSelectedLockType, setIsSelectedLockType] = useState(false);
 
+  const location = useLocation();
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const financialYearAccessPermissions = permissions
     .filter(permission => permission.screen_type === 'FinancialYearAccess')
     .map(permission => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setstart_year(location.state.preservedInputs.start_year || "");
+      setend_year(location.state.preservedInputs.end_year || "");
+      setTransactionType(location.state.preservedInputs.transactionType || "");
+      setLockType(location.state.preservedInputs.LockType || "");
+
+      if (location.state.preservedInputs.transactionType) {
+        setSelectedTransaction({
+          label: location.state.preservedInputs.transactionType,
+          value: location.state.preservedInputs.transactionType,
+        });
+      }
+      if (location.state.preservedInputs.LockType) {
+        setSelectedLockType({
+          label: location.state.preservedInputs.LockType,
+          value: location.state.preservedInputs.LockType,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setstart_year("");
+    setend_year("");
+    setTransactionType("");
+    setLockType("");
+    setSelectedTransaction("");
+    setSelectedLockType("");
+    setRowData([]);
+  };
 
   const [selectedCompanyNo, setselectedCompanyNo] = useState(null);
   const [selectedCompanyLogo, setSelectedCompanyLogo] = useState(null);
@@ -61,10 +115,13 @@ function Grid() {
     setSelectedLockType(selectedLockType);
     setLockType(selectedLockType ? selectedLockType.value : '');
   };
-  const filteredOptionLockType = Lockdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+
+  const filteredOptionLockType = Array.isArray(Lockdrop)
+    ? Lockdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -84,10 +141,14 @@ function Grid() {
     setSelectedTransaction(selectedTransaction);
     setTransactionType(selectedTransaction ? selectedTransaction.value : '');
   };
-  const filteredOptionTransaction = transactiondrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+
+  const filteredOptionTransaction = Array.isArray(transactiondrop)
+    ? transactiondrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
+
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
@@ -122,148 +183,6 @@ function Grid() {
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
-
-  //  useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/Transaction`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   })      .then((response) => response.json())
-  //     .then((data) => {
-  //       // Extract city names from the fetched data
-  //       const TransactionOption = data.map(option => option.attributedetails_name);
-  //       setTransactionGriddrop(TransactionOption);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-  // useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/city`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   }) 
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       const cityNames = data.map(option => option.attributedetails_name);
-  //       setDrop(cityNames);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-  // useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/country`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   }) 
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       // Extract city names from the fetched data
-  //       const countries = data.map(option => option.attributedetails_name);
-  //       setCondrop(countries);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-  // useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/state`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   })  
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       // Extract city names from the fetched data
-  //       const States = data.map(option => option.attributedetails_name);
-  //       setStatedrop(States);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-  // useEffect(() => {
-
-  //   fetch(`${config.apiBaseUrl}/locationno`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       // Extract city names from the fetched data
-  //       const LocationOption = data.map(option => option.location_no);
-  //       setLocationdrop(LocationOption);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-  // useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/status`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   })     
-  //    .then((response) => response.json())
-  //     .then((data) => {
-  //       // Extract city names from the fetched data
-  //       const statusOption = data.map(option => option.attributedetails_name);
-  //       setStatusGriddrop(statusOption);
-  //     })
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-
-  // useEffect(() => {
-  //   const company_code = sessionStorage.getItem('selectedCompanyCode');
-
-  //   fetch(`${config.apiBaseUrl}/status`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ company_code })
-  //   })
-  //     .then((data) => data.json())
-  //     .then((val) => setStatusdrop(val))
-  //     .catch((error) => console.error('Error fetching data:', error));
-  // }, []);
-
-
-  // const filteredOptionStatus = statusdrop.map((option) => ({
-  //   value: option.attributedetails_name,
-  //   label: option.attributedetails_name,
-  // }));
-
-  // const handleChangeStatus = (selectedStatus) => {
-  //   setSelectedStatus(selectedStatus);
-  //   setStatus(selectedStatus ? selectedStatus.value : '');
-  //   setHasValueChanged(true);
-  // };
-
-  // const handleCompanyNoChange = (event) => {
-  //   setCompany_no(event.target.value);
-  // };
-
-  // const handleCompanyNameChange = (event) => {
-  //   setCompany_name(event.target.value);
-  // };
-
 
   const handleSearch = async () => {
     try {
@@ -376,6 +295,7 @@ function Grid() {
       headerName: "Start Year",
       field: "start_year",
       editable: true,
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "left" },
       checkboxSelection: true,
       cellEditorParams: {
@@ -689,22 +609,34 @@ function Grid() {
     reportWindow.document.close();
   };
 
-
-
   const handleNavigateToForm = () => {
-    navigate("/AddFYA", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
+    navigate("/AddFYA", { state: { mode: "create" } });
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddFYA", { state: { mode: "update", selectedRow } });
+    navigate("/AddFYA", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          start_year,
+          end_year,
+          transactionType,
+          LockType,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
     setSelectedRows(selectedData);
-
   };
+
   // Assuming you have a unique identifier for each row, such as 'id'
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
@@ -886,7 +818,7 @@ function Grid() {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="fa-solid fa-ellipsis-vertical"></i> 
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
@@ -1020,7 +952,7 @@ function Grid() {
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
@@ -1044,8 +976,8 @@ function Grid() {
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}
           />
-          </div>
-  
+        </div>
+
       </div>
 
 

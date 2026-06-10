@@ -110,6 +110,7 @@ function UserComMap_input({ }) {
       .then((data) => data.json())
       .then((val) => setcompanynodrop(val));
   }, []);
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/locationno`)
       .then((data) => data.json())
@@ -131,25 +132,33 @@ function UserComMap_input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionUser = usercodedrop.map((option) => ({
-    value: option.user_code,
-    label: `${option.user_code} - ${option.user_name}`,
-  }));
+  const filteredOptionUser = Array.isArray(usercodedrop)
+    ? usercodedrop.map((option) => ({
+      value: option.user_code,
+      label: `${option.user_code} - ${option.user_name}`,
+    }))
+    : [];
 
-  const filteredOptionCompany = companynodrop.map((option) => ({
-    value: option.company_no,
-    label: `${option.company_no} - ${option.company_name}`,
-  }));
+  const filteredOptionCompany = Array.isArray(companynodrop)
+    ? companynodrop.map((option) => ({
+      value: option.company_no,
+      label: `${option.company_no} - ${option.company_name}`,
+    }))
+    : [];
 
-  const filteredOptionLocation = locationnodrop.map((option) => ({
-    value: option.location_no,
-    label: `${option.location_no} - ${option.location_name}`,
-  }));
+  const filteredOptionLocation = Array.isArray(locationnodrop)
+    ? locationnodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no} - ${option.location_name}`,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -222,7 +231,13 @@ function UserComMap_input({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/CompanyMapping"); // Pass selectedRows as props to the Input component
+    navigate("/CompanyMapping", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (
@@ -283,15 +298,10 @@ function UserComMap_input({ }) {
           keyfiels
         }),
       });
-      // if (response.status === 200) {
-      //   console.log("Data Updated successfully");
-      //   setIsUpdated(true);
-      //   clearInputFields();
-      //   toast.success("Data Updated successfully!")
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });

@@ -27,7 +27,7 @@ function IntermediaryHdrInput({ open, handleClose }) {
   const statusRef = useRef(null);
   const delRef = useRef(null);
 
-    const clearInputFields = () => {
+  const clearInputFields = () => {
     setCode("");
     setDetails("");
     setStatus("");
@@ -62,15 +62,19 @@ function IntermediaryHdrInput({ open, handleClose }) {
       .catch((err) => console.log(err));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionDelete = delPerdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionDelete = Array.isArray(delPerdrop)
+    ? delPerdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selected) => {
     setSelectedStatus(selected);
@@ -83,43 +87,43 @@ function IntermediaryHdrInput({ open, handleClose }) {
   };
 
   const handleInsert = async () => {
-  if (!Code || !Details || !status || !deletePermission) {
-    setError(true);
-    toast.warning("Missing Required Fields");
-    return;
-  }
-  setError(false);
-  setLoading(true);
-  try {
-    const res = await fetch(`${config.apiBaseUrl}/AddIntermediaryheaderData`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Code,
-        Details,
-        status,
-        deletePermission,
-        created_by: sessionStorage.getItem("selectedUserCode"),
-      }),
-    });
+    if (!Code || !Details || !status || !deletePermission) {
+      setError(true);
+      toast.warning("Missing Required Fields");
+      return;
+    }
+    setError(false);
+    setLoading(true);
+    try {
+      const res = await fetch(`${config.apiBaseUrl}/AddIntermediaryheaderData`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Code,
+          Details,
+          status,
+          deletePermission,
+          created_by: sessionStorage.getItem("selectedUserCode"),
+        }),
+      });
 
-    if (res.ok) {
-      toast.success("Data inserted successfully!", {
+      if (res.ok) {
+        toast.success("Data inserted successfully!", {
           onClose: () => clearInputFields(),
         });
-    } else {
-      const err = await res.json();
-      toast.error(err.message || "Failed to insert data");
+      } else {
+        const err = await res.json();
+        toast.error(err.message || "Failed to insert data");
+      }
+    } catch (e) {
+      toast.error("Error inserting data: " + e.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (e) {
-    toast.error("Error inserting data: " + e.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-if (!open) return null;
+  if (!open) return null;
 
   return (
     <div className="modal-overlay">
@@ -148,104 +152,104 @@ if (!open) return null;
 
           {/* Form Container */}
           <div className="form-row shadow-lg p-2 bg-light rounded mt-2 container-form-box">
-           
+
             {/* Code */}
             <div className="form-block col-md-3">
               <div className="inputGroup">
-              <input
-                className="exp-input-field form-control"
-                title="Please Enter the Header Code"
-                autoComplete="off"
-                placeholder=" "
-                value={Code}
-                onChange={(e) => setCode(e.target.value)}
-                maxLength={30}
-                ref={codeRef}
-              />
-              <label className={`exp-form-labels ${error && !Code ? 'text-danger' : ''}`}>
-                Header Code<span className="text-danger">*</span>
-              </label>
-            </div>
+                <input
+                  className="exp-input-field form-control"
+                  title="Please Enter the Header Code"
+                  autoComplete="off"
+                  placeholder=" "
+                  value={Code}
+                  onChange={(e) => setCode(e.target.value)}
+                  maxLength={30}
+                  ref={codeRef}
+                />
+                <label className={`exp-form-labels ${error && !Code ? 'text-danger' : ''}`}>
+                  Header Code<span className="text-danger">*</span>
+                </label>
+              </div>
             </div>
 
             {/* Details */}
             <div className="form-block col-md-3">
               <div className="inputGroup">
-              <input
-                className="exp-input-field form-control"
-                autoComplete="off"
-                placeholder=" "
-                value={Details}
-                onChange={(e) => setDetails(e.target.value)}
-                maxLength={250}
-                ref={nameRef}
-                title="Please Enter the Name"
-              />
-              <label className={`exp-form-labels ${error && !Details ? 'text-danger' : ''}`}>
-                Name<span className="text-danger">*</span>
-              </label>
-            </div>
+                <input
+                  className="exp-input-field form-control"
+                  autoComplete="off"
+                  placeholder=" "
+                  value={Details}
+                  onChange={(e) => setDetails(e.target.value)}
+                  maxLength={250}
+                  ref={nameRef}
+                  title="Please Enter the Name"
+                />
+                <label className={`exp-form-labels ${error && !Details ? 'text-danger' : ''}`}>
+                  Name<span className="text-danger">*</span>
+                </label>
+              </div>
             </div>
 
             {/* Status */}
             <div className="form-block col-md-3">
               <div
-              className={`inputGroup selectGroup 
+                className={`inputGroup selectGroup 
       ${selectedStatus ? "has-value" : ""} 
       ${isSelectStatus ? "is-focused" : ""}`}
-              title="Please Select the Status"
-            >
-              <Select
-                value={selectedStatus}
-                onChange={handleChangeStatus}
-                options={filteredOptionStatus}
-                placeholder=" "
-                onFocus={() => setIsSelectStatus(true)}
-                onBlur={() => setIsSelectStatus(false)}
-                classNamePrefix="react-select"
-                isClearable
-                ref={statusRef}
-              />
-              <label className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
-                Status<span className="text-danger">*</span>
-              </label>
-            </div>
+                title="Please Select the Status"
+              >
+                <Select
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                  options={filteredOptionStatus}
+                  placeholder=" "
+                  onFocus={() => setIsSelectStatus(true)}
+                  onBlur={() => setIsSelectStatus(false)}
+                  classNamePrefix="react-select"
+                  isClearable
+                  ref={statusRef}
+                />
+                <label className={`floating-label ${error && !status ? 'text-danger' : ''}`}>
+                  Status<span className="text-danger">*</span>
+                </label>
+              </div>
             </div>
 
             {/* Delete Permission */}
             <div className="form-block col-md-3">
               <div
-              className={`inputGroup selectGroup 
+                className={`inputGroup selectGroup 
               ${selectedDelete ? "has-value" : ""} 
               ${isSelectDelete ? "is-focused" : ""}`}
-              title="Please Select the Delete Permission"
-            >
-              <Select
-                value={selectedDelete}
-                onChange={handleChangeDelete}
-                options={filteredOptionDelete}
-                placeholder=" "
-                onFocus={() => setIsSelectDelete(true)}
-                onBlur={() => setIsSelectDelete(false)}
-                classNamePrefix="react-select"
-                isClearable
-                ref={delRef}
-              />
-              <label className={`floating-label ${error && !deletePermission ? 'text-danger' : ''}`}>
-                Delete Permission<span className="text-danger">*</span>
-              </label>
-            </div>
+                title="Please Select the Delete Permission"
+              >
+                <Select
+                  value={selectedDelete}
+                  onChange={handleChangeDelete}
+                  options={filteredOptionDelete}
+                  placeholder=" "
+                  onFocus={() => setIsSelectDelete(true)}
+                  onBlur={() => setIsSelectDelete(false)}
+                  classNamePrefix="react-select"
+                  isClearable
+                  ref={delRef}
+                />
+                <label className={`floating-label ${error && !deletePermission ? 'text-danger' : ''}`}>
+                  Delete Permission<span className="text-danger">*</span>
+                </label>
+              </div>
             </div>
 
             {/* Save Button */}
             <div class="col-12">
-            <div className="search-btn-wrapper">
+              <div className="search-btn-wrapper">
                 <div className="icon-btn save" onClick={handleInsert}>
                   <span className="tooltip">Save</span>
                   <i class="fa-solid fa-floppy-disk"></i>
                 </div>
+              </div>
             </div>
-          </div>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import "./apps.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import labels from "./Labels";
@@ -40,7 +40,6 @@ function LocInfoGrid() {
   const [loading, setLoading] = useState(false);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
-
   const locationo = useRef(null);
   const LocationName = useRef(null);
   const City = useRef(null);
@@ -56,12 +55,67 @@ function LocInfoGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const LocationPermissions = permissions
     .filter(permission => permission.screen_type === 'Location')
     .map(permission => permission.permission_type.toLowerCase());
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+    if (location.state?.preservedInputs) {
+      const inputs = location.state.preservedInputs;
+      setlocation_no(inputs.location_no || "");
+      setlocation_name(inputs.location_name || "");
+      setcity(inputs.city || "");
+      setstate(inputs.state || "");
+      setpincode(inputs.pincode || "");
+      setcountry(inputs.country || "");
+      setstatus(inputs.status || "");
+      if (inputs.status) {
+        setSelectedStatus({
+          label: inputs.status,
+          value: inputs.status,
+        });
+      } else {
+        setSelectedStatus(null);
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setlocation_no("");
+    setlocation_name("");
+    setcity("");
+    setstate("");
+    setpincode("");
+    setcountry("");
+    setSelectedStatus("");
+    setstatus("");
+    setRowData([]);
+  };
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -145,10 +199,12 @@ function LocInfoGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -205,6 +261,7 @@ function LocInfoGrid() {
       checkboxSelection: true,
       headerName: "Location No",
       field: "location_no",
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "center" },
       cellEditorParams: {
         maxLength: 150,
@@ -579,7 +636,12 @@ function LocInfoGrid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddLocation", { state: { mode: "update", selectedRow } });
+    navigate("/AddLocation", {
+      state: {
+        mode: "update", selectedRow, preservedRowData: rowData,
+        preservedInputs: { location_no, location_name, city, state, pincode, country, status, },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -587,19 +649,6 @@ function LocInfoGrid() {
     const selectedData = selectedNodes.map((node) => node.data);
     setSelectedRows(selectedData);
   };
-
-  // const onCellValueChanged = (params) => {
-  //   const updatedRowData = [...rowData];
-  //   const rowIndex = updatedRowData.findIndex(
-  //     (row) => row.location_no === params.data.location_no // Use the unique identifier 
-  //   );
-  //   if (rowIndex !== -1) {
-  //     updatedRowData[rowIndex][params.colDef.field] = params.newValue;
-  //     setRowData(updatedRowData);
-
-  //     setEditedData((prevData) => [...prevData, updatedRowData[rowIndex]]);
-  //   }
-  // };
 
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
@@ -997,7 +1046,7 @@ function LocInfoGrid() {
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={reloadGridData}>
+                <div className="icon-btn reload" onClick={clearInputFields}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>

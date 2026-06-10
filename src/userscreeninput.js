@@ -92,10 +92,12 @@ function UserScreenInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionscreens = screensdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionscreens = Array.isArray(screensdrop)
+    ? screensdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangescreens = (selectedscreens) => {
     setselectedscreens(selectedscreens);
@@ -117,10 +119,12 @@ function UserScreenInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionPermissions = permissionsdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionPermissions = Array.isArray(permissionsdrop)
+    ? permissionsdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangePermissions = (selectedpermissions) => {
     setselectedpermissions(selectedpermissions);
@@ -148,10 +152,12 @@ function UserScreenInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionRole = roleiddrop.map((option) => ({
-    value: option.role_id,
-    label: `${option.role_id} - ${option.role_name}`,
-  }));
+  const filteredOptionRole = Array.isArray(roleiddrop)
+    ? roleiddrop.map((option) => ({
+      value: option.role_id,
+      label: `${option.role_id} - ${option.role_name}`,
+    }))
+    : [];
 
   const handleChangeRole = (selectedRole) => {
     setSelectedRole(selectedRole);
@@ -198,7 +204,7 @@ function UserScreenInput({ }) {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } 
+      }
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
@@ -239,7 +245,7 @@ function UserScreenInput({ }) {
         console.log("Data updated successfully");
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -257,7 +263,12 @@ function UserScreenInput({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/UserRights");
+    navigate("/UserRights", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs,
+      },
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {

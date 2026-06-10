@@ -178,25 +178,33 @@ function Input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatusSC = statusDropSC.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatusSC = Array.isArray(statusDropSC)
+    ? statusDropSC.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionOverTimeSc = overTimeDropSc.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionOverTimeSc = Array.isArray(overTimeDropSc)
+    ? overTimeDropSc.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionStatus = statusDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusDrop)
+    ? statusDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionOverTime = overTimeDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionOverTime = Array.isArray(overTimeDrop)
+    ? overTimeDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);

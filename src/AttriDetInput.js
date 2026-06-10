@@ -85,10 +85,12 @@ function AttriDetInput({ }) {
     fetchHdrCode();
   }, []);
 
-  const filteredOptionHeader = statusdrop.map((option) => ({
-    value: option.attributeheader_code,
-    label: option.attributeheader_code,
-  }));
+  const filteredOptionHeader = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributeheader_code,
+      label: option.attributeheader_code,
+    }))
+    : [];
 
   const handleChangeHeader = (selectedHeader) => {
     setSelectedHeader(selectedHeader);
@@ -141,13 +143,13 @@ function AttriDetInput({ }) {
   };
 
   const handleNavigate = () => {
-  navigate("/Attribute", {
-    state: {
-      preservedRowData: locationState.preservedRowData,
-      preservedInputs: locationState.preservedInputs
-    }
-  });
-};
+    navigate("/Attribute", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
+  };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
@@ -208,12 +210,13 @@ function AttriDetInput({ }) {
           descriptions,
           created_by,
           modified_by,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
