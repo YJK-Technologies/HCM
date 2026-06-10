@@ -266,7 +266,20 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Last_Name, First_Name, DOB, Gender: selectedGender, address, Phone, designation_id, department_id, Status, company_code: sessionStorage.getItem('selectedCompanyCode') })
+        body: JSON.stringify({ 
+          EmployeeId, 
+          Last_Name, 
+          First_Name, 
+          DOB, 
+          Gender: selectedGender, 
+          address, 
+          Phone, 
+          designation_id, 
+          department_id, 
+          Status, 
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'), 
+        })
       });
       console.log("Payload:", { Gender, selectedGender });
       if (response.ok) {
@@ -303,7 +316,6 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
             Status: item.Status || item.status || "",
             designation_id: item.designation_id,
             department_id: item.department_id,
-            company_code: sessionStorage.getItem('selectedCompanyCode'),
           }))
         );
         setRowData(updatedData);
