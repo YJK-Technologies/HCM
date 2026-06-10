@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
@@ -30,12 +30,49 @@ function RoleInfoGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const roleInfoPermission = permissions
     .filter(permission => permission.screen_type === 'Role')
     .map(permission => permission.permission_type.toLowerCase());
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+    if (location.state?.preservedInputs) {
+      const inputs = location.state.preservedInputs;
+      setrole_id(inputs.role_id || "");
+      setrole_name(inputs.role_name || "");
+
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setrole_id("");
+    setrole_name("");
+    setRowData([]);
+  };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -80,6 +117,7 @@ function RoleInfoGrid() {
       checkboxSelection: true,
       headerName: "Role ID",
       field: "role_id",
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 18,
@@ -342,8 +380,19 @@ function RoleInfoGrid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddRole", { state: { mode: "update", selectedRow } })
-  }
+    navigate("/AddRole", {
+      state: {
+        mode: "update",
+        selectedRow,
+        preservedRowData: rowData,
+        preservedInputs: {
+          role_id,
+          role_name,
+
+        },
+      },
+    });
+  };
 
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
@@ -552,7 +601,7 @@ function RoleInfoGrid() {
                   <i class="fa-solid fa-print"></i></div>
               )}
             </div>
-            
+
             {/* Mobile Dropdown */}
             <div className="dropdown mobile-actions">
               <button
@@ -648,7 +697,7 @@ function RoleInfoGrid() {
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={reloadGridData}>
+                <div className="icon-btn reload" onClick={clearInputFields}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>

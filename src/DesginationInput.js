@@ -66,17 +66,17 @@ function DesginationInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : '');
   };
-
-
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -107,18 +107,17 @@ function DesginationInput({ }) {
     }
   }, []);
 
-  const filteredOptionDept = Deptdrop.map((option) => ({
-    value: option.Department,
-    label: option.Department,
-  }));
+  const filteredOptionDept = Array.isArray(Deptdrop)
+    ? Deptdrop.map((option) => ({
+      value: option.Department,
+      label: option.Department,
+    }))
+    : [];
 
   const handleChangedept = (selecteddept) => {
     setSelecteddept(selecteddept);
     setdept_id(selecteddept ? selecteddept.value : '');
   };
-
-
-
 
   const handleInsert = async () => {
     if (!dept_id || !desgination_id || !desgination || !status) {
@@ -145,7 +144,7 @@ function DesginationInput({ }) {
         }),
       });
       if (response.ok) {
-       toast.success("Data inserted successfully", {
+        toast.success("Data inserted successfully", {
           onClose: () => {
             clearInputFields();
             setError(false)
@@ -228,7 +227,7 @@ function DesginationInput({ }) {
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -245,9 +244,13 @@ function DesginationInput({ }) {
     }
   };
 
-
   const handleNavigate = () => {
-    navigate("/DesgiantionInfo");
+    navigate("/DesgiantionInfo", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {

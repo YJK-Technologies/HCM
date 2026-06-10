@@ -114,15 +114,17 @@ function StdAccInput({ }) {
   };
   const { FirstDate, LastDate } = getFinancialYearDates();
 
-
   const handleChangeTransaction = (selectedTransaction) => {
     setSelectedTransaction(selectedTransaction);
     setTransactionType(selectedTransaction ? selectedTransaction.value : '');
   };
-  const filteredOptionTransaction = transactiondrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+
+  const filteredOptionTransaction = Array.isArray(transactiondrop)
+    ? transactiondrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -142,11 +144,13 @@ function StdAccInput({ }) {
     setSelectedLockType(selectedLockType);
     setLockType(selectedLockType ? selectedLockType.value : '');
   };
-
-  const filteredOptionLockType = Lockdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  
+  const filteredOptionLockType = Array.isArray(Lockdrop)
+    ? Lockdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -230,7 +234,7 @@ function StdAccInput({ }) {
       !endYear ||
       !TransactionType ||
       !LockType
-    ){
+    ) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
@@ -251,8 +255,8 @@ function StdAccInput({ }) {
       return;
     }
 
-     setError(false);
-     setLoading(true);
+    setError(false);
+    setLoading(true);
 
     try {
       const response = await fetch(`${config.apiBaseUrl}/UpdateFinacnialyearlock`, {
@@ -271,9 +275,9 @@ function StdAccInput({ }) {
         }),
       });
       if (response.ok) {
-         toast.success("Data updated successfully", {
+        toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -291,21 +295,25 @@ function StdAccInput({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/FinancialYearAccess");
+    navigate("/FinancialYearAccess", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
-
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
       if (hasValueChanged) {
-        await handleKeyDownStatus(e); 
-        setHasValueChanged(false); 
+        await handleKeyDownStatus(e);
+        setHasValueChanged(false);
       }
 
       if (value) {
         nextFieldRef.current.focus();
       } else {
-        e.preventDefault(); 
+        e.preventDefault();
       }
     }
   };
@@ -357,7 +365,7 @@ function StdAccInput({ }) {
               <input
                 id="stdname"
                 class="exp-input-field form-control"
-                  title="Please Enter the End Year"
+                title="Please Enter the End Year"
                 type="Date"
                 value={endYear}
                 onChange={(e) => setEndYear(e.target.value)}

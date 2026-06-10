@@ -4,7 +4,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 // import "./apps.css";
 import './App.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -43,12 +43,60 @@ function CompanyMappingGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyMappingPermission = permissions
-    .filter((permission) => permission.screen_type === "Company Mapping")
+    .filter((permission) => permission.screen_type === "CompanyMapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setuser_code(location.state.preservedInputs.user_code || "");
+      setcompany_no(location.state.preservedInputs.company_no || "");
+      setlocation_no(location.state.preservedInputs.location_no || "");
+      setstatus(location.state.preservedInputs.status || "");
+
+      if (location.state.preservedInputs.status) {
+        setSelectedStatus({
+          label: location.state.preservedInputs.status,
+          value: location.state.preservedInputs.status,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setuser_code("");
+    setcompany_no("");
+    setlocation_no("");
+    setSelectedStatus("");
+    setstatus("");
+    setRowData([]);
+  };
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/usercode`)
@@ -173,6 +221,7 @@ function CompanyMappingGrid() {
       checkboxSelection: true,
       headerName: "User Code",
       field: "user_code",
+      cellClass: "ag-link-cell",
       editable: true,
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
@@ -468,23 +517,15 @@ function CompanyMappingGrid() {
   const handleNavigateToForm = () => {
     navigate("/AddCompanyMapping", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddCompanyMapping", { state: { mode: "update", selectedRow } });
+    navigate("/AddCompanyMapping", {
+      state: {
+        mode: "update", selectedRow, preservedRowData: rowData,
+        preservedInputs: { user_code, company_no, location_no, status }
+      }
+    });
   };
-
-  // const onCellValueChanged = (params) => {
-  //   const updatedRowData = [...rowData];
-  //   const rowIndex = updatedRowData.findIndex(
-  //     (row) => row.keyfiels === params.data.keyfiels // Use the unique identifier
-  //   );
-  //   if (rowIndex !== -1) {
-  //     updatedRowData[rowIndex][params.colDef.field] = params.newValue;
-  //     setRowData(updatedRowData);
-
-  //     // Add the edited row data to the state
-  //     setEditedData((prevData) => [...prevData, updatedRowData[rowIndex]]);
-  //   }
-  // };
 
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
@@ -506,7 +547,6 @@ function CompanyMappingGrid() {
           updatedEdited[existingIndex] = updatedRowData[rowIndex];
           return updatedEdited;
         } else {
-          // Add new edited row
           return [...prevData, updatedRowData[rowIndex]];
         }
       });
@@ -825,7 +865,7 @@ function CompanyMappingGrid() {
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={reloadGridData}>
+                <div className="icon-btn reload" onClick={clearInputFields}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>
