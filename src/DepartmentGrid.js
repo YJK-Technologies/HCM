@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,11 +31,58 @@ function Department() {
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [statusgriddrop, setStatusGriddrop] = useState([]);
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const departmentPermission = permissions
     .filter((permission) => permission.screen_type === "Department")
     .map((permission) => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setdept_id(location.state.preservedInputs.dept_id || "");
+      setdept_name(location.state.preservedInputs.dept_name || "");
+      setStatus(location.state.preservedInputs.status || "");
+    }
+
+    if (location.state.preservedInputs.status) {
+      setSelectedStatus({
+        label: location.state.preservedInputs.status,
+        value: location.state.preservedInputs.status,
+      });
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setdept_id("");
+    setdept_name("");
+    setStatus("");
+    setSelectedStatus("");
+    setRowData([]);
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -73,10 +120,12 @@ function Department() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -124,6 +173,7 @@ function Department() {
       cellStyle: { textAlign: "center" },
       // minWidth: 250,
       // maxWidth: 250,
+      cellClass: "ag-link-cell",
       cellEditorParams: {
         maxLength: 18,
       },
@@ -391,8 +441,22 @@ function Department() {
   const handleNavigatesToForm = () => {
     navigate("/AddDepartment", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddDepartment", { state: { mode: "update", selectedRow } });
+    navigate("/AddDepartment", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          dept_id,
+          dept_name,
+          status
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -704,7 +768,7 @@ function Department() {
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={reloadGridData}>
+                <div className="icon-btn reload" onClick={clearInputFields}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>

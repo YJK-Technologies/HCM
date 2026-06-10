@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate, useLocation } from "react-router-dom";  
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,7 +18,6 @@ function AttriDetGrid() {
 
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
   const [selectedRows, setSelectedRows] = useState([]);
   const [attributeheader_code, setattributeheader_code] = useState("");
   const [attributedetails_code, setattributedetails_code] = useState("");
@@ -32,55 +31,57 @@ function AttriDetGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const attributePermission = permissions
     .filter(permission => permission.screen_type === 'Attribute')
     .map(permission => permission.permission_type.toLowerCase());
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
 
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
-  if (location.state?.preservedRowData) {
-    setRowData(location.state.preservedRowData);
-  }
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
 
-  if (location.state?.preservedInputs) {
-    setattributeheader_code(location.state.preservedInputs.attributeheader_code || "");
-    setattributedetails_code(location.state.preservedInputs.attributedetails_code || "");
-    setattributedetails_name(location.state.preservedInputs.attributedetails_name || "");
-    setdescriptions(location.state.preservedInputs.descriptions || "");
-  }
-}, [location.state]);
+    if (location.state?.preservedInputs) {
+      setattributeheader_code(location.state.preservedInputs.attributeheader_code || "");
+      setattributedetails_code(location.state.preservedInputs.attributedetails_code || "");
+      setattributedetails_name(location.state.preservedInputs.attributedetails_name || "");
+      setdescriptions(location.state.preservedInputs.descriptions || "");
 
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5500/attributedetData");
-  //     const jsonData = await response.json();
-  //     setRowData(jsonData);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };   
-  // Define the function to reload the grid data
-  const reloadGridData = () => {
-  clearInputFields();
+    }
+  }, [location.state]);
 
-  navigate("/Attribute", {
-    replace: true,
-    state: {}
-  });
-
-  window.location.reload();
-};
-
-    const clearInputFields = () => {
+  const clearInputFields = () => {
     setattributeheader_code("");
     setattributedetails_code("");
     setattributedetails_name("");
     setdescriptions("");
+    setRowData([]);
   };
 
+  const reloadGridData = () => {
+    window.location.reload();
+  };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -121,6 +122,7 @@ function AttriDetGrid() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "Code",
+      cellClass: "ag-link-cell",
       field: "attributeheader_code",
       //editable: true,
       cellStyle: { textAlign: "center" },
@@ -402,22 +404,25 @@ function AttriDetGrid() {
   const handleNavigatesToForm = () => {
     navigate("/AddAttributeDetail", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
-  const handleNavigateWithRowData = (selectedRow) => {
-  navigate("/AddAttributeDetail", {
-    state: {
-      mode: "update",
-      selectedRow,
-      preservedRowData: rowData,
 
-      preservedInputs: {
-        attributeheader_code,
-        attributedetails_code,
-        attributedetails_name,
-        descriptions
-      }
-    }
-  });
-};
+  const handleNavigateWithRowData = (selectedRow) => {
+    navigate("/AddAttributeDetail", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          attributeheader_code,
+          attributedetails_code,
+          attributedetails_name,
+          descriptions,
+        },
+      },
+    });
+  };
+
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
@@ -635,7 +640,7 @@ function AttriDetGrid() {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="fa-solid fa-ellipsis-vertical"></i> 
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
@@ -761,7 +766,7 @@ function AttriDetGrid() {
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

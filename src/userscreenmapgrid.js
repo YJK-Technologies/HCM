@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,11 +33,50 @@ function UserScreenMapGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const UserScreenPermission = permissions
     .filter(permission => permission.screen_type === 'UserRights')
     .map(permission => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+    if (location.state?.preservedInputs) {
+      const inputs = location.state.preservedInputs;
+      setrole_id(inputs.role_id || "");
+      setscreen_type(inputs.screen_type || "");
+      setpermission_type(inputs.permission_type || "");
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setrole_id("");
+    setscreen_type("");
+    setpermission_type("");
+    setRowData([]);
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -148,6 +187,7 @@ function UserScreenMapGrid() {
       headerName: "Role Id",
       field: "role_id",
       editable: true,
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
@@ -412,7 +452,18 @@ function UserScreenMapGrid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddUserRights", { state: { mode: "update", selectedRow } });
+    navigate("/AddUserRights", {
+      state: {
+        mode: "update",
+        selectedRow,
+        preservedRowData: rowData,
+        preservedInputs: {
+          role_id,
+          screen_type,
+          permission_type,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -628,7 +679,7 @@ function UserScreenMapGrid() {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="fa-solid fa-ellipsis-vertical"></i> 
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end text-center">
@@ -732,7 +783,7 @@ function UserScreenMapGrid() {
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

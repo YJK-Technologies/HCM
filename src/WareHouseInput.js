@@ -56,7 +56,7 @@ function WareHouseInput({ }) {
   };
 
   useEffect(() => {
-    if (mode === "update" && selectedRow ) {
+    if (mode === "update" && selectedRow) {
       setSelectedLocation({
         label: selectedRow.location_no,
         value: selectedRow.location_no,
@@ -98,15 +98,19 @@ function WareHouseInput({ }) {
       .then((val) => setLocationdrop(val));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionLocation = locationnodrop.map((option) => ({
-    value: option.location_no,
-    label: option.location_no,
-  }));
+  const filteredOptionLocation = Array.isArray(locationnodrop)
+    ? locationnodrop.map((option) => ({
+      value: option.location_no,
+      label: option.location_no,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -172,22 +176,25 @@ function WareHouseInput({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/WareHouse"); // Pass selectedRows as props to the Input component
+    navigate("/Warehouse", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
-      // Check if the value has changed and handle the search logic
       if (hasValueChanged) {
-        await handleKeyDownStatus(e); // Trigger the search function
-        setHasValueChanged(false); // Reset the flag after the search
+        await handleKeyDownStatus(e);
+        setHasValueChanged(false);
       }
 
-      // Move to the next field if the current field has a valid value
       if (value) {
         nextFieldRef.current.focus();
       } else {
-        e.preventDefault(); // Prevent moving to the next field if the value is empty
+        e.preventDefault();
       }
     }
   };
@@ -236,7 +243,7 @@ function WareHouseInput({ }) {
         console.log("Data Updated successfully");
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });

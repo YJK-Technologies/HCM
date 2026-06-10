@@ -286,30 +286,40 @@ function UserInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionRole = roleDrop.map((option) => ({
-    value: option.role_id,
-    label: option.role_name,
-  }));
+  const filteredOptionRole = Array.isArray(roleDrop)
+    ? roleDrop.map((option) => ({
+      value: option.role_id,
+      label: option.role_name,
+    }))
+    : [];
 
-  const filteredOptionUserCode = UserCodeNameDrop.map((option) => ({
-    value: option.EmployeeId,
-    label: `${option.EmployeeId} - ${option.Name}`
-  }));
+  const filteredOptionUserCode = Array.isArray(UserCodeNameDrop)
+    ? UserCodeNameDrop.map((option) => ({
+      value: option.EmployeeId,
+      label: `${option.EmployeeId} - ${option.Name}`,
+    }))
+    : [];
 
-  const filteredOptionLog = Loginoroutdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionLog = Array.isArray(Loginoroutdrop)
+    ? Loginoroutdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionGender = Genderdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionGender = Array.isArray(Genderdrop)
+    ? Genderdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -377,12 +387,12 @@ function UserInput({ }) {
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
       if (user_images) {
-        formData.append("user_img", user_images); // Appending the image file
+        formData.append("user_img", user_images);
       }
 
       const response = await fetch(`${config.apiBaseUrl}/useradd`, {
         method: "POST",
-        body: formData, // Sending formData
+        body: formData,
       });
 
       if (response.ok) {
@@ -412,31 +422,18 @@ function UserInput({ }) {
   }
 
   const handleNavigate = () => {
-    navigate("/User"); // Pass selectedRows as props to the Input component
+    navigate("/User", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs,
+      },
+    });
   };
-
-  // const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
-  //   if (e.key === 'Enter') {
-  //     // Check if the value has changed and handle the search logic
-  //     if (hasValueChanged) {
-  //       await handleKeyDownStatus(e); // Trigger the search function
-  //       setHasValueChanged(false); // Reset the flag after the search
-  //     }
-
-  //     // Move to the next field if the current field has a valid value
-  //     if (value) {
-  //       nextFieldRef.current.focus();
-  //     } else {
-  //       e.preventDefault(); // Prevent moving to the next field if the value is empty
-  //     }
-  //   }
-  // };
 
   const handleKeyDown = (e, nextRef, currentRef) => {
     if (e.key === 'Enter') {
       e.preventDefault();
 
-      // For update mode, skip to Email from Log In/Out
       if (mode === 'update' && currentRef === loginlogout) {
         email.current?.focus();
       } else {
@@ -504,7 +501,7 @@ function UserInput({ }) {
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -813,7 +810,7 @@ function UserInput({ }) {
                       type="button"
                       className="delete-image-btn"
                       onClick={(e) => {
-                        e.stopPropagation();  
+                        e.stopPropagation();
                         handleRemoveImage();
                       }}
                     >
