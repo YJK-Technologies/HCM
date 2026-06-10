@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import labels from "./Labels";
@@ -38,6 +38,7 @@ function IntermediaryGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -45,6 +46,56 @@ function IntermediaryGrid() {
     .filter(permission => permission.screen_type === 'Intermediary')
     .map(permission => permission.permission_type.toLowerCase());
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setcode(location.state.preservedInputs.Code || "");
+      setcodeDetails(location.state.preservedInputs.codeDetails || "");
+      setintermediary_addr_1(location.state.preservedInputs.intermediary_addr_1 || "");
+      setintermediary_area_code(location.state.preservedInputs.intermediary_area_code || "");
+      setintermediary_stat_code(location.state.preservedInputs.intermediary_stat_code || "");
+      setintermediary_cnty_code(location.state.preservedInputs.intermediary_cnty_code || "");
+      setintermediary_imex_no(location.state.preservedInputs.intermediary_imex_no || "");
+      setintermediary_office_no(location.state.preservedInputs.intermediary_office_no || "");
+      setintermediary_fax_no(location.state.preservedInputs.intermediary_fax_no || "");
+      setintermediary_email_id(location.state.preservedInputs.intermediary_email_id || "");
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setcode("");
+    setcodeDetails("");
+    setintermediary_addr_1("");
+    setintermediary_area_code("");
+    setintermediary_stat_code("");
+    setintermediary_cnty_code("");
+    setintermediary_imex_no("");
+    setintermediary_office_no("");
+    setintermediary_fax_no("");
+    setintermediary_email_id("");
+    setRowData([]);
+  };
 
   const reloadGridData = () => {
     window.location.reload();
@@ -81,20 +132,15 @@ function IntermediaryGrid() {
     } finally {
       setLoading(false);
     }
-
   };
 
-
-
-
-
   const columnDefs = [
-
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "Header Code",
       field: "Code",
+      cellClass: "ag-link-cell",
       //editable: true,
       cellStyle: { textAlign: "center" },
       // minWidth: 250,
@@ -504,17 +550,32 @@ function IntermediaryGrid() {
     reportWindow.document.close();
   };
 
-
-
-  /*const handleNavigateToForm = () => {
-    navigate("/form");
-  };*/
-
   const handleNavigatesToForm = () => {
     navigate("/AddIntermedDetails", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddIntermedDetails", { state: { mode: "update", selectedRow } });
+    navigate("/AddIntermedDetails", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          Code,
+          codeDetails,
+          intermediary_addr_1,
+          intermediary_area_code,
+          intermediary_stat_code,
+          intermediary_cnty_code,
+          intermediary_imex_no,
+          intermediary_office_no,
+          intermediary_fax_no,
+          intermediary_email_id
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -523,7 +584,6 @@ function IntermediaryGrid() {
     setSelectedRows(selectedData);
   };
 
-  // Assuming you have a unique identifier for each row, such as 'id'
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
@@ -533,7 +593,6 @@ function IntermediaryGrid() {
       updatedRowData[rowIndex][params.colDef.field] = params.newValue;
       setRowData(updatedRowData);
 
-      // Add the edited row data to the state
       setEditedData((prevData) => [...prevData, updatedRowData[rowIndex]]);
     }
   };
@@ -947,14 +1006,14 @@ function IntermediaryGrid() {
             </div>
 
             {/* Search + Reload Buttons */}
-            <div className="col-12">
+            <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
               <div className="search-btn-wrapper">
                 <div className="icon-btn search" onClick={handleSearch}>
                   <span className="tooltip">Search</span>
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </div>
 
-                <div className="icon-btn reload" onClick={reloadGridData}>
+                <div className="icon-btn reload" onClick={clearInputFields}>
                   <span className="tooltip">Reload</span>
                   <i className="fa-solid fa-rotate-right"></i>
                 </div>

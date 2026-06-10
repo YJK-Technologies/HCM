@@ -201,10 +201,12 @@ function BankAccInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionUser = Userdrop.map((option) => ({
-    value: option.user_accgroup_code,
-    label: option.user_accgroup_name,
-  }));
+  const filteredOptionUser = Array.isArray(Userdrop)
+    ? Userdrop.map((option) => ({
+      value: option.user_accgroup_code,
+      label: option.user_accgroup_name,
+    }))
+    : [];
 
   const handleChangeUser = (selectedUser) => {
     setSelectedUser(selectedUser);
@@ -320,25 +322,33 @@ function BankAccInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionCity = drop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCity = Array.isArray(drop)
+    ? drop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionState = statedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionState = Array.isArray(statedrop)
+    ? statedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionCountry = condrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCountry = Array.isArray(condrop)
+    ? condrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionAccountype = accdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionAccountype = Array.isArray(accdrop)
+    ? accdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   // const handleChangeStdAccGrp = (selectedUserAcc) => {
   //   setSelectedUserAcc(selectedUserAcc);
@@ -365,7 +375,6 @@ function BankAccInput({ }) {
     setselectedAcctype(selectedAcctype);
     setaccount_type(selectedAcctype ? selectedAcctype.value : '');
   };
-
 
   // const SelectItem = async (user_accgroup_code) => {
   //   try {
@@ -394,7 +403,12 @@ function BankAccInput({ }) {
   // };
 
   const handleNavigate = () => {
-    navigate("/BankAccount", { selectedRows }); // Pass selectedRows as props to the Input component
+    navigate("/BankAccount", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
 
@@ -407,10 +421,7 @@ function BankAccInput({ }) {
     setError(false);
     setLoading(true);
     try {
-      // Create a new FormData instance
       const formData = new FormData();
-
-      // Append data to formData
       formData.append("company_code", sessionStorage.getItem('selectedCompanyCode'));
       formData.append("account_code", account_code);
       formData.append("account_name", account_name);
@@ -509,7 +520,7 @@ function BankAccInput({ }) {
         console.log("Data Updated successfully");
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -618,10 +629,12 @@ function BankAccInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionDefaultBank = defaultBankDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionDefaultBank = Array.isArray(defaultBankDrop)
+    ? defaultBankDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeDefaultBank = (selectedDefaultBank) => {
     setselectedDefaultBank(selectedDefaultBank);
@@ -673,7 +686,7 @@ function BankAccInput({ }) {
                   />
                   <label className={`exp-form-labels ${error && !account_code ? 'text-danger' : ''}`}>Accountant Code
                     {/* <span className="text-danger">*</span> */}
-                    </label>
+                  </label>
                 </div>
               </div>
 

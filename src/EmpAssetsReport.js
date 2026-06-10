@@ -469,6 +469,11 @@ function EmpAssetsReport({ }) {
       field: "LastAllocationDate",
       editable: false,
     },
+    {
+      headerName: "Serial Number",
+      field: "SerialNumber",
+      editable: false,
+    },
   ];
 
   const defaultColDef = {

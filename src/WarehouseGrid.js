@@ -4,7 +4,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./App.css";
 import Select from 'react-select';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -36,17 +36,61 @@ function WarehouseGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
   const [isSelectStatus, setIsSelectStatus] = useState(false);
+
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const warehouseGridPermision = permissions
     .filter(permission => permission.screen_type === 'Warehouse')
     .map(permission => permission.permission_type.toLowerCase());
 
-  /*testing for search criteria
-    const [showAddUserForm, setShowAddUserForm] = useState(false);
-   const [editedData, setEditedData] = useState([]);
-   const [startDate, setStartDate] = useState("");
-   const [endDate, setEndDate] = useState("");*/
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setwarehouse_code(location.state.preservedInputs.warehouse_code || "");
+      setwarehouse_name(location.state.preservedInputs.warehouse_name || "");
+      setstatus(location.state.preservedInputs.status || "");
+      setlocation_no(location.state.preservedInputs.location_no || "");
+
+      if (location.state.preservedInputs.status) {
+        setSelectedStatus({
+          label: location.state.preservedInputs.status,
+          value: location.state.preservedInputs.status,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setwarehouse_code("");
+    setwarehouse_name("");
+    setstatus("");
+    setlocation_no("");
+    setSelectedStatus("");
+    setRowData([]);
+  };
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/locationno`)
@@ -92,17 +136,17 @@ function WarehouseGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setstatus(selectedStatus ? selectedStatus.value : '');
   };
-
 
   const handleSearch = async () => {
     setLoading(true);
@@ -154,6 +198,7 @@ function WarehouseGrid() {
       cellStyle: { textAlign: "left" },
       // minWidth: 250,
       // maxWidth: 250,
+      cellClass: "ag-link-cell",
       cellEditorParams: {
         maxLength: 18,
       },
@@ -455,12 +500,26 @@ function WarehouseGrid() {
     reportWindow.document.close();
   };
 
-
   const handleNavigateToForm = () => {
-    navigate("/AddWarehouse", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
+    navigate("/AddWarehouse", { state: { mode: "create" } });
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddWarehouse", { state: { mode: "update", selectedRow } });
+    navigate("/AddWarehouse", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          warehouse_code,
+          warehouse_name,
+          status,
+          location_no,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -804,14 +863,14 @@ function WarehouseGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

@@ -12,8 +12,8 @@ const config = require('./Apiconfig');
 
 /* ── Bubble colours mapping ── */
 const BUBBLE_TYPES = [
-  'gold','amber','silver','gold','amber','gold','silver','amber',
-  'gold','silver','amber','gold','silver','gold','amber','silver','gold','amber'
+  'gold', 'amber', 'silver', 'gold', 'amber', 'gold', 'silver', 'amber',
+  'gold', 'silver', 'amber', 'gold', 'silver', 'gold', 'amber', 'silver', 'gold', 'amber'
 ];
 
 const BubbleField = () => (
@@ -25,26 +25,40 @@ const BubbleField = () => (
 );
 
 const PILLS = [
-  { label: 'Payroll',     cls: '' },
-  { label: 'Attendance',  cls: 'dim' },
-  { label: 'Appraisals',  cls: '' },
-  { label: 'Onboarding',  cls: 'dim' },
+  { label: 'Payroll', cls: '' },
+  { label: 'Attendance', cls: 'dim' },
+  { label: 'Appraisals', cls: '' },
+  { label: 'Onboarding', cls: 'dim' },
 ];
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const [user_code,     setuser_code]     = useState('');
+  const [user_code, setuser_code] = useState('');
   const [user_password, setuser_password] = useState('');
-  const [loginError,    setLoginError]    = useState('');
-  const [showPassword,  setShowPassword]  = useState(false);
-  const [open,          setOpen]          = useState(false);
-  const [isCapsLockOn,           setIsCapsLockOn]           = useState(false);
-  const [showCapsLockWarning,    setShowCapsLockWarning]    = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+  const [showCapsLockWarning, setShowCapsLockWarning] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(false);
-  const [loading,       setLoading]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const secretKey = 'yjk26012024';
+
+  // Load saved credentials on page load
+  useEffect(() => {
+    const savedUserCode = localStorage.getItem("remember_user_code");
+    const savedPassword = localStorage.getItem("remember_password");
+    const savedRememberMe = localStorage.getItem("remember_me");
+
+    if (savedRememberMe === "true") {
+      setuser_code(savedUserCode || "");
+      setuser_password(savedPassword || "");
+      setRememberMe(true);
+    }
+  }, []);
 
   /* ── Caps Lock ── */
   useEffect(() => {
@@ -59,10 +73,10 @@ const Login = () => {
       }
     };
     window.addEventListener('keydown', handle);
-    window.addEventListener('keyup',   handle);
+    window.addEventListener('keyup', handle);
     return () => {
       window.removeEventListener('keydown', handle);
-      window.removeEventListener('keyup',   handle);
+      window.removeEventListener('keyup', handle);
     };
   }, []);
 
@@ -81,8 +95,8 @@ const Login = () => {
     setTimeout(() => setLoading(false), 3000);
 
     try {
-      const encryptedUserCode  = CryptoJS.AES.encrypt(user_code,     secretKey).toString();
-      const encryptedPassword  = CryptoJS.AES.encrypt(user_password, secretKey).toString();
+      const encryptedUserCode = CryptoJS.AES.encrypt(user_code, secretKey).toString();
+      const encryptedPassword = CryptoJS.AES.encrypt(user_password, secretKey).toString();
 
       const response = await fetch(`${config.apiBaseUrl}/login`, {
         method: 'POST',
@@ -92,16 +106,27 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+
+        if (rememberMe) {
+          localStorage.setItem("remember_user_code", user_code);
+          localStorage.setItem("remember_password", user_password);
+          localStorage.setItem("remember_me", true);
+        } else {
+          localStorage.removeItem("remember_user_code");
+          localStorage.removeItem("remember_password");
+          localStorage.removeItem("remember_me");
+        }
+        
         const [{ user_code: uc, role_id, user_images, email_id }] = data;
 
         if (user_images?.data) {
           sessionStorage.setItem('user_image', arrayBufferToBase64(user_images.data));
         }
 
-        sessionStorage.setItem('isLoggedIn',   true);
-        sessionStorage.setItem('user_code',    uc);
-        sessionStorage.setItem('role_id',      role_id);
-        sessionStorage.setItem('userEmailId',  email_id);
+        sessionStorage.setItem('isLoggedIn', true);
+        sessionStorage.setItem('user_code', uc);
+        sessionStorage.setItem('role_id', role_id);
+        sessionStorage.setItem('userEmailId', email_id);
 
         await UserPermission(role_id);
         await fetchUserData(uc);
@@ -150,13 +175,13 @@ const Login = () => {
 
   const handleSave = (data) => {
     if (!data) return;
-    sessionStorage.setItem('selectedCompanyCode',  data.company_no);
-    sessionStorage.setItem('selectedCompanyName',  data.company_name);
+    sessionStorage.setItem('selectedCompanyCode', data.company_no);
+    sessionStorage.setItem('selectedCompanyName', data.company_name);
     sessionStorage.setItem('selectedLocationCode', data.location_no);
     sessionStorage.setItem('selectedLocationName', data.location_name);
-    sessionStorage.setItem('selectedShortName',    data.short_name);
-    sessionStorage.setItem('selectedUserName',     data.user_name);
-    sessionStorage.setItem('selectedUserCode',     data.user_code);
+    sessionStorage.setItem('selectedShortName', data.short_name);
+    sessionStorage.setItem('selectedUserName', data.user_name);
+    sessionStorage.setItem('selectedUserCode', data.user_code);
   };
 
   return (
@@ -195,7 +220,8 @@ const Login = () => {
           <div className="signup-panel login-input-area">
 
             <div className="panel-header">
-              <h2 className="signup-title">Welcome back</h2>
+              {/* <h2 className="signup-title">Welcome back</h2> */}
+              <h2 className="signup-title">Welcome</h2>
               <p className="signup-subtitle">Sign in to your YJK HCM account</p>
             </div>
 
@@ -251,8 +277,16 @@ const Login = () => {
               )}
               <div className="form-options">
                 <div className="remember-me-container">
-                  <input type="checkbox" id="remember-me" className="custom-checkbox" />
-                  <label htmlFor="remember-me" className="checkbox-label">Remember me</label>
+                  <input
+                    type="checkbox"
+                    id="remember-me"
+                    className="custom-checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <label htmlFor="remember-me" className="checkbox-label">
+                    Remember me
+                  </label>
                 </div>
                 <span
                   className="forgot-password-link"
@@ -261,7 +295,7 @@ const Login = () => {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && setOpen(true)}
                 >
-                  Forgot password?
+                  Forgot Password?
                 </span>
               </div>
               <button

@@ -372,42 +372,42 @@ function InterviewCompletionRate({ }) {
     setRowData([]);
   };
 
-  const generateReport = () => {
-    const api = gridRef.current?.api;
-    if (!api) return;
+const generateReport = () => {
+  const api = gridRef.current?.api;
+  if (!api) return;
 
-    const selectedRows = api
-      .getSelectedRows()
-      .filter((row) => row.schedule_id !== null);
+  const selectedRows = api
+    .getSelectedRows()
+    .filter((row) => row.schedule_id !== null);
 
-    if (selectedRows.length === 0) {
-      toast.warning("Please select at least one row to print");
-      return;
-    }
+  if (selectedRows.length === 0) {
+    toast.warning("Please select at least one row to print");
+    return;
+  }
 
-    /* ================= READ THEME COLORS ================= */
+  /* ================= THEME COLORS ================= */
 
-    const headerGradientStart = getCSSVariable("--but");
-    const tableHeaderBg = getCSSVariable("--ag-header");
-    const fontColor = getCSSVariable("--font-color");
-    const rowAltColor = getCSSVariable("--ag-row");
-    const hoverColor = getCSSVariable("--ag-hover");
+  const headerGradientStart = getCSSVariable("--but");
+  const tableHeaderBg = getCSSVariable("--ag-header");
+  const fontColor = getCSSVariable("--font-color");
+  const rowAltColor = getCSSVariable("--ag-row");
+  const hoverColor = getCSSVariable("--ag-hover");
 
-    // ✅ Get Selected Recommendation
-    const selectedRecommendation = recommendation || "";
+  /* ================= TITLE ================= */
 
-    // ✅ Dynamic Title Text
-    let recommendationText = "Candidates";
+  const selectedRecommendation = recommendation || "";
 
-    if (selectedRecommendation.toLowerCase() === "select") {
-      recommendationText = "Selected Candidate";
-    } else if (selectedRecommendation.toLowerCase() === "hold") {
-      recommendationText = "Hold Candidate";
-    } else if (selectedRecommendation.toLowerCase() === "next round") {
-      recommendationText = "Next Round Candidate";
-    } else if (selectedRecommendation.toLowerCase() === "reject") {
-      recommendationText = "Reject Candidate";
-    }
+  let recommendationText = "Candidates";
+
+  if (selectedRecommendation.toLowerCase() === "select") {
+    recommendationText = "Selected Candidate";
+  } else if (selectedRecommendation.toLowerCase() === "hold") {
+    recommendationText = "Hold Candidate";
+  } else if (selectedRecommendation.toLowerCase() === "next round") {
+    recommendationText = "Next Round Candidate";
+  } else if (selectedRecommendation.toLowerCase() === "reject") {
+    recommendationText = "Reject Candidate";
+  }
 
     const logoUrl = window.location.origin + "/favicon.ico";
     const reportWindow = window.open("", "_blank");
@@ -420,149 +420,259 @@ function InterviewCompletionRate({ }) {
     // 🔥 append to HEAD
     reportWindow.document.head.appendChild(link);
 
-    reportWindow.document.write(`
-  <html>
-  <head>
-    <title>Interview Completion Report</title>
-    <style>
-      body {
-        font-family: 'Segoe UI', sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f6f9;
-        color: ${fontColor};
-      }
+  reportWindow.document.write(`
+    <html>
+    <head>
+      <title>Interview Completion Report</title>
 
-      .header {
-        display: flex;
-        align-items: center;
-        background: ${tableHeaderBg};
-        padding: 15px 20px;
-        color: white;
-        border-radius: 8px;
-      }
+      <link rel="icon" type="image/x-icon" href="${logoUrl}" />
 
-      .title-section {
-        flex: 1;
-        text-align: center;
-      }
+      <style>
 
-      .title-section h2 {
-        margin: 0;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        margin-top: 15px;
-      }
-
-      th {
-        background-color: ${tableHeaderBg};
-        color: white;
-        padding: 10px;
-        text-align: left;
-      }
-
-      td {
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
-      }
-
-      tr:nth-child(even) {
-        background-color: ${rowAltColor};
-      }
-
-      tr:hover {
-        background-color: ${hoverColor};
-      }
-
-      .print-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background: ${headerGradientStart};
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      .print-btn:hover {
-        opacity: 0.85;
-      }
-
-      @media print {
-        .print-btn {
-          display: none;
+        *{
+          box-sizing:border-box;
         }
+
         body {
-          background: white;
+          font-family: 'Segoe UI', sans-serif;
+          margin: 0;
+          padding: 20px;
+          background-color: #f4f6f9;
+          color: ${fontColor};
         }
-      }
-    </style>
-  </head>
-  <body>
 
-  <div class="header">
-    <img src="${logoUrl}" class="logo" />
-    <div class="title-section">
-      <h2>Interview Completion Report</h2>
-    </div>
-  </div>
+        .report-container{
+          width:100%;
+        }
 
-  <div style="margin-top:15px;">
-    <strong>Total ${recommendationText} : ${selectedRows.length}</strong>
-    <span style="float:right;">
-      Printed Date: ${new Date().toLocaleDateString()}
-    </span>
-  </div>
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: ${tableHeaderBg};
+          padding: 15px 20px;
+          color: white;
+          border-radius: 10px;
+          margin-bottom: 20px;
+        }
 
-  <table>
-    <thead>
-      <tr>
-        <th>Schedule ID</th>
-        <th>Employee ID</th>
-        <th>Rating</th>
-        <th>Comments</th>
-        <th>Submitted On</th>
-        <th>Recommendation</th>
-      </tr>
-    </thead>
-    <tbody>
+        .logo {
+          width: 60px;
+          height: 60px;
+          object-fit: contain;
+        }
+
+        .title-section {
+          flex: 1;
+          text-align: center;
+        }
+
+        .title-section h2 {
+          margin: 0;
+          font-size: 24px;
+          letter-spacing: 0.5px;
+        }
+
+        .sub-info {
+          margin: 15px 0 20px;
+          font-size: 14px;
+          color: #555;
+          display: flex;
+          justify-content: space-between;
+          font-weight: 600;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        thead {
+          display: table-header-group;
+        }
+
+        th {
+          background-color: ${tableHeaderBg};
+          color: white;
+          padding: 12px 10px;
+          text-align: left;
+          font-size: 14px;
+          border: 1px solid #dcdcdc;
+        }
+
+        td {
+          padding: 10px;
+          border: 1px solid #e0e0e0;
+          font-size: 13px;
+          word-break: break-word;
+        }
+
+        tr:nth-child(even) {
+          background-color: ${rowAltColor};
+        }
+
+        tr:hover {
+          background-color: ${hoverColor};
+        }
+
+        .footer {
+          margin-top: 25px;
+          text-align: center;
+          font-size: 13px;
+          color: #777;
+          font-weight: 500;
+        }
+
+        .print-btn-wrapper{
+          text-align:center;
+          margin-top:20px;
+        }
+
+        .print-btn {
+          padding: 10px 24px;
+          background: ${headerGradientStart};
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .print-btn:hover {
+          opacity: 0.9;
+        }
+
+        /* ================= PRINT STYLES ================= */
+
+        @media print {
+
+          @page {
+            size: auto;
+            margin: 12mm;
+          }
+
+          body {
+            background: white !important;
+            padding: 0;
+            margin: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .print-btn-wrapper {
+            display: none !important;
+          }
+
+          .header {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+            border-radius: 0;
+          }
+
+          table {
+            box-shadow: none;
+          }
+
+          th {
+            background: ${tableHeaderBg} !important;
+            color: white !important;
+          }
+
+          tr:nth-child(even) {
+            background-color: ${rowAltColor} !important;
+          }
+
+          .footer {
+            margin-top: 15px;
+          }
+        }
+
+      </style>
+    </head>
+
+    <body>
+
+      <div class="report-container">
+
+        <div class="header">
+
+          <img src="${logoUrl}" class="logo" />
+
+          <div class="title-section">
+            <h2>Interview Completion Report</h2>
+          </div>
+
+          <div style="width:60px;"></div>
+
+        </div>
+
+        <div class="sub-info">
+          <div>
+            Total ${recommendationText} : ${selectedRows.length}
+          </div>
+
+          <div>
+            Printed Date : ${new Date().toLocaleDateString()}
+          </div>
+        </div>
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Schedule ID</th>
+              <th>Employee ID</th>
+              <th>Rating</th>
+              <th>Comments</th>
+              <th>Submitted On</th>
+              <th>Recommendation</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            ${selectedRows
+              .map(
+                (row) => `
+                <tr>
+                  <td>${row.schedule_id || ""}</td>
+                  <td>${row.employee_id || ""}</td>
+                  <td>${row.rating || ""}</td>
+                  <td>${row.comments || ""}</td>
+                  <td>${row.submitted_on || ""}</td>
+                  <td>${row.Recommendation || ""}</td>
+                </tr>
+              `
+              )
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+        <div class="print-btn-wrapper">
+          <button class="print-btn" onclick="window.print()">
+            Print
+          </button>
+        </div>
+
+        <div class="footer">
+          © ${new Date().getFullYear()} YJK Technologies | Confidential Report
+        </div>
+
+      </div>
+
+    </body>
+    </html>
   `);
 
-    selectedRows.forEach((row) => {
-      reportWindow.document.write(`
-      <tr>
-        <td>${row.schedule_id || ""}</td>
-        <td>${row.employee_id || ""}</td>
-        <td>${row.rating || ""}</td>
-        <td>${row.comments || ""}</td>
-        <td>${row.submitted_on || ""}</td>
-        <td>${row.Recommendation || ""}</td>
-      </tr>
-    `);
-    });
-
-    reportWindow.document.write(`
-    </tbody>
-  </table>
-
-  <div style="text-align:center;">
-    <button class="print-btn" onclick="window.print()">Print</button>
-  </div>
-
-  </body>
-  </html>
-  `);
-
-    reportWindow.document.close();
-  };
+  reportWindow.document.close();
+};
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)

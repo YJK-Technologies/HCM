@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
@@ -35,15 +35,58 @@ function Desgination() {
   const [modifiedDate, setModifiedDate] = useState("");
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
+  const location = useLocation();
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const desgiantionInfoPermissions = permissions
     .filter(permission => permission.screen_type === 'DesgiantionInfo')
     .map(permission => permission.permission_type.toLowerCase());
 
+    useEffect(() => {
+      const handleKeyDown = (event) => {
+        const isReloadShortcut =
+          (event.ctrlKey && event.key.toLowerCase() === "r") ||
+          (event.altKey && event.key.toLowerCase() === "r") ||
+          event.key === "F5";
 
+        if (isReloadShortcut) {
+          event.preventDefault();
+          clearInputFields();
+        }
+      };
 
+      window.addEventListener("keydown", handleKeyDown);
 
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setdept_id(location.state.preservedInputs.dept_id || "");
+      setdesgination_id(location.state.preservedInputs.desgination_id || "");
+      setStatus(location.state.preservedInputs.status || "");
+
+      if (location.state.preservedInputs.status) {
+        setSelectedStatus({
+          label: location.state.preservedInputs.status,
+          value: location.state.preservedInputs.status,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setdept_id("");
+    setdesgination_id("");
+    setSelectedStatus("");
+    setStatus("");
+    setRowData([]);
+  }
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -78,11 +121,12 @@ function Desgination() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -136,6 +180,7 @@ function Desgination() {
       field: "dept_id",
       cellStyle: { textAlign: "left" },
       // minWidth: 180,
+      cellClass: "ag-link-cell",
       checkboxSelection: true,
       cellEditorParams: {
         maxLength: 20,
@@ -415,14 +460,27 @@ function Desgination() {
     reportWindow.document.close();
   };
 
-
-
   const handleNavigateToForm = () => {
     navigate("/AddDesgination", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddDesgination", { state: { mode: "update", selectedRow } });
+    navigate("/AddDesgination", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          dept_id,
+          desgination_id,
+          status,
+        },
+      },
+    });
   };
+
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
@@ -740,14 +798,14 @@ function Desgination() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

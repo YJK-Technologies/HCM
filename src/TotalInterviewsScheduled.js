@@ -501,14 +501,71 @@ function TotalInterviewsScheduled({ }) {
             opacity: 0.85;
           }
   
-          @media print {
-            .print-btn {
-              display: none;
-            }
-            body {
-              background: white;
-            }
-          }
+      @media print {
+        body {
+          background: white !important;
+          margin: 0;
+          padding: 15px;
+          color: ${fontColor} !important;
+
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .header {
+          display: flex;
+          align-items: center;
+          background: ${tableHeaderBg} !important;
+          color: white !important;
+          padding: 15px 20px;
+          border-radius: 8px;
+        }
+
+        .title-section h2 {
+          color: white !important;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white !important;
+          box-shadow: none !important;
+        }
+
+        th {
+          background-color: ${tableHeaderBg} !important;
+          color: white !important;
+          border: 1px solid #ccc !important;
+          padding: 10px;
+        }
+
+        td {
+          border: 1px solid #ccc !important;
+          padding: 8px;
+          color: ${fontColor} !important;
+        }
+
+        tr:nth-child(even) {
+          background-color: ${rowAltColor} !important;
+        }
+
+        .print-btn {
+          display: none !important;
+        }
+
+        .footer {
+          margin-top: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #666 !important;
+        }
+
+        @page {
+          size: auto;
+          margin: 10mm;
+        }
+      }
+
         </style>
       </head>
       <body>

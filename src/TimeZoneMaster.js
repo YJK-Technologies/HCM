@@ -169,25 +169,33 @@ function TimeZoneMaster() {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
-    const filteredOptionStatus = statusDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionStatus = Array.isArray(statusDrop)
+        ? statusDrop.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionStatusSc = statusDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionStatusSc = Array.isArray(statusDropSc)
+        ? statusDropSc.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionDstApplicable = dstApplicableDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionDstApplicable = Array.isArray(dstApplicableDrop)
+        ? dstApplicableDrop.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
 
-    const filteredOptionDstApplicableSc = dstApplicableDropSc.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-    }));
+    const filteredOptionDstApplicableSc = Array.isArray(dstApplicableDropSc)
+        ? dstApplicableDropSc.map((option) => ({
+            value: option.attributedetails_name,
+            label: option.attributedetails_name,
+        }))
+        : [];
 
     const handleChangeStatus = (selectedStatus) => {
         setSelectedStatus(selectedStatus);
@@ -927,7 +935,7 @@ function TimeZoneMaster() {
                             </div>
                         </div>
 
-                        <div className="col-12">
+                        <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                             <div className="search-btn-wrapper">
                                 <div className="icon-btn search" onClick={handleSearch}>
                                     <span className="tooltip">Search</span>

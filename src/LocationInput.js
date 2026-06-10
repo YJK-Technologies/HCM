@@ -101,8 +101,6 @@ function LocInfoInput({ }) {
       setstate(selectedRow.state || "");
       setcountry(selectedRow.country || "");
       setstatus(selectedRow.status || "");;
-
-
       setSelectedCity({
         label: selectedRow.city,
         value: selectedRow.city,
@@ -191,25 +189,33 @@ function LocInfoInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionCity = drop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCity = Array.isArray(drop)
+    ? drop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionState = statedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionState = Array.isArray(statedrop)
+    ? statedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionCountry = condrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCountry = Array.isArray(condrop)
+    ? condrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeCity = (selectedCity) => {
     setSelectedCity(selectedCity);
@@ -357,7 +363,7 @@ function LocInfoInput({ }) {
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -380,7 +386,12 @@ function LocInfoInput({ }) {
   }
 
   const handleNavigate = () => {
-    navigate("/Location"); // Pass selectedRows as props to the Input component
+    navigate("/Location", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs,
+      },
+    });
   };
 
   const handleKeyDown = async (
@@ -432,7 +443,7 @@ function LocInfoInput({ }) {
         </div>
       </div>
 
-      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box mb-2">
         <div className="row g-3">
 
           <div className="col-md-2">

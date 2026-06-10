@@ -146,16 +146,18 @@ function IntermediaryDetailInput({ }) {
     fetchHdrCode();
   }, []);
 
-  const filteredOptionHeader = intcodedrop.map((option) => ({
-    value: option.Code,
-    label: `${option.Code} - ${option.Details}`,
-  }));
+  const filteredOptionHeader = Array.isArray(intcodedrop)
+    ? intcodedrop.map((option) => ({
+      value: option.Code,
+      label: `${option.Code} - ${option.Details}`,
+    }))
+    : [];
 
   const handleChangeHeader = (selectedHeader) => {
     setSelectedHeader(selectedHeader);
     setCode(selectedHeader ? selectedHeader.value : '');
-
   };
+  
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
@@ -202,37 +204,42 @@ function IntermediaryDetailInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionCity = drop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCity = Array.isArray(drop)
+    ? drop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionState = statedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionState = Array.isArray(statedrop)
+    ? statedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionCountry = condrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCountry = Array.isArray(condrop)
+    ? condrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
+
   const handleChangeCity = (selectedCity) => {
     setSelectedCity(selectedCity);
     setIntermediary_Area_Code(selectedCity ? selectedCity.value : '');
-
   };
 
   const handleChangeState = (selectedState) => {
     setselectedState(selectedState);
     setIntermediary_Stat_Code(selectedState ? selectedState.value : '');
-
   };
 
   const handleChangeCountry = (selectedCountry) => {
     setselectedCountry(selectedCountry);
     setIntermediary_Cnty_Code(selectedCountry ? selectedCountry.value : '');
-
   };
+
   const handleInsert = async () => {
     if (
       !Code ||
@@ -321,7 +328,12 @@ function IntermediaryDetailInput({ }) {
   }
 
   const handleNavigate = () => {
-    navigate("/Intermediary"); // Pass selectedRows as props to the Input component
+    navigate("/Intermediary", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
@@ -417,7 +429,7 @@ function IntermediaryDetailInput({ }) {
       if (response.ok) {
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -793,61 +805,13 @@ function IntermediaryDetailInput({ }) {
                   )}
                 </div>
               </div>
-              {/* <div className="col-md-3 form-group">
-            
-          {mode === "create" ? (
-                <div class="exp-form-floating">
-                  <div class="d-flex justify-content-start">
-                    <div>
-                      <label for="state" class="exp-form-labels">
-                        Created By
-                      </label>
-                    </div>
-                  </div>
-                  <input
-                    id="emailid"
-                    class="exp-input-field form-control"
-                    type="text"
-                    placeholder=""
-                    required
-                    title="Please enter the email ID"
-                    value={created_by}
-                  />
-                </div>
-                ) : (
-            <div class="exp-form-floating">
-                  <div class="d-flex justify-content-start">
-                    <div>
-                      <label for="state" class="exp-form-labels">
-                        Modified By
-                      </label>
-                    </div>
-                  </div>
-                  <input
-                    id="emailid"
-                    class="exp-input-field form-control"
-                    type="text"
-                    placeholder=""
-                    required
-                    title="Please enter the email ID"
-                    value={modified_by}
-                  />
-                </div>
-           )}
-          </div>
-         */}
-
             </div>
             <div>
               <IntermediaryHdrInputPopup open={open2} handleClose={handleClose} />
             </div>
-
-
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }

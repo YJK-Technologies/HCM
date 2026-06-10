@@ -249,7 +249,9 @@ body::-webkit-scrollbar {
     min-width: auto !important; 
     width: 60px !important;     
     padding: 12px 0;
-    left:0;
+    left: 0;
+    max-height: 20rem;
+    overflow-y: auto;
     border-radius: 12px;
     border: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);

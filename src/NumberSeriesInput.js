@@ -42,13 +42,12 @@ function NumberSeriesInput({ }) {
   const numpre = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const created_by = sessionStorage.getItem('selectedUserCode')
-  const [isUpdated, setIsUpdated] = useState(false);
   const [isSelectedscreentype, setIsSelectedscreentype] = useState(false);
   const [isSelectedStatus, setIsSelectStatus] = useState(false);
   const [isSelectedBoolean, setIsSelectBoolean] = useState(false);
 
   const modified_by = sessionStorage.getItem("selectedUserCode");
-  
+
   const location = useLocation();
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
@@ -76,7 +75,7 @@ function NumberSeriesInput({ }) {
   }
 
   useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
+    if (mode === "update" && selectedRow) {
       setStart_Year(selectedRow.Start_Year || "");
       setEnd_Year(selectedRow.End_Year || "");
       setStart_No(selectedRow.Start_No || "");
@@ -106,7 +105,7 @@ function NumberSeriesInput({ }) {
     } else if (mode === "create") {
       clearInputFields();
     }
-  }, [mode, selectedRow, isUpdated]);
+  }, [mode, selectedRow]);
 
 
   const handleUpdate = async () => {
@@ -132,7 +131,6 @@ function NumberSeriesInput({ }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-
           company_code: sessionStorage.getItem('selectedCompanyCode'),
           Screen_Type: selectedscreentype.value,
           Start_Year: Start_Year,
@@ -149,7 +147,7 @@ function NumberSeriesInput({ }) {
       if (response.ok) {
         toast.success("Data inserted successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -213,45 +211,47 @@ function NumberSeriesInput({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  const filteredOptionscreentype = Array.isArray(screentypedrop)
+    ? screentypedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionscreentype = screentypedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-  const filteredOptionBoolean = booleandrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionBoolean = Array.isArray(booleandrop)
+    ? booleandrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   useEffect(() => {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0-based month, so 0 is January, 1 is February, etc.
+    if (mode === "create") {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth();
 
-    let financialYearStartDate, financialYearEndDate;
+      let financialYearStartDate, financialYearEndDate;
 
-    if (currentMonth < 3) {  // If current month is less than April (March)
-      // Set the previous year's start date and the current year's end date
-      financialYearStartDate = `${currentYear - 1}-04-01`;
-      financialYearEndDate = `${currentYear}-03-31`;
-    } else {
-      // Set the current year's start date and the next year's end date
-      financialYearStartDate = `${currentYear}-04-01`;
-      financialYearEndDate = `${currentYear + 1}-03-31`;
+      if (currentMonth < 3) {
+        financialYearStartDate = `${currentYear - 1}-04-01`;
+        financialYearEndDate = `${currentYear}-03-31`;
+      } else {
+        financialYearStartDate = `${currentYear}-04-01`;
+        financialYearEndDate = `${currentYear + 1}-03-31`;
+      }
+
+      setStart_Year(financialYearStartDate);
+      setEnd_Year(financialYearEndDate);
     }
-
-    // Set the calculated dates to the state
-    setStart_Year(financialYearStartDate);
-    setEnd_Year(financialYearEndDate);
-
-  }, []);
-
+  }, [mode]);
 
   const handleChangescreentype = (selectedscreentype) => {
     setselectedscreentype(selectedscreentype);
@@ -303,7 +303,7 @@ function NumberSeriesInput({ }) {
         }),
       });
       if (response.ok) {
-         toast.success("Data updated successfully", {
+        toast.success("Data updated successfully", {
           onClose: () => {
             clearInputFields();
             setError(false)
@@ -323,24 +323,25 @@ function NumberSeriesInput({ }) {
   };
 
   const handleNavigate = () => {
-    navigate("/NumberSeries"); // Pass selectedRows as props to the Input component
+    navigate("/NumberSeries", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
-
-
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
-      // Check if the value has changed and handle the search logic
       if (hasValueChanged) {
-        await handleKeyDownStatus(e); // Trigger the search function
-        setHasValueChanged(false); // Reset the flag after the search
+        await handleKeyDownStatus(e); 
+        setHasValueChanged(false); 
       }
 
-      // Move to the next field if the current field has a valid value
       if (value) {
         nextFieldRef.current.focus();
       } else {
-        e.preventDefault(); // Prevent moving to the next field if the value is empty
+        e.preventDefault();
       }
     }
   };

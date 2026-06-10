@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import './App.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -43,6 +43,8 @@ function Grid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const companyPermissions = permissions
@@ -52,6 +54,61 @@ function Grid() {
   const [selectedCompanyNo, setselectedCompanyNo] = useState(null);
   const [selectedCompanyLogo, setSelectedCompanyLogo] = useState(null);
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setCompany_no(location.state.preservedInputs.company_no || "");
+      setCompany_name(location.state.preservedInputs.company_name || "");
+      setCity(location.state.preservedInputs.city || "");
+      setPincode(location.state.preservedInputs.pincode || "");
+      setCountry(location.state.preservedInputs.country || "");
+      setcompany_gst_no(location.state.preservedInputs.company_gst_no || "");
+      setState(location.state.preservedInputs.state || "");
+      setStatus(location.state.preservedInputs.status || "");
+
+      if (location.state.preservedInputs.status) {
+        setSelectedStatus({
+          label: location.state.preservedInputs.status,
+          value: location.state.preservedInputs.status,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setCompany_no("");
+    setCompany_name("");
+    setCity("");
+    setState("");
+    setPincode("");
+    setCountry("");
+    setcompany_gst_no("");
+    setSelectedStatus("");
+    setStatus("");
+    setRowData([]);
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -156,10 +213,12 @@ function Grid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -255,6 +314,7 @@ function Grid() {
       headerCheckboxSelection: true,
       headerName: "Company No",
       field: "company_no",
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "left" },
       checkboxSelection: true,
       cellEditorParams: {
@@ -720,7 +780,25 @@ function Grid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddCompany", { state: { mode: "update", selectedRow } });
+    navigate("/AddCompany", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          company_no,
+          company_name,
+          city,
+          state,
+          pincode,
+          country,
+          company_gst_no,
+          status,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -914,7 +992,7 @@ function Grid() {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="fa-solid fa-ellipsis-vertical"></i> 
+              <i className="fa-solid fa-ellipsis-vertical"></i>
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end">
@@ -1102,14 +1180,14 @@ function Grid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

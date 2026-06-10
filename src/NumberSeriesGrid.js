@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ToastContainer, toast } from 'react-toastify';
@@ -34,15 +34,55 @@ function NumberSeriesGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
   const [isSelectedscreentype, setIsSelectscreentype] = useState(false);
+
+  const location = useLocation();
+
   //code added by Haraish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const numberSeriesPermission = permissions
     .filter((permission) => permission.screen_type === "NumberSeries")
     .map((permission) => permission.permission_type.toLowerCase());
 
-  console.log(numberSeriesPermission);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
 
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
 
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setScreen_Type(location.state.preservedInputs.Screen_Type || "");
+
+      if (location.state.preservedInputs.Screen_Type) {
+        setselectedscreentype({
+          label: location.state.preservedInputs.Screen_Type,
+          value: location.state.preservedInputs.Screen_Type,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setScreen_Type("");
+    setselectedscreentype("");
+    setRowData([]);
+  }
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -96,24 +136,17 @@ function NumberSeriesGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-
-  const filteredOptionscreentype = screentypedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
-
-
-
-
-
+  const filteredOptionscreentype = Array.isArray(screentypedrop)
+    ? screentypedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangescreentype = (selectedscreentype) => {
     setselectedscreentype(selectedscreentype);
     setScreen_Type(selectedscreentype ? selectedscreentype.value : "");
   };
-
 
   const reloadGridData = () => {
     window.location.reload();
@@ -161,6 +194,7 @@ function NumberSeriesGrid() {
       checkboxSelection: true,
       headerName: "Screen Type",
       field: "Screen_Type",
+      cellClass: "ag-link-cell",
       //  editable: true,
       cellStyle: { textAlign: "left" },
 
@@ -487,15 +521,23 @@ function NumberSeriesGrid() {
     reportWindow.document.close();
   };
 
-  /*const handleNavigateToForm = () => {
-    navigate("/form");
-  };*/
-
   const handleNavigatesToForm = () => {
     navigate("/AddNumberSeries", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddNumberSeries", { state: { mode: "update", selectedRow } });
+    navigate("/AddNumberSeries", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          Screen_Type,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -783,14 +825,14 @@ function NumberSeriesGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

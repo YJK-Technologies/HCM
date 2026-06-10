@@ -236,7 +236,7 @@ function Input({ }) {
           Exceed_Leave: Exceedleave,
           Start_Year: Start_Year,
           End_Year: End_Year,
-          Status: StatusSC,
+          status: StatusSC,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
         })
       });

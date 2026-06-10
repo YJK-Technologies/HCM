@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -21,6 +21,7 @@ const AccountInformation = () => {
   const [rowData, setRowData] = useState([]);
   const [selectedData, setSelectedData] = useState(null);
   const [selectedRadio, setSelectedRadio] = useState(null);
+  const gridRef = useRef();
 
   const columnData = [
     {
@@ -99,11 +100,16 @@ const AccountInformation = () => {
     }
   };
 
-  const handleSave = (data) => {
-    if (!data || Object.keys(data).length === 0) {
-      toast.warning("Please select a row ");
+  const handleSave = () => {
+    const selectedRows = gridRef.current.api.getSelectedRows();
+
+    // Validation
+    if (!selectedRows || selectedRows.length === 0) {
+      toast.warning("Please select a company");
       return;
     }
+
+    const data = selectedRows[0];
 
     sessionStorage.setItem('selectedCompanyCode', data.company_no);
     sessionStorage.setItem('selectedCompanyName', data.company_name);
@@ -222,97 +228,120 @@ const AccountInformation = () => {
   return (
     <div className="container-fluid Topnav-screen">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
-        <div className="shadow-lg p-1 bg-light rounded main-header-box">
-          <div className="header-flex">
-              <h1 className="page-title">List of Companies</h1>
+      <div className="shadow-lg p-1 bg-light rounded main-header-box">
+        <div className="header-flex">
+          <h1 className="page-title">List of Companies</h1>
 
-            <div className="action-wrapper">
-              <div className="action-icon add" onClick={() => handleSave(selectedData)} >
-                <span className="tooltip">Save</span>
-                <i className="fa-solid fa-floppy-disk" title='Save'></i>
-              </div>
+          <div className="action-wrapper desktop-actions">
+            <div className="action-icon add" onClick={handleSave} >
+              <span className="tooltip">Save</span>
+              <i className="fa-solid fa-floppy-disk"></i>
             </div>
-
           </div>
-        </div>
 
-        <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+          {/* Mobile Dropdown */}
+          <div className="dropdown mobile-actions">
+            <button
+              className="btn btn-primary dropdown-toggle p-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+
+            <ul className="dropdown-menu dropdown-menu-end text-center">
+
+              <li>
+                <button className="dropdown-item" onClick={handleSave}>
+                  <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                </button>
+              </li>
+
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
               <div className="info-label-container">
                 <label className="partyName">
                   <strong>User Code: {userCode}</strong>
                 </label>
               </div>
-              </div>
             </div>
+          </div>
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
                 <label className="partyName">
                   <strong>User Name: {userName}</strong>
                 </label>
-                </div>
               </div>
             </div>
+          </div>
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
                 <label className="partyName">
                   <strong>Company Code: {companyNo}</strong>
                 </label>
-                </div>
               </div>
             </div>
+          </div>
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-                 <div className="info-label-container">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
                 <label className="partyName">
                   <strong>Company Name: {companyName}</strong>
                 </label>
               </div>
-              </div>
             </div>
+          </div>
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
                 <label className="partyName">
                   <strong>Location Code: {locationNo}</strong>
                 </label>
-                </div>
               </div>
             </div>
+          </div>
 
-            <div className="col-md-4">
-              <div className="exp-form-floating">
-                <div className="info-label-container">
+          <div className="col-md-4">
+            <div className="exp-form-floating">
+              <div className="info-label-container">
                 <label className="exp-form-labels partyName">
                   <strong>Location Name: {locationName}</strong>
                 </label>
-                </div>
               </div>
             </div>
-
-          </div>
           </div>
 
-<div className="shadow-lg pt-2 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
-          <div className="ag-theme-alpine mb-2" style={{ height: 437, width: "100%", marginTop: "20px" }}>
-            <AgGridReact
-              columnDefs={columnData}
-              rowData={rowData}
-              defaultColDef={{ editable: true, resizable: true }}
-              rowSelection="single"
-              onSelectionChanged={onSelectionChanged}
-            />
-          </div>
         </div>
+      </div>
+
+      <div className="shadow-lg pt-2 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+        <div className="ag-theme-alpine mb-2" style={{ height: 437, width: "100%", marginTop: "20px" }}>
+          <AgGridReact
+            ref={gridRef}
+            columnDefs={columnData}
+            rowData={rowData}
+            defaultColDef={{ editable: true, resizable: true }}
+            rowSelection="single"
+            onSelectionChanged={onSelectionChanged}
+          />
+        </div>
+      </div>
     </div>
   );
 };

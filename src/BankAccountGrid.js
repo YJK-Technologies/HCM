@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Dropdown, DropdownButton } from "react-bootstrap";
@@ -12,10 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select';
 import labels from "./Labels";
 import LoadingScreen from './Loading';
-
 import { showConfirmationToast } from './ToastConfirmation';
-
-
 
 function BankAccGrid() {
   const [editedData, setEditedData] = useState([]);
@@ -52,6 +49,7 @@ function BankAccGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
 
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -60,8 +58,62 @@ function BankAccGrid() {
     .map(permission => permission.permission_type.toLowerCase());
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
 
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setaccount_code(location.state.preservedInputs.account_code || "");
+      setaccount_name(location.state.preservedInputs.account_name || "");
+      setacc_addr_1(location.state.preservedInputs.acc_addr_1 || "");
+      setacc_area_code(location.state.preservedInputs.acc_area_code || "");
+      setacc_state_code(location.state.preservedInputs.acc_state_code || "");
+      setacc_country_code(location.state.preservedInputs.acc_country_code || "");
+      setbranch(location.state.preservedInputs.branch || "");
+      setaccount_type(location.state.preservedInputs.account_type || "");
+
+      if (location.state.preservedInputs.account_type) {
+        setselectedAcctype({
+          label: location.state.preservedInputs.account_type,
+          value: location.state.preservedInputs.account_type,
+        });
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setaccount_code("");
+    setaccount_name("");
+    setacc_addr_1("");
+    setacc_area_code("");
+    setacc_state_code("");
+    setacc_country_code("");
+    setselectedAcctype("");
+    setaccount_type("");
+    setbranch("");
+    setRowData([]);
+  };
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/getacctype`, {
       method: 'POST',
       headers: {
@@ -70,7 +122,6 @@ function BankAccGrid() {
       body: JSON.stringify({ company_code })
     }).then((response) => response.json())
       .then((data) => {
-        // Extract city names from the fetched data
         const Accounts = data.map(option => option.attributedetails_name);
         setaccGriddrop(Accounts);
       })
@@ -78,10 +129,8 @@ function BankAccGrid() {
   }, []);
 
 
-
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-
     fetch(`${config.apiBaseUrl}/city`, {
       method: 'POST',
       headers: {
@@ -91,7 +140,6 @@ function BankAccGrid() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Extract city names from the fetched data
         const cityNames = data.map(option => option.attributedetails_name);
         setDrop(cityNames);
       })
@@ -100,7 +148,6 @@ function BankAccGrid() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-
     fetch(`${config.apiBaseUrl}/country`, {
       method: 'POST',
       headers: {
@@ -110,7 +157,6 @@ function BankAccGrid() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Extract city names from the fetched data
         const countries = data.map(option => option.attributedetails_name);
         setCondrop(countries);
       })
@@ -119,7 +165,6 @@ function BankAccGrid() {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
-
     fetch(`${config.apiBaseUrl}/state`, {
       method: 'POST',
       headers: {
@@ -129,13 +174,11 @@ function BankAccGrid() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Extract city names from the fetched data
         const States = data.map(option => option.attributedetails_name);
         setStatedrop(States);
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
-
 
 
   useEffect(() => {
@@ -153,21 +196,17 @@ function BankAccGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-
-  const filteredOptionAccountype = accdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
-
+  const filteredOptionAccountype = Array.isArray(accdrop)
+    ? accdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeacc = (selectedAcctype) => {
     setselectedAcctype(selectedAcctype);
     setaccount_type(selectedAcctype ? selectedAcctype.value : '');
-    setError(false);
   };
-
-
 
   const reloadGridData = () => {
     try {
@@ -208,18 +247,15 @@ function BankAccGrid() {
     } finally {
       setLoading(false);
     }
-
   };
 
-
-
   const columnDefs = [
-
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       headerName: "Accountant Code",
       field: "account_code",
+      cellClass: "ag-link-cell",
       //editable: true,
       cellStyle: { textAlign: "left" },
       // minWidth: 250,
@@ -658,17 +694,30 @@ function BankAccGrid() {
     reportWindow.document.close();
   };
 
-
-
-  /*const handleNavigateToForm = () => {
-    navigate("/form");
-  };*/
-
   const handleNavigatesToForm = () => {
     navigate("/AddBankAccount", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
+
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddBankAccount", { state: { mode: "update", selectedRow } });
+    navigate("/AddBankAccount", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          account_code,
+          account_name,
+          acc_addr_1,
+          acc_area_code,
+          acc_state_code,
+          acc_country_code,
+          branch,
+          account_type
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -1066,14 +1115,14 @@ function BankAccGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>

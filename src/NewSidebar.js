@@ -286,17 +286,6 @@ const menuData = [
           // { label: "Assets", path: "/Assets" },
         ],
       },
-      {
-        label: "Reports",
-        isDropdown: true,
-        subMenus: [
-          { label: "Loan Summary Report", path: "/LoanSummaryReports" },
-          { label: "Pending Approvals Report", path: "/PendingApprovalsRepo" },
-          { label: "Loan Disbursement Report", path: "/LoanDisbursementRepo" },
-          { label: "Overdue Loans Report", path: "/OverdueLoansReport" },
-          { label: "Repayment Schedule Report", path: "/RepaymentScheduleRep" },
-        ],
-      },
     ],
   },
 
@@ -325,6 +314,17 @@ const menuData = [
           { label: "Loan Approvals", path: "/LoanApprovals" },
           { label: "Loan Payment", path: "/LoanPayment" },
           { label: "Loan Repayment Schedule", path: "/LoanSchedule" },
+        ],
+      },
+            {
+        label: "Reports",
+        isDropdown: true,
+        subMenus: [
+          { label: "Loan Summary Report", path: "/LoanSummaryReports" },
+          { label: "Pending Approvals Report", path: "/PendingApprovalsRepo" },
+          { label: "Loan Disbursement Report", path: "/LoanDisbursementRepo" },
+          { label: "Overdue Loans Report", path: "/OverdueLoansReport" },
+          { label: "Repayment Schedule Report", path: "/RepaymentScheduleRep" },
         ],
       },
       {
@@ -386,7 +386,7 @@ const menuData = [
           { label: "Project Progress", path: "/ProjectProgress" },
           { label: "Project Chart Report", path: "/ProjectChartReport" },
           { label: "Shift Summary Report", path: "/ShiftSumRep" },
-          { label: "Late Report", path: "/LateReport" },
+          { label: "Late Arrival Report", path: "/LateReport" },
           { label: "Overtime Report", path: "/OvertimeReport" },
           { label: "Leave Summary Report", path: "/AbsentReport" },
         ],

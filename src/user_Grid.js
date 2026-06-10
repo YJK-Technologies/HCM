@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -51,11 +51,77 @@ function UserGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const userPermission = permissions
     .filter((permission) => permission.screen_type === "User")
     .map((permission) => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+    if (location.state?.preservedInputs) {
+      const inputs = location.state.preservedInputs;
+      setuser_code(inputs.user_code || "");
+      setuser_name(inputs.user_name || "");
+      setfirst_name(inputs.first_name || "");
+      setlast_name(inputs.last_name || "");
+      setuser_status(inputs.user_status || "");
+      if (inputs.user_status) {
+        setSelectedStatus({
+          label: inputs.user_status,
+          value: inputs.user_status,
+        });
+      } else {
+        setSelectedStatus(null);
+      }
+      setuser_type(inputs.user_type || "");
+      setdob(inputs.dob || "");
+      setgender(inputs.gender || "");
+      if (inputs.gender) {
+        setSelectedGender({
+          label: inputs.gender,
+          value: inputs.gender,
+        });
+      } else {
+        setSelectedGender(null);
+      }
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setuser_code("");
+    setuser_name("");
+    setfirst_name("");
+    setlast_name("");
+    setSelectedStatus("");
+    setuser_status("");
+    setdob("");
+    setSelectedGender("");
+    setgender("");
+    setRowData([]);
+  };
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -177,21 +243,24 @@ function UserGrid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const filteredOptionUser = Usertypedrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
   }));
 
-  const filteredOptionGender = Genderdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionGender = Array.isArray(Genderdrop)
+    ? Genderdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
@@ -216,7 +285,23 @@ function UserGrid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddUser", { state: { mode: "update", selectedRow } });
+    navigate("/AddUser", {
+      state: {
+        mode: "update",
+        selectedRow,
+        preservedRowData: rowData,
+        preservedInputs: {
+          user_code,
+          user_name,
+          first_name,
+          last_name,
+          user_status,
+          user_type,
+          dob,
+          gender,
+        },
+      },
+    });
   };
 
   const reloadGridData = () => {
@@ -288,6 +373,7 @@ function UserGrid() {
       checkboxSelection: true,
       headerName: "User Code",
       field: "user_code",
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "left" },
       cellEditorParams: {
         maxLength: 18,
@@ -857,6 +943,7 @@ function UserGrid() {
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
           <h1 className="page-title">User</h1>
+
           <div className="action-wrapper desktop-actions">
             {["add", "all permission"].some((permission) => userPermission.includes(permission)) && (
               <div className="action-icon add" onClick={handleNavigateToForm}>
@@ -1092,14 +1179,14 @@ function UserGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
@@ -1121,7 +1208,7 @@ function UserGrid() {
             onSelectionChanged={onSelectionChanged}
             pagination={true}
             onRowSelected={onRowSelected}
-            paginationPageSizeSelector={false}
+            paginationAutoPageSize={true}
           />
         </div>
       </div>

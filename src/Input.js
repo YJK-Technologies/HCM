@@ -347,30 +347,40 @@ function Input({ }) {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const filteredOptionCity = drop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCity = Array.isArray(drop)
+    ? drop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionState = statedrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionState = Array.isArray(statedrop)
+    ? statedrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionCountry = condrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionStatus = Array.isArray(statusdrop)
+    ? statusdrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionStatus = statusdrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  const filteredOptionCountry = Array.isArray(condrop)
+    ? condrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+    : [];
 
-  const filteredOptionLocation = locationnodrop.map((option) => ({
-    value: option.location_no,
-    label: `${option.location_no} - ${option.location_name}`,
-  }));
+  const filteredOptionLocation = Array.isArray(locationnodrop)
+    ? locationnodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no} - ${option.location_name}`,
+    }))
+    : [];
 
   const handleChangeCity = (selectedCity) => {
     setSelectedCity(selectedCity);
@@ -487,7 +497,12 @@ function Input({ }) {
   }
 
   const handleNavigate = () => {
-    navigate("/Company");
+    navigate("/Company", {
+      state: {
+        preservedRowData: location.state?.preservedRowData,
+        preservedInputs: location.state?.preservedInputs
+      }
+    });
   };
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
@@ -577,7 +592,7 @@ function Input({ }) {
         console.log("Data Updated successfully");
         toast.success("Data updated successfully", {
           onClose: () => {
-            clearInputFields();
+            // clearInputFields();
             setError(false)
           }
         });
@@ -615,7 +630,7 @@ function Input({ }) {
         </div>
       </div>
 
-      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
+      <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box mb-2">
         <div className="row g-3">
 
           <div className="col-md-2">
@@ -755,6 +770,7 @@ function Input({ }) {
                 onBlur={() => setIsSelectCity(false)}
                 classNamePrefix="react-select"
                 isClearable
+                openMenuOnFocus
                 ref={City}
                 onKeyDown={(e) => handleKeyDown(e, State, City)}
               />
@@ -772,6 +788,7 @@ function Input({ }) {
               <Select
                 id="state"
                 isClearable
+                openMenuOnFocus
                 value={selectedState}
                 onChange={handleChangeState}
                 options={filteredOptionState}
@@ -816,6 +833,7 @@ function Input({ }) {
               <Select
                 id="country"
                 isClearable
+                openMenuOnFocus
                 value={selectedCountry}
                 onChange={handleChangeCountry}
                 options={filteredOptionCountry}
@@ -860,6 +878,7 @@ function Input({ }) {
               <Select
                 id="status"
                 isClearable
+                openMenuOnFocus
                 value={selectedStatus}
                 onChange={handleChangeStatus}
                 options={filteredOptionStatus}
@@ -983,6 +1002,7 @@ function Input({ }) {
                 id="locno"
                 value={selectedLocation}
                 isClearable
+                openMenuOnFocus
                 onChange={handleChangeLocation}
                 options={filteredOptionLocation}
                 classNamePrefix="react-select"
@@ -998,7 +1018,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container">
+              <div className="image-upload-container" onClick={() => logo.current.click()}>
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
@@ -1009,7 +1029,11 @@ function Input({ }) {
                     <button
                       type="button"
                       className="delete-image-btn"
-                      onClick={handleRemoveLogo}
+                      // onClick={handleRemoveLogo}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveLogo();
+                      }}
                     >
                       &times;
                     </button>
@@ -1030,6 +1054,7 @@ function Input({ }) {
                   accept="image/*"
                   onChange={handleFileSelect}
                   ref={logo}
+                  style={{ pointerEvents: "none" }}
                   onKeyDown={(e) => handleKeyDown(e, sign, logo)}
                 />
               </div>

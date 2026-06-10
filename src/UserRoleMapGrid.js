@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./apps.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ToastContainer, toast } from 'react-toastify';
@@ -34,11 +34,52 @@ function UserRoleGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const location = useLocation();
+
   //code added by Harish purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const userRoleMapPermission = permissions
     .filter(permission => permission.screen_type === 'UserRoleMapping')
     .map(permission => permission.permission_type.toLowerCase());
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isReloadShortcut =
+        (event.ctrlKey && event.key.toLowerCase() === "r") ||
+        (event.altKey && event.key.toLowerCase() === "r") ||
+        event.key === "F5";
+
+      if (isReloadShortcut) {
+        event.preventDefault();
+        clearInputFields();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.preservedRowData) {
+      setRowData(location.state.preservedRowData);
+    }
+
+    if (location.state?.preservedInputs) {
+      setuser_code(location.state.preservedInputs.user_code || "");
+      setuser_name(location.state.preservedInputs.user_name || "");
+      setrole_id(location.state.preservedInputs.role_id || "");
+      setrole_name(location.state.preservedInputs.role_name || "");
+    }
+  }, [location.state]);
+
+  const clearInputFields = () => {
+    setuser_code("");
+    setuser_name("");
+    setrole_id("");
+    setrole_name("");
+    setRowData([]);
+  };
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/usercode`)
@@ -112,6 +153,7 @@ function UserRoleGrid() {
       headerName: "User Code",
       field: "user_code",
       editable: true,
+      cellClass: "ag-link-cell",
       cellStyle: { textAlign: "center" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
@@ -390,7 +432,21 @@ function UserRoleGrid() {
   };
 
   const handleNavigateWithRowData = (selectedRow) => {
-    navigate("/AddUserRoleMapping", { state: { mode: "update", selectedRow } });
+    navigate("/AddUserRoleMapping", {
+      state: {
+        mode: "update",
+        selectedRow,
+
+        preservedRowData: rowData,
+
+        preservedInputs: {
+          user_code,
+          user_name,
+          role_id,
+          role_name,
+        },
+      },
+    });
   };
 
   const onSelectionChanged = () => {
@@ -720,14 +776,14 @@ function UserRoleGrid() {
           </div>
 
           {/* Search + Reload Buttons */}
-          <div className="col-12">
+          <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearch}>
                 <span className="tooltip">Search</span>
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
 
-              <div className="icon-btn reload" onClick={reloadGridData}>
+              <div className="icon-btn reload" onClick={clearInputFields}>
                 <span className="tooltip">Reload</span>
                 <i className="fa-solid fa-rotate-right"></i>
               </div>
