@@ -38,8 +38,8 @@ const TopBar = () => {
     try {
       const payload = {
         company_code: company_code,
-        CompanyCode: company_code,   // For CompOff
-        Location_Code: sessionStorage.getItem('selectedLocationCode'), 
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),  // For VisaRequest, TravelRequest, LeaveRequest, loanRequest
+        CompanyCode: company_code,   // For CompOff 
         employee_id: user_code,      // For Loan, Visa, Travel, Shift
         EmployeeId: user_code,       // For Leave & CompOff
         swap_employee_id: user_code  // For Shift
@@ -325,7 +325,8 @@ const TopBar = () => {
         body: JSON.stringify({
           loan_request_id: loanRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -351,7 +352,8 @@ const TopBar = () => {
           EmployeeId: empId,
           FromDate: fromDate,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -376,7 +378,8 @@ const TopBar = () => {
         body: JSON.stringify({
           visa_request_id: visaRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -401,7 +404,8 @@ const TopBar = () => {
         body: JSON.stringify({
           travel_request_id: travelRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 

@@ -69,6 +69,7 @@ export default function LeavePopup({ open, handleClose, handleLeave }) {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           EmployeeId: sessionStorage.getItem('selectedUserCode'),
           FromDate,
           ToDate,
