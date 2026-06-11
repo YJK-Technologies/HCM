@@ -21927,24 +21927,19 @@ const getAllemployeedoc = async (req, res) => {
 };
 
 const UpdateEmployeeImage = async (req, res) => {
-  const { EmployeeId, Modified_by } = req.body; // Assuming EmployeeId is sent in the body
+  const { EmployeeId, Modified_by } = req.body; 
   let Photos = null;
   if (req.file) {
-    Photos = req.file.buffer; // Buffer containing the uploaded image
+    Photos = req.file.buffer; 
   }
   try {
-    // Check if the employee exists in the database
     const pool = await connection.connectToDatabase();
-    // Proceed to update the image if the employee exists
     const result = await pool
       .request()
-      .input("EmployeeId", sql.NVarChar, EmployeeId) // Add the EmployeeId for any further queries if needed
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Photos", sql.VarBinary, Photos)
-      .input("Modified_by", sql.NVarChar, Modified_by) // Assuming req.user.username is available
-      .query(
-        `EXEC [sp_employee_personal_test]  'UI',@EmployeeId,'','','','','','','','','','','','','','','','','','',@Photos,'','','','','','','','','','','',0,0,'','','','','','',','','','','','','','',@Modified_by,'','','','','',NULL,NULL,NULL`,
-      );
-    // Return success response
+      .input("Modified_by", sql.NVarChar, Modified_by)
+      .query(`EXEC [sp_employee_personal_test]  'UI',@EmployeeId,'','','','','','','','','','','','','','','','','','',@Photos,'','','','','','','','','','','','',0,0,'','','','','','',','','','','','','','',@Modified_by,'','','','','',NULL,NULL,NULL`);
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       return res
         .status(200)
@@ -22092,6 +22087,7 @@ const Employeedataupdate = async (req, res) => {
     Title,
     Place_of_Birth,
     Reference_Phone,
+    Location_Code,
     Pan_No,
     Aadhar_no,
     Marital_Status,
@@ -22143,6 +22139,7 @@ const Employeedataupdate = async (req, res) => {
       .input("Kids", sql.NVarChar, Kids)
       .input("Grade_id", sql.NVarChar, Grade_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Title", sql.NVarChar, Title)
       .input("Place_of_Birth", sql.NVarChar, Place_of_Birth)
       .input("Nationality", sql.NVarChar, Nationality)
@@ -22154,37 +22151,21 @@ const Employeedataupdate = async (req, res) => {
       .input("Email_Business", sql.NVarChar, Email_Business)
       .input("Phone_Alternate", sql.NVarChar, Phone_Alternate)
       .input("Emergency_Contact_Name", sql.NVarChar, Emergency_Contact_Name)
-      .input(
-        "Emergency_Contact_Relationship",
-        sql.NVarChar,
-        Emergency_Contact_Relationship,
-      )
+      .input("Emergency_Contact_Relationship", sql.NVarChar, Emergency_Contact_Relationship)
       .input("Emergency_Contact_Phone", sql.NVarChar, Emergency_Contact_Phone)
       .input("City", sql.NVarChar, City)
       .input("State", sql.NVarChar, State)
       .input("Country", sql.NVarChar, Country)
       .input("Postal_Code", sql.NVarChar, Postal_Code)
       .input("Passport_No", sql.NVarChar, Passport_No)
-      .input(
-        "Passport_Expiry_Date",
-        sql.Date,
-        Passport_Expiry_Date ? new Date(Passport_Expiry_Date) : null,
-      )
+      .input("Passport_Expiry_Date", sql.Date,Passport_Expiry_Date ? new Date(Passport_Expiry_Date) : null)
       .input("Other_Id_Type", sql.NVarChar, Other_Id_Type)
       .input("Other_Id_No", sql.NVarChar, Other_Id_No)
-
       .input("Modified_by", sql.NVarChar, Modified_by)
       .input("Status", sql.NVarChar, Status)
-      .query(`EXEC sp_employee_personal_test
-            @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name,
-            @Father_Name, @Mother_Name, @DOB, @Gender,
-            @Email, @Phone1, @Phone2, @Address1,
-            @Address2, @Address3, @PermanantAddress,
-            @Reference_Name, @Reference_Phone, @Pan_No,
-            @Aadhar_no, @Photos, @Marital_Status,
-             @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No,'', @Modified_by,
-             '', '', '', '',
-             @Status, null, null, null`);
+      .query(`EXEC sp_employee_personal_test @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1,
+      @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,@Location_Code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No,'', @Modified_by,
+      '', '', '', '', @Status, null, null, null`);
     res.status(200).json("Employee personal data updated successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -22195,7 +22176,7 @@ const Employeedataupdate = async (req, res) => {
 };
 
 const deleteemployeeper = async (req, res) => {
-  const { EmployeeId, company_code, Modified_by } = req.body;
+  const { EmployeeId, company_code, Modified_by, Location_Code } = req.body;
   if (!EmployeeId) {
     return res.status(400).json({ message: "Employee ID is required." });
   }
@@ -22205,9 +22186,10 @@ const deleteemployeeper = async (req, res) => {
       .request()
       .input("employeeID", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
       .query(
-        `EXEC [sp_employee_personal_test]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','',@Modified_by,'','','','','',NULL,NULL,NULL`,
+        `EXEC [sp_employee_personal_test]  'D',@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,@Location_Code,'','','','','','',0,0,'','','','','','','','','','','','','','',@Modified_by,'','','','','',NULL,NULL,NULL`,
       );
     if (result.rowsAffected[0] > 0) {
       return res
@@ -22228,10 +22210,7 @@ const deleteemployeeper = async (req, res) => {
 const getAllemployeedata = async (req, res) => {
   try {
     await connection.connectToDatabase();
-    const result = await sql.query(
-      `EXEC [sp_employee_personal_test]  'A','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`,
-      /* "exec spexpensetype"*/
-    );
+    const result = await sql.query(`EXEC [sp_employee_personal_test]  'A','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -22292,6 +22271,7 @@ const addEmployeePersonalData = async (req, res) => {
     Kids,
     Grade_id,
     company_code,
+    Location_Code,
     Created_by,
     City,
     State,
@@ -22355,6 +22335,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("Kids", sql.NVarChar, Kids)
       .input("Grade_id", sql.NVarChar, Grade_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Title", sql.NVarChar, Title)
       .input("Place_of_Birth", sql.NVarChar, Place_of_Birth)
       .input("Nationality", sql.NVarChar, Nationality)
@@ -22381,8 +22362,7 @@ const addEmployeePersonalData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(
-        `EXEC sp_employee_personal_test @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', '', '', '', '', @Status, @datetime2, @datetime3, @datetime4`,
+      .query(`EXEC sp_employee_personal_test @mode, @EmployeeId, @First_Name, @Middle_Name, @Last_Name, @Father_Name, @Mother_Name, @DOB, @Gender, @Email, @Phone1, @Phone2, @Address1, @Address2, @Address3, @PermanantAddress, @Reference_Name, @Reference_Phone, @Pan_No, @Aadhar_no, @Photos, @Marital_Status, @Siblings, @Kids, @Grade_id,@company_code,@Location_Code,@Title,@Place_of_Birth,@Nationality,@Religion,@Blood_Group,@Spouse_Name,@Number_of_Siblings,@Number_of_Children,@Email_Business,@Phone_Alternate,@Emergency_Contact_Name,@Emergency_Contact_Relationship,@Emergency_Contact_Phone,@City,@State,@Country,@Postal_Code,@Passport_No,@Passport_Expiry_Date,@Other_Id_Type,@Other_Id_No, @Created_by, '', '', '', '', '', @Status, @datetime2, @datetime3, @datetime4`,
       );
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -24367,7 +24347,7 @@ const getAnnouncement = async (req, res) => {
 
 //Code Added By Harish 16/12/2024
 const EmployeePersonalSC = async (req, res) => {
-  const { EmployeeId, DOB, First_Name, Last_Name, company_code, Gender, designation_id, department_id,
+  const { EmployeeId, DOB, First_Name, Last_Name, company_code, Location_Code, Gender, designation_id, department_id,
     Address1, Address2, Address3, PermanantAddress, phone1, Phone2, address, Phone, Status } = req.body;
 
   try {
@@ -24379,6 +24359,7 @@ const EmployeePersonalSC = async (req, res) => {
       .input("First_Name", sql.NVarChar, First_Name)
       .input("Last_Name", sql.NVarChar, Last_Name)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Gender", sql.NVarChar, Gender)
       .input("designation_id", sql.NVarChar, designation_id)
       .input("department_id", sql.NVarChar, department_id)
@@ -24393,7 +24374,7 @@ const EmployeePersonalSC = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("DOB", sql.NVarChar, DOB)
       .query(`EXEC sp_employee_personal_test  @mode,@EmployeeId,@First_Name,'',@Last_Name,'','',@DOB, @Gender,'', @phone1, @Phone2, 
-        @Address1, @Address2, @Address3, @PermanantAddress,'','','','','','','','','',@company_code,'','','','','','',0,0,'','',
+        @Address1, @Address2, @Address3, @PermanantAddress,'','','','','','','','','',@company_code,@Location_Code,'','','','','','',0,0,'','',
         '','','','','','','','','','','','','', @designation_id, @department_id, @address, @Phone, @Status,NULL,NULL,NULL
 `);
     if (result.recordset.length > 0) {
@@ -32056,7 +32037,7 @@ const getAssertReturnDetail = async (req, res) => {
 //code added by pavun on 08-05-25
 
 const assetsEmployeeId = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -32065,9 +32046,8 @@ const assetsEmployeeId = async (req, res) => {
       .input("mode", sql.NVarChar, "EI")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_employee_personal_test  @mode,@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`,
-      );
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_employee_personal_test  @mode,@EmployeeId,'','','','','','','','','','','','','','','','','','','','','','','',@company_code,@Location_Code,'','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -33944,15 +33924,14 @@ const Getpayslip = async (req, res) => {
 //code added by pavun on 30-06-25
 
 const getEmployeeId = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_employee_personal_test 'FE','','','','','','','','','','','','','','','','','','','','','','','','',@company_code,'','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`,
-      );
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_employee_personal_test 'FE','','','','','','','','','','','','','','','','','','','','','','','','',@company_code,@Location_Code,'','','','','','',0,0,'','','','','','','','','','','','','','','','','','','','',NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -39491,7 +39470,7 @@ const Decision_ID = async (req, res) => {
 //Code Added by Harish on 22-01-26
 
 const Employee_ID = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -39499,10 +39478,8 @@ const Employee_ID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "EA")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_employee_personal_test
-        @mode, '', '', '', '', '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '',
-         0, 0, '',@company_code,'','','','','','','','','','','','','','','','','','','','','','','',
-         '', '', '', '', '', null, null, null `);
+      .input("Location_Code", sql.VarChar, Location_Code)
+      .query(`EXEC sp_employee_personal_test @mode, '', '', '', '', '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '',0, 0, '',@company_code,@Location_Code,'','','','','','','','','','','','','','','','','','','','','','','','', '', '', '', '', null, null, null `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);

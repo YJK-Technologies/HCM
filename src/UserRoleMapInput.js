@@ -51,7 +51,7 @@ function UserRoleInput({ }) {
   useEffect(() => {
     if (mode === "update" && selectedRow && !isUpdated) {
       setuser_code(selectedRow.user_code || "");
-      setrole_id(selectedRow.order_no || "");
+      setrole_id(selectedRow.role_id || "");
       setKeyfield(selectedRow.keyfield || "");
       setSelectedUser({
         label: selectedRow.user_code,
