@@ -110,6 +110,8 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
   const [ageto, setageto] = useState("");
   const [Name, setName] = useState("");
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   const filteredOptiongender = genderdrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -161,12 +163,9 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
         agefrom: agefrom ? Number(agefrom) : null,
         ageto: ageto ? Number(ageto) : null,
         company_code,
+        Location_Code
       };
-
-      console.log("Payload:", payload);
-
-      const response = await fetch(
-        `${config.apiBaseUrl}/getFamilyDetailsSearchCretria`,
+      const response = await fetch(`${config.apiBaseUrl}/getFamilyDetailsSearchCretria`,
         {
           method: "POST",
           headers: {

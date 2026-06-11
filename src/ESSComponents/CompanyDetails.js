@@ -52,6 +52,9 @@ function Input() {
   const [section, setSection] = useState('');
   const [workLocation, setWorkLocation] = useState('');
   const [originalData, setOriginalData] = useState(null);
+
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const companyPermissions = permissions
@@ -134,6 +137,7 @@ function Input() {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }),
     })
       .then((response) => response.json())
@@ -219,6 +223,7 @@ function Input() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           company_code: selectedmanager.companyCode,
+          Location_Code
         }),
       })
         .then((response) => response.json())
@@ -261,7 +266,7 @@ function Input() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') }), // Send only the value
+        body: JSON.stringify({ Location_Code, company_code: sessionStorage.getItem('selectedCompanyCode') }), // Send only the value
       });
 
       const data = await response.json();
@@ -302,7 +307,8 @@ function Input() {
         Work_Location: workLocation,
         Employee_Type: empType,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode')
+        created_by: sessionStorage.getItem('selectedUserCode'),
+        Location_Code
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addEmployeeCompany`, {
@@ -348,7 +354,8 @@ function Input() {
           const Header = {
             EmployeeId: EmployeeId,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            modified_by: sessionStorage.getItem("selectedUserCode")
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           }
           const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeCompany`, {
 
@@ -484,7 +491,8 @@ function Input() {
           const Header = {
             ...currentData,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            modified_by: sessionStorage.getItem("selectedUserCode")
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
 
           const response = await fetch(`${config.apiBaseUrl}/updateEmployeeCompany`, {
@@ -685,6 +693,7 @@ function Input() {
           setSelecteddesg(selectedDesg?.value || null);
 
           const managerData = await fetchmanager(designation_ID);
+
           const selectedmanager = managerData.find(option => option.value === manager);
           setselectedmanager(selectedmanager);
           setManager(selectedmanager?.value || null);
