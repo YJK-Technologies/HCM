@@ -59,6 +59,9 @@ function Input({}) {
   const [isSelectVisa, setIsSelectVisa] = useState({});
   const [loading, setLoading] = useState(false);
   const [originalFamilyMembers, setOriginalFamilyMembers] = useState([]);
+
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const familyPermissions = permissions
@@ -295,6 +298,7 @@ function Input({}) {
         Air_Ticket_Entitled: Number(member.airTicketEntitled),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem("selectedUserCode"),
+        Location_Code
       })),
     );
     setError(false);
@@ -347,7 +351,8 @@ function Input({}) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+      modified_by: sessionStorage.getItem('selectedUserCode'),
+      Location_Code
     };
     setError(false);
     showConfirmationToast(
@@ -541,6 +546,7 @@ const handleUpdate = async (relationName, index) => {
     Air_Ticket_Entitled: Number(member.airTicketEntitled),
     company_code: sessionStorage.getItem("selectedCompanyCode"),
     modified_by: sessionStorage.getItem("selectedUserCode"),
+    Location_Code
   };
 
   setError(false);

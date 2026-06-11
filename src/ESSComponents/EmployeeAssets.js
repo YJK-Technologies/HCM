@@ -35,6 +35,8 @@ function EmployeeAssets({}) {
   const [originalAssetvalue, setOriginalAssetvalue] = useState([]);
   const location = useLocation();
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   const [Assetvalue, setAssetvalue] = useState([
     {
       relation: "Assetvalue",
@@ -401,6 +403,7 @@ const handleSave = async () => {
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       Keyfield: "",
       CreatedBy: sessionStorage.getItem("selectedUserCode"),
+      Location_Code,
       CreatedDate: new Date(),
       modify_by: "",
       modify_date: null,
@@ -411,8 +414,7 @@ const handleSave = async () => {
   setLoading(true);
 
   try {
-    const response = await fetch(
-      `${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
+    const response = await fetch(`${config.apiBaseUrl}/EmployeeAssetsLoopInsert`,
       {
         method: "POST",
         headers: {
@@ -545,6 +547,7 @@ const handleUpdateAsset = async (relation, index) => {
     Remarks: member.Remarks,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
     modify_by: sessionStorage.getItem("selectedUserCode"),
+    Location_Code
   };
 
   showConfirmationToast(
@@ -598,9 +601,10 @@ const handleDeleteAsset = async (relation, index) => {
   }
 
   const payload = {
-    keyfield: member.keyfield,
+    Keyfield: member.keyfield,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
-    modify_by: sessionStorage.getItem('selectedUserCode')
+    modify_by: sessionStorage.getItem('selectedUserCode'),
+    Location_Code
   };
 
   showConfirmationToast(

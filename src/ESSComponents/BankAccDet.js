@@ -57,6 +57,8 @@ function Input({ }) {
   const [isSelectedCurrency, setIsSelectedCurrency] = useState(false);
   const [originalData, setOriginalData] = useState(null);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const bankPermissions = permissions
@@ -282,6 +284,7 @@ function Input({ }) {
       formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
+      formData.append("Location_Code", Location_Code);
 
       if (passBookImg) {
         formData.append("Bankbook_img", passBookImg);
@@ -327,7 +330,8 @@ function Input({ }) {
             EmployeeId: EmployeeId,
             Account_NO: Account_NO,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            modified_by: sessionStorage.getItem("selectedUserCode")
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
 
           const response = await fetch(`${config.apiBaseUrl}/Employeebankdetdelete`, {
@@ -585,6 +589,8 @@ function Input({ }) {
       formData.append("S_NO", sNo);
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
       formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
+      formData.append("Location_Code", Location_Code);
+
       if (passBookImg) {
         formData.append("Bankbook_img", passBookImg);
       }
