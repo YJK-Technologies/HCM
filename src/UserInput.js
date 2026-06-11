@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from './Loading';
 import { ToastContainer, toast } from 'react-toastify';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const config = require('./Apiconfig');
 
@@ -62,6 +63,7 @@ function UserInput({ }) {
   const [UserCodeNameDrop, setUserCodeNameDrop] = useState([]);
 
   const [superAdmin, setSuperAdmin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const location = useLocation();
   const locationState = location.state || {};
@@ -332,9 +334,20 @@ function UserInput({ }) {
     setUser_status(selectedStatus ? selectedStatus.value : '');
   };
 
+  // const handleChangeRole = (selectedRole) => {
+  //   setSelectedRole(selectedRole);
+  //   setRole(selectedRole ? selectedRole.value : '');
+  // };
+
   const handleChangeRole = (selectedRole) => {
     setSelectedRole(selectedRole);
-    setRole(selectedRole ? selectedRole.value : '');
+
+    const roleValue = selectedRole?.value || '';
+    setRole(roleValue);
+
+    if (['user', 'us', 'admin', 'ad'].includes(roleValue.toLowerCase())) {
+      setSuperAdmin(false);
+    }
   };
 
   const handleChangeUserCode = (selectedUserCode) => {
@@ -463,9 +476,9 @@ function UserInput({ }) {
       !first_name ||
       !last_name ||
       !user_password ||
-      !selectedRole ||
+      !role_id ||
       !email_id ||
-      !selectedStatus ||
+      !user_status ||
       !dob
     ) {
       setError(true);
@@ -488,13 +501,12 @@ function UserInput({ }) {
       formData.append("first_name", first_name);
       formData.append("last_name", last_name);
       formData.append("user_password", user_password);
-      formData.append("user_status", selectedStatus.value);
-      formData.append("log_in_out", selectedLog.value);
+      formData.append("user_status", user_status);
+      formData.append("log_in_out", log_in_out);
       formData.append("email_id", email_id);
       formData.append("dob", dob);
-      formData.append("status", selectedStatus.value);
-      formData.append("gender", selectedGender.value);
-      formData.append("role_id", selectedRole.value);
+      formData.append("gender", gender);
+      formData.append("role_id", role_id);
       formData.append("modified_by", modified_by);
       formData.append("super_admin", superAdmin ? "Yes" : "No");
 
@@ -642,12 +654,12 @@ function UserInput({ }) {
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
+            <div className="inputGroup password-group">
               <input
                 id="upass"
-                class="exp-input-field form-control"
+                className="exp-input-field form-control"
                 title="Please Enter the Password"
-                type="text"
+                type={showPassword ? "text" : "password"}
                 autoComplete="off"
                 placeholder=" "
                 required
@@ -657,7 +669,16 @@ function UserInput({ }) {
                 ref={password}
                 onKeyDown={(e) => handleKeyDown(e, Status, password)}
               />
-              <label for="state" className={`exp-form-labels ${error && !user_password ? 'text-danger' : ''}`}>Password<span className="text-danger">*</span></label>
+              <label
+                htmlFor="upass"
+                className={`exp-form-labels ${error && !user_password ? "text-danger" : ""}`}
+              >
+                Password<span className="text-danger">*</span>
+              </label>
+              <span className="password-eye" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+
             </div>
           </div>
 
@@ -711,7 +732,7 @@ function UserInput({ }) {
             </div>
           </div>
 
-          {mode !== 'update' && (
+          {/* {mode !== 'update' && ( */}
             <div className="col-md-2">
               <div
                 className={`inputGroup selectGroup 
@@ -736,7 +757,7 @@ function UserInput({ }) {
                 <label for="state" className={`floating-label ${error && !role_id ? 'text-danger' : ''}`}>Role ID<span className="text-danger">*</span></label>
               </div>
             </div>
-          )}
+          {/* )} */}
 
           <div className="col-md-2">
             <div className="inputGroup">
@@ -809,6 +830,7 @@ function UserInput({ }) {
                 type="checkbox"
                 id="superAdmin"
                 checked={superAdmin}
+                disabled={['user', 'us', 'admin', 'ad'].includes(role_id?.toLowerCase())}
                 onChange={(e) => setSuperAdmin(e.target.checked)}
                 ref={SuperAdmin}
               />

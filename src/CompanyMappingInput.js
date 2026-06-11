@@ -233,8 +233,8 @@ function UserComMap_input({ }) {
   const handleNavigate = () => {
     navigate("/CompanyMapping", {
       state: {
+        refreshGrid: true,
         preservedRowData: location.state?.preservedRowData,
-
         preservedInputs: location.state?.preservedInputs
       }
     });
