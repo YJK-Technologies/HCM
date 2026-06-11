@@ -1101,6 +1101,7 @@ const Dashboard = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             company_code,
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
             RepManager: user_code,
           }),
         });
@@ -1522,6 +1523,7 @@ const Dashboard = () => {
         body = {
           request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem('selectedUserCode'),
         };

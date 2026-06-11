@@ -259,6 +259,7 @@ function RequestReport({ }) {
         body = {
           request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem('selectedUserCode'),
         };
@@ -3964,6 +3965,7 @@ function RequestReport({ }) {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           employee_id: searchEmpId,
           RepManager: sessionStorage.getItem('selectedUserCode'),
           shift_from_date: effectiveFromDate,

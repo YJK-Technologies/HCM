@@ -38,7 +38,8 @@ const TopBar = () => {
     try {
       const payload = {
         company_code: company_code,
-        CompanyCode: company_code,   // For CompOff 
+        CompanyCode: company_code,   // For CompOff
+        Location_Code: sessionStorage.getItem('selectedLocationCode'), 
         employee_id: user_code,      // For Loan, Visa, Travel, Shift
         EmployeeId: user_code,       // For Leave & CompOff
         swap_employee_id: user_code  // For Shift
@@ -99,6 +100,7 @@ const TopBar = () => {
         body: JSON.stringify({
           request_id: requestId,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           swap_employee_id: sessionStorage.getItem('selectedUserCode'),
           modified_by: sessionStorage.getItem('selectedUserCode'),
           is_swap_request: actionStatus
@@ -451,7 +453,8 @@ const TopBar = () => {
         body: JSON.stringify({
           request_id: shiftRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
