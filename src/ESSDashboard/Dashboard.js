@@ -951,7 +951,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -1371,6 +1371,7 @@ const Dashboard = () => {
         body = {
           loan_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
         };
       }
@@ -1723,6 +1724,7 @@ const Dashboard = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())

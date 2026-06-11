@@ -29623,6 +29623,7 @@ const Getmanager = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
+    .request()
     .input("company_code", sql.VarChar, company_code)
     .input("Location_Code", sql.VarChar, Location_Code)
     .query(`EXEC sp_employee_company_Ramya 'M','','','','','','','','','','',@company_code,@Location_Code,'', '','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
@@ -48164,7 +48165,7 @@ const monthlyInstallmentCalculation = async (req, res) => {
       .input("loan_amount", sql.Decimal(10, 2), loan_amount)
       .input("interest_rate", sql.Decimal(5, 2), interest_rate)
       .input("repayment_months", sql.Int, repayment_months)
-      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, @loan_amount, @interest_rate, @repayment_months, 0, '', '', '', 0, '',  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, @loan_amount, @interest_rate, @repayment_months, 0, '', '', '', 0, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48180,7 +48181,7 @@ const monthlyInstallmentCalculation = async (req, res) => {
 
 //Code added by pavun on 06-05-2026
 const getLoanNotification = async (req, res) => {
-  const { employee_id, company_code } = req.body;
+  const { employee_id, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48189,7 +48190,8 @@ const getLoanNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', @employee_id, 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', @employee_id, 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  @Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);

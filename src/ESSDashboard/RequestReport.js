@@ -87,6 +87,7 @@ function RequestReport({ }) {
         loan_request_id: safeId,
         request_status: status,
         company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Visa") {
@@ -225,6 +226,7 @@ function RequestReport({ }) {
         body = {
           loan_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
         };
       } else if (type === "Visa") {
@@ -434,7 +436,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'),}),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -631,6 +633,7 @@ function RequestReport({ }) {
         RepaymentDateFrom: repaymentDateLoanFromSc,
         RepaymentDateTo: repaymentDateLoanToSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 

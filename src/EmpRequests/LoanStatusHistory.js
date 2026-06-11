@@ -271,13 +271,14 @@ function LoanStatusHistory() {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
         fetch(`${config.apiBaseUrl}/getLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setLoanReqIdDrop(val))
@@ -365,6 +366,7 @@ function LoanStatusHistory() {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((data) => data.json())
@@ -415,13 +417,14 @@ function LoanStatusHistory() {
 
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
         fetch(`${config.apiBaseUrl}/getLoanRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setLoanReqIdDropSc(val))
