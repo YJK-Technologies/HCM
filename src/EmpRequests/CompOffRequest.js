@@ -59,6 +59,7 @@ const EmployeeCompOff = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -227,6 +228,7 @@ const EmployeeCompOff = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
