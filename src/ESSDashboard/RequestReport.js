@@ -95,6 +95,7 @@ function RequestReport({ }) {
         visa_request_id: safeId,
         request_status: status,
         company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Travel") {
@@ -104,6 +105,7 @@ function RequestReport({ }) {
         travel_request_id: safeId,
         request_status: status,
         company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
     } else if (type === "Academic") {
@@ -229,6 +231,7 @@ function RequestReport({ }) {
         body = {
           visa_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           Modified_by: sessionStorage.getItem("selectedUserCode")
         };
@@ -238,6 +241,7 @@ function RequestReport({ }) {
         body = {
           travel_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
@@ -1217,6 +1221,7 @@ function RequestReport({ }) {
         estimated_cost: estimatedCostVisaSc ? estimatedCostVisaSc : 0,
         Remarks: remarksVisaSc,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 
@@ -1818,6 +1823,7 @@ function RequestReport({ }) {
         priority_level: priorityTravelSc || "",
         manager_id: managerTravelSc || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         manager_id: sessionStorage.getItem('selectedUserCode'),
       };
 

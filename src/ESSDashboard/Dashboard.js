@@ -964,7 +964,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'),}),
         });
 
         if (res.ok) visaData = await res.json();
@@ -978,7 +978,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ manager_id: user_code, company_code }),
+            body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
           },
         );
 
@@ -1381,6 +1381,7 @@ const Dashboard = () => {
         body = {
           visa_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           Modified_by: sessionStorage.getItem("selectedUserCode")
         };
@@ -1393,6 +1394,7 @@ const Dashboard = () => {
         body = {
           travel_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
