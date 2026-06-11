@@ -46657,7 +46657,7 @@ const getAllocationStatus = async (req, res) => {
 
 //Code added by Pavun on 09-04-26
 const LeaveCancellation = async (req, res) => {
-  const { EmployeeId, LeaveStatus, FromDate } = req.body;
+  const { EmployeeId, LeaveStatus, FromDate, company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -46666,7 +46666,9 @@ const LeaveCancellation = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
-      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','','','','', 0, '','', null, null, null, null, null, null, null, null`);
+      .input("company_code", sql.VarChar, company_code)
+      .input("Location_Code", sql.VarChar, Location_Code)
+      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '', @company_code, @Location_Code, '','', 0, '','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);

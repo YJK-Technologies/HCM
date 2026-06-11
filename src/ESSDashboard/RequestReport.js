@@ -77,6 +77,7 @@ function RequestReport({ }) {
         FromDate: fromDate,
         ToDate: toDate,
         company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         ReportingManager: sessionStorage.getItem("selectedUserCode"),
       };
     } else if (type === "Loan") {
@@ -215,6 +216,7 @@ function RequestReport({ }) {
           LeaveStatus: status,
           FromDate: row.FromDate,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
       } else if (type === "Loan") {
@@ -2136,6 +2138,7 @@ function RequestReport({ }) {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
             EmployeeId: searchEmpId,
             FromDate: leaveFromDate,
             ToDate: leaveToDate,

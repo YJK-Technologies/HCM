@@ -1359,6 +1359,7 @@ const Dashboard = () => {
           LeaveStatus: status,
           FromDate: backendDate,
           company_code: company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
