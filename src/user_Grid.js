@@ -51,6 +51,8 @@ function UserGrid() {
   const [createdDate, setCreatedDate] = useState("");
   const [modifiedDate, setModifiedDate] = useState("");
 
+  const [roleDropGrid, setRoleDropGrid] = useState([]);
+
   const location = useLocation();
 
   //code added by Harish purpose of set user permisssion
@@ -195,6 +197,25 @@ function UserGrid() {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/roleid`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const RoleOptions = data.map((option) => ({
+          value: option.role_id,
+          label: `${option.role_id} - ${option.role_name}`,
+        }));
+        setRoleDropGrid(RoleOptions);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
 
   useEffect(() => {
@@ -523,6 +544,20 @@ function UserGrid() {
       },
     },
     {
+      headerName: "Role ID-Name",
+      field: "role_id",
+      editable: true,
+      cellStyle: { textAlign: "left" },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: roleDropGrid.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const role = roleDropGrid.find((d) => d.value === params.value);
+        return role ? role.label : params.value;
+      },
+    },
+    {
       headerName: "Gender",
       field: "gender",
       editable: true,
@@ -571,6 +606,10 @@ function UserGrid() {
         "Log In/Out": safeValue(row.log_in_out),
         "Email Id": safeValue(row.email_id),
         "DOB": safeValue(row.dob),
+        "Role ID-Name": safeValue(row.role_id),
+        // "Role ID-Name":
+        //   roleDropGrid.find((d) => d.value === row.role_id)?.label ||
+        //   row.role_id,
         "Gender": safeValue(row.gender),
       };
     });
@@ -741,14 +780,8 @@ function UserGrid() {
 
     reportWindow.document.write("</body></html>");
     reportWindow.document.close();
-
-    // AUTO PRINT OPTION (optional but smooth UX)
-    reportWindow.onload = () => {
-      setTimeout(() => {
-        reportWindow.print();
-      }, 500);
-    };
   };
+
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
