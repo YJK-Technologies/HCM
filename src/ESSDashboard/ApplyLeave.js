@@ -60,6 +60,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -206,9 +207,14 @@ const ApplyLeave = () => {
     return diffDays;
   };
 
-  const formatToBackendDate = (date) => {
-    const [day, month, year] = date.split("-");
-    return `${year}-${month}-${day}`;
+  // const formatToBackendDate = (date) => {
+  //   const [day, month, year] = date.split("-");
+  //   return `${year}-${month}-${day}`;
+  // };
+
+  const formatToBackendDate = (dateValue) => {
+    if (!dateValue) return "";
+    return format(new Date(dateValue), "yyyy-MM-dd");
   };
 
   const handleSave = async (e) => {
@@ -279,6 +285,7 @@ const ApplyLeave = () => {
       ReportingManager,
       EmployeeId: sessionStorage.getItem("selectedUserCode"),
       company_code: sessionStorage.getItem('selectedCompanyCode'),
+      Location_Code: sessionStorage.getItem('selectedLocationCode'),
       created_by: sessionStorage.getItem("selectedUserCode"),
       AlternativeReponsablePerson,
       HolidayDate: LeaveType === "Comp Off" && selectedCompOff
@@ -289,7 +296,7 @@ const ApplyLeave = () => {
         ? selectedCompOff.label
         : null
     };
-      setLoading(true);
+    setLoading(true);
     try {
 
       const response = await fetch(`${config.apiBaseUrl}/addEmployeeLeave`, {
@@ -322,7 +329,7 @@ const ApplyLeave = () => {
   };
 
   const [columnDefs] = useState([
-    {headerName: "S.No",valueGetter: (params) => params.node.rowIndex + 1,width: 40,cellStyle: { textAlign: "center" },},
+    { headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1, width: 40, cellStyle: { textAlign: "center" }, },
     { headerName: 'Leave Type', field: 'LeaveId', sortable: true, filter: true, },
     { headerName: 'Current No of Leaves', field: 'CurrentYearCredit', sortable: true, filter: true },
     { headerName: 'Taken Current Year', field: 'TakenCurrentYear', sortable: true, filter: true },
@@ -381,6 +388,8 @@ const ApplyLeave = () => {
               },
               body: JSON.stringify({
                 EmployeeId: sessionStorage.getItem('selectedUserCode'),
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 LeaveStatus: "Cancelled",
                 FromDate: data.FromDate,
               }),
@@ -424,50 +433,50 @@ const ApplyLeave = () => {
     {
       headerName: "S.No", valueGetter: (params) => params.node.rowIndex + 1,
       width: 80, cellStyle: { textAlign: "center" },
-    },    
+    },
     {
       headerName: "Request Type", field: "RequestType",
       cellStyle: { textAlign: "center" }, editable: false,
     },
     {
-      headerName: "Leave Type", field: "LeaveType", 
+      headerName: "Leave Type", field: "LeaveType",
       cellStyle: { textAlign: "center" }, editable: false,
     },
     {
-      headerName: "From Date", field: "FromDate", 
+      headerName: "From Date", field: "FromDate",
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "To Date", field: "ToDate", 
+      headerName: "To Date", field: "ToDate",
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Status", field: "LeaveStatus", 
+      headerName: "Status", field: "LeaveStatus",
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Holiday Date", field: "HolidayDate", 
+      headerName: "Holiday Date", field: "HolidayDate",
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Holiday Name", field: "HolidayName", 
+      headerName: "Holiday Name", field: "HolidayName",
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Leave Used", field: "LeaveUsed", hide: true, 
+      headerName: "Leave Used", field: "LeaveUsed", hide: true,
       editable: false, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Is Leave Applied", field: "IsLeaveApplied", editable: false, 
+      headerName: "Is Leave Applied", field: "IsLeaveApplied", editable: false,
       hide: true, cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Action", field: "action", width: 160, 
-      cellStyle: { textAlign: "center" }, sortable: false, filter: false, 
+      headerName: "Action", field: "action", width: 160,
+      cellStyle: { textAlign: "center" }, sortable: false, filter: false,
       cellRenderer: (params) => {
         const row = params.data;
 
-        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No" && row.LeaveStatus === "Approved" ) {
+        if (row.RequestType === "Comp Off" && row.LeaveUsed === "No" && row.LeaveStatus === "Approved") {
           return (
             <button
               className="btn btn-success btn-sm"
@@ -526,6 +535,7 @@ const ApplyLeave = () => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           EmployeeId: sessionStorage.getItem('selectedUserCode'),
           FromDate: fromDate ? fromDate : null,
           ToDate: toDate ? toDate : null,

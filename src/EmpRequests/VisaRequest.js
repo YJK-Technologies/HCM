@@ -578,6 +578,7 @@ function VisaRequest({ }) {
                                 request_status: "Cancelled",
                                 visa_request_id: data.visa_request_id,
                                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                                 travel_start_date: data.travel_start_date
                             }),
                         });
@@ -813,6 +814,7 @@ function VisaRequest({ }) {
                 Remarks: remarks,
                 manager_id: ProjectManager,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 Created_by: sessionStorage.getItem('selectedUserCode')
             };
             const response = await fetch(`${config.apiBaseUrl}/visa_requestsInsert`, {
@@ -860,6 +862,7 @@ function VisaRequest({ }) {
                 Remarks: remarksSc,
                 manager_id: ProjectManagerSC,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             };
 
             const response = await fetch(`${config.apiBaseUrl}/visaRequestSearch`, {
@@ -906,6 +909,7 @@ function VisaRequest({ }) {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
+                    const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
                     const dataToSend = {
                         visa_requestsData: Array.isArray(rowData)
@@ -913,12 +917,14 @@ function VisaRequest({ }) {
                                 ...row,
                                 company_code,
                                 Modified_by,
+                                Location_Code
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
                                     Modified_by,
+                                    Location_Code
                                 },
                             ],
                     };
@@ -960,6 +966,7 @@ function VisaRequest({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Location_Code = sessionStorage.getItem('selectedLocationCode');
                     const Modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
@@ -967,13 +974,15 @@ function VisaRequest({ }) {
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
-                                Modified_by
+                                Modified_by,
+                                Location_Code
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
-                                    Modified_by
+                                    Modified_by,
+                                    Location_Code
                                 },
                             ],
                     };
@@ -983,7 +992,8 @@ function VisaRequest({ }) {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                "company_code": company_code
+                                "company_code": company_code,
+                                "Location_Code": Location_Code
                             },
                             body: JSON.stringify(dataToSend),
                         },

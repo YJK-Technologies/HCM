@@ -59,6 +59,7 @@ const EmployeeCompOff = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -136,6 +137,7 @@ const EmployeeCompOff = () => {
       RepManager: ReportingManager,
       EmployeeId: sessionStorage.getItem("selectedUserCode"),
       CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+      Location_Code: sessionStorage.getItem('selectedLocationCode'),
       CreatedBy: sessionStorage.getItem("selectedUserCode"),
       ResPerson: AlternativeReponsablePerson,
     };
@@ -226,6 +228,7 @@ const EmployeeCompOff = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -303,6 +306,7 @@ const EmployeeCompOff = () => {
           },
           body: JSON.stringify({
             CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
             EmployeeId: sessionStorage.getItem("selectedUserCode"),
             FromDate: holidayFromDate,
             ToDate: holidayToDate,

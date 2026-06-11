@@ -24,6 +24,7 @@ function LoanApproval({ }) {
                 body: JSON.stringify({
                     loan_request_id: row.loan_request_id,
                     company_code,
+                    Location_Code: sessionStorage.getItem('selectedLocationCode'),
                     request_status: status ? "Approved" : "Rejected",
                 }),
             });
@@ -343,6 +344,7 @@ function LoanApproval({ }) {
                 RepaymentDateFrom: repaymentDateLoanFromSc,
                 RepaymentDateTo: repaymentDateLoanToSc,
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 manager_id: sessionStorage.getItem('selectedUserCode'),
             };
 

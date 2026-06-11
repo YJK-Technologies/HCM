@@ -951,7 +951,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -964,7 +964,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code }),
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'),}),
         });
 
         if (res.ok) visaData = await res.json();
@@ -978,7 +978,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ manager_id: user_code, company_code }),
+            body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
           },
         );
 
@@ -1068,6 +1068,7 @@ const Dashboard = () => {
           body: JSON.stringify({
             RepManager: user_code,
             CompanyCode: company_code,
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
           }),
         });
 
@@ -1343,6 +1344,7 @@ const Dashboard = () => {
           ApprovedBy: approver,
           CompanyCode: company_code,
           modified_by: sessionStorage.getItem("selectedUserCode"),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           Keyfield: id,
         };
       }
@@ -1359,6 +1361,7 @@ const Dashboard = () => {
           LeaveStatus: status,
           FromDate: backendDate,
           company_code: company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
       }
@@ -1370,6 +1373,7 @@ const Dashboard = () => {
         body = {
           loan_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
         };
       }
@@ -1381,6 +1385,7 @@ const Dashboard = () => {
         body = {
           visa_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           Modified_by: sessionStorage.getItem("selectedUserCode")
         };
@@ -1393,6 +1398,7 @@ const Dashboard = () => {
         body = {
           travel_request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem("selectedUserCode")
         };
@@ -1720,6 +1726,7 @@ const Dashboard = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())
