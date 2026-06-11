@@ -38,6 +38,7 @@ const TopBar = () => {
     try {
       const payload = {
         company_code: company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),  // For VisaRequest, TravelRequest, LeaveRequest, loanRequest, compOffRequest
         CompanyCode: company_code,   // For CompOff 
         employee_id: user_code,      // For Loan, Visa, Travel, Shift
         EmployeeId: user_code,       // For Leave & CompOff
@@ -323,7 +324,8 @@ const TopBar = () => {
         body: JSON.stringify({
           loan_request_id: loanRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -349,7 +351,8 @@ const TopBar = () => {
           EmployeeId: empId,
           FromDate: fromDate,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -374,7 +377,8 @@ const TopBar = () => {
         body: JSON.stringify({
           visa_request_id: visaRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -399,7 +403,8 @@ const TopBar = () => {
         body: JSON.stringify({
           travel_request_id: travelRequestId,
           is_notification_seen: 1,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
@@ -426,7 +431,8 @@ const TopBar = () => {
           HolidayDate: holidayDate,
           Keyfield: keyField,
           is_notification_seen: 1,
-          CompanyCode: sessionStorage.getItem('selectedCompanyCode')
+          CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 

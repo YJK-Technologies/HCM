@@ -56,6 +56,7 @@ const LeaveRequestPage = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -71,6 +72,7 @@ const LeaveRequestPage = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -208,9 +210,9 @@ const LeaveRequestPage = () => {
     return diffDays;
   };
 
-  const formatToBackendDate = (date) => {
-    const [day, month, year] = date.split("-");
-    return `${year}-${month}-${day}`;
+  const formatToBackendDate = (dateValue) => {
+    if (!dateValue) return "";
+    return format(new Date(dateValue), "yyyy-MM-dd");
   };
 
   const handleSave = async (e) => {
@@ -271,6 +273,7 @@ const LeaveRequestPage = () => {
       ReportingManager,
       EmployeeId: sessionStorage.getItem("selectedUserCode"),
       company_code: sessionStorage.getItem('selectedCompanyCode'),
+      Location_Code: sessionStorage.getItem('selectedLocationCode'),
       created_by: sessionStorage.getItem("selectedUserCode"),
       AlternativeReponsablePerson,
       HolidayDate: LeaveType === "Comp Off" && selectedCompOff
@@ -368,6 +371,8 @@ const LeaveRequestPage = () => {
               },
               body: JSON.stringify({
                 EmployeeId: sessionStorage.getItem('selectedUserCode'),
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 LeaveStatus: "Cancelled",
                 FromDate: data.FromDate,
               }),
@@ -456,7 +461,7 @@ const LeaveRequestPage = () => {
           ? "This request has already been cancelled."
           : "Click to cancel this leave request.";
       }
-    },    
+    },
     {
       headerName: "S.No",
       field: "S.No",
@@ -547,6 +552,7 @@ const LeaveRequestPage = () => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           EmployeeId: sessionStorage.getItem('selectedUserCode'),
           FromDate: fromDate ? fromDate : null,
           ToDate: toDate ? toDate : null,
@@ -1095,7 +1101,7 @@ const LeaveRequestPage = () => {
               </label>
             </div>
           </div>
-              
+
           <div className="col-12">
             <div className="search-btn-wrapper">
               <div className="icon-btn search" onClick={handleSearchItem}>

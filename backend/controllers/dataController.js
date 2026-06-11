@@ -21347,7 +21347,7 @@ const updateSalaryDetails = async (req, res) => {
 
 const addEmployeeLeave = async (req, res) => {
   const { EmployeeId, LeaveType, FromDate, ToDate, Duration, ReportingManager,
-    AlternativeReponsablePerson, LeaveStatus, Select_slots, Reason, company_code,
+    AlternativeReponsablePerson, LeaveStatus, Select_slots, Reason, company_code, Location_Code,
     created_by, HolidayDate, HolidayName
   } = req.body;
 
@@ -21375,11 +21375,12 @@ const addEmployeeLeave = async (req, res) => {
       .input("Select_slots", sql.VarChar, Select_slots)
       .input("Reason", sql.VarChar, Reason)
       .input("company_code", sql.VarChar, company_code)
+      .input("Location_Code", sql.VarChar, Location_Code)
       .input("HolidayDate", sql.Date, HolidayDate)
       .input("HolidayName", sql.VarChar, HolidayName)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
-        @LeaveStatus,@Documents,@Select_slots,@Reason,@company_code,@HolidayDate,@HolidayName,0,@created_by,'','','','','','','','',''`);
+      .query(`EXEC sp_employee_Leave_Ramya @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,
+        @LeaveStatus,@Documents,@Select_slots,@Reason,@company_code,@Location_Code,@HolidayDate,@HolidayName,0,@created_by,'','','','','','','','',''`);
     res.status(200).json("Employee leave data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -21394,7 +21395,7 @@ const allEmployeeLeaveData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-      .query(`EXEC sp_employee_Leave 'A','','','','','','','','','','','','','','',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_Leave_Ramya 'A','','','','','','','','','','','','','','','',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -21414,12 +21415,13 @@ const deleteEmployeeLeave = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { EmployeeId, company_code } = record;
+      const { EmployeeId, company_code, Location_Code } = record;
       await pool
         .request()
         .input("EmployeeId", sql.NVarChar, EmployeeId)
         .input("company_code", sql.NVarChar, company_code)
-        .query(`EXEC sp_employee_Leave 'D',@EmployeeId,'','','','','','','','','','',@company_code,'','',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .input("Location_Code", sql.NVarChar, Location_Code)
+        .query(`EXEC sp_employee_Leave_Ramya 'D',@EmployeeId,'','','','','','','','','','',@company_code,@Location_Code,'','',0,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Employee leave data deleted successfully");
@@ -21456,8 +21458,9 @@ const updateEmployeeLeave = async (req, res) => {
         .input("LeaveStatus", updatedRow.LeaveStatus)
         .input("Reason", updatedRow.Reason)
         .input("company_code", updatedRow.company_code)
+        .input("Location_Code", updatedRow.Location_Code)
         .input("modified_by", updatedRow.modified_by)
-        .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,NULL,@Reason,@Documents,@company_code,
+        .query(`EXEC sp_employee_Leave_Ramya @mode,@EmployeeId,@LeaveType,@FromDate,ToDate,@Duration,@ReportingManager,@AlternativeReponsablePerson,@LeaveStatus,NULL,@Reason,@Documents,@company_code,@Location_Code,
           '','',0,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Employee leave data updated successfully");
@@ -22580,7 +22583,7 @@ const getEmployeeTotalLeaveBalance = async (req, res) => {
 };
 
 const getEmployeeLeavesearch = async (req, res) => {
-  const { FromDate, ToDate, LeaveType, LeaveStatus, company_code, EmployeeId, ReportingManager } =
+  const { FromDate, ToDate, LeaveType, LeaveStatus, company_code, Location_Code, EmployeeId, ReportingManager } =
     req.body;
   try {
     const pool = await connection.connectToDatabase();
@@ -22593,8 +22596,9 @@ const getEmployeeLeavesearch = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("ReportingManager", sql.NVarChar, ReportingManager)
-      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','',0,'','',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_employee_Leave_Ramya @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,@Location_Code,'','',0,'','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24375,7 +24379,7 @@ const getTeamManager = async (req, res) => {
 };
 
 const DashboardLeaveAuthorization = async (req, res) => {
-  const { EmployeeId, LeaveStatus, FromDate, company_code, modified_by } = req.body; // Removed FromDate
+  const { EmployeeId, LeaveStatus, FromDate, company_code, Location_Code, modified_by } = req.body; // Removed FromDate
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -24385,8 +24389,9 @@ const DashboardLeaveAuthorization = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, '','',0,'',@modified_by, null, null, null, null, null, null, null, null`);
+      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '',@company_code, @Location_Code, '','',0,'',@modified_by, null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -29618,6 +29623,7 @@ const Getmanager = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
+    .request()
     .input("company_code", sql.VarChar, company_code)
     .input("Location_Code", sql.VarChar, Location_Code)
     .query(`EXEC sp_employee_company_Ramya 'M','','','','','','','','','','',@company_code,@Location_Code,'', '','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
@@ -42626,7 +42632,7 @@ const Shift_Summary_Report = async (req, res) => {
 const visa_requestsInsert = async (req, res) => {
   const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id,
     purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level,
-    sponsor_name, estimated_cost, Remarks, company_code, manager_id, Created_by } = req.body;
+    sponsor_name, estimated_cost, Remarks, company_code, Location_Code, manager_id, Created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42648,10 +42654,11 @@ const visa_requestsInsert = async (req, res) => {
       .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
-        @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @manager_id, '', 0, @Created_by, '', '', ''`,);
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+        @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, '', 0, @Created_by, '', '', ''`,);
 
     res.status(200)
       .json({ success: true, message: "visa_requests insertd successfully" });
@@ -42664,7 +42671,7 @@ const visa_requestsInsert = async (req, res) => {
 const visa_requestsUpdate = async (req, res) => {
   const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id,
     purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level,
-    sponsor_name, estimated_cost, Remarks, company_code, manager_id, keyfield, Modified_by } = req.body;
+    sponsor_name, estimated_cost, Remarks, company_code, Location_Code,manager_id, keyfield, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42686,11 +42693,12 @@ const visa_requestsUpdate = async (req, res) => {
       .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
-        @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+        @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
 
     res
       .status(200)
@@ -42702,7 +42710,7 @@ const visa_requestsUpdate = async (req, res) => {
 };
 
 const visa_requestsDelete = async (req, res) => {
-  const { keyfield, company_code, Modified_by } = req.body;
+  const { keyfield, company_code, Location_Code, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42711,8 +42719,9 @@ const visa_requestsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("keyfield", sql.NVarChar, keyfield)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, 0, '', '', @Modified_by, ''`,);
+      .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`,);
 
     res
       .status(200)
@@ -42751,10 +42760,11 @@ const visa_requestsLoopInsert = async (req, res) => {
         .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
         .input("Remarks", sql.NVarChar, item.Remarks)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
-          @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @manager_id, @keyfield, 0, @Created_by, '', '', ''`,);
+        .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+          @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, @Created_by, '', '', ''`,);
     }
     res.status(200).json("visa_requests data inserted successfully");
   } catch (err) {
@@ -42791,11 +42801,12 @@ const visa_requestsLoopUpdate = async (req, res) => {
         .input("estimated_cost", sql.Decimal(12, 2), item.estimated_cost)
         .input("Remarks", sql.NVarChar, item.Remarks)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
-          @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
+        .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+          @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
     }
     res.status(200).json("visa_requests data updated successfully");
   } catch (err) {
@@ -42819,8 +42830,9 @@ const visa_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_visa_requests_test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', @keyfield, 0, '', '', @Modified_by, ''`);
+        .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`);
     }
     res.status(200).json("visa_requests data deleted successfully");
   } catch (err) {
@@ -42834,7 +42846,7 @@ const travel_requestsInsert = async (req, res) => {
   const { travel_request_id, request_number, employee_id, department_id, travel_type,
     destination_country_id, destination_city, purpose_of_travel, travel_start_date,
     travel_end_date, transport_mode, accommodation_required, estimated_cost,
-    currency_code, request_status, Remarks, priority_level, manager_id, company_code,
+    currency_code, request_status, Remarks, priority_level, manager_id, company_code, Location_Code,
     keyfield, created_by, created_date, modified_by, modified_date } = req.body;
 
   try {
@@ -42861,13 +42873,14 @@ const travel_requestsInsert = async (req, res) => {
       .input("priority_level", sql.NVarChar, priority_level)
       .input("manager_id", sql.VarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
       .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
-        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,@keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
 
     res
       .status(200)
@@ -42899,6 +42912,7 @@ const travel_requestsUpdate = async (req, res) => {
     priority_level,
     manager_id,
     company_code,
+    Location_Code,
     keyfield,
     created_by,
     created_date,
@@ -42930,13 +42944,14 @@ const travel_requestsUpdate = async (req, res) => {
       .input("priority_level", sql.NVarChar, priority_level)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
       .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
-        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
+        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,@keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
 
     res
       .status(200)
@@ -42948,7 +42963,7 @@ const travel_requestsUpdate = async (req, res) => {
 };
 
 const travel_requestsDelete = async (req, res) => {
-  const { travel_request_id, company_code } = req.body;
+  const { travel_request_id, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -42957,7 +42972,8 @@ const travel_requestsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     res
       .status(200)
@@ -43004,10 +43020,11 @@ const travel_requestsLoopInsert = async (req, res) => {
         .input("priority_level", sql.NVarChar, item.priority_level)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
-          @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, 0, @created_by, '', '', ''`);
+        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+          @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code, @keyfield, 0, @created_by, '', '', ''`);
     }
     res.status(200).json("travel_requests data inserted successfully");
   } catch (err) {
@@ -43048,10 +43065,11 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("priority_level", sql.NVarChar, item.priority_level)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, @request_number, @employee_id, @department_id,@travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
-          @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @keyfield, 0, '', '', @modified_by, ''`);
+        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id,@travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+          @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code, @keyfield, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("travel_requests data updated successfully");
   } catch (err) {
@@ -43075,9 +43093,10 @@ const travel_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("travel_request_id", sql.Int, item.travel_request_id)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @keyfield, 0, '', '', @modified_by, ''`);
+        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, @keyfield, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("travel_requests data deleted successfully");
   } catch (err) {
@@ -43089,7 +43108,7 @@ const travel_requestsLoopDelete = async (req, res) => {
 // Auto-generated Node.js CRUD for sp_loan_requests
 const loan_requestsInsert = async (req, res) => {
   const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months,
-    monthly_installment, currency_code, purpose, request_status, repayment_date, company_code, manager_id, keyfield, created_by } = req.body;
+    monthly_installment, currency_code, purpose, request_status, repayment_date, company_code,Location_Code, manager_id, keyfield, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43109,11 +43128,12 @@ const loan_requestsInsert = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("repayment_date", sql.Int, repayment_date)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
-        @currency_code, @purpose, @request_status, @repayment_date, @company_code, @manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @created_by, '', '', ''`,);
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
+        @currency_code, @purpose, @request_status, @repayment_date, @company_code,@Location_Code, @manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @created_by, '', '', ''`,);
 
     res
       .status(200)
@@ -43126,7 +43146,7 @@ const loan_requestsInsert = async (req, res) => {
 
 const loan_requestsUpdate = async (req, res) => {
   const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate, repayment_months,
-    monthly_installment, currency_code, purpose, request_status, repayment_date, company_code, manager_id, keyfield, modified_by } = req.body;
+    monthly_installment, currency_code, purpose, request_status, repayment_date, company_code,Location_Code, manager_id, keyfield, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43146,11 +43166,12 @@ const loan_requestsUpdate = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("repayment_date", sql.Int, repayment_date)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
-        @currency_code, @purpose, @request_status, @repayment_date, @company_code, @manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
+        @currency_code, @purpose, @request_status, @repayment_date, @company_code,@Location_Code, @manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
 
     res
       .status(200)
@@ -43162,7 +43183,7 @@ const loan_requestsUpdate = async (req, res) => {
 };
 
 const loan_requestsDelete = async (req, res) => {
-  const { keyfield, company_code } = req.body;
+  const { keyfield, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43171,7 +43192,8 @@ const loan_requestsDelete = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("keyfield", sql.NVarChar, keyfield)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, '', @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     res
       .status(200)
@@ -43208,10 +43230,11 @@ const loan_requestsLoopInsert = async (req, res) => {
         .input("request_status", sql.NVarChar, item.request_status)
         .input("repayment_date", sql.Int, item.repayment_date)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
-          @currency_code, @purpose, @request_status, @repayment_date, @company_code, @manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @created_by, '', '', ''`);
+        .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
+          @currency_code, @purpose, @request_status, @repayment_date, @company_code,@Location_Code, @manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @created_by, '', '', ''`);
     }
     res.status(200).json("loan_requests data inserted successfully");
   } catch (err) {
@@ -43246,11 +43269,12 @@ const loan_requestsLoopUpdate = async (req, res) => {
         .input("request_status", sql.NVarChar, item.request_status)
         .input("repayment_date", sql.Int, item.repayment_date)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
-          @currency_code, @purpose, @request_status, @repayment_date, @company_code, @manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
+        .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
+          @currency_code, @purpose, @request_status, @repayment_date, @company_code, @Location_Code,@manager_id, @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_requests data updated successfully");
   } catch (err) {
@@ -43274,8 +43298,9 @@ const loan_requestsLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("company_code", sql.NVarChar, item.company_code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, '', @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
+        .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', @keyfield, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("loan_requests data deleted successfully");
   } catch (err) {
@@ -43306,7 +43331,7 @@ const getVisaType = async (req, res) => {
 const visaRequestSearch = async (req, res) => {
   const { visa_request_id, employee_id, passport_id, destination_country_id, visa_type_id,
     purpose, travel_start_date, travel_end_date, request_status, request_number, priority_level,
-    sponsor_name, estimated_cost, Remarks, company_code, manager_id } = req.body;
+    sponsor_name, estimated_cost, Remarks, company_code, Location_Code, manager_id } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43328,9 +43353,10 @@ const visaRequestSearch = async (req, res) => {
       .input("estimated_cost", sql.Decimal(12, 2), estimated_cost)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date,
-         @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @manager_id, '', 0, '', '', '', ''`);
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date,
+         @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -43587,6 +43613,7 @@ const travel_requestsSearch = async (req, res) => {
     priority_level,
     manager_id,
     company_code,
+    Location_Code
   } = req.body;
 
   try {
@@ -43615,8 +43642,9 @@ const travel_requestsSearch = async (req, res) => {
       .input("priority_level", sql.NVarChar, priority_level)
       .input("manager_id", sql.VarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
-        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, '', 0, '', '', '', '' `);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
+        @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,'', 0, '', '', '', '' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -43650,7 +43678,7 @@ const getLoanTypes = async (req, res) => {
 
 const loanRequestSearch = async (req, res) => {
   const { loan_request_id, request_number, employee_id, loan_type_id, loan_amount, interest_rate,
-    repayment_months, monthly_installment, currency_code, manager_id, purpose, request_status, repayment_date, company_code } = req.body;
+    repayment_months, monthly_installment, currency_code, manager_id, purpose, request_status, repayment_date, company_code,Location_Code } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
@@ -43670,9 +43698,10 @@ const loanRequestSearch = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("repayment_date", sql.NVarChar, repayment_date)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
-        @currency_code, @purpose, @request_status, @repayment_date, @company_code, @manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, @loan_amount, @interest_rate, @repayment_months, @monthly_installment, 
+        @currency_code, @purpose, @request_status, @repayment_date, @company_code,@Location_Code, @manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -43703,7 +43732,7 @@ const getPaymentMethod = async (req, res) => {
 };
 
 const getLoanRequest = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -43711,7 +43740,8 @@ const getLoanRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "F")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44179,7 +44209,7 @@ const loan_documentsSearch = async (req, res) => {
 
 //Code added by pavun on 11-03-26
 const getApprovalLoanRequest = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44187,7 +44217,8 @@ const getApprovalLoanRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "LA")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44400,16 +44431,17 @@ const EmployeeDetailsRequest = async (req, res) => {
 
 //Code added by pavun on 14-03-26
 const LoanRequestDashboard = async (req, res) => {
-  const { manager_id, company_code } = req.body;
+  const { manager_id, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "LR")
-      .input("company_code", sql.NVarChar, company_code)
       .input("manager_id", sql.NVarChar, manager_id)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, @manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code,@manager_id, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44423,7 +44455,7 @@ const LoanRequestDashboard = async (req, res) => {
 };
 
 const visaRequestDashboard = async (req, res) => {
-  const { manager_id, company_code, Modified_by } = req.body;
+  const { manager_id, company_code, Location_Code, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44432,8 +44464,9 @@ const visaRequestDashboard = async (req, res) => {
       .input("mode", sql.NVarChar, "VR")
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_test @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @manager_id, '', 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, @manager_id, '', 0, '', '', @Modified_by, ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44447,7 +44480,7 @@ const visaRequestDashboard = async (req, res) => {
 };
 
 const travelRequestsDashboard = async (req, res) => {
-  const { manager_id, company_code } = req.body;
+  const { manager_id, company_code, Location_Code} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44458,7 +44491,8 @@ const travelRequestsDashboard = async (req, res) => {
       .input("mode", sql.NVarChar, "TR")
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', @manager_id, @company_code, '', 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', @manager_id, @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44496,7 +44530,7 @@ const DashboardEmployeeInfoChange = async (req, res) => {
 };
 
 const ApprovalLoan = async (req, res) => {
-  const { loan_request_id, request_status, company_code } = req.body;
+  const { loan_request_id, request_status, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44506,7 +44540,8 @@ const ApprovalLoan = async (req, res) => {
       .input("loan_request_id", sql.Int, loan_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, '', '', 0, 0, 0, 0, 0, '', '', @request_status, 0, @company_code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, '', '', 0, 0, 0, 0, 0, '', '', @request_status, 0, @company_code,@Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     res.status(200).json("loan approval successfully");
   } catch (err) {
@@ -44516,7 +44551,7 @@ const ApprovalLoan = async (req, res) => {
 };
 
 const ApprovalVisa = async (req, res) => {
-  const { visa_request_id, request_status, company_code, Modified_by } = req.body;
+  const { visa_request_id, request_status, company_code, Location_Code, Modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44526,8 +44561,9 @@ const ApprovalVisa = async (req, res) => {
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, '', '', '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, '', '', 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
 
     res.status(200).json("visa approval successfully");
   } catch (err) {
@@ -44537,7 +44573,7 @@ const ApprovalVisa = async (req, res) => {
 };
 
 const ApprovalTravel = async (req, res) => {
-  const { travel_request_id, request_status, company_code, modified_by } = req.body;
+  const { travel_request_id, request_status, company_code, Location_Code, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -44548,8 +44584,9 @@ const ApprovalTravel = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', 0, '', '', @modified_by, ''`);
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code, '', 0, '', '', @modified_by, ''`);
 
     res.status(200).json("travel approval successfully");
   } catch (err) {
@@ -44758,6 +44795,7 @@ const getEmployeeLeaveReport = async (req, res) => {
     LeaveType,
     LeaveStatus,
     company_code,
+    Location_Code,
     EmployeeId,
     ReportingManager,
   } = req.body;
@@ -44772,8 +44810,9 @@ const getEmployeeLeaveReport = async (req, res) => {
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("ReportingManager", sql.NVarChar, ReportingManager)
-      .query(`EXEC sp_employee_Leave @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,'','',0,'','',null,null,null,null,null,null,null,null`);
+      .query(`EXEC sp_employee_Leave_Ramya @mode,@EmployeeId,@LeaveType,@FromDate,@ToDate,'',@ReportingManager,'',@LeaveStatus,'','','',@company_code,@Location_Code,'','',0,'','',null,null,null,null,null,null,null,null`);
 
     if (result.recordset?.length > 0) {
       res.status(200).json(result.recordset);
@@ -46630,7 +46669,7 @@ const getAllocationStatus = async (req, res) => {
 
 //Code added by Pavun on 09-04-26
 const LeaveCancellation = async (req, res) => {
-  const { EmployeeId, LeaveStatus, FromDate } = req.body;
+  const { EmployeeId, LeaveStatus, FromDate, company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -46639,7 +46678,9 @@ const LeaveCancellation = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("LeaveStatus", sql.NVarChar, LeaveStatus)
       .input("FromDate", sql.Date, FromDate)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '','','','', 0, '','', null, null, null, null, null, null, null, null`);
+      .input("company_code", sql.VarChar, company_code)
+      .input("Location_Code", sql.VarChar, Location_Code)
+      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', @FromDate, '', '', '', '', @LeaveStatus, '','', '', @company_code, @Location_Code, '','', 0, '','', null, null, null, null, null, null, null, null`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
     console.error(err);
@@ -46651,7 +46692,7 @@ const LeaveCancellation = async (req, res) => {
 //Code added by pavun on 10-04-26
 const compOffRequestInsert = async (req, res) => {
   const { EmployeeId, HolidayDate, HolidayName, LeaveFromDate, LeaveToDate,
-    Status, LeaveUsed, Reason, RepManager, ResPerson, CompanyCode, CreatedBy } = req.body;
+    Status, LeaveUsed, Reason, RepManager, ResPerson, CompanyCode,Location_Code, CreatedBy } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -46668,9 +46709,10 @@ const compOffRequestInsert = async (req, res) => {
       .input("RepManager", sql.NVarChar, RepManager)
       .input("ResPerson", sql.NVarChar, ResPerson)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("CreatedBy", sql.NVarChar, CreatedBy)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
-      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,0,@CreatedBy,'','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,@HolidayDate,@HolidayName,@LeaveFromDate,@LeaveToDate,
+      '','','','',@Status,@LeaveUsed,@Reason,@RepManager,@ResPerson,@CompanyCode,@Location_Code,0,@CreatedBy,'','','','',''`);
 
     res.status(200).json({ success: true, message: "Employee comp off inserted successfully" });
   } catch (err) {
@@ -46680,7 +46722,7 @@ const compOffRequestInsert = async (req, res) => {
 };
 
 const DashboardCompOffRequest = async (req, res) => {
-  const { RepManager, CompanyCode } = req.body;
+  const { RepManager, CompanyCode,Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -46688,7 +46730,8 @@ const DashboardCompOffRequest = async (req, res) => {
       .input("mode", sql.NVarChar, "CLR")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,0,'','','','','',''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,0,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -46702,7 +46745,7 @@ const DashboardCompOffRequest = async (req, res) => {
 };
 
 const DashboardCompOffApproval = async (req, res) => {
-  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode, Keyfield, ModifiedBy } = req.body;
+  const { EmployeeId, Status, HolidayDate, ApprovedBy, CompanyCode,Location_Code, Keyfield, ModifiedBy } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     await pool
@@ -46713,9 +46756,10 @@ const DashboardCompOffApproval = async (req, res) => {
       .input("HolidayDate", sql.Date, HolidayDate)
       .input("ApprovedBy", sql.NVarChar, ApprovedBy)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Keyfield", sql.NVarChar, Keyfield)
       .input("ModifiedBy", sql.NVarChar, ModifiedBy)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','',@ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,0,
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,@HolidayDate,'','','',@ApprovedBy,'',@Keyfield,'',@Status,'','','','',@CompanyCode,@Location_Code,0,
         '','',@ModifiedBy,'','',''`);
     res.status(200).json("leave status updated successfully");
   } catch (err) {
@@ -46725,7 +46769,7 @@ const DashboardCompOffApproval = async (req, res) => {
 };
 
 const getCompOffDropdown = async (req, res) => {
-  const { EmployeeId, CompanyCode } = req.body;
+  const { EmployeeId, CompanyCode,Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -46734,7 +46778,8 @@ const getCompOffDropdown = async (req, res) => {
       .input("mode", sql.NVarChar, "CO")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,0,'','','','','',''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,@Location_Code,0,'','','','','',''`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -47204,7 +47249,7 @@ const EmpCompOffList = async (req, res) => {
 };
 
 const compOffSearchCriteria = async (req, res) => {
-  const { FromDate, ToDate, HolidayName, Status, EmployeeId, CompanyCode, RepManager } = req.body;
+  const { FromDate, ToDate, HolidayName, Status, EmployeeId, CompanyCode,Location_Code, RepManager } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -47217,8 +47262,9 @@ const compOffSearchCriteria = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("RepManager", sql.NVarChar, RepManager)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,0,'','','','',@FromDate,@ToDate`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,@Location_Code,0,'','','','',@FromDate,@ToDate`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47232,7 +47278,7 @@ const compOffSearchCriteria = async (req, res) => {
 };
 
 const compOffRequestReport = async (req, res) => {
-  const { FromDate, ToDate, HolidayName, Status, EmployeeId, RepManager, CompanyCode } = req.body;
+  const { FromDate, ToDate, HolidayName, Status, EmployeeId, RepManager, CompanyCode,Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -47246,7 +47292,8 @@ const compOffRequestReport = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,0,'','','','',@FromDate,@ToDate`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,'',@HolidayName,'','','','','','',@Status,'','',@RepManager,'',@CompanyCode,@Location_Code,0,'','','','',@FromDate,@ToDate`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47608,7 +47655,7 @@ const EmpDepartment = async (req, res) => {
 const approvalLoanRequestSearch = async (req, res) => {
   const { loan_request_id, request_number, employee_id, loan_type_id, LoanAmountFrom, LoanAmountTo, InterestRateFrom, InterestRateTo,
     RepaymentMonthsFrom, RepaymentMonthsTo, MonthlyInstallmentFrom, MonthlyInstallmentTo, currency_code, manager_id, purpose, request_status, RepaymentDateFrom, RepaymentDateTo,
-    company_code } = req.body;
+    company_code,Location_Code } = req.body;
   try {
     const pool = await sql.connect(dbConfig);
     const result = await pool
@@ -47633,9 +47680,10 @@ const approvalLoanRequestSearch = async (req, res) => {
       .input("purpose", sql.NVarChar, purpose)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, 0, 0, 0, 0, 
-        @currency_code, @purpose, @request_status, 0, @company_code, @manager_id, '', @LoanAmountFrom, @LoanAmountTo, @InterestRateFrom, @InterestRateTo, @RepaymentMonthsFrom, @RepaymentMonthsTo, 
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, @request_number, @employee_id, @loan_type_id, 0, 0, 0, 0, 
+        @currency_code, @purpose, @request_status, 0, @company_code,@Location_Code, @manager_id, '', @LoanAmountFrom, @LoanAmountTo, @InterestRateFrom, @InterestRateTo, @RepaymentMonthsFrom, @RepaymentMonthsTo, 
         @MonthlyInstallmentFrom, @MonthlyInstallmentTo, @RepaymentDateFrom, @RepaymentDateTo, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
@@ -47675,7 +47723,7 @@ const getSettings = async (req, res) => {
 
 //Code added by pavun on 24-04-2026
 const shiftChangeRequestInsert = async (req, res) => {
-  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code, RepManager, created_by, screen_type } = req.body;
+  const { employee_id, current_shift_id, requested_shift_id, reason, priority, swap_employee_id, effective_date, company_code,Location_Code, RepManager, created_by, screen_type } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47691,11 +47739,12 @@ const shiftChangeRequestInsert = async (req, res) => {
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("effective_date", sql.NVarChar, effective_date)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("RepManager", sql.NVarChar, RepManager)
       .input("created_by", sql.NVarChar, created_by)
       .input("screen_type", sql.NVarChar, screen_type)
-      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
-        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@RepManager,0,@created_by,'','','','', @screen_type`);
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','',
+        '','','',@reason,'',@priority,'',@swap_employee_id,@effective_date,'',@company_code,@Location_Code,@RepManager,0,@created_by,'','','','', @screen_type`);
 
     res.status(200).json({
       success: true,
@@ -47708,7 +47757,7 @@ const shiftChangeRequestInsert = async (req, res) => {
 };
 
 const shiftChangeRequestEmployee = async (req, res) => {
-  const { company_code, swap_employee_id } = req.body;
+  const { company_code,Location_Code, swap_employee_id } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47717,8 +47766,9 @@ const shiftChangeRequestEmployee = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SRE")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,'',0,'','','','','', ''`);
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,0,'','','','','','','','','','','','','',@swap_employee_id,'','',@company_code,@Location_Code,'',0,'','','','','', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47760,7 +47810,7 @@ const GetJobID = async (req, res) => {
 
 //code added by Sakthi on 24-04-2026
 const GetLoanTypeID = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47768,7 +47818,8 @@ const GetLoanTypeID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "LIN")
       .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.VarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47784,7 +47835,7 @@ const GetLoanTypeID = async (req, res) => {
 
 //Code added by pavun on 25-04-2026
 const shiftRequestEmployeeApproval = async (req, res) => {
-  const { request_id, company_code, swap_employee_id, is_swap_request, modified_by } = req.body;
+  const { request_id, company_code,Location_Code, swap_employee_id, is_swap_request, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47794,10 +47845,11 @@ const shiftRequestEmployeeApproval = async (req, res) => {
       .input("mode", sql.NVarChar, "SEA")
       .input("request_id", sql.Int, request_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("swap_employee_id", sql.NVarChar, swap_employee_id)
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,'',0,'',
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,@request_id,'','','','','','','','','','','','',@is_swap_request,@swap_employee_id,'','',@company_code,Location_Code,'',0,'',
         @modified_by,'','','', ''`);
 
     res.status(200).json({
@@ -47869,7 +47921,7 @@ const deletePrintTemplates = async (req, res) => {
 
 //Code added by pavun on 27-04-2026
 const shiftChangeRequestManager = async (req, res) => {
-  const { RepManager, company_code } = req.body;
+  const { RepManager, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47879,7 +47931,8 @@ const shiftChangeRequestManager = async (req, res) => {
       .input("mode", sql.NVarChar, "SRM")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,'','','','','','','','','','','','','','','','',@company_code,@RepManager,0,'','','','','', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,0,'','','','','','','','','','','','','','','','',@company_code,@Location_Code,@RepManager,0,'','','','','', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47893,7 +47946,7 @@ const shiftChangeRequestManager = async (req, res) => {
 };
 
 const shiftRequestManagerApproval = async (req, res) => {
-  const { request_id, company_code, request_status, modified_by } = req.body;
+  const { request_id, company_code,Location_Code, request_status, modified_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47903,9 +47956,10 @@ const shiftRequestManagerApproval = async (req, res) => {
       .input("mode", sql.NVarChar, "SMA")
       .input("request_id", sql.Int, request_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("request_status", sql.NVarChar, request_status)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,'',0,'',@modified_by,'','','', ''`);
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,@request_id,'','','','','','','','','','',@request_status,'','','','','',@company_code,@Location_Code,'',0,'',@modified_by,'','','', ''`);
 
     res.status(200).json({
       success: true,
@@ -48026,8 +48080,9 @@ const shiftChangeRequestSearch = async (req, res) => {
       .input("is_swap_request", sql.NVarChar, is_swap_request)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'',@is_swap_request,
-        '','','',@company_code,'',0,'','','',@shift_from_date,@shift_to_date, ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,0,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'',@is_swap_request,
+        '','','',@company_code,@Location_Code,'',0,'','','',@shift_from_date,@shift_to_date, ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48041,7 +48096,7 @@ const shiftChangeRequestSearch = async (req, res) => {
 };
 
 const shiftChangeRequestReport = async (req, res) => {
-  const { request_id, shift_from_date, shift_to_date, employee_id, request_status, current_shift_id, requested_shift_id, RepManager, company_code, screen_type } = req.body;
+  const { request_id, shift_from_date, shift_to_date, employee_id, request_status, current_shift_id, requested_shift_id, RepManager, company_code,Location_Code, screen_type } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48058,9 +48113,10 @@ const shiftChangeRequestReport = async (req, res) => {
       .input("RepManager", sql.NVarChar, RepManager)
       .input("request_status", sql.NVarChar, request_status)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("screen_type", sql.NVarChar, screen_type)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'','','','','',
-        @company_code,@RepManager,0,'','','',@shift_from_date,@shift_to_date, @screen_type`);
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,@request_id,@employee_id,'',@current_shift_id,@requested_shift_id,'','','','','','',@request_status,'','','','','',
+        @company_code,@Location_Code,@RepManager,0,'','','',@shift_from_date,@shift_to_date, @screen_type`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48109,7 +48165,7 @@ const monthlyInstallmentCalculation = async (req, res) => {
       .input("loan_amount", sql.Decimal(10, 2), loan_amount)
       .input("interest_rate", sql.Decimal(5, 2), interest_rate)
       .input("repayment_months", sql.Int, repayment_months)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', '', 0, @loan_amount, @interest_rate, @repayment_months, 0, '', '', '', 0, '',  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', '', 0, @loan_amount, @interest_rate, @repayment_months, 0, '', '', '', 0, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48125,7 +48181,7 @@ const monthlyInstallmentCalculation = async (req, res) => {
 
 //Code added by pavun on 06-05-2026
 const getLoanNotification = async (req, res) => {
-  const { employee_id, company_code } = req.body;
+  const { employee_id, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48134,7 +48190,8 @@ const getLoanNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, 0, '', @employee_id, 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, 0, '', @employee_id, 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  @Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48150,7 +48207,7 @@ const getLoanNotification = async (req, res) => {
 
 //Code added by pavun on 08-05-2026
 const loanNotificationSeen = async (req, res) => {
-  const { loan_request_id, is_notification_seen, company_code } = req.body;
+  const { loan_request_id, is_notification_seen, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48160,7 +48217,8 @@ const loanNotificationSeen = async (req, res) => {
       .input("loan_request_id", sql.Int, loan_request_id)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_loan_requests_Ramya @mode, @loan_request_id, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,  '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @is_notification_seen, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_loan_requests_Ramya2 @mode, @loan_request_id, '', '', 0, 0, 0, 0, 0, '', '', '', 0, @company_code,@Location_Code, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, @is_notification_seen, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -48173,7 +48231,7 @@ const loanNotificationSeen = async (req, res) => {
 };
 
 const getLeaveNotification = async (req, res) => {
-  const { EmployeeId, company_code } = req.body;
+  const { EmployeeId, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48182,7 +48240,8 @@ const getLeaveNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', '', '', '', '', '', '', '','', '',@company_code,'','', 0, '','', null, null, null, null, null, null, null, null`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', '', '', '', '', '', '', '','', '',@company_code,@Location_Code,'','', 0, '','', null, null, null, null, null, null, null, null`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48196,7 +48255,7 @@ const getLeaveNotification = async (req, res) => {
 };
 
 const leaveNotificationSeen = async (req, res) => {
-  const { EmployeeId, FromDate, is_notification_seen, company_code } = req.body;
+  const { EmployeeId, FromDate, is_notification_seen, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48207,7 +48266,8 @@ const leaveNotificationSeen = async (req, res) => {
       .input("FromDate", sql.Date, FromDate)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_employee_Leave @mode, @EmployeeId, '', @FromDate, '', '', '', '', '', '','', '',@company_code,'','', @is_notification_seen, '','', null, null, null, null, null, null, null, null`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_employee_Leave_Ramya @mode, @EmployeeId, '', @FromDate, '', '', '', '', '', '','', '',@company_code,@Location_Code,'','', @is_notification_seen, '','', null, null, null, null, null, null, null, null`);
 
     res.status(200).json({
       success: true,
@@ -48220,7 +48280,7 @@ const leaveNotificationSeen = async (req, res) => {
 };
 
 const getVisaNotification = async (req, res) => {
-  const { employee_id, company_code } = req.body;
+  const { employee_id, company_code ,Location_Code} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48229,7 +48289,8 @@ const getVisaNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_test @mode, 0, @employee_id, '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_visa_requests_DG @mode, 0, @employee_id, '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48243,7 +48304,7 @@ const getVisaNotification = async (req, res) => {
 };
 
 const visaNotificationSeen = async (req, res) => {
-  const { visa_request_id, is_notification_seen, company_code } = req.body;
+  const { visa_request_id, is_notification_seen, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48253,7 +48314,8 @@ const visaNotificationSeen = async (req, res) => {
       .input("visa_request_id", sql.Int, visa_request_id)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, '', '', @is_notification_seen, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', @is_notification_seen, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -48266,7 +48328,7 @@ const visaNotificationSeen = async (req, res) => {
 };
 
 const getTravelNotification = async (req, res) => {
-  const { employee_id, company_code } = req.body;
+  const { employee_id, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48275,7 +48337,8 @@ const getTravelNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, 0, '', @employee_id, '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', 0, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, 0, '', @employee_id, '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48289,7 +48352,7 @@ const getTravelNotification = async (req, res) => {
 };
 
 const travelNotificationSeen = async (req, res) => {
-  const { travel_request_id, is_notification_seen, company_code } = req.body;
+  const { travel_request_id, is_notification_seen, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48299,7 +48362,8 @@ const travelNotificationSeen = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, '', @is_notification_seen, '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', @is_notification_seen, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -48312,7 +48376,7 @@ const travelNotificationSeen = async (req, res) => {
 };
 
 const getComOffNotification = async (req, res) => {
-  const { EmployeeId, CompanyCode } = req.body;
+  const { EmployeeId, CompanyCode,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48321,7 +48385,8 @@ const getComOffNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,0,'','','','','',''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,'','','','','','','','','','','','','',@CompanyCode,@Location_Code,0,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48335,7 +48400,7 @@ const getComOffNotification = async (req, res) => {
 };
 
 const compOffNotificationSeen = async (req, res) => {
-  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode, Keyfield } = req.body;
+  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode,Location_Codev, Keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48346,8 +48411,9 @@ const compOffNotificationSeen = async (req, res) => {
       .input("HolidayDate", sql.Date, HolidayDate)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Keyfield", sql.NVarChar, Keyfield)
-      .query(`EXEC sp_Employee_Comp_Off_Leave @mode,@EmployeeId,@HolidayDate,'','','','','',@Keyfield,'','','','','','',@CompanyCode,@is_notification_seen,'','','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,@EmployeeId,@HolidayDate,'','','','','',@Keyfield,'','','','','','',@CompanyCode,@Location_Code,@is_notification_seen,'','','','','',''`);
 
     res.status(200).json({
       success: true,
@@ -48360,7 +48426,7 @@ const compOffNotificationSeen = async (req, res) => {
 };
 
 const getShiftNotification = async (req, res) => {
-  const { employee_id, company_code } = req.body;
+  const { employee_id, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48369,7 +48435,8 @@ const getShiftNotification = async (req, res) => {
       .input("mode", sql.NVarChar, "AN")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,0,@employee_id,'','','','','','','','','','','','','','','',@company_code,'',0,'','','','','',''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,0,@employee_id,'','','','','','','','','','','','','','','',@company_code,@Location_Code,'',0,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48383,7 +48450,7 @@ const getShiftNotification = async (req, res) => {
 };
 
 const shiftNotificationSeen = async (req, res) => {
-  const { request_id, is_notification_seen, company_code } = req.body;
+  const { request_id, is_notification_seen, company_code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48393,7 +48460,8 @@ const shiftNotificationSeen = async (req, res) => {
       .input("request_id", sql.Int, request_id)
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_shift_change_requests @mode,@request_id,'','','','','','','','','','','','','','','','',@company_code,'',@is_notification_seen,'','','','','',''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_shift_change_requests_Ramya @mode,@request_id,'','','','','','','','','','','','','','','','',@company_code,@Location_Code,'',@is_notification_seen,'','','','','',''`);
 
     res.status(200).json({
       success: true,
@@ -48559,7 +48627,7 @@ const GetAssetRequest = async (req, res) => {
 
 //Code added by pavun on 11-05-2026
 const visaCancellation = async (req, res) => {
-  const { visa_request_id, travel_start_date, request_status, Modified_by, company_code } = req.body;
+  const { visa_request_id, travel_start_date, request_status, Modified_by, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48571,7 +48639,8 @@ const visaCancellation = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("Modified_by", sql.NVarChar, Modified_by)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_visa_requests_test @mode, @visa_request_id, '', '', '', '', '', @travel_start_date, '', @request_status, '', '', '', 0, '', @company_code, '', '', 0, '', '', @Modified_by, ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', @travel_start_date, '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
 
     res.status(200).json({
       success: true,
@@ -48584,7 +48653,7 @@ const visaCancellation = async (req, res) => {
 };
 
 const travelCancellation = async (req, res) => {
-  const { travel_request_id, travel_start_date, request_status, modified_by, company_code } = req.body;
+  const { travel_request_id, travel_start_date, request_status, modified_by, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48596,7 +48665,8 @@ const travelCancellation = async (req, res) => {
       .input("request_status", sql.NVarChar, request_status)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_travel_requests_test @mode, @travel_request_id, '', '', '', '', '', '', '', @travel_start_date, '', '', 0, 0, '', @request_status, '', '', '', @company_code, '', 0, '', '', @modified_by, ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', @travel_start_date, '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code,  '', 0, '', '', @modified_by, ''`);
 
     res.status(200).json({
       success: true,

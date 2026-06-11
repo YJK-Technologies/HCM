@@ -68,6 +68,7 @@ function LoanDocuments({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())
@@ -82,6 +83,7 @@ function LoanDocuments({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())
@@ -96,6 +98,7 @@ function LoanDocuments({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())
