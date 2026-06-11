@@ -132,6 +132,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
   const arrayBufferToBase64 = (buffer) => {
     let binary = '';
@@ -152,7 +153,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ EmployeeId, Account_NO, Name, AccountHolderName, bankName, IFSC_Code, Bankbook_img, branchName, company_code: sessionStorage.getItem("selectedCompanyCode") })
+        body: JSON.stringify({ EmployeeId, Account_NO, Name, AccountHolderName, bankName, IFSC_Code, Bankbook_img, branchName, Location_Code, company_code: sessionStorage.getItem("selectedCompanyCode") })
       });
       if (response.ok) {
         const searchData = await response.json();

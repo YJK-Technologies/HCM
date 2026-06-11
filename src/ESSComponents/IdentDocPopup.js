@@ -109,14 +109,15 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   const handleSearch = async () => {
     setLoading(true);
 
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/getIdentityDocumentSearchCretria`,
+      const response = await fetch(`${config.apiBaseUrl}/getIdentityDocumentSearchCretria`,
         {
           method: "POST",
           headers: {
@@ -127,7 +128,8 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
             documentType,
             Name,
             documentNo,
-            company_code
+            company_code,
+            Location_Code
           })
         }
       );
