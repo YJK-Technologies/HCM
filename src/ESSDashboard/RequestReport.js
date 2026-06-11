@@ -125,6 +125,7 @@ function RequestReport({ }) {
         EmployeeId: safeEmpId,
         Status: status,
         CompanyCode: company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         HolidayName,
         RepManager: sessionStorage.getItem("selectedUserCode"),
       };
@@ -258,6 +259,7 @@ function RequestReport({ }) {
           HolidayDate: row.HolidayDate,
           ApprovedBy: sessionStorage.getItem("selectedUserCode"),
           CompanyCode: company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           ModifiedBy: sessionStorage.getItem("selectedUserCode"),
           Keyfield: id,
         };
@@ -3558,6 +3560,7 @@ function RequestReport({ }) {
         },
         body: JSON.stringify({
           CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           EmployeeId: searchEmpId,
           FromDate: holidayFromDate,
           ToDate: holidayToDate,
