@@ -106,18 +106,17 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
 
   const [PFNo, setPFNo] = useState("");
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   const handleSearch = async () => {
     setLoading(true);
 
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      // ✅ Convert salary safely
-      const salaryValue =
-        salaryPerAnnum === "" ? null : parseInt(salaryPerAnnum, 10);
+      const salaryValue = salaryPerAnnum === "" ? null : parseInt(salaryPerAnnum, 10);
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/getFinancialDetailsSearchCretria`,
+      const response = await fetch(`${config.apiBaseUrl}/getFinancialDetailsSearchCretria`,
         {
           method: "POST",
           headers: {
@@ -132,6 +131,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
             salary_from: salary_from ? parseFloat(salary_from) : null,
             salary_to: salary_to ? parseFloat(salary_to) : null,
             company_code,
+            Location_Code
           }),
         }
       );
@@ -139,10 +139,8 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
       if (response.ok) {
         const searchData = await response.json();
 
-        // ✅ Structured mapping (like your second API)
         const updatedData = searchData.map((item) => ({
           ...item,
-
           EmployeeId: item.EmployeeId,
           Name: item.Name,
           salaryType: item.salaryType,
@@ -150,8 +148,6 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
           PFNo: item.PFNo,
           salary_from: item.salary_from,
           salary_to: item.salary_to,
-
-          // Optional formatting
           salaryPerAnnum: item.salary_month
             ? Number(item.salary_month)
             : null,
@@ -159,19 +155,14 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
 
         setRowData(updatedData);
         console.log("data fetched successfully");
-      }
-
-      else if (response.status === 404) {
+      } else if (response.status === 404) {
         toast.warning("Data Not found");
-        setRowData([]);   // ✅ only clear grid (NOT inputs)
-      }
-
-      else {
+        setRowData([]);  
+      } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Something went wrong");
         setRowData([]);
       }
-
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error: " + error.message);
@@ -181,9 +172,9 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
   };
 
   const handleClosePopup = () => {
-    clearInputs();     // ✅ clear all inputs
-    setRowData([]);    // ✅ clear grid
-    handleClose();     // ✅ close popup
+    clearInputs();     
+    setRowData([]);    
+    handleClose();     
   };
 
   const handleReload = () => {
@@ -193,14 +184,13 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
 
   const clearInputs = () => {
     setEmployeeId("");
-    setname("");              // ✅ Name
+    setname("");             
     setSalaryType("");
     setPayScale("");
     setSalaryPerAnnum("");
-
-    setPFNo("");              // ✅ PF No
-    setsalary_from("");       // ✅ salary range from
-    setsalary_to("");         // ✅ salary range to
+    setPFNo("");              
+    setsalary_from("");       
+    setsalary_to("");         
   };
 
   const [selectedRows, setSelectedRows] = useState([]);

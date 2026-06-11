@@ -332,6 +332,7 @@ function UserGrid() {
           user_type,
           dob,
           gender,
+          created_by: sessionStorage.getItem("selectedUserCode")
         }), // Send company_no and company_name as search criteria
       });
 

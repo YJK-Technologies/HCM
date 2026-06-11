@@ -47,6 +47,8 @@ function Input({ }) {
   const [isSelectDocument, setIsSelectDocument] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const identityPermissions = permissions
@@ -318,6 +320,7 @@ function Input({ }) {
             document: fileBase64,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
         }),
       ),
@@ -325,8 +328,7 @@ function Input({ }) {
     setError(false);
     setLoading(true);
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/addEmployeeIdentityDocument`,
+      const response = await fetch(`${config.apiBaseUrl}/addEmployeeIdentityDocument`,
         {
           method: "POST",
           headers: {
@@ -701,7 +703,8 @@ function Input({ }) {
       expiryDate: member.expiryDate,
       document: fileBase64,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+      modified_by: sessionStorage.getItem('selectedUserCode'),
+      Location_Code
     };
     setError(false);
 
@@ -710,8 +713,7 @@ function Input({ }) {
       async () => {
         try {
           setLoading(true);
-          const response = await fetch(
-            `${config.apiBaseUrl}/updateEmployeeIdentityDocument`,
+          const response = await fetch(`${config.apiBaseUrl}/updateEmployeeIdentityDocument`,
             {
               method: "POST",
               headers: {
@@ -779,7 +781,8 @@ function Input({ }) {
     const documentNoToDelete = {
       documentNo: member.documentNo,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+      modified_by: sessionStorage.getItem('selectedUserCode'),
+      Location_Code
     };
 
     showConfirmationToast(
@@ -787,8 +790,7 @@ function Input({ }) {
       async () => {
         try {
           setLoading(true);
-          const response = await fetch(
-            `${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
+          const response = await fetch(`${config.apiBaseUrl}/deleteEmployeeIdentityDocument`,
             {
               method: "POST",
               headers: {

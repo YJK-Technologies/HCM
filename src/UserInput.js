@@ -45,6 +45,7 @@ function UserInput({ }) {
   const Dob = useRef(null);
   const Gender = useRef(null);
   const ImagE = useRef(null);
+  const SuperAdmin = useRef(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -60,9 +61,11 @@ function UserInput({ }) {
 
   const [UserCodeNameDrop, setUserCodeNameDrop] = useState([]);
 
+  const [superAdmin, setSuperAdmin] = useState(false);
+
   const location = useLocation();
   const locationState = location.state || {};
-  const mode = locationState.mode || "create"; // ✅ default fallback
+  const mode = locationState.mode || "create";
   const selectedRow = locationState.selectedRow || null;
 
   useEffect(() => {
@@ -114,6 +117,9 @@ function UserInput({ }) {
       setLog_in_out(selectedRow.log_in_out || "");
       setUser_status(selectedRow.user_status || "");
       setGender(selectedRow.gender || "");
+      setSuperAdmin(
+        selectedRow.super_admin?.toLowerCase() === "yes"
+      );
       setSelectedStatus({
         label: selectedRow.user_status,
         value: selectedRow.user_status,
@@ -384,6 +390,7 @@ function UserInput({ }) {
       formData.append("dob", dob);
       formData.append("role_id", role_id);
       formData.append("gender", gender);
+      formData.append("super_admin", superAdmin ? "Yes" : "No");
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
       if (user_images) {
@@ -489,6 +496,7 @@ function UserInput({ }) {
       formData.append("gender", selectedGender.value);
       formData.append("role_id", selectedRole.value);
       formData.append("modified_by", modified_by);
+      formData.append("super_admin", superAdmin ? "Yes" : "No");
 
       if (user_images) {
         formData.append("user_images", user_images);
@@ -789,9 +797,22 @@ function UserInput({ }) {
                 isClearable
                 maxLength={50}
                 ref={Gender}
-                onKeyDown={(e) => handleKeyDown(e, ImagE, Gender)}
+                onKeyDown={(e) => handleKeyDown(e, SuperAdmin, Gender)}
               />
               <label for="gender" className="floating-label">Gender</label>
+            </div>
+          </div>
+
+          <div className="col-md-2">
+            <div className="checkboxGroup">
+              <input
+                type="checkbox"
+                id="superAdmin"
+                checked={superAdmin}
+                onChange={(e) => setSuperAdmin(e.target.checked)}
+                ref={SuperAdmin}
+              />
+              <label htmlFor="superAdmin">Super Admin</label>
             </div>
           </div>
 
