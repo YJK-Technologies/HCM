@@ -35,6 +35,9 @@ function Input({ }) {
   const [isSelectPayscale, setIsSelectPayscale] = useState(false);
   const [loading, setLoading] = useState(false);
   const [originalData, setOriginalData] = useState(null);
+
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const financePermissions = permissions
@@ -268,6 +271,7 @@ function Input({ }) {
         salary_month: salaryMonth,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem("selectedUserCode"),
+        Location_Code
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addSalaryDetails`, {
@@ -397,6 +401,7 @@ function Input({ }) {
             PFNo: PFNo,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
 
           const response = await fetch(
@@ -522,6 +527,7 @@ function Input({ }) {
             ...currentData,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
 
           const response = await fetch(

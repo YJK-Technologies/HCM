@@ -15,6 +15,7 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
   const [Remarks, setRemarks] = useState("");
   const [rowData, setRowData] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -32,6 +33,7 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
           ConditionAtIssue: ConditionAtIssue,
           Remarks: Remarks,
           AssetID: AssetID,
+          Location_Code,
           company_code: sessionStorage.getItem("selectedCompanyCode")
         })
       });

@@ -141,6 +141,8 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   const [selecteddesg, setSelecteddesg] = useState((null));
   const company_code = sessionStorage.getItem('selectedCompanyCode')
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   const handleDPT = (selectedDPT) => {
     setselecteddept(selectedDPT);
     setdpt(selectedDPT ? selectedDPT.value : '');
@@ -238,6 +240,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }),
     })
       .then((response) => response.json())
@@ -305,8 +308,8 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
         body: JSON.stringify({
           EmployeeId, Department:dpt, Designation:selecteddesg, Name, manager, status, from_date, to_date,
           Employee_Type: selectedEmpType ? selectedEmpType.value : null,
-          company_code: sessionStorage.getItem('selectedCompanyCode')
-
+          company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code
         })
       });
       if (response.ok) {
