@@ -1076,6 +1076,7 @@ function TravelRequest({ }) {
                 request_status: "Cancelled",
                 travel_request_id: data.travel_request_id,
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 travel_start_date: data.travel_start_date
               }),
             });
@@ -1345,6 +1346,7 @@ function TravelRequest({ }) {
         priority_level: priority,
         manager_id: ProjectManager,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         keyfield: "",
         created_by: sessionStorage.getItem("selectedUserCode"),
         created_date: new Date(),
@@ -1403,6 +1405,7 @@ function TravelRequest({ }) {
         priority_level: prioritySc || "",
         manager_id: ProjectManagerSC || null,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       };
 
       const response = await fetch(
@@ -1471,6 +1474,7 @@ function TravelRequest({ }) {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const Location_Code = sessionStorage.getItem('selectedLocationCode');
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
@@ -1478,12 +1482,14 @@ function TravelRequest({ }) {
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
+                Location_Code,
                 modified_by,
               }))
               : [
                 {
                   ...rowData,
                   company_code,
+                  Location_Code,
                   modified_by,
                 },
               ],
@@ -1526,6 +1532,7 @@ function TravelRequest({ }) {
         try {
           setLoading(true);
           const company_code = sessionStorage.getItem("selectedCompanyCode");
+          const Location_Code = sessionStorage.getItem('selectedLocationCode');
           const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
@@ -1533,12 +1540,14 @@ function TravelRequest({ }) {
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
+                Location_Code,
                 modified_by
               }))
               : [
                 {
                   ...rowData,
                   company_code,
+                  Location_Code,
                   modified_by
                 },
               ],

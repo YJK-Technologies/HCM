@@ -172,6 +172,7 @@ function LoanRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((response) => response.json())
@@ -342,6 +343,7 @@ function LoanRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((response) => response.json())
@@ -497,6 +499,7 @@ function LoanRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((data) => data.json())
@@ -726,6 +729,7 @@ function LoanRequest({ }) {
                 repayment_date: repaymentDate,
                 manager_id: ProjectManager,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
                 created_by: sessionStorage.getItem('selectedUserCode')
             };
             const response = await fetch(`${config.apiBaseUrl}/loan_requestsInsert`, {
@@ -771,6 +775,7 @@ function LoanRequest({ }) {
                 repayment_date: repaymentDateSc,
                 manager_id: ProjectManagerSC,
                 company_code: sessionStorage.getItem('selectedCompanyCode'),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             };
 
             const response = await fetch(`${config.apiBaseUrl}/loanRequestSearch`, {
@@ -816,6 +821,7 @@ function LoanRequest({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Location_Code = sessionStorage.getItem('selectedLocationCode');
                     const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
@@ -823,12 +829,14 @@ function LoanRequest({ }) {
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
+                                Location_Code,
                                 modified_by,
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
+                                    Location_Code,
                                     modified_by,
                                 },
                             ],
@@ -871,6 +879,7 @@ function LoanRequest({ }) {
                 try {
                     setLoading(true);
                     const company_code = sessionStorage.getItem("selectedCompanyCode");
+                    const Location_Code = sessionStorage.getItem('selectedLocationCode');
                     const modified_by = sessionStorage.getItem("selectedUserCode");
 
                     const dataToSend = {
@@ -878,12 +887,14 @@ function LoanRequest({ }) {
                             ? rowData.map((row) => ({
                                 ...row,
                                 company_code,
+                                Location_Code,
                                 modified_by
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
+                                    Location_Code,
                                     modified_by
                                 },
                             ],

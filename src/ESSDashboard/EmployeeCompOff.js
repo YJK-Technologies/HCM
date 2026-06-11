@@ -104,6 +104,7 @@ const EmployeeCompOff = () => {
             RepManager: ReportingManager,
             EmployeeId: sessionStorage.getItem("selectedUserCode"),
             CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
             CreatedBy: sessionStorage.getItem("selectedUserCode"),
             ResPerson: AlternativeReponsablePerson,
         };
