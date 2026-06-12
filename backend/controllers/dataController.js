@@ -29863,6 +29863,7 @@ const Getmanager = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
+    .request()
     .input("company_code", sql.VarChar, company_code)
     .input("Location_Code", sql.VarChar, Location_Code)
     .query(`EXEC sp_employee_company_Ramya 'M','','','','','','','','','','',@company_code,@Location_Code,'', '','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
