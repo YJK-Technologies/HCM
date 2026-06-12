@@ -1454,6 +1454,7 @@ router.post("/visaCancellation",dataController.visaCancellation)
 router.post("/travelCancellation",dataController.travelCancellation)
 router.post("/getFEM",dataController.getFEM)
 router.post("/getMappedEmployeeDropdown",dataController.getMappedEmployeeDropdown)
+router.post("/getCompanyData",dataController.getCompanyData)
 
 
 
