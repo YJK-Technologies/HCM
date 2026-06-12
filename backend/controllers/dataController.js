@@ -48978,6 +48978,31 @@ const getCompanyData = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
+const getCompanyMappingData = async (req, res) => {
+  const { company_code, keyfiels } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "GCM")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("keyfiels", sql.NVarChar, keyfiels)
+      .query(`EXEC sp_user_company_mapping @mode,@company_code,'','','','',0,@keyfiels,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
+  } catch (err) {
+    console.error("Error", err.message);
+    return res
+      .status(500)
+      .json({ message: err.message || "Internal Server Error" });
+  }
+};
 //Code Ended By Pavun On 12-06-2026
 
 module.exports = {
@@ -50404,6 +50429,7 @@ module.exports = {
   travelCancellation,
   getFEM,
   getMappedEmployeeDropdown,
-  getCompanyData
+  getCompanyData,
+  getCompanyMappingData
 
 };
