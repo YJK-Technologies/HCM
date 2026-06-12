@@ -39,12 +39,61 @@ function WareHouseInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const warehouseCode = location.state?.warehouse_code;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && warehouseCode) {
+      fetchWarehouseData();
+    }
+  }, [mode, warehouseCode]);
+
+  const fetchWarehouseData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getWarehouseData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          warehouse_code: warehouseCode,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const warehouse = data[0];
+
+        setSelectedLocation({
+          label: warehouse.location_no,
+          value: warehouse.location_no,
+        });
+        setLocation_No(warehouse.location_no || "");
+        setSelectedStatus({
+          label: warehouse.status,
+          value: warehouse.status,
+        });
+        setStatus(warehouse.status || "");
+        setWarehouse_Code(warehouse.warehouse_code || "");
+        setWarehouse_Name(warehouse.warehouse_name || "");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch warehouse details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setWarehouse_Code("");
@@ -55,25 +104,25 @@ function WareHouseInput({ }) {
     setLocation_No("");
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow) {
-      setSelectedLocation({
-        label: selectedRow.location_no,
-        value: selectedRow.location_no,
-      });
-      setLocation_No(selectedRow.location_no || "");
-      setSelectedStatus({
-        label: selectedRow.status,
-        value: selectedRow.status,
-      });
-      setStatus(selectedRow.status || "");
-      setWarehouse_Code(selectedRow.warehouse_code || "");
-      setWarehouse_Name(selectedRow.warehouse_name || "");
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setSelectedLocation({
+  //       label: selectedRow.location_no,
+  //       value: selectedRow.location_no,
+  //     });
+  //     setLocation_No(selectedRow.location_no || "");
+  //     setSelectedStatus({
+  //       label: selectedRow.status,
+  //       value: selectedRow.status,
+  //     });
+  //     setStatus(selectedRow.status || "");
+  //     setWarehouse_Code(selectedRow.warehouse_code || "");
+  //     setWarehouse_Name(selectedRow.warehouse_name || "");
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
 
 
@@ -178,7 +227,8 @@ function WareHouseInput({ }) {
   const handleNavigate = () => {
     navigate("/Warehouse", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });

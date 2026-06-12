@@ -57,14 +57,18 @@ function RoleInfoGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
+
     if (location.state?.preservedInputs) {
       const inputs = location.state.preservedInputs;
       setrole_id(inputs.role_id || "");
       setrole_name(inputs.role_name || "");
 
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs);
+      }
     }
   }, [location.state]);
 
@@ -74,7 +78,7 @@ function RoleInfoGrid() {
     setRowData([]);
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -84,7 +88,11 @@ function RoleInfoGrid() {
           "Content-Type": "application/json",
           "company_code": company_code
         },
-        body: JSON.stringify({ company_code: company_code, role_id, role_name }) // Send company_no and company_name as search criteria
+        body: JSON.stringify({ 
+          company_code: company_code, 
+          role_id: searchParams?.role_id ?? role_id, 
+          role_name: searchParams?.role_name ?? role_name
+        }) 
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -379,16 +387,28 @@ function RoleInfoGrid() {
     navigate("/AddRole", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddRole", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+  //       preservedRowData: rowData,
+  //       preservedInputs: {
+  //         role_id,
+  //         role_name,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddRole", {
       state: {
         mode: "update",
-        selectedRow,
-        preservedRowData: rowData,
+        role_id: selectedRow.role_id,
         preservedInputs: {
           role_id,
           role_name,
-
         },
       },
     });

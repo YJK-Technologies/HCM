@@ -17,7 +17,6 @@ function DepartmentInput({ }) {
   const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const [isUpdated, setIsUpdated] = useState(false);
   const [key_field, setkey_field] = useState(false);
   const modified_by = sessionStorage.getItem("selectedUserCode");
   const created_by = sessionStorage.getItem("selectedUserCode");
@@ -34,12 +33,57 @@ function DepartmentInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const keyfields = location.state?.key_field;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && keyfields) {
+      fetchDepartmentData();
+    }
+  }, [mode, keyfields]);
+
+  const fetchDepartmentData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getDepartmentData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key_field: keyfields,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const department = data[0];
+
+        setDepartmentCode(department.dept_id || "");
+        setDepartmenntName(department.dept_name || "");
+        setkey_field(department.key_field || "");
+        setStatus(department.Status || "");
+        setSelectedStatus({
+          label: department.Status,
+          value: department.Status,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch department details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setDepartmentCode("");
@@ -75,22 +119,22 @@ function DepartmentInput({ }) {
     setStatus(selectedStatus ? selectedStatus.value : '');
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
 
-      setDepartmentCode(selectedRow.dept_id || "");
-      setDepartmenntName(selectedRow.dept_name || "");
-      setkey_field(selectedRow.key_field || "");
-      setStatus(selectedRow.Status || "");
-      setSelectedStatus({
-        label: selectedRow.Status,
-        value: selectedRow.Status,
-      });
+  //     setDepartmentCode(selectedRow.dept_id || "");
+  //     setDepartmenntName(selectedRow.dept_name || "");
+  //     setkey_field(selectedRow.key_field || "");
+  //     setStatus(selectedRow.Status || "");
+  //     setSelectedStatus({
+  //       label: selectedRow.Status,
+  //       value: selectedRow.Status,
+  //     });
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   const handleInsert = async () => {
     if (!departmentCode || !departmenntName || !status) {
@@ -165,7 +209,8 @@ function DepartmentInput({ }) {
   const handleNavigatesToForm = () => {
     navigate("/Department", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });

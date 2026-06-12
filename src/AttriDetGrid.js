@@ -58,16 +58,21 @@ function AttriDetGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setattributeheader_code(location.state.preservedInputs.attributeheader_code || "");
-      setattributedetails_code(location.state.preservedInputs.attributedetails_code || "");
-      setattributedetails_name(location.state.preservedInputs.attributedetails_name || "");
-      setdescriptions(location.state.preservedInputs.descriptions || "");
+      const inputs = location.state.preservedInputs;
 
+      setattributeheader_code(inputs.attributeheader_code || "");
+      setattributedetails_code(inputs.attributedetails_code || "");
+      setattributedetails_name(inputs.attributedetails_name || "");
+      setdescriptions(inputs.descriptions || "");
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
+      }
     }
   }, [location.state]);
 
@@ -83,7 +88,7 @@ function AttriDetGrid() {
     window.location.reload();
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
 
     try {
@@ -92,7 +97,13 @@ function AttriDetGrid() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ company_code: sessionStorage.getItem("selectedCompanyCode"), attributeheader_code, attributedetails_code, attributedetails_name, descriptions }), // Send as search criteria
+        body: JSON.stringify({ 
+          company_code: sessionStorage.getItem("selectedCompanyCode"), 
+          attributeheader_code: searchParams?.attributeheader_code ?? attributeheader_code,  
+          attributedetails_code: searchParams?.attributedetails_code ?? attributedetails_code, 
+          attributedetails_name: searchParams?.attributedetails_name ?? attributedetails_name, 
+          descriptions: searchParams?.descriptions ?? descriptions,  
+        }), 
       });
 
       if (response.ok) {
@@ -405,13 +416,30 @@ function AttriDetGrid() {
     navigate("/AddAttributeDetail", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddAttributeDetail", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         attributeheader_code,
+  //         attributedetails_code,
+  //         attributedetails_name,
+  //         descriptions,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddAttributeDetail", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
+        attributeheader_code: selectedRow.attributeheader_code,
+        attributedetails_code: selectedRow.attributedetails_code,
 
         preservedInputs: {
           attributeheader_code,
