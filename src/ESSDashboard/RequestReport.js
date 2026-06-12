@@ -137,6 +137,7 @@ function RequestReport({ }) {
         request_id: safeId,
         request_status: status,
         company_code: company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         RepManager: sessionStorage.getItem("selectedUserCode"),
       };
     }
