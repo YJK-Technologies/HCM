@@ -38,12 +38,65 @@ function UserScreenInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const keyfields = location.state?.keyfield;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && keyfields) {
+      fetchRoleRightsData();
+    }
+  }, [mode, keyfields]);
+
+  const fetchRoleRightsData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getRoleRightsData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keyfield: keyfields,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const roleRights = data[0];
+
+        setKeyfield(roleRights.keyfield || "");
+        setselectedpermissions({
+          label: roleRights.permission_type,
+          value: roleRights.permission_type,
+        });
+        setpermission_type(roleRights.permission_type);
+        setSelectedRole({
+          label: roleRights.role_id,
+          value: roleRights.role_id,
+        });
+        setrole_id(roleRights.role_id);
+        setselectedscreens({
+          label: roleRights.screen_type,
+          value: roleRights.screen_type,
+        });
+        setscreen_type(roleRights.screen_type);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch role rights details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setselectedpermissions("");
@@ -54,28 +107,28 @@ function UserScreenInput({ }) {
     setscreen_type("");
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      setKeyfield(selectedRow.keyfield || "");
-      setselectedpermissions({
-        label: selectedRow.permission_type,
-        value: selectedRow.permission_type,
-      });
-      setpermission_type(selectedRow.permission_type);
-      setSelectedRole({
-        label: selectedRow.role_id,
-        value: selectedRow.role_id,
-      });
-      setrole_id(selectedRow.role_id);
-      setselectedscreens({
-        label: selectedRow.screen_type,
-        value: selectedRow.screen_type,
-      });
-      setscreen_type(selectedRow.screen_type);
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setKeyfield(selectedRow.keyfield || "");
+  //     setselectedpermissions({
+  //       label: selectedRow.permission_type,
+  //       value: selectedRow.permission_type,
+  //     });
+  //     setpermission_type(selectedRow.permission_type);
+  //     setSelectedRole({
+  //       label: selectedRow.role_id,
+  //       value: selectedRow.role_id,
+  //     });
+  //     setrole_id(selectedRow.role_id);
+  //     setselectedscreens({
+  //       label: selectedRow.screen_type,
+  //       value: selectedRow.screen_type,
+  //     });
+  //     setscreen_type(selectedRow.screen_type);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -265,7 +318,8 @@ function UserScreenInput({ }) {
   const handleNavigate = () => {
     navigate("/UserRights", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs,
       },
     });

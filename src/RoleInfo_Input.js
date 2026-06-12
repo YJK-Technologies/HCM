@@ -23,13 +23,13 @@ function Role_input({ }) {
   const [loading, setLoading] = useState(false);
 
   const created_by = sessionStorage.getItem('selectedUserCode')
-
   const modified_by = sessionStorage.getItem("selectedUserCode");
-  const [isUpdated, setIsUpdated] = useState(false);
   const location = useLocation();
   const locationState = location.state || {};
-  const mode = locationState.mode || "create"; // ✅ default fallback
+  const mode = locationState.mode || "create";
   const selectedRow = locationState.selectedRow || null;
+  const roleId = location.state?.role_id;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
@@ -37,22 +37,60 @@ function Role_input({ }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (mode === "update" && roleId) {
+      fetchRoleData();
+    }
+  }, [mode, roleId]);
+
+  const fetchRoleData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getRoleData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          role_id: roleId,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const role = data[0];
+
+        setRole_id(role.role_id || "");
+        setRole_name(role.role_name || "");
+        setDescription(role.description || "");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch role details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearInputFields = () => {
     setRole_id("");
     setRole_name("");
     setDescription("");
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      setRole_id(selectedRow.role_id || "");
-      setRole_name(selectedRow.role_name || "");
-      setDescription(selectedRow.description || "");
-    }
-    else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setRole_id(selectedRow.role_id || "");
+  //     setRole_name(selectedRow.role_name || "");
+  //     setDescription(selectedRow.description || "");
+  //   }
+  //   else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   const handleInsert = async () => {
     if (
@@ -92,7 +130,7 @@ function Role_input({ }) {
         const errorResponse = await response.json();
         console.error(errorResponse.message);
         toast.warning(errorResponse.message);
-      } 
+      }
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
@@ -104,7 +142,8 @@ function Role_input({ }) {
   const handleNavigate = () => {
     navigate("/Role", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs,
       },
     });
@@ -112,25 +151,22 @@ function Role_input({ }) {
 
   const handleKeyDown = async (e, nextFieldRef, value, hasValueChanged, setHasValueChanged) => {
     if (e.key === 'Enter') {
-      // Check if the value has changed and handle the search logic
       if (hasValueChanged) {
-        await handleKeyDownStatus(e); // Trigger the search function
-        setHasValueChanged(false); // Reset the flag after the search
+        await handleKeyDownStatus(e);
+        setHasValueChanged(false);
       }
 
-      // Move to the next field if the current field has a valid value
       if (value) {
         nextFieldRef.current.focus();
       } else {
-        e.preventDefault(); // Prevent moving to the next field if the value is empty
+        e.preventDefault();
       }
     }
   };
 
   const handleKeyDownStatus = async (e) => {
-    if (e.key === 'Enter' && hasValueChanged) { // Only trigger search if the value has changed
-      // Trigger the search function
-      setHasValueChanged(false); // Reset the flag after search
+    if (e.key === 'Enter' && hasValueChanged) {
+      setHasValueChanged(false);
     }
   };
 

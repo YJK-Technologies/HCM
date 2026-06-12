@@ -62,20 +62,26 @@ function Desgination() {
     }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setdept_id(location.state.preservedInputs.dept_id || "");
-      setdesgination_id(location.state.preservedInputs.desgination_id || "");
-      setStatus(location.state.preservedInputs.status || "");
+      const inputs = location.state.preservedInputs;
 
-      if (location.state.preservedInputs.status) {
+      setdept_id(inputs.dept_id || "");
+      setdesgination_id(inputs.desgination_id || "");
+      setStatus(inputs.status || "");
+
+      if (inputs.status) {
         setSelectedStatus({
-          label: location.state.preservedInputs.status,
-          value: location.state.preservedInputs.status,
+          label: inputs.status,
+          value: inputs.status,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -134,7 +140,7 @@ function Desgination() {
     setHasValueChanged(true);
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     const company_code = sessionStorage.getItem('selectedCompanyCode')
     setLoading(true);
 
@@ -144,7 +150,12 @@ function Desgination() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ dept_id, desgination_id, status, company_code }) // Send company_no and company_name as search criteria
+        body: JSON.stringify({ 
+          dept_id: searchParams?.dept_id ?? dept_id, 
+          desgination_id: searchParams?.desgination_id ?? desgination_id, 
+          status: searchParams?.status ?? status, 
+          company_code 
+        })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -464,14 +475,28 @@ function Desgination() {
     navigate("/AddDesgination", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddDesgination", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         dept_id,
+  //         desgination_id,
+  //         status,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddDesgination", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
-
+        keyfield: selectedRow.keyfield,
         preservedInputs: {
           dept_id,
           desgination_id,

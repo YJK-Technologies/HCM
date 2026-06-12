@@ -42,6 +42,8 @@ function DesginationInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const keyfields = location.state?.keyfield;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
@@ -49,7 +51,51 @@ function DesginationInput({ }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (mode === "update" && keyfields) {
+      fetchDesignationData();
+    }
+  }, [mode, keyfields]);
 
+  const fetchDesignationData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getDesignationData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keyfield: keyfields,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const designation = data[0];
+
+        setdesgination_id(designation.desgination_id || "");
+        setdesgination(designation.desgination || "");
+        setkey_field(designation.keyfield || "");
+        setSelecteddept({
+          label: designation.dept_id,
+          value: designation.dept_id,
+        });
+        setSelectedStatus({
+          label: designation.status,
+          value: designation.status,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch designation info details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -172,26 +218,26 @@ function DesginationInput({ }) {
     setStatus("");
   }
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      setdesgination_id(selectedRow.desgination_id || "");
-      setdesgination(selectedRow.desgination || "");
-      setkey_field(selectedRow.keyfield || "");
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setdesgination_id(selectedRow.desgination_id || "");
+  //     setdesgination(selectedRow.desgination || "");
+  //     setkey_field(selectedRow.keyfield || "");
 
 
-      setSelecteddept({
-        label: selectedRow.dept_id,
-        value: selectedRow.dept_id,
-      });
-      setSelectedStatus({
-        label: selectedRow.status,
-        value: selectedRow.status,
-      });
+  //     setSelecteddept({
+  //       label: selectedRow.dept_id,
+  //       value: selectedRow.dept_id,
+  //     });
+  //     setSelectedStatus({
+  //       label: selectedRow.status,
+  //       value: selectedRow.status,
+  //     });
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   const handleUpdate = async () => {
     if (
@@ -247,7 +293,8 @@ function DesginationInput({ }) {
   const handleNavigate = () => {
     navigate("/DesgiantionInfo", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });

@@ -58,20 +58,26 @@ function Department() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setdept_id(location.state.preservedInputs.dept_id || "");
-      setdept_name(location.state.preservedInputs.dept_name || "");
-      setStatus(location.state.preservedInputs.status || "");
+      const inputs = location.state.preservedInputs;
+
+      setdept_id(inputs.dept_id || "");
+      setdept_name(inputs.dept_name || "");
+      setStatus(inputs.status || "");
       
-      if (location.state.preservedInputs.status) {
+      if (inputs.status) {
         setSelectedStatus({
-          label: location.state.preservedInputs.status,
-          value: location.state.preservedInputs.status,
+          label: inputs.status,
+          value: inputs.status,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -132,7 +138,7 @@ function Department() {
     setStatus(selectedStatus ? selectedStatus.value : '');
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     setLoading(true);
@@ -144,7 +150,12 @@ function Department() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ dept_id, dept_name, Status: status, company_code }), // Send  as search criteria
+          body: JSON.stringify({ 
+            dept_id: searchParams?.dept_id ?? dept_id, 
+            dept_name: searchParams?.dept_name ?? dept_name, 
+            Status: searchParams?.status ?? status, 
+            company_code 
+          }), 
         }
       );
       if (response.ok) {
@@ -442,13 +453,28 @@ function Department() {
     navigate("/AddDepartment", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddDepartment", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         dept_id,
+  //         dept_name,
+  //         status
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddDepartment", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
+        key_field: selectedRow.key_field,
 
         preservedInputs: {
           dept_id,
