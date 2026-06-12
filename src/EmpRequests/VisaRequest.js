@@ -181,6 +181,7 @@ function VisaRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((response) => response.json())
@@ -338,6 +339,7 @@ function VisaRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((response) => response.json())
@@ -520,6 +522,7 @@ function VisaRequest({ }) {
             },
             body: JSON.stringify({
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem('selectedLocationCode'),
             }),
         })
             .then((data) => data.json())

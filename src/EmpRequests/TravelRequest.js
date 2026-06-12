@@ -212,6 +212,7 @@ function TravelRequest({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -227,6 +228,7 @@ function TravelRequest({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())
@@ -557,6 +559,7 @@ function TravelRequest({ }) {
       body: JSON.stringify({
         // user_code: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
