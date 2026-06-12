@@ -68,27 +68,34 @@ function Grid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setstart_year(location.state.preservedInputs.start_year || "");
-      setend_year(location.state.preservedInputs.end_year || "");
-      setTransactionType(location.state.preservedInputs.transactionType || "");
-      setLockType(location.state.preservedInputs.LockType || "");
+      const inputs = location.state.preservedInputs;
 
-      if (location.state.preservedInputs.transactionType) {
+      setstart_year(inputs.start_year || "");
+      setend_year(inputs.end_year || "");
+      setTransactionType(inputs.transactionType || "");
+      setLockType(inputs.LockType || "");
+
+      if (inputs.transactionType) {
         setSelectedTransaction({
-          label: location.state.preservedInputs.transactionType,
-          value: location.state.preservedInputs.transactionType,
+          label: inputs.transactionType,
+          value: inputs.transactionType,
         });
       }
-      if (location.state.preservedInputs.LockType) {
+
+      if (inputs.LockType) {
         setSelectedLockType({
-          label: location.state.preservedInputs.LockType,
-          value: location.state.preservedInputs.LockType,
+          label: inputs.LockType,
+          value: inputs.LockType,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -184,7 +191,7 @@ function Grid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
       const response = await fetch(`${config.apiBaseUrl}/getFinacnialyearlockscreenSearchCriteria`, {
@@ -195,11 +202,11 @@ function Grid() {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
-          start_year: start_year,
-          end_year: end_year,
-          transaction_type: transactionType,
-          locked: LockType
-        }) // Send company_no and company_name as search criteria
+          start_year: searchParams?.start_year ?? start_year, 
+          end_year: searchParams?.end_year ?? end_year, 
+          transaction_type: searchParams?.transactionType ?? transactionType, 
+          locked: searchParams?.LockType ?? LockType, 
+        })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -613,14 +620,29 @@ function Grid() {
     navigate("/AddFYA", { state: { mode: "create" } });
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddFYA", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         start_year,
+  //         end_year,
+  //         transactionType,
+  //         LockType,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddFYA", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
-
+        keyfield: selectedRow.keyfield,
         preservedInputs: {
           start_year,
           end_year,

@@ -50,12 +50,82 @@ function IntermediaryDetailInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const codes = location.state?.Code;
+  const codeDetail = location.state?.codeDetails;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && codes && codeDetail) {
+      fetchIntermediaryData();
+    }
+  }, [mode, codes, codeDetail]);
+
+  const fetchIntermediaryData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getIntermediaryData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Code: codes,
+          codeDetails: codeDetail,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const intermediary = data[0];
+
+        setselectedState({
+          label: intermediary.intermediary_stat_code,
+          value: intermediary.intermediary_stat_code,
+        });
+        setSelectedCity({
+          label: intermediary.intermediary_area_code,
+          value: intermediary.intermediary_area_code,
+        });
+        setselectedCountry({
+          label: intermediary.intermediary_cnty_code,
+          value: intermediary.intermediary_cnty_code,
+        });
+        setSelectedHeader({
+          label: intermediary.Code,
+          value: intermediary.Code,
+        });
+        setCodeDetails(intermediary.codeDetails || "");
+        setIntermediary_Addr_1(intermediary.intermediary_addr_1 || "");
+        setIntermediary_Addr_2(intermediary.intermediary_addr_2 || "");
+        setIntermediary_Addr_3(intermediary.intermediary_addr_3 || "");
+        setIntermediary_Addr_4(intermediary.intermediary_addr_4 || "");
+        setIntermediary_Imex_No(intermediary.intermediary_imex_no || "");
+        setIntermediary_Office_No(intermediary.intermediary_office_no || "");
+        setIntermediary_Resi_No(intermediary.intermediary_resi_no || "");
+        setIntermediary_Mobile_No(intermediary.intermediary_mobile_no || "");
+        setIntermediary_Fax_No(intermediary.intermediary_fax_no || "");
+        setIntermediary_Email_Id(intermediary.intermediary_email_id || "");
+        setIntermediary_Stat_Code(intermediary.intermediary_stat_code || "");
+        setIntermediary_Area_Code(intermediary.intermediary_area_code || "");
+        setIntermediary_Cnty_Code(intermediary.intermediary_cnty_code || "");
+        setCode(intermediary.Code || "");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch intermediary details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setSelectedHeader("");
@@ -78,44 +148,44 @@ function IntermediaryDetailInput({ }) {
     setIntermediary_Email_Id("");
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      setselectedState({
-        label: selectedRow.intermediary_stat_code,
-        value: selectedRow.intermediary_stat_code,
-      });
-      setSelectedCity({
-        label: selectedRow.intermediary_area_code,
-        value: selectedRow.intermediary_area_code,
-      });
-      setselectedCountry({
-        label: selectedRow.intermediary_cnty_code,
-        value: selectedRow.intermediary_cnty_code,
-      });
-      setSelectedHeader({
-        label: selectedRow.Code,
-        value: selectedRow.Code,
-      });
-      setCodeDetails(selectedRow.codeDetails || "");
-      setIntermediary_Addr_1(selectedRow.intermediary_addr_1 || "");
-      setIntermediary_Addr_2(selectedRow.intermediary_addr_2 || "");
-      setIntermediary_Addr_3(selectedRow.intermediary_addr_3 || "");
-      setIntermediary_Addr_4(selectedRow.intermediary_addr_4 || "");
-      setIntermediary_Imex_No(selectedRow.intermediary_imex_no || "");
-      setIntermediary_Office_No(selectedRow.intermediary_office_no || "");
-      setIntermediary_Resi_No(selectedRow.intermediary_resi_no || "");
-      setIntermediary_Mobile_No(selectedRow.intermediary_mobile_no || "");
-      setIntermediary_Fax_No(selectedRow.intermediary_fax_no || "");
-      setIntermediary_Email_Id(selectedRow.intermediary_email_id || "");
-      setIntermediary_Stat_Code(selectedRow.intermediary_stat_code || "");
-      setIntermediary_Area_Code(selectedRow.intermediary_area_code || "");
-      setIntermediary_Cnty_Code(selectedRow.intermediary_cnty_code || "");
-      setCode(selectedRow.Code || "");
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setselectedState({
+  //       label: selectedRow.intermediary_stat_code,
+  //       value: selectedRow.intermediary_stat_code,
+  //     });
+  //     setSelectedCity({
+  //       label: selectedRow.intermediary_area_code,
+  //       value: selectedRow.intermediary_area_code,
+  //     });
+  //     setselectedCountry({
+  //       label: selectedRow.intermediary_cnty_code,
+  //       value: selectedRow.intermediary_cnty_code,
+  //     });
+  //     setSelectedHeader({
+  //       label: selectedRow.Code,
+  //       value: selectedRow.Code,
+  //     });
+  //     setCodeDetails(selectedRow.codeDetails || "");
+  //     setIntermediary_Addr_1(selectedRow.intermediary_addr_1 || "");
+  //     setIntermediary_Addr_2(selectedRow.intermediary_addr_2 || "");
+  //     setIntermediary_Addr_3(selectedRow.intermediary_addr_3 || "");
+  //     setIntermediary_Addr_4(selectedRow.intermediary_addr_4 || "");
+  //     setIntermediary_Imex_No(selectedRow.intermediary_imex_no || "");
+  //     setIntermediary_Office_No(selectedRow.intermediary_office_no || "");
+  //     setIntermediary_Resi_No(selectedRow.intermediary_resi_no || "");
+  //     setIntermediary_Mobile_No(selectedRow.intermediary_mobile_no || "");
+  //     setIntermediary_Fax_No(selectedRow.intermediary_fax_no || "");
+  //     setIntermediary_Email_Id(selectedRow.intermediary_email_id || "");
+  //     setIntermediary_Stat_Code(selectedRow.intermediary_stat_code || "");
+  //     setIntermediary_Area_Code(selectedRow.intermediary_area_code || "");
+  //     setIntermediary_Cnty_Code(selectedRow.intermediary_cnty_code || "");
+  //     setCode(selectedRow.Code || "");
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
 
   const Address3 = useRef(null);
@@ -157,7 +227,7 @@ function IntermediaryDetailInput({ }) {
     setSelectedHeader(selectedHeader);
     setCode(selectedHeader ? selectedHeader.value : '');
   };
-  
+
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
 
@@ -330,7 +400,8 @@ function IntermediaryDetailInput({ }) {
   const handleNavigate = () => {
     navigate("/Intermediary", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });

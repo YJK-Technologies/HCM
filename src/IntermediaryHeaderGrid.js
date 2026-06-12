@@ -65,21 +65,27 @@ function IntermediaryGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setcode(location.state.preservedInputs.Code || "");
-      setcodeDetails(location.state.preservedInputs.codeDetails || "");
-      setintermediary_addr_1(location.state.preservedInputs.intermediary_addr_1 || "");
-      setintermediary_area_code(location.state.preservedInputs.intermediary_area_code || "");
-      setintermediary_stat_code(location.state.preservedInputs.intermediary_stat_code || "");
-      setintermediary_cnty_code(location.state.preservedInputs.intermediary_cnty_code || "");
-      setintermediary_imex_no(location.state.preservedInputs.intermediary_imex_no || "");
-      setintermediary_office_no(location.state.preservedInputs.intermediary_office_no || "");
-      setintermediary_fax_no(location.state.preservedInputs.intermediary_fax_no || "");
-      setintermediary_email_id(location.state.preservedInputs.intermediary_email_id || "");
+      const inputs = location.state.preservedInputs;
+
+      setcode(inputs.Code || "");
+      setcodeDetails(inputs.codeDetails || "");
+      setintermediary_addr_1(inputs.intermediary_addr_1 || "");
+      setintermediary_area_code(inputs.intermediary_area_code || "");
+      setintermediary_stat_code(inputs.intermediary_stat_code || "");
+      setintermediary_cnty_code(inputs.intermediary_cnty_code || "");
+      setintermediary_imex_no(inputs.intermediary_imex_no || "");
+      setintermediary_office_no(inputs.intermediary_office_no || "");
+      setintermediary_fax_no(inputs.intermediary_fax_no || "");
+      setintermediary_email_id(inputs.intermediary_email_id || "");
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
+      }
     }
   }, [location.state]);
 
@@ -101,7 +107,7 @@ function IntermediaryGrid() {
     window.location.reload();
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -112,9 +118,18 @@ function IntermediaryGrid() {
           "company_code": company_code
         },
         body: JSON.stringify({
-          company_code: company_code, Code, codeDetails, intermediary_addr_1, intermediary_area_code, intermediary_stat_code, intermediary_cnty_code, intermediary_imex_no, intermediary_office_no,
-          intermediary_fax_no, intermediary_email_id
-        }) // Send company_no and company_name as search criteria
+          company_code: company_code, 
+          Code: searchParams?.Code ?? Code,
+          codeDetails: searchParams?.codeDetails ?? codeDetails, 
+          intermediary_addr_1: searchParams?.intermediary_addr_1 ?? intermediary_addr_1,
+          intermediary_area_code: searchParams?.intermediary_area_code ?? intermediary_area_code, 
+          intermediary_stat_code: searchParams?.intermediary_stat_code ?? intermediary_stat_code, 
+          intermediary_cnty_code: searchParams?.intermediary_cnty_code ?? intermediary_cnty_code, 
+          intermediary_imex_no: searchParams?.intermediary_imex_no ?? intermediary_imex_no, 
+          intermediary_office_no: searchParams?.intermediary_office_no ?? intermediary_office_no,
+          intermediary_fax_no: searchParams?.intermediary_fax_no ?? intermediary_fax_no,
+          intermediary_email_id: searchParams?.intermediary_email_id ?? intermediary_email_id,
+        }) 
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -554,14 +569,36 @@ function IntermediaryGrid() {
     navigate("/AddIntermedDetails", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddIntermedDetails", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         Code,
+  //         codeDetails,
+  //         intermediary_addr_1,
+  //         intermediary_area_code,
+  //         intermediary_stat_code,
+  //         intermediary_cnty_code,
+  //         intermediary_imex_no,
+  //         intermediary_office_no,
+  //         intermediary_fax_no,
+  //         intermediary_email_id
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddIntermedDetails", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
-
+        Code: selectedRow.Code,
+        codeDetails: selectedRow.codeDetails,
         preservedInputs: {
           Code,
           codeDetails,

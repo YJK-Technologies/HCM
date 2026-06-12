@@ -520,11 +520,25 @@ function CompanyMappingGrid() {
     navigate("/AddCompanyMapping", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddCompanyMapping", {
+  //     state: {
+  //       mode: "update", selectedRow, preservedRowData: rowData,
+  //       preservedInputs: { user_code, company_no, location_no, status }
+  //     }
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddCompanyMapping", {
       state: {
-        mode: "update", selectedRow, preservedRowData: rowData,
-        preservedInputs: { user_code, company_no, location_no, status }
+        mode: "update", keyfiels: selectedRow.keyfiels, 
+        preservedInputs: { 
+          user_code, 
+          company_no, 
+          location_no, 
+          status 
+        }
       }
     });
   };

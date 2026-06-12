@@ -64,21 +64,27 @@ function WarehouseGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setwarehouse_code(location.state.preservedInputs.warehouse_code || "");
-      setwarehouse_name(location.state.preservedInputs.warehouse_name || "");
-      setstatus(location.state.preservedInputs.status || "");
-      setlocation_no(location.state.preservedInputs.location_no || "");
+      const inputs = location.state.preservedInputs;
 
-      if (location.state.preservedInputs.status) {
+      setwarehouse_code(inputs.warehouse_code || "");
+      setwarehouse_name(inputs.warehouse_name || "");
+      setstatus(inputs.status || "");
+      setlocation_no(inputs.location_no || "");
+
+      if (inputs.status) {
         setSelectedStatus({
-          label: location.state.preservedInputs.status,
-          value: location.state.preservedInputs.status,
+          label: inputs.status,
+          value: inputs.status,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -148,7 +154,7 @@ function WarehouseGrid() {
     setstatus(selectedStatus ? selectedStatus.value : '');
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -158,7 +164,13 @@ function WarehouseGrid() {
           "Content-Type": "application/json",
           "company_code": company_code
         },
-        body: JSON.stringify({ company_code: company_code, warehouse_code, warehouse_name, status, location_no }) // Send company_no and company_name as search criteria
+        body: JSON.stringify({ 
+          company_code,
+          warehouse_code: searchParams?.warehouse_code ?? warehouse_code, 
+          warehouse_name: searchParams?.warehouse_name ?? warehouse_name, 
+          status: searchParams?.status ?? status, 
+          location_no: searchParams?.location_no ?? location_no,  
+        }) 
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -504,13 +516,29 @@ function WarehouseGrid() {
     navigate("/AddWarehouse", { state: { mode: "create" } });
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddWarehouse", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         warehouse_code,
+  //         warehouse_name,
+  //         status,
+  //         location_no,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddWarehouse", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
+        warehouse_code: selectedRow.warehouse_code,
 
         preservedInputs: {
           warehouse_code,

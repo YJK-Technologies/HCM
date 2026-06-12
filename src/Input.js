@@ -83,6 +83,12 @@ function Input({ }) {
   const companyNo = location.state?.company_no;
 
   useEffect(() => {
+    if (!location.state) {
+      clearInputFields(); 
+    }
+  }, []);
+
+  useEffect(() => {
     if (mode === "update" && companyNo) {
       fetchCompanyData();
     }
@@ -596,7 +602,7 @@ function Input({ }) {
     navigate("/Company", {
       state: {
         refreshGrid: true,
-        preservedRowData: location.state?.preservedRowData,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });
