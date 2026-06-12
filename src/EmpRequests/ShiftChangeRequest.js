@@ -335,6 +335,7 @@ const ShiftChangeRequest = () => {
                 },
                 body: JSON.stringify({
                     company_code: sessionStorage.getItem('selectedCompanyCode'),
+                    Location_Code: sessionStorage.getItem('selectedLocationCode'),
                     employee_id: sessionStorage.getItem('selectedUserCode'),
                     shift_from_date: effectiveFromDate ? effectiveFromDate : null,
                     shift_to_date: effectiveToDate ? effectiveToDate : null,
