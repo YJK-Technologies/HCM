@@ -270,6 +270,7 @@ function Project({ }) {
       body: JSON.stringify({
         // user_code: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
@@ -286,6 +287,7 @@ function Project({ }) {
       body: JSON.stringify({
         // user_code: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())

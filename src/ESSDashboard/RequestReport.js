@@ -137,6 +137,7 @@ function RequestReport({ }) {
         request_id: safeId,
         request_status: status,
         company_code: company_code,
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         RepManager: sessionStorage.getItem("selectedUserCode"),
       };
     }
@@ -269,6 +270,7 @@ function RequestReport({ }) {
         body = {
           request_id: id,
           company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           request_status: status,
           modified_by: sessionStorage.getItem('selectedUserCode'),
         };
@@ -1484,7 +1486,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
     })
       .then((data) => data.json())
       .then((val) => setManagerDropTravelSc(val));
@@ -3979,6 +3981,7 @@ function RequestReport({ }) {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           employee_id: searchEmpId,
           RepManager: sessionStorage.getItem('selectedUserCode'),
           shift_from_date: effectiveFromDate,
