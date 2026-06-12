@@ -1068,6 +1068,7 @@ const Dashboard = () => {
           body: JSON.stringify({
             RepManager: user_code,
             CompanyCode: company_code,
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
           }),
         });
 
@@ -1344,6 +1345,7 @@ const Dashboard = () => {
           ApprovedBy: approver,
           CompanyCode: company_code,
           modified_by: sessionStorage.getItem("selectedUserCode"),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           Keyfield: id,
         };
       }

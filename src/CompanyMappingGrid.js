@@ -70,21 +70,24 @@ function CompanyMappingGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
-
     if (location.state?.preservedInputs) {
-      setuser_code(location.state.preservedInputs.user_code || "");
-      setcompany_no(location.state.preservedInputs.company_no || "");
-      setlocation_no(location.state.preservedInputs.location_no || "");
-      setstatus(location.state.preservedInputs.status || "");
 
-      if (location.state.preservedInputs.status) {
+      const inputs = location.state.preservedInputs;
+
+      setuser_code(inputs.user_code || "");
+      setcompany_no(inputs.company_no || "");
+      setlocation_no(inputs.location_no || "");
+      setstatus(inputs.status || "");
+
+      if (inputs.status) {
         setSelectedStatus({
-          label: location.state.preservedInputs.status,
-          value: location.state.preservedInputs.status,
+          label: inputs.status,
+          value: inputs.status,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -171,23 +174,22 @@ function CompanyMappingGrid() {
     setHasValueChanged(true);
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
-      const response = await fetch(
-        `${config.apiBaseUrl}/companymappingsearchdata`,
+      const response = await fetch(`${config.apiBaseUrl}/companymappingsearchdata`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            company_no,
-            user_code,
+            company_no: searchParams?.company_no ?? company_no,
+            user_code: searchParams?.user_code ?? user_code,
             company_code,
-            location_no,
-            status,
+            location_no: searchParams?.location_no ?? location_no,
+            status: searchParams?.status ?? status,
           }),
         }
       );
@@ -297,7 +299,7 @@ function CompanyMappingGrid() {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
+    wrapText: false,
     editable: true,
   };
 

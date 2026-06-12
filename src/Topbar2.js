@@ -38,7 +38,7 @@ const TopBar = () => {
     try {
       const payload = {
         company_code: company_code,
-        Location_Code: sessionStorage.getItem('selectedLocationCode'),  // For VisaRequest, TravelRequest, LeaveRequest, loanRequest
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),  // For VisaRequest, TravelRequest, LeaveRequest, loanRequest, compOffRequest
         CompanyCode: company_code,   // For CompOff 
         employee_id: user_code,      // For Loan, Visa, Travel, Shift
         EmployeeId: user_code,       // For Leave & CompOff
@@ -432,7 +432,8 @@ const TopBar = () => {
           HolidayDate: holidayDate,
           Keyfield: keyField,
           is_notification_seen: 1,
-          CompanyCode: sessionStorage.getItem('selectedCompanyCode')
+          CompanyCode: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
         }),
       });
 
