@@ -98,6 +98,7 @@ if (!form.reason.trim()) newErrors.reason = true;
             swap_employee_id: form.swap_employee_id?.value || '',
             effective_date: rowData?.Date,
             company_code: sessionStorage.getItem('selectedCompanyCode'),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
             RepManager: form.rep_manager?.value,
             created_by: sessionStorage.getItem('selectedUserCode'),
             screen_type: screenType   // ✅ important
