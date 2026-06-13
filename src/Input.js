@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Select from 'react-select'
 import LoadingScreen from './Loading';
+import Logo from './DefaultImages/Logo.PNG';
+import Signature from './DefaultImages/Signature.png';
 
 const config = require('./Apiconfig');
 
@@ -41,8 +43,8 @@ function Input({ }) {
   const [selectedCountry, setselectedCountry] = useState('');
   const [selectedStatus, setselectedStatus] = useState('');
   const [selectedLocation, setselectedLocation] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedSignatureImage, setselectedSignatureImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(Logo);
+  const [selectedSignatureImage, setselectedSignatureImage] = useState(Signature);
   const [isSelectCity, setIsSelectCity] = useState(false);
   const [isSelectState, setIsSelectState] = useState(false);
   const [isSelectCountry, setIsSelectCountry] = useState(false);
@@ -207,14 +209,14 @@ function Input({ }) {
     setWebsiteURL("");
     setContact_no("");
     setAnnualReportURL("");
-    setSelectedImage("");
+    setSelectedImage(Logo);
     setcompany_gst_no("")
     setCity('');
     setState('');
     setCountry('');
     setStatus('');
     setlocation_no('');
-    setselectedSignatureImage("");
+    setselectedSignatureImage(Signature);
     if (logo.current) {
       logo.current.value = null;
     }
@@ -1125,7 +1127,7 @@ function Input({ }) {
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedImage}
+                      src={selectedImage || Logo}
                       alt="Uploaded Logo"
                       className="uploaded-image"
                     />
@@ -1171,7 +1173,7 @@ function Input({ }) {
                 {selectedSignatureImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedSignatureImage}
+                      src={selectedSignatureImage || Signature}
                       alt="Uploaded Signature"
                       className="uploaded-image"
                     />

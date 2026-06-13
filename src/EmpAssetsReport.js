@@ -86,6 +86,8 @@ function EmpAssetsReport({ }) {
 
   const [EmployeeIDDropGrid, setEmployeeIDDropGrid] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const empAssetsReportPermissions = permissions
     .filter((permission) => permission.screen_type === "EmpAssetsReport")
@@ -247,7 +249,7 @@ function EmpAssetsReport({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         });
 
         if (!response.ok) {

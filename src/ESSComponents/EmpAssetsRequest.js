@@ -32,6 +32,8 @@ function EmployeeAssets({ }) {
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const [Managerdrop, setManagerdrop] = useState([]);
   const [isSelectRepManager, setIsSelectRepManager] = useState({});
 
@@ -342,8 +344,7 @@ function EmployeeAssets({ }) {
             created_by,
           };
 
-          const headerRes = await fetch(
-            `${config.apiBaseUrl}/AssetRequestHdr`,
+          const headerRes = await fetch(`${config.apiBaseUrl}/AssetRequestHdr`,
             {
               method: "POST",
               headers: {
@@ -670,7 +671,7 @@ function EmployeeAssets({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         });
 
         if (!response.ok) {
