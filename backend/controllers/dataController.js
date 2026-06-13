@@ -46964,7 +46964,7 @@ const DashboardCompOffRequest = async (req, res) => {
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode, @Location_Code, 0,'','','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,0,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48632,7 +48632,7 @@ const getComOffNotification = async (req, res) => {
 };
 
 const compOffNotificationSeen = async (req, res) => {
-  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode,Location_Code, Keyfield } = req.body;
+  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode,Location_Codev, Keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
