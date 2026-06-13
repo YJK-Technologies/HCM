@@ -76,25 +76,31 @@ function BankAccGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setaccount_code(location.state.preservedInputs.account_code || "");
-      setaccount_name(location.state.preservedInputs.account_name || "");
-      setacc_addr_1(location.state.preservedInputs.acc_addr_1 || "");
-      setacc_area_code(location.state.preservedInputs.acc_area_code || "");
-      setacc_state_code(location.state.preservedInputs.acc_state_code || "");
-      setacc_country_code(location.state.preservedInputs.acc_country_code || "");
-      setbranch(location.state.preservedInputs.branch || "");
-      setaccount_type(location.state.preservedInputs.account_type || "");
+      const inputs = location.state.preservedInputs;
 
-      if (location.state.preservedInputs.account_type) {
+      setaccount_code(inputs.account_code || "");
+      setaccount_name(inputs.account_name || "");
+      setacc_addr_1(inputs.acc_addr_1 || "");
+      setacc_area_code(inputs.acc_area_code || "");
+      setacc_state_code(inputs.acc_state_code || "");
+      setacc_country_code(inputs.acc_country_code || "");
+      setbranch(inputs.branch || "");
+      setaccount_type(inputs.account_type || "");
+
+      if (inputs.account_type) {
         setselectedAcctype({
-          label: location.state.preservedInputs.account_type,
-          value: location.state.preservedInputs.account_type,
+          label: inputs.account_type,
+          value: inputs.account_type,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -217,7 +223,7 @@ function BankAccGrid() {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/getbankaccSearch`, {
@@ -226,7 +232,15 @@ function BankAccGrid() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          company_code: sessionStorage.getItem('selectedCompanyCode'), account_code, account_name, acc_addr_1, acc_area_code, acc_state_code, acc_country_code, account_type, branch
+          company_code: sessionStorage.getItem('selectedCompanyCode'), 
+          account_code: searchParams?.account_code ?? account_code,  
+          account_name: searchParams?.account_name ?? account_name, 
+          acc_addr_1: searchParams?.acc_addr_1 ?? acc_addr_1, 
+          acc_area_code: searchParams?.acc_area_code ?? acc_area_code,  
+          acc_state_code: searchParams?.acc_state_code ?? acc_state_code,  
+          acc_country_code: searchParams?.acc_country_code ?? acc_country_code, 
+          account_type: searchParams?.account_type ?? account_type,  
+          branch: searchParams?.branch ?? branch, 
         })
       });
       if (response.ok) {
@@ -698,13 +712,33 @@ function BankAccGrid() {
     navigate("/AddBankAccount", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddBankAccount", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         account_code,
+  //         account_name,
+  //         acc_addr_1,
+  //         acc_area_code,
+  //         acc_state_code,
+  //         acc_country_code,
+  //         branch,
+  //         account_type
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddBankAccount", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
+        account_code: selectedRow.account_code,
 
         preservedInputs: {
           account_code,

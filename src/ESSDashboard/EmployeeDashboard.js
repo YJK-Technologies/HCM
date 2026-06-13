@@ -141,7 +141,8 @@ const Dashboard = (payslip) => {
     S3: {label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6", },
     S4: {label: "Night Shift", icon: "fa-moon", color: "#1e293b", },
     S5: {label: "Split Shift", icon: "fa-clock", color: "#ec4899", },
-    S6: {label: "Week Off",icon: "fa-couch",color: "#22c55e",},};
+    S6: {label: "Week Off",icon: "fa-couch",color: "#22c55e",},
+  };
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");

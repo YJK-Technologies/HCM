@@ -62,18 +62,23 @@ function NumberSeriesGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setScreen_Type(location.state.preservedInputs.Screen_Type || "");
+      const inputs = location.state.preservedInputs;
 
-      if (location.state.preservedInputs.Screen_Type) {
+      setScreen_Type(inputs.Screen_Type || "");
+      if (inputs.Screen_Type) {
         setselectedscreentype({
-          label: location.state.preservedInputs.Screen_Type,
-          value: location.state.preservedInputs.Screen_Type,
+          label: inputs.Screen_Type,
+          value: inputs.Screen_Type,
         });
+      }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
       }
     }
   }, [location.state]);
@@ -152,7 +157,7 @@ function NumberSeriesGrid() {
     window.location.reload();
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -161,10 +166,11 @@ function NumberSeriesGrid() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            company_code: company_code,
-            Screen_Type: Screen_Type,
           },
-          body: JSON.stringify({ company_code: company_code, Screen_Type: Screen_Type }), // Send company_no and company_name as search criteria
+          body: JSON.stringify({ 
+            company_code,
+            Screen_Type: searchParams?.Screen_Type ?? Screen_Type, 
+          }), 
         }
       );
       if (response.ok) {
@@ -197,10 +203,8 @@ function NumberSeriesGrid() {
       cellClass: "ag-link-cell",
       //  editable: true,
       cellStyle: { textAlign: "left" },
-
       // minWidth: 250,
       // maxWidth: 250,
-
       cellRenderer: (params) => {
         const handleClick = () => {
           handleNavigateWithRowData(params.data);
@@ -525,14 +529,28 @@ function NumberSeriesGrid() {
     navigate("/AddNumberSeries", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddNumberSeries", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         Screen_Type,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddNumberSeries", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
-
+        Screen_Type: selectedRow.Screen_Type,
+        Start_Year: selectedRow.Start_Year,
+        End_Year: selectedRow.End_Year,
         preservedInputs: {
           Screen_Type,
         },

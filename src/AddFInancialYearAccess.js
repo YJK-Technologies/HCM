@@ -39,12 +39,62 @@ function StdAccInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const keyfields = location.state?.keyfield;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && keyfields) {
+      fetchFinancialYearAccessData();
+    }
+  }, [mode, keyfields]);
+
+  const fetchFinancialYearAccessData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getFinancialYearAccessData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keyfield: keyfields,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const financialYearAccess = data[0];
+
+        setStartYear(financialYearAccess.start_year || "");
+        setEndYear(financialYearAccess.end_year || "");
+        setTransactionType(financialYearAccess.transaction_type || "");
+        setLockType(financialYearAccess.locked || "");
+        setKeyfield(financialYearAccess.keyfield || "");
+        setSelectedTransaction({
+          label: financialYearAccess.transaction_type,
+          value: financialYearAccess.transaction_type,
+        });
+        setSelectedLockType({
+          label: financialYearAccess.locked,
+          value: financialYearAccess.locked,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch financial year access details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setStartYear("");
@@ -56,39 +106,39 @@ function StdAccInput({ }) {
   };
 
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      if (selectedRow.start_year) {
-        const formattedStartYear = new Date(selectedRow.start_year).toISOString().split("T")[0];
-        setStartYear(formattedStartYear);
-      } else {
-        setStartYear("");
-      }
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     if (selectedRow.start_year) {
+  //       const formattedStartYear = new Date(selectedRow.start_year).toISOString().split("T")[0];
+  //       setStartYear(formattedStartYear);
+  //     } else {
+  //       setStartYear("");
+  //     }
 
-      if (selectedRow.end_year) {
-        const formattedEndYear = new Date(selectedRow.end_year).toISOString().split("T")[0];
-        setEndYear(formattedEndYear);
-      } else {
-        setEndYear("");
-      }
-      setTransactionType(selectedRow.transaction_type || "");
-      setLockType(selectedRow.locked || "");
-      setKeyfield(selectedRow.keyfield || "");
+  //     if (selectedRow.end_year) {
+  //       const formattedEndYear = new Date(selectedRow.end_year).toISOString().split("T")[0];
+  //       setEndYear(formattedEndYear);
+  //     } else {
+  //       setEndYear("");
+  //     }
+  //     setTransactionType(selectedRow.transaction_type || "");
+  //     setLockType(selectedRow.locked || "");
+  //     setKeyfield(selectedRow.keyfield || "");
 
-      setSelectedTransaction({
-        label: selectedRow.transaction_type,
-        value: selectedRow.transaction_type,
-      });
-      setSelectedLockType({
-        label: selectedRow.locked,
-        value: selectedRow.locked,
-      });
+  //     setSelectedTransaction({
+  //       label: selectedRow.transaction_type,
+  //       value: selectedRow.transaction_type,
+  //     });
+  //     setSelectedLockType({
+  //       label: selectedRow.locked,
+  //       value: selectedRow.locked,
+  //     });
 
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   const getFinancialYearDates = () => {
     const now = new Date();
@@ -144,7 +194,7 @@ function StdAccInput({ }) {
     setSelectedLockType(selectedLockType);
     setLockType(selectedLockType ? selectedLockType.value : '');
   };
-  
+
   const filteredOptionLockType = Array.isArray(Lockdrop)
     ? Lockdrop.map((option) => ({
       value: option.attributedetails_name,
@@ -297,7 +347,8 @@ function StdAccInput({ }) {
   const handleNavigate = () => {
     navigate("/FinancialYearAccess", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });

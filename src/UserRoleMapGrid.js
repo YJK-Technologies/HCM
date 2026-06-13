@@ -61,15 +61,21 @@ function UserRoleGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
     if (location.state?.preservedInputs) {
-      setuser_code(location.state.preservedInputs.user_code || "");
-      setuser_name(location.state.preservedInputs.user_name || "");
-      setrole_id(location.state.preservedInputs.role_id || "");
-      setrole_name(location.state.preservedInputs.role_name || "");
+      const inputs = location.state.preservedInputs;
+
+      setuser_code(inputs.user_code || "");
+      setuser_name(inputs.user_name || "");
+      setrole_id(inputs.role_id || "");
+      setrole_name(inputs.role_name || "");
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs);
+      }
     }
   }, [location.state]);
 
@@ -114,7 +120,7 @@ function UserRoleGrid() {
     window.location.reload();
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -124,7 +130,13 @@ function UserRoleGrid() {
           "Content-Type": "application/json",
           company_code: company_code,
         },
-        body: JSON.stringify({ company_code, user_code, user_name, role_id, role_name }) // Send user_no and user_name as search criteria
+        body: JSON.stringify({
+          company_code,
+          user_code: searchParams?.user_code ?? user_code,
+          user_name: searchParams?.user_name ?? user_name,
+          role_id: searchParams?.role_id ?? role_id,
+          role_name: searchParams?.role_name ?? role_name,
+        })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -431,14 +443,29 @@ function UserRoleGrid() {
     navigate("/AddUserRoleMapping", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddUserRoleMapping", {
+  //     state: {
+  //       mode: "update",
+  //       selectedRow,
+
+  //       preservedRowData: rowData,
+
+  //       preservedInputs: {
+  //         user_code,
+  //         user_name,
+  //         role_id,
+  //         role_name,
+  //       },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddUserRoleMapping", {
       state: {
         mode: "update",
-        selectedRow,
-
-        preservedRowData: rowData,
-
+        keyfield: selectedRow.keyfield,
         preservedInputs: {
           user_code,
           user_name,
