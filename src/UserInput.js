@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from './Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import UserProfile from './DefaultImages/User.png';
 
 const config = require('./Apiconfig');
 
@@ -32,7 +33,7 @@ function UserInput({ }) {
   const [Loginoroutdrop, setLoginoroutdrop] = useState([]);
   const [error, setError] = useState(false);
   const [user_images, setuser_image] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(UserProfile);
   const navigate = useNavigate();
   const usercode = useRef(null);
   const username = useRef(null);
@@ -176,7 +177,7 @@ function UserInput({ }) {
     setEmail_id("");
     setDob("");
     setUser_password("");
-    setSelectedImage("");
+    setSelectedImage(UserProfile);
     if (ImagE.current) {
       ImagE.current.value = null;
     }
@@ -928,7 +929,7 @@ function UserInput({ }) {
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedImage}
+                      src={selectedImage || UserProfile}
                       alt="Uploaded Signature"
                       className="uploaded-image"
                     />

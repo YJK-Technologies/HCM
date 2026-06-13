@@ -65,6 +65,8 @@ function EmpFamPersonalDetail({ }) {
 
   const [Managerdrop, setManagerdrop] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const familyPermissions = permissions
@@ -195,6 +197,7 @@ function EmpFamPersonalDetail({ }) {
             purpose: purpose,
             request_status: "Pending",
             created_by,
+            Location_Code
           };
 
           const headerRes = await fetch(`${config.apiBaseUrl}/FamilyRequestHdr`,
@@ -248,25 +251,24 @@ function EmpFamPersonalDetail({ }) {
         group.members.map((row) => ({
           info_request_id,
           company_code,
+          Location_Code,
           EmployeeId,
           request_status: "Pending",
-
           Relation: row.relationName,
           Name: row.name,
-          DOB: row.dob || null,
-          AGE: row.Age || null,
+          DOB: row.dob,
+          AGE: row.Age,
           aadhar_no: row.aadharNo,
           Sex: row.sex,
           Nationality: row.nationality,
           CPR_No: row.CRPNo,
-          CPR_Expiry_Date: row.CRP_ExpiryDate || null,
+          CPR_Expiry_Date: row.CRP_ExpiryDate,
           Passport_No: row.passportNo,
-          Passport_Expiry_Date: row.passportExpiryDate || null,
-          Visa_Entitled: row.visaEntitled || 0,
-          Visa_Expiry_Date: row.visaExpiryDate || null,
+          Passport_Expiry_Date: row.passportExpiryDate,
+          Visa_Entitled: row.visaEntitled,
+          Visa_Expiry_Date: row.visaExpiryDate,
           Air_Ticket_Entitled: row.airTicketEntitled === "1" ? true : false,
           RepManager: row.RepManager,
-
           created_by,
         })),
       );
@@ -351,7 +353,8 @@ function EmpFamPersonalDetail({ }) {
           const formattedvisaExpiryDate = formatDate(Visa_Expiry_Date);
 
           const airTicketValue = Air_Ticket_Entitled === true ? "1" : "0";
-          console.log(Visa_Entitled);
+          const visaEntitledValue = Visa_Entitled === true ? "1" : "0";
+          
           const memberData = {
             relationName: Relation || "",
             selectRelation: Relation
@@ -368,9 +371,9 @@ function EmpFamPersonalDetail({ }) {
             selectNationality: Nationality
               ? { value: Nationality, label: Nationality }
               : null,
-            visaEntitled: Visa_Entitled || "",
-            selectVisa: Visa_Entitled
-              ? { value: Visa_Entitled, label: Visa_Entitled }
+            visaEntitled: visaEntitledValue || "",
+            selectVisa: visaEntitledValue
+              ? { value: visaEntitledValue, label: visaEntitledValue }
               : null,
             airTicketEntitled: airTicketValue || "",
             selectAirTicket: airTicketValue

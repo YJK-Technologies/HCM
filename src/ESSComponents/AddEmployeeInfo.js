@@ -174,6 +174,7 @@ function Input({ }) {
       toast.warning("Please enter a valid email business");
       return;
     }
+
     setError(false);
     setLoading(true);
 
@@ -202,7 +203,7 @@ function Input({ }) {
       formData.append("Siblings", Siblings);
       formData.append("Kids", selectedkids);
       formData.append("Status", Status);
-      formData.append("Grade_id", selectedgradeid);
+      formData.append("Grade_id", selectedgradeid ? selectedgradeid : 0);
       formData.append("City", city);
       formData.append("State", state);
       formData.append("Country", country);
@@ -211,8 +212,8 @@ function Input({ }) {
       formData.append("Emergency_Contact_Relationship", emergencyContactRelation);
       formData.append("Emergency_Contact_Name", emergencyContactName);
       formData.append("Email_Business", businessEmail);
-      formData.append("Number_of_Children", noOfChildren);
-      formData.append("Number_of_Siblings", noOfSiblings);
+      formData.append("Number_of_Children", noOfChildren ? noOfChildren : 0);
+      formData.append("Number_of_Siblings", noOfSiblings ? noOfSiblings : 0);
       formData.append("Spouse_Name", spouseName);
       formData.append("Other_Id_No", otherIdNo);
       formData.append("Blood_Group", bloodGroup);
@@ -399,7 +400,7 @@ function Input({ }) {
           formData.append("Marital_Status", selectedmartial);
           formData.append("Kids", selectedkids);
           formData.append("Status", Status);
-          formData.append("Grade_id", selectedgradeid);
+          formData.append("Grade_id", selectedgradeid ? selectedgradeid : 0);
           formData.append("City", city);
           formData.append("State", state);
           formData.append("Country", country);
@@ -408,8 +409,8 @@ function Input({ }) {
           formData.append("Emergency_Contact_Relationship", emergencyContactRelation);
           formData.append("Emergency_Contact_Name", emergencyContactName);
           formData.append("Email_Business", businessEmail);
-          formData.append("Number_of_Children", noOfChildren);
-          formData.append("Number_of_Siblings", noOfSiblings);
+          formData.append("Number_of_Children", noOfChildren ? noOfChildren : 0);
+          formData.append("Number_of_Siblings", noOfSiblings ? noOfSiblings : 0);
           formData.append("Spouse_Name", spouseName);
           formData.append("Other_Id_No", otherIdNo);
           formData.append("Blood_Group", bloodGroup);
@@ -427,6 +428,7 @@ function Input({ }) {
           if (user_images) {
             formData.append("Photos", user_images);
           }
+          
           const response = await fetch(`${config.apiBaseUrl}/Employeedataupdate`, {
             method: "POST",
             body: formData,

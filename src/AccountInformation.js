@@ -28,43 +28,43 @@ const AccountInformation = () => {
       checkboxSelection: true,
       headerName: 'S.No',
       field: 'ItemSNO',
-      maxWidth: 80,
+      // maxWidth: 80,
       sortable: false,
       editable: false
     },
     {
       headerName: 'Company Code',
       field: 'company_no',
-      maxWidth: 300,
-      minWidth: 300,
+      // maxWidth: 300,
+      // minWidth: 300,
       sortable: false,
       editable: false
     },
     {
       headerName: 'Company Name',
       field: 'company_name',
-      minWidth: 500,
+      // minWidth: 500,
       sortable: false,
       editable: false
     },
     {
       headerName: 'Location code',
       field: 'location_no',
-      minWidth: 450,
+      // minWidth: 450,
       sortable: false,
       editable: false
     },
     {
       headerName: 'Location Name',
       field: 'location_name',
-      minWidth: 500,
+      // minWidth: 500,
       sortable: false,
       editable: false
     },
     {
       headerName: 'Short Name',
       field: 'short_name',
-      minWidth: 500,
+      // minWidth: 500,
       sortable: false,
       editable: false,
       hide: true

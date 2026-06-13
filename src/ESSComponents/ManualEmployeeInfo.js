@@ -119,6 +119,8 @@ function ManualEmployeeInfo({ }) {
   const [Managerdrop, setManagerdrop] = useState([]);
   const [isSelectManager, setIsSelectManager] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const logo = useRef(null);
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
@@ -201,7 +203,6 @@ function ManualEmployeeInfo({ }) {
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
-
         try {
           setLoading(true);
 
@@ -211,6 +212,7 @@ function ManualEmployeeInfo({ }) {
           /* ---------------- HEADER ---------------- */
           const headerPayload = {
             company_code,
+            Location_Code,
             EmployeeId,
             purpose: purpose,
             request_status: "Pending",
@@ -281,8 +283,7 @@ function ManualEmployeeInfo({ }) {
           company_code,
           EmployeeId,
           request_status: "Pending",
-
-          // Personal
+          Location_Code,
           First_Name,
           Middle_Name,
           Last_Name,
@@ -293,72 +294,46 @@ function ManualEmployeeInfo({ }) {
           email: Email,
           phone1: Phone1,
           phone2: Phone2,
-
-          // Address
           Address1: address1,
           address2,
           address3,
           PermanantAddress: permanantAddress,
-
-          // Reference
           Reference_name: reference_Name,
           Reference_Phone: reference_Phone,
-
-          // IDs
           Pan_No: pan_No,
           Aadhar_no: Aadhaar_no,
           Photos: photoBase64,
-
-          // Family
           marital_status: selectedmartial,
           Kids: selectedkids,
-
-          // Job
           Grade_id: selectedgradeid,
           Title: title,
-
-          // Extra
           Place_of_Birth: placeOfBirth,
           Nationality: nationality,
           Religion: religion,
           Blood_Group: bloodGroup,
-
-          // Family Details
           Spouse_Name: spouseName,
           Number_of_Siblings: noOfSiblings,
           Number_of_Children: noOfChildren,
-
-          // Contact
           Email_Business: businessEmail,
-          Phone_Alternate: Phone2,
-
-          // Emergency
+          // Phone_Alternate: Phone2,
           Emergency_Contact_Name: emergencyContactName,
           Emergency_Contact_Relationship: emergencyContactRelation,
           Emergency_Contact_Phone: emergencyContactPhone,
           Siblings: Siblings,
-
-          // Location
           City: city,
           State: state,
           Postal_Code: postalCode,
           Country: country,
-
-          // Passport
           Passport_No: passportNo,
           Passport_Expiry_Date: passportExpiryDate,
-
-          // Other ID
           Other_Id_Type: otherIdType,
           Other_Id_No: otherIdNo,
           RepManager,
-
           created_by,
         },
       ];
 
-      const res = await fetch(
-        `${config.apiBaseUrl}/PersonalRequestDetails`,
+      const res = await fetch(`${config.apiBaseUrl}/PersonalRequestDetails`,
         {
           method: "POST",
           headers: {
