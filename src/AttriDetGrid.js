@@ -71,7 +71,7 @@ function AttriDetGrid() {
       setdescriptions(inputs.descriptions || "");
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -97,13 +97,13 @@ function AttriDetGrid() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          company_code: sessionStorage.getItem("selectedCompanyCode"), 
-          attributeheader_code: searchParams?.attributeheader_code ?? attributeheader_code,  
-          attributedetails_code: searchParams?.attributedetails_code ?? attributedetails_code, 
-          attributedetails_name: searchParams?.attributedetails_name ?? attributedetails_name, 
-          descriptions: searchParams?.descriptions ?? descriptions,  
-        }), 
+        body: JSON.stringify({
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          attributeheader_code: searchParams?.attributeheader_code ?? attributeheader_code,
+          attributedetails_code: searchParams?.attributedetails_code ?? attributedetails_code,
+          attributedetails_name: searchParams?.attributedetails_name ?? attributedetails_name,
+          descriptions: searchParams?.descriptions ?? descriptions,
+        }),
       });
 
       if (response.ok) {

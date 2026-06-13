@@ -33,6 +33,7 @@ function EmployeeAssets({}) {
   const [isSelectAssetID, setIsisSelectAssetID] = useState(false);
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
   const [originalAssetvalue, setOriginalAssetvalue] = useState([]);
+
   const location = useLocation();
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode');
@@ -871,7 +872,7 @@ const handleDeleteAsset = async (relation, index) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         });
 
         if (!response.ok) {
