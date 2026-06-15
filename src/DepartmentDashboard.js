@@ -23,6 +23,7 @@ const getCurrentMonthRange = () => {
 const DepartmentDashboard = () => {
   const { startDate, endDate } = getCurrentMonthRange();
   const companyCode = sessionStorage.getItem("selectedCompanyCode");
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   // ================= SUMMARY =================
   const [summary, setSummary] = useState({
@@ -72,6 +73,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
           body: JSON.stringify({
             mode: "SUMMARY",
             company_code: companyCode,
+            Location_Code
           }),
         });
 
@@ -95,6 +97,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
           body: JSON.stringify({
             mode: "AGC",
             company_code: companyCode,
+            Location_Code
           }),
         });
 
@@ -124,6 +127,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
         body: JSON.stringify({
           mode,
           company_code: companyCode,
+          Location_Code,
           fromDate,
           toDate,
         }),
@@ -158,6 +162,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
       body: JSON.stringify({
         mode,
         company_code: companyCode,
+        Location_Code,
         fromDate,
         toDate,
       }),
