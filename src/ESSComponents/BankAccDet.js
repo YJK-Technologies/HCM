@@ -9,6 +9,8 @@ import Bankaccdetpopup from "./bankaccdetpopup";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from "react-select";
+import BankPassbook from '../DefaultImages/Passbook.webp';
+
 const config = require('../Apiconfig');
 
 function Input({ }) {
@@ -19,7 +21,7 @@ function Input({ }) {
   const [bankName, setBankName] = useState('');
   const [branchName, setBranchName] = useState('');
   const [passBookImg, setPassBookImg] = useState('');
-  const [selectedImg, setSelectedImage] = useState(null);
+  const [selectedImg, setSelectedImage] = useState(BankPassbook);
   const [saveButtonVisible, setSaveButtonVisible] = useState(true);
   const [updateButtonVisible, setUpdateButtonVisible] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -1277,7 +1279,7 @@ function Input({ }) {
                 {selectedImg ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedImg}
+                      src={selectedImg || BankPassbook}
                       alt="Uploaded Logo"
                       className="uploaded-image"
                     />

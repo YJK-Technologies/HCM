@@ -11,6 +11,8 @@ import Select from 'react-select';
 import DocumentPopup from "./DocumentPopup.js";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
+import DocumentImage from '../DefaultImages/Document.jpg';
+
 const config = require('../Apiconfig');
 
 function EmpDocumentReq({ }) {
@@ -19,7 +21,20 @@ function EmpDocumentReq({ }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPdfUrl, setCurrentPdfUrl] = useState(null);
   const navigate = useNavigate();
-  const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }]);
+  const [documents, setDocuments] = useState([
+{
+  relation: 'documents',
+  members: [{
+    documentName: '',
+    document: null,
+    documentUrl: DocumentImage,
+    keyfield: '',
+    RepManager: '',
+    selectRepManager: null,
+    isDefaultImage: true,
+  }]
+}
+]);
   // const [documents, setDocuments] = useState([{ relation: 'documents', members: [{ documentName: '', document: null, documentUrl: '', keyfield:'' }] }]);
   const [documentNameDrop, setDocumentNameDrop] = useState([]);
   const [documentUrl, setDocumentUrl] = useState({});
@@ -409,20 +424,24 @@ function EmpDocumentReq({ }) {
           console.log(documentUrl)
 
           const memberData = {
-            documentName: document_name || "",
-            selectDocumentName: document_name
-              ? { value: document_name, label: document_name }
-              : null,
-            documentUrl: documentUrl,
-            document: documentFile,
-            keyfield: keyfield,
-            RepManager: RepManager || "",
-            selectRepManager: RepManager
-              ? filteredOptionManager.find(
-                (opt) => opt.value === RepManager
-              )
-              : null,
-          };
+  documentName: document_name || "",
+  selectDocumentName: document_name
+    ? { value: document_name, label: document_name }
+    : null,
+
+  documentUrl: documentUrl || DocumentImage,
+  document: documentFile,
+  keyfield: keyfield,
+
+  RepManager: RepManager || "",
+  selectRepManager: RepManager
+    ? filteredOptionManager.find(
+        (opt) => opt.value === RepManager
+      )
+    : null,
+
+  isDefaultImage: !documentFile
+};
 
           const existingRelation = acc.find(group => group.relation === document_name);
 
@@ -440,26 +459,46 @@ function EmpDocumentReq({ }) {
         setDocuments(updatedDocument);
         setEmployeeId(employee_id);
       } else if (response.status === 404) {
-        toast.warning('Data not found');
-        setDocuments([
-          {
-            relation: 'documents',
-            members: [{
-              documentName: '',
-              document: null,
-              documentUrl: ''
-            }]
-          }
-        ]);
-      } else {
+  toast.warning('Data not found');
+
+  setDocuments([
+    {
+      relation: 'documents',
+      members: [{
+        documentName: '',
+        document: null,
+        documentUrl: DocumentImage,
+        keyfield: '',
+        RepManager: '',
+        selectRepManager: null,
+        isDefaultImage: true,
+      }]
+    }
+  ]);
+} else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert sales data");
         console.error(errorResponse.details || errorResponse.message);
       }
     } catch (error) {
-      console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
+  console.error("Error inserting data:", error);
+  toast.error('Error inserting data: ' + error.message);
+
+  setDocuments([
+    {
+      relation: 'documents',
+      members: [{
+        documentName: '',
+        document: null,
+        documentUrl: DocumentImage,
+        keyfield: '',
+        RepManager: '',
+        selectRepManager: null,
+        isDefaultImage: true,
+      }]
     }
+  ]);
+}
   };
 
   const reloadGridData = () => {
@@ -467,15 +506,28 @@ function EmpDocumentReq({ }) {
   };
 
   const handleAddRow = (relation) => {
-    setDocuments((prev) =>
-      prev.map((item) =>
-        item.relation === relation
-          // ? { ...item, members: [...item.members, { documentType: '', documentNo: '', issueDate: '', expiryDate: '' }] }
-          ? { ...item, members: [...item.members, { documentName: '', document: null, documentUrl: '', keyfield: '', RepManager: '', selectRepManager: null, }] }
-          : item
-      )
-    );
-  };
+  setDocuments((prev) =>
+    prev.map((item) =>
+      item.relation === relation
+        ? {
+            ...item,
+            members: [
+              ...item.members,
+              {
+                documentName: '',
+                document: null,
+                documentUrl: DocumentImage,
+                keyfield: '',
+                RepManager: '',
+                selectRepManager: null,
+                isDefaultImage: true,
+              }
+            ]
+          }
+        : item
+    )
+  );
+};
 
   const handleDeleteRow = (relation, index) => {
     setDocuments((prev) =>
@@ -569,6 +621,7 @@ function EmpDocumentReq({ }) {
                     ...member,
                     document: file,
                     documentUrl: fileUrl,
+                    isDefaultImage: false,
                   }
                   : member
               ),
@@ -647,21 +700,27 @@ function EmpDocumentReq({ }) {
   }, [location.state, documentNameDrop]);
 
   const handleRemovePdf = (relation, index) => {
-    setDocuments(prev =>
-      prev.map(doc =>
-        doc.relation === relation
-          ? {
+  setDocuments(prev =>
+    prev.map(doc =>
+      doc.relation === relation
+        ? {
             ...doc,
             members: doc.members.map((m, i) =>
               i === index
-                ? { ...m, document: null, documentUrl: "" }
+                ? {
+                    ...m,
+                    document: null,
+                    documentUrl: "",
+                    document: null,
+                    isDefaultImage: false,
+                  }
                 : m
             )
           }
-          : doc
-      )
-    );
-  };
+        : doc
+    )
+  );
+};
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -829,36 +888,60 @@ function EmpDocumentReq({ }) {
                 <div className="inputGroup">
                   <div className="image-upload-container">
 
-                    {member.documentUrl ? (
-                      <div
-                        className="image-preview-box"
-                        onClick={() => handlePdfClick(member.documentUrl)}
-                      >
-                        <iframe
-                          src={member.documentUrl}
-                          title="PDF Preview"
-                          className="pdf-inline-preview"
-                        ></iframe>
+                    {member.document ? (
+  <div
+    className="image-preview-box"
+    onClick={() => handlePdfClick(member.documentUrl)}
+  >
+    <iframe
+      src={member.documentUrl}
+      title="PDF Preview"
+      className="pdf-inline-preview"
+    />
 
-                        <button
-                          type="button"
-                          className="delete-image-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemovePdf(relationGroup.relation, index);
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="upload-placeholder-box">
-                        <div className="upload-icon-text">
-                          <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
-                          <span>Upload Document</span>
-                        </div>
-                      </div>
-                    )}
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : member.isDefaultImage ? (
+  <div
+    className="upload-placeholder-box"
+    onClick={() =>
+      document.getElementById(`upload-${index}`).click()
+    }
+  >
+    <img
+      src={DocumentImage}
+      alt="Default Document"
+      className="uploaded-image"
+    />
+
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : (
+  <div className="upload-placeholder-box">
+    <div className="upload-icon-text">
+      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+      <span>Upload Document</span>
+    </div>
+  </div>
+)}
 
                     <input
                       type="file"

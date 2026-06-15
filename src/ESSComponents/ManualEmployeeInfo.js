@@ -11,6 +11,7 @@ import Select from "react-select";
 import EmployeeInfoPopup from "./EmployeeinfoPopup.js";
 import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
+import UserProfile from '../DefaultImages/User.png';
 
 const config = require("../Apiconfig");
 
@@ -50,7 +51,7 @@ function ManualEmployeeInfo({ }) {
   const [selectedkids, setselectedkids] = useState("");
   const [selectedmartial, setselectedmartial] = useState("");
   const [selectedgradeid, setselectedgradeid] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(UserProfile);
   const navigate = useNavigate();
   const location = useLocation();
   const [user_images, setuser_image] = useState("");

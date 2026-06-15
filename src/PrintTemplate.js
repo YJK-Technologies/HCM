@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import LoadingScreen from './Loading';
+import TemplateImage from './DefaultImages/Template.webp';
 const config = require('./Apiconfig');
 
 function PrintTemplate() {
@@ -16,7 +17,7 @@ function PrintTemplate() {
         .filter(permission => permission.screen_type === 'TemplateDesign')
         .map(permission => permission.permission_type.toLowerCase());
 
-    const [Academic, setAcademic] = useState([{ relation: 'Screens', members: [{ screenName: '', templatename: '', Templates: null, documentUrl: '' }] }]);
+    const [Academic, setAcademic] = useState([{ relation: 'Screens', members: [{ screenName: '', templatename: '', Templates: null, documentUrl: null, isDefaultImage: true }] }]);
     const [Screens, setScreens] = useState("");
     const [templatename, settemplatename] = useState("");
     const [error, setError] = useState(false);
@@ -39,7 +40,16 @@ function PrintTemplate() {
         setAcademic((prev) =>
             prev.map((item) =>
                 item.relation === relation
-                    ? { ...item, members: [...item.members, { screenName: '', templatename: '', institution: '', }] }
+                    ? {
+                        ...item,
+                        members: [...item.members, {
+    screenName: '',
+    templatename: '',
+    Templates: null,
+    documentUrl: null,
+    isDefaultImage: true
+}]
+                    }
                     : item
             )
         );
@@ -181,7 +191,8 @@ function PrintTemplate() {
         setAcademic(prev => {
             const updated = [...prev];
             updated[0].members[index].Templates = null;
-            updated[0].members[index].documentUrl = null;
+updated[0].members[index].documentUrl = null;
+updated[0].members[index].isDefaultImage = false;
             return updated;
         });
 
@@ -198,6 +209,7 @@ function PrintTemplate() {
                 const updated = [...prev];
                 updated[0].members[index].Templates = file;
                 updated[0].members[index].documentUrl = fileUrl;
+                updated[0].members[index].isDefaultImage = false;
                 return updated;
             });
         } else {
@@ -540,7 +552,7 @@ function PrintTemplate() {
                                 <div className="col-md-2">
                                     <div className="inputGroup">
                                         <div className={`image-upload-container ${error && !member.Templates ? "image-error" : ""}`}>
-                                            {member.documentUrl ? (
+                                            {member.documentUrl || member.isDefaultImage ? (
                                                 <div className="image-preview-box">
                                                     {member.Templates?.type?.includes("pdf") ||
                                                         member.Templates?.name?.endsWith(".pdf") ? (
@@ -552,7 +564,7 @@ function PrintTemplate() {
                                                         />
                                                     ) : (
                                                         <img
-                                                            src={member.documentUrl}
+                                                            src={member.documentUrl ? member.documentUrl : TemplateImage}
                                                             alt="Uploaded Template"
                                                             className="uploaded-image"
                                                         />
