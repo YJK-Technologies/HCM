@@ -3068,11 +3068,8 @@ function RequestReport({ }) {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code,
           Info_request_id: 0,
-          EmployeeId: "",
-          FieldName: "",
-          FromDate: null,
-          ToDate: null,
         }),
       });
 
@@ -3107,11 +3104,12 @@ function RequestReport({ }) {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Info_request_id: assetInfoId || null,
+          Info_request_id: assetInfoId,
+          Location_Code,
           EmployeeId: assetEmpId,
           FieldName: assetFieldName,
-          FromDate: assetFromDate || null,
-          ToDate: assetToDate || null,
+          FromDate: assetFromDate,
+          ToDate: assetToDate,
         }),
       });
 
@@ -3156,6 +3154,7 @@ function RequestReport({ }) {
               EmployeeID: row.EmployeeID,
               request_status: status,
               AssetID: row.AssetID,
+              Location_Code,
               ExpectedReturnDate: row.ExpectedReturnDate,
               ActualReturnDate: row.ActualReturnDate,
               Remarks: row.Remarks,

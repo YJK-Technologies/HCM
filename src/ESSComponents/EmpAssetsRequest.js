@@ -339,9 +339,10 @@ function EmployeeAssets({ }) {
           const headerPayload = {
             company_code,
             EmployeeId: EmployeeID,
-            purpose: "Asset Request", // or bind from UI if needed
+            purpose: "Asset Request",
             request_status: "Pending",
             created_by,
+            Location_Code
           };
 
           const headerRes = await fetch(`${config.apiBaseUrl}/AssetRequestHdr`,
@@ -397,13 +398,13 @@ function EmployeeAssets({ }) {
           company_code,
           EmployeeId: EmployeeID,
           request_status: "Pending",
-
           AssetID: row.AssetID?.value || null,
-          ExpectedReturnDate: row.ExpectedReturnDate || null,
-          ActualReturnDate: row.ActualReturnDate || null,
-          Remarks: row.Remarks || "",
-          RepManager: row.RepManager || "",
+          ExpectedReturnDate: row.ExpectedReturnDate,
+          ActualReturnDate: row.ActualReturnDate,
+          Remarks: row.Remarks,
+          RepManager: row.RepManager,
           CreatedBy: created_by,
+          Location_Code
         })),
       );
 

@@ -158,7 +158,7 @@ const Dashboard = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         },
       );
       const data = await response.json();
@@ -259,6 +259,7 @@ const Dashboard = () => {
           userid: userId || "All",
           company_code,
           Status: "Active",
+          Location_Code
         }),
       });
 
@@ -348,6 +349,7 @@ const Dashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1092,6 +1094,7 @@ const Dashboard = () => {
             body: JSON.stringify({
               company_code,
               RepManager: user_code,
+              Location_Code
             }),
           },
         );
@@ -1273,8 +1276,6 @@ const Dashboard = () => {
             EmployeeName: row.Employee_Name,
             title: "Academic Details",
             status: row.request_status,
-
-            // 🔴 store full rows for approval
             rows: [],
           };
         }
@@ -1296,8 +1297,6 @@ const Dashboard = () => {
             EmployeeName: row.Employee_Name,
             title: "Document Details",
             status: row.request_status,
-
-            // important for approval
             rows: [],
           };
         }
@@ -1532,6 +1531,7 @@ const Dashboard = () => {
               AssetID,
               ExpectedReturnDate,
               ActualReturnDate,
+              Location_Code,
               Remarks,
             };
           }),
@@ -1594,6 +1594,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1629,6 +1630,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1673,6 +1675,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           manager: manager,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
       console.log(manager);
@@ -1717,6 +1720,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           manager: manager,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1752,8 +1756,8 @@ const Dashboard = () => {
   }, []);
 
   const filteredOptionManager = Managerdrop.map((option) => ({
-    value: option.manager,
-    label: option.manager,
+    value: option.EmployeeId,
+    label: `${option.EmployeeId} - ${option.full_name}`,
   }));
 
   const handleChangeManager = (SelectedManager) => {
@@ -2057,6 +2061,7 @@ const Dashboard = () => {
           PFNo: pfNo,
           Account_NO: accountNo,
           shift: shift,
+          Location_Code,
           manager: sessionStorage.getItem("selectedUserCode"),
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
@@ -2098,6 +2103,7 @@ const Dashboard = () => {
           Day_Sequence: shiftDay,
           Start_Time: shiftStartTime,
           End_Time: shiftEndTime,
+          Location_Code,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });
@@ -2185,6 +2191,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -2227,6 +2234,7 @@ const Dashboard = () => {
             manager: sessionStorage.getItem("selectedUserCode"),
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             LeaveStatus: LeaveStatus,
+            Location_Code
           }),
         },
       );
@@ -2251,6 +2259,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           manager: sessionStorage.getItem("selectedUserCode"),
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 

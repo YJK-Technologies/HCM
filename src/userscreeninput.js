@@ -105,6 +105,7 @@ function UserScreenInput({ }) {
     setrole_id("");
     setselectedscreens("")
     setscreen_type("");
+    setKeyfield("");
   };
 
   // useEffect(() => {

@@ -24252,9 +24252,7 @@ const DashboardUpcomingBirthday = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_ess_admin_dashboard_Ramya 'UB',@company_code,@Location_Code,'','','','','','','','','','',''`,
-      );
+      .query(`EXEC sp_ess_admin_dashboard_Ramya 'UB',@company_code,@Location_Code,'','','','','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24276,11 +24274,13 @@ const DashboardNewJoinee = async (req, res) => {
       .request()
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_ess_admin_dashboard_Ramya 'NJ',@company_code,@Location_Code,'','','','','','','','','','',''`,
-      );
+      .query(`EXEC sp_ess_admin_dashboard_Ramya 'NJ',@company_code,@Location_Code,'','','','','','','','','','',''`);
 
-    res.json(result.recordset);
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -24320,9 +24320,7 @@ const DashboardTeamList = async (req, res) => {
       .input("manager", sql.NVarChar, manager)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_ess_admin_dashboard_Ramya 'TL',@company_code,@Location_Code,@manager,'','','','','','','','','',''`,
-      );
+      .query(`EXEC sp_ess_admin_dashboard_Ramya 'TL',@company_code,@Location_Code,@manager,'','','','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24342,12 +24340,9 @@ const DashboardTeamListChart = async (req, res) => {
     const result = await pool
       .request()
       .input("manager", sql.NVarChar, manager)
-
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_ess_admin_dashboard_Ramya 'TLC',@company_code,@Location_Code,@manager,'','','','','','','','','',''`,
-      );
+      .query(`EXEC sp_ess_admin_dashboard_Ramya 'TLC',@company_code,@Location_Code,@manager,'','','','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -30829,7 +30824,11 @@ const GetClr = async (req, res) => {
       .input("Location_Code", sql.NVarChar, Location_Code)
       .query(`EXEC sp_ess_Employee_dashboard_Ramya @mode,'',@company_code,@Location_Code`);
 
-    res.json(result.recordset);
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
@@ -33647,16 +33646,15 @@ const getAnnouncementText = async (req, res) => {
 };
 
 const getManager = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_ess_admin_dashboard 'GM',@company_code,'','','','','','','','','','',''`,
-      );
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_ess_admin_dashboard_Ramya 'GM',@company_code,@Location_Code,'','','','','','','','','','',''`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -33703,8 +33701,7 @@ const Getpayslip = async (req, res) => {
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("salary_month", sql.NVarChar, salary_month)
       .query(`EXEC sp_ESS_MonthlyPayslip_Ramya  'FPY',@Employeeid	,'','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-        @company_code,@Location_Code,@salary_month,'','',null,null,null,null,null,null,null,null
-`);
+        @company_code,@Location_Code,@salary_month,'','',null,null,null,null,null,null,null,null`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -42523,7 +42520,7 @@ const getDepartmentDashboard = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
 
-    const result = await poolf
+    const result = await pool
       .request()
       .input("mode", sql.NVarChar, mode)
       .input("company_code", sql.NVarChar, company_code)
@@ -42617,9 +42614,7 @@ const shiftPatternChart = async (req, res) => {
       .input("mode", sql.NVarChar, "TSPS")
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_Employee_Shift_Report_Ramya @mode,'','','','','',@company_code,@Location_Code,'','','',''`,
-      );
+      .query(`EXEC sp_Employee_Shift_Report_Ramya @mode,'','','','','',@company_code,@Location_Code,'','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -46604,7 +46599,7 @@ const getTHRSReport = async (req, res) => {
     if (result.recordset && result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
-      res.status(200).json([]);
+      res.status(404).json("Data not found");
     }
   } catch (err) {
     console.error("THRS Error:", err);
@@ -46699,7 +46694,7 @@ const DashboardCompOffRequest = async (req, res) => {
       .input("RepManager", sql.NVarChar, RepManager)
       .input("CompanyCode", sql.NVarChar, CompanyCode)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,0,'','','','','',''`);
+      .query(`EXEC sp_Employee_Comp_Off_Leave_Ramya @mode,'','','','','','','','','','','','',@RepManager,'',@CompanyCode,@Location_Code,0,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -46802,7 +46797,7 @@ const AssetRequestHdr = async (req, res) => {
 
 // Code added by Dinesh Gokul 0n 10-04-2026
 const GetAssetRequestDetails = async (req, res) => {
-  const { company_code, Info_request_id, EmployeeId, FieldName, FromDate, ToDate } = req.body;
+  const { company_code, Location_Code, Info_request_id, EmployeeId, FieldName, FromDate, ToDate } = req.body;
 
   if (!company_code) {
     return res.status(400).json("company_code is required.");
@@ -46814,13 +46809,14 @@ const GetAssetRequestDetails = async (req, res) => {
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "SC")
-      .input("Info_request_id", sql.Int, Info_request_id || null)
+      .input("Info_request_id", sql.Int, Info_request_id)
       .input("company_code", sql.NVarChar, company_code)
-      .input("EmployeeId", sql.NVarChar, EmployeeId || "")
-      .input("FieldName", sql.NVarChar, FieldName || "")
-      .input("FromDate", sql.Date, FromDate || null)
-      .input("ToDate", sql.Date, ToDate || null)
-      .query(` EXEC sp_employee_assets_request_dtls_test 'SC',0, @info_request_id, '', @EmployeeId, @company_code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate,''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .input("EmployeeId", sql.NVarChar, EmployeeId)
+      .input("FieldName", sql.NVarChar, FieldName)
+      .input("FromDate", sql.NVarChar, FromDate)
+      .input("ToDate", sql.NVarChar, ToDate)
+      .query(` EXEC sp_employee_assets_request_dtls_Pavun @mode,0, @info_request_id, '', @EmployeeId, @company_code, @Location_Code, '', 0, '', '', '', '', '', @FieldName, @FromDate, @ToDate,''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -46857,6 +46853,7 @@ const ApproveAssetRequest = async (req, res) => {
         .input("DetailID", sql.BigInt, row.DetailID)
         .input("info_request_id", sql.Int, row.info_request_id)
         .input("company_code", sql.NVarChar, row.company_code)
+        .input("Location_Code", sql.NVarChar, row.Location_Code)
         .input("EmployeeID", sql.NVarChar, row.EmployeeID)
         .input("request_status", sql.NVarChar, row.request_status)
         .input("AssetID", sql.BigInt, row.AssetID)
@@ -46865,8 +46862,8 @@ const ApproveAssetRequest = async (req, res) => {
         .input("Remarks", sql.NVarChar, row.Remarks)
         .input("CreatedBy", sql.NVarChar, row.CreatedBy)
         .input("ModifiedBy", sql.NVarChar, row.ModifiedBy)
-        .query(`EXEC sp_employee_assets_request_dtls_test 'AP',@DetailID, @info_request_id, '', @EmployeeID, @company_code, 
-          @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, @ModifiedBy, '', '', '',''`);
+        .query(`EXEC sp_employee_assets_request_dtls_Pavun @mode, @DetailID, @info_request_id, '', @EmployeeID, @company_code, @Location_Code,
+        @request_status, @AssetID, @ExpectedReturnDate, @ActualReturnDate, @Remarks, @CreatedBy, @ModifiedBy, '', '', '',''`);
     }
     res.status(200).json("Request processed successfully (Approved/Rejected)");
 
@@ -46897,19 +46894,18 @@ const AssetRequestDetails = async (req, res) => {
       await pool
         .request()
         .input("mode", sql.NVarChar, "I")
-        .input("DetailID", sql.BigInt, insertRow.DetailID || 0)
         .input("info_request_id", sql.Int, insertRow.info_request_id)
-        .input("keyfield", sql.NVarChar, "")
         .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("Location_Code", sql.NVarChar, insertRow.Location_Code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("AssetID", sql.BigInt, insertRow.AssetID)
-        .input("ExpectedReturnDate", sql.Date, insertRow.ExpectedReturnDate)
-        .input("ActualReturnDate", sql.Date, insertRow.ActualReturnDate)
+        .input("ExpectedReturnDate", sql.NVarChar, insertRow.ExpectedReturnDate)
+        .input("ActualReturnDate", sql.NVarChar, insertRow.ActualReturnDate)
         .input("Remarks", sql.NVarChar, insertRow.Remarks)
         .input("CreatedBy", sql.NVarChar, insertRow.CreatedBy)
         .input("RepManager", sql.NVarChar, insertRow.RepManager)
-        .query(`EXEC sp_employee_assets_request_dtls_test 'I', @DetailID, @info_request_id, '', @EmployeeID, @company_code, @request_status, @AssetID, @ExpectedReturnDate, 
+        .query(`EXEC sp_employee_assets_request_dtls_Pavun @mode, 0, @info_request_id, '', @EmployeeID, @company_code, @Location_Code, @request_status, @AssetID, @ExpectedReturnDate, 
           @ActualReturnDate, @Remarks, @CreatedBy, '', '', '', '',@RepManager`);
     }
 
@@ -48368,7 +48364,7 @@ const getComOffNotification = async (req, res) => {
 };
 
 const compOffNotificationSeen = async (req, res) => {
-  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode,Location_Codev, Keyfield } = req.body;
+  const { EmployeeId, HolidayDate, is_notification_seen, CompanyCode,Location_Code, Keyfield } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -48563,7 +48559,7 @@ const GetDocumentsRequest = async (req, res) => {
 };
 
 const GetAssetRequest = async (req, res) => {
-  const { company_code, RepManager } = req.body;
+  const { company_code, Location_Code, RepManager } = req.body;
 
   if (!company_code) {
     return res.status(400).json("company_code is required.");
@@ -48576,8 +48572,9 @@ const GetAssetRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "RA")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("RepManager", sql.NVarChar, RepManager)
-      .query(`EXEC sp_employee_assets_request_dtls_test @mode,0, 0, '', '', @company_code, '', 0, '', '', '', '', '', '', '', '',@RepManager`);
+      .query(`EXEC sp_employee_assets_request_dtls_Pavun @mode,0, 0, '', '', @company_code, @Location_Code, '', 0, '', '', '', '', '', '', '', '',@RepManager`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);

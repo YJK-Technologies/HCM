@@ -70,8 +70,11 @@ function CompanyMappingGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedInputs) {
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
 
+    if (location.state?.preservedInputs) {
       const inputs = location.state.preservedInputs;
 
       setuser_code(inputs.user_code || "");
@@ -87,7 +90,7 @@ function CompanyMappingGrid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -532,12 +535,12 @@ function CompanyMappingGrid() {
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddCompanyMapping", {
       state: {
-        mode: "update", keyfiels: selectedRow.keyfiels, 
-        preservedInputs: { 
-          user_code, 
-          company_no, 
-          location_no, 
-          status 
+        mode: "update", keyfiels: selectedRow.keyfiels,
+        preservedInputs: {
+          user_code,
+          company_no,
+          location_no,
+          status
         }
       }
     });
