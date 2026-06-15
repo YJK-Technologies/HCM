@@ -10,6 +10,8 @@ import PdfPreview from "./PdfPreviewHelp";
 import IdentityDocuments from "./IdentDocPopup.js";
 import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
+import DocumentImage from '../DefaultImages/Document.jpg';
+
 const config = require("../Apiconfig");
 
 function Input({ }) {
@@ -27,7 +29,8 @@ function Input({ }) {
           issueDate: "",
           expiryDate: "",
           document: null,
-          documentUrl: "",
+          documentUrl: DocumentImage,
+          showDefaultImage: true,
         },
       ],
     },
@@ -541,14 +544,15 @@ function Input({ }) {
             members: [
               ...item.members,
               {
-                documentType: "",
-                documentNo: "",
-                issueDate: "",
-                expiryDate: "",
-                document: null,
-                documentUrl: "",
-                keyfield: "",
-              },
+  documentType: "",
+  documentNo: "",
+  issueDate: "",
+  expiryDate: "",
+  document: null,
+  documentUrl: DocumentImage,
+  showDefaultImage: true,
+  keyfield: "",
+},
             ],
           }
           : item,
@@ -618,6 +622,7 @@ function Input({ }) {
                     ...member,
                     document: file,
                     documentUrl: fileUrl,
+                    showDefaultImage: false,
                     isNewFile: true,
                   }
                   : member,
@@ -863,19 +868,26 @@ function Input({ }) {
   }, [location.state]);
 
   const handleRemovePdf = (relation, index) => {
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.relation === relation
-          ? {
+  setDocuments((prev) =>
+    prev.map((doc) =>
+      doc.relation === relation
+        ? {
             ...doc,
             members: doc.members.map((m, i) =>
-              i === index ? { ...m, document: null, documentUrl: "" } : m,
+              i === index
+                ? {
+                    ...m,
+                    document: null,
+                    documentUrl: "",
+                    showDefaultImage: false,
+                  }
+                : m
             ),
           }
-          : doc,
-      ),
-    );
-  };
+        : doc
+    )
+  );
+};
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1193,42 +1205,62 @@ function Input({ }) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className="image-upload-container">
-                    {member.documentUrl ? (
-                      <div
-                        className="image-preview-box"
-                        onClick={() => handlePdfClick(member.documentUrl)}
-                      >
-                        <iframe
-                          src={member.documentUrl}
-                          title="PDF Preview"
-                          className="pdf-inline-preview"
-                        ></iframe>
+                    {member.document ? (
+  <div
+    className="image-preview-box"
+    onClick={() => handlePdfClick(member.documentUrl)}
+  >
+    <iframe
+      src={member.documentUrl}
+      title="PDF Preview"
+      className="pdf-inline-preview"
+    />
 
-                        <button
-                          type="button"
-                          className="delete-image-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemovePdf(relationGroup.relation, index);
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="upload-placeholder-box">
-                        <div className="upload-icon-text">
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : member.showDefaultImage ? (
+  <div className="upload-placeholder-box">
+    <img
+      src={DocumentImage}
+      alt="Default Document"
+      className="uploaded-image"
+    />
+
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : (
+  <div className="upload-placeholder-box">
+    <div className="upload-icon-text">
                           <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
                           <span>Upload Document</span>
                         </div>
-                      </div>
-                    )}
+  </div>
+)}
 
                     <input
                       type="file"
                       id={`upload-${index}`}
                       className={`hidden-file-input 
-                      ${member.documentUrl ? "disable-overlay" : ""}`}
+  ${member.document ? "disable-overlay" : ""}
+`}
                       accept="application/pdf"
                       onChange={(event) =>
                         handleFileChange(event, relationGroup.relation, index)

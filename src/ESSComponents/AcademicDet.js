@@ -8,6 +8,7 @@ import TabButtons from "./Tabs";
 import AcademicDetails from "./AcademicDetPopup.js";
 import PdfPreview from "./PdfPreviewHelp";
 import LoadingScreen from "../Loading";
+import DocumentImage from '../DefaultImages/Document.jpg';
 
 const config = require("../Apiconfig");
 
@@ -22,7 +23,8 @@ function Input({ }) {
           institution: "",
           academicYear: "",
           document: null,
-          documentUrl: "",
+          documentUrl: DocumentImage,
+          isDefaultImage: true,
           keyfield: "",
         },
       ],
@@ -78,8 +80,9 @@ function Input({ }) {
                 institution: "",
                 academicYear: "",
                 document: null,
-                documentUrl: "",
+                documentUrl: DocumentImage, // Default image
                 keyfield: "",
+                isDefaultImage: true,
               },
             ],
           }
@@ -378,6 +381,8 @@ function Input({ }) {
                     document: file,
                     documentUrl: fileUrl,
                     isNewFile: true,
+                    isFileRemoved: false,
+                    isDefaultImage: false,
                   }
                   : member,
               ),
@@ -1058,14 +1063,15 @@ function Input({ }) {
                   ...m,
                   document: null,
                   documentUrl: "",
-                  isNewFile: true,     // important
-                  isFileRemoved: true, // important
+                  isNewFile: true,
+                  isFileRemoved: true,
+                  isDefaultImage: false,
                 }
-                : m,
+                : m
             ),
           }
-          : doc,
-      ),
+          : doc
+      )
     );
   };
 
@@ -1340,13 +1346,25 @@ function Input({ }) {
                     {member.documentUrl ? (
                       <div
                         className="image-preview-box"
-                        onClick={() => handlePdfClick(member.documentUrl)}
+                        onClick={() => {
+                          if (!member.isDefaultImage) {
+                            handlePdfClick(member.documentUrl);
+                          }
+                        }}
                       >
-                        <iframe
-                          src={member.documentUrl}
-                          title="PDF Preview"
-                          className="pdf-inline-preview"
-                        ></iframe>
+                        {member.isDefaultImage ? (
+                          <img
+                            src={DocumentImage}
+                            alt="Default Document"
+                            className="pdf-inline-preview"
+                          />
+                        ) : (
+                          <iframe
+                            src={member.documentUrl}
+                            title="PDF Preview"
+                            className="pdf-inline-preview"
+                          ></iframe>
+                        )}
 
                         <button
                           type="button"
@@ -1372,7 +1390,7 @@ function Input({ }) {
                       type="file"
                       id={`upload-${index}`}
                       className={`hidden-file-input 
-                      ${member.documentUrl ? "disable-overlay" : ""}`}
+                      ${member.documentUrl && !member.isDefaultImage ? "disable-overlay" : ""}`}
                       accept="application/pdf"
                       onChange={(event) =>
                         handleFileChange(event, relationGroup.relation, index)
@@ -1436,3 +1454,4 @@ function Input({ }) {
   );
 }
 export default Input;
+

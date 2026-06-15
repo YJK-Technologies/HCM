@@ -13,6 +13,8 @@ import { showConfirmationToast } from '../ToastConfirmation';
 import '../apps.css'
 import LoadingScreen from '../Loading';
 import * as XLSX from "xlsx-js-style";
+import DocumentImage from '../DefaultImages/Document.jpg';
+
 const config = require('../Apiconfig');
 
 function CandidateMaster() {
@@ -53,7 +55,7 @@ function CandidateMaster() {
   const [selectedcandidate_name, setSelectedcandidatename] = useState("");
   const [canditatename, set_candidatename] = useState("");
   const [isselectedscheduleid, setIsscheduleid] = useState("");
-  const [selectedCV, setSelectedCV] = useState("");
+  const [selectedCV, setSelectedCV] = useState(null);
   const [candidate_CV, setCandidate_CV] = useState("");
   const [canditatenameDrop, setcanditatenameDrop] = useState([]);
   const [canditatenameGrid, setcanditatenameGrid] = useState([]);
@@ -305,6 +307,8 @@ function CandidateMaster() {
 
   const handleRemoveLogo = () => {
     setSelectedCV(null);
+    setCandidate_CV("");
+
     if (cv.current) {
       cv.current.value = "";
     }
@@ -1223,29 +1227,29 @@ function CandidateMaster() {
           <div className="col-md-2">
             <div className="inputGroup">
               <div className="image-upload-container">
-                {selectedCV ? (
-                  <div className="image-preview-box">
+                <div className="image-preview-box">
+                  {selectedCV ? (
                     <iframe
                       src={selectedCV}
-                      alt="Uploaded CV"
+                      title="Uploaded CV"
                       className="uploaded-image"
-                    ></iframe>
-                    <button
-                      type="button"
-                      className="delete-image-btn"
-                      onClick={handleRemoveLogo}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ) : (
-                  <div className="upload-placeholder-box">
-                    <div className="upload-icon-text">
-                      <i className="fa-regular fa-image upload-icon me-1"></i>
-                      <span>Upload CV</span>
-                    </div>
-                  </div>
-                )}
+                    />
+                  ) : (
+                    <img
+                      src={DocumentImage}
+                      alt="Default Document"
+                      className="uploaded-image"
+                    />
+                  )}
+
+                  <button
+                    type="button"
+                    className="delete-image-btn"
+                    onClick={handleRemoveLogo}
+                  >
+                    &times;
+                  </button>
+                </div>
 
                 <input
                   type="file"

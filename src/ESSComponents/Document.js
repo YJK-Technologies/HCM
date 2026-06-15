@@ -11,6 +11,8 @@ import Select from "react-select";
 import DocumentPopup from "./DocumentPopup.js";
 import { showConfirmationToast } from "../ToastConfirmation";
 import LoadingScreen from "../Loading";
+import DocumentImage from '../DefaultImages/Document.jpg';
+
 const config = require("../Apiconfig");
 
 function Input({}) {
@@ -23,7 +25,7 @@ function Input({}) {
     {
       relation: "documents",
       members: [
-        { documentName: "", document: null, documentUrl: "", keyfield: "" },
+        { documentName: "", document: null, documentUrl: DocumentImage, keyfield: "", isDefaultImage: true },
       ],
     },
   ]);
@@ -409,6 +411,7 @@ const convertBufferToBlobUrlAndFile = (
               : null,
             documentUrl: documentUrl,
             document: documentFile,
+              isDefaultImage: !documentUrl,
             keyfield: keyfield,
 
             isNewFile: false,
@@ -473,12 +476,12 @@ const convertBufferToBlobUrlAndFile = (
               members: [
                 ...item.members,
                 {
-                  documentType: "",
-                  documentNo: "",
-                  issueDate: "",
-                  expiryDate: "",
-                  keyfield: ""
-                },
+  documentName: "",
+  document: null,
+  documentUrl: DocumentImage,
+  keyfield: "",
+  isDefaultImage: true,
+},
               ],
             }
           : item,
@@ -885,19 +888,26 @@ const handleUpdate = async (relationName, index) => {
   }, [location.state, documentNameDrop]);
 
   const handleRemovePdf = (relation, index) => {
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.relation === relation
-          ? {
-              ...doc,
-              members: doc.members.map((m, i) =>
-                i === index ? { ...m, document: null, documentUrl: "" } : m,
-              ),
-            }
-          : doc,
-      ),
-    );
-  };
+  setDocuments((prev) =>
+    prev.map((doc) =>
+      doc.relation === relation
+        ? {
+            ...doc,
+            members: doc.members.map((m, i) =>
+              i === index
+                ? {
+                    ...m,
+                    document: null,
+                    documentUrl: "",
+                    isDefaultImage: false,
+                  }
+                : m
+            ),
+          }
+        : doc
+    )
+  );
+};
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -1101,42 +1111,61 @@ const handleUpdate = async (relationName, index) => {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className={`image-upload-container ${error && !member.document ? "image-error" : ""}`}>
-                    {member.documentUrl ? (
-                      <div
-                        className="image-preview-box"
-                        onClick={() => handlePdfClick(member.documentUrl)}
-                      >
-                        <iframe
-                          src={member.documentUrl}
-                          title="PDF Preview"
-                          className="pdf-inline-preview"
-                        ></iframe>
+                    {member.document ? (
+  <div
+    className="image-preview-box"
+    onClick={() => handlePdfClick(member.documentUrl)}
+  >
+    <iframe
+      src={member.documentUrl}
+      title="PDF Preview"
+      className="pdf-inline-preview"
+    />
 
-                        <button
-                          type="button"
-                          className="delete-image-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemovePdf(relationGroup.relation, index);
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="upload-placeholder-box">
-                        <div className="upload-icon-text">
-                          <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
-                          <span>Upload Document</span>
-                        </div>
-                      </div>
-                    )}
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : member.isDefaultImage ? (
+  <div className="upload-placeholder-box">
+    <img
+      src={DocumentImage}
+      alt="Default Document"
+      className="uploaded-image"
+    />
+
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : (
+  <div className="upload-placeholder-box">
+    <div className="upload-icon-text">
+      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+      <span>Upload Document</span>
+    </div>
+  </div>
+)}
 
                     <input
                       type="file"
                       id={`upload-${index}`}
                       className={`hidden-file-input 
-                      ${member.documentUrl ? "disable-overlay" : ""}`}
+                      ${member.document && member.documentUrl ? "disable-overlay" : ""}`}
                       accept="application/pdf"
                       onChange={(event) =>
                         handleFileChange(event, relationGroup.relation, index)
