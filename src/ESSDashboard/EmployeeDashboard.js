@@ -57,6 +57,8 @@ const Dashboard = (payslip) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -393,6 +395,7 @@ const Dashboard = (payslip) => {
       body: JSON.stringify({
         EmployeeId: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }),
     })
       .then((data) => data.json())
@@ -422,6 +425,7 @@ const Dashboard = (payslip) => {
           body: JSON.stringify({
             start_date: startdate,
             end_date: enddate,
+            Location_Code,
             userid: sessionStorage.getItem("selectedUserCode"),
             company_code: sessionStorage.getItem("selectedCompanyCode"),
           }),
@@ -462,6 +466,7 @@ const Dashboard = (payslip) => {
         body: JSON.stringify({
           From_Date: fromDate || shiftFromDate,
           To_Date: toDate || shiftToDate,
+          Location_Code,
           Employee_ID: sessionStorage.getItem("selectedUserCode"),
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
@@ -729,6 +734,7 @@ const Dashboard = (payslip) => {
           const newRows = searchData.map((matchedItem) => ({
             HOLIDAYS: matchedItem.HOLIDAYS,
             Description: matchedItem.Description,
+            Location_Code
           }));
           setHolidayRowData(newRows);
         } else if (response.status === 404) {
@@ -760,6 +766,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -933,6 +940,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1125,6 +1133,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         }),
       });
 
@@ -1160,6 +1169,7 @@ const Dashboard = (payslip) => {
         salary_month,
         company_code,
         Employeeid,
+        Location_Code
       };
 
       const response = await fetch(`${config.apiBaseUrl}/Getpayslip`, {
