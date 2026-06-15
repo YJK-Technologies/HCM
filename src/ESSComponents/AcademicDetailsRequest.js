@@ -10,6 +10,7 @@ import AcademicDetails from "./AcademicDetPopup.js";
 import PdfPreview from "./PdfPreviewHelp";
 import LoadingScreen from "../Loading";
 import { showConfirmationToast } from "../ToastConfirmation";
+import DocumentImage from '../DefaultImages/Document.jpg';
 
 const config = require("../Apiconfig");
 
@@ -25,6 +26,7 @@ function Input({ }) {
           academicYear: "",
           document: null,
           documentUrl: "",
+          showDefaultImage: true,
           keyfield: "",
           purpose: "",
           RepManager: "",
@@ -85,15 +87,16 @@ function Input({ }) {
             members: [
               ...item.members,
               {
-                academicName: "",
-                major: "",
-                institution: "",
-                academicYear: "",
-                document: null,
-                documentUrl: "",
-                keyfield: "",
-                purpose: "",
-              },
+  academicName: "",
+  major: "",
+  institution: "",
+  academicYear: "",
+  document: null,
+  documentUrl: "",
+  showDefaultImage: true,
+  keyfield: "",
+  purpose: "",
+},
             ],
           }
           : item,
@@ -463,6 +466,7 @@ function Input({ }) {
             documentUrl: documentUrl,
             document: documentFile,
             purpose: purpose,
+            showDefaultImage: !documentUrl,
           };
 
           const existingRelation = acc.find(
@@ -494,6 +498,7 @@ function Input({ }) {
                 institution: "",
                 academicYear: "",
                 document: null,
+                showDefaultImage: true,
                 documentUrl: "",
                 keyfield: "",
                 purpose: "",
@@ -539,11 +544,12 @@ function Input({ }) {
               ...doc,
               members: doc.members.map((member, i) =>
                 i === index
-                  ? {
-                    ...member,
-                    document: file,
-                    documentUrl: fileUrl,
-                  }
+                 ? {
+    ...member,
+    document: file,
+    documentUrl: fileUrl,
+    showDefaultImage: false,
+  }
                   : member,
               ),
             }
@@ -634,19 +640,26 @@ function Input({ }) {
   };
 
   const handleRemovePdf = (relation, index) => {
-    setAcademic((prev) =>
-      prev.map((doc) =>
-        doc.relation === relation
-          ? {
+  setAcademic((prev) =>
+    prev.map((doc) =>
+      doc.relation === relation
+        ? {
             ...doc,
             members: doc.members.map((m, i) =>
-              i === index ? { ...m, document: null, documentUrl: "" } : m,
+              i === index
+                ? {
+                    ...m,
+                    document: null,
+                    documentUrl: "",
+                    showDefaultImage: false,
+                  }
+                : m
             ),
           }
-          : doc,
-      ),
-    );
-  };
+        : doc
+    )
+  );
+};
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -908,36 +921,59 @@ function Input({ }) {
               <div className="col-md-2">
                 <div className="inputGroup">
                   <div className="image-upload-container">
-                    {member.documentUrl ? (
-                      <div
-                        className="image-preview-box"
-                        onClick={() => handlePdfClick(member.documentUrl)}
-                      >
-                        <iframe
-                          src={member.documentUrl}
-                          title="PDF Preview"
-                          className="pdf-inline-preview"
-                        ></iframe>
+                    {member.documentUrl && !member.showDefaultImage ? (
+  <div
+  className="image-preview-box"
+  onClick={() => {
+    if (member.documentUrl) {
+      handlePdfClick(member.documentUrl);
+    }
+  }}
+>
+    <iframe
+      src={member.documentUrl}
+      title="PDF Preview"
+      className="pdf-inline-preview"
+    />
 
-                        <button
-                          type="button"
-                          className="delete-image-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemovePdf(relationGroup.relation, index);
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="upload-placeholder-box">
-                        <div className="upload-icon-text">
-                          <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
-                          <span>Upload Document</span>
-                        </div>
-                      </div>
-                    )}
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : member.showDefaultImage ? (
+  <div className="upload-placeholder-box">
+    <img
+      src={DocumentImage}
+      alt="Default Document"
+      className="uploaded-image"
+    />
+
+    <button
+      type="button"
+      className="delete-image-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemovePdf(relationGroup.relation, index);
+      }}
+    >
+      &times;
+    </button>
+  </div>
+) : (
+  <div className="upload-placeholder-box">
+    <div className="upload-icon-text">
+      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+      <span>Upload Document</span>
+    </div>
+  </div>
+)}
 
                     <input
                       type="file"
