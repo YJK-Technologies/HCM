@@ -22,6 +22,7 @@ function RequestReport({ }) {
   const [Status, setStatus] = useState("");
   const [mode, setMode] = useState("");
   const navigate = useNavigate();
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   useEffect(() => {
     if (requestData.type) {
@@ -2625,8 +2626,7 @@ function RequestReport({ }) {
 
   const fetchPersonalData = async () => {
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+      const response = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
         {
           method: "POST",
           headers: {
@@ -2635,6 +2635,7 @@ function RequestReport({ }) {
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             column_name: "",
+            Location_Code,
             from_date: null,
             to_date: null,
           }),
@@ -2656,8 +2657,7 @@ function RequestReport({ }) {
     try {
       setLoadingPersonal(true);
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/GetPersonalRequestDetails`,
+      const response = await fetch(`${config.apiBaseUrl}/GetPersonalRequestDetails`,
         {
           method: "POST",
           headers: {
@@ -2667,6 +2667,7 @@ function RequestReport({ }) {
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             Info_request_id: PersonalInfoId || 0,
             EmployeeId: PersonalEmpId,
+            Location_Code,
             column_name: personalColumn,
             from_date: personalFromDate || null,
             to_date: personalToDate || null,
@@ -2692,8 +2693,7 @@ function RequestReport({ }) {
     try {
       const status = isApproved ? "Approved" : "Rejected";
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/ApprovePersonalRequest`,
+      const response = await fetch(`${config.apiBaseUrl}/ApprovePersonalRequest`,
         {
           method: "POST",
           headers: {
@@ -2707,6 +2707,7 @@ function RequestReport({ }) {
                 company_code: row.company_code,
                 EmployeeId: row.EmployeeId,
                 request_status: status,
+                Location_Code,
                 created_by: sessionStorage.getItem("selectedUserCode"),
                 modified_by: sessionStorage.getItem("selectedUserCode"),
               },
@@ -2850,6 +2851,7 @@ function RequestReport({ }) {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Info_request_id: 0,
+          Location_Code,
           EmployeeId: "",
           column_name: "",
           from_date: null,
@@ -2893,6 +2895,7 @@ function RequestReport({ }) {
           column_name: familyColumn,
           from_date: familyFromDate || null,
           to_date: familyToDate || null,
+          Location_Code
         }),
       });
 
@@ -2935,6 +2938,7 @@ function RequestReport({ }) {
               info_request_id: row.info_request_id,
               company_code: row.company_code,
               EmployeeId: row.EmployeeId,
+              Location_Code,
               request_status: status,
               created_by: sessionStorage.getItem("selectedUserCode"),
               modified_by: sessionStorage.getItem("selectedUserCode"),

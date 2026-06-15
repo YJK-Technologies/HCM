@@ -142,6 +142,8 @@ const Dashboard = () => {
   const hasStoppedRef = useRef(false);
   const intervalRef = useRef(null);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
 
   // useEffect(() => {
   //   fetchDashboardData();
@@ -964,7 +966,7 @@ const Dashboard = () => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'),}),
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
         });
 
         if (res.ok) visaData = await res.json();
@@ -1006,7 +1008,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ RepManager: user_code, company_code }),
+            body: JSON.stringify({ RepManager: user_code, company_code, Location_Code }),
           },
         );
 
@@ -1021,7 +1023,11 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({
+              company_code,
+              RepManager: user_code,
+              Location_Code
+            }),
           },
         );
 
@@ -1410,10 +1416,15 @@ const Dashboard = () => {
         url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
 
         body = {
-          Info_request_id: id,
-          company_code,
-          request_status: status,
-          approver_id: sessionStorage.getItem("selectedUserCode"),
+          approvalData: [
+            {
+              Info_request_id: id,
+              company_code,
+              Location_Code,
+              request_status: status,
+              approver_id: sessionStorage.getItem("selectedUserCode"),
+            },
+          ],
         };
       }
 
@@ -1422,11 +1433,16 @@ const Dashboard = () => {
         url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
 
         body = {
-          Info_request_id: id,
-          company_code,
-          request_status: status,
-          approver_id: sessionStorage.getItem("selectedUserCode"),
-          modified_by: sessionStorage.getItem("selectedUserCode"),
+          approvalData: [
+            {
+              Info_request_id: id,
+              company_code,
+              Location_Code,
+              request_status: status,
+              approver_id: sessionStorage.getItem("selectedUserCode"),
+              modified_by: sessionStorage.getItem("selectedUserCode"),
+            }
+          ]
         };
       }
 

@@ -557,8 +557,7 @@ const handleUpdate = async (relationName, index) => {
       try {
         setLoading(true);
 
-        const response = await fetch(
-          `${config.apiBaseUrl}/updateEmployeeFamily`,
+        const response = await fetch(`${config.apiBaseUrl}/updateEmployeeFamily`,
           {
             method: "POST",
             headers: {

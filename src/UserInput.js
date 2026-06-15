@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from './Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import UserProfile from './DefaultImages/User.png';
 
 const config = require('./Apiconfig');
 
@@ -32,7 +33,7 @@ function UserInput({ }) {
   const [Loginoroutdrop, setLoginoroutdrop] = useState([]);
   const [error, setError] = useState(false);
   const [user_images, setuser_image] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(UserProfile);
   const navigate = useNavigate();
   const usercode = useRef(null);
   const username = useRef(null);
@@ -69,12 +70,95 @@ function UserInput({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create";
   const selectedRow = locationState.selectedRow || null;
+  const userCode = location.state?.user_code;
+  const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
     if (!location.state) {
       clearInputFields(); // ensure fresh create mode
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && userCode) {
+      fetchUserData();
+    }
+  }, [mode, userCode]);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getUserData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_code: userCode,
+          company_code
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const user = data[0];
+
+        setUser_code(user.user_code || "");
+        setUser_name(user.user_name || "");
+        setFirst_name(user.first_name || "");
+        setLast_name(user.last_name || "");
+        setUser_password(user.user_password || "");
+        setRole(user.role_id || "");
+        setLog_in_out(user.log_in_out || "");
+        setUser_status(user.user_status || "");
+        setGender(user.gender || "");
+        setSuperAdmin(
+          user.super_admin?.toLowerCase() === "yes"
+        );
+        setSelectedStatus({
+          label: user.user_status,
+          value: user.user_status,
+        });
+        setSelectedRole({
+          label: user.role_id,
+          value: user.role_id,
+        });
+        setSelectedLog({
+          label: user.log_in_out,
+          value: user.log_in_out,
+        });
+        setSelectedGender({
+          label: user.gender,
+          value: user.gender,
+        });
+        setEmail_id(user.email_id || "");
+
+        if (user.dob) {
+          const formattedDate = new Date(user.dob).toISOString().split("T")[0];
+          setDob(formattedDate);
+        } else {
+          setDob("");
+        }
+
+        if (user.user_images && user.user_images.data) {
+          const base64Image = arrayBufferToBase64(user.user_images.data);
+          const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'user_image.jpg');
+          setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
+          setuser_image(file);
+        } else {
+          setSelectedImage(null);
+          setuser_image(null);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch user details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setUser_code("");
@@ -93,7 +177,7 @@ function UserInput({ }) {
     setEmail_id("");
     setDob("");
     setUser_password("");
-    setSelectedImage("");
+    setSelectedImage(UserProfile);
     if (ImagE.current) {
       ImagE.current.value = null;
     }
@@ -108,59 +192,59 @@ function UserInput({ }) {
     return window.btoa(binary);
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow) {
-      setUser_code(selectedRow.user_code || "");
-      setUser_name(selectedRow.user_name || "");
-      setFirst_name(selectedRow.first_name || "");
-      setLast_name(selectedRow.last_name || "");
-      setUser_password(selectedRow.user_password || "");
-      setRole(selectedRow.role_id || "");
-      setLog_in_out(selectedRow.log_in_out || "");
-      setUser_status(selectedRow.user_status || "");
-      setGender(selectedRow.gender || "");
-      setSuperAdmin(
-        selectedRow.super_admin?.toLowerCase() === "yes"
-      );
-      setSelectedStatus({
-        label: selectedRow.user_status,
-        value: selectedRow.user_status,
-      });
-      setSelectedRole({
-        label: selectedRow.role_id,
-        value: selectedRow.role_id,
-      });
-      setSelectedLog({
-        label: selectedRow.log_in_out,
-        value: selectedRow.log_in_out,
-      });
-      setSelectedGender({
-        label: selectedRow.gender,
-        value: selectedRow.gender,
-      });
-      setEmail_id(selectedRow.email_id || "");
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setUser_code(selectedRow.user_code || "");
+  //     setUser_name(selectedRow.user_name || "");
+  //     setFirst_name(selectedRow.first_name || "");
+  //     setLast_name(selectedRow.last_name || "");
+  //     setUser_password(selectedRow.user_password || "");
+  //     setRole(selectedRow.role_id || "");
+  //     setLog_in_out(selectedRow.log_in_out || "");
+  //     setUser_status(selectedRow.user_status || "");
+  //     setGender(selectedRow.gender || "");
+  //     setSuperAdmin(
+  //       selectedRow.super_admin?.toLowerCase() === "yes"
+  //     );
+  //     setSelectedStatus({
+  //       label: selectedRow.user_status,
+  //       value: selectedRow.user_status,
+  //     });
+  //     setSelectedRole({
+  //       label: selectedRow.role_id,
+  //       value: selectedRow.role_id,
+  //     });
+  //     setSelectedLog({
+  //       label: selectedRow.log_in_out,
+  //       value: selectedRow.log_in_out,
+  //     });
+  //     setSelectedGender({
+  //       label: selectedRow.gender,
+  //       value: selectedRow.gender,
+  //     });
+  //     setEmail_id(selectedRow.email_id || "");
 
-      if (selectedRow.dob) {
-        const formattedDate = new Date(selectedRow.dob).toISOString().split("T")[0];
-        setDob(formattedDate);
-      } else {
-        setDob("");
-      }
+  //     if (selectedRow.dob) {
+  //       const formattedDate = new Date(selectedRow.dob).toISOString().split("T")[0];
+  //       setDob(formattedDate);
+  //     } else {
+  //       setDob("");
+  //     }
 
-      if (selectedRow.user_images && selectedRow.user_images.data) {
-        const base64Image = arrayBufferToBase64(selectedRow.user_images.data);
-        const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'user_image.jpg');
-        setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
-        setuser_image(file);
-      } else {
-        setSelectedImage(null);
-        setuser_image(null);
-      }
+  //     if (selectedRow.user_images && selectedRow.user_images.data) {
+  //       const base64Image = arrayBufferToBase64(selectedRow.user_images.data);
+  //       const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'user_image.jpg');
+  //       setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
+  //       setuser_image(file);
+  //     } else {
+  //       setSelectedImage(null);
+  //       setuser_image(null);
+  //     }
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
   const base64ToFile = (base64Data, fileName) => {
     if (!base64Data || !base64Data.startsWith("data:")) {
@@ -444,7 +528,8 @@ function UserInput({ }) {
   const handleNavigate = () => {
     navigate("/User", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs,
       },
     });
@@ -733,30 +818,30 @@ function UserInput({ }) {
           </div>
 
           {/* {mode !== 'update' && ( */}
-            <div className="col-md-2">
-              <div
-                className={`inputGroup selectGroup 
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
               ${selectedRole ? "has-value" : ""} 
               ${isSelectRole ? "is-focused" : ""}`}
-                title="Please Select the Role ID"
-              >
-                <Select
-                  id="usertype"
-                  value={selectedRole}
-                  onChange={handleChangeRole}
-                  options={filteredOptionRole}
-                  placeholder=" "
-                  onFocus={() => setIsSelectRole(true)}
-                  onBlur={() => setIsSelectRole(false)}
-                  classNamePrefix="react-select"
-                  isClearable
-                  maxLength={50}
-                  ref={usertype}
-                  onKeyDown={(e) => handleKeyDown(e, email, usertype)}
-                />
-                <label for="state" className={`floating-label ${error && !role_id ? 'text-danger' : ''}`}>Role ID<span className="text-danger">*</span></label>
-              </div>
+              title="Please Select the Role ID"
+            >
+              <Select
+                id="usertype"
+                value={selectedRole}
+                onChange={handleChangeRole}
+                options={filteredOptionRole}
+                placeholder=" "
+                onFocus={() => setIsSelectRole(true)}
+                onBlur={() => setIsSelectRole(false)}
+                classNamePrefix="react-select"
+                isClearable
+                maxLength={50}
+                ref={usertype}
+                onKeyDown={(e) => handleKeyDown(e, email, usertype)}
+              />
+              <label for="state" className={`floating-label ${error && !role_id ? 'text-danger' : ''}`}>Role ID<span className="text-danger">*</span></label>
             </div>
+          </div>
           {/* )} */}
 
           <div className="col-md-2">
@@ -844,7 +929,7 @@ function UserInput({ }) {
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedImage}
+                      src={selectedImage || UserProfile}
                       alt="Uploaded Signature"
                       className="uploaded-image"
                     />
@@ -898,7 +983,7 @@ function UserInput({ }) {
 
           <div class="col-12">
             <div className="search-btn-wrapper">
-              {mode === "update" && selectedRow ? (
+              {mode === "update" ? (
                 <div className="icon-btn update" onClick={handleUpdate}>
                   <span className="tooltip">Update</span>
                   <i class="fa-solid fa-pen-to-square"></i>

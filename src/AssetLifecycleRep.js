@@ -93,6 +93,8 @@ function AssetLifecycleRep({ }) {
   const [LastReturnDateSC, setLastReturnDateSC] = useState("");
   const [TotalDaysUsedSC, setTotalDaysUsedSC] = useState("");
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const assetLifecycleRepPermissions = permissions
     .filter((permission) => permission.screen_type === "AssetLifecycleRep")
@@ -293,7 +295,7 @@ function AssetLifecycleRep({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         });
 
         if (!response.ok) {

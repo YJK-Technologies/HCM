@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Select from 'react-select'
 import LoadingScreen from './Loading';
+import Logo from './DefaultImages/Logo.PNG';
+import Signature from './DefaultImages/Signature.png';
 
 const config = require('./Apiconfig');
 
@@ -41,8 +43,8 @@ function Input({ }) {
   const [selectedCountry, setselectedCountry] = useState('');
   const [selectedStatus, setselectedStatus] = useState('');
   const [selectedLocation, setselectedLocation] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedSignatureImage, setselectedSignatureImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(Logo);
+  const [selectedSignatureImage, setselectedSignatureImage] = useState(Signature);
   const [isSelectCity, setIsSelectCity] = useState(false);
   const [isSelectState, setIsSelectState] = useState(false);
   const [isSelectCountry, setIsSelectCountry] = useState(false);
@@ -80,12 +82,114 @@ function Input({ }) {
   const locationState = location.state || {};
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
+  const companyNo = location.state?.company_no;
 
   useEffect(() => {
     if (!location.state) {
-      clearInputFields(); // ensure fresh create mode
+      clearInputFields(); 
     }
   }, []);
+
+  useEffect(() => {
+    if (mode === "update" && companyNo) {
+      fetchCompanyData();
+    }
+  }, [mode, companyNo]);
+
+  const fetchCompanyData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${config.apiBaseUrl}/getCompanyData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_no: companyNo,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.length > 0) {
+        const company = data[0];
+
+        setCompany_no(company.company_no || "");
+        setCompany_name(company.company_name || "");
+        setShort_name(company.short_name || "");
+        setAddress1(company.address1 || "");
+        setAddress2(company.address2 || "");
+        setAddress3(company.address3 || "");
+
+        setCity(company.city || "");
+        setSelectedCity({
+          label: company.city,
+          value: company.city,
+        });
+
+        setState(company.state || "");
+        setselectedState({
+          label: company.state,
+          value: company.state,
+        });
+
+        setCountry(company.country || "");
+        setselectedCountry({
+          label: company.country,
+          value: company.country,
+        });
+
+        setStatus(company.status || "");
+        setselectedStatus({
+          label: company.status,
+          value: company.status,
+        });
+
+        setlocation_no(company.location_no || "");
+        setselectedLocation({
+          label: company.location_no,
+          value: company.location_no,
+        });
+
+        setPincode(company.pincode || "");
+        setEmail_id(company.email_id || "");
+        setWebsiteURL(company.websiteURL || "");
+        setContact_no(company.contact_no || "");
+        setAnnualReportURL(company.annualReportURL || "");
+        setcompany_gst_no(company.company_gst_no || "");
+
+        if (company.foundedDate) {
+          setFoundedDate(
+            new Date(company.foundedDate).toISOString().split("T")[0]
+          );
+        }
+
+        if (company.company_logo && company.company_logo.data) {
+          const base64Image = arrayBufferToBase64(company.company_logo.data);
+          const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'company_logo.jpg');
+          setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
+          setCompanyImage(file)
+        } else {
+          setSelectedImage(null);
+        }
+
+        if (company.authorisedSignatur && company.authorisedSignatur.data) {
+          const base64Image = arrayBufferToBase64(company.authorisedSignatur.data);
+          const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'authorisedSignatur.jpg');
+          setselectedSignatureImage(`data:image/jpeg;base64,${base64Image}`);
+          setSignatureImage(file)
+        } else {
+          setselectedSignatureImage(null);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch company details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearInputFields = () => {
     setCompany_no("");
@@ -105,14 +209,14 @@ function Input({ }) {
     setWebsiteURL("");
     setContact_no("");
     setAnnualReportURL("");
-    setSelectedImage("");
+    setSelectedImage(Logo);
     setcompany_gst_no("")
     setCity('');
     setState('');
     setCountry('');
     setStatus('');
     setlocation_no('');
-    setselectedSignatureImage("");
+    setselectedSignatureImage(Signature);
     if (logo.current) {
       logo.current.value = null;
     }
@@ -132,75 +236,75 @@ function Input({ }) {
     return window.btoa(binary);
   };
 
-  useEffect(() => {
-    if (mode === "update" && selectedRow && !isUpdated) {
-      setCompany_no(selectedRow.company_no || "");
-      setCompany_name(selectedRow.company_name || "");
-      setShort_name(selectedRow.short_name || "");
-      setAddress1(selectedRow.address1 || "");
-      setAddress2(selectedRow.address2 || "");
-      setAddress3(selectedRow.address3 || "");
-      setcompany_gst_no(selectedRow.company_gst_no || "");
-      setSelectedCity({
-        label: selectedRow.city,
-        value: selectedRow.city,
-      });
-      setCity(selectedRow.city || "")
-      setselectedState({
-        label: selectedRow.state,
-        value: selectedRow.state,
-      });
-      setState(selectedRow.state || "")
-      setselectedCountry({
-        label: selectedRow.country,
-        value: selectedRow.country,
-      });
-      setCountry(selectedRow.country || "")
-      setselectedStatus({
-        label: selectedRow.status,
-        value: selectedRow.status,
-      });
-      setStatus(selectedRow.status || '')
-      setselectedLocation({
-        label: selectedRow.location_no,
-        value: selectedRow.location_no,
-      });
-      setlocation_no(selectedRow.location_no || "")
-      setPincode(selectedRow.pincode || "");
-      setEmail_id(selectedRow.email_id || "");
-      setWebsiteURL(selectedRow.websiteURL || "");
-      setContact_no(selectedRow.contact_no || "");
-      setAnnualReportURL(selectedRow.annualReportURL || "");
+  // useEffect(() => {
+  //   if (mode === "update" && selectedRow) {
+  //     setCompany_no(selectedRow.company_no || "");
+  //     setCompany_name(selectedRow.company_name || "");
+  //     setShort_name(selectedRow.short_name || "");
+  //     setAddress1(selectedRow.address1 || "");
+  //     setAddress2(selectedRow.address2 || "");
+  //     setAddress3(selectedRow.address3 || "");
+  //     setcompany_gst_no(selectedRow.company_gst_no || "");
+  //     setSelectedCity({
+  //       label: selectedRow.city,
+  //       value: selectedRow.city,
+  //     });
+  //     setCity(selectedRow.city || "")
+  //     setselectedState({
+  //       label: selectedRow.state,
+  //       value: selectedRow.state,
+  //     });
+  //     setState(selectedRow.state || "")
+  //     setselectedCountry({
+  //       label: selectedRow.country,
+  //       value: selectedRow.country,
+  //     });
+  //     setCountry(selectedRow.country || "")
+  //     setselectedStatus({
+  //       label: selectedRow.status,
+  //       value: selectedRow.status,
+  //     });
+  //     setStatus(selectedRow.status || '')
+  //     setselectedLocation({
+  //       label: selectedRow.location_no,
+  //       value: selectedRow.location_no,
+  //     });
+  //     setlocation_no(selectedRow.location_no || "")
+  //     setPincode(selectedRow.pincode || "");
+  //     setEmail_id(selectedRow.email_id || "");
+  //     setWebsiteURL(selectedRow.websiteURL || "");
+  //     setContact_no(selectedRow.contact_no || "");
+  //     setAnnualReportURL(selectedRow.annualReportURL || "");
 
-      if (selectedRow.foundedDate) {
-        const formattedDate = new Date(selectedRow.foundedDate).toISOString().split("T")[0];
-        setFoundedDate(formattedDate);
-      } else {
-        setFoundedDate("");
-      }
+  //     if (selectedRow.foundedDate) {
+  //       const formattedDate = new Date(selectedRow.foundedDate).toISOString().split("T")[0];
+  //       setFoundedDate(formattedDate);
+  //     } else {
+  //       setFoundedDate("");
+  //     }
 
-      if (selectedRow.company_logo && selectedRow.company_logo.data) {
-        const base64Image = arrayBufferToBase64(selectedRow.company_logo.data);
-        const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'company_logo.jpg');
-        setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
-        setCompanyImage(file)
-      } else {
-        setSelectedImage(null);
-      }
+  //     if (selectedRow.company_logo && selectedRow.company_logo.data) {
+  //       const base64Image = arrayBufferToBase64(selectedRow.company_logo.data);
+  //       const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'company_logo.jpg');
+  //       setSelectedImage(`data:image/jpeg;base64,${base64Image}`);
+  //       setCompanyImage(file)
+  //     } else {
+  //       setSelectedImage(null);
+  //     }
 
-      if (selectedRow.authorisedSignatur && selectedRow.authorisedSignatur.data) {
-        const base64Image = arrayBufferToBase64(selectedRow.authorisedSignatur.data);
-        const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'authorisedSignatur.jpg');
-        setselectedSignatureImage(`data:image/jpeg;base64,${base64Image}`);
-        setSignatureImage(file)
-      } else {
-        setselectedSignatureImage(null);
-      }
+  //     if (selectedRow.authorisedSignatur && selectedRow.authorisedSignatur.data) {
+  //       const base64Image = arrayBufferToBase64(selectedRow.authorisedSignatur.data);
+  //       const file = base64ToFile(`data:image/jpeg;base64,${base64Image}`, 'authorisedSignatur.jpg');
+  //       setselectedSignatureImage(`data:image/jpeg;base64,${base64Image}`);
+  //       setSignatureImage(file)
+  //     } else {
+  //       setselectedSignatureImage(null);
+  //     }
 
-    } else if (mode === "create") {
-      clearInputFields();
-    }
-  }, [mode, selectedRow, isUpdated]);
+  //   } else if (mode === "create") {
+  //     clearInputFields();
+  //   }
+  // }, [mode, selectedRow]);
 
 
   const base64ToFile = (base64Data, fileName) => {
@@ -499,7 +603,8 @@ function Input({ }) {
   const handleNavigate = () => {
     navigate("/Company", {
       state: {
-        preservedRowData: location.state?.preservedRowData,
+        refreshGrid: true,
+        // preservedRowData: location.state?.preservedRowData,
         preservedInputs: location.state?.preservedInputs
       }
     });
@@ -1022,7 +1127,7 @@ function Input({ }) {
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedImage}
+                      src={selectedImage || Logo}
                       alt="Uploaded Logo"
                       className="uploaded-image"
                     />
@@ -1068,7 +1173,7 @@ function Input({ }) {
                 {selectedSignatureImage ? (
                   <div className="image-preview-box">
                     <img
-                      src={selectedSignatureImage}
+                      src={selectedSignatureImage || Signature}
                       alt="Uploaded Signature"
                       className="uploaded-image"
                     />

@@ -94,6 +94,8 @@ function Assets({ }) {
   const [CountrySC, setCountrySC] = useState("");
   const [StatusSC, setStatusSC] = useState("");
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getLeaveStatus`, {
       method: "POST",
@@ -740,7 +742,7 @@ function Assets({ }) {
         CurrencyCode: CurrencyCode,
         VendorName: VendorNameSC,
         AssetStatus: AssetStatus,
-        Location: LocationSC,
+        Location_Code,
         Country: Country,
         Status: StatusSC,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -812,7 +814,7 @@ function Assets({ }) {
         WarrantyStart: WarrantyStart,
         WarrantyEnd: WarrantyEnd,
         AssetStatus: "Not Allocated",
-        Location: Location,
+        Location_Code,
         Country: Country,
         Status: Status,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
@@ -864,12 +866,14 @@ function Assets({ }) {
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
+                Location_Code,
                 modify_by,
               }))
               : [
                 {
                   ...rowData,
                   company_code,
+                  Location_Code,
                   modify_by,
                 },
               ],
@@ -923,12 +927,14 @@ function Assets({ }) {
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
+                Location_Code,
                 modify_by,
               }))
               : [
                 {
                   ...rowData,
                   company_code,
+                  Location_Code,
                   modify_by,
                 },
               ],
@@ -1574,8 +1580,8 @@ function Assets({ }) {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                            ${selectedCurrencySc ? "has-value" : ""} 
-                            ${isSelectedCurrencySc ? "is-focused" : ""}`}
+              ${selectedCurrencySc ? "has-value" : ""} 
+              ${isSelectedCurrencySc ? "is-focused" : ""}`}
               title="Please select the Currency Code"
             >
               <Select

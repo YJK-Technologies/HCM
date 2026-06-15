@@ -82,11 +82,13 @@ function LocInfoGrid() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.preservedRowData) {
-      setRowData(location.state.preservedRowData);
-    }
+    // if (location.state?.preservedRowData) {
+    //   setRowData(location.state.preservedRowData);
+    // }
     if (location.state?.preservedInputs) {
+
       const inputs = location.state.preservedInputs;
+
       setlocation_no(inputs.location_no || "");
       setlocation_name(inputs.location_name || "");
       setcity(inputs.city || "");
@@ -94,14 +96,18 @@ function LocInfoGrid() {
       setpincode(inputs.pincode || "");
       setcountry(inputs.country || "");
       setstatus(inputs.status || "");
+
       if (inputs.status) {
         setSelectedStatus({
           label: inputs.status,
           value: inputs.status,
         });
-      } else {
-        setSelectedStatus(null);
       }
+
+      if (location.state?.refreshGrid) {
+        handleSearch(inputs); 
+      }
+
     }
   }, [location.state]);
 
@@ -216,7 +222,7 @@ function LocInfoGrid() {
     window.location.reload();
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
       const response = await fetch(`${config.apiBaseUrl}/locationSearchdata`, {
@@ -225,13 +231,13 @@ function LocInfoGrid() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          location_no,
-          location_name,
-          city,
-          state,
-          pincode,
-          country,
-          status,
+          location_no: searchParams?.location_no ?? location_no,
+          location_name: searchParams?.location_name ?? location_name,
+          city: searchParams?.city ?? city,
+          state: searchParams?.state ?? state,
+          pincode: searchParams?.pincode ?? pincode,
+          country: searchParams?.country ?? country,
+          status: searchParams?.status ?? status,
         }),
       });
 
@@ -635,11 +641,29 @@ function LocInfoGrid() {
     navigate("/AddLocation", { state: { mode: "create" } });
   };
 
+  // const handleNavigateWithRowData = (selectedRow) => {
+  //   navigate("/AddLocation", {
+  //     state: {
+  //       mode: "update", selectedRow, preservedRowData: rowData,
+  //       preservedInputs: { location_no, location_name, city, state, pincode, country, status, },
+  //     },
+  //   });
+  // };
+
   const handleNavigateWithRowData = (selectedRow) => {
     navigate("/AddLocation", {
       state: {
-        mode: "update", selectedRow, preservedRowData: rowData,
-        preservedInputs: { location_no, location_name, city, state, pincode, country, status, },
+        mode: "update", 
+        location_no: selectedRow.location_no, 
+        preservedInputs: { 
+          location_no, 
+          location_name, 
+          city, 
+          state, 
+          pincode,
+          country, 
+          status, 
+        },
       },
     });
   };
