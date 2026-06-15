@@ -48296,7 +48296,7 @@ const getAGESTypes = async (req, res) => {
 
 //code added by pavun on 02-04-2026
 const shiftChangeRequestSearch = async (req, res) => {
-  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, is_swap_request, request_status, company_code } = req.body;
+  const { shift_from_date, shift_to_date, employee_id, current_shift_id, requested_shift_id, is_swap_request, request_status, company_code, Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
