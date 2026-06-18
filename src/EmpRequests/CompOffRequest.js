@@ -283,7 +283,7 @@ const EmployeeCompOff = () => {
 
   const defaultColDef = {
     resizable: true,
-    wrapText: true,
+    wrapText: false,
   };
 
   const handleCompOffSearch = async () => {

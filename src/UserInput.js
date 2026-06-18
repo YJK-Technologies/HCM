@@ -429,7 +429,7 @@ function UserInput({ }) {
     const roleValue = selectedRole?.value || '';
     setRole(roleValue);
 
-    if (['user', 'us', 'admin', 'ad'].includes(roleValue.toLowerCase())) {
+    if (!["sa", "super admin"].includes(roleValue.toLowerCase())) {
       setSuperAdmin(false);
     }
   };
@@ -915,7 +915,7 @@ function UserInput({ }) {
                 type="checkbox"
                 id="superAdmin"
                 checked={superAdmin}
-                disabled={['user', 'us', 'admin', 'ad'].includes(role_id?.toLowerCase())}
+                disabled={!["sa", "super admin"].includes(role_id?.toLowerCase())}
                 onChange={(e) => setSuperAdmin(e.target.checked)}
                 ref={SuperAdmin}
               />
