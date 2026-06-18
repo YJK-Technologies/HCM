@@ -311,7 +311,7 @@ function AgesReport() {
     reportWindow.document.write(`
   <html>
   <head>
-    <title>AGES Report</title>
+    <title>Age Report</title>
 <style>
   body{
     font-family:'Segoe UI',sans-serif;
@@ -455,7 +455,7 @@ function AgesReport() {
     <div class="header">
       <img src="${logoUrl}" class="logo"/>
       <div class="title-section">
-        <h2>AGES Report</h2>
+        <h2>Age Report</h2>
       </div>
     </div>
 
@@ -831,8 +831,8 @@ function AgesReport() {
           <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
-                  ${selectedEmpIdSc ? "has-value" : ""} 
-                  ${isSelectedEmpIdSc ? "is-focused" : ""}`}
+              ${selectedEmpIdSc ? "has-value" : ""} 
+              ${isSelectedEmpIdSc ? "is-focused" : ""}`}
               title="Please enter the Employee ID"
             >
               <Select
