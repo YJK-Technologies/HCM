@@ -53,11 +53,44 @@ function AgesReport() {
 
   const location = useLocation();
 
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const [dynamicOptions, setDynamicOptions] = useState([]);
+  const [selectedDsg, setSelectedDsg] = useState('');
+  const [isSelectDesignation, setIsSelectDesignation] = useState(false);
+
   //--------------- DEPARTMENT ID-----------------
 
   const handleDPT = (selectedDPT) => {
     setselecteddept(selectedDPT);
     setDepartmentId(selectedDPT ? selectedDPT.value : "");
+    fetchDesignation(selectedDPT ? selectedDPT.value : '');
+  };
+
+  const fetchDesignation = async (selectedValue) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDesgination`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dept_id: selectedValue, company_code }),
+      });
+
+      const data = await response.json();
+      const formattedData = [
+        { value: 'All', label: 'All' },
+        ...data.map((product) => ({
+          value: product.Desgination,
+          label: `${product.Desgination} - ${product.DesignationName}`,
+        }))
+      ];
+
+      setDynamicOptions(formattedData);
+      return formattedData;
+    } catch (error) {
+      console.error('Error fetching product codes:', error);
+      return [];
+    }
   };
 
   const filteredOptionDPt = DPTdrop.map((option) => ({
@@ -66,8 +99,6 @@ function AgesReport() {
   }));
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem("selectedCompanyCode");
-
     const fetchDept = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/DeptID`, {
@@ -93,6 +124,12 @@ function AgesReport() {
       fetchDept();
     }
   }, []);
+
+  const handleChangedesgination = (selecteddesg) => {
+    setSelectedDsg(selecteddesg);
+    setdesignation_id(selecteddesg ? selecteddesg.value : '');
+  };
+
   //--------------- Employee ID-----------------
   const handleChangeEmpIdSc = (selectedEmpIdSc) => {
     setSelectedEmpIdSc(selectedEmpIdSc);
@@ -893,7 +930,7 @@ function AgesReport() {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 className="exp-input-field form-control"
@@ -904,6 +941,30 @@ function AgesReport() {
                 onChange={(e) => setdesignation_id(e.target.value)}
               />
               <label for="sname" className="exp-form-labels">
+                Designation
+              </label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedDsg ? "has-value" : ""} 
+              ${isSelectDesignation ? "is-focused" : ""}`}
+            >
+              <Select
+                id="designation"
+                placeholder=" "
+                onFocus={() => setIsSelectDesignation(true)}
+                onBlur={() => setIsSelectDesignation(false)}
+                classNamePrefix="react-select"
+                isClearable
+                name="designation_ID"
+                value={selectedDsg}
+                options={dynamicOptions}
+                onChange={handleChangedesgination}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
                 Designation
               </label>
             </div>
@@ -982,8 +1043,8 @@ function AgesReport() {
       </div>
 
       {/* Grid */}
-      <div className="shadow-lg pt-3 bg-light rounded mt-2 container-form-box">
-        <div className="ag-theme-quartz" style={{ height: 500, width: "100%" }}>
+      <div className="shadow-lg pt-3 bg-light rounded mt-2">
+        <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
           <AgGridReact
             rowData={rowData}
             columnDefs={columnDefs}

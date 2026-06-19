@@ -16088,9 +16088,7 @@ const getDesgination = async (req, res) => {
       .request()
       .input("dept_id", sql.NVarChar, dept_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_desgination 'F',@dept_id,'', '', '', @company_code,'', '', '',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .query(`EXEC sp_desgination 'F',@dept_id,'', '', '', @company_code,'', '', '',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
