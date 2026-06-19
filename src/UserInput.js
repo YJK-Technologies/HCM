@@ -388,7 +388,7 @@ function UserInput({ }) {
   const filteredOptionRole = Array.isArray(roleDrop)
     ? roleDrop.map((option) => ({
       value: option.role_id,
-      label: option.role_name,
+      label: `${option.role_id} - ${option.role_name}`,
     }))
     : [];
 
