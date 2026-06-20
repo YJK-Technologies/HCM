@@ -258,6 +258,14 @@ function UserScreenMapGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -824,6 +832,7 @@ function UserScreenMapGrid() {
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             onCellValueChanged={onCellValueChanged}
             rowSelection="multiple"
             onSelectionChanged={onSelectionChanged}

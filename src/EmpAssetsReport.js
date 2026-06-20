@@ -497,6 +497,14 @@ function EmpAssetsReport({ }) {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const reloadGridData = () => {
     setRowData([]);
     searchClearInputFields();
@@ -1305,6 +1313,7 @@ function EmpAssetsReport({ }) {
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             paginationAutoPageSize={true}
             gridOptions={gridOptions}

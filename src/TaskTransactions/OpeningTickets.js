@@ -231,6 +231,14 @@ function Input({}) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -1057,6 +1065,7 @@ function Input({}) {
             columnDefs={searchColumnDefs}
             rowData={searchRowData}
             onCellClicked={(params) => handleNavigateWithRowData(params.data)}
+            onFirstDataRendered={onFirstDataRendered}
             pagination={true}
             rowHeight={27}
             headerHeight={27}

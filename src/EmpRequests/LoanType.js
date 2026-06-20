@@ -354,6 +354,14 @@ function LoanType({ }) {
         setGridColumnApi(params.columnApi);
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const handleSearch = async () => {
         setLoading(true)
         try {
@@ -1225,6 +1233,7 @@ function LoanType({ }) {
                         rowData={rowData}
                         columnDefs={columnDefs}
                         onGridReady={onGridReady}
+                        onFirstDataRendered={onFirstDataRendered}
                         pagination={true}
                         paginationAutoPageSize={true}
                         gridOptions={gridOptions}

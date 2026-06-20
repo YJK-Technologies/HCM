@@ -389,7 +389,6 @@ updated[0].members[index].isDefaultImage = false;
         }
     };
 
-
     return (
         <div className="container-fluid Topnav-screen">
             {loading && <LoadingScreen />}

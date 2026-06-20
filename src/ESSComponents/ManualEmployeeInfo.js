@@ -178,8 +178,8 @@ function ManualEmployeeInfo({ }) {
       !address2 ||
       !address3 ||
       !permanantAddress ||
-      !pan_No ||
-      !Aadhaar_no ||
+      // !pan_No ||
+      // !Aadhaar_no ||
       !selectedmartial ||
       !kids ||
       !Grade_id ||
@@ -1504,12 +1504,7 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={20}
               />
-              <label
-                htmlFor="Panno"
-                className={`exp-form-labels ${error && !pan_No ? "text-danger" : ""}`}
-              >
-                PAN No{showAsterisk && <span className="text-danger">*</span>}
-              </label>
+              <label htmlFor="Panno" className="exp-form-labels" >PAN No </label> 
             </div>
           </div>
 
@@ -1532,13 +1527,7 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={18}
               />
-              <label
-                htmlFor="Aadharno"
-                className={`exp-form-labels ${error && !Aadhaar_no ? "text-danger" : ""}`}
-              >
-                Aadhaar No
-                {showAsterisk && <span className="text-danger">*</span>}
-              </label>
+              <label htmlFor="Aadharno" className="exp-form-labels" > Aadhaar No </label>
             </div>
           </div>
 

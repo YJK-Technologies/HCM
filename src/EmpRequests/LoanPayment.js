@@ -314,6 +314,14 @@ function LoanPayment({ }) {
         paginationPageSize: 10,
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const handleSave = async () => {
         if (!paymentId ||
             !loanReqId ||
@@ -993,6 +1001,8 @@ function LoanPayment({ }) {
                         pagination={true}
                         paginationAutoPageSize={true}
                         gridOptions={gridOptions}
+                        onFirstDataRendered={onFirstDataRendered}
+                    
                     />
                 </div>
             </div>

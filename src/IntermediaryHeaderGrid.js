@@ -338,6 +338,14 @@ function IntermediaryGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -1067,6 +1075,7 @@ function IntermediaryGrid() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               onGridReady={onGridReady}
+              onFirstDataRendered={onFirstDataRendered}
               onCellValueChanged={onCellValueChanged}
               rowSelection="multiple"
               pagination={true}

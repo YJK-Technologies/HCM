@@ -301,6 +301,14 @@ function InterviewCompletionRate({ }) {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const gridOptions = {
     pagination: true,
     paginationPageSize: 10,
@@ -1189,6 +1197,7 @@ const generateReport = () => {
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

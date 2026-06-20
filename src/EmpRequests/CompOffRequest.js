@@ -286,6 +286,14 @@ const EmployeeCompOff = () => {
     wrapText: false,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleCompOffSearch = async () => {
     const from = new Date(holidayFromDate);
     const to = new Date(holidayToDate);
@@ -663,6 +671,7 @@ const EmployeeCompOff = () => {
                 rowData={leaveRowData}
                 columnDefs={leaveColumnDefs}
                 defaultColDef={defaultColDef}
+                onFirstDataRendered={onFirstDataRendered}
                 rowSelection="single"
                 ref={gridRef}
                 pagination={true}

@@ -376,6 +376,14 @@ function TotalInterviewsScheduled({ }) {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const generateReport = () => {
     if (!gridApi) return;
 
@@ -1210,6 +1218,7 @@ function TotalInterviewsScheduled({ }) {
             gridOptions={gridOptions}
             rowSelection="multiple"
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

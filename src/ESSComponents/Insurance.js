@@ -1394,7 +1394,7 @@ useEffect(() => {
                     maxLength={30}
                     placeholder=" "
                     autoComplete="off"
-                    title="Please Enter the CRP No"
+                    title="Please Enter the Document No"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1405,7 +1405,7 @@ useEffect(() => {
                     }
                   />
                   <label for="cno" className="exp-form-labels">
-                    CRP No
+                    Document No
                   </label>
                 </div>
               </div>
@@ -1419,7 +1419,7 @@ useEffect(() => {
                     maxLength={18}
                     placeholder=" "
                     autoComplete="off"
-                    title="Please Enter the CRP Expiry Date"
+                    title="Please Enter the Document Expiry Date"
                     onChange={(e) =>
                       RelationInputChange(
                         relationGroup.relation,
@@ -1430,7 +1430,7 @@ useEffect(() => {
                     }
                   />
                   <label for="cno" className="exp-form-labels">
-                    CRP Expiry Date
+                    Document Expiry Date
                   </label>
                 </div>
               </div>

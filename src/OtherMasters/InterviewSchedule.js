@@ -519,6 +519,14 @@ function InterviewSchedule({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSave = async () => {
     if (!canditatename || !PanelID || !scheduled_datetime || !endYear || !timezone || !InterviewMode || !location) {
       setError(" ");
@@ -1393,6 +1401,7 @@ function InterviewSchedule({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

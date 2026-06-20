@@ -317,6 +317,14 @@ const ShiftChangeRequest = () => {
         resizable: true,
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const handleShiftRequestSearch = async () => {
         const from = new Date(effectiveFromDate);
         const to = new Date(effectiveToDate);
@@ -789,6 +797,7 @@ const ShiftChangeRequest = () => {
                                 rowData={leaveRowData}
                                 columnDefs={leaveColumnDefs}
                                 defaultColDef={defaultColDef}
+                                onFirstDataRendered={onFirstDataRendered}
                                 rowSelection="single"
                                 ref={gridRef}
                                 pagination={true}

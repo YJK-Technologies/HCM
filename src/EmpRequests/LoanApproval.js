@@ -322,6 +322,14 @@ function LoanApproval({ }) {
         paginationPageSize: 10,
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const handLoanSearch = async () => {
         setLoading(true);
         try {
@@ -996,6 +1004,7 @@ function LoanApproval({ }) {
                             pagination={true}
                             paginationAutoPageSize={true}
                             gridOptions={gridLoanOptions}
+                            onFirstDataRendered={onFirstDataRendered}
                         />
                     </div>
                 </div>

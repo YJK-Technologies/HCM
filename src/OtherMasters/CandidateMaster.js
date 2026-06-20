@@ -668,6 +668,15 @@ function CandidateMaster() {
     },
   ]
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
+
   const tabs = [
     { label: 'Job Master' },
     { label: 'Candidate Master' },
@@ -1590,6 +1599,7 @@ function CandidateMaster() {
           <AgGridReact
             rowData={rowData}
             columnDefs={columnDefs}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             // onRowClicked={(event) => handleRowSelection(event.data)}
             pagination={true}
