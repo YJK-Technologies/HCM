@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import LoadingScreen from './Loading';
-import TemplateImage from './DefaultImages/Template.webp';
+import TemplateImage from './DefaultImages/Template.jpg';
 const config = require('./Apiconfig');
 
 function PrintTemplate() {
@@ -43,12 +43,12 @@ function PrintTemplate() {
                     ? {
                         ...item,
                         members: [...item.members, {
-    screenName: '',
-    templatename: '',
-    Templates: null,
-    documentUrl: null,
-    isDefaultImage: true
-}]
+                            screenName: '',
+                            templatename: '',
+                            Templates: null,
+                            documentUrl: null,
+                            isDefaultImage: true
+                        }]
                     }
                     : item
             )
@@ -191,8 +191,8 @@ function PrintTemplate() {
         setAcademic(prev => {
             const updated = [...prev];
             updated[0].members[index].Templates = null;
-updated[0].members[index].documentUrl = null;
-updated[0].members[index].isDefaultImage = false;
+            updated[0].members[index].documentUrl = null;
+            updated[0].members[index].isDefaultImage = false;
             return updated;
         });
 

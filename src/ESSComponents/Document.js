@@ -15,7 +15,7 @@ import DocumentImage from '../DefaultImages/Document.jpg';
 
 const config = require("../Apiconfig");
 
-function Input({}) {
+function Input({ }) {
   const [employeeId, setEmployeeId] = useState("");
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -206,30 +206,30 @@ function Input({}) {
     { label: "Employee Assets" },
   ];
 
-const convertToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () =>
-      resolve(reader.result.split(",")[1]); // remove metadata prefix
-    reader.onerror = (error) => reject(error);
-  });
-};
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () =>
+        resolve(reader.result.split(",")[1]); // remove metadata prefix
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
-// ✅ check valid file
-const isValidFile = (file) => {
-  return file && file instanceof File && file.size > 0;
-};
+  // ✅ check valid file
+  const isValidFile = (file) => {
+    return file && file instanceof File && file.size > 0;
+  };
 
-// ✅ check empty buffer from API
-const isEmptyBuffer = (doc) => {
-  return (
-    doc &&
-    doc.type === "Buffer" &&
-    Array.isArray(doc.data) &&
-    doc.data.length === 0
-  );
-};
+  // ✅ check empty buffer from API
+  const isEmptyBuffer = (doc) => {
+    return (
+      doc &&
+      doc.type === "Buffer" &&
+      Array.isArray(doc.data) &&
+      doc.data.length === 0
+    );
+  };
 
   const handleSave = async () => {
     if (!employeeId) {
@@ -337,28 +337,28 @@ const isEmptyBuffer = (doc) => {
       handleRefNo(employeeId);
     }
   };
-const convertBufferToBlobUrlAndFile = (
-  buffer,
-  fileName = "document.pdf",
-  mimeType = "application/pdf"
-) => {
-  if (
-    buffer &&
-    buffer.type === "Buffer" &&
-    Array.isArray(buffer.data) &&
-    buffer.data.length > 0
-  ) {
-    const byteArray = new Uint8Array(buffer.data);
-    const blob = new Blob([byteArray], { type: mimeType });
-    const blobUrl = URL.createObjectURL(blob);
-    const file = new File([blob], fileName, { type: mimeType });
+  const convertBufferToBlobUrlAndFile = (
+    buffer,
+    fileName = "document.pdf",
+    mimeType = "application/pdf"
+  ) => {
+    if (
+      buffer &&
+      buffer.type === "Buffer" &&
+      Array.isArray(buffer.data) &&
+      buffer.data.length > 0
+    ) {
+      const byteArray = new Uint8Array(buffer.data);
+      const blob = new Blob([byteArray], { type: mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      const file = new File([blob], fileName, { type: mimeType });
 
-    return { blobUrl, file };
-  }
+      return { blobUrl, file };
+    }
 
-  // EMPTY BUFFER → treat as NO FILE
-  return { blobUrl: null, file: null };
-};
+    // EMPTY BUFFER → treat as NO FILE
+    return { blobUrl: null, file: null };
+  };
 
   const handleRefNo = async (code) => {
     try {
@@ -411,7 +411,7 @@ const convertBufferToBlobUrlAndFile = (
               : null,
             documentUrl: documentUrl,
             document: documentFile,
-              isDefaultImage: !documentUrl,
+            isDefaultImage: !documentUrl,
             keyfield: keyfield,
 
             isNewFile: false,
@@ -472,18 +472,18 @@ const convertBufferToBlobUrlAndFile = (
       prev.map((item) =>
         item.relation === relation
           ? {
-              ...item,
-              members: [
-                ...item.members,
-                {
-  documentName: "",
-  document: null,
-  documentUrl: DocumentImage,
-  keyfield: "",
-  isDefaultImage: true,
-},
-              ],
-            }
+            ...item,
+            members: [
+              ...item.members,
+              {
+                documentName: "",
+                document: null,
+                documentUrl: DocumentImage,
+                keyfield: "",
+                isDefaultImage: true,
+              },
+            ],
+          }
           : item,
       ),
     );
@@ -504,19 +504,19 @@ const convertBufferToBlobUrlAndFile = (
       prevDocuments.map((doc) =>
         doc.relation === relation
           ? {
-              ...doc,
-              members: doc.members.map((member, i) =>
-                i === index
-                  ? {
-                      ...member,
-                      documentName: selectDocumentName
-                        ? selectDocumentName.value
-                        : "",
-                      selectDocumentName: selectDocumentName,
-                    }
-                  : member,
-              ),
-            }
+            ...doc,
+            members: doc.members.map((member, i) =>
+              i === index
+                ? {
+                  ...member,
+                  documentName: selectDocumentName
+                    ? selectDocumentName.value
+                    : "",
+                  selectDocumentName: selectDocumentName,
+                }
+                : member,
+            ),
+          }
           : doc,
       ),
     );
@@ -536,9 +536,9 @@ const convertBufferToBlobUrlAndFile = (
 
   const filteredOptionDocumentName = Array.isArray(documentNameDrop)
     ? documentNameDrop.map((option) => ({
-        value: option.attributedetails_name,
-        label: option.attributedetails_name,
-      }))
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
     : [];
 
   // const handleFileChange = (event, index) => {
@@ -572,18 +572,18 @@ const convertBufferToBlobUrlAndFile = (
         prevDocuments.map((doc) =>
           doc.relation === relation
             ? {
-                ...doc,
-                members: doc.members.map((member, i) =>
-                  i === index
-                    ? {
-                        ...member,
-                        document: file,
-                        documentUrl: fileUrl,
-                        isNewFile: true,
-                      }
-                    : member,
-                ),
-              }
+              ...doc,
+              members: doc.members.map((member, i) =>
+                i === index
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                    isNewFile: true,
+                  }
+                  : member,
+              ),
+            }
             : doc,
         ),
       );
@@ -670,102 +670,102 @@ const convertBufferToBlobUrlAndFile = (
   //     },
   //   );
   // };
-const handleUpdate = async (relationName, index) => {
-  const relationGroup = documents.find(
-    (group) => group.relation === relationName
-  );
+  const handleUpdate = async (relationName, index) => {
+    const relationGroup = documents.find(
+      (group) => group.relation === relationName
+    );
 
-  const member = relationGroup ? relationGroup.members[index] : null;
+    const member = relationGroup ? relationGroup.members[index] : null;
 
-  if (!member) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  if (!member.keyfield) {
-    setError(true);
-    toast.warning("Error: Missing required keyfield");
-    return;
-  }
-
-  if (!member.documentName || !member.document) {
-    setError(true);
-    toast.warning("Error: Missing required fields");
-    return;
-  }
-
-  // ✅ no change detection
-  const original = member.originalData;
-
-  if (
-    original &&
-    original.documentName === member.documentName &&
-    member.isNewFile === false
-  ) {
-    toast.warning("No changes detected");
-    return;
-  }
-
-  // ✅ SAFE FILE CONVERSION
-  let fileBase64 = null;
-
-  if (
-    isValidFile(member.document) &&
-    !isEmptyBuffer(member.document_files)
-  ) {
-    fileBase64 = await convertToBase64(member.document);
-  }
-
-  const editedData = {
-    EmployeeId: employeeId,
-    document_name: member.documentName,
-    document_files: fileBase64,
-    keyfield: member.keyfield,
-    company_code: sessionStorage.getItem("selectedCompanyCode"),
-    modified_by: sessionStorage.getItem("selectedUserCode"),
-  };
-
-  setError(false);
-
-  showConfirmationToast(
-    "Are you sure you want to update the data in the row ?",
-    async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch(
-          `${config.apiBaseUrl}/updateempDoc`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              editedData: [editedData],
-            }),
-          }
-        );
-
-        if (response.ok) {
-          toast.success("Data updated successfully!", {
-            onClose: () => window.location.reload(),
-          });
-        } else {
-          const errorResponse = await response.json();
-          toast.warning(errorResponse.message);
-        }
-      } catch (err) {
-        toast.error("Error update data: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    () => {
-      toast.info("Data update cancelled.");
+    if (!member) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
     }
-  );
-};
+
+    if (!member.keyfield) {
+      setError(true);
+      toast.warning("Error: Missing required keyfield");
+      return;
+    }
+
+    if (!member.documentName || !member.document) {
+      setError(true);
+      toast.warning("Error: Missing required fields");
+      return;
+    }
+
+    // ✅ no change detection
+    const original = member.originalData;
+
+    if (
+      original &&
+      original.documentName === member.documentName &&
+      member.isNewFile === false
+    ) {
+      toast.warning("No changes detected");
+      return;
+    }
+
+    // ✅ SAFE FILE CONVERSION
+    let fileBase64 = null;
+
+    if (
+      isValidFile(member.document) &&
+      !isEmptyBuffer(member.document_files)
+    ) {
+      fileBase64 = await convertToBase64(member.document);
+    }
+
+    const editedData = {
+      EmployeeId: employeeId,
+      document_name: member.documentName,
+      document_files: fileBase64,
+      keyfield: member.keyfield,
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+      modified_by: sessionStorage.getItem("selectedUserCode"),
+    };
+
+    setError(false);
+
+    showConfirmationToast(
+      "Are you sure you want to update the data in the row ?",
+      async () => {
+        try {
+          setLoading(true);
+
+          const response = await fetch(
+            `${config.apiBaseUrl}/updateempDoc`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                editedData: [editedData],
+              }),
+            }
+          );
+
+          if (response.ok) {
+            toast.success("Data updated successfully!", {
+              onClose: () => window.location.reload(),
+            });
+          } else {
+            const errorResponse = await response.json();
+            toast.warning(errorResponse.message);
+          }
+        } catch (err) {
+          toast.error("Error update data: " + err.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        toast.info("Data update cancelled.");
+      }
+    );
+  };
   const handleDelete = async (relationName, index) => {
     const relationGroup = documents.find(
       (group) => group.relation === relationName,
@@ -888,26 +888,26 @@ const handleUpdate = async (relationName, index) => {
   }, [location.state, documentNameDrop]);
 
   const handleRemovePdf = (relation, index) => {
-  setDocuments((prev) =>
-    prev.map((doc) =>
-      doc.relation === relation
-        ? {
+    setDocuments((prev) =>
+      prev.map((doc) =>
+        doc.relation === relation
+          ? {
             ...doc,
             members: doc.members.map((m, i) =>
               i === index
                 ? {
-                    ...m,
-                    document: null,
-                    documentUrl: "",
-                    isDefaultImage: false,
-                  }
+                  ...m,
+                  document: null,
+                  documentUrl: "",
+                  isDefaultImage: false,
+                }
                 : m
             ),
           }
-        : doc
-    )
-  );
-};
+          : doc
+      )
+    );
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -948,10 +948,10 @@ const handleUpdate = async (relationName, index) => {
               {saveButtonVisible &&
                 ["add", "all permission"].some((p) => documentsPermissions.includes(p)) && (
                   <li>
-                  <button className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
-                  </button>
-                </li>
+                    <button className="dropdown-item" onClick={handleSave}>
+                      <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                    </button>
+                  </li>
                 )}
               <li>
                 <button className="dropdown-item" onClick={reloadGridData}>
@@ -1068,7 +1068,7 @@ const handleUpdate = async (relationName, index) => {
                   className={`inputGroup selectGroup 
               ${member.selectDocumentName ? "has-value" : ""} 
                ${isSelectDocument[index] ? "is-focused" : ""}`}
-               title="Please Select the Document Name"
+                  title="Please Select the Document Name"
                 >
                   <Select
                     id={`cname-${index}`}
@@ -1112,54 +1112,54 @@ const handleUpdate = async (relationName, index) => {
                 <div className="inputGroup">
                   <div className={`image-upload-container ${error && !member.document ? "image-error" : ""}`}>
                     {member.document ? (
-  <div
-    className="image-preview-box"
-    onClick={() => handlePdfClick(member.documentUrl)}
-  >
-    <iframe
-      src={member.documentUrl}
-      title="PDF Preview"
-      className="pdf-inline-preview"
-    />
+                      <div
+                        className="image-preview-box"
+                        onClick={() => handlePdfClick(member.documentUrl)}
+                      >
+                        <iframe
+                          src={member.documentUrl}
+                          title="PDF Preview"
+                          className="pdf-inline-preview"
+                        />
 
-    <button
-      type="button"
-      className="delete-image-btn"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleRemovePdf(relationGroup.relation, index);
-      }}
-    >
-      &times;
-    </button>
-  </div>
-) : member.isDefaultImage ? (
-  <div className="upload-placeholder-box">
-    <img
-      src={DocumentImage}
-      alt="Default Document"
-      className="uploaded-image"
-    />
+                        <button
+                          type="button"
+                          className="delete-image-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemovePdf(relationGroup.relation, index);
+                          }}
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ) : member.isDefaultImage ? (
+                      <div className="upload-placeholder-box">
+                        <img
+                          src={DocumentImage}
+                          alt="Default Document"
+                          className="uploaded-image"
+                        />
 
-    <button
-      type="button"
-      className="delete-image-btn"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleRemovePdf(relationGroup.relation, index);
-      }}
-    >
-      &times;
-    </button>
-  </div>
-) : (
-  <div className="upload-placeholder-box">
-    <div className="upload-icon-text">
-      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
-      <span>Upload Document</span>
-    </div>
-  </div>
-)}
+                        <button
+                          type="button"
+                          className="delete-image-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemovePdf(relationGroup.relation, index);
+                          }}
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder-box">
+                        <div className="upload-icon-text">
+                          <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+                          <span>Upload Document</span>
+                        </div>
+                      </div>
+                    )}
 
                     <input
                       type="file"
@@ -1181,31 +1181,31 @@ const handleUpdate = async (relationName, index) => {
                     {["update", "all permission"].some((permission) =>
                       documentsPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        title="Update"
-                        onClick={() =>
-                          handleUpdate(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-pen-to-square"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          title="Update"
+                          onClick={() =>
+                            handleUpdate(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-pen-to-square"></i>
+                        </button>
+                      )}
                     {["delete", "all permission"].some((permission) =>
                       documentsPermissions.includes(permission),
                     ) && (
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        title="Delete"
-                        onClick={() =>
-                          handleDelete(relationGroup.relation, index)
-                        }
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                      </button>
-                    )}
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            handleDelete(relationGroup.relation, index)
+                          }
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      )}
                   </div>
                 )}
               </div>
