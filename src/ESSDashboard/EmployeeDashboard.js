@@ -1180,13 +1180,24 @@ const Dashboard = (payslip) => {
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch payslip");
+     if (response.ok) {
+  const data = await response.json();
 
-      const data = await response.json();
-      console.log("Payslip Data:", data.Basic);
-      setPayslipData(data[0]);
+  console.log("Payslip Data:", data);
 
-      setShowModal(true);
+  setPayslipData(data[0]);
+  setShowModal(true);
+
+} else if (response.status === 404) {
+
+  toast.warning("Data not found");
+
+} else {
+
+  const errorResponse = await response.json();
+  toast.error(errorResponse.message || "Failed to fetch payslip");
+
+}
     } catch (err) {
       console.error(err);
       alert("Error fetching payslip");

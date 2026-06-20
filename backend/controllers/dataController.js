@@ -33701,7 +33701,11 @@ const Getpayslip = async (req, res) => {
       .query(`EXEC sp_ESS_MonthlyPayslip_Ramya  'FPY',@Employeeid	,'','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         @company_code,@Location_Code,@salary_month,'','',null,null,null,null,null,null,null,null`);
 
-    res.json(result.recordset);
+     if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json("Data not found");
+    }
   } catch (err) {
     console.error("Error", err);
     res.status(500).json({ message: err.message || "Internal Server Error" });
