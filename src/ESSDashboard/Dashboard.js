@@ -2328,6 +2328,28 @@ const Dashboard = () => {
     },
   };
 
+  const valueLabelPlugin = {
+    id: "valueLabelPlugin",
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+
+      ctx.save();
+      ctx.font = "bold 14px Arial";
+      ctx.fillStyle = "black";
+      ctx.textAlign = "center";
+
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+
+        meta.data.forEach((bar, index) => {
+          ctx.fillText(dataset.data[index], bar.x, bar.y - 8);
+        });
+      });
+
+      ctx.restore();
+    },
+  };
+
   const handleToggle = () => {
     const newState = !showChart;
     setShowChart(newState);
@@ -2795,6 +2817,29 @@ const Dashboard = () => {
     setEmployeeName('');
   };
 
+  const doughnutLabelPlugin = {
+    id: "doughnutLabelPlugin",
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+
+      ctx.save();
+      ctx.font = "bold 12px Arial";
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const meta = chart.getDatasetMeta(0);
+
+      meta.data.forEach((element, index) => {
+        const value = chart.data.datasets[0].data[index];
+
+        const { x, y } = element.tooltipPosition();
+        ctx.fillText(value, x, y);
+      });
+
+      ctx.restore();
+    },
+  };
 
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
@@ -2943,14 +2988,14 @@ const Dashboard = () => {
 
       <div className="dashboard-row row spacing-mt-2">
         <div className="col-lg-8">
-          <div className="dashboard-row ">
+          <div className="dashboard-row">
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base attendance-card-wrapper rounded app-shadow-lg height-full">
                 <div className="display-flex flex-between-center padding-horizontal-2 spacing-mb-2">
                   <h6 className="card-title-heading spacing-mb-0">
                     Today Attendance
                   </h6>
-                  <button
+                  {/* <button
                     className="btn-outline-primary-custom"
                     onClick={handleToggle}
                   >
@@ -2963,7 +3008,7 @@ const Dashboard = () => {
                         <i className="fa-solid fa-chart-pie mr-2"></i> Show Chart
                       </>
                     )}
-                  </button>
+                  </button> */}
                 </div>
 
                 <div
@@ -2977,6 +3022,7 @@ const Dashboard = () => {
                         data={chartData}
                         options={chartOptions}
                         onClick={onBarClick}
+                        plugins={[valueLabelPlugin]}
                       />
                     ) : (
                       <p>Loading...</p>
@@ -3022,6 +3068,7 @@ const Dashboard = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={90}
+                        label={({ value }) => value}
                       // label={({ name, value }) => `${name} (${value})`}
                       >
                         {shiftData.map((entry, index) => (
@@ -3386,7 +3433,7 @@ const Dashboard = () => {
                       style={{ height: 260, width: "100%", paddingBottom: "20px" }}
                     >
                       {teamData?.labels?.length > 0 ? (
-                        <Doughnut data={teamData} options={teamOptions} />
+                        <Doughnut data={teamData} options={teamOptions} plugins={[doughnutLabelPlugin]}/>
                       ) : (
                         <div className="no-data-state py-5">
                           <i className="fa-solid fa-inbox mb-2"></i>
@@ -3540,7 +3587,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="col-md-2">
+              {/* <div className="col-md-2">
                 <div
                   className={`inputGroup selectGroup 
                   ${selectedShiftEmpId ? "has-value" : ""} 
@@ -3701,7 +3748,7 @@ const Dashboard = () => {
                   />
                   <label className="exp-form-labels">End Time</label>
                 </div>
-              </div>
+              </div> */}
 
               <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
@@ -3744,7 +3791,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-row spacing-mt-2">
+      {/*} <div className="dashboard-row spacing-mt-2">
         <div className="grid-col-12">
           <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
             <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">
@@ -3903,7 +3950,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* <div className="grid-col-md-5">
+              <div className="grid-col-md-5">
                 <div
                   className={`inputGroup selectGroup 
                 ${selectedShift ? "has-value" : ""} 
@@ -3924,7 +3971,7 @@ const Dashboard = () => {
                   />
                   <label className="floating-label">Shift</label>
                 </div>
-              </div> */}
+              </div> 
 
               <div className="col-md-2 d-flex justify-content-md-start justify-content-end align-items-center">
                 <div className="search-btn-wrapper">
@@ -3962,7 +4009,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
