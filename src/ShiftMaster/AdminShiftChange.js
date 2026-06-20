@@ -622,6 +622,14 @@ function AdminShiftChange() {
     }
   ];
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleShiftRequest = (rowData) => {
     if (!rowData) return;
     setSelectedRow(rowData);
@@ -916,6 +924,7 @@ function AdminShiftChange() {
           <AgGridReact
             columnDefs={ShiftColDefs}
             rowData={shiftRowData}
+            onFirstDataRendered={onFirstDataRendered}
             suppressRowClickSelection={true}
             pagination={true}
             paginationAutoPageSize={true}

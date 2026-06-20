@@ -385,6 +385,14 @@ function HoliDays() {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const reloadGridData = () => {
     setRowData([]);
     searchClearInputFields();
@@ -1122,6 +1130,7 @@ function HoliDays() {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

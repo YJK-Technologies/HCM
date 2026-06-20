@@ -599,6 +599,14 @@ function LoanDocuments({ }) {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -1184,6 +1192,7 @@ function LoanDocuments({ }) {
             rowData={rowData}
             pagination={true}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             paginationAutoPageSize={true}
             gridOptions={gridOptions}

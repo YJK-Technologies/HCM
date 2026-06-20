@@ -1047,7 +1047,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="text"
                     className="exp-input-field form-control"
-                    title="Please Enter the CRP No"
+                    title="Please Enter the Document No"
                     value={member.CRPNo}
                     maxLength={30}
                     placeholder=" "
@@ -1062,7 +1062,7 @@ function EmpFamPersonalDetail({ }) {
                     }
                   />
                   <label for="cno" className="exp-form-labels">
-                    CRP No
+                    Document No
                   </label>
                 </div>
               </div>
@@ -1072,7 +1072,7 @@ function EmpFamPersonalDetail({ }) {
                   <input
                     type="date"
                     className="exp-input-field form-control"
-                    title="Please Enter the CRP Expiry Date"
+                    title="Please Enter the Document Expiry Date"
                     value={member.CRP_ExpiryDate}
                     maxLength={18}
                     placeholder=" "
@@ -1087,7 +1087,7 @@ function EmpFamPersonalDetail({ }) {
                     }
                   />
                   <label for="cno" className="exp-form-labels">
-                    CRP Expiry Date
+                    Document Expiry Date
                   </label>
                 </div>
               </div>

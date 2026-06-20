@@ -415,6 +415,14 @@ function Input({ }) {
     pagination: true,
     paginationPageSize: 10,
   };
+  
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
 
   //search code
   const filterOptiontype = typedrop.map((option) => ({
@@ -1350,6 +1358,7 @@ function Input({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

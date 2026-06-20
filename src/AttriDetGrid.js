@@ -204,6 +204,14 @@ function AttriDetGrid() {
     setGridApi(params.api);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -811,6 +819,7 @@ function AttriDetGrid() {
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             pagination={true}
             paginationAutoPageSize={true}

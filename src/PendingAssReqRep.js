@@ -59,6 +59,14 @@ function PendingAssReqRep({ }) {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -1096,6 +1104,7 @@ function PendingAssReqRep({ }) {
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

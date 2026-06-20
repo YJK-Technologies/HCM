@@ -115,6 +115,14 @@ const MyAgGridComponent = () => {
     },
   ];
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const columnDefs2 = [
     { headerName: 'S.No', field: 'sno', maxlength: '150', maxwidth: '150' },
     { headerName: 'Project ID', field: 'projectid' },
@@ -609,6 +617,7 @@ const MyAgGridComponent = () => {
             <AgGridReact
               columnDefs={columnDefs}
               rowData={rowData}
+              onFirstDataRendered={onFirstDataRendered}
               rowHeight={27}
               headerHeight={27}
               onCellClicked={handleCellClick}
@@ -620,6 +629,7 @@ const MyAgGridComponent = () => {
             <AgGridReact
               columnDefs={columnDefs2}
               rowData={rowDataReport}
+              onFirstDataRendered={onFirstDataRendered}
               rowHeight={27}
               headerHeight={27}
               onCellClicked={(params) => handleNavigateWithRowData(params.data)}

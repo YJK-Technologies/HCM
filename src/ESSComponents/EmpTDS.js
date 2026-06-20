@@ -155,6 +155,14 @@ function Input({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSearch = async () => {
     setLoading(true)
     try {
@@ -752,6 +760,7 @@ function Input({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
             onGridReady={(params) => {
               gridApiRef.current = params.api;
               gridColumnApiRef.current = params.columnApi;

@@ -384,6 +384,14 @@ function Input() {
 
   ]
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const tabs = [
     { label: 'Salary Eligibility Days' },
     { label: 'Bonus' },
@@ -869,6 +877,7 @@ function Input() {
             // onRowClicked={(event) => handleRowSelection(event.data)}
             pagination={true}
             paginationAutoPageSize={true}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

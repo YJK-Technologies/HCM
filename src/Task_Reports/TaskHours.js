@@ -42,6 +42,14 @@ const MyAgGridComponent = () => {
     { headerName: 'Balance Hours', field: 'Balance_Hours', width: '150' },
   ];
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
     const year = date.getFullYear();
@@ -826,6 +834,7 @@ const handleExcel = () => {
                 rowHeight={27}
                 headerHeight={27}
                 onCellClicked={handleCellClick}
+                onFirstDataRendered={onFirstDataRendered}
               />
             </div>
           </div>
@@ -835,6 +844,7 @@ const handleExcel = () => {
               <AgGridReact
                 columnDefs={columnEmployeeTime}
                 rowData={rowDataEmployeeTime}
+                onFirstDataRendered={onFirstDataRendered}
                 rowHeight={27}
                 headerHeight={27}
               />
@@ -861,6 +871,7 @@ const handleExcel = () => {
             <AgGridReact
               columnDefs={columnTask}
               rowData={rowDataTask}
+              onFirstDataRendered={onFirstDataRendered}
               rowHeight={27}
               headerHeight={27}
               onCellClicked={(params) => handleNavigateWithRowData(params.data)}

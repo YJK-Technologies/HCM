@@ -699,6 +699,14 @@ const LeaveRequestPage = () => {
     // flex: 1
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleReloadSearch = () => {
     clearInputsSearch([])
     setLeaveRowData([])
@@ -1127,6 +1135,7 @@ const LeaveRequestPage = () => {
                 rowData={leaveRowData}
                 columnDefs={leaveColumnDefs}
                 defaultColDef={defaultColDef}
+                onFirstDataRendered={onFirstDataRendered}
                 rowSelection="single"
                 ref={gridRef}
               />

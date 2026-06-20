@@ -377,6 +377,14 @@ function LoanSchedule({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSave = async () => {
     if (
       !scheduleId ||
@@ -1255,6 +1263,7 @@ function LoanSchedule({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

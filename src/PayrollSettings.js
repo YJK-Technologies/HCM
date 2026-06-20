@@ -260,6 +260,14 @@ function PayrollSettingsGrid() {
     setGridApi(params.api);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const onSelectionChanged = () => {
     const selected = gridApi.getSelectedRows();
     setSelectedRows(selected);
@@ -496,6 +504,7 @@ function PayrollSettingsGrid() {
             rowData={rowData}
             columnDefs={columnDefs}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             onSelectionChanged={onSelectionChanged}
             onCellValueChanged={onCellValueChanged}
