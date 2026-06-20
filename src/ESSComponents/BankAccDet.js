@@ -1153,7 +1153,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div
               className={`inputGroup selectGroup 
               ${selectedWPSEnabled ? "has-value" : ""} 
@@ -1176,7 +1176,7 @@ function Input({ }) {
                 WPS Enabled
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="col-md-2">
             <div className="inputGroup">

@@ -1190,7 +1190,12 @@ const Dashboard = (payslip) => {
 
 } else if (response.status === 404) {
 
-  toast.warning("Data not found");
+  const [year, month] = selectedPeriod.split("-");
+  const monthName = new Date(year, month - 1).toLocaleString("en-US", {
+    month: "long",
+  });
+
+  toast.warning(`No payslip found for ${monthName} ${year}.`);
 
 } else {
 
