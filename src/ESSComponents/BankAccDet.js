@@ -9,7 +9,7 @@ import Bankaccdetpopup from "./bankaccdetpopup";
 import { showConfirmationToast } from '../ToastConfirmation';
 import LoadingScreen from '../Loading';
 import Select from "react-select";
-import BankPassbook from '../DefaultImages/Passbook.webp';
+import BankPassbook from '../DefaultImages/Passbook.jpg';
 
 const config = require('../Apiconfig');
 
