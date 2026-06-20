@@ -619,6 +619,14 @@ const AccountInformation = () => {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   useEffect(() => {
     const fetchProjectTasksAndDetails = async () => {
       try {
@@ -1558,6 +1566,7 @@ const AccountInformation = () => {
             columnDefs={columnDefs}
             rowData={rowData}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
             // defaultColDef={{ editable: true, resizable: true }}
             rowSelection="single"
             rowHeight={27}

@@ -247,6 +247,14 @@ function OvertimeReport() {
         gridApiRef.current = params.api;
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const handleSearch = async () => {
 
         if (!fromDate || !toDate) {
@@ -1009,6 +1017,7 @@ function OvertimeReport() {
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         onGridReady={onGridReady}
+                        onFirstDataRendered={onFirstDataRendered}
                         rowSelection="multiple"
                         pagination={true}
                         paginationAutoPageSize={true}

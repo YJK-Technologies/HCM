@@ -242,6 +242,14 @@ function TotalCandidatesApplied() {
     gridApiRef.current = params.api;
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const columnDefs = [
     {
       headerCheckboxSelection: true,
@@ -1207,6 +1215,7 @@ const generateReport = () => {
             pagination={true}
             paginationAutoPageSize={true}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

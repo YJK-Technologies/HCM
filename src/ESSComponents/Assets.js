@@ -600,6 +600,14 @@ function Assets({ }) {
     setGridColumnApi(params.columnApi);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const reloadGridData = () => {
     setrowData([]);
     searchClearInputFields();
@@ -1785,6 +1793,7 @@ function Assets({ }) {
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             // onCellValueChanged={onCellValueChanged}
             rowSelection="multiple"
             // onSelectionChanged={onSelectionChanged}

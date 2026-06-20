@@ -456,6 +456,14 @@ function InterviewDecision({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSave = async () => {
     if (!canditatename || !JobID || !decided_by || !endYear || !decided_on || !remarks) {
       setError(" ");
@@ -1290,6 +1298,7 @@ function InterviewDecision({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

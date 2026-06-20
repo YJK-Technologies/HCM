@@ -40,6 +40,7 @@ function WareHouseInput({ }) {
   const mode = locationState.mode || "create"; // ✅ default fallback
   const selectedRow = locationState.selectedRow || null;
   const warehouseCode = location.state?.warehouse_code;
+  const LocationCode = location.state?.location_no;
   const company_code = sessionStorage.getItem('selectedCompanyCode');
 
   useEffect(() => {
@@ -49,10 +50,10 @@ function WareHouseInput({ }) {
   }, []);
 
   useEffect(() => {
-    if (mode === "update" && warehouseCode) {
+    if (mode === "update" && warehouseCode && LocationCode) {
       fetchWarehouseData();
     }
-  }, [mode, warehouseCode]);
+  }, [mode, warehouseCode, LocationCode]);
 
   const fetchWarehouseData = async () => {
     try {
@@ -65,6 +66,7 @@ function WareHouseInput({ }) {
         },
         body: JSON.stringify({
           warehouse_code: warehouseCode,
+          location_no: LocationCode,
           company_code
         }),
       });

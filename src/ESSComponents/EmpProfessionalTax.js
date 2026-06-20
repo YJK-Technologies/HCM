@@ -166,6 +166,15 @@ function Input({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
+
   const handleInsert = async () => {
     if (
       !Employee_Salary_From ||
@@ -816,6 +825,7 @@ function Input({ }) {
             columnDefs={Employeecol}
             rowData={rowData}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered} 
             suppressRowClickSelection={true}
             onGridReady={(params) => {
               gridApiRef.current = params.api;

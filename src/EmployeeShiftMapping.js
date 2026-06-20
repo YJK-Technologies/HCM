@@ -782,6 +782,13 @@ function EmployeeTypeMaster() {
     setGridColumnApi(params.columnApi);
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
   const onSelectionChanged = () => {
     const selectedNodes = gridApi.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
@@ -1630,6 +1637,7 @@ function EmployeeTypeMaster() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               onGridReady={onGridReady}
+              onFirstDataRendered={onFirstDataRendered}
               onCellValueChanged={onCellValueChanged}
               rowSelection="multiple"
               onSelectionChanged={onSelectionChanged}

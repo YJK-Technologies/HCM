@@ -227,7 +227,7 @@ function Input({ }) {
   };
 
   const filteredOptionBoolean = booleanDrop.map((option) => ({
-    value: option.attributedetails_name,
+    value: option.attributedetails_code,
     label: option.attributedetails_name,
   }));
 

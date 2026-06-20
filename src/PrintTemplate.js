@@ -389,7 +389,6 @@ function PrintTemplate() {
         }
     };
 
-
     return (
         <div className="container-fluid Topnav-screen">
             {loading && <LoadingScreen />}

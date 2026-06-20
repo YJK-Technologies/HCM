@@ -435,6 +435,14 @@ function InterviewFeedback({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSave = async () => {
     if (!scheduleid || !EmployeeID || !rating || !submitted_on || !Recommendation) {
       setError(" ");
@@ -1252,6 +1260,7 @@ function InterviewFeedback({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

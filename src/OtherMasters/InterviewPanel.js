@@ -370,6 +370,14 @@ function InterviewPanel({ }) {
     paginationPageSize: 10,
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const handleSave = async () => {
     if (!panel_name || !JobID || !dpt || !endYear) {
       setError(" ");
@@ -1069,6 +1077,7 @@ function InterviewPanel({ }) {
             pagination={true}
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

@@ -271,9 +271,15 @@ function Input({ }) {
 
   const onGridReady = (params) => {
     setGridApi(params.api);
-
   };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
 
   const handleChangestatus = (selectedstatus) => {
     setselectedtstatus(selectedstatus);
@@ -1560,6 +1566,7 @@ function Input({ }) {
               onSelectionChanged={onSelectionChanged}
               suppressRowClickSelection={true}
               onGridReady={onGridReady}
+              onFirstDataRendered={onFirstDataRendered}
               gridOptions={gridOptions}
             // onCellClicked={(params) => handleNavigateWithRowData(params.data)}
             />

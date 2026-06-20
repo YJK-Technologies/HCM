@@ -775,6 +775,13 @@ function VisaRequest({ }) {
         pagination: true,
     };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
     const handleSave = async () => {
         if (
             // !empId ||
@@ -1921,6 +1928,7 @@ function VisaRequest({ }) {
                         pagination={true}
                         paginationAutoPageSize={true}
                         gridOptions={gridOptions}
+                        onFirstDataRendered={onFirstDataRendered}
                     />
                 </div>
             </div>
