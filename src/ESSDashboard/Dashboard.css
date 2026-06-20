@@ -3496,7 +3496,24 @@
 }
 
 .fixed-list-height {
-    height: 590px; 
+    /* height: 590px;  */
+    height: 576px; 
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.fixed-list-heights {
+    /* height: 590px;  */
+    height: 416px; 
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.fixed-list-height-leave {
+    /* height: 590px;  */
+    height: 176px; 
     overflow-y: auto;
     display: flex;
     flex-direction: column;

@@ -7,14 +7,14 @@ import config from "../Apiconfig";
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,  } from "chart.js";
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement, } from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { publicIpv4 } from "public-ip";
 import ShiftRequestModal from "./ShiftRequestModal.js";
 
-ChartJS.register( BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,);
 
 const Dashboard = (payslip) => {
   const navigate = useNavigate();
@@ -138,12 +138,12 @@ const Dashboard = (payslip) => {
   };
 
   const shiftConfig = {
-    S1: {label: "Morning Shift", icon: "fa-sun", color: "#f59e0b", },
-    S2: {label: "General Shift", icon: "fa-briefcase", color: "#3b82f6", },
-    S3: {label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6", },
-    S4: {label: "Night Shift", icon: "fa-moon", color: "#1e293b", },
-    S5: {label: "Split Shift", icon: "fa-clock", color: "#ec4899", },
-    S6: {label: "Week Off",icon: "fa-couch",color: "#22c55e",},
+    S1: { label: "Morning Shift", icon: "fa-sun", color: "#f59e0b", },
+    S2: { label: "General Shift", icon: "fa-briefcase", color: "#3b82f6", },
+    S3: { label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6", },
+    S4: { label: "Night Shift", icon: "fa-moon", color: "#1e293b", },
+    S5: { label: "Split Shift", icon: "fa-clock", color: "#ec4899", },
+    S6: { label: "Week Off", icon: "fa-couch", color: "#22c55e", },
   };
 
   useEffect(() => {
@@ -1180,13 +1180,29 @@ const Dashboard = (payslip) => {
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch payslip");
+     if (response.ok) {
+  const data = await response.json();
 
-      const data = await response.json();
-      console.log("Payslip Data:", data.Basic);
-      setPayslipData(data[0]);
+  console.log("Payslip Data:", data);
 
-      setShowModal(true);
+  setPayslipData(data[0]);
+  setShowModal(true);
+
+} else if (response.status === 404) {
+
+  const [year, month] = selectedPeriod.split("-");
+  const monthName = new Date(year, month - 1).toLocaleString("en-US", {
+    month: "long",
+  });
+
+  toast.warning(`No payslip found for ${monthName} ${year}.`);
+
+} else {
+
+  const errorResponse = await response.json();
+  toast.error(errorResponse.message || "Failed to fetch payslip");
+
+}
     } catch (err) {
       console.error(err);
       alert("Error fetching payslip");
@@ -1500,6 +1516,695 @@ const Dashboard = (payslip) => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employee");
 
     XLSX.writeFile(workbook, "Employee_Search_Report.xlsx");
+  };
+
+  const [dashboardRequests, setDashboardRequests] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardRequests = async () => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      let leaveData = [];
+      let loanData = [];
+      let visaData = [];
+      let travelData = [];
+      let empData = [];
+      let familyChangeData = [];
+      let academicData = [];
+      let documentData = [];
+      let compOffData = [];
+      let assetData = [];
+      let shiftChangeData = [];
+
+      /* ---------- Leave ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/LeaveStatus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            manager: user_code,
+            company_code,
+          }),
+        });
+
+        if (res.ok) leaveData = await res.json();
+      } catch (err) {
+        console.log("Leave API failed");
+      }
+
+      /* ---------- Loan ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+        });
+
+        if (res.ok) loanData = await res.json();
+      } catch (err) {
+        console.log("Loan API failed");
+      }
+
+      /* ---------- Visa ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+        });
+
+        if (res.ok) visaData = await res.json();
+      } catch (err) {
+        console.log("Visa API failed");
+      }
+
+      /* ---------- Travel ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+          },
+        );
+
+        if (res.ok) travelData = await res.json();
+      } catch (err) {
+        console.log("Travel API failed");
+      }
+
+      /* ---------- Employee Change ---------- */
+      // try {
+      //   const res = await fetch(`${config.apiBaseUrl}/GetEmployeeRequest`,
+      //     {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify({ RepManager: user_code, company_code }),
+      //     },
+      //   );
+
+      //   if (res.ok) travelData = await res.json();
+      // } catch (err) {
+      //   console.log("Travel API failed");
+      // }
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ RepManager: user_code, company_code, Location_Code }),
+          },
+        );
+
+        if (res.ok) empData = await res.json();
+      } catch (err) {
+        console.log("Employee API failed");
+      }
+
+      /* ---------- Employee Family Change ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              company_code,
+              RepManager: user_code,
+              Location_Code
+            }),
+          },
+        );
+
+        if (res.ok) familyChangeData = await res.json();
+      } catch (err) {
+        console.log("Family API failed");
+      }
+
+      /* ---------- Academic ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code, RepManager: user_code, }),
+          },
+        );
+
+        if (res.ok) academicData = await res.json();
+      } catch (err) {
+        console.log("Academic API failed");
+      }
+
+      /* ---------- Documents ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_code, RepManager: user_code, }),
+          },
+        );
+
+        if (res.ok) documentData = await res.json();
+      } catch (err) {
+        console.log("Document API failed");
+      }
+
+      /* ---------- Comp Off ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/DashboardCompOffRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            RepManager: user_code,
+            CompanyCode: company_code,
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          }),
+        });
+
+        if (res.ok) compOffData = await res.json();
+      } catch (err) {
+        console.log("Comp Off API failed");
+      }
+
+      /* ---------- Employee Assets ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              company_code,
+              RepManager: user_code,
+              Location_Code
+            }),
+          },
+        );
+
+        if (res.ok) assetData = await res.json();
+      } catch (err) {
+        console.log("Employee Assets API failed");
+      }
+
+      /* ---------- Shift Change ---------- */
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/shiftChangeRequestManager`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
+            RepManager: user_code,
+          }),
+        });
+
+        if (res.ok) shiftChangeData = await res.json();
+      } catch (err) {
+        console.log("Shift Change API failed");
+      }
+
+      /* ---------- Leave ---------- */
+      const formattedLeave = leaveData
+        .filter((r) => r.LeaveStatus === "Pending")
+        .map((row) => ({
+          type: "Leave",
+          id: row.EmployeeId,
+          EmployeeId: row.EmployeeId,
+          EmployeeName: row.EmployeeName,
+          title: row.LeaveType,
+          FromDate: formatDate(row.FromDate),
+          ToDate: formatDate(row.ToDate),
+          status: row.LeaveStatus,
+          days: row.LeaveDays,
+        }));
+
+      /* ---------- Loan ---------- */
+      const formattedLoan = loanData.map((row) => ({
+        type: "Loan",
+        id: row.loan_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.loan_type_id,
+        status: row.request_status,
+      }));
+
+      /* ---------- Visa ---------- */
+      const formattedVisa = visaData.map((row) => ({
+        type: "Visa",
+        id: row.visa_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.visa_type_id,
+        FromDate: formatDate(row.travel_start_date),
+        ToDate: formatDate(row.travel_end_date),
+        status: row.request_status,
+        days: row.TravelDays,
+      }));
+
+      /* ---------- Travel ---------- */
+      const formattedTravel = travelData.map((row) => ({
+        type: "Travel",
+        id: row.travel_request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.Employee_Name,
+        title: row.travel_type,
+        FromDate: formatDate(row.travel_start_date),
+        ToDate: formatDate(row.travel_end_date),
+        status: row.request_status,
+        days: row.TravelDays,
+      }));
+
+      /* ---------- Comp Off ---------- */
+      const formattedCompOff = compOffData.map((row) => ({
+        type: "Comp Off",
+        id: row.Keyfield,
+        HolidayDate: row.HolidayDate,
+        EmployeeId: row.EmployeeId,
+        EmployeeName: row.EmployeeName,
+        title: row.HolidayName || "Comp Off Request",
+        FromDate: row.LeaveFromDate ? formatDate(row.LeaveFromDate) : null,
+        ToDate: row.LeaveToDate ? formatDate(row.LeaveToDate) : null,
+        status: row.Status,
+        days: row.LeaveDays,
+      }));
+
+      /* ---------- Shift Change ---------- */
+      const formattedShiftChange = shiftChangeData.map((row) => ({
+        type: "Shift Change",
+        id: row.request_id,
+        EmployeeId: row.employee_id,
+        EmployeeName: row.EmployeeName,
+        title: `${row.current_shift_name} → ${row.requested_shift_name}`,
+        FromDate: row.FromDate
+          ? formatDate(row.FromDate)
+          : null,
+        ToDate: row.ToDate
+          ? formatDate(row.ToDate)
+          : null,
+        status: row.request_status,
+        keyfield: row.keyfield,
+        currentShift: row.current_shift_name,
+        requestedShift: row.requested_shift_name,
+        days: row.LeaveDays
+      }));
+
+      /* ---------- Employee Change Group ---------- */
+      const grouped = {};
+
+      empData.forEach((row) => {
+        if (!grouped[row.Info_request_id]) {
+          grouped[row.Info_request_id] = {
+            type: "Employee",
+            id: row.Info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.EmployeeName,
+            title: "Detail Changes",
+            status: row.request_status,
+          };
+        }
+      });
+
+      const formattedEmp = Object.values(grouped);
+
+      /* ---------- Family Change Group ---------- */
+      const groupedFamily = {};
+
+      familyChangeData.forEach((row) => {
+        if (!groupedFamily[row.Info_request_id]) {
+          groupedFamily[row.Info_request_id] = {
+            type: "Family",
+            id: row.Info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Detail Changes",
+            status: row.request_status,
+          };
+        }
+      });
+
+      const formattedFamily = Object.values(groupedFamily);
+      /* ---------- Asset Change Group ---------- */
+      const groupedAsset = {};
+
+      assetData.forEach((row) => {
+        const key = row.info_request_id || row.RequestID;
+
+        if (!groupedAsset[key]) {
+          groupedAsset[key] = {
+            type: "Asset",
+            id: key,
+            EmployeeId: row.EmployeeID,
+            EmployeeName: row.Employee_Name,
+            title: "Detail Changes",
+            status: row.request_status,
+            rows: [],
+          };
+        }
+
+        groupedAsset[key].rows.push(row);
+      });
+
+      const formattedAsset = Object.values(groupedAsset);
+
+      /* ---------- Academic Group ---------- */
+      const groupedAcademic = {};
+
+      academicData.forEach((row) => {
+        if (!groupedAcademic[row.info_request_id]) {
+          groupedAcademic[row.info_request_id] = {
+            type: "Academic",
+            id: row.info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Academic Details",
+            status: row.request_status,
+            rows: [],
+          };
+        }
+
+        groupedAcademic[row.info_request_id].rows.push(row);
+      });
+
+      const formattedAcademic = Object.values(groupedAcademic);
+
+      /* ---------- Documents Group ---------- */
+      const groupedDocuments = {};
+
+      documentData.forEach((row) => {
+        if (!groupedDocuments[row.info_request_id]) {
+          groupedDocuments[row.info_request_id] = {
+            type: "Document",
+            id: row.info_request_id,
+            EmployeeId: row.EmployeeId,
+            EmployeeName: row.Employee_Name,
+            title: "Document Details",
+            status: row.request_status,
+            rows: [],
+          };
+        }
+
+        groupedDocuments[row.info_request_id].rows.push(row);
+      });
+
+      const formattedDocuments = Object.values(groupedDocuments);
+      /* ---------- Merge ---------- */
+      const merged = [
+        ...formattedLeave,
+        ...formattedVisa,
+        ...formattedTravel,
+        ...formattedLoan,
+        ...formattedEmp,
+        ...formattedFamily,
+        ...formattedAcademic,
+        ...formattedDocuments,
+        ...formattedCompOff,
+        ...formattedAsset,
+        ...formattedShiftChange,
+      ];
+
+      setDashboardRequests(merged);
+    };
+
+    fetchDashboardRequests();
+    const interval = setInterval(fetchDashboardRequests, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleApproval = async (type, id, FromDate, isApproved, extra = {}) => {
+    try {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+      const approver = sessionStorage.getItem("selectedUserCode");
+      const modified_by = sessionStorage.getItem("selectedUserCode");
+
+      let url = "";
+      let body = {};
+
+      const status = isApproved ? "Approved" : "Rejected";
+
+      /* ---------- Comp Off ---------- */
+      if (type === "Comp Off") {
+        url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
+
+        body = {
+          EmployeeId: extra.EmployeeId,
+          Status: status,
+          HolidayDate: extra.HolidayDate,
+          ApprovedBy: approver,
+          CompanyCode: company_code,
+          modified_by: sessionStorage.getItem("selectedUserCode"),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Keyfield: id,
+        };
+      }
+
+      /* ---------- Leave ---------- */
+      else if (type === "Leave") {
+        const [day, month, year] = FromDate.split("-");
+        const backendDate = `${year}-${month}-${day}`;
+
+        url = `${config.apiBaseUrl}/LeaveAuthorization`;
+
+        body = {
+          EmployeeId: id,
+          LeaveStatus: status,
+          FromDate: backendDate,
+          company_code: company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          modified_by: sessionStorage.getItem("selectedUserCode")
+        };
+      }
+
+      /* ---------- Loan ---------- */
+      else if (type === "Loan") {
+        url = `${config.apiBaseUrl}/ApprovalLoan`;
+
+        body = {
+          loan_request_id: id,
+          company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          request_status: status,
+        };
+      }
+
+      /* ---------- Visa ---------- */
+      else if (type === "Visa") {
+        url = `${config.apiBaseUrl}/ApprovalVisa`;
+
+        body = {
+          visa_request_id: id,
+          company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          request_status: status,
+          Modified_by: sessionStorage.getItem("selectedUserCode")
+        };
+      }
+
+      /* ---------- Travel ---------- */
+      else if (type === "Travel") {
+        url = `${config.apiBaseUrl}/ApprovalTravel`;
+
+        body = {
+          travel_request_id: id,
+          company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          request_status: status,
+          modified_by: sessionStorage.getItem("selectedUserCode")
+        };
+      }
+
+      /* ---------- Employee Change ---------- */
+      else if (type === "Employee") {
+        url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
+
+        body = {
+          approvalData: [
+            {
+              Info_request_id: id,
+              company_code,
+              Location_Code,
+              request_status: status,
+              approver_id: sessionStorage.getItem("selectedUserCode"),
+            },
+          ],
+        };
+      }
+
+      /* ---------- Family Change ---------- */
+      else if (type === "Family") {
+        url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
+
+        body = {
+          approvalData: [
+            {
+              Info_request_id: id,
+              company_code,
+              Location_Code,
+              request_status: status,
+              approver_id: sessionStorage.getItem("selectedUserCode"),
+              modified_by: sessionStorage.getItem("selectedUserCode"),
+            }
+          ]
+        };
+      }
+
+      /* ---------- Academic Change ---------- */
+      else if (type === "Academic") {
+        url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
+
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Academic",
+        );
+
+        body = {
+          approvalData: selectedRequest.rows.map((row) => ({
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          })),
+        };
+      }
+
+      /* ---------- Document Change ---------- */
+      else if (type === "Document") {
+        url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
+
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Document",
+        );
+
+        body = {
+          approvalData: selectedRequest.rows.map((row) => ({
+            detail_id: row.detail_id,
+            info_request_id: row.info_request_id,
+            company_code,
+            EmployeeId: row.EmployeeId,
+            request_status: status,
+            created_by: sessionStorage.getItem("selectedUserCode"),
+            modified_by: sessionStorage.getItem("selectedUserCode"),
+          })),
+        };
+      }
+
+      /* --------------- Asset Change -----------------*/
+      else if (type === "Asset") {
+        url = `${config.apiBaseUrl}/ApproveAssetRequest`;
+
+        const selectedRequest = dashboardRequests.find(
+          (r) => r.id === id && r.type === "Asset"
+        );
+        const formatToSQLDate = (value) => {
+          if (!value) return null;
+
+          const date = new Date(value);
+          if (isNaN(date)) return null;
+
+          return date.toISOString().split("T")[0]; // yyyy-MM-dd
+        };
+
+        body = {
+          approvalData: selectedRequest.rows.map((row) => {
+            let AssetID = null;
+            let ExpectedReturnDate = null;
+            let ActualReturnDate = null;
+            let Remarks = "";
+
+            if (row.FieldName === "AssetID") {
+              AssetID = row.NewValue;
+            }
+            if (row.FieldName === "ExpectedReturnDate") {
+              ExpectedReturnDate = formatToSQLDate(row.NewValue);
+            }
+            if (row.FieldName === "ActualReturnDate") {
+              ActualReturnDate = formatToSQLDate(row.NewValue);
+            }
+            if (row.FieldName === "Remarks") {
+              Remarks = row.NewValue;
+            }
+
+            return {
+              DetailID: row.DetailID,
+              info_request_id: row.RequestID || row.info_request_id,
+              company_code,
+              EmployeeID: row.EmployeeID,
+              request_status: status,
+              AssetID,
+              ExpectedReturnDate,
+              ActualReturnDate,
+              Location_Code,
+              Remarks,
+            };
+          }),
+        };
+      }
+
+      /* ---------- Shift Request ---------- */
+      else if (type === "Shift Change") {
+        url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
+
+        body = {
+          request_id: id,
+          company_code,
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          request_status: status,
+          modified_by: sessionStorage.getItem('selectedUserCode'),
+        };
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        toast.success(`${type} ${status} successfully`);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to process request");
+      }
+    } catch (error) {
+      console.error("Approval error:", error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  const [requestSearch, setRequestSearch] = useState("");
+
+  const filteredRequests = dashboardRequests
+    .filter(r => (r.status || "").toLowerCase() === "pending")
+    .filter(req => {
+      const searchLower = (requestSearch || "").trim().toLowerCase();
+
+      if (!searchLower) return true;
+
+      return (
+        (req.EmployeeName && String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
+        (req.EmployeeId && String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
+        (req.type && String(req.type).toLowerCase().includes(searchLower)) ||
+        (req.title && String(req.title).toLowerCase().includes(searchLower))
+      );
+    });
+
+  const convertDate = (date) => {
+    if (!date) return "";
+    const parts = date.split(/[-\/]/);
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  };
+
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (
@@ -1904,17 +2609,16 @@ const Dashboard = (payslip) => {
                         return (
                           <div
                             key={index}
-                            className={`day-cell ${
-                              isDayToday
-                                ? "today-cell"
-                                : isDayHoliday
-                                  ? "holiday-cell"
-                                  : isDayWeekend
-                                    ? "weekend-cell"
-                                    : isDayLeave
-                                      ? "leave-cell"
-                                      : ""
-                            }`}
+                            className={`day-cell ${isDayToday
+                              ? "today-cell"
+                              : isDayHoliday
+                                ? "holiday-cell"
+                                : isDayWeekend
+                                  ? "weekend-cell"
+                                  : isDayLeave
+                                    ? "leave-cell"
+                                    : ""
+                              }`}
                           >
                             {day}
                           </div>
@@ -1944,262 +2648,348 @@ const Dashboard = (payslip) => {
       </div>
 
       <div className="dashboard-row spacing-mt-2">
-        <div className="grid-col-lg-3">
-          <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
-            <div className="display-flex flex-between-center mb-3">
-              <h6 className="card-title-heading mb-0">New Joiners</h6>
-            </div>
-
-            <div className="joinee-carousel-container" ref={joineeCarouselRef}>
-              {NewJoinees.length > 0 ? (
-                NewJoinees.map((joinee, index) => (
-                  <div key={index} className="joinee-slide">
-                    <div className="joinee-card-inner">
-                      <div className="joinee-accent-circle-top"></div>
-                      <div className="joinee-accent-circle-bottom"></div>
-
-                      <div className="profile-image-wrapper">
-                        {joinee.Photos ? (
-                          <img
-                            src={joinee.Photos}
-                            className="joinee-img-modern"
-                            alt="profile"
-                          />
-                        ) : (
-                          <div className="joinee-img-modern initials-avatar">
-                            {joinee.EmployeeName.split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </div>
-                        )}
-                        <div className="joinee-icon-badge">✨</div>
-                      </div>
-
-                      <div className="joinee-details mt-3">
-                        <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
-                        <div className="emp-dept-sub">
-                          {joinee.department_ID} • {joinee.EmployeeId}
-                        </div>
-                        <div className="welcome-badge">Welcome Onboard! 🤝</div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-birthday-view">
-                  <div className="empty-icon">👥</div>
-                  <p className="text-muted-color">No new joinees this month</p>
+        <div className="col-lg-8">
+          <div className="dashboard-row ps-1 pe-1">
+            <div className="grid-col-lg-6 grid-col-md-6">
+              <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
+                <div className="display-flex flex-between-center mb-3">
+                  <h6 className="card-title-heading mb-0">New Joiners</h6>
                 </div>
-              )}
-            </div>
 
-            {NewJoinees.length > 1 && (
-              <div className="joinee-nav-controls-bottom">
-                <button className="nav-btn" onClick={handleJoineePrev}>
-                  ❮
-                </button>
-                <div className="joinee-nav-dots">
-                  {NewJoinees.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`dot ${currentIndexJoinee === i ? "active" : ""}`}
-                    ></span>
-                  ))}
-                </div>
-                <button className="nav-btn" onClick={handleJoineeNext}>
-                  ❯
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                <div className="joinee-carousel-container" ref={joineeCarouselRef}>
+                  {NewJoinees.length > 0 ? (
+                    NewJoinees.map((joinee, index) => (
+                      <div key={index} className="joinee-slide">
+                        <div className="joinee-card-inner">
+                          <div className="joinee-accent-circle-top"></div>
+                          <div className="joinee-accent-circle-bottom"></div>
 
-        <div className="grid-col-lg-3">
-          <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
-            <div className="display-flex flex-between-center mb-3">
-              <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
-            </div>
-
-            <div className="birthday-carousel-container" ref={carouselRef}>
-              {upcomingBirthdays.length > 0 ? (
-                upcomingBirthdays.map((person, index) => (
-                  <div key={index} className="birthday-slide">
-                    <div className="birthday-card-inner">
-                      <div className="birthday-accent-circle"></div>
-                      <div className="birthday-accent-circle-bottom"></div>
-
-                      <div className="profile-image-wrapper">
-                        {person.Photos ? (
-                          <img
-                            src={person.Photos}
-                            className="birthday-img-modern"
-                            alt="profile"
-                          />
-                        ) : (
-                          <div className="birthday-img-modern initials-avatar">
-                            {person.EmployeeName
-                              ? person.EmployeeName.split(" ")
+                          <div className="profile-image-wrapper">
+                            {joinee.Photos ? (
+                              <img
+                                src={joinee.Photos}
+                                className="joinee-img-modern"
+                                alt="profile"
+                              />
+                            ) : (
+                              <div className="joinee-img-modern initials-avatar">
+                                {joinee.EmployeeName.split(" ")
                                   .map((n) => n[0])
                                   .join("")
                                   .toUpperCase()
-                                  .slice(0, 2)
-                              : "U"}
+                                  .slice(0, 2)}
+                              </div>
+                            )}
+                            <div className="joinee-icon-badge">✨</div>
                           </div>
-                        )}
-                        <div className="birthday-icon-badge">🎂</div>
+
+                          <div className="joinee-details mt-3">
+                            <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
+                            <div className="emp-dept-sub">
+                              {joinee.department_ID} • {joinee.EmployeeId}
+                            </div>
+                            <div className="welcome-badge">Welcome Onboard! 🤝</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-birthday-view">
+                      <div className="empty-icon">👥</div>
+                      <p className="text-muted-color">No new joinees this month</p>
+                    </div>
+                  )}
+                </div>
+
+                {NewJoinees.length > 1 && (
+                  <div className="joinee-nav-controls-bottom">
+                    <button className="nav-btn" onClick={handleJoineePrev}>
+                      ❮
+                    </button>
+                    <div className="joinee-nav-dots">
+                      {NewJoinees.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`dot ${currentIndexJoinee === i ? "active" : ""}`}
+                        ></span>
+                      ))}
+                    </div>
+                    <button className="nav-btn" onClick={handleJoineeNext}>
+                      ❯
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid-col-lg-6 grid-col-md-6">
+              <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
+                <div className="display-flex flex-between-center mb-3">
+                  <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
+                </div>
+
+                <div className="birthday-carousel-container" ref={carouselRef}>
+                  {upcomingBirthdays.length > 0 ? (
+                    upcomingBirthdays.map((person, index) => (
+                      <div key={index} className="birthday-slide">
+                        <div className="birthday-card-inner">
+                          <div className="birthday-accent-circle"></div>
+                          <div className="birthday-accent-circle-bottom"></div>
+
+                          <div className="profile-image-wrapper">
+                            {person.Photos ? (
+                              <img
+                                src={person.Photos}
+                                className="birthday-img-modern"
+                                alt="profile"
+                              />
+                            ) : (
+                              <div className="birthday-img-modern initials-avatar">
+                                {person.EmployeeName
+                                  ? person.EmployeeName.split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .toUpperCase()
+                                    .slice(0, 2)
+                                  : "U"}
+                              </div>
+                            )}
+                            <div className="birthday-icon-badge">🎂</div>
+                          </div>
+
+                          <div className="birthday-details mt-3">
+                            <h6 className="emp-name-text">{person.EmployeeName}</h6>
+                            <div className="emp-dept-sub">
+                              {person.Department || "Team Member"}
+                            </div>
+                            <div className="wish-badge">Happy Birthday! 🎈</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-birthday-view">
+                      <div className="empty-icon">🎉</div>
+                      <p className="text-muted-color">No birthdays this week</p>
+                    </div>
+                  )}
+                </div>
+
+                {upcomingBirthdays.length > 1 && (
+                  <div className="birthday-nav-controls-bottom">
+                    <button className="nav-btn" onClick={handlePrev}>
+                      ❮
+                    </button>
+                    <div className="birthday-nav-dots">
+                      {upcomingBirthdays.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`dot ${currentIndex === i ? "active" : ""}`}
+                        ></span>
+                      ))}
+                    </div>
+                    <button className="nav-btn" onClick={handleNext}>
+                      ❯
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="col-12 mt-0 ps-1 pe-1">
+              <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 className="card-title-heading mb-0">Leave Balance</h6>
+                  </div>
+                  <button
+                    className="btn-apply-modern"
+                    title="Apply Leave"
+                    onClick={handleLeave}
+                  >
+                    Apply Leave
+                  </button>
+                </div>
+
+                <div className="leave-grid-container fixed-list-height-leave">
+                  {leaveData.length > 0 ? (
+                    leaveData.map((leave, index) => {
+                      const total = leave.Current_Total || 0;
+                      const available = leave.Current_Balance || 0;
+
+                      const percentage = total > 0 ? (available / total) * 100 : 0;
+                      const strokeDasharray = `${percentage}, 100`;
+
+                      return (
+                        <div
+                          key={index}
+                          className="leave-status-item"
+                          title={leave.leavetype}
+                        >
+                          <div className="leave-progress-wrapper">
+                            <svg viewBox="0 0 36 36" className="circular-chart">
+                              <path
+                                className="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              />
+                              <path
+                                className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, "-")}`}
+                                strokeDasharray={strokeDasharray}
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              />
+                              <text x="18" y="20.35" className="percentage">
+                                {available}{" "}
+                              </text>
+                            </svg>
+                          </div>
+                          <div className="leave-info-text">
+                            <span className="leave-label">{leave.LeaveId}</span>
+                            <span className="leave-total-sub">of {total} Days</span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-4 w-100">
+                      <p className="text-muted">No leave data available.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Leave Approval */}
+        <div className="grid-col-lg-4">
+          <div className="app-card-base pending-requests-card rounded app-shadow-lg">
+            {/* Header Section */}
+            <div className="card-header-modern">
+              {/* Row 1: Title and Count */}
+              <div className="header-top-row d-flex justify-content-between align-items-center mb-2">
+                <h6 className="card-title-heading mb-0">Pending Requests</h6>
+                <span className="request-badge-count">
+                  {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length}&nbsp;&nbsp;Pending
+                </span>
+              </div>
+
+              {/* Row 2: Search Bar (Bottom) */}
+              <div className="header-bottom-row">
+                <div className="search-wrapper-modern">
+                  <i className="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input
+                    type="text"
+                    className="search-input-modern"
+                    placeholder="Search employee or request type..."
+                    value={requestSearch}
+                    onChange={(e) => setRequestSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Scrollable List */}
+            <div className="custom-list-container fixed-list-heights">
+              {filteredRequests.length > 0 ? (
+                filteredRequests.map((req, index) => (
+                  <div
+                    key={index}
+                    className="request-item-modern"
+                    onClick={() => {
+                      navigate("/RequestReport", {
+                        state: {
+                          type: req.type,
+                          id: req.id,
+                          fromDate: convertDate(req.FromDate),
+                          toDate: convertDate(req.ToDate),
+                          employeeId: req.EmployeeId,
+                          status: "Pending",
+                          mode: "item",
+                          HolidayName: req.title
+                        },
+                      })
+                    }}
+                  >
+                    {/* Avatar Fallback Logic */}
+                    <div className="req-avatar">
+                      {req.EmployeeName
+                        ? req.EmployeeName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+                        : "Mr.X"
+                      }
+                    </div>
+                    <div className="req-content">
+                      <div className="req-top-row">
+                        <span className="req-emp-name">{req.EmployeeName}</span>
+                        <span className="req-type-tag" onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/RequestReport", {
+                            state: { employeeId: req.EmployeeId, type: req.type, status: "Pending", mode: "type" },
+                          });
+                        }}>
+                          {req.type}
+                        </span>
                       </div>
 
-                      <div className="birthday-details mt-3">
-                        <h6 className="emp-name-text">{person.EmployeeName}</h6>
-                        <div className="emp-dept-sub">
-                          {person.Department || "Team Member"}
-                        </div>
-                        <div className="wish-badge">Happy Birthday! 🎈</div>
+                      <div className="req-mid-row">
+                        <span className="req-id">ID: {req.EmployeeId}</span>
+                        <span className="req-dot">•</span>
+                        <span className="req-title">{req.title}</span>
                       </div>
+
+                      {req.FromDate && (
+                        <div className="req-date-footer">
+                          <i className="fa-regular fa-calendar-days"></i>
+                          <span>{req.FromDate}</span>
+                          <i className="fa-solid fa-arrow-right-long mx-2"></i>
+                          <span>{req.ToDate}</span>
+                          {req.days && <span className="req-days-count">({req.days} Days)</span>}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Group */}
+                    <div className="req-actions-vertical">
+                      <button
+                        className="action-circle-btn approve"
+                        title="Approve"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApproval(req.type, req.id, req.FromDate, true, {
+                            EmployeeId: req.EmployeeId,
+                            HolidayDate: req.HolidayDate,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-check"></i>
+                      </button>
+                      <button
+                        className="action-circle-btn reject"
+                        title="Reject"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApproval(req.type, req.id, req.FromDate, false, {
+                            EmployeeId: req.EmployeeId,
+                            HolidayDate: req.HolidayDate,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-xmark"></i>
+                      </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="no-birthday-view">
-                  <div className="empty-icon">🎉</div>
-                  <p className="text-muted-color">No birthdays this week</p>
-                </div>
-              )}
-            </div>
-
-            {upcomingBirthdays.length > 1 && (
-              <div className="birthday-nav-controls-bottom">
-                <button className="nav-btn" onClick={handlePrev}>
-                  ❮
-                </button>
-                <div className="birthday-nav-dots">
-                  {upcomingBirthdays.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`dot ${currentIndex === i ? "active" : ""}`}
-                    ></span>
-                  ))}
-                </div>
-                <button className="nav-btn" onClick={handleNext}>
-                  ❯
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="grid-col-lg-6">
-          <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 className="card-title-heading mb-0">Leave Balance</h6>
-              </div>
-              <button
-                className="btn-apply-modern"
-                title="Apply Leave"
-                onClick={handleLeave}
-              >
-                Apply Leave
-              </button>
-            </div>
-
-            <div className="leave-grid-container">
-              {leaveData.length > 0 ? (
-                leaveData.map((leave, index) => {
-                  const total = leave.Current_Total || 0;
-                  const available = leave.Current_Balance || 0;
-
-                  const percentage = total > 0 ? (available / total) * 100 : 0;
-                  const strokeDasharray = `${percentage}, 100`;
-
-                  return (
-                    <div
-                      key={index}
-                      className="leave-status-item"
-                      title={leave.leavetype}
-                    >
-                      <div className="leave-progress-wrapper">
-                        <svg viewBox="0 0 36 36" className="circular-chart">
-                          <path
-                            className="circle-bg"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <path
-                            className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, "-")}`}
-                            strokeDasharray={strokeDasharray}
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <text x="18" y="20.35" className="percentage">
-                            {available}{" "}
-                          </text>
-                        </svg>
-                      </div>
-                      <div className="leave-info-text">
-                        <span className="leave-label">{leave.LeaveId}</span>
-                        <span className="leave-total-sub">of {total} Days</span>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="text-center py-4 w-100">
-                  <p className="text-muted">No leave data available.</p>
+                <div className="no-data-state">
+                  <div className="empty-illustration">📂</div>
+                  <p>No matching requests found</p>
                 </div>
               )}
             </div>
           </div>
         </div>
-        {/* <div className="grid-col-lg-6">
-          <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 className="card-title-heading mb-0">Leave Balance</h6>
-              </div>
-              <button className="btn-apply-modern" title="Apply Leave" onClick={handleLeave}>
-                Apply Leave
-              </button>
-            </div>
-
-            <div className="leave-grid-container">
-              {leaveData.length > 0 ? (
-                leaveData.map((leave, index) => {
-                  const percentage = (leave.availableleave / leave.totalleave) * 100;
-                  const strokeDasharray = `${percentage}, 100`;
-
-                  return (
-                    <div key={index} className="leave-status-item" title={leave.leavetype} >
-                      <div className="leave-progress-wrapper">
-                        <svg viewBox="0 0 36 36" className="circular-chart">
-                          <path className="circle-bg"
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <path className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, '-')}`}
-                            strokeDasharray={strokeDasharray}
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          />
-                          <text x="18" y="20.35" className="percentage">{leave.availableleave}</text>
-                        </svg>
-                      </div>
-                      <div className="leave-info-text">
-                        <span className="leave-label">{leave.LeaveId}</span>
-                        <span className="leave-total-sub">of {leave.totalleave} Days</span>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="text-center py-4 w-100">
-                  <p className="text-muted">No leave data available.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div> */}
       </div>
 
-      <div className="dashboard-row spacing-mt-2">
+      <div className="dashboard-row">
         <div className="grid-col-12">
           <div className="birthday-card-wrapper rounded app-shadow-lg height-full">
             <h6 className="display-flex justify-content-start card-title-heading spacing-mb-2">
@@ -2273,6 +3063,7 @@ const Dashboard = (payslip) => {
                   suppressLoadingOverlay={true}
                   pagination={true}
                   paginationAutoPageSize={true}
+                  onFirstDataRendered={onFirstDataRendered}
                   getRowStyle={(params) => {
                     if (params.data.Status === "Compensatory Leave") {
                       const themeColor = getComputedStyle(
