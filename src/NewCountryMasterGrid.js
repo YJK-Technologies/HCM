@@ -705,6 +705,14 @@ function Input({ }) {
     XLSX.writeFile(workbook, "Country_Master_Search_Report.xlsx");
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div class="container-fluid Topnav-screen ">
       {loading && <LoadingScreen />}
@@ -1194,6 +1202,7 @@ function Input({ }) {
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             pagination={true}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>

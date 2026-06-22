@@ -84,7 +84,7 @@ function WarehouseGrid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -164,13 +164,13 @@ function WarehouseGrid() {
           "Content-Type": "application/json",
           "company_code": company_code
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           company_code,
-          warehouse_code: searchParams?.warehouse_code ?? warehouse_code, 
-          warehouse_name: searchParams?.warehouse_name ?? warehouse_name, 
-          status: searchParams?.status ?? status, 
-          location_no: searchParams?.location_no ?? location_no,  
-        }) 
+          warehouse_code: searchParams?.warehouse_code ?? warehouse_code,
+          warehouse_name: searchParams?.warehouse_name ?? warehouse_name,
+          status: searchParams?.status ?? status,
+          location_no: searchParams?.location_no ?? location_no,
+        })
       });
       if (response.ok) {
         const searchData = await response.json();
@@ -724,6 +724,13 @@ function WarehouseGrid() {
     }
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -921,6 +928,7 @@ function WarehouseGrid() {
             pagination={true}
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
 

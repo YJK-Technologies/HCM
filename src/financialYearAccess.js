@@ -95,7 +95,7 @@ function Grid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -202,10 +202,10 @@ function Grid() {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
-          start_year: searchParams?.start_year ?? start_year, 
-          end_year: searchParams?.end_year ?? end_year, 
-          transaction_type: searchParams?.transactionType ?? transactionType, 
-          locked: searchParams?.LockType ?? LockType, 
+          start_year: searchParams?.start_year ?? start_year,
+          end_year: searchParams?.end_year ?? end_year,
+          transaction_type: searchParams?.transactionType ?? transactionType,
+          locked: searchParams?.LockType ?? LockType,
         })
       });
       if (response.ok) {
@@ -791,6 +791,13 @@ function Grid() {
     }
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -997,6 +1004,7 @@ function Grid() {
             pagination={true}
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
 
