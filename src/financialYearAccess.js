@@ -20,6 +20,7 @@ function Grid() {
   const [transactiondrop, setTransactiondrop] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [LockGridDrop, setLockGriddrop] = useState([]);
+  const [transactionTypeGridDrop, setTransactionTypeGridDrop] = useState([]);
   const [TransactionGriddrop, setTransactionGriddrop] = useState([])
 
   const [transactionType, setTransactionType] = useState('');
@@ -187,6 +188,24 @@ function Grid() {
         // Extract city names from the fetched data
         const LockOption = data.map(option => option.attributedetails_name);
         setLockGriddrop(LockOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Transaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    }).then((response) => response.json())
+      .then((data) => {
+        // Extract city names from the fetched data
+        const TransactionOption = data.map(option => option.attributedetails_name);
+        setTransactionTypeGridDrop(TransactionOption);
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
@@ -361,6 +380,10 @@ function Grid() {
       minWidth: 150,
       cellEditorParams: {
         maxLength: 250,
+      },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: transactionTypeGridDrop,
       },
     },
     {

@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import './App.css';
+import "./App.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import Select from 'react-select';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { showConfirmationToast } from './ToastConfirmation';
-import LoadingScreen from './Loading';
+import Select from "react-select";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { showConfirmationToast } from "./ToastConfirmation";
+import LoadingScreen from "./Loading";
 
-const config = require('./Apiconfig');
+const config = require("./Apiconfig");
 
 function Grid() {
   const [rowData, setRowData] = useState([]);
@@ -32,7 +32,7 @@ function Grid() {
   const [pincode, setPincode] = useState("");
   const [country, setCountry] = useState("");
   const [status, setStatus] = useState("");
-  const [Locationdrop, setLocationdrop] = useState("")
+  const [Locationdrop, setLocationdrop] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,10 +46,10 @@ function Grid() {
   const location = useLocation();
 
   //code added by Pavun purpose of set user permisssion
-  const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
+  const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
   const companyPermissions = permissions
-    .filter(permission => permission.screen_type === 'Company')
-    .map(permission => permission.permission_type.toLowerCase());
+    .filter((permission) => permission.screen_type === "Company")
+    .map((permission) => permission.permission_type.toLowerCase());
 
   const [selectedCompanyNo, setselectedCompanyNo] = useState(null);
   const [selectedCompanyLogo, setSelectedCompanyLogo] = useState(null);
@@ -79,7 +79,6 @@ function Grid() {
     // }
 
     if (location.state?.preservedInputs) {
-
       const inputs = location.state.preservedInputs;
 
       setCompany_no(inputs.company_no || "");
@@ -99,7 +98,7 @@ function Grid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -122,114 +121,112 @@ function Grid() {
   };
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/city`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const cityNames = data.map(option => option.attributedetails_name);
+        const cityNames = data.map((option) => option.attributedetails_name);
         setDrop(cityNames);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/country`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const countries = data.map(option => option.attributedetails_name);
+        const countries = data.map((option) => option.attributedetails_name);
         setCondrop(countries);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/state`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const States = data.map(option => option.attributedetails_name);
+        const States = data.map((option) => option.attributedetails_name);
         setStatedrop(States);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-
     fetch(`${config.apiBaseUrl}/locationno`)
       .then((response) => response.json())
       .then((data) => {
-        const LocationOption = data.map(option => option.location_no);
+        const LocationOption = data.map((option) => option.location_no);
         setLocationdrop(LocationOption);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((response) => response.json())
       .then((data) => {
-        const statusOption = data.map(option => option.attributedetails_name);
+        const statusOption = data.map((option) => option.attributedetails_name);
         setStatusGriddrop(statusOption);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-
   useEffect(() => {
-    const company_code = sessionStorage.getItem('selectedCompanyCode');
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
     fetch(`${config.apiBaseUrl}/status`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code }),
     })
       .then((data) => data.json())
       .then((val) => setStatusdrop(val))
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const filteredOptionStatus = Array.isArray(statusdrop)
     ? statusdrop.map((option) => ({
-      value: option.attributedetails_name,
-      label: option.attributedetails_name,
-    }))
+        value: option.attributedetails_name,
+        label: option.attributedetails_name,
+      }))
     : [];
 
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
-    setStatus(selectedStatus ? selectedStatus.value : '');
+    setStatus(selectedStatus ? selectedStatus.value : "");
     setHasValueChanged(true);
   };
 
@@ -244,27 +241,30 @@ function Grid() {
   const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
-      const response = await fetch(`${config.apiBaseUrl}/companysearchcriteria`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${config.apiBaseUrl}/companysearchcriteria`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_no: searchParams?.company_no ?? company_no,
+            company_name: searchParams?.company_name ?? company_name,
+            city: searchParams?.city ?? city,
+            state: searchParams?.state ?? state,
+            pincode: searchParams?.pincode ?? pincode,
+            country: searchParams?.country ?? country,
+            status: searchParams?.status ?? status,
+            company_gst_no: searchParams?.company_gst_no ?? company_gst_no,
+          }),
         },
-        body: JSON.stringify({ 
-          company_no: searchParams?.company_no ?? company_no, 
-          company_name: searchParams?.company_name ?? company_name, 
-          city: searchParams?.city ?? city, 
-          state: searchParams?.state ?? state, 
-          pincode: searchParams?.pincode ?? pincode, 
-          country: searchParams?.country ?? country, 
-          status: searchParams?.status ?? status, 
-          company_gst_no: searchParams?.company_gst_no ?? company_gst_no 
-        }) 
-      });
+      );
       if (response.ok) {
         const searchData = await response.json();
         setRowData(searchData);
-        console.log(searchData)
-        console.log("data fetched successfully")
+        console.log(searchData);
+        console.log("data fetched successfully");
       } else if (response.status === 404) {
         console.log("Data not found");
         toast.warning("Data not found");
@@ -286,7 +286,7 @@ function Grid() {
   };
 
   const arrayBufferToBase64 = (buffer) => {
-    let binary = '';
+    let binary = "";
     const bytes = new Uint8Array(buffer);
     const len = bytes.byteLength;
     for (let i = 0; i < len; i++) {
@@ -342,10 +342,7 @@ function Grid() {
         };
 
         return (
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={handleClick}
-          >
+          <span style={{ cursor: "pointer" }} onClick={handleClick}>
             {params.value}
           </span>
         );
@@ -369,30 +366,6 @@ function Grid() {
         maxLength: 250,
       },
     },
-    // {
-    //   headerName: "Company Image",
-    //   field: "company_logo",
-    //   editable: true,
-    //   cellStyle: { textAlign: "center" },
-    //   minWidth: 150,
-    //   cellEditorParams: {
-    //     maxLength: 250,
-    //   },
-    //   cellRenderer: (params) => {
-    //     if (params.value) {
-    //       const base64Image = arrayBufferToBase64(params.value.data);
-    //       return (
-    //         <img src={`data:image/jpeg;base64,${base64Image}`}
-    //           alt="Item Image"
-    //           style={{ width: " 50px", height: "50px" }}
-    //         />
-    //       );
-    //     } else {
-    //       return "";
-    //     }
-    //   },
-    //   onCellClicked: (params) => handleClickOpen(params),
-    // },
     {
       headerName: "Address 1",
       field: "address1",
@@ -477,7 +450,6 @@ function Grid() {
         maxLength: 250,
       },
     },
-
     {
       headerName: "Status",
       field: "status",
@@ -485,9 +457,8 @@ function Grid() {
       cellStyle: { textAlign: "left" },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
-        values: statusgriddrop
+        values: statusgriddrop,
       },
-
     },
     {
       headerName: "Founded Date",
@@ -505,7 +476,6 @@ function Grid() {
         maxLength: 150,
       },
     },
-
     {
       headerName: "Contact No",
       field: "contact_no",
@@ -524,7 +494,6 @@ function Grid() {
         return false;
       },
     },
-
     {
       headerName: "Annual Report URL",
       field: "AnnualReportURL",
@@ -563,12 +532,12 @@ function Grid() {
   };
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
@@ -584,7 +553,8 @@ function Grid() {
     }
 
     const reportData = selectedRows.map((row) => {
-      const formatValue = (val) => (val !== undefined && val !== null ? val : '');
+      const formatValue = (val) =>
+        val !== undefined && val !== null ? val : "";
 
       const addressParts = [
         row.address1,
@@ -593,7 +563,7 @@ function Grid() {
         row.city,
         row.pincode,
         row.state,
-        row.country
+        row.country,
       ].map(formatValue);
 
       const formattedAddress = `
@@ -610,13 +580,13 @@ function Grid() {
         "Company No": formatValue(row.company_no),
         "Company Name": formatValue(row.company_name),
         "Short Name": formatValue(row.short_name),
-        "Address": formattedAddress,
-        "Email": formatValue(row.email_id),
-        "Status": formatValue(row.status),
+        Address: formattedAddress,
+        Email: formatValue(row.email_id),
+        Status: formatValue(row.status),
         "Founded Date": formatValue(row.foundedDate),
         "Website URL": formatValue(row.websiteURL),
         "Contact No": formatValue(row.contact_no),
-        "Annual Report URL": formatValue(row.annualReportURL)
+        "Annual Report URL": formatValue(row.annualReportURL),
       };
     });
 
@@ -784,7 +754,7 @@ function Grid() {
     reportData.forEach((row) => {
       reportWindow.document.write("<tr>");
       Object.values(row).forEach((value) => {
-        reportWindow.document.write(`<td>${value || ''}</td>`);
+        reportWindow.document.write(`<td>${value || ""}</td>`);
       });
       reportWindow.document.write("</tr>");
     });
@@ -855,7 +825,7 @@ function Grid() {
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
-      (row) => row.company_no === params.data.company_no // Use the unique identifier 
+      (row) => row.company_no === params.data.company_no, // Use the unique identifier
     );
     if (rowIndex !== -1) {
       updatedRowData[rowIndex][params.colDef.field] = params.newValue;
@@ -866,14 +836,30 @@ function Grid() {
     }
   };
 
+  function validateEmail(email) {
+    const emailRegex = /^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/;
+    return emailRegex.test(email);
+  }
 
   const saveEditedData = async () => {
-    const selectedRowsData = editedData
-      .filter(row => selectedRows.some(selectedRow => selectedRow.company_no === row.company_no))
+    const selectedRowsData = editedData.filter((row) =>
+      selectedRows.some(
+        (selectedRow) => selectedRow.company_no === row.company_no,
+      ),
+    );
 
     if (selectedRowsData.length === 0) {
-      toast.warning("Please select and modify at least one row to update its data");
+      toast.warning(
+        "Please select and modify at least one row to update its data",
+      );
       return;
+    }
+
+    for (const row of selectedRowsData) {
+      if (row.email_id && !validateEmail(row.email_id.trim())) {
+        toast.warning(`Invalid Email Format: ${row.email_id}`);
+        return;
+      }
     }
 
     showConfirmationToast(
@@ -881,16 +867,16 @@ function Grid() {
       async () => {
         try {
           setLoading(true);
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+          const modified_by = sessionStorage.getItem("selectedUserCode");
 
           const response = await fetch(`${config.apiBaseUrl}/saveEditedData`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Modified-By": modified_by
+              "Modified-By": modified_by,
             },
             body: JSON.stringify({ editedData: selectedRowsData }), // Send only the selected rows for saving
-            "modified_by": modified_by
+            modified_by: modified_by,
           });
 
           if (response.status === 200) {
@@ -912,20 +898,19 @@ function Grid() {
       },
       () => {
         toast.info("Data updated cancelled.");
-      }
+      },
     );
   };
-
 
   const deleteSelectedRows = async () => {
     const selectedRows = gridApi.getSelectedRows();
 
     if (selectedRows.length === 0) {
-      toast.warning("Please select atleast One Row to Delete")
+      toast.warning("Please select atleast One Row to Delete");
       return;
     }
 
-    const modified_by = sessionStorage.getItem('selectedUserCode');
+    const modified_by = sessionStorage.getItem("selectedUserCode");
     const company_nosToDelete = selectedRows.map((row) => row.company_no);
     showConfirmationToast(
       "Are you sure you want to Delete the data in the selected rows?",
@@ -936,10 +921,10 @@ function Grid() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Modified-By": modified_by
+              "Modified-By": modified_by,
             },
             body: JSON.stringify({ company_nos: company_nosToDelete }),
-            "modified_by": modified_by
+            modified_by: modified_by,
           });
 
           if (response.ok) {
@@ -948,38 +933,38 @@ function Grid() {
               onClose: () => handleSearch(),
               autoClose: 1000,
             });
-
           } else {
             const errorResponse = await response.json();
             toast.warning(errorResponse.message || "Failed to delete data");
           }
         } catch (error) {
           console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
+          toast.error("Error Deleting Data: " + error.message);
         } finally {
           setLoading(false);
         }
       },
       () => {
         toast.info("Data Delete cancelled.");
-      }
+      },
     );
   };
 
   const handlesetPincode = (e) => {
     const value = e.target.value;
-    if (value.length <= 10) {  // Ensure length is 10 or less
+    if (value.length <= 10) {
+      // Ensure length is 10 or less
       setPincode(value);
     }
   };
 
   const handleKeyDownStatus = async (e) => {
-    if (e.key === 'Enter' && hasValueChanged) { // Only trigger search if the value has changed
+    if (e.key === "Enter" && hasValueChanged) {
+      // Only trigger search if the value has changed
       await handleSearch(); // Trigger the search function
       setHasValueChanged(false); // Reset the flag after search
     }
   };
-
 
   // Handler for when a row is selected
   const onRowSelected = (event) => {
@@ -988,39 +973,49 @@ function Grid() {
     }
   };
 
-
   return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
-      <ToastContainer position="top-right" className="toast-design" theme="colored" />
+      <ToastContainer
+        position="top-right"
+        className="toast-design"
+        theme="colored"
+      />
       <div className="shadow-lg p-1 bg-light rounded main-header-box">
         <div className="header-flex">
-
           <h1 className="page-title">Company</h1>
 
           <div className="action-wrapper desktop-actions">
-            {['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
+            {["add", "all permission"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
               <div className="action-icon add" onClick={handleNavigateToForm}>
                 <span className="tooltip">Add</span>
                 <i className="fa-solid fa-user-plus"></i>
               </div>
             )}
 
-            {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
+            {["delete", "all permission"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
               <div className="action-icon delete" onClick={deleteSelectedRows}>
                 <span className="tooltip">Delete</span>
                 <i className="fa-solid fa-user-minus"></i>
               </div>
             )}
 
-            {['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
+            {["update", "all permission"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
               <div className="action-icon update" onClick={saveEditedData}>
                 <span className="tooltip">Update</span>
                 <i class="fa-solid fa-pen-to-square"></i>
               </div>
             )}
 
-            {['all permission', 'view'].some(p => companyPermissions.includes(p)) && (
+            {["all permission", "view"].some((p) =>
+              companyPermissions.includes(p),
+            ) && (
               <div className="action-icon print" onClick={generateReport}>
                 <span className="tooltip">Print</span>
                 <i className="fa-solid fa-print"></i>
@@ -1040,23 +1035,35 @@ function Grid() {
             </button>
 
             <ul className="dropdown-menu dropdown-menu-end">
-              {['add', 'all permission'].some(p => companyPermissions.includes(p)) && (
+              {["add", "all permission"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
                 <li>
-                  <button className="dropdown-item" onClick={handleNavigateToForm}>
+                  <button
+                    className="dropdown-item"
+                    onClick={handleNavigateToForm}
+                  >
                     <i className="fa-solid fa-user-plus add fs-4"></i>
                   </button>
                 </li>
               )}
 
-              {['delete', 'all permission'].some(p => companyPermissions.includes(p)) && (
+              {["delete", "all permission"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
                 <li>
-                  <button className="dropdown-item" onClick={deleteSelectedRows}>
+                  <button
+                    className="dropdown-item"
+                    onClick={deleteSelectedRows}
+                  >
                     <i className="fa-solid fa-user-minus delete fs-4"></i>
                   </button>
                 </li>
               )}
 
-              {['update', 'all permission'].some(p => companyPermissions.includes(p)) && (
+              {["update", "all permission"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
                 <li>
                   <button className="dropdown-item" onClick={saveEditedData}>
                     <i className="fa-solid fa-pen-to-square update fs-4"></i>
@@ -1064,7 +1071,9 @@ function Grid() {
                 </li>
               )}
 
-              {['all permission', 'view'].some(p => companyPermissions.includes(p)) && (
+              {["all permission", "view"].some((p) =>
+                companyPermissions.includes(p),
+              ) && (
                 <li>
                   <button className="dropdown-item" onClick={generateReport}>
                     <i className="fa-solid fa-print text-dark fs-4"></i>
@@ -1078,7 +1087,6 @@ function Grid() {
 
       <div className="shadow-lg p-3 bg-light rounded mt-2 container-form-box">
         <div className="row g-3">
-
           {/* Company No */}
           <div className="col-md-2">
             <div className="inputGroup">
@@ -1087,7 +1095,7 @@ function Grid() {
                 type="text"
                 value={company_no}
                 onChange={handleCompanyNoChange}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 maxLength={18}
                 className="exp-input-field form-control"
                 required
@@ -1095,7 +1103,9 @@ function Grid() {
                 autoComplete="off"
                 placeholder=" "
               />
-              <label htmlFor="cno" className="exp-form-labels">Company No</label>
+              <label htmlFor="cno" className="exp-form-labels">
+                Company No
+              </label>
             </div>
           </div>
 
@@ -1106,7 +1116,7 @@ function Grid() {
                 id="cname"
                 value={company_name}
                 onChange={handleCompanyNameChange}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 title="Please Enter the Company Name"
                 maxLength={250}
                 className="exp-input-field form-control"
@@ -1125,7 +1135,7 @@ function Grid() {
                 className="exp-input-field form-control"
                 title="Please Enter the City"
                 onChange={(e) => setCity(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 autoComplete="off"
                 placeholder=" "
               />
@@ -1141,7 +1151,7 @@ function Grid() {
                 className="exp-input-field form-control"
                 title="Please Enter the State"
                 onChange={(e) => setState(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 autoComplete="off"
                 placeholder=" "
               />
@@ -1159,7 +1169,7 @@ function Grid() {
                 maxLength={10}
                 value={pincode}
                 onChange={handlesetPincode}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 autoComplete="off"
                 placeholder=" "
               />
@@ -1175,7 +1185,7 @@ function Grid() {
                 title="Please Enter the Country"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 autoComplete="off"
                 placeholder=" "
               />
@@ -1237,11 +1247,13 @@ function Grid() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      <div className="shadow-lg pt-3 bg-light rounded mt-2 container-form-box" style={{ width: "100%" }}>
+      <div
+        className="shadow-lg pt-3 bg-light rounded mt-2 container-form-box"
+        style={{ width: "100%" }}
+      >
         <div className="ag-theme-alpine" style={{ height: 455, width: "100%" }}>
           <AgGridReact
             rowData={rowData}

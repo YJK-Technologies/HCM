@@ -144,9 +144,9 @@ function RoleInfoGrid() {
           </span>
         );
       },
-      valueFormatter: (params) => {
-        return params.value ? params.value.toUpperCase() : '';
-      },
+      // valueFormatter: (params) => {
+      //   return params.value ? params.value.toUpperCase() : '';
+      // },
     },
     {
       headerName: "Role Name",
@@ -156,9 +156,9 @@ function RoleInfoGrid() {
       cellEditorParams: {
         maxLength: 50,
       },
-      valueFormatter: (params) => {
-        return params.value ? params.value.toUpperCase() : '';
-      },
+      // valueFormatter: (params) => {
+      //   return params.value ? params.value.toUpperCase() : '';
+      // },
     },
     {
       headerName: "Description",
@@ -168,9 +168,9 @@ function RoleInfoGrid() {
       cellEditorParams: {
         maxLength: 255,
       },
-      valueFormatter: (params) => {
-        return params.value ? params.value.toUpperCase() : '';
-      },
+      // valueFormatter: (params) => {
+      //   return params.value ? params.value.toUpperCase() : '';
+      // },
     },
   ];
 

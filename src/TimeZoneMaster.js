@@ -162,7 +162,7 @@ function TimeZoneMaster() {
             .then((response) => response.json())
             .then((data) => {
                 const statusOption = data.map(
-                    (option) => Number(option.attributedetails_name)
+                    (option) => Number(option.attributedetails_code)
                 );
                 setDstApplicableDropGrid(statusOption);
             })
