@@ -119,10 +119,6 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
   const [academicYearFrom, setAcademicYearFrom] = useState("");
   const [academicYearTo, setAcademicYearTo] = useState("");
 
-
-
-
-
   const handleSearch = async () => {
     setLoading(true)
     try {
@@ -213,6 +209,14 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
     handleClosePopup();
   }
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div>
       {open && (
@@ -246,7 +250,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       title="Please Enter the Employee ID"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -262,7 +266,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
                       title="Please Enter the Employee Name"
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -275,10 +279,10 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       autoComplete="off"
                       placeholder=" "
                       className="exp-input-field form-control"
-                        title="Please Enter the Academic Name"
+                      title="Please Enter the Academic Name"
                       value={AcademicName}
                       onChange={(e) => setAcademicName(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Academic Name</label>
                   </div>
@@ -294,7 +298,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       title="Please Enter the Major"
                       value={Major}
                       onChange={(e) => setMajor(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Major</label>
                   </div>
@@ -310,7 +314,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                       title="Please Enter the Major"
                       value={Institution}
                       onChange={(e) => setInstitution(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Institution</label>
                   </div>
@@ -321,7 +325,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                     <input
                       id="fdate"
                       className="exp-input-field form-control"
-                        title="Please Enter the Academic Year From"
+                      title="Please Enter the Academic Year From"
                       type="date"
                       placeholder=" "
                       autoComplete="off"
@@ -393,6 +397,7 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

@@ -2474,6 +2474,7 @@ const Dashboard = (payslip) => {
                     rowHeight={30}
                     pagination={true}
                     paginationAutoPageSize={true}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
 
                   <ShiftRequestModal
@@ -2638,6 +2639,7 @@ const Dashboard = (payslip) => {
                     <AgGridReact
                       columnDefs={holidayCols}
                       rowData={holidayRowData}
+                      onFirstDataRendered={onFirstDataRendered}
                     />
                   </div>
                 </div>

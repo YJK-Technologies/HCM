@@ -279,50 +279,43 @@ function Input({ }) {
     {
       headerName: "Country Name",
       field: "Country_Name",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "ISO Code",
       field: "ISO_Code",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Time Zone Default",
       field: "TimeZone_Default",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Week Start Day",
       field: "Week_Start_Day",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Week End Day",
       field: "Weekend_Days",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Max Work Hours Day",
       field: "Max_Work_Hours_Day",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Max Work Hours Week",
       field: "Max_Work_Hours_Week",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Overtime Allowed",
       field: "Overtime_Allowed",
-      // cellEditor: "agSelectCellEditor",
       editable: true,
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: overTimeDropGrid,
       },
@@ -330,13 +323,12 @@ function Input({ }) {
     {
       headerName: "Currency Code",
       field: "Currency_Code",
-      // filter: 'agTextColumnFilter',
       editable: true
     },
     {
       headerName: "Status",
       field: "Status",
-      // cellEditor: "agSelectCellEditor",
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: statusGridDrop,
       },
@@ -350,7 +342,8 @@ function Input({ }) {
 
   const handleSave = async () => {
     console.log(Country_Code, Country_Name, Week_Start_Day, ISO_Code, TimeZone_Default, Status)
-    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || !Status) {
+    if (!Country_Code || !Country_Name || !Week_Start_Day || !ISO_Code || !TimeZone_Default || !Status) 
+    {
       setError(" ");
       toast.warning("Error: Missing required fields");
       return;
@@ -703,6 +696,14 @@ function Input({ }) {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Country Master");
 
     XLSX.writeFile(workbook, "Country_Master_Search_Report.xlsx");
+  };
+
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (
@@ -1194,6 +1195,7 @@ function Input({ }) {
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             pagination={true}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>
