@@ -259,6 +259,14 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
     handleClosePopup(); // ✅ reuse clean close
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div>
       {open && (
@@ -475,6 +483,7 @@ export default function FinanceDetailsPopup({ open, handleClose, familyDetails }
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

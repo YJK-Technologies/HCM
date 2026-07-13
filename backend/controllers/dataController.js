@@ -29048,9 +29048,9 @@ const getTaskstatus = async (req, res) => {
 const getDailyTasks = async (req, res) => {
   try {
     let pool = await sql.connect(dbConfig);
-    const result = await pool.request().input("mode", sql.NVarChar, "A")
-      .query(`EXEC sp_TaskMaster @mode,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-`);
+    const result = await pool.request()
+    .input("mode", sql.NVarChar, "A")
+    .query(`EXEC sp_TaskMaster @mode,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);

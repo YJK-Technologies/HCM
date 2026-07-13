@@ -637,6 +637,7 @@ const ShiftChangeRequest = () => {
                                 rowHeight={30}
                                 pagination={true}
                                 paginationAutoPageSize={true}
+                                onFirstDataRendered={onFirstDataRendered}
                             />
                             <ShiftRequestModal
                                 isOpen={isModalOpen}

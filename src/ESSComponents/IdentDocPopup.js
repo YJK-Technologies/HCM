@@ -219,6 +219,14 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
     handleClosePopup(); // ✅ single clean exit
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div>
       {open && (
@@ -340,6 +348,7 @@ export default function IdentityDocumentsPopup({ open, handleClose, identityDocu
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

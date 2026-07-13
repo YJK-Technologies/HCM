@@ -254,12 +254,12 @@ function Input({ }) {
   };
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const handleSearch = async () => {
     setLoading(true);

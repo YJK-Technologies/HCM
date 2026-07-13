@@ -154,12 +154,12 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
   //   label: option.Department,
   // }));
 
-  const filteredOptionDPt = [{ value: 'All', label: 'All' }, 
-    ...(Array.isArray(DPTdrop) ? DPTdrop.map((option) => ({
-        value: option.Department,
-        label: option.Department,
-      }))
-      : [])
+  const filteredOptionDPt = [{ value: 'All', label: 'All' },
+  ...(Array.isArray(DPTdrop) ? DPTdrop.map((option) => ({
+    value: option.Department,
+    label: option.Department,
+  }))
+    : [])
   ];
 
   const fetchProductCodes = async (selectedValue) => {
@@ -306,7 +306,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          EmployeeId, Department:dpt, Designation:selecteddesg, Name, manager, status, from_date, to_date,
+          EmployeeId, Department: dpt, Designation: selecteddesg, Name, manager, status, from_date, to_date,
           Employee_Type: selectedEmpType ? selectedEmpType.value : null,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
           Location_Code
@@ -409,6 +409,14 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
     handleClosePopup();
   }
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div>
       {open && (
@@ -484,7 +492,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selecteddpt ? "has-value" : ""} 
               ${isSelectDepartment ? "is-focused" : ""}`}
-              title="Please Select the Department"
+                    title="Please Select the Department"
                   >
                     <Select
                       id="department"
@@ -524,7 +532,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${Designation ? "has-value" : ""} 
               ${isSelectDesignation ? "is-focused" : ""}`}
-              title="Please Select the Designation"
+                    title="Please Select the Designation"
                   >
                     <Select
                       id="designation"
@@ -549,7 +557,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selectedmanager ? "has-value" : ""} 
               ${isSelectManager ? "is-focused" : ""}`}
-              title="Please Select the Manager"
+                    title="Please Select the Manager"
                   >
                     <Select
                       id="manager"
@@ -636,7 +644,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     className={`inputGroup selectGroup 
               ${selectedEmpType ? "has-value" : ""} 
               ${isSelectEmpType ? "is-focused" : ""}`}
-              title="Please Select the Employee Type"
+                    title="Please Select the Employee Type"
                   >
                     <Select
                       id="shift"
@@ -687,6 +695,7 @@ export default function Companydetailpopup({ open, handleClose, CompanyDetails }
                     pagination={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

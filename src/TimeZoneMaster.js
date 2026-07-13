@@ -162,7 +162,7 @@ function TimeZoneMaster() {
             .then((response) => response.json())
             .then((data) => {
                 const statusOption = data.map(
-                    (option) => Number(option.attributedetails_name)
+                    (option) => Number(option.attributedetails_code)
                 );
                 setDstApplicableDropGrid(statusOption);
             })
@@ -691,6 +691,14 @@ function TimeZoneMaster() {
         XLSX.writeFile(workbook, "Time_Zone_Master_Search_Report.xlsx");
     };
 
+    const onFirstDataRendered = (params) => {
+        const allColumnIds = params.columnApi
+            .getColumns()
+            .map((col) => col.getId());
+
+        params.columnApi.autoSizeColumns(allColumnIds);
+    };
+
     return (
         <div className="container-fluid Topnav-screen">
             <div align="">
@@ -971,6 +979,7 @@ function TimeZoneMaster() {
                             onSelectionChanged={onSelectionChanged}
                             pagination={true}
                             paginationAutoPageSize={true}
+                            onFirstDataRendered={onFirstDataRendered}
                         />
                     </div>
                 </div>

@@ -2841,6 +2841,14 @@ const Dashboard = () => {
     },
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div className="dashboard-container-fluid Topnav-screen pb-2">
       <ToastContainer
@@ -3036,6 +3044,7 @@ const Dashboard = () => {
                         rowData={leaveRowData}
                         columnDefs={columnLeave}
                         rowHeight={30}
+                        onFirstDataRendered={onFirstDataRendered}
                       />
                     </div>
                   )}
@@ -3433,7 +3442,7 @@ const Dashboard = () => {
                       style={{ height: 260, width: "100%", paddingBottom: "20px" }}
                     >
                       {teamData?.labels?.length > 0 ? (
-                        <Doughnut data={teamData} options={teamOptions} plugins={[doughnutLabelPlugin]}/>
+                        <Doughnut data={teamData} options={teamOptions} plugins={[doughnutLabelPlugin]} />
                       ) : (
                         <div className="no-data-state py-5">
                           <i className="fa-solid fa-inbox mb-2"></i>
@@ -3454,6 +3463,7 @@ const Dashboard = () => {
                     rowHeight={35}
                     headerHeight={40}
                     animateRows={true}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               )}
@@ -3541,6 +3551,7 @@ const Dashboard = () => {
                 columnDefs={columnDefsTHRS}
                 rowData={rowDataTHRS}
                 rowHeight={30}
+                onFirstDataRendered={onFirstDataRendered}
               />
             </div>
           </div>
@@ -3784,6 +3795,7 @@ const Dashboard = () => {
                     gridApiRef.current = params.api;
                     gridColumnApiRef.current = params.columnApi;
                   }}
+                  onFirstDataRendered={onFirstDataRendered}
                 />
               </div>
             </div>
@@ -4004,6 +4016,7 @@ const Dashboard = () => {
                     gridApiRef.current = params.api;
                     gridColumnApiRef.current = params.columnApi;
                   }}
+                  onFirstDataRendered={onFirstDataRendered}
                 />
               </div>
             </div>

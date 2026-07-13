@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
 const config = require('../Apiconfig');
 
-export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets , EmployeeAssetsPopup }) {
+export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets, EmployeeAssetsPopup }) {
   const [loading, setLoading] = useState(false);
   const [EmployeeId, setEmployeeId] = useState("");
   const [AssetID, setAssetID] = useState("");
@@ -38,7 +38,7 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
         })
       });
 
-   if (response.ok) {
+      if (response.ok) {
         const searchData = await response.json();
         setRowData(searchData);
         console.log("data fetched successfully")
@@ -131,20 +131,20 @@ export default function EmployeeAssetsPopup({ open, handleClose,onSelectAssets ,
   ]
 
 
-const handleConfirm = () => {
-  const selectedData = selectedRows.map(row => ({
-    EmployeeID: row.EmployeeId,
-    AssetID: row.AssetID,
-  }));
+  const handleConfirm = () => {
+    const selectedData = selectedRows.map(row => ({
+      EmployeeID: row.EmployeeId,
+      AssetID: row.AssetID,
+    }));
 
-  onSelectAssets(selectedData);   // changed
-  handleClose();
-  clearInputs();
-  setRowData([]);
-};
-   
+    onSelectAssets(selectedData);   // changed
+    handleClose();
+    clearInputs();
+    setRowData([]);
+  };
 
-   
+
+
 
   const gridOptions = {
     pagination: true,
@@ -164,6 +164,14 @@ const handleConfirm = () => {
   const handleReload = () => {
     clearInputs([])
     setRowData([])
+  };
+
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (
@@ -294,6 +302,7 @@ const handleConfirm = () => {
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

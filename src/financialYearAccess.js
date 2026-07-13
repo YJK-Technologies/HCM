@@ -20,6 +20,7 @@ function Grid() {
   const [transactiondrop, setTransactiondrop] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [LockGridDrop, setLockGriddrop] = useState([]);
+  const [transactionTypeGridDrop, setTransactionTypeGridDrop] = useState([]);
   const [TransactionGriddrop, setTransactionGriddrop] = useState([])
 
   const [transactionType, setTransactionType] = useState('');
@@ -95,7 +96,7 @@ function Grid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -191,6 +192,24 @@ function Grid() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+    useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
+
+    fetch(`${config.apiBaseUrl}/Transaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    }).then((response) => response.json())
+      .then((data) => {
+        // Extract city names from the fetched data
+        const TransactionOption = data.map(option => option.attributedetails_name);
+        setTransactionTypeGridDrop(TransactionOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
   const handleSearch = async (searchParams = null) => {
     try {
       const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -202,10 +221,10 @@ function Grid() {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
-          start_year: searchParams?.start_year ?? start_year, 
-          end_year: searchParams?.end_year ?? end_year, 
-          transaction_type: searchParams?.transactionType ?? transactionType, 
-          locked: searchParams?.LockType ?? LockType, 
+          start_year: searchParams?.start_year ?? start_year,
+          end_year: searchParams?.end_year ?? end_year,
+          transaction_type: searchParams?.transactionType ?? transactionType,
+          locked: searchParams?.LockType ?? LockType,
         })
       });
       if (response.ok) {
@@ -361,6 +380,10 @@ function Grid() {
       minWidth: 150,
       cellEditorParams: {
         maxLength: 250,
+      },
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: transactionTypeGridDrop,
       },
     },
     {
@@ -791,6 +814,13 @@ function Grid() {
     }
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   return (
     <div className="container-fluid Topnav-screen">
@@ -997,6 +1027,7 @@ function Grid() {
             pagination={true}
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
 

@@ -576,7 +576,7 @@ function NumberSeriesGrid() {
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
-      (row) => row.Screen_Type === params.data.Screen_Type
+      (row) => row.KeyField === params.data.KeyField
     );
 
     if (rowIndex !== -1) {
@@ -585,7 +585,7 @@ function NumberSeriesGrid() {
 
       setEditedData((prevData) => {
         const existingIndex = prevData.findIndex(
-          (item) => item.Screen_Type === params.data.Screen_Type
+          (item) => item.KeyField === params.data.KeyField
         );
 
         if (existingIndex !== -1) {
