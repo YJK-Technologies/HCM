@@ -158,6 +158,15 @@ const config = require('./Apiconfig');
     editable: false,
   }
 ];
+
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
 const gridOptions = {
   pagination: true,
   paginationPageSize: 10,
@@ -473,6 +482,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                           <AgGridReact
                             rowData={rowData}
                             columnDefs={columnDefs}
+                            onFirstDataRendered={onFirstDataRendered}
                             rowSelection="single"
                             paginationAutoPageSize={true}
                             gridOptions={gridOptions}

@@ -3789,6 +3789,7 @@ const Dashboard = () => {
               >
                 <AgGridReact
                   columnDefs={ShiftColDefs}
+                  onFirstDataRendered={onFirstDataRendered}
                   rowData={shiftRowData}
                   suppressRowClickSelection={true}
                   onGridReady={(params) => {

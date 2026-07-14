@@ -1171,8 +1171,15 @@
   transform: none;
 }
 
-.weekend-cell {
-  background-color: #ffe5e5;
+/* .weekend-cell {
+  background-color: #1b8bd6;
+  color: #ffff;
+  font-weight: bold;
+} */
+ .weekend-cell {
+  background-color: #1b8bd6 !important;
+  color: #fff !important;
+  font-weight: bold;
 }
 
 .holiday-cell {

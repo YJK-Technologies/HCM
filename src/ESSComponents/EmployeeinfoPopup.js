@@ -176,6 +176,14 @@ const gridOptions = {
   paginationPageSize: 10,
 };
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
 
 export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
 
@@ -685,6 +693,7 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     pagination={true}
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
+                    onFirstDataRendered={onFirstDataRendered}
                     onSelectionChanged={handleRowSelected}
                     onFirstDataRendered={onFirstDataRendered}
                   />

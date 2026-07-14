@@ -310,6 +310,14 @@ function WarehouseGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+    const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -722,14 +730,6 @@ function WarehouseGrid() {
     if (event.node.isSelected()) {
       handleRowClick(event.data);
     }
-  };
-
-  const onFirstDataRendered = (params) => {
-    const allColumnIds = params.columnApi
-      .getColumns()
-      .map((col) => col.getId());
-
-    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (

@@ -363,6 +363,14 @@ function TimeZoneMaster() {
         setGridApi(params.api);
     };
 
+      const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
     const onSelectionChanged = () => {
         const selectedNodes = gridApi.getSelectedNodes();
         const selectedData = selectedNodes.map((node) => node.data);
@@ -691,14 +699,6 @@ function TimeZoneMaster() {
         XLSX.writeFile(workbook, "Time_Zone_Master_Search_Report.xlsx");
     };
 
-    const onFirstDataRendered = (params) => {
-        const allColumnIds = params.columnApi
-            .getColumns()
-            .map((col) => col.getId());
-
-        params.columnApi.autoSizeColumns(allColumnIds);
-    };
-
     return (
         <div className="container-fluid Topnav-screen">
             <div align="">
@@ -977,6 +977,7 @@ function TimeZoneMaster() {
                             onCellValueChanged={onCellValueChanged}
                             rowSelection="multiple"
                             onSelectionChanged={onSelectionChanged}
+                            onFirstDataRendered={onFirstDataRendered}
                             pagination={true}
                             paginationAutoPageSize={true}
                             onFirstDataRendered={onFirstDataRendered}

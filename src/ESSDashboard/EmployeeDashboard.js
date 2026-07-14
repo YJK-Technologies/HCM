@@ -830,7 +830,8 @@ const Dashboard = (payslip) => {
 
   const isWeekend = (day) => {
     const date = new Date(year, month, day);
-    return date.getDay() === 0 || date.getDay() === 6;
+    return date.getDay() === 0;
+    // return date.getDay() === 0 || date.getDay() === 6;
   };
 
   const isHoliday = (day) => {
@@ -2470,6 +2471,7 @@ const Dashboard = (payslip) => {
                 >
                   <AgGridReact
                     columnDefs={empShiftCols}
+                    onFirstDataRendered={onFirstDataRendered}
                     rowData={rempShiftRowData}
                     rowHeight={30}
                     pagination={true}
