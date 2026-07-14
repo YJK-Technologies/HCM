@@ -272,8 +272,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
 
       console.log("Payload:", payload);
 
-      const response = await fetch(
-        `${config.apiBaseUrl}/EmployeeDocSC`,
+      const response = await fetch(`${config.apiBaseUrl}/EmployeeDocSC`,
         {
           method: "POST",
           headers: {
@@ -368,6 +367,14 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
     EmployeeInfo(selectedData);
 
     handleClosePopup(); // ✅ reuse
+  };
+
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (
@@ -479,6 +486,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
                     paginationAutoPageSize={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

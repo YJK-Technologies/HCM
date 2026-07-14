@@ -157,7 +157,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
         console.log("data fetched successfully");
       } else if (response.status === 404) {
         toast.warning("Data Not found");
-        setRowData([]);  
+        setRowData([]);
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Something went wrong");
@@ -172,9 +172,9 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
   };
 
   const handleClosePopup = () => {
-    clearInputs();     
-    setRowData([]);    
-    handleClose();     
+    clearInputs();
+    setRowData([]);
+    handleClose();
   };
 
   const handleReload = () => {
@@ -184,13 +184,13 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
 
   const clearInputs = () => {
     setEmployeeId("");
-    setname("");             
+    setname("");
     setSalaryType("");
     setPayScale("");
     setSalaryPerAnnum("");
-    setPFNo("");              
-    setsalary_from("");       
-    setsalary_to("");         
+    setPFNo("");
+    setsalary_from("");
+    setsalary_to("");
   };
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -214,6 +214,14 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
     finaceDetails(selectedData);
     handleClosePopup();
   }
+
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   return (
     <div>
@@ -250,7 +258,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={EmployeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -261,13 +269,13 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     <input
                       type="text"
                       autoComplete="off"
-                        title="Please Enter the Employee Name"
+                      title="Please Enter the Employee Name"
                       placeholder=" "
                       maxLength={225}
                       className="exp-input-field form-control"
                       value={Name}
                       onChange={(e) => setname(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -277,14 +285,14 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   <div className="inputGroup">
                     <input
                       type="text"
-                        title="Please Enter the Salary Type"
+                      title="Please Enter the Salary Type"
                       autoComplete="off"
                       placeholder=" "
                       maxLength={50}
                       className="exp-input-field form-control"
                       value={salaryType}
                       onChange={(e) => setSalaryType(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Type</label>
                   </div>
@@ -301,7 +309,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                       className="exp-input-field form-control"
                       value={payScale}
                       onChange={(e) => setPayScale(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Payscale</label>
                   </div>
@@ -326,7 +334,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   <div className="inputGroup">
                     <input
                       class="exp-input-field form-control"
-                        title="Please Enter the PF No"
+                      title="Please Enter the PF No"
                       type="text"
                       id="PFNo"
                       placeholder=" "
@@ -355,7 +363,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                         }
                       }}
                       maxLength={18}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Range From</label>
                   </div>
@@ -377,7 +385,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                         }
                       }}
                       maxLength={18}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Salary Range To</label>
                   </div>
@@ -413,6 +421,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     pagination={true}
                     gridOptions={gridOptions}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

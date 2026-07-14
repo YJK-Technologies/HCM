@@ -623,12 +623,12 @@ function AdminShiftChange() {
   ];
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const handleShiftRequest = (rowData) => {
     if (!rowData) return;
@@ -727,7 +727,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftEmpId ? "has-value" : ""} 
                   ${isSelectedShiftEmpId ? "is-focused" : ""}`}
-                  title="Please select the Employee ID"
+              title="Please select the Employee ID"
             >
               <Select
                 id="status"
@@ -751,7 +751,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftDeptId ? "has-value" : ""} 
                   ${isSelectedShiftDeptId ? "is-focused" : ""}`}
-                  title="Please select the Department ID"
+              title="Please select the Department ID"
             >
               <Select
                 id="status"
@@ -775,7 +775,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftDesigId ? "has-value" : ""} 
                   ${isSelectedShiftDesigId ? "is-focused" : ""}`}
-                  title="Please select the Designation ID"
+              title="Please select the Designation ID"
             >
               <Select
                 id="status"
@@ -799,7 +799,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftPatternId ? "has-value" : ""} 
                   ${isSelectedShiftPatternId ? "is-focused" : ""}`}
-                  title="Please select the Shift Pattern ID"
+              title="Please select the Shift Pattern ID"
             >
               <Select
                 id="status"
@@ -823,7 +823,7 @@ function AdminShiftChange() {
               className={`inputGroup selectGroup 
                   ${selectedShiftCode ? "has-value" : ""} 
                   ${isSelectedShiftCode ? "is-focused" : ""}`}
-                  title="Please select the Shift Code"
+              title="Please select the Shift Code"
             >
               <Select
                 id="status"

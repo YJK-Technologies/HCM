@@ -538,6 +538,63 @@ function Input({ }) {
         }
     };
 
+
+    // const handleUpdate = async () => {
+    //   if (!EmployeeId || !Account_NO || !AccountHolderName || !bankName || !IFSC_Code || !passBookImg) {
+    //     setError(true);
+    //     toast.warning("Error: Missing required fields");
+    //     return;
+    //   }
+    //   setError(false);
+
+    //   try {
+    //     setLoading(true)
+    //     const formData = new FormData();
+    //     formData.append("EmployeeId", EmployeeId);
+    //     formData.append("Account_NO", Account_NO);
+    //     formData.append("AccountHolderName", AccountHolderName);
+    //     formData.append("bankName", bankName);
+    //     formData.append("branchName", branchName);
+    //     formData.append("IFSC_Code", IFSC_Code);
+    //     formData.append("Bank_City", bankCity);
+    //     formData.append("Bank_Country", bankCountry);
+    //     formData.append("Salary_Currency", salaryCurrency);
+    //     formData.append("WPS_Enabled", WPSEnabled);
+    //     formData.append("WPS_Member_Id", WPSMemberId);
+    //     formData.append("Is_Primary_Account", isPrimaryAccount);
+    //     formData.append("Is_Active", isActive);
+    //     formData.append("Is_Deleted", isDelete);
+    //     formData.append("S_NO", sNo);
+    //     formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+    //     formData.append("modified_by", sessionStorage.getItem("selectedUserCode"));
+
+    //     if (passBookImg) {
+    //       formData.append("Bankbook_img", passBookImg);
+    //     }
+
+    //     const response = await fetch(`${config.apiBaseUrl}/updateEmployeebankdet`, {
+    //       method: "POST",
+    //       body: formData,
+    //     });
+
+    //     if (response.ok) {
+    //       console.log("Data updated successfully");
+    //       toast.success("Data updated successfully!", {
+    //         onClose: () => window.location.reload(),
+    //       });
+    //     } else {
+    //       const errorResponse = await response.json();
+    //       console.error(errorResponse.message);
+    //       toast.warning(errorResponse.message);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error inserting data:", error);
+    //     toast.error('Error inserting data: ' + error.message);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+
     const handleUpdate = async () => {
         if (
             !EmployeeId ||
@@ -772,6 +829,26 @@ function Input({ }) {
         console.log(data);
     };
 
+    // useEffect(() => {
+    //   if (location.state) {
+    //     if (location.state.employeeId) {
+    //       setEmployeeId(location.state.employeeId);
+    //       handleRefNo(location.state.employeeId)
+    //     }
+    //     if (location.state.firstName) {
+    //       setFirst_Name(location.state.firstName);
+    //     }
+    //     if (location.state.department_id) {
+    //       setdepartment_id(location.state.department_id);
+    //     } else {
+    //       console.log("data not found")
+    //     }
+    //     if (location.state.designation_id) {
+    //       setdesignation_id(location.state.designation_id);
+    //     }
+    //   }
+    // }, [location.state]);
+
     useEffect(() => {
         const { employeeId, firstName, department_id, designation_id } = location.state || {};
 
@@ -967,6 +1044,21 @@ function Input({ }) {
                                 </div>
                             </div>
 
+                            {/* <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="sNo"
+                                        class="exp-input-field form-control"
+                                        type="number"
+                                        placeholder=" "
+                                        autoComplete="off"
+                                        value={sNo}
+                                        onChange={(e) => setSNo(e.target.value)}
+                                    />
+                                    <label for="add1" className={`exp-form-labels`}>SNo</label>
+                                </div>
+                            </div> */}
+
                             <div className="col-md-2">
                                 <div className="inputGroup">
                                     <input
@@ -1055,6 +1147,30 @@ function Input({ }) {
                                 </div>
                             </div>
 
+                            {/* <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedAccountType ? "has-value" : ""} 
+                                    ${isSelectAccountType ? "is-focused" : ""}`}
+                                >
+                                    <Select
+                                        id="department"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectAccountType(true)}
+                                        onBlur={() => setIsSelectAccountType(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedAccountType}
+                                        onChange={handleChangeAccountType}
+                                        options={filteredOptionAccountType}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        Account Type
+                                    </label>
+                                </div>
+                            </div> */}
+
                             <div className="col-md-2">
                                 <div className="inputGroup">
                                     <input
@@ -1089,6 +1205,22 @@ function Input({ }) {
                                 </div>
                             </div>
 
+                            {/* <div className="col-md-2">
+                                <div className="inputGroup">
+                                    <input
+                                        id="salaryCurrency"
+                                        class="exp-input-field form-control"
+                                        type="text"
+                                        placeholder=" "
+                                        autoComplete="off"
+                                        value={salaryCurrency}
+                                        maxLength={3}
+                                        onChange={(e) => setSalaryCurrency(e.target.value)}
+                                    />
+                                    <label for="add1" className={`exp-form-labels`}>Salary Currency</label>
+                                </div>
+                            </div> */}
+
                             <div className="col-md-2">
                                 <div
                                     className={`inputGroup selectGroup 
@@ -1111,6 +1243,31 @@ function Input({ }) {
                                     <label for="sname" className={`floating-label`}>Salary Currency</label>
                                 </div>
                             </div>
+
+                            {/* <div className="col-md-2">
+                                <div
+                                    className={`inputGroup selectGroup 
+                                    ${selectedWPSEnabled ? "has-value" : ""} 
+                                    ${isSelectWPSEnabled ? "is-focused" : ""}`}
+                                    title="Please select if WPS Enabled"
+                                >
+                                    <Select
+                                        id="WPSEnabled"
+                                        placeholder=" "
+                                        onFocus={() => setIsSelectWPSEnabled(true)}
+                                        onBlur={() => setIsSelectWPSEnabled(false)}
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        type="text"
+                                        value={selectedWPSEnabled}
+                                        onChange={handleChangeWPSEnabled}
+                                        options={filteredOptionBoolean}
+                                    />
+                                    <label htmlFor="selecteddpt" className={`floating-label`}>
+                                        WPS Enabled
+                                    </label>
+                                </div>
+                            </div> */}
 
                             <div className="col-md-2">
                                 <div className="inputGroup">
@@ -1158,6 +1315,54 @@ function Input({ }) {
                                     </label>
                                 </div>
                             </div>
+
+                            {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsActive ? "has-value" : ""} 
+              ${isSelectIsActive ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsActive"
+                placeholder=" "
+                onFocus={() => setIsSelectIsActive(true)}
+                onBlur={() => setIsSelectIsActive(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsActive}
+                onChange={handleChangeIsActive}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Active
+              </label>
+            </div>
+          </div> */}
+
+                            {/* <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedIsDelete ? "has-value" : ""} 
+              ${isSelectIsDelete ? "is-focused" : ""}`}
+            >
+              <Select
+                id="IsDelete"
+                placeholder=" "
+                onFocus={() => setIsSelectIsDelete(true)}
+                onBlur={() => setIsSelectIsDelete(false)}
+                classNamePrefix="react-select"
+                isClearable
+                type="text"
+                value={selectedIsDelete}
+                onChange={handleChangeIsDelete}
+                options={filteredOptionBoolean}
+              />
+              <label htmlFor="selecteddpt" className={`floating-label`}>
+                Is Delete
+              </label>
+            </div>
+          </div> */}
 
                             <div className="col-md-2">
                                 <div className="inputGroup">

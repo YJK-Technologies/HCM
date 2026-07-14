@@ -591,12 +591,12 @@ function Input({ }) {
   };
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
@@ -775,7 +775,7 @@ function Input({ }) {
                   </button>
                 </li>
               )}
-              
+
               <li>
                 <button className="dropdown-item" onClick={handleReload}>
                   <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>

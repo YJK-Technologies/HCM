@@ -246,7 +246,13 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
     handleClosePopup();
   }
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   return (
     <div>
@@ -282,7 +288,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       value={EmployeeId}
                       maxLength={100}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee ID</label>
                   </div>
@@ -299,7 +305,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       value={Name}
                       maxLength={200}
                       onChange={(e) => setname(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Employee Name</label>
                   </div>
@@ -316,7 +322,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       value={AccountHolderName}
                       maxLength={200}
                       onChange={(e) => setAccountHolderName(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Account Holder Name</label>
                   </div>
@@ -333,7 +339,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       value={Account_NO}
                       maxLength={50}
                       onChange={(e) => setAccountNumber(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Account No</label>
                   </div>
@@ -367,7 +373,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                       value={bankName}
                       maxLength={255}
                       onChange={(e) => setbankName(e.target.value)}
-                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Bank Name</label>
                   </div>
@@ -419,6 +425,7 @@ export default function Bankaccdetpopup({ open, handleClose, Employeebankdetails
                     rowSelection="single"
                     pagination={true}
                     onSelectionChanged={handleRowSelected}
+                    onFirstDataRendered={onFirstDataRendered}
                   />
                 </div>
               </div>

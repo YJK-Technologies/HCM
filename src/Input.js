@@ -755,7 +755,7 @@ function Input({ }) {
                 onKeyDown={(e) => handleKeyDown(e, companyname, companycode)}
                 readOnly={mode === "update"}
               />
-              <label for="cno" className={`exp-form-labels ${error && !company_no ? 'text-danger' : ''}`}>Company Code<span className="text-danger">*</span></label>
+              <label for="cno" className={`exp-form-labels ${error && !company_no ? 'text-danger' : ''}`}>Company No<span className="text-danger">*</span></label>
             </div>
           </div>
 
@@ -958,7 +958,7 @@ function Input({ }) {
               <input
                 id="email"
                 className="exp-input-field form-control"
-                title="Please Enter the Email ID"
+                title="Please Enter the Email"
                 type="email"
                 placeholder=" "
                 autoComplete="off"
@@ -1123,7 +1123,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container" onClick={() => logo.current.click()}>
+              <div className="image-upload-container" title="Please Uploaded Logo" onClick={() => logo.current.click()}>
                 {selectedImage ? (
                   <div className="image-preview-box">
                     <img
@@ -1168,7 +1168,7 @@ function Input({ }) {
 
           <div className="col-md-2">
             <div className="inputGroup">
-              <div className="image-upload-container" onClick={() => sign.current.click()}>
+              <div className="image-upload-container" title="Please Uploaded Signature" onClick={() => sign.current.click()}>
 
                 {selectedSignatureImage ? (
                   <div className="image-preview-box">

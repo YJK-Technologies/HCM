@@ -110,7 +110,7 @@ function UserGrid() {
       }
 
       if (location.state?.refreshGrid) {
-        handleSearch(inputs); 
+        handleSearch(inputs);
       }
     }
   }, [location.state]);
@@ -376,7 +376,7 @@ function UserGrid() {
           dob: searchParams?.dob ?? dob,
           gender: searchParams?.gender ?? gender,
           created_by: sessionStorage.getItem("selectedUserCode")
-        }), 
+        }),
       });
 
       if (response.ok) {
@@ -992,6 +992,14 @@ function UserGrid() {
     }
   };
 
+  const onFirstDataRendered = (params) => {
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
+
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
+
   return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
@@ -1265,6 +1273,7 @@ function UserGrid() {
             pagination={true}
             onRowSelected={onRowSelected}
             paginationAutoPageSize={true}
+            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>
