@@ -191,6 +191,7 @@ const ApplyLeave = () => {
       body: JSON.stringify({
         EmployeeId: sessionStorage.getItem('selectedUserCode'),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())

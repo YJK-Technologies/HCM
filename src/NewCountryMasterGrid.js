@@ -567,6 +567,14 @@ function Input({ }) {
     setGridColumnApi(params.columnApi);
   };
 
+    const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -696,14 +704,6 @@ function Input({ }) {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Country Master");
 
     XLSX.writeFile(workbook, "Country_Master_Search_Report.xlsx");
-  };
-
-  const onFirstDataRendered = (params) => {
-    const allColumnIds = params.columnApi
-      .getColumns()
-      .map((col) => col.getId());
-
-    params.columnApi.autoSizeColumns(allColumnIds);
   };
 
   return (
@@ -1191,11 +1191,11 @@ function Input({ }) {
             rowData={rowData}
             columnDefs={columnDefs}
             onGridReady={onGridReady}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             paginationAutoPageSize={true}
             gridOptions={gridOptions}
             pagination={true}
-            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
       </div>
