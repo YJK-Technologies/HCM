@@ -732,14 +732,6 @@ function WarehouseGrid() {
     }
   };
 
-  const onFirstDataRendered = (params) => {
-    const allColumnIds = params.columnApi
-      .getColumns()
-      .map((col) => col.getId());
-
-    params.columnApi.autoSizeColumns(allColumnIds);
-  };
-
   return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
@@ -931,7 +923,6 @@ function WarehouseGrid() {
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
             onCellValueChanged={onCellValueChanged}
-            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             onSelectionChanged={onSelectionChanged}
             pagination={true}

@@ -822,14 +822,6 @@ function Grid() {
     }
   };
 
-  const onFirstDataRendered = (params) => {
-    const allColumnIds = params.columnApi
-      .getColumns()
-      .map((col) => col.getId());
-
-    params.columnApi.autoSizeColumns(allColumnIds);
-  };
-
   return (
     <div className="container-fluid Topnav-screen">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
@@ -1036,7 +1028,6 @@ function Grid() {
             pagination={true}
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}
-            onFirstDataRendered={onFirstDataRendered}
           />
         </div>
 

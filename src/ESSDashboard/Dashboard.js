@@ -1900,14 +1900,6 @@ const Dashboard = () => {
     },
   ];
 
-  const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
-
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
-
   const columnDefs = [
     {
       headerName: "S.No",
