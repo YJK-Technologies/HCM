@@ -1900,6 +1900,14 @@ const Dashboard = () => {
     },
   ];
 
+  const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const columnDefs = [
     {
       headerName: "S.No",
@@ -3778,6 +3786,7 @@ const Dashboard = () => {
               >
                 <AgGridReact
                   columnDefs={ShiftColDefs}
+                  onFirstDataRendered={onFirstDataRendered}
                   rowData={shiftRowData}
                   suppressRowClickSelection={true}
                   onGridReady={(params) => {

@@ -395,6 +395,14 @@ function Grid() {
     setGridColumnApi(params.columnApi);
   };
 
+    const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -994,6 +1002,7 @@ function Grid() {
             onCellValueChanged={onCellValueChanged}
             rowSelection="multiple"
             onSelectionChanged={onSelectionChanged}
+            onFirstDataRendered={onFirstDataRendered}
             pagination={true}
             paginationAutoPageSize={true}
             onRowSelected={onRowSelected}

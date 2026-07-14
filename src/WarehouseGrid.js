@@ -310,6 +310,14 @@ function WarehouseGrid() {
     setGridColumnApi(params.columnApi);
   };
 
+    const onFirstDataRendered = (params) => {
+  const allColumnIds = params.columnApi
+    .getColumns()
+    .map((col) => col.getId());
+
+  params.columnApi.autoSizeColumns(allColumnIds);
+};
+
   const getCSSVariable = (variableName) => {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
@@ -916,6 +924,7 @@ function WarehouseGrid() {
             defaultColDef={defaultColDef}
             onGridReady={onGridReady}
             onCellValueChanged={onCellValueChanged}
+            onFirstDataRendered={onFirstDataRendered}
             rowSelection="multiple"
             onSelectionChanged={onSelectionChanged}
             pagination={true}
