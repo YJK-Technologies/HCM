@@ -21535,47 +21535,106 @@ const addEmployeedoc = async (req, res) => {
   }
 };
 
+// const Add_employee_bankdetails = async (req, res) => {
+//   const { Account_NO,EmployeeId,S_NO,AccountHolderName,Account_Type,Bank_City,bankName,branchName,IFSC_Code,
+//     Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id,company_code,Location_Code,created_by } = req.body;
+
+//   let Bankbook_img = null;
+
+//   if (req.file) {
+//     Bankbook_img = req.file.buffer;
+//   }
+
+//   let pool;
+//   try {
+//     pool = await sql.connect(dbConfig);
+//     const result = await pool
+//       .request()
+//       .input("mode", sql.VarChar, "I") // Insert mode
+//       .input("Account_NO", sql.VarChar, Account_NO)
+//       .input("EmployeeId", sql.VarChar, EmployeeId)
+//       .input("AccountHolderName", sql.VarChar, AccountHolderName)
+//       .input("bankName", sql.VarChar, bankName)
+//       .input("branchName", sql.VarChar, branchName)
+//       .input("IFSC_Code", sql.VarChar, IFSC_Code)
+//       .input("Bankbook_img", sql.VarBinary, Bankbook_img)
+//       .input("company_code", sql.VarChar, company_code)
+//       .input("Location_Code", sql.VarChar, Location_Code)
+//       .input("Account_Type", sql.VarChar, Account_Type)
+//       .input("Bank_City", sql.VarChar, Bank_City)
+//       .input("Bank_Country", sql.VarChar, Bank_Country)
+//       .input("Salary_Currency", sql.VarChar, Salary_Currency)
+//       .input("WPS_Enabled", sql.VarChar, WPS_Enabled)
+//       .input("WPS_Member_Id", sql.VarChar, WPS_Member_Id)
+//       .input("Is_Primary_Account", sql.VarChar, Is_Primary_Account)
+//       .input("Is_Active", sql.VarChar, Is_Active)
+//       .input("Is_Deleted", sql.VarChar, Is_Deleted)
+//       .input("S_NO", sql.Int, S_NO)
+//       .input("created_by", sql.VarChar, created_by)
+//       .query(`EXEC sp_employee_bankdetails_Ramya @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,@Location_Code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+//     res.json({ success: true, message: "Data inserted successfully" });
+//   } catch (err) {
+//     console.error("Error", err);
+//     res.status(500).json({ message: err.message || "Internal Server Error" });
+//   }
+// };
+
 const Add_employee_bankdetails = async (req, res) => {
-  const { Account_NO,EmployeeId,S_NO,AccountHolderName,Account_Type,Bank_City,bankName,branchName,IFSC_Code,
-    Bank_Country,Salary_Currency,Is_Deleted,Is_Active,Is_Primary_Account,WPS_Enabled,WPS_Member_Id,company_code,Location_Code,created_by } = req.body;
+  const employeeData = req.body.employeeData;
 
-  let Bankbook_img = null;
-
-  if (req.file) {
-    Bankbook_img = req.file.buffer;
+  if (!employeeData || !employeeData.length) {
+    return res.status(400).json("Invalid or empty employeeData array.");
   }
 
-  let pool;
   try {
-    pool = await sql.connect(dbConfig);
-    const result = await pool
-      .request()
-      .input("mode", sql.VarChar, "I") // Insert mode
-      .input("Account_NO", sql.VarChar, Account_NO)
-      .input("EmployeeId", sql.VarChar, EmployeeId)
-      .input("AccountHolderName", sql.VarChar, AccountHolderName)
-      .input("bankName", sql.VarChar, bankName)
-      .input("branchName", sql.VarChar, branchName)
-      .input("IFSC_Code", sql.VarChar, IFSC_Code)
-      .input("Bankbook_img", sql.VarBinary, Bankbook_img)
-      .input("company_code", sql.VarChar, company_code)
-      .input("Location_Code", sql.VarChar, Location_Code)
-      .input("Account_Type", sql.VarChar, Account_Type)
-      .input("Bank_City", sql.VarChar, Bank_City)
-      .input("Bank_Country", sql.VarChar, Bank_Country)
-      .input("Salary_Currency", sql.VarChar, Salary_Currency)
-      .input("WPS_Enabled", sql.VarChar, WPS_Enabled)
-      .input("WPS_Member_Id", sql.VarChar, WPS_Member_Id)
-      .input("Is_Primary_Account", sql.VarChar, Is_Primary_Account)
-      .input("Is_Active", sql.VarChar, Is_Active)
-      .input("Is_Deleted", sql.VarChar, Is_Deleted)
-      .input("S_NO", sql.Int, S_NO)
-      .input("created_by", sql.VarChar, created_by)
-      .query(`EXEC sp_employee_bankdetails_Ramya @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,@Location_Code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
-    res.json({ success: true, message: "Data inserted successfully" });
+    const pool = await connection.connectToDatabase(dbConfig);
+
+    for (const insertRow of employeeData) {
+      let Bankbook_img = insertRow.Bankbook_img || null;
+
+      if (Bankbook_img) {
+          Bankbook_img = Buffer.from(Bankbook_img, "base64");
+      }
+
+      await pool.request()
+      .input("mode", sql.VarChar, "I")
+      .input("Account_NO", sql.VarChar, insertRow.Account_NO)
+      .input("EmployeeId", sql.VarChar, insertRow.EmployeeId)
+      .input("AccountHolderName", sql.VarChar, insertRow.AccountHolderName)
+      .input("bankName", sql.VarChar, insertRow.bankName)
+      .input("branchName", sql.VarChar, insertRow.branchName)
+      .input("IFSC_Code", sql.VarChar, insertRow.IFSC_Code)
+      .input("Bankbook_img", sql.VarBinary(sql.MAX), Bankbook_img)
+      .input("company_code", sql.VarChar, insertRow.company_code)
+      .input("Location_Code", sql.VarChar, insertRow.Location_Code)
+      .input("Account_Type", sql.VarChar, insertRow.Account_Type)
+      .input("Bank_City", sql.VarChar, insertRow.Bank_City)
+      .input("Bank_Country", sql.VarChar, insertRow.Bank_Country)
+      .input("Salary_Currency", sql.VarChar, insertRow.Salary_Currency)
+      .input("WPS_Enabled", sql.VarChar, insertRow.WPS_Enabled)
+      .input("WPS_Member_Id", sql.VarChar, insertRow.WPS_Member_Id)
+      .input("Is_Primary_Account", sql.Bit, insertRow.Is_Primary_Account)
+      .input("Is_Active", sql.VarChar, insertRow.Is_Active)
+      .input("Is_Deleted", sql.VarChar, insertRow.Is_Deleted)
+      .input("S_NO", sql.Int, insertRow.S_NO)
+      .input("created_by", sql.VarChar, insertRow.created_by)
+      .input("modified_by", sql.VarChar, insertRow.modified_by)
+        .query(`EXEC sp_employee_bankdetails_Ramya
+          @mode,@Account_NO,@EmployeeId,'','',
+          @AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,
+          @company_code,@Location_Code,0,@Account_Type,@Bank_City,
+          @Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,
+          @Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,
+          @created_by,@modified_by,
+          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    }
+
+    res.status(200).json("Employee bank details inserted successfully");
   } catch (err) {
-    console.error("Error", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
+    console.error("Error inserting bank details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
@@ -21591,66 +21650,158 @@ const getallEmployeebankdet = async (req, res) => {
   }
 };
 
+// const Employeebankdetdelete = async (req, res) => {
+//   const { EmployeeId, Account_NO, company_code, modified_by, Location_Code } = req.body;
+//   try {
+//     const pool = await connection.connectToDatabase();
+//     await pool
+//       .request()
+//       .input("EmployeeId", sql.NVarChar, EmployeeId)
+//       .input("Account_NO", sql.NVarChar, Account_NO)
+//       .input("company_code", sql.NVarChar, company_code)
+//       .input("Location_Code", sql.NVarChar, Location_Code)
+//       .input("modified_by", sql.VarChar, modified_by)
+//       .query(`EXEC sp_employee_bankdetails_Ramya 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,@Location_Code,0,'','','','','','','','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+//     res.status(200).json("Bank details Deleted Successfully");
+//   } catch (err) {
+//     console.error("Error", err);
+//     res.status(500).json({ message: err.message || "Internal Server Error" });
+//   }
+// };
+
+// const updateEmployeebankdet = async (req, res) => {
+//   const { Account_NO,EmployeeId,Account_Type,Bank_City,Bank_Country,Salary_Currency,WPS_Enabled,WPS_Member_Id,
+//     Is_Primary_Account,Is_Active,Is_Deleted,AccountHolderName,bankName,branchName,IFSC_Code,company_code,modified_by,Location_Code,S_NO } = req.body;
+
+//   let Bankbook_img = null;
+
+//   if (req.file) {
+//     Bankbook_img = req.file.buffer;
+//   }
+
+//   try {
+//     const pool = await connection.connectToDatabase();
+//     await pool
+//       .request()
+//       .input("mode", sql.NVarChar, "U")
+//       .input("Account_NO", sql.VarChar, Account_NO)
+//       .input("EmployeeId", sql.VarChar, EmployeeId)
+//       .input("AccountHolderName", sql.VarChar, AccountHolderName)
+//       .input("bankName", sql.VarChar, bankName)
+//       .input("branchName", sql.VarChar, branchName)
+//       .input("IFSC_Code", sql.VarChar, IFSC_Code)
+//       .input("Bankbook_img", sql.VarBinary, Bankbook_img)
+//       .input("company_code", sql.VarChar, company_code)
+//       .input("Location_Code", sql.VarChar, Location_Code)
+//       .input("Account_Type", sql.VarChar, Account_Type)
+//       .input("Bank_City", sql.VarChar, Bank_City)
+//       .input("Bank_Country", sql.VarChar, Bank_Country)
+//       .input("Salary_Currency", sql.VarChar, Salary_Currency)
+//       .input("WPS_Enabled", sql.VarChar, WPS_Enabled)
+//       .input("WPS_Member_Id", sql.VarChar, WPS_Member_Id)
+//       .input("Is_Primary_Account", sql.VarChar, Is_Primary_Account)
+//       .input("Is_Active", sql.VarChar, Is_Active)
+//       .input("Is_Deleted", sql.VarChar, Is_Deleted)
+//       .input("S_NO", sql.Int, S_NO)
+//       .input("modified_by", sql.VarChar, modified_by)
+//       .query(`EXEC sp_employee_bankdetails_Ramya @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,@Location_Code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+
+//     res.status(200).json("Employee bank details edited successfully");
+//   } catch (err) {
+//     console.error("Error", err);
+//     res.status(500).json({ message: err.message || "Internal Server Error" });
+//   }
+// };
+
 const Employeebankdetdelete = async (req, res) => {
-  const { EmployeeId, Account_NO, company_code, modified_by, Location_Code } = req.body;
+  const bankDetailsToDelete = req.body.bankDetailsToDelete;
+
+  if (!bankDetailsToDelete || !bankDetailsToDelete.length) {
+    return res.status(400).json("Invalid or empty bankDetailsToDelete array.");
+  }
+
   try {
-    const pool = await connection.connectToDatabase();
-    await pool
-      .request()
-      .input("EmployeeId", sql.NVarChar, EmployeeId)
-      .input("Account_NO", sql.NVarChar, Account_NO)
-      .input("company_code", sql.NVarChar, company_code)
-      .input("Location_Code", sql.NVarChar, Location_Code)
-      .input("modified_by", sql.VarChar, modified_by)
-      .query(`EXEC sp_employee_bankdetails_Ramya 'D',@Account_NO, @EmployeeId, '','', '', '', '', 0,'',@company_code,@Location_Code,0,'','','','','','','','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
-    res.status(200).json("Bank details Deleted Successfully");
+    const pool = await connection.connectToDatabase(dbConfig);
+
+    for (const record of bankDetailsToDelete) {
+      await pool
+        .request()
+        .input("EmployeeId", sql.VarChar, record.EmployeeId)
+        .input("Account_NO", sql.VarChar, record.Account_NO)
+        .input("company_code", sql.VarChar, record.company_code)
+        .input("Location_Code", sql.VarChar, record.Location_Code)
+        .input("modified_by", sql.VarChar, record.modified_by)
+        .query(`EXEC sp_employee_bankdetails_Ramya 'D', @Account_NO, @EmployeeId, '','', 
+          '','','', 0, '', @company_code, @Location_Code, 0, '','','','','','','','','','','', 
+          @modified_by, NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    }
+
+    res.status(200).json("Employee bank details deleted successfully");
   } catch (err) {
-    console.error("Error", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
+    console.error("Error deleting bank details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const updateEmployeebankdet = async (req, res) => {
-  const { Account_NO,EmployeeId,Account_Type,Bank_City,Bank_Country,Salary_Currency,WPS_Enabled,WPS_Member_Id,
-    Is_Primary_Account,Is_Active,Is_Deleted,AccountHolderName,bankName,branchName,IFSC_Code,company_code,modified_by,Location_Code,S_NO } = req.body;
+  const editedData = req.body.editedData;
 
-  let Bankbook_img = null;
-
-  if (req.file) {
-    Bankbook_img = req.file.buffer;
+  if (!editedData || !editedData.length) {
+    return res.status(400).json("Invalid or empty editedData array.");
   }
 
   try {
-    const pool = await connection.connectToDatabase();
-    await pool
-      .request()
-      .input("mode", sql.NVarChar, "U")
-      .input("Account_NO", sql.VarChar, Account_NO)
-      .input("EmployeeId", sql.VarChar, EmployeeId)
-      .input("AccountHolderName", sql.VarChar, AccountHolderName)
-      .input("bankName", sql.VarChar, bankName)
-      .input("branchName", sql.VarChar, branchName)
-      .input("IFSC_Code", sql.VarChar, IFSC_Code)
-      .input("Bankbook_img", sql.VarBinary, Bankbook_img)
-      .input("company_code", sql.VarChar, company_code)
-      .input("Location_Code", sql.VarChar, Location_Code)
-      .input("Account_Type", sql.VarChar, Account_Type)
-      .input("Bank_City", sql.VarChar, Bank_City)
-      .input("Bank_Country", sql.VarChar, Bank_Country)
-      .input("Salary_Currency", sql.VarChar, Salary_Currency)
-      .input("WPS_Enabled", sql.VarChar, WPS_Enabled)
-      .input("WPS_Member_Id", sql.VarChar, WPS_Member_Id)
-      .input("Is_Primary_Account", sql.VarChar, Is_Primary_Account)
-      .input("Is_Active", sql.VarChar, Is_Active)
-      .input("Is_Deleted", sql.VarChar, Is_Deleted)
-      .input("S_NO", sql.Int, S_NO)
-      .input("modified_by", sql.VarChar, modified_by)
-      .query(`EXEC sp_employee_bankdetails_Ramya @mode,@Account_NO,@EmployeeId,'','',@AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,@company_code,@Location_Code,0,@Account_Type,@Bank_City,@Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,@Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    const pool = await connection.connectToDatabase(dbConfig);
 
-    res.status(200).json("Employee bank details edited successfully");
+    for (const updatedRow of editedData) {
+      let Bankbook_img = updatedRow.Bankbook_img || null;
+
+        if (Bankbook_img) {
+            Bankbook_img = Buffer.from(Bankbook_img, "base64");
+        }
+
+        await pool
+        .request()
+        .input("mode", sql.VarChar, "U")
+        .input("Account_NO", sql.VarChar, updatedRow.Account_NO)
+        .input("EmployeeId", sql.VarChar, updatedRow.EmployeeId)
+        .input("AccountHolderName", sql.VarChar, updatedRow.AccountHolderName)
+        .input("bankName", sql.VarChar, updatedRow.bankName)
+        .input("branchName", sql.VarChar, updatedRow.branchName)
+        .input("IFSC_Code", sql.VarChar, updatedRow.IFSC_Code)
+        .input("Bankbook_img", sql.VarBinary, Bankbook_img)
+        .input("company_code", sql.VarChar, updatedRow.company_code)
+        .input("Location_Code", sql.VarChar, updatedRow.Location_Code)
+        .input("Account_Type", sql.VarChar, updatedRow.Account_Type)
+        .input("Bank_City", sql.VarChar, updatedRow.Bank_City)
+        .input("Bank_Country", sql.VarChar, updatedRow.Bank_Country)
+        .input("Salary_Currency", sql.VarChar, updatedRow.Salary_Currency)
+        .input("WPS_Enabled", sql.VarChar, updatedRow.WPS_Enabled)
+        .input("WPS_Member_Id", sql.VarChar, updatedRow.WPS_Member_Id)
+        .input("Is_Primary_Account", sql.Bit, updatedRow.Is_Primary_Account)
+        .input("Is_Active", sql.Bit, updatedRow.Is_Active)
+        .input("Is_Deleted", sql.Bit, updatedRow.Is_Deleted)
+        .input("S_NO", sql.Int, updatedRow.S_NO)
+        .input("created_by", sql.VarChar, updatedRow.created_by || "")
+        .input("modified_by", sql.VarChar, updatedRow.modified_by)
+        .query(`EXEC sp_employee_bankdetails_Ramya
+          @mode,@Account_NO,@EmployeeId,'','',
+          @AccountHolderName,@bankName,@branchName,@IFSC_Code,@Bankbook_img,
+          @company_code,@Location_Code,0,@Account_Type,@Bank_City,
+          @Bank_Country,@Salary_Currency,@WPS_Enabled,@WPS_Member_Id,
+          @Is_Primary_Account,@Is_Active,@Is_Deleted,@S_NO,
+          @created_by,@modified_by,
+          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    }
+
+    res.status(200).json("Employee bank details updated successfully");
   } catch (err) {
-    console.error("Error", err);
-    res.status(500).json({ message: err.message || "Internal Server Error" });
+    console.error("Error updating bank details:", err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
