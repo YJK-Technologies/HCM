@@ -69,7 +69,7 @@ import ProjectDetails from './Task_Reports/ProjectProgress.js';
 import ProjectChartReport from "./Task_Reports/ProjectChartReport.js";
 import CompanyDetails from './ESSComponents/CompanyDetails.js';
 import FinanceDet from './ESSComponents/FinanceDet.js';
-import BankAccDet from './ESSComponents/BankAccDet.js';
+import BankAccDet from './ESSComponents/BankAccDetail.js';
 import IdentDoc from './ESSComponents/IdentDoc.js';
 import AcademicDet from './ESSComponents/AcademicDet.js';
 import Insur from './ESSComponents/Insurance.js';
