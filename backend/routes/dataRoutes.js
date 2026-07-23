@@ -1469,6 +1469,8 @@ router.post("/getIntermediaryData",dataController.getIntermediaryData)
 router.post("/getNumberSeriesData",dataController.getNumberSeriesData)
 router.post("/getWarehouseData",dataController.getWarehouseData)
 router.post("/getFinancialYearAccessData",dataController.getFinancialYearAccessData)
+router.post("/getDefaultScreens",dataController.getDefaultScreens)
+router.post("/GetCheckInMode",dataController.GetCheckInMode)
 
 
 

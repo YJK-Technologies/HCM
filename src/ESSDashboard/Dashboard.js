@@ -142,12 +142,52 @@ const Dashboard = () => {
   const hasStoppedRef = useRef(false);
   const intervalRef = useRef(null);
 
+  const [checkInMode, setCheckInMode] = useState("");
+
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
 
   // useEffect(() => {
   //   fetchDashboardData();
   // }, []);
+
+  // For Checkin Mode
+  useEffect(() => {
+
+    const fetchCheckInMode = async () => {
+
+      try {
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/GetCheckInMode`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              company_code: sessionStorage.getItem("selectedCompanyCode"),
+              Location_Code: sessionStorage.getItem("selectedLocationCode"),
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.length > 0) {
+          setCheckInMode(data[0].Check_In_Mode);
+        }
+
+      } catch (err) {
+        console.log(err);
+      }
+
+    };
+
+    fetchCheckInMode();
+
+  }, []);
+
   const fetchDashboardData = async () => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -2864,27 +2904,35 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="dashboard-wrapper">
-            <input
-              id="timing"
-              className="app-form-control"
-              type="text"
-              readOnly
-              value={timer}
-            />
+          {
+          checkInMode === "Manual" && 
+          (
 
-            <button
-              onClick={handleTime}
-              className="check-btn"
-              style={{
-                backgroundColor: isCheckedIn ? "red" : "green",
-                color: "white",
-              }}
-              title={isCheckedIn ? "Check Out" : "Check In"}
-            >
-              {isCheckedIn ? "Check Out" : "Check In"}
-            </button>
-          </div>
+            <div className="dashboard-wrapper">
+
+              <input
+                id="timing"
+                className="app-form-control"
+                type="text"
+                readOnly
+                value={timer}
+              />
+
+              <button
+                onClick={handleTime}
+                className="check-btn"
+                style={{
+                  backgroundColor: isCheckedIn ? "red" : "green",
+                  color: "white",
+                }}
+                title={isCheckedIn ? "Check Out" : "Check In"}
+              >
+                {isCheckedIn ? "Check Out" : "Check In"}
+              </button>
+
+            </div>
+
+          )}
         </div>
       </div>
 

@@ -33601,7 +33601,9 @@ const AddPMSSetting = async (req, res) => {
   const {
     Per_Day_Working_hours,
     company_code,
+    Location_Code, 
     Status,
+    Check_In_Mode,
     created_by,
     tempstr1,
     tempstr2,
@@ -33620,7 +33622,9 @@ const AddPMSSetting = async (req, res) => {
       .input("mode", sql.NVarChar, "I") // Insert mode
       .input("Per_Day_Working_hours", sql.Int, Per_Day_Working_hours)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Status", sql.NVarChar, Status)
+      .input("Check_In_Mode", sql.NVarChar, Check_In_Mode)
       .input("created_by", sql.NVarChar, created_by)
       .input("tempstr1", sql.NVarChar, tempstr1)
       .input("tempstr2", sql.NVarChar, tempstr2)
@@ -33631,7 +33635,7 @@ const AddPMSSetting = async (req, res) => {
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'',@Per_Day_Working_hours,@company_code,@Status,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS_test @mode,'',@Per_Day_Working_hours,@company_code,@Location_Code,@Status,@Check_In_Mode,@created_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -33646,16 +33650,17 @@ const AddPMSSetting = async (req, res) => {
 };
 
 const deletePMSsettings = async (req, res) => {
-  const { company_code, modified_by } = req.body;
+  const { company_code, Location_Code, modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     await pool
       .request()
       .input("mode", sql.NVarChar, "D")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'','',@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS_test @mode,'','',@company_code,@Location_Code,'','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     res.status(200).json("data deleted successfully");
   } catch (err) {
@@ -33665,15 +33670,16 @@ const deletePMSsettings = async (req, res) => {
 };
 
 const GetPMSsettings = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("mode", sql.NVarChar, "A")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'','',@company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS_test @mode,'','',@company_code,@Location_Code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
     res.json(result.recordset);
   } catch (err) {
@@ -33683,7 +33689,7 @@ const GetPMSsettings = async (req, res) => {
 };
 
 const PMSsettingsUpdate = async (req, res) => {
-  const { Per_Day_Working_hours, company_code, Status, modified_by } = req.body;
+  const { Per_Day_Working_hours, company_code, Location_Code, Status, Check_In_Mode, modified_by } = req.body;
   try {
     const pool = await connection.connectToDatabase();
 
@@ -33692,10 +33698,12 @@ const PMSsettingsUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("Per_Day_Working_hours", sql.Int, Per_Day_Working_hours)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Status", sql.NVarChar, Status)
+      .input("Check_In_Mode", sql.NVarChar, Check_In_Mode)
       .input("modified_by", sql.NVarChar, modified_by)
       .query(
-        `EXEC sp_setting_screen_PMS @mode,'',@Per_Day_Working_hours,@company_code,@Status,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+        `EXEC sp_setting_screen_PMS_test @mode,'',@Per_Day_Working_hours,@company_code,@Location_Code,@Status,@Check_In_Mode,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
       );
 
     res.status(200).json("Edited data saved successfully");
@@ -47720,7 +47728,7 @@ const getDateFormat = async (req, res) => {
 
 //code added by Sakthi on 20-04-2026
 const global_settingsInsert = async (req, res) => {
-  const { Default_date_format, Default_currency, Default_language, Status, company_code, created_by } = req.body;
+  const { Default_date_format, Default_currency, Default_language, Status, company_code, DefaultCompanyId, DefaultScreenId, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47734,8 +47742,10 @@ const global_settingsInsert = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, company_code)
+      .input("DefaultCompanyId", sql.NVarChar, DefaultCompanyId)
+      .input("DefaultScreenId", sql.NVarChar, DefaultScreenId)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Global_Settings @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @created_by, '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test  @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @DefaultCompanyId, @DefaultScreenId, '', @created_by, '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -47824,7 +47834,7 @@ const getSettings = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "S")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Global_Settings @mode, '', '', '', '', @company_code, '', '', '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -49203,6 +49213,78 @@ const getFinancialYearAccessData = async (req, res) => {
 };
 //Code Ended By Pavun On 12-06-2026
 
+//code added by sakthi on 07-23-26
+const getDefaultScreens = async (req, res) => {
+  const { role_id, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "GDS")
+      .input("role_id", sql.VarChar, role_id)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', @role_id, '', '', '', '' `);
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Error fetching default screens:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+//code added by sakthi on 07-23-26
+
+//code added by sakthi on 07-23-26
+const getDefaultScreens = async (req, res) => {
+  const { role_id, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "GDS")
+      .input("role_id", sql.VarChar, role_id)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', @role_id, '', '', '', '' `);
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Error fetching default screens:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+//code added by sakthi on 07-23-26
+
+//Code added by Dinesh Gokul On 23-07-2026
+const GetCheckInMode = async (req, res) => {
+  const { company_code, Location_Code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "CM") // Use a new mode
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_screen_PMS_test @mode, '', '', @company_code, @Location_Code, '', '', '', '', NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+//Code ended by Dinesh Gokul On 23-07-2026
 module.exports = {
   login,
   forgetPassword,
@@ -50641,6 +50723,8 @@ module.exports = {
   getIntermediaryData,
   getNumberSeriesData,
   getWarehouseData,
-  getFinancialYearAccessData
+  getFinancialYearAccessData,
+  getDefaultScreens,
+  GetCheckInMode
 
 };
