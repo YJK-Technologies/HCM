@@ -47720,7 +47720,7 @@ const getDateFormat = async (req, res) => {
 
 //code added by Sakthi on 20-04-2026
 const global_settingsInsert = async (req, res) => {
-  const { Default_date_format, Default_currency, Default_language, Status, company_code, created_by } = req.body;
+  const { Default_date_format, Default_currency, Default_language, Status, company_code, DefaultCompanyId, DefaultScreenId, created_by } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -47734,8 +47734,10 @@ const global_settingsInsert = async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("keyfield", sql.NVarChar, company_code)
+      .input("DefaultCompanyId", sql.NVarChar, DefaultCompanyId)
+      .input("DefaultScreenId", sql.NVarChar, DefaultScreenId)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Global_Settings @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @created_by, '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test  @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @DefaultCompanyId, @DefaultScreenId,@created_by, '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -47824,7 +47826,7 @@ const getSettings = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "S")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Global_Settings @mode, '', '', '', '', @company_code, '', '', '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
