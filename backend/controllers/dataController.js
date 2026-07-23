@@ -47737,7 +47737,7 @@ const global_settingsInsert = async (req, res) => {
       .input("DefaultCompanyId", sql.NVarChar, DefaultCompanyId)
       .input("DefaultScreenId", sql.NVarChar, DefaultScreenId)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Global_Settings_test  @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @DefaultCompanyId, @DefaultScreenId,@created_by, '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test  @mode, @Default_date_format, @Default_currency, @Default_language, @Status, @company_code, @keyfield, @DefaultCompanyId, @DefaultScreenId, '', @created_by, '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -47826,7 +47826,7 @@ const getSettings = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "S")
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', '', '', '', ''`);
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', '', '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -49204,6 +49204,30 @@ const getFinancialYearAccessData = async (req, res) => {
   }
 };
 //Code Ended By Pavun On 12-06-2026
+
+//code added by sakthi on 07-23-26
+const getDefaultScreens = async (req, res) => {
+  const { role_id, company_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool.request()
+      .input("mode", sql.VarChar, "GDS")
+      .input("role_id", sql.VarChar, role_id)
+      .input("company_code", sql.VarChar, company_code)
+      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', @role_id, '', '', '', '' `);
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Error fetching default screens:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+//code added by sakthi on 07-23-26
 
 module.exports = {
   login,
@@ -50643,6 +50667,7 @@ module.exports = {
   getIntermediaryData,
   getNumberSeriesData,
   getWarehouseData,
-  getFinancialYearAccessData
+  getFinancialYearAccessData,
+  getDefaultScreens
 
 };

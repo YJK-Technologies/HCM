@@ -79,20 +79,75 @@ const SettingsPage = () => {
     fetchScreens();
   }, []);
 
+useEffect(() => {
+    const fetchUserCompanies = async () => {
+      try {
+        const userCode = sessionStorage.getItem("selectedUserCode");
+
+        const response = await fetch(`${config.apiBaseUrl}/getusercompany`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_code: userCode }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCompanyDrop(data);
+        } else {
+          setCompanyDrop([]);
+        }
+      } catch (error) {
+        console.error("Error fetching user company data:", error);
+        setCompanyDrop([]);
+      }
+    };
+
+    fetchUserCompanies();
+  }, []);
+
+  useEffect(() => {
+  const fetchScreens = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/getDefaultScreens`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          role_id: sessionStorage.getItem("role_id"),
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
+      });
+
+      const data = await response.json();
+      setScreenDrop(data);
+    } catch (error) {
+      console.error("Error fetching screens:", error);
+    }
+  };
+
+  fetchScreens();
+}, []);
+
   // Filter options mapping
-  const filteredOptionCompany = Array.isArray(companyDrop)
-    ? companyDrop.map((option) => ({
-        value: option?.company_code || option?.attributedetails_name,
-        label: option?.company_name || option?.attributedetails_name,
-      }))
-    : [];
+const filteredOptionCompany = Array.isArray(companyDrop)
+  ? companyDrop.map((option) => ({
+      value: option?.keyfiels, // This will be inserted
+      label: `${option?.company_no} - ${option?.company_name} - ${option?.location_no} - ${option?.location_name}`, // This is displayed
+      company_no: option?.company_no,
+      company_name: option?.company_name,
+      location_no: option?.location_no,
+      location_name: option?.location_name,
+      keyfiels: option?.keyfiels,
+    }))
+  : [];
 
   const filteredOptionScreen = Array.isArray(screenDrop)
-    ? screenDrop.map((option) => ({
-        value: option?.screen_code || option?.attributedetails_name,
-        label: option?.screen_name || option?.attributedetails_name,
-      }))
-    : [];
+  ? screenDrop.map((option) => ({
+      value: option.screen_type,
+      label: option.screen_type,
+    }))
+  : [];
 
     // Handlers
   const handleChangeCompany = (selected) => {
@@ -140,18 +195,20 @@ const SettingsPage = () => {
           setCurrency(selectedCurrency);
           setCurrencyValue(selectedCurrency.value);
 
-          // Set Default Company
+          // Default Company (DB column name `DefaultCompanyId` or `Default_company`)
+          const companyVal = settings.DefaultCompanyId || settings.Default_company;
           const selectedComp = filteredOptionCompany.find(
-            (opt) => opt.value === settings.Default_company
+            (opt) => opt.value === companyVal
           );
           if (selectedComp) {
             setCompany(selectedComp);
             setCompanyValue(selectedComp.value);
           }
 
-          // Set Default Screen
+          // Default Screen (DB column name `DefaultScreenId` or `Default_screen`)
+          const screenVal = settings.DefaultScreenId || settings.Default_screen;
           const selectedScr = filteredOptionScreen.find(
-            (opt) => opt.value === settings.Default_screen
+            (opt) => opt.value === screenVal
           );
           if (selectedScr) {
             setScreen(selectedScr);
@@ -251,6 +308,8 @@ const SettingsPage = () => {
         Default_currency: currencyValue,
         Status: 'Active',
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        DefaultCompanyId: companyValue, // Backend key match
+        DefaultScreenId: screenValue,   // Backend key match
         created_by: sessionStorage.getItem("selectedUserCode"),
       };
 
@@ -301,7 +360,7 @@ const SettingsPage = () => {
       </header>
 
       <main className="settings-content">
-      {/* Top Section: Default Company & Screen */}
+      {/* Company and Screen Section */}
         <div className="row g-3 mb-3">
           <div className="col-lg-6">
             <section className="settings-card shadow-sm p-3">
