@@ -26,9 +26,84 @@ const SettingsPage = () => {
   const [currency, setCurrency] = useState('');
   const [currencyValue, setCurrencyValue] = useState('');
 
+  // States for Company and Screen (Image-il ullapadi)
+  const [companyDrop, setCompanyDrop] = useState([]);
+  const [company, setCompany] = useState(null);
+  const [companyValue, setCompanyValue] = useState("");
+
+  const [screenDrop, setScreenDrop] = useState([]);
+  const [screen, setScreen] = useState(null);
+  const [screenValue, setScreenValue] = useState("");
+
   const [errors, setErrors] = useState(false);
 
   const config = require("./Apiconfig");
+
+  // 1. Fetch Company Dropdown
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getCompanies`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
+        const data = await response.json();
+        setCompanyDrop(data);
+      } catch (error) {
+        console.error("Error fetching company options:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
+  // 2. Fetch Screen Dropdown
+  useEffect(() => {
+    const fetchScreens = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/getScreens`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+          }),
+        });
+        const data = await response.json();
+        setScreenDrop(data);
+      } catch (error) {
+        console.error("Error fetching screen options:", error);
+      }
+    };
+    fetchScreens();
+  }, []);
+
+  // Filter options mapping
+  const filteredOptionCompany = Array.isArray(companyDrop)
+    ? companyDrop.map((option) => ({
+        value: option?.company_code || option?.attributedetails_name,
+        label: option?.company_name || option?.attributedetails_name,
+      }))
+    : [];
+
+  const filteredOptionScreen = Array.isArray(screenDrop)
+    ? screenDrop.map((option) => ({
+        value: option?.screen_code || option?.attributedetails_name,
+        label: option?.screen_name || option?.attributedetails_name,
+      }))
+    : [];
+
+    // Handlers
+  const handleChangeCompany = (selected) => {
+    setCompany(selected);
+    setCompanyValue(selected ? selected.value : "");
+  };
+
+  const handleChangeScreen = (selected) => {
+    setScreen(selected);
+    setScreenValue(selected ? selected.value : "");
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -64,6 +139,24 @@ const SettingsPage = () => {
           );
           setCurrency(selectedCurrency);
           setCurrencyValue(selectedCurrency.value);
+
+          // Set Default Company
+          const selectedComp = filteredOptionCompany.find(
+            (opt) => opt.value === settings.Default_company
+          );
+          if (selectedComp) {
+            setCompany(selectedComp);
+            setCompanyValue(selectedComp.value);
+          }
+
+          // Set Default Screen
+          const selectedScr = filteredOptionScreen.find(
+            (opt) => opt.value === settings.Default_screen
+          );
+          if (selectedScr) {
+            setScreen(selectedScr);
+            setScreenValue(selectedScr.value);
+          }
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -208,6 +301,40 @@ const SettingsPage = () => {
       </header>
 
       <main className="settings-content">
+      {/* Top Section: Default Company & Screen */}
+        <div className="row g-3 mb-3">
+          <div className="col-lg-6">
+            <section className="settings-card shadow-sm p-3">
+              <div className="custom-select-container">
+                <label className="fw-bold mb-2">Select Default Company</label>
+                <Select
+                  value={company}
+                  onChange={handleChangeCompany}
+                  options={filteredOptionCompany}
+                  classNamePrefix="modern-select"
+                  placeholder="Select Company"
+                  isClearable
+                />
+              </div>
+            </section>
+          </div>
+
+          <div className="col-lg-6">
+            <section className="settings-card shadow-sm p-3">
+              <div className="custom-select-container">
+                <label className="fw-bold mb-2">Select Default Screen</label>
+                <Select
+                  value={screen}
+                  onChange={handleChangeScreen}
+                  options={filteredOptionScreen}
+                  classNamePrefix="modern-select"
+                  placeholder="Select Screen"
+                  isClearable
+                />
+              </div>
+            </section>
+          </div>
+        </div>
         <div className="row g-2 mb-2">
           <div className="col-lg-4">
             <section className="settings-card shadow-sm">
