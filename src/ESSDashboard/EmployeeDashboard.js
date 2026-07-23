@@ -59,6 +59,8 @@ const Dashboard = (payslip) => {
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
+  const [checkInMode, setCheckInMode] = useState("");
+
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -78,6 +80,43 @@ const Dashboard = (payslip) => {
       });
     }
   };
+
+  // For Checkin Mode
+    useEffect(() => {
+  
+      const fetchCheckInMode = async () => {
+  
+        try {
+  
+          const response = await fetch(
+            `${config.apiBaseUrl}/GetCheckInMode`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                company_code: sessionStorage.getItem("selectedCompanyCode"),
+                Location_Code: sessionStorage.getItem("selectedLocationCode"),
+              }),
+            }
+          );
+  
+          const data = await response.json();
+  
+          if (data.length > 0) {
+            setCheckInMode(data[0].Check_In_Mode);
+          }
+  
+        } catch (err) {
+          console.log(err);
+        }
+  
+      };
+  
+      fetchCheckInMode();
+  
+    }, []);
 
   const handlePrev = () => {
     if (carouselRef.current) {
@@ -2224,6 +2263,9 @@ const Dashboard = (payslip) => {
             </div>
           </div>
 
+          {
+          checkInMode === "Manual" && 
+          (
           <div className="dashboard-wrapper">
             <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
               <div className="custom-badge">{user_code}</div>
@@ -2249,6 +2291,8 @@ const Dashboard = (payslip) => {
               </button>
             </div>
           </div>
+          )}
+
         </div>
       </div>
 

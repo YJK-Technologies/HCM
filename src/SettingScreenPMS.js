@@ -13,6 +13,7 @@ function PMSsettings() {
   const [PerDayWorkingHours, setPerDayWorkingHours] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [status, setstatus] = useState("");
+  const [checkInMode, setCheckInMode] = useState('Manual'); // or '' for empty initial state
   const [error, setError] = useState("");
   const [isUpdateVisible, setIsUpdateVisible] = useState(false);
   const [isSelectStatus, setIsSelectStatus] = useState(false);
@@ -54,13 +55,14 @@ function PMSsettings() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (!data || data.length === 0) return;
 
-        const { Status, Per_Day_Working_hours } = data[0];
+        const { Status, Per_Day_Working_hours, Check_In_Mode } = data[0];
 
         const setDefault = (type, setType, options, setSelected) => {
           if (type !== undefined && type !== null) {
@@ -76,6 +78,10 @@ function PMSsettings() {
           setPerDayWorkingHours(Per_Day_Working_hours);
         }
 
+        if (Check_In_Mode) {
+          setCheckInMode(Check_In_Mode);
+        }
+
         // 👇 Show Update button and hide Save
         setIsUpdateVisible(true);
       })
@@ -86,7 +92,8 @@ function PMSsettings() {
     setLoading(true);
     if (
       !PerDayWorkingHours ||
-      !status
+      !status ||
+      !checkInMode
     ) {
       setError(" ");
       toast.warning("Error: Missing required fields");
@@ -100,8 +107,10 @@ function PMSsettings() {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           Per_Day_Working_hours: PerDayWorkingHours,
           Status: status,
+          Check_In_Mode: checkInMode,
           created_by: sessionStorage.getItem('selectedUserCode')
         }),
       });
@@ -139,7 +148,8 @@ function PMSsettings() {
         try {
           const Header = {
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            modified_by: sessionStorage.getItem('selectedUserCode')
+            modified_by: sessionStorage.getItem('selectedUserCode'),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
           };
 
           const response = await fetch(`${config.apiBaseUrl}/deletePMSsettings`, {
@@ -177,7 +187,7 @@ function PMSsettings() {
 
   const handleUpdate = async () => {
     setLoading(true);
-    if (!PerDayWorkingHours || !status) {
+    if (!PerDayWorkingHours || !status || !checkInMode) {
       setError(" ");
       return;
     }
@@ -190,8 +200,10 @@ function PMSsettings() {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code: sessionStorage.getItem('selectedLocationCode'),
           Per_Day_Working_hours: PerDayWorkingHours,
           Status: status,
+          Check_In_Mode: checkInMode,
           modified_by: sessionStorage.getItem('selectedUserCode')
         }),
       });
@@ -318,6 +330,48 @@ function PMSsettings() {
               <label className={`floating-label ${error && !selectedStatus ? 'text-danger' : ''}`}>
                 Status<span className="text-danger">*</span>
               </label>
+            </div>
+          </div>
+
+          {/* Check-In Mode Field */}
+          <div className="col-md-3">
+            <div className="d-flex align-items-center h-100">
+              <label
+                className={`form-label mb-0 me-3 ${error && !checkInMode ? 'text-danger' : ''}`}
+                style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}
+              >
+                Check-In Mode <span className="text-danger">*</span>
+              </label>
+
+              <div className="form-check mb-0 me-3">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="checkInMode"
+                  id="checkInManual"
+                  value="Manual"
+                  checked={checkInMode === 'Manual'}
+                  onChange={(e) => setCheckInMode(e.target.value)}
+                />
+                <label className="form-check-label" htmlFor="checkInManual">
+                  Manual
+                </label>
+              </div>
+
+              <div className="form-check mb-0">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="checkInMode"
+                  id="checkInIntegration"
+                  value="Integration"
+                  checked={checkInMode === 'Integration'}
+                  onChange={(e) => setCheckInMode(e.target.value)}
+                />
+                <label className="form-check-label" htmlFor="checkInIntegration">
+                  Integration
+                </label>
+              </div>
             </div>
           </div>
 
