@@ -156,22 +156,51 @@ const Login = () => {
     } catch (err) { console.error(err); }
   };
 
-  const fetchUserData = async (userCode) => {
-    try {
-      const res = await fetch(`${config.apiBaseUrl}/getusercompany`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_code: userCode }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.length > 0) {
-          handleSave(data[0]);
-          navigate('/AccountInformation');
+const fetchUserData = async (userCode) => {
+  try {
+    const res = await fetch(`${config.apiBaseUrl}/getDefaultUserCompany`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_code: userCode }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+
+      if (data.length > 0) {
+       handleSave(data[0]);
+
+        const defaultScreen = data[0].DefaultScreenId?.trim();
+              
+        if (defaultScreen) {
+          navigate(`/${defaultScreen}`);
+        } else {
+          navigate("/AccountInformation");
         }
       }
-    } catch (err) { console.error(err); }
-  };
+    } else {
+      console.error("No company mapping found.");
+    }
+  } catch (err) {
+    console.error("Error fetching default user company:", err);
+  }
+};
+  // const fetchUserData = async (userCode) => {
+  //   try {
+  //     const res = await fetch(`${config.apiBaseUrl}/getusercompany`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ user_code: userCode }),
+  //     });
+  //     if (res.ok) {
+  //       const data = await res.json();
+  //       if (data.length > 0) {
+  //         handleSave(data[0]);
+  //         navigate('/AccountInformation');
+  //       }
+  //     }
+  //   } catch (err) { console.error(err); }
+  // };
 
   const handleSave = (data) => {
     if (!data) return;
@@ -182,6 +211,7 @@ const Login = () => {
     sessionStorage.setItem('selectedShortName', data.short_name);
     sessionStorage.setItem('selectedUserName', data.user_name);
     sessionStorage.setItem('selectedUserCode', data.user_code);
+    sessionStorage.setItem( "DefaultScreenId", data.DefaultScreenId || "" );
   };
 
   return (
