@@ -67,6 +67,8 @@ function Input({ }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
   const employeeGradePermissions = permissions
@@ -360,7 +362,8 @@ function Input({ }) {
         ctc_currency: ctccurrency,
         minimum_take_salary: parseFloat(minimumtakesalary),
         company_code: sessionStorage.getItem('selectedCompanyCode'),
-        created_by: sessionStorage.getItem('selectedUserCode')
+        created_by: sessionStorage.getItem('selectedUserCode'),
+        Location_Code
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addGrade`, {
@@ -411,6 +414,7 @@ function Input({ }) {
         salary_range_to: parseFloat(SalaryrangeTo),
         minimum_take_salary: parseFloat(minimum_take_salary),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }
       const response = await fetch(`${config.apiBaseUrl}/GradeSC`, {
         method: "POST",
@@ -474,12 +478,14 @@ function Input({ }) {
                 ...row,
                 company_code,
                 modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
+                  Location_Code
                 },
               ],
           };
@@ -524,12 +530,14 @@ function Input({ }) {
           ...row,
           company_code,
           modified_by,
+          Location_Code
         }))
         : [
           {
             ...rowData,
             company_code,
             modified_by,
+            Location_Code
           },
         ],
     };
