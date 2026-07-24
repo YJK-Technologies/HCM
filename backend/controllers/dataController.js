@@ -68,7 +68,7 @@ const forgetPassword = async (req, res) => {
       .input("mode", sql.NVarChar, "VE")
       .input("user_code", sql.NVarChar, user_code)
       .input("email_id", sql.NVarChar, email_id)
-      .query(`EXEC sp_user_info_hdr_Pavun @mode,'',@user_code,'','','','','','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr @mode,'',@user_code,'','','','','','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       const otp = generateOTP();
       await sendOTP(email_id, otp);
@@ -122,7 +122,7 @@ const Passwords = async (req, res) => {
       .input("user_code", sql.NVarChar, user_code)
       .input("email_id", sql.NVarChar, email_id)
       .input("user_password", sql.NVarChar, user_password)
-      .query("EXEC sp_user_info_hdr_Pavun @mode,'',@user_code,'','','',@user_password,'','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL");
+      .query("EXEC sp_user_info_hdr @mode,'',@user_code,'','','',@user_password,'','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL");
     res.status(200).json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("Error", err);
@@ -150,7 +150,7 @@ const login = async (req, res) => {
       .input("mode", sql.NVarChar, "LUC")
       .input("user_code", sql.NVarChar, decryptedUserCode)
       .input("user_password", sql.NVarChar, decryptedPassword)
-      .query(`EXEC sp_user_info_hdr_Pavun 'LUC','',@user_code,'','','',@user_password,'','','','','','','','','','','','','','','','','','',''`);
+      .query(`EXEC sp_user_info_hdr 'LUC','',@user_code,'','','',@user_password,'','','','','','','','','','','','','','','','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -573,7 +573,7 @@ const getUsercode = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_user_info_hdr_Pavun 'F','','user_code','','', '' ,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    .query(`EXEC sp_user_info_hdr 'F','','user_code','','', '' ,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -1086,7 +1086,7 @@ const getAlluserData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-    .query(`EXEC sp_user_info_hdr_Pavun 'A','','','','',' ','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+    .query(`EXEC sp_user_info_hdr 'A','','','','',' ','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -1135,7 +1135,7 @@ const userAddData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_user_info_hdr_Pavun @mode,@company_code,@user_code,@user_name,@first_name,@last_name,@user_password,@user_status,@log_in_out,@user_type,
+      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,@user_name,@first_name,@last_name,@user_password,@user_status,@log_in_out,@user_type,
         @email_id,@dob,@gender,@role_id,@user_img,@super_admin,@created_by,@modified_by,@tempstr1, @tempstr2, @tempstr3, @tempstr4,@datetime1, @datetime2, @datetime3, @datetime4`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -1188,7 +1188,7 @@ const UsersaveEditedData = async (req, res) => {
         .input("datetime2", sql.NVarChar, updatedRow.datetime2)
         .input("datetime3", sql.NVarChar, updatedRow.datetime3)
         .input("datetime4", sql.NVarChar, updatedRow.datetime4)
-        .query(`EXEC sp_user_info_hdr_Pavun @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
+        .query(`EXEC sp_user_info_hdr @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
             @email_id, @dob, @gender,@role_id,'',@super_admin,@created_by, @modified_by, @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     }
 
@@ -1216,7 +1216,7 @@ const UserdeleteData = async (req, res) => {
         .input("user_code", user_code)
         .input("company_code", sql.NVarChar, req.headers["company_code"])
         .input("modified_by", sql.NVarChar, req.headers["modified-by"])
-        .query(`EXEC sp_user_info_hdr_Pavun 'D',@company_code,@user_code,'','','','', '', '', '','','', '','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_user_info_hdr 'D',@company_code,@user_code,'','','','', '', '', '','','', '','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("user deleted successfully");
@@ -4177,7 +4177,7 @@ const getUsersearchdata = async (req, res) => {
       .input("gender", sql.NVarChar, gender)
       .input("role_id", sql.NVarChar, role_id)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_user_info_hdr_Pavun @mode,@company_code,@user_code,@user_name,@first_name,@last_name,'',@user_status,'','',@email_id,@dob,@gender,@role_id,
+      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,@user_name,@first_name,@last_name,'',@user_status,'','',@email_id,@dob,@gender,@role_id,
         '','',@created_by,'','','','','','','','',''`);
 
     // Send response
@@ -14923,7 +14923,7 @@ const UpdateUserImage = async (req, res) => {
       .request()
       .input("user_code", sql.NVarChar, user_code)
       .input("user_img", sql.VarBinary, user_img)
-      .query(`EXEC sp_user_info_hdr_Pavun 'UI','',@user_code,'','','','','','','','','','','',@user_img,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr 'UI','',@user_code,'','','','','','','','','','','',@user_img,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -17538,7 +17538,7 @@ const UserUpdate = async (req, res) => {
       .input("super_admin", sql.NVarChar, super_admin)
       .input("created_by", sql.NVarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_user_info_hdr_Pavun @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
+      .query(`EXEC sp_user_info_hdr @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
             @email_id, @dob, @gender,@role_id,@user_images, @super_admin, @created_by, @modified_by, '', '', '', '', '', '', '', ''`);
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
@@ -29702,7 +29702,7 @@ const getTaskHourReport = async (req, res) => {
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
       .query(
-        `EXEC sp_task_hour_report_Ramya @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`,
+        `EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -29728,7 +29728,7 @@ const getTaskHourReportDetail = async (req, res) => {
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
       .query(
-        `EXEC sp_task_hour_report_Ramya @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,
+        `EXEC sp_task_hour_report @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -29772,7 +29772,7 @@ const getProjectDetailReport = async (req, res) => {
       .input("projectid", sql.VarChar, projectid)
       .input("Status", sql.VarChar, Status)
       .query(
-        `EXEC sp_task_hour_report_Ramya @mode,'','','',@projectid,'','','',@Status`,
+        `EXEC sp_task_hour_report @mode,'','','',@projectid,'','','',@Status`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -29788,7 +29788,7 @@ const getProjectReport = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_task_hour_report_Ramya 'PR','','','','','','','',''`,
+      `EXEC sp_task_hour_report 'PR','','','','','','','',''`,
     );
     res.json(result.recordset);
   } catch (err) {
@@ -29953,7 +29953,7 @@ const Userdropdown = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "MG")
       .input("user_code", sql.NVarChar, user_code)
-      .query(`EXEC [sp_user_info_hdr_Pavun] @mode,'',@user_code,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC [sp_user_info_hdr] @mode,'',@user_code,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -33734,7 +33734,7 @@ const ESSEmployeeDashboard = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
-      .query(`EXEC sp_task_hour_report_Ramya @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`);
+      .query(`EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -33899,7 +33899,7 @@ const getEmployeeCheckInCheckOut = async (req, res) => {
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
       .query(
-        `EXEC sp_task_hour_report_Ramya @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,
+        `EXEC sp_task_hour_report @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,
       );
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -42801,7 +42801,7 @@ const visa_requestsInsert = async (req, res) => {
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
         @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, '', 0, @Created_by, '', '', ''`,);
 
     res.status(200)
@@ -42841,7 +42841,7 @@ const visa_requestsUpdate = async (req, res) => {
       .input("manager_id", sql.NVarChar, manager_id)
       .input("keyfield", sql.NVarChar, keyfield)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
         @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
 
     res
@@ -42865,7 +42865,7 @@ const visa_requestsDelete = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`,);
+      .query(`EXEC sp_visa_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`,);
 
     res
       .status(200)
@@ -42907,7 +42907,7 @@ const visa_requestsLoopInsert = async (req, res) => {
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+        .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
           @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, @Created_by, '', '', ''`,);
     }
     res.status(200).json("visa_requests data inserted successfully");
@@ -42949,7 +42949,7 @@ const visa_requestsLoopUpdate = async (req, res) => {
         .input("manager_id", sql.NVarChar, item.manager_id)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
+        .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date, 
           @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, @keyfield, 0, '', '', @Modified_by, ''`);
     }
     res.status(200).json("visa_requests data updated successfully");
@@ -42976,7 +42976,7 @@ const visa_requestsLoopDelete = async (req, res) => {
         .input("company_code", sql.NVarChar, item.company_code)
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`);
+        .query(`EXEC sp_visa_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', @keyfield, 0, '', '', @Modified_by, ''`);
     }
     res.status(200).json("visa_requests data deleted successfully");
   } catch (err) {
@@ -43023,7 +43023,7 @@ const travel_requestsInsert = async (req, res) => {
       .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
         @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,@keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
 
     res
@@ -43094,7 +43094,7 @@ const travel_requestsUpdate = async (req, res) => {
       .input("created_date", sql.DateTime, created_date)
       .input("modified_by", sql.NVarChar, modified_by)
       .input("modified_date", sql.DateTime, modified_date)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
         @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,@keyfield, 0, @created_by, @created_date, @modified_by, @modified_date`);
 
     res
@@ -43117,7 +43117,7 @@ const travel_requestsDelete = async (req, res) => {
       .input("travel_request_id", sql.Int, travel_request_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     res
       .status(200)
@@ -43167,7 +43167,7 @@ const travel_requestsLoopInsert = async (req, res) => {
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("created_by", sql.NVarChar, item.created_by)
-        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
           @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code, @keyfield, 0, @created_by, '', '', ''`);
     }
     res.status(200).json("travel_requests data inserted successfully");
@@ -43212,7 +43212,7 @@ const travel_requestsLoopUpdate = async (req, res) => {
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id,@travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id,@travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date, 
           @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code, @keyfield, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("travel_requests data updated successfully");
@@ -43240,7 +43240,7 @@ const travel_requestsLoopDelete = async (req, res) => {
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.NVarChar, item.modified_by)
-        .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, @keyfield, 0, '', '', @modified_by, ''`);
+        .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, @keyfield, 0, '', '', @modified_by, ''`);
     }
     res.status(200).json("travel_requests data deleted successfully");
   } catch (err) {
@@ -43499,7 +43499,7 @@ const visaRequestSearch = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("manager_id", sql.NVarChar, manager_id)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date,
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, @employee_id, @passport_id, @destination_country_id, @visa_type_id, @purpose, @travel_start_date, @travel_end_date,
          @request_status, @request_number, @priority_level, @sponsor_name, @estimated_cost, @Remarks, @company_code, @Location_Code, @manager_id, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
@@ -43787,7 +43787,7 @@ const travel_requestsSearch = async (req, res) => {
       .input("manager_id", sql.VarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, @request_number, @employee_id, @department_id, @travel_type, @destination_country_id, @destination_city, @purpose_of_travel, @travel_start_date,
         @travel_end_date, @transport_mode, @accommodation_required, @estimated_cost, @currency_code, @request_status, @Remarks, @priority_level, @manager_id, @company_code, @Location_Code,'', 0, '', '', '', '' `);
 
     if (result.recordset.length > 0) {
@@ -44610,7 +44610,7 @@ const visaRequestDashboard = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, @manager_id, '', 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, @manager_id, '', 0, '', '', @Modified_by, ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44636,7 +44636,7 @@ const travelRequestsDashboard = async (req, res) => {
       .input("manager_id", sql.NVarChar, manager_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', @manager_id, @company_code, @Location_Code, '', 0, '', '', '', ''`);
+      .query(`EXEC sp_travel_requests @mode, 0, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', @manager_id, @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -44705,7 +44705,7 @@ const ApprovalVisa = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Modified_by", sql.NVarChar, Modified_by)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', '', '', '', '', '', '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
 
     res.status(200).json("visa approval successfully");
   } catch (err) {
@@ -44728,7 +44728,7 @@ const ApprovalTravel = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code, '', 0, '', '', @modified_by, ''`);
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code, '', 0, '', '', @modified_by, ''`);
 
     res.status(200).json("travel approval successfully");
   } catch (err) {
@@ -46706,7 +46706,7 @@ const getTHRSReport = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
-      .query(`EXEC sp_task_hour_report_Ramya @mode, @start_date, @end_date, @userid, '', @company_code,@Location_Code, '', @Status `);
+      .query(`EXEC sp_task_hour_report @mode, @start_date, @end_date, @userid, '', @company_code,@Location_Code, '', @Status `);
 
     if (result.recordset && result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -47312,7 +47312,7 @@ const EmpCompOffList = async (req, res) => {
       .input("userid", sql.VarChar, userid)
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
-      .query(`EXEC sp_task_hour_report_Ramya @mode,'','',@userid,'',@company_code,@Location_Code,'', ''`);
+      .query(`EXEC sp_task_hour_report @mode,'','',@userid,'',@company_code,@Location_Code,'', ''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -47648,7 +47648,7 @@ const getUCN = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_user_info_hdr_Pavun 'UCN', @company_code, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`);
+      .query(`EXEC sp_user_info_hdr 'UCN', @company_code, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -48368,7 +48368,7 @@ const getVisaNotification = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_visa_requests_DG @mode, 0, @employee_id, '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', '', ''`);
+      .query(`EXEC sp_visa_requests @mode, 0, @employee_id, '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48393,7 +48393,7 @@ const visaNotificationSeen = async (req, res) => {
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', @is_notification_seen, '', '', '', ''`);
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', '', '', '', '', '', '', '', '', '', '', 0, '', @company_code, @Location_Code, '', '', @is_notification_seen, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -48416,7 +48416,7 @@ const getTravelNotification = async (req, res) => {
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, 0, '', @employee_id, '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
+      .query(`EXEC sp_travel_requests @mode, 0, '', @employee_id, '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', 0, '', '', '', ''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -48441,7 +48441,7 @@ const travelNotificationSeen = async (req, res) => {
       .input("is_notification_seen", sql.Bit, is_notification_seen)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', @is_notification_seen, '', '', '', ''`);
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', @company_code, @Location_Code, '', @is_notification_seen, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -48720,7 +48720,7 @@ const visaCancellation = async (req, res) => {
       .input("Modified_by", sql.NVarChar, Modified_by)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_visa_requests_DG @mode, @visa_request_id, '', '', '', '', '', @travel_start_date, '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
+      .query(`EXEC sp_visa_requests @mode, @visa_request_id, '', '', '', '', '', @travel_start_date, '', @request_status, '', '', '', 0, '', @company_code, @Location_Code, '', '', 0, '', '', @Modified_by, ''`);
 
     res.status(200).json({
       success: true,
@@ -48746,7 +48746,7 @@ const travelCancellation = async (req, res) => {
       .input("modified_by", sql.NVarChar, modified_by)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_travel_requests_DG @mode, @travel_request_id, '', '', '', '', '', '', '', @travel_start_date, '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code,  '', 0, '', '', @modified_by, ''`);
+      .query(`EXEC sp_travel_requests @mode, @travel_request_id, '', '', '', '', '', '', '', @travel_start_date, '', '', 0, 0, '', @request_status, '', '', '', @company_code, @Location_Code,  '', 0, '', '', @modified_by, ''`);
 
     res.status(200).json({
       success: true,
@@ -48958,7 +48958,7 @@ const getUserData = async (req, res) => {
       .input("mode", sql.NVarChar, "GUIH")
       .input("company_code", sql.NVarChar, company_code)
       .input("user_code", sql.NVarChar, user_code)
-      .query(`EXEC sp_user_info_hdr_Pavun @mode,@company_code,@user_code,'','','','','','','','','','','','','','','','','','','','','','',''`);
+      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,'','','','','','','','','','','','','','','','','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset); 
