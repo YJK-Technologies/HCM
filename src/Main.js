@@ -25,6 +25,7 @@ import UserRoleInput from "./UserRoleMapInput.js";
 import LocInfoGrid from "./LocationInfoGrid.js";
 import LocInfoInput from "./LocationInput.js";
 import Settings from './Settings.js';
+import UserSettings from './UserSettings.js';
 import AccountInformation from "./AccountInformation.js";
 import UserScreenMapGrid from "./userscreenmapgrid.js";
 import UserScreenInput from "./userscreeninput.js";
@@ -223,6 +224,7 @@ function Main() {
     { path: "/", component: <Home /> },
     { path: "/Login", component: <Login /> },
     { path: "/Settings", component: <Settings /> },
+    { path: "/UserSettings", component: <UserSettings /> },
     { path: "/TemplateDesign", component: <PrintTemplate /> },
     { path: "/AddCompany", component: <Input /> },
     { path: "/Company", component: <Grid /> },
