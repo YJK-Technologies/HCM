@@ -49237,6 +49237,70 @@ const getDefaultUserCompany = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
+const userSettingsInsert = async (req, res) => {
+  const { User_Code, Status, company_code, Location_Code, DefaultCompanyId, DefaultScreenId, role_id, created_by,} = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    await pool
+      .request()
+      .input("mode", sql.NVarChar, "I")
+      .input("User_Code", sql.NVarChar, User_Code)
+      .input("Status", sql.NVarChar, Status)
+      .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .input("keyfield", sql.NVarChar, company_code)
+      .input("DefaultCompanyId", sql.NVarChar, DefaultCompanyId)
+      .input("DefaultScreenId", sql.NVarChar, DefaultScreenId)
+      .input("role_id", sql.NVarChar, role_id)
+      .input("created_by", sql.NVarChar, created_by)
+      .query(` EXEC sp_UserSettings @mode, @User_Code, @Status, @company_code, @Location_Code, @keyfield, 
+        @DefaultCompanyId, @DefaultScreenId, @role_id, @created_by, '', '', '' `);
+
+    res.status(200).json({
+      success: true,
+      message: "User Settings saved successfully",
+    });
+  } catch (err) {
+    console.error("Error during User Settings insert:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+const getUserSettings = async (req, res) => {
+  const { User_Code, company_code } = req.body;
+
+  try {
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "S")
+      .input("company_code", sql.NVarChar, company_code)
+      .input("User_Code", sql.NVarChar, User_Code)
+      .query(` EXEC sp_UserSettings @mode, @User_Code, '', @company_code, '', '', '', '', '', '', '', '', '' `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Data not found",
+      });
+    }
+  } catch (err) {
+    console.error("Error getting User Settings:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
 //code ended by sakthi on  24-07-26
 module.exports = {
   login,
@@ -50679,6 +50743,8 @@ module.exports = {
   getFinancialYearAccessData,
   getDefaultScreens,
   GetCheckInMode,
-  getDefaultUserCompany
+  getDefaultUserCompany,
+  userSettingsInsert,
+  getUserSettings
 
 };

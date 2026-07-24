@@ -168,8 +168,15 @@ const fetchUserData = async (userCode) => {
       const data = await res.json();
 
       if (data.length > 0) {
-        handleSave(data[0]);
-        navigate("/AccountInformation");
+       handleSave(data[0]);
+
+        const defaultScreen = data[0].DefaultScreenId?.trim();
+              
+        if (defaultScreen) {
+          navigate(`/${defaultScreen}`);
+        } else {
+          navigate("/AccountInformation");
+        }
       }
     } else {
       console.error("No company mapping found.");
@@ -204,6 +211,7 @@ const fetchUserData = async (userCode) => {
     sessionStorage.setItem('selectedShortName', data.short_name);
     sessionStorage.setItem('selectedUserName', data.user_name);
     sessionStorage.setItem('selectedUserCode', data.user_code);
+    sessionStorage.setItem( "DefaultScreenId", data.DefaultScreenId || "" );
   };
 
   return (

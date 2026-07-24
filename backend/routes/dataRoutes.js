@@ -1472,6 +1472,8 @@ router.post("/getFinancialYearAccessData",dataController.getFinancialYearAccessD
 router.post("/getDefaultScreens",dataController.getDefaultScreens)
 router.post("/GetCheckInMode",dataController.GetCheckInMode)
 router.post("/getDefaultUserCompany",dataController.getDefaultUserCompany)
+router.post("/userSettingsInsert",dataController.userSettingsInsert)
+router.post("/getUserSettings",dataController.getUserSettings)
 
 
 
