@@ -49262,6 +49262,31 @@ const GetCheckInMode = async (req, res) => {
   }
 };
 //Code ended by Dinesh Gokul On 23-07-2026
+
+//code added by sakthi on  24-07-26
+const getDefaultUserCompany = async (req, res) => {
+  const { user_code } = req.body;
+
+  try {
+    const pool = await connection.connectToDatabase();
+
+    const result = await pool
+      .request()
+      .input("mode", sql.NVarChar, "UCLD")
+      .input("user_code", sql.NVarChar, user_code)
+      .query(` EXEC sp_user_company_mapping @mode, '', @user_code, '', '', '', 0, '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL `);
+
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset);
+    } else {
+      res.status(404).json({ message: "Default company not found" });
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi on  24-07-26
 module.exports = {
   login,
   forgetPassword,
@@ -50702,6 +50727,7 @@ module.exports = {
   getWarehouseData,
   getFinancialYearAccessData,
   getDefaultScreens,
-  GetCheckInMode
+  GetCheckInMode,
+  getDefaultUserCompany
 
 };
