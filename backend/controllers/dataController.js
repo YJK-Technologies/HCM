@@ -49237,29 +49237,6 @@ const getDefaultScreens = async (req, res) => {
 };
 //code added by sakthi on 07-23-26
 
-//code added by sakthi on 07-23-26
-const getDefaultScreens = async (req, res) => {
-  const { role_id, company_code } = req.body;
-
-  try {
-    const pool = await connection.connectToDatabase();
-
-    const result = await pool.request()
-      .input("mode", sql.VarChar, "GDS")
-      .input("role_id", sql.VarChar, role_id)
-      .input("company_code", sql.VarChar, company_code)
-      .query(`EXEC sp_Global_Settings_test @mode, '', '', '', '', @company_code, '','','', @role_id, '', '', '', '' `);
-
-    res.status(200).json(result.recordset);
-  } catch (error) {
-    console.error("Error fetching default screens:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-//code added by sakthi on 07-23-26
 
 //Code added by Dinesh Gokul On 23-07-2026
 const GetCheckInMode = async (req, res) => {
