@@ -22828,9 +22828,7 @@ const addEmployeeAcademicDetails = async (req, res) => {
         .input("datetime2", insertRow.datetime2)
         .input("datetime3", insertRow.datetime3)
         .input("datetime4", insertRow.datetime4)
-        .query(
-          `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@Document,@keyfield,@company_code,'',@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`,
-        );
+        .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@Document,@keyfield,@company_code,'',@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     }
     res
       .status(200)
@@ -22886,9 +22884,7 @@ const updateEmployeeAcademicDetails = async (req, res) => {
         .input("keyfield", updatedRow.keyfield)
         .input("company_code", updatedRow.company_code)
         .input("modified_by", updatedRow.modified_by)
-        .query(
-          `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@document,@keyfield,@company_code,'','',@modified_by,'','','','','','','',''`,
-        );
+        .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@document,@keyfield,@company_code,'','',@modified_by,'','','','','','','',''`);
     }
     res.status(200).json("Employee academic details updated successfully");
   } catch (err) {
@@ -22917,9 +22913,7 @@ const deleteEmployeeAcademicDetails = async (req, res) => {
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
         .input("modified_by", sql.NVarChar, modified_by)
-        .query(
-          `EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Employee academic details deleted successfully");
@@ -24141,11 +24135,7 @@ const addAnnounmentdetails = async (req, res) => {
       .input("Messagetype", sql.NVarChar, Messagetype)
       .input("MessageTitle", sql.NVarChar, MessageTitle)
       .input("status", sql.NVarChar, status)
-      .input(
-        "RequestfordoNotShowAgainOption",
-        sql.NVarChar,
-        RequestfordoNotShowAgainOption,
-      )
+      .input("RequestfordoNotShowAgainOption", sql.NVarChar,RequestfordoNotShowAgainOption)
       .input("Start_Date", sql.Date, Start_Date)
       .input("Start_Time", sql.NVarChar, Start_Time)
       .input("End_Date", sql.Date, End_Date)
@@ -24162,7 +24152,7 @@ const addAnnounmentdetails = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_Announcement_Ramya @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,@messageTitle,@status,@RequestfordoNotShowAgainOption,@Start_Date,@Start_Time,
+      .query(`EXEC sp_Announcement @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,@messageTitle,@status,@RequestfordoNotShowAgainOption,@Start_Date,@Start_Time,
 @End_Date,@End_Time,@company_code,@Location_Code,@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     res.status(200).json("Announcement details data inserted successfully");
   } catch (err) {
@@ -24178,7 +24168,7 @@ const allAnnouncementDetails = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_Announcement_Ramya 'A','','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      `EXEC sp_Announcement 'A','','','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
     );
 
     res.json(result.recordset);
@@ -24205,7 +24195,7 @@ const deleteAnnouncement = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("Location_Code", sql.NVarChar, updatedRow.Location_Code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Announcement_Ramya 'D',@Announcement_id,'','','',
+        .query(`EXEC sp_Announcement 'D',@Announcement_id,'','','',
         '','','','','','','','',@company_code,@Location_Code,'',@modified_by,NULL,NULL,NULL,
         NULL,NULL,NULL,NULL,NULL`);
     }
@@ -24239,7 +24229,7 @@ const updateAnnouncementDetails = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("Location_Code", sql.NVarChar, updatedRow.Location_Code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Announcement_Ramya @mode,@Announcement_id,@SelectType,@SelectDetails,'',@Messagetype,@messageTitle,@status,'','','',
+        .query(`EXEC sp_Announcement @mode,@Announcement_id,@SelectType,@SelectDetails,'',@Messagetype,@messageTitle,@status,'','','',
         '','',@company_code,@Location_Code,'',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Announcement data updated successfully");
@@ -24698,9 +24688,7 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("Name", sql.NVarChar, Name)
       .input("academic_year_from", sql.Date, academic_year_from ? new Date(academic_year_from) : null)
       .input("academic_year_to", sql.Date, academic_year_to ? new Date(academic_year_to) : null)
-      .query(
-        `EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -30152,22 +30140,16 @@ const AnnouncementSearchCretria = async (req, res) => {
       .input("Messagetype", sql.NVarChar, Messagetype)
       .input("MessageTitle", sql.NVarChar, MessageTitle)
       .input("status", sql.NVarChar, status)
-      .input(
-        "RequestfordoNotShowAgainOption",
-        sql.NVarChar,
-        RequestfordoNotShowAgainOption,
-      )
+      .input("RequestfordoNotShowAgainOption", sql.NVarChar,RequestfordoNotShowAgainOption,)
       .input("Start_Date", sql.NVarChar, Start_Date)
       .input("Start_Time", sql.NVarChar, Start_Time)
       .input("End_Date", sql.NVarChar, End_Date)
       .input("End_Time", sql.NVarChar, End_Time)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_Announcement_Ramya @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,
+      .query(`EXEC sp_Announcement @mode,@Announcement_id,@SelectType,@SelectDetails,@AnnouncementValidFor,@Messagetype,
         @MessageTitle,@status,@RequestfordoNotShowAgainOption,@Start_Date,@Start_Time,@End_Date,@End_Time,
-        @company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+        @company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -33780,9 +33762,7 @@ const getAnnouncementText = async (req, res) => {
       .input("mode", sql.NVarChar, "ANC")
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(
-        `EXEC sp_Announcement_Ramya @mode,'','','','','','','','','','','','',@company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .query(`EXEC sp_Announcement @mode,'','','','','','','','','','','','',@company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -38193,9 +38173,7 @@ const candidate_masterLoopUpdate = async (req, res) => {
         .input("company_code", sql.VarChar, item.company_code)
         .input("keyfield", sql.VarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
-        .query(
-          `EXEC sp_candidate_master  @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','','','',@modified_by,''`,
-        );
+        .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone, @applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code, @keyfield, '','','','','',@modified_by,''`);
 
       // 👇 capture NEW keyfield
       if (result.recordset?.length) {
@@ -38231,9 +38209,7 @@ const candidate_masterLoopDelete = async (req, res) => {
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("modified_by", sql.VarChar, item.modified_by)
-        .query(
-          `EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', @modified_by, ''`,
-        );
+        .query(`EXEC sp_candidate_master @mode,0, '', '', '', 0, '','','','','', '', @keyfield, '','','','', '', @modified_by, ''`);
     }
     res.status(200).json("candidate_master data deleted successfully");
   } catch (err) {
@@ -38279,9 +38255,7 @@ const candidate_masterInsert = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Canditate_CV", sql.VarBinary, Canditate_CV)
       .input("created_by", sql.NVarChar, created_by)
-      .query(
-        `EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, '', '', @created_by, '', '', ''`,
-      );
+      .query(`EXEC sp_candidate_master @mode,0, @candidate_name, @email, @phone, @applied_job_id, '',@Education,@Experience,@Related_experience,@Job_description, @company_code,'',@Canditate_CV, '', '', @created_by, '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -39009,9 +38983,7 @@ const CandidateSearch = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("fromDate", sql.VarChar, fromDate)
       .input("toDate", sql.VarChar, toDate)
-      .query(
-        `EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','',@fromDate,@toDate,'','','','' `,
-      );
+      .query(`EXEC sp_candidate_master @mode,0,@candidate_name,@email,@phone,@applied_job_id,'',@Education,@Experience,@Related_experience,@Job_description,@company_code,'','',@fromDate,@toDate,'','','','' `);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -39351,9 +39323,7 @@ const CanditateID = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SE")
       .input("company_code", sql.VarChar, company_code)
-      .query(
-        `EXEC sp_candidate_master 'SE',0,'','','',0,'','','','','',@company_code,'','','','','','','',''`,
-      );
+      .query(`EXEC sp_candidate_master 'SE',0,'','','',0,'','','','','',@company_code,'','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -42680,9 +42650,7 @@ const getDepartmentDashboard = async (req, res) => {
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.Date, fromDate)
       .input("to_date", sql.Date, toDate)
-      .query(
-        `EXEC sp_Department_Dashboard_Ramya @mode, @company_code,@Location_Code, @from_date, @to_date `,
-      );
+      .query(`EXEC sp_Department_Dashboard @mode, @company_code,@Location_Code, @from_date, @to_date`);
 
     res.json(result.recordset);
   } catch (err) {

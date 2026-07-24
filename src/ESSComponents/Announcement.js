@@ -84,6 +84,8 @@ function Input({ }) {
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const searchClearInputFields = () => {
     setAnnouncement_id("");
     setselecttype("");
@@ -283,6 +285,7 @@ function Input({ }) {
           End_Date: End_Date,
           End_Time: endtime,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
+          Location_Code
         })
       });
       if (response.ok) {
@@ -391,6 +394,7 @@ function Input({ }) {
         Start_Time: Start_Time,
         End_Date: enddate,
         End_Time: End_Time,
+        Location_Code,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode'),
       };
@@ -439,12 +443,14 @@ function Input({ }) {
                 ...row,
                 company_code,
                 modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
+                  Location_Code
                 },
               ],
           };
@@ -488,12 +494,14 @@ function Input({ }) {
           ...row,
           company_code,
           modified_by,
+          Location_Code
         }))
         : [
           {
             ...rowData,
             company_code,
             modified_by,
+            Location_Code
           },
         ],
     };
