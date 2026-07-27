@@ -836,7 +836,7 @@ function TravelRequest({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code, EmployeeId }),
+          body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
         });
 
         if (!response.ok) {
@@ -865,7 +865,7 @@ function TravelRequest({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code, EmployeeId }),
+          body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
         });
 
         if (!response.ok) {
@@ -893,7 +893,7 @@ function TravelRequest({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code, EmployeeId }),
+      body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
