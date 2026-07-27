@@ -459,6 +459,7 @@ function UserInput({ }) {
       !user_status ||
       !role_id ||
       !email_id ||
+      !gender ||
       !dob
     ) {
       setError(true);
@@ -564,6 +565,7 @@ function UserInput({ }) {
       !role_id ||
       !email_id ||
       !user_status ||
+      !gender ||
       !dob
     ) {
       setError(true);
@@ -905,7 +907,7 @@ function UserInput({ }) {
                 ref={Gender}
                 onKeyDown={(e) => handleKeyDown(e, SuperAdmin, Gender)}
               />
-              <label for="gender" className="floating-label">Gender</label>
+              <label for="gender" className={`floating-label ${error && !gender ? 'text-danger' : ''}`}>Gender<span className="text-danger">*</span></label>
             </div>
           </div>
 
