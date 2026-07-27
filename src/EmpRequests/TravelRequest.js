@@ -828,6 +828,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
     const fetchDept = async () => {
       try {
@@ -858,6 +859,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
     const fetchDept = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/EmpDepartment`, {
@@ -887,6 +889,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
     fetch(`${config.apiBaseUrl}/EmpDepartment`, {
       method: "POST",
