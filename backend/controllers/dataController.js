@@ -11889,6 +11889,7 @@ const addEmployeeHoliday = async (req, res) => {
   const {
     Holiday_Date,
     Country_Code,
+    Location_Code,
     Location_ID,
     Holiday_Name,
     Holiday_Type,
@@ -11906,13 +11907,14 @@ const addEmployeeHoliday = async (req, res) => {
       .input("Holiday_Date", sql.Date, Holiday_Date)
       .input("Country_Code", sql.NVarChar, Country_Code)
       .input("Location_ID", sql.Int, Location_ID)
+      .input("Location_Code", sql.Int, Location_ID)
       .input("Holiday_Name", sql.NVarChar, Holiday_Name)
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,@created_by,'','','',''`,);
+      .query(`EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Location_Code,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,@created_by,'','','',''`,);
     res.status(200).json("Employee holiday data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -11952,6 +11954,7 @@ const updateEmployeeHoliday = async (req, res) => {
         .input("Holiday_Date", sql.Date, updatedRow.Holiday_Date)
         .input("Country_Code", sql.NVarChar, updatedRow.Country_Code)
         .input("Location_ID", sql.Int, updatedRow.Location_ID)
+        .input("Location_Code", sql.Int, updatedRow.Location_Code)
         .input("Holiday_Name", sql.NVarChar, updatedRow.Holiday_Name)
         .input("Holiday_Type", sql.NVarChar, updatedRow.Holiday_Type)
         .input("Is_Paid", sql.NVarChar, updatedRow.Is_Paid)
@@ -11959,7 +11962,7 @@ const updateEmployeeHoliday = async (req, res) => {
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Holiday_Master @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,'',@modified_by,'','',@keyfield`,);
+        .query(`EXEC sp_Holiday_Master_test @mode,0,@Holiday_Date,@Country_Code,@Location_ID,@Location_Code,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,'','',@company_code,'',@modified_by,'','',@keyfield`,);
     }
 
     res.status(200).json("Employeedata updated successfully");
@@ -12052,6 +12055,7 @@ const getsearchHoliday = async (req, res) => {
     EndDate,
     Country_Code,
     Location_ID,
+    Location_Code,
     Holiday_Name,
     Holiday_Type,
     Is_Paid,
@@ -12067,12 +12071,13 @@ const getsearchHoliday = async (req, res) => {
       .input("EndDate", sql.NVarChar, EndDate)
       .input("Country_Code", sql.NVarChar, Country_Code)
       .input("Location_ID", sql.Int, Location_ID)
+      .input("Location_Code", sql.Int, Location_Code)
       .input("Holiday_Name", sql.NVarChar, Holiday_Name)
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
       .input("Status", sql.NVarChar, Status)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_Holiday_Master @mode,0,'',@Country_Code,@Location_ID,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,@company_code,'','','','',''`);
+      .query(`EXEC sp_Holiday_Master_test @mode,0,'',@Country_Code,@Location_ID,@Location_Code,@Holiday_Name,@Holiday_Type,@Is_Paid,@Status,@StartDate,@EndDate,@company_code,'','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -14316,7 +14321,7 @@ const deleteEmployeeHoliday = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','',@company_code,'',@modified_by,'','',@keyfield`);
+        .query(`EXEC sp_Holiday_Master_test @mode,0,'','',0,'','','','','','','',@company_code,'',@modified_by,'','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -24998,7 +25003,7 @@ const GetDashboardAttendanceSummary = async (req, res) => {
 
 //code added by pavun 04-04-2026
 const LoanTypeDistribution = async (req, res) => {
-  const { company_code, from_date, to_date } = req.body;
+  const { company_code, Location_Code,from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -25006,9 +25011,10 @@ const LoanTypeDistribution = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, company_code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard 'LTD', @company_code,@from_date,@to_date,'','','','','',''`);
+      .query(`EXEC sp_loan_dashboard 'LTD', @company_code,@Location_Code,@from_date,@to_date,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25022,7 +25028,7 @@ const LoanTypeDistribution = async (req, res) => {
 };
 
 const DepartmentLoanAmount = async (req, res) => {
-  const { company_code, from_date, to_date } = req.body;
+  const { company_code,Location_Code, from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -25030,9 +25036,10 @@ const DepartmentLoanAmount = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard 'DL', @company_code,@from_date,@to_date,'','','','','',''`);
+      .query(`EXEC sp_loan_dashboard 'DL', @company_code,@Location_Code,@from_date,@to_date,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25046,7 +25053,7 @@ const DepartmentLoanAmount = async (req, res) => {
 };
 
 const LoanStatusTrend = async (req, res) => {
-  const { company_code, from_date, to_date } = req.body;
+  const { company_code,Location_Code, from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -25054,9 +25061,10 @@ const LoanStatusTrend = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard 'LS', @company_code,@from_date,@to_date,'','','','','',''`);
+      .query(`EXEC sp_loan_dashboard 'LS', @company_code,@Location_Code,@from_date,@to_date,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -25070,7 +25078,7 @@ const LoanStatusTrend = async (req, res) => {
 };
 
 const OverduevsPaid = async (req, res) => {
-  const { company_code, from_date, to_date } = req.body;
+  const { company_code,Location_Code, from_date, to_date } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -25078,9 +25086,10 @@ const OverduevsPaid = async (req, res) => {
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.NVarChar, from_date)
       .input("to_date", sql.NVarChar, to_date)
-      .query(`EXEC sp_loan_dashboard 'OD', @company_code,@from_date,@to_date,'','','','','',''`);
+      .query(`EXEC sp_loan_dashboard 'OD', @company_code,@Location_Code,@from_date,@to_date,'','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -26700,6 +26709,7 @@ const getLoanDashboard = async (req, res) => {
   const {
     mode,
     company_code,
+    Location_Code,
     fromDate,
     toDate,
     department_id,
@@ -26713,11 +26723,12 @@ const getLoanDashboard = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, mode)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.Date, fromDate || null)
       .input("to_date", sql.Date, toDate || null)
       .input("department_id", sql.NVarChar, department_id || null)
       .input("age_group", sql.NVarChar, age_group || null)
-      .query(`EXEC sp_loan_dashboard @mode, @company_code, @from_date, @to_date, @department_id, @age_group,'','','','' `);
+      .query(`EXEC sp_loan_dashboard @mode, @company_code, @Location_Code,@from_date, @to_date, @department_id, @age_group,'','','','' `);
 
     res.status(200).json(result.recordset);
 
@@ -26734,7 +26745,7 @@ const getLoanDashboard = async (req, res) => {
 
 //code added by Sakthi on 29-04-2026
 const getAGES = async (req, res) => {
-  const { mode, company_code, from_date, to_date, department_id, age_group, employee_id, first_name, designation_id, DOB } = req.body;
+  const { mode, company_code,Location_Code, from_date, to_date, department_id, age_group, employee_id, first_name, designation_id, DOB } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -26743,6 +26754,7 @@ const getAGES = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "AGES")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
       .input("department_id", sql.NVarChar, department_id || null)
@@ -26751,7 +26763,7 @@ const getAGES = async (req, res) => {
       .input("first_name", sql.NVarChar, first_name || null)
       .input("designation_id", sql.NVarChar, designation_id || null)
       .input("DOB", sql.NVarChar, DOB || null)
-      .query(`EXEC sp_loan_dashboard @mode, @company_code, @from_date, @to_date, @department_id, @age_group, @employee_id, @first_name, @designation_id, @DOB `);
+      .query(`EXEC sp_loan_dashboard @mode, @company_code,@Location_Code, @from_date, @to_date, @department_id, @age_group, @employee_id, @first_name, @designation_id, @DOB `);
 
     res.status(200).json(result.recordset);
 
