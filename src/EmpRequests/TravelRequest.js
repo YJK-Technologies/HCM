@@ -828,6 +828,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
     const fetchDept = async () => {
       try {
@@ -836,7 +837,7 @@ function TravelRequest({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code, EmployeeId }),
+          body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
         });
 
         if (!response.ok) {
@@ -858,6 +859,7 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
     const fetchDept = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/EmpDepartment`, {
@@ -865,7 +867,7 @@ function TravelRequest({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code, EmployeeId }),
+          body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
         });
 
         if (!response.ok) {
@@ -887,13 +889,14 @@ function TravelRequest({ }) {
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
     const EmployeeId = sessionStorage.getItem("selectedUserCode");
+    const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
     fetch(`${config.apiBaseUrl}/EmpDepartment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code, EmployeeId }),
+      body: JSON.stringify({ company_code, EmployeeId,Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {

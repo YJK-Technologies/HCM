@@ -67,6 +67,7 @@ function HoliDays() {
   const [isSelectHolidayTypeSc, setIsSelectHolidayTypeSc] = useState(false);
   const [loading, setLoading] = useState(false);
 
+const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const searchClearInputFields = () => {
     setstartdate("");
@@ -414,6 +415,7 @@ function HoliDays() {
           EndDate: enddate,
           Country_Code: countryCodeSc,
           Location_ID: locationIdSc,
+          Location_Code: Location_Code,
           Holiday_Name: holidayNameSc,
           Holiday_Type: holidayTypeSc,
           Is_Paid: isPaidSc,
@@ -450,6 +452,7 @@ function HoliDays() {
         Holiday_Date: HolidayDate,
         Country_Code: countryCode,
         Location_ID: locationId,
+        Location_Code: Location_Code,
         Holiday_Name: holidayName,
         Holiday_Type: holidayType,
         Is_Paid: isPaid,
@@ -496,13 +499,15 @@ function HoliDays() {
               ? rowData.map((row) => ({
                 ...row,
                 modified_by,
-                company_code
+                company_code,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   modified_by,
-                  company_code
+                  company_code,
+                  Location_Code
                 },
               ],
           };
@@ -549,12 +554,14 @@ function HoliDays() {
                 ...row,
                 company_code,
                 modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
+                  Location_Code
                 },
               ],
           };

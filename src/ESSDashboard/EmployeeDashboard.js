@@ -392,6 +392,7 @@ const Dashboard = (payslip) => {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           EmployeeId: sessionStorage.getItem("selectedUserCode"),
+          Location_Code
         }),
       });
 
@@ -1109,6 +1110,7 @@ const Dashboard = (payslip) => {
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
+          Location_Code
         }),
       });
 
