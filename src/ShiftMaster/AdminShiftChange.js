@@ -61,6 +61,7 @@ function AdminShiftChange() {
   const [rempShiftRowData, setEmpShiftRowData] = useState([]);
 
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const handleShiftSearch = async () => {
     setLoading(true);
@@ -81,6 +82,7 @@ function AdminShiftChange() {
           Day_Sequence: shiftDay,
           Start_Time: shiftStartTime,
           End_Time: shiftEndTime,
+          Location_Code,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
       });

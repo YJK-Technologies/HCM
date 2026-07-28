@@ -2039,6 +2039,7 @@ const Dashboard = () => {
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
+          Location_Code
         }),
       });
 
