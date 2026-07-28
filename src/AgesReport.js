@@ -58,6 +58,8 @@ function AgesReport() {
   const [selectedDsg, setSelectedDsg] = useState('');
   const [isSelectDesignation, setIsSelectDesignation] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   //--------------- DEPARTMENT ID-----------------
 
   const handleDPT = (selectedDPT) => {
@@ -211,6 +213,7 @@ function AgesReport() {
         body: JSON.stringify({
           mode: "AGES",
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code:Location_Code,
           employee_id: empIdSc,
           first_name: first_name,
           department_id: department_id,
@@ -218,6 +221,7 @@ function AgesReport() {
           from_date: from_date,
           to_date: to_date,
           age_group: AGESTypeSc,
+          
         }),
       });
 
