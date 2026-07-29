@@ -45,6 +45,8 @@ function OvertimeReport() {
         .filter((permission) => permission.screen_type === "OvertimeReport")
         .map((permission) => permission.permission_type.toLowerCase());
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
     const company_code = sessionStorage.getItem('selectedCompanyCode')
 
     useEffect(() => {
@@ -85,7 +87,7 @@ function OvertimeReport() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
+                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
                 });
 
                 const val = await response.json();

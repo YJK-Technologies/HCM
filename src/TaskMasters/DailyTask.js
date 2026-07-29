@@ -78,6 +78,8 @@ function Input({ }) {
     .filter(permission => permission.screen_type === 'Task')
     .map(permission => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const [selectedFile, setSelectedFile] = useState([]);
   const navigate = useNavigate();
 
@@ -134,7 +136,7 @@ function Input({ }) {
   //         headers: {
   //           'Content-Type': 'application/json',
   //         },
-  //         body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
+  //         body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
   //       });
   //       const data = await response.json();
 

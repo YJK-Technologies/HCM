@@ -162,6 +162,8 @@ function TravelRequest({ }) {
 
   const [empIdDropGrid, setEmpIdDropGrid] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -170,7 +172,7 @@ function TravelRequest({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdDrop(val))
@@ -516,7 +518,7 @@ function TravelRequest({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdDropSc(val))
@@ -1049,7 +1051,7 @@ function TravelRequest({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => {

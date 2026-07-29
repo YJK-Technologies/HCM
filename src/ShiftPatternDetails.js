@@ -69,6 +69,8 @@ function ShiftPatternDetails() {
   const shiftPatternDetailsPermission = permissions
     .filter((permission) => permission.screen_type === "ShiftPatternDetails")
     .map((permission) => permission.permission_type.toLowerCase());
+  
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -123,7 +125,7 @@ function ShiftPatternDetails() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ Company_Code })
+      body: JSON.stringify({ Company_Code, Location_Code })
     })
       .then((response) => response.json())
       .then((data) => {
@@ -143,7 +145,7 @@ function ShiftPatternDetails() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setPatternIdDrop(val))
@@ -157,7 +159,7 @@ function ShiftPatternDetails() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setPatternIdDropSc(val))
@@ -171,7 +173,7 @@ function ShiftPatternDetails() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code, Location_Code })
     })
       .then((response) => response.json())
       .then((data) => {
@@ -192,7 +194,7 @@ function ShiftPatternDetails() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftIdDrop(val))
@@ -206,7 +208,7 @@ function ShiftPatternDetails() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftIdDropSc(val))

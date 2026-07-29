@@ -27,6 +27,7 @@ function GenerateShift({ }) {
     const [isSelectDesignation, setIsSelectDesignation] = useState(false);
 
     const company_code = sessionStorage.getItem('selectedCompanyCode')
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
     useEffect(() => {
         const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -69,7 +70,7 @@ function GenerateShift({ }) {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
+                    body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
                 });
 
                 const val = await response.json();
@@ -188,6 +189,7 @@ function GenerateShift({ }) {
                         To_Date: toDate,
                         company_code: sessionStorage.getItem("selectedCompanyCode"),
                         created_by: sessionStorage.getItem("selectedUserCode"),
+                        Location_Code
                     }),
                 },
             );

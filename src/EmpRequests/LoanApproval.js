@@ -74,6 +74,8 @@ function LoanApproval({ }) {
     const [selectedCurrencyLoanSc, setSelectedCurrencyLoanSc] = useState("");
     const [isSelectedCurrencyLoanSc, setIsSelectedCurrencyLoanSc] = useState(false);
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+    
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -82,7 +84,7 @@ function LoanApproval({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setEmpIdLoanDropSc(val))
@@ -96,7 +98,7 @@ function LoanApproval({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setLoanTypeIdDropSc(val))
@@ -162,7 +164,7 @@ function LoanApproval({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => {

@@ -103,6 +103,9 @@ function VisaRequest({ }) {
         .filter(permission => permission.screen_type === 'VisaRequest')
         .map(permission => permission.permission_type.toLowerCase());
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
+
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -111,7 +114,7 @@ function VisaRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setEmpIdDrop(val))
@@ -269,7 +272,7 @@ function VisaRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setEmpIdDropSc(val))
@@ -430,7 +433,7 @@ function VisaRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => {

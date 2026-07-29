@@ -105,6 +105,8 @@ function EmployeeTypeMaster() {
     .filter((permission) => permission.screen_type === "EmployeeShiftMapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const searchClearInputFields = () => {
     setEmployeeShiftIdSc("");
     setSelectedEmployeeIdSc("");
@@ -278,7 +280,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -318,7 +320,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -338,7 +340,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -374,7 +376,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftPatternIdDrop(val))
@@ -404,7 +406,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftIdDrop(val))
@@ -419,7 +421,7 @@ function EmployeeTypeMaster() {
   //       headers: {
   //         "Content-Type": "application/json",
   //       },
-  //       body: JSON.stringify({ company_code }),
+  //       body: JSON.stringify({ company_code, Location_Code }),
   //     })
   //       .then((data) => data.json())
   //       .then((val) => setEmployeeIdDrop(val))
@@ -449,7 +451,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmployeeIdDropSc(val))
@@ -464,7 +466,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftIdDropSc(val))
@@ -494,7 +496,7 @@ function EmployeeTypeMaster() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftPatternIdDropSc(val))
@@ -536,6 +538,7 @@ function EmployeeTypeMaster() {
             Effective_To: effectiveToSc,
             Is_Current: statusSc,
             Company_Code,
+            Location_Code
           }),
         },
       );
@@ -881,6 +884,7 @@ function EmployeeTypeMaster() {
             Is_Current: status,
             Company_Code: sessionStorage.getItem("selectedCompanyCode"),
             Created_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           }),
         },
       );
@@ -916,19 +920,20 @@ function EmployeeTypeMaster() {
               ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
+                Location_Code,
                 Modified_by,
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
+                  Location_Code,
                   Modified_by,
                 },
               ],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/Employee_shift_mappingLoopUpdate`,
+          const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopUpdate`,
             {
               method: "POST",
               headers: {
@@ -971,19 +976,20 @@ function EmployeeTypeMaster() {
               ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
+                Location_Code,
                 Modified_by,
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
+                  Location_Code,
                   Modified_by,
                 },
               ],
           };
 
-          const response = await fetch(
-            `${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
+          const response = await fetch(`${config.apiBaseUrl}/Employee_shift_mappingLoopDelete`,
             {
               method: "POST",
               headers: {

@@ -152,6 +152,8 @@ function Input({ }) {
 
   const location = useLocation();
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
 
   const isSalaryPath = location.pathname === '/salarypath';
 
@@ -209,7 +211,7 @@ useEffect(() => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') }) 
+        body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code }) 
       });
 
       const val = await response.json();

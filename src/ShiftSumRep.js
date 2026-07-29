@@ -59,6 +59,8 @@ function ShiftSumRep() {
     .filter((permission) => permission.screen_type === "ShiftSumRep")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const searchClearInputFields = () => {
     setSelectedEmployeeIdSc("");
     setEmployeeIdSc("");
@@ -85,7 +87,7 @@ function ShiftSumRep() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -106,7 +108,7 @@ function ShiftSumRep() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmployeeIdDrop(val))
@@ -136,7 +138,7 @@ function ShiftSumRep() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmployeeIdDropSc(val))

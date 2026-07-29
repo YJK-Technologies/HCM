@@ -13,6 +13,8 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess, screenType }) 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
     const [form, setForm] = useState({
         requested_shift_id: null,
         reason: '',
@@ -28,8 +30,8 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess, screenType }) 
             const fetchData = async () => {
                 try {
                     const [empRes, shiftRes, managerRes, priorityRes] = await Promise.all([
-                        fetch(`${config.apiBaseUrl}/getEmployeeId`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) }),
-                        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) }),
+                        fetch(`${config.apiBaseUrl}/getEmployeeId`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code, Location_Code }) }),
+                        fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code, Location_Code }) }),
                         fetch(`${config.apiBaseUrl}/ESSManager`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) }),
                         fetch(`${config.apiBaseUrl}/getPriority`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) })
                     ]);
