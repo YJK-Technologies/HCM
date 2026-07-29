@@ -60,6 +60,8 @@ function ShiftPatternMaster() {
     .filter((permission) => permission.screen_type === "ShiftPatternMaster")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const searchClearInputFields = () => {
     setShift_Pattern_IDSC("");
     setPattern_CodeSC("");
@@ -75,6 +77,7 @@ function ShiftPatternMaster() {
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
     setHasValueChangedSC(true);
   };
+
   const handleChangeStatus = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
     setStatus(selectedStatus ? selectedStatus.value : "");
@@ -169,7 +172,7 @@ function ShiftPatternMaster() {
           Rotation_Days: Rotation_DaysSC || null,
           Description: DescriptionSC || null,
           Status: StatusSC || null,
-
+          Location_Code,
           company_code,
         }),
       });
@@ -444,6 +447,7 @@ function ShiftPatternMaster() {
             Rotation_Days: Number(Rotation_Days),
             Description: Description,
             Status: Status,
+            Location_Code,
             Company_Code: sessionStorage.getItem("selectedCompanyCode"),
             Created_by: sessionStorage.getItem("selectedUserCode"),
           }),
@@ -483,12 +487,14 @@ function ShiftPatternMaster() {
                 ...row,
                 Company_Code,
                 Modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
                   Modified_by,
+                  Location_Code
                 },
               ],
           };
@@ -543,12 +549,14 @@ function ShiftPatternMaster() {
                 ...row,
                 Company_Code,
                 Modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
                   Modified_by,
+                  Location_Code
                 },
               ],
           };

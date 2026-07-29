@@ -378,10 +378,7 @@ function LoanDocuments({ }) {
     formData.append("file_path", file_path);
     formData.append("uploaded_by", uploaded_by);
     formData.append("uploaded_at", uploaded_at);
-    formData.append(
-      "company_code",
-      sessionStorage.getItem("selectedCompanyCode"),
-    );
+    formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
     formData.append("keyfield", "");
     formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
 
@@ -390,8 +387,7 @@ function LoanDocuments({ }) {
     }
 
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/loan_documentsInsert`,
+      const response = await fetch(`${config.apiBaseUrl}/loan_documentsInsert`,
         {
           method: "POST",
           body: formData,

@@ -113,7 +113,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -133,7 +133,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -177,7 +177,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -198,7 +198,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftEmpIdDrop(val))
@@ -228,7 +228,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftPatternIdDrop(val))
@@ -243,7 +243,7 @@ function AdminShiftChange() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftCodeDrop(val))

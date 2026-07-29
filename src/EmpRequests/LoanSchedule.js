@@ -57,6 +57,8 @@ function LoanSchedule({ }) {
 
   const [employeeIdDropGrid, setEmployeeIdDropGrid] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -220,7 +222,7 @@ function LoanSchedule({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -241,7 +243,7 @@ function LoanSchedule({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmployeeIdDropSc(val))

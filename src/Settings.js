@@ -7,16 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 const SettingsPage = () => {
   const [open, setOpen] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [salesPeriod, setSalesPeriod] = useState(null);
-  const [purchasePeriod, setPurchasePeriod] = useState(null);
-  const [itemsPeriod, setItemsPeriod] = useState(null);
-  const [stockPeriod, setStockPeriod] = useState(null);
-  const [birthdayPeriod, setBirthdayPeriod] = useState(null);
-  const [joineesPeriod, setJoineesPeriod] = useState(null);
-  const [birthdayDays, setBirthdayDays] = useState(null);
-  const [joineesDays, setJoineesDays] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [DateDrop, setDateDrop] = useState([]);
@@ -26,139 +17,11 @@ const SettingsPage = () => {
   const [currency, setCurrency] = useState('');
   const [currencyValue, setCurrencyValue] = useState('');
 
-  // States for Company and Screen (Image-il ullapadi)
-  const [companyDrop, setCompanyDrop] = useState([]);
-  const [company, setCompany] = useState(null);
-  const [companyValue, setCompanyValue] = useState("");
-
-  const [screenDrop, setScreenDrop] = useState([]);
-  const [screen, setScreen] = useState(null);
-  const [screenValue, setScreenValue] = useState("");
-
   const [errors, setErrors] = useState(false);
 
   const config = require("./Apiconfig");
 
-  // 1. Fetch Company Dropdown
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch(`${config.apiBaseUrl}/getCompanies`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-          }),
-        });
-        const data = await response.json();
-        setCompanyDrop(data);
-      } catch (error) {
-        console.error("Error fetching company options:", error);
-      }
-    };
-    fetchCompanies();
-  }, []);
-
-  // 2. Fetch Screen Dropdown
-  useEffect(() => {
-    const fetchScreens = async () => {
-      try {
-        const response = await fetch(`${config.apiBaseUrl}/getScreens`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            company_code: sessionStorage.getItem("selectedCompanyCode"),
-          }),
-        });
-        const data = await response.json();
-        setScreenDrop(data);
-      } catch (error) {
-        console.error("Error fetching screen options:", error);
-      }
-    };
-    fetchScreens();
-  }, []);
-
-useEffect(() => {
-    const fetchUserCompanies = async () => {
-      try {
-        const userCode = sessionStorage.getItem("selectedUserCode");
-
-        const response = await fetch(`${config.apiBaseUrl}/getusercompany`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_code: userCode }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCompanyDrop(data);
-        } else {
-          setCompanyDrop([]);
-        }
-      } catch (error) {
-        console.error("Error fetching user company data:", error);
-        setCompanyDrop([]);
-      }
-    };
-
-    fetchUserCompanies();
-  }, []);
-
-  useEffect(() => {
-  const fetchScreens = async () => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/getDefaultScreens`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role_id: sessionStorage.getItem("role_id"),
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-        }),
-      });
-
-      const data = await response.json();
-      setScreenDrop(data);
-    } catch (error) {
-      console.error("Error fetching screens:", error);
-    }
-  };
-
-  fetchScreens();
-}, []);
-
-  // Filter options mapping
-const filteredOptionCompany = Array.isArray(companyDrop)
-  ? companyDrop.map((option) => ({
-      value: option?.keyfiels, // This will be inserted
-      label: `${option?.company_no} - ${option?.company_name} - ${option?.location_no} - ${option?.location_name}`, // This is displayed
-      company_no: option?.company_no,
-      company_name: option?.company_name,
-      location_no: option?.location_no,
-      location_name: option?.location_name,
-      keyfiels: option?.keyfiels,
-    }))
-  : [];
-
-  const filteredOptionScreen = Array.isArray(screenDrop)
-  ? screenDrop.map((option) => ({
-      value: option.screen_type,
-      label: option.screen_type,
-    }))
-  : [];
-
-    // Handlers
-  const handleChangeCompany = (selected) => {
-    setCompany(selected);
-    setCompanyValue(selected ? selected.value : "");
-  };
-
-  const handleChangeScreen = (selected) => {
-    setScreen(selected);
-    setScreenValue(selected ? selected.value : "");
-  };
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -170,6 +33,7 @@ const filteredOptionCompany = Array.isArray(companyDrop)
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code
           }),
         });
 
@@ -194,26 +58,6 @@ const filteredOptionCompany = Array.isArray(companyDrop)
           );
           setCurrency(selectedCurrency);
           setCurrencyValue(selectedCurrency.value);
-
-          // Default Company (DB column name `DefaultCompanyId` or `Default_company`)
-          const companyVal = settings.DefaultCompanyId || settings.Default_company;
-          const selectedComp = filteredOptionCompany.find(
-            (opt) => opt.value === companyVal
-          );
-          if (selectedComp) {
-            setCompany(selectedComp);
-            setCompanyValue(selectedComp.value);
-          }
-
-          // Default Screen (DB column name `DefaultScreenId` or `Default_screen`)
-          const screenVal = settings.DefaultScreenId || settings.Default_screen;
-          const selectedScr = filteredOptionScreen.find(
-            (opt) => opt.value === screenVal
-          );
-          if (selectedScr) {
-            setScreen(selectedScr);
-            setScreenValue(selectedScr.value);
-          }
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -307,9 +151,8 @@ const filteredOptionCompany = Array.isArray(companyDrop)
         Default_language: selectedOption.value,
         Default_currency: currencyValue,
         Status: 'Active',
+        Location_Code,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-        DefaultCompanyId: companyValue, // Backend key match
-        DefaultScreenId: screenValue,   // Backend key match
         created_by: sessionStorage.getItem("selectedUserCode"),
       };
 
@@ -360,40 +203,6 @@ const filteredOptionCompany = Array.isArray(companyDrop)
       </header>
 
       <main className="settings-content">
-      {/* Company and Screen Section */}
-        <div className="row g-3 mb-3">
-          <div className="col-lg-6">
-            <section className="settings-card shadow-sm p-3">
-              <div className="custom-select-container">
-                <label className="fw-bold mb-2">Select Default Company</label>
-                <Select
-                  value={company}
-                  onChange={handleChangeCompany}
-                  options={filteredOptionCompany}
-                  classNamePrefix="modern-select"
-                  placeholder="Select Company"
-                  isClearable
-                />
-              </div>
-            </section>
-          </div>
-
-          <div className="col-lg-6">
-            <section className="settings-card shadow-sm p-3">
-              <div className="custom-select-container">
-                <label className="fw-bold mb-2">Select Default Screen</label>
-                <Select
-                  value={screen}
-                  onChange={handleChangeScreen}
-                  options={filteredOptionScreen}
-                  classNamePrefix="modern-select"
-                  placeholder="Select Screen"
-                  isClearable
-                />
-              </div>
-            </section>
-          </div>
-        </div>
         <div className="row g-2 mb-2">
           <div className="col-lg-4">
             <section className="settings-card shadow-sm">
@@ -445,22 +254,8 @@ const filteredOptionCompany = Array.isArray(companyDrop)
 
                 {/* Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
                 <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                  {/* Total Sales */}
-                  {/* <div className="col">
-                    <div className="custom-select-container">
-                      <label><i className="fa-solid fa-sack-dollar me-2"></i>Total Sales Period</label>
-                      <Select
-                        // value={salesPeriod}
-                        // onChange={setSalesPeriod}
-                        // options={filteredOptionPeriod}
-                        classNamePrefix="modern-select"
-                        placeholder="Select Period"
-                        isClearable
-                      />
-                    </div>
-                  </div> */}
 
-                  {/* Total Stock Values */}
+                  {/* Date Format Values */}
                   <div className="col">
                     <div className="custom-select-container">
                       <label style={{ color: errors && !dateFormatValue ? "red" : "" }}>
