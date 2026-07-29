@@ -78,6 +78,8 @@ function ShiftMasterGrid() {
     .filter((permission) => permission.screen_type === "ShiftMasterGrid")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const searchClearInputFields = () => {
     setShift_IDSC("");
     setShift_CodeSC("");
@@ -358,6 +360,7 @@ function ShiftMasterGrid() {
           Start_Time: formatTimeForSQL(Start_TimeSC),
           End_Time: formatTimeForSQL(End_TimeSC),
           company_code,
+          Location_Code
         })
 
       });
@@ -639,6 +642,7 @@ function ShiftMasterGrid() {
             Grace_Out_Min: Number(Grace_Out_Min),
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           }),
         }
       );
@@ -680,12 +684,14 @@ function ShiftMasterGrid() {
                 ...row,
                 company_code,
                 modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
+                  Location_Code
                 },
               ],
           };
@@ -739,12 +745,14 @@ function ShiftMasterGrid() {
                 ...row,
                 company_code,
                 modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   modified_by,
+                  Location_Code
                 },
               ],
           };

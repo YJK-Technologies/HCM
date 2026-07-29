@@ -426,8 +426,6 @@ function Input({ }) {
       if (response.ok) {
         const fetchedData = await response.json();
         const newRows = fetchedData.map((matchedItem) => ({
-
-
           GradeID: matchedItem.GradeID,
           GradeName: matchedItem.GradeName,
           Basic: matchedItem.Basic,
@@ -490,7 +488,7 @@ function Input({ }) {
               ],
           };
 
-          const response = await fetch(`${config.apiBaseUrl}/updateGrade `, {
+          const response = await fetch(`${config.apiBaseUrl}/updateGrade`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"

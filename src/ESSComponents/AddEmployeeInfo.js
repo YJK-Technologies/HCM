@@ -124,6 +124,8 @@ function Input({ }) {
     .filter(permission => permission.screen_type === 'AddEmployeeInfo')
     .map(permission => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const handleInsert = async () => {
     if (
       !First_Name ||
@@ -557,7 +559,7 @@ function Input({ }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-
+        Location_Code
       }),
     })
       .then((response) => response.json())

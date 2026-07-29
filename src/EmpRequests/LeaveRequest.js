@@ -118,6 +118,7 @@ const LeaveRequestPage = () => {
           body: JSON.stringify({
             EmployeeId: sessionStorage.getItem("selectedUserCode"),
             CompanyCode: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code: sessionStorage.getItem('selectedLocationCode'),
           }),
         });
 
@@ -194,6 +195,7 @@ const LeaveRequestPage = () => {
       body: JSON.stringify({
         EmployeeId: sessionStorage.getItem('selectedUserCode'),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       }),
     })
       .then((data) => data.json())

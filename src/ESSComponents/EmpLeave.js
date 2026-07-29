@@ -102,6 +102,8 @@ function Input({ }) {
   const [carryForwardDrop, setcarryForwardDrop] = useState([]);
   const [carryForwardDropGrid, setcarryForwardDropGrid] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const handleChangecarryForward = (selectedcarryForward) => {
     setSelectedcarryForward(selectedcarryForward);
     setcarryForward(selectedcarryForward ? selectedcarryForward.value : "");
@@ -237,6 +239,7 @@ function Input({ }) {
           Start_Year: Start_Year,
           End_Year: End_Year,
           status: StatusSC,
+          Location_Code,
           company_code: sessionStorage.getItem('selectedCompanyCode'),
         })
       });
@@ -615,6 +618,7 @@ function Input({ }) {
         End_Year: formattedToDate,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode'),
+        Location_Code
       };
 
       const response = await fetch(`${config.apiBaseUrl}/addLeaveType`, {
@@ -661,12 +665,14 @@ function Input({ }) {
                 ...row,
                 company_code,
                 Modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
                   Modified_by,
+                  Location_Code
                 },
               ],
           };
@@ -716,13 +722,15 @@ function Input({ }) {
               ? rowData.map((row) => ({
                 ...row,
                 company_code,
-                Modified_by
+                Modified_by,
+                Location_Code
               }))
               : [
                 {
                   ...rowData,
                   company_code,
-                  Modified_by
+                  Modified_by,
+                  Location_Code
                 },
               ],
           };

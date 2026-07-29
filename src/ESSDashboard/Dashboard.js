@@ -455,7 +455,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -499,7 +499,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -519,7 +519,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -540,7 +540,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftEmpIdDrop(val))
@@ -570,7 +570,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftPatternIdDrop(val))
@@ -585,7 +585,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftCodeDrop(val))

@@ -91,6 +91,8 @@ function LoanRequest({ }) {
 
     const [currencyDropGrid, setCurrencyDropGrid] = useState([]);
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
 
@@ -99,7 +101,7 @@ function LoanRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setEmpIdDrop(val))
@@ -157,7 +159,7 @@ function LoanRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((res) => res.json())
             .then((data) => setLoanTypeIdDrop(data))
@@ -244,6 +246,7 @@ function LoanRequest({ }) {
                     body: JSON.stringify({
                         Loan_Type_ID: loanTypeId,
                         company_code,
+                        Location_Code
                     }),
                 });
 
@@ -285,7 +288,7 @@ function LoanRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setEmpIdDropSc(val))
@@ -299,7 +302,7 @@ function LoanRequest({ }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ company_code })
+            body: JSON.stringify({ company_code, Location_Code })
         })
             .then((data) => data.json())
             .then((val) => setLoanTypeIdDropSc(val))
@@ -422,7 +425,7 @@ function LoanRequest({ }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => {
@@ -443,7 +446,7 @@ function LoanRequest({ }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ company_code })
+            body: JSON.stringify({ company_code, Location_Code })
         })
             .then((response) => response.json())
             .then((data) => {

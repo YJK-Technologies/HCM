@@ -49,6 +49,8 @@ function Input({ }) {
     .filter((permission) => permission.screen_type === "ProjectMapping")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   // //UserEffect for React Select
   // useEffect(() => {
   //   fetch(`${config.apiBaseUrl}/getProjectDrop`)
@@ -192,7 +194,7 @@ function Input({ }) {
   //         headers: {
   //           'Content-Type': 'application/json',
   //         },
-  //         body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode') })
+  //         body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
   //       });
   //       const data = await response.json();
 

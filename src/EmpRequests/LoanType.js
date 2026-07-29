@@ -42,6 +42,8 @@ function LoanType({ }) {
         .filter(permission => permission.screen_type === 'LoanType')
         .map(permission => permission.permission_type.toLowerCase());
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode');
+
     const [error, setError] = useState(false);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState([]);
@@ -377,6 +379,7 @@ function LoanType({ }) {
                 Start_Year: startYearSc,
                 End_Year: endYearSc,
                 Min_repayment_months: minRepaymentMonthsSc,
+                Location_Code
             };
 
             const response = await fetch(`${config.apiBaseUrl}/getLoanType`, {
@@ -432,6 +435,7 @@ function LoanType({ }) {
                 Min_repayment_months: minRepaymentMonths,
                 company_code: sessionStorage.getItem("selectedCompanyCode"),
                 Created_by: sessionStorage.getItem("selectedUserCode"),
+                Location_Code
             };
 
             const response = await fetch(`${config.apiBaseUrl}/addLoanType`, {
@@ -473,12 +477,14 @@ function LoanType({ }) {
                                 ...row,
                                 company_code,
                                 Modified_by,
+                                Location_Code
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
                                     Modified_by,
+                                    Location_Code
                                 },
                             ],
                     };
@@ -528,12 +534,14 @@ function LoanType({ }) {
                                 ...row,
                                 company_code,
                                 Modified_by,
+                                Location_Code
                             }))
                             : [
                                 {
                                     ...rowData,
                                     company_code,
                                     Modified_by,
+                                    Location_Code
                                 },
                             ],
                     };

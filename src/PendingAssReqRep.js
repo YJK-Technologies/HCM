@@ -54,6 +54,8 @@ function PendingAssReqRep({ }) {
     .filter((permission) => permission.screen_type === "PendingAssReqRep")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const onGridReady = (params) => {
     setGridApi(params.api);
     gridApiRef.current = params.api;
@@ -75,7 +77,7 @@ function PendingAssReqRep({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdDropSc(val))
@@ -89,7 +91,7 @@ function PendingAssReqRep({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setLoanTypeIdDropSc(val))
@@ -145,7 +147,7 @@ function PendingAssReqRep({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => {
@@ -166,7 +168,7 @@ function PendingAssReqRep({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
