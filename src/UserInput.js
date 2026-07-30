@@ -66,6 +66,8 @@ function UserInput({ }) {
   const [superAdmin, setSuperAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const location = useLocation();
   const locationState = location.state || {};
   const mode = locationState.mode || "create";
@@ -96,7 +98,8 @@ function UserInput({ }) {
         },
         body: JSON.stringify({
           user_code: userCode,
-          company_code
+          company_code,
+          Location_Code
         }),
       });
 
@@ -371,7 +374,7 @@ function UserInput({ }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code, Location_Code })
     })
       .then((data) => data.json())
       .then((val) => setUserCodeNameDrop(val))
@@ -477,6 +480,7 @@ function UserInput({ }) {
     try {
       const formData = new FormData();
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("Location_Code", Location_Code);
       formData.append("user_code", user_code);
       formData.append("user_name", user_name);
       formData.append("first_name", first_name);
@@ -583,6 +587,7 @@ function UserInput({ }) {
     try {
       const formData = new FormData();
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("Location_Code", Location_Code);
       formData.append("user_code", user_code);
       formData.append("user_name", user_name);
       formData.append("first_name", first_name);
