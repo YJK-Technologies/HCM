@@ -118,6 +118,7 @@ function RequestReport({ }) {
         Info_request_id: safeId,
         request_status: status,
         company_code,
+        Location_Code
       };
     } else if (type === "Comp Off") {
       url = `${config.apiBaseUrl}/compOffRequestReport`;
@@ -2323,6 +2324,7 @@ function RequestReport({ }) {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code
           }),
         },
       );
@@ -2362,6 +2364,7 @@ function RequestReport({ }) {
                 request_status: status,
                 created_by: sessionStorage.getItem("selectedUserCode"),
                 modified_by: sessionStorage.getItem("selectedUserCode"),
+                Location_Code
               },
             ],
           }),
@@ -2396,7 +2399,8 @@ function RequestReport({ }) {
           EmployeeId: academicEmpId,
           column_name: academicColumn,
           from_date: academicFromDate || null,
-          to_date: academicToDate || null
+          to_date: academicToDate || null,
+          Location_Code
         })
       });
 

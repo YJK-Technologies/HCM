@@ -23710,15 +23710,13 @@ const AcademicRequestHdr = async (req, res) => {
       const result = await pool
         .request()
         .input("mode", sql.NVarChar, "I")
-        .input("info_request_id", sql.Int, 0)
         .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("Location_Code", sql.NVarChar, insertRow.Location_Code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("purpose", sql.NVarChar, insertRow.purpose)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(`EXEC sp_ess_employee_academic_request_hdr 
-          @mode, @info_request_id, @company_code, @EmployeeId, '', 
-          @purpose, @request_status, @created_by`);
+        .query(`EXEC sp_ess_employee_academic_request_hdr_test @mode, 0, @company_code, @Location_Code, @EmployeeId, '', @purpose, @request_status, @created_by`);
 
       insertedId = result.recordset[0].info_request_id;
     }
@@ -23760,6 +23758,7 @@ const AcademicRequestDetails = async (req, res) => {
         .input("detail_id", sql.Int, insertRow.detail_id || 0)
         .input("info_request_id", sql.Int, insertRow.info_request_id)
         .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("Location_Code", sql.NVarChar, insertRow.Location_Code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("academicName", sql.NVarChar, insertRow.academicName)
@@ -23769,7 +23768,7 @@ const AcademicRequestDetails = async (req, res) => {
         .input("document", sql.VarBinary, document)
         .input("created_by", sql.NVarChar, insertRow.created_by)
         .input("RepManager", sql.NVarChar, insertRow.RepManager)
-        .query(`EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, '', @company_code, @EmployeeId, @request_status, @academicName, @major, 
+        .query(`EXEC sp_ess_employee_academic_request_dtls_test @mode, @detail_id, @info_request_id, '', @company_code, @Location_Code, @EmployeeId, @request_status, @academicName, @major, 
           @institution, @academicYear, @document, @created_by, '', '', '', '',@RepManager`);
     }
 
@@ -23792,6 +23791,7 @@ const GetAcademicRequestDetails = async (req, res) => {
     column_name,
     from_date,
     to_date,
+    Location_Code
   } = req.body;
 
   if (!company_code) {
@@ -23808,9 +23808,10 @@ const GetAcademicRequestDetails = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId || "")
       .input("column_name", sql.NVarChar, column_name || "")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
-      .query(`EXEC sp_ess_employee_academic_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name,
+      .query(`EXEC sp_ess_employee_academic_request_dtls_test 'SC', 0, @info_request_id, '', @company_code, @Location_Code, @EmployeeId, '', '', '', '', NULL, NULL, '', '', @column_name,
          @from_date, @to_date,''`);
 
     if (result.recordset.length > 0) {
@@ -23844,19 +23845,14 @@ const ApproveAcademicRequest = async (req, res) => {
         .input("mode", sql.NVarChar, "AP")
         .input("detail_id", sql.Int, row.detail_id)
         .input("info_request_id", sql.Int, row.info_request_id)
-        .input("keyfield", sql.NVarChar, "")
         .input("company_code", sql.NVarChar, row.company_code)
         .input("EmployeeId", sql.NVarChar, row.EmployeeId)
         .input("request_status", sql.NVarChar, row.request_status)
-        .input("academicName", sql.NVarChar, "")
-        .input("major", sql.NVarChar, "")
-        .input("institution", sql.NVarChar, "")
-        .input("academicYear", sql.Date, null)
         .input("document", sql.VarBinary, null)
         .input("created_by", sql.NVarChar, row.created_by)
         .input("modified_by", sql.NVarChar, row.modified_by)
-        .query(` EXEC sp_ess_employee_academic_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @academicName, @major, @institution, @academicYear, @document, @created_by, @modified_by, '', '', '',''`);
+        .query(` EXEC sp_ess_employee_academic_request_dtls_test @mode, @detail_id, @info_request_id, '', @company_code, @Location_Code, @EmployeeId,
+        @request_status, '', '', '', NULL, NULL, @created_by, @modified_by, '', '', '',''`);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
@@ -27294,7 +27290,7 @@ const GetFamilyRequest = async (req, res) => {
 };
 
 const GetAcademicRequest = async (req, res) => {
-  const { company_code, RepManager } = req.body;
+  const { company_code, RepManager, Location_Code } = req.body;
 
   if (!company_code) {
     return res.status(400).json("company_code is required.");
@@ -27308,7 +27304,8 @@ const GetAcademicRequest = async (req, res) => {
       .input("mode", sql.NVarChar, "REA")
       .input("RepManager", sql.NVarChar, RepManager)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ess_employee_academic_request_dtls @mode, 0, 0, '', @company_code, '', '', '', '', '', NULL, NULL, '', '', '',
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_ess_employee_academic_request_dtls_test @mode, 0, 0, '', @company_code, @Location_Code, '', '', '', '', '', NULL, NULL, '', '', '',
         '', '',@RepManager`);
 
     if (result.recordset.length > 0) {

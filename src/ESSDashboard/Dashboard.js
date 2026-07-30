@@ -1502,6 +1502,7 @@ const Dashboard = () => {
             EmployeeId: row.EmployeeId,
             request_status: status,
             modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           })),
         };
       }
