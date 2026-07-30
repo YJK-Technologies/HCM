@@ -982,6 +982,7 @@ const Dashboard = () => {
           body: JSON.stringify({
             manager: user_code,
             company_code,
+            Location_Code
           }),
         });
 
@@ -1099,7 +1100,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
@@ -1520,6 +1521,7 @@ const Dashboard = () => {
             company_code,
             EmployeeId: row.EmployeeId,
             request_status: status,
+            Location_Code,
             created_by: sessionStorage.getItem("selectedUserCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),

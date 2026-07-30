@@ -3272,6 +3272,7 @@ function RequestReport({ }) {
           column_name: "",
           from_date: null,
           to_date: null,
+          Location_Code
         }),
       });
 
@@ -3304,6 +3305,7 @@ function RequestReport({ }) {
           column_name: docColumn,
           from_date: docFromDate || null,
           to_date: docToDate || null,
+          Location_Code
         }),
       });
 
@@ -3348,6 +3350,7 @@ function RequestReport({ }) {
               company_code: row.company_code,
               EmployeeId: row.EmployeeId,
               request_status: status,
+              Location_Code,
               created_by: sessionStorage.getItem("selectedUserCode"),
               modified_by: sessionStorage.getItem("selectedUserCode"),
             },

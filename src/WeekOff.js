@@ -39,7 +39,8 @@ function WeekOff() {
   const weekOffPermissions = permissions
     .filter((permission) => permission.screen_type === "WeekOff")
     .map((permission) => permission.permission_type.toLowerCase());
-
+  
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const addRow = (relation) => {
     setWeekOffData((prev) =>
@@ -111,8 +112,6 @@ function WeekOff() {
     );
   };
 
-
-
   const handleEmployeeUpdate = async () => {
     if (!selectedgenerate) {
       toast.warning("Error: Missing required fields");
@@ -126,11 +125,10 @@ function WeekOff() {
         new_joinees: new_joinees,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         modified_by: sessionStorage.getItem("selectedUserCode"),
-
+        Location_Code,
       };
 
-      const employeeResponse = await fetch(
-        `${config.apiBaseUrl}/SettingEmployeeUpdate`,
+      const employeeResponse = await fetch(`${config.apiBaseUrl}/SettingEmployeeUpdate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -192,6 +190,7 @@ function WeekOff() {
         new_joinees: new_joinees,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem("selectedUserCode"),
+        Location_Code
       };
 
       const employeeResponse = await fetch(
@@ -224,6 +223,7 @@ function WeekOff() {
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Keyfield: member.relationName,
           created_by: sessionStorage.getItem("selectedUserCode"),
+          Location_Code
         }))
       );
 
@@ -276,6 +276,7 @@ function WeekOff() {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       modified_by: sessionStorage.getItem("selectedUserCode"),
+      Location_Code
     };
 
     showConfirmationToast(
@@ -313,6 +314,7 @@ function WeekOff() {
       }
     );
   };
+
   const handleUpdate = async (selectRelation, index) => {
     const group = weekOffData.find(group => group.relation === selectRelation);
     const member = group ? group.members[index] : null;
@@ -335,7 +337,8 @@ function WeekOff() {
       new_joinees: Number(member.joineesDays) || 0,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       modified_by: sessionStorage.getItem("selectedUserCode"),
-      keyfield: member.keyfield
+      keyfield: member.keyfield,
+      Location_Code
     };
 
     showConfirmationToast(
@@ -426,6 +429,7 @@ function WeekOff() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }),
     })
       .then((res) => res.json())
@@ -467,11 +471,11 @@ function WeekOff() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("FetchGenerateEmployee:", data); // Debug
 
         const list = Array.isArray(data) ? data : data?.data || [];
 

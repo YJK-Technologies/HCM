@@ -68,7 +68,7 @@ const forgetPassword = async (req, res) => {
       .input("mode", sql.NVarChar, "VE")
       .input("user_code", sql.NVarChar, user_code)
       .input("email_id", sql.NVarChar, email_id)
-      .query(`EXEC sp_user_info_hdr @mode,'',@user_code,'','','','','','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr_test @mode,'','',@user_code,'','','','','','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       const otp = generateOTP();
       await sendOTP(email_id, otp);
@@ -122,7 +122,7 @@ const Passwords = async (req, res) => {
       .input("user_code", sql.NVarChar, user_code)
       .input("email_id", sql.NVarChar, email_id)
       .input("user_password", sql.NVarChar, user_password)
-      .query("EXEC sp_user_info_hdr @mode,'',@user_code,'','','',@user_password,'','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL");
+      .query("EXEC sp_user_info_hdr_test @mode,'','',@user_code,'','','',@user_password,'','','',@email_id,'','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL");
     res.status(200).json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("Error", err);
@@ -150,7 +150,7 @@ const login = async (req, res) => {
       .input("mode", sql.NVarChar, "LUC")
       .input("user_code", sql.NVarChar, decryptedUserCode)
       .input("user_password", sql.NVarChar, decryptedPassword)
-      .query(`EXEC sp_user_info_hdr 'LUC','',@user_code,'','','',@user_password,'','','','','','','','','','','','','','','','','','',''`);
+      .query(`EXEC sp_user_info_hdr_test @mode,'','',@user_code,'','','',@user_password,'','','','','','','','','','','','','','','','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -516,7 +516,7 @@ const getUsercode = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-      .query(`EXEC sp_user_info_hdr 'F','','user_code','','', '' ,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr_test 'F','','','user_code','','', '' ,'','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -1003,7 +1003,7 @@ const getAlluserData = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql
-      .query(`EXEC sp_user_info_hdr 'A','','','','',' ','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr_test 'A','','','','','',' ','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -1013,7 +1013,7 @@ const getAlluserData = async (req, res) => {
 };
 
 const userAddData = async (req, res) => {
-  const { company_code, user_code, user_name, first_name, last_name, user_password, user_status, log_in_out, user_type,
+  const { company_code, Location_Code, user_code, user_name, first_name, last_name, user_password, user_status, log_in_out, user_type,
     email_id, dob, gender, role_id, super_admin, created_by, modified_by, tempstr1, tempstr2, tempstr3, tempstr4, datetime1, datetime2, datetime3, datetime4 } = req.body;
 
   let user_img = null;
@@ -1028,6 +1028,7 @@ const userAddData = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "I") // Insert mode
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("user_code", sql.NVarChar, user_code)
       .input("user_name", sql.NVarChar, user_name)
       .input("first_name", sql.NVarChar, first_name)
@@ -1052,7 +1053,7 @@ const userAddData = async (req, res) => {
       .input("datetime2", sql.NVarChar, datetime2)
       .input("datetime3", sql.NVarChar, datetime3)
       .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,@user_name,@first_name,@last_name,@user_password,@user_status,@log_in_out,@user_type,
+      .query(`EXEC sp_user_info_hdr_test @mode,@company_code,@Location_Code,@user_code,@user_name,@first_name,@last_name,@user_password,@user_status,@log_in_out,@user_type,
         @email_id,@dob,@gender,@role_id,@user_img,@super_admin,@created_by,@modified_by,@tempstr1, @tempstr2, @tempstr3, @tempstr4,@datetime1, @datetime2, @datetime3, @datetime4`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -1082,6 +1083,7 @@ const UsersaveEditedData = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "U") // update mode
         .input("company_code", sql.NVarChar, req.headers["company_code"])
+        .input("Location_Code", sql.NVarChar, req.headers["location_code"])
         .input("user_code", sql.NVarChar, updatedRow.user_code)
         .input("user_name", sql.NVarChar, updatedRow.user_name)
         .input("first_name", sql.NVarChar, updatedRow.first_name)
@@ -1105,7 +1107,7 @@ const UsersaveEditedData = async (req, res) => {
         .input("datetime2", sql.NVarChar, updatedRow.datetime2)
         .input("datetime3", sql.NVarChar, updatedRow.datetime3)
         .input("datetime4", sql.NVarChar, updatedRow.datetime4)
-        .query(`EXEC sp_user_info_hdr @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
+        .query(`EXEC sp_user_info_hdr_test @mode,@company_code,@Location_Code,@user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
             @email_id, @dob, @gender,@role_id,'',@super_admin,@created_by, @modified_by, @tempstr1, @tempstr2, @tempstr3, @tempstr4, @datetime1, @datetime2, @datetime3, @datetime4`);
     }
 
@@ -1132,8 +1134,9 @@ const UserdeleteData = async (req, res) => {
         .request()
         .input("user_code", user_code)
         .input("company_code", sql.NVarChar, req.headers["company_code"])
+        .input("Location_Code", sql.NVarChar, req.headers["location_code"])
         .input("modified_by", sql.NVarChar, req.headers["modified-by"])
-        .query(`EXEC sp_user_info_hdr 'D',@company_code,@user_code,'','','','', '', '', '','','', '','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_user_info_hdr_test 'D',@company_code,@Location_Code,@user_code,'','','','', '', '', '','','', '','','','','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("user deleted successfully");
@@ -2878,7 +2881,7 @@ const getUserrolesearchdata = async (req, res) => {
 };
 
 const getUsersearchdata = async (req, res) => {
-  const { company_code, user_code, user_name, first_name, last_name, user_status,
+  const { company_code, Location_Code, user_code, user_name, first_name, last_name, user_status,
     email_id, dob, gender, role_id, created_by } = req.body;
 
   try {
@@ -2890,6 +2893,7 @@ const getUsersearchdata = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "SC")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("user_code", sql.NVarChar, user_code)
       .input("user_name", sql.NVarChar, user_name)
       .input("first_name", sql.NVarChar, first_name)
@@ -2900,7 +2904,7 @@ const getUsersearchdata = async (req, res) => {
       .input("gender", sql.NVarChar, gender)
       .input("role_id", sql.NVarChar, role_id)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,@user_name,@first_name,@last_name,'',@user_status,'','',@email_id,@dob,@gender,@role_id,
+      .query(`EXEC sp_user_info_hdr_test @mode,@company_code,@Location_Code,@user_code,@user_name,@first_name,@last_name,'',@user_status,'','',@email_id,@dob,@gender,@role_id,
         '','',@created_by,'','','','','','','','',''`);
 
     // Send response
@@ -5906,7 +5910,7 @@ const UpdateUserImage = async (req, res) => {
       .request()
       .input("user_code", sql.NVarChar, user_code)
       .input("user_img", sql.VarBinary, user_img)
-      .query(`EXEC sp_user_info_hdr 'UI','',@user_code,'','','','','','','','','','','',@user_img,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr_test 'UI','','',@user_code,'','','','','','','','','','','',@user_img,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
@@ -6861,7 +6865,7 @@ const RoleUpdate = async (req, res) => {
 };
 
 const UserUpdate = async (req, res) => {
-  const { company_code, user_code, user_name, first_name, last_name, user_password,
+  const { company_code, Location_Code, user_code, user_name, first_name, last_name, user_password,
     user_status, log_in_out, user_type, email_id, dob, gender, role_id, super_admin,
     created_by, modified_by } = req.body;
 
@@ -6877,6 +6881,7 @@ const UserUpdate = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "U") // update mode
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("user_code", sql.NVarChar, user_code)
       .input("user_name", sql.NVarChar, user_name)
       .input("first_name", sql.NVarChar, first_name)
@@ -6893,8 +6898,8 @@ const UserUpdate = async (req, res) => {
       .input("super_admin", sql.NVarChar, super_admin)
       .input("created_by", sql.NVarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_user_info_hdr @mode,@company_code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
-            @email_id, @dob, @gender,@role_id,@user_images, @super_admin, @created_by, @modified_by, '', '', '', '', '', '', '', ''`);
+      .query(`EXEC sp_user_info_hdr_test @mode, @company_code, @Location_Code, @user_code, @user_name, @first_name, @last_name, @user_password, @user_status, @log_in_out, @user_type, 
+      @email_id, @dob, @gender,@role_id,@user_images, @super_admin, @created_by, @modified_by, '', '', '', '', '', '', '', ''`);
     res.status(200).json("Edited data saved successfully");
   } catch (err) {
     console.error("Error", err);
@@ -9985,9 +9990,9 @@ const updateempDoc = async (req, res) => {
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
         .input("company_code", updatedRow.company_code)
-        .query(
-          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .input("Location_Code", updatedRow.Location_Code)
+        .query(`EXEC sp_ess_employee_documents_test @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,@Location_Code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,
+        NULL,NULL,NULL,NULL`,);
     }
     res.status(200).json("Employee family data updated successfully");
   } catch (err) {
@@ -14031,7 +14036,7 @@ const Userdropdown = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "MG")
       .input("user_code", sql.NVarChar, user_code)
-      .query(`EXEC [sp_user_info_hdr] @mode,'',@user_code,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_user_info_hdr_test @mode,'','',@user_code,'','','','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error during update:", err);
@@ -15011,19 +15016,11 @@ const AddEmpDoc = async (req, res) => {
         .input("document_files", document_files)
         .input("keyfield", insertRow.keyfield)
         .input("company_code", insertRow.company_code)
+        .input("Location_Code", insertRow.Location_Code)
         .input("created_by", insertRow.created_by)
         .input("modified_by", insertRow.modified_by)
-        .input("tempstr1", insertRow.tempstr1)
-        .input("tempstr2", insertRow.tempstr2)
-        .input("tempstr3", insertRow.tempstr3)
-        .input("tempstr4", insertRow.tempstr4)
-        .input("datetime1", insertRow.datetime1)
-        .input("datetime2", insertRow.datetime2)
-        .input("datetime3", insertRow.datetime3)
-        .input("datetime4", insertRow.datetime4)
-        .query(
-          `EXEC sp_ess_employee_documents @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,'',@created_by,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_ess_employee_documents_test @mode,@EmployeeId,@document_name,@document_files,@keyfield,@company_code,@Location_Code,'',@created_by,'','','',
+        NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
     }
     res.status(200).json("Employee document data inserted successfully");
   } catch (err) {
@@ -15043,15 +15040,14 @@ const delempdoc = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code, modified_by } = record;
+      const { keyfield, company_code, Location_Code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("Location_Code", sql.NVarChar, Location_Code)
         .input("modified_by", sql.NVarChar, modified_by)
-        .query(
-          `EXEC sp_ess_employee_documents 'D','','','',@keyfield,@company_code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_ess_employee_documents_test 'D','','','',@keyfield,@company_code,@Location_Code,'','','',@modified_by,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("Employee document data deleted successfully");
   } catch (err) {
@@ -15066,7 +15062,7 @@ const getAllempdoc = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_ess_employee_documents 'A','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      `EXEC sp_ess_employee_documents_test 'A','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
     );
     res.json(result.recordset);
   } catch (err) {
@@ -15675,7 +15671,7 @@ const TotalPayslips = async (req, res) => {
 
 // Code Added by Harish on 15-05-25
 const EmployeeDocSC = async (req, res) => {
-  const { company_code, Employee_Id, document_name, Name } = req.body;
+  const { company_code, Location_Code, Employee_Id, document_name, Name } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -15686,9 +15682,9 @@ const EmployeeDocSC = async (req, res) => {
       .input("Employee_ID", sql.NVarChar, Employee_Id)
       .input("document_name", sql.NVarChar, document_name)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Name", sql.NVarChar, Name)
-      .query(`EXEC sp_ess_employee_documents @mode,@Employee_ID,@document_name	,'','',@company_code,@Name,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-`);
+      .query(`EXEC sp_ess_employee_documents_test @mode,@Employee_ID,@document_name	,'','',@company_code,@Location_Code,@Name,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -15917,20 +15913,11 @@ const AddWeekOff = async (req, res) => {
         .input("mode", sql.NVarChar, "I") // Insert mode
         .input("week_off_days", insertRows.week_off_days)
         .input("company_code", insertRows.company_code)
+        .input("Location_Code", insertRows.Location_Code)
         .input("Status", insertRows.Status)
         .input("created_by", insertRows.created_by)
-        .input("tempstr1", insertRows.tempstr1)
-        .input("tempstr2", insertRows.tempstr2)
-        .input("tempstr3", insertRows.tempstr3)
-        .input("tempstr4", insertRows.tempstr4)
-        .input("datetime1", insertRows.datetime1)
-        .input("datetime2", insertRows.datetime2)
-        .input("datetime3", insertRows.datetime3)
-        .input("datetime4", insertRows.datetime4)
-        .query(
-          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,'',@created_by,'',
-          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_setting_screen_weekoff_test @mode,@week_off_days,@company_code,@Location_Code,@Status,'',@created_by,'',
+          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("WeekOff data inserted successfully");
   } catch (err) {
@@ -15952,16 +15939,15 @@ const deleteWeekOff = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code, modified_by } = record;
+      const { keyfield, company_code, Location_Code, modified_by } = record;
       await pool
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("Location_Code", sql.NVarChar, Location_Code)
         .input("modified_by", sql.NVarChar, modified_by)
-        .query(
-          `EXEC sp_setting_screen_weekoff @mode,'',@company_code,'',@keyfield,'' ,@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_setting_screen_weekoff_test @mode,'',@company_code,@Location_Code,'',@keyfield,'' ,@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("data deleted successfully");
   } catch (err) {
@@ -15985,13 +15971,12 @@ const updateWeekOff = async (req, res) => {
         .input("mode", sql.NVarChar, "U") // update mode
         .input("week_off_days", updatedRow.week_off_days)
         .input("company_code", updatedRow.company_code)
+        .input("Location_Code", updatedRow.Location_Code)
         .input("Status", updatedRow.Status)
         .input("keyfield", updatedRow.keyfield)
         .input("modified_by", updatedRow.modified_by)
-        .query(
-          `EXEC sp_setting_screen_weekoff @mode,@week_off_days,@company_code,@Status,@keyfield,
-          '',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-        );
+        .query(`EXEC sp_setting_screen_weekoff_test @mode,@week_off_days,@company_code,@Location_Code,@Status,@keyfield,
+          '',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
     res.status(200).json("data updated successfully");
   } catch (err) {
@@ -16004,15 +15989,14 @@ const updateWeekOff = async (req, res) => {
 };
 
 const getWeekOff = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_setting_screen_weekoff 'A','',@company_code,'','','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_screen_weekoff_test 'A','',@company_code,@Location_Code,'','','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -16024,6 +16008,7 @@ const AddGenerateEmployee = async (req, res) => {
   const {
     employee_id,
     company_code,
+    Location_Code,
     Status,
     created_by,
     upcoming_birthday,
@@ -16043,17 +16028,12 @@ const AddGenerateEmployee = async (req, res) => {
       .input("mode", sql.NVarChar, "I") // Insert mode
       .input("employee_id", sql.VarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Status", sql.NVarChar, Status)
       .input("created_by", sql.NVarChar, created_by)
       .input("upcoming_birthday", sql.Int, upcoming_birthday)
       .input("new_joinees", sql.Int, new_joinees)
-      .input("tempstr3", sql.NVarChar, tempstr3)
-      .input("tempstr4", sql.NVarChar, tempstr4)
-      .input("datetime1", sql.NVarChar, datetime1)
-      .input("datetime2", sql.NVarChar, datetime2)
-      .input("datetime3", sql.NVarChar, datetime3)
-      .input("datetime4", sql.NVarChar, datetime4)
-      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id, @company_code,'',@created_by,'',@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_setting_generate_employeeid_test @mode,@employee_id, @company_code,@Location_Code,'',@created_by,'',@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`);
     // Return success response
     if (result.rowsAffected && result.rowsAffected[0] > 0) {
       return res
@@ -16069,8 +16049,8 @@ const AddGenerateEmployee = async (req, res) => {
 };
 
 const deleteGenerateEmployee = async (req, res) => {
-  const { employee_id } = req.body;
-  const { company_code } = req.body;
+  const { employee_id, Location_Code, company_code } = req.body;
+
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     await pool
@@ -16078,7 +16058,8 @@ const deleteGenerateEmployee = async (req, res) => {
       .input("mode", sql.NVarChar, "D")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_setting_generate_employeeid @mode, @employee_id, @company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_generate_employeeid_test @mode, @employee_id, @company_code,@Location_Code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.status(200).json("data deleted successfully");
   } catch (err) {
     console.error("Error", err);
@@ -16087,13 +16068,14 @@ const deleteGenerateEmployee = async (req, res) => {
 };
 
 const getGenerateEmployee = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_setting_generate_employeeid 'A', '', @company_code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_generate_employeeid_test 'A', '', @company_code,@Location_Code,'','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -16104,15 +16086,14 @@ const getGenerateEmployee = async (req, res) => {
 
 //Code added by Murugavel on 19-06-2025
 const FetchWeekOff = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(
-        `EXEC sp_setting_screen_weekoff 'AA','',@company_code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_screen_weekoff_test 'AA','',@company_code,@Location_Code,'','','' ,'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -16121,13 +16102,14 @@ const FetchWeekOff = async (req, res) => {
 };
 
 const FetchGenerateEmployee = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_setting_generate_employeeid 'FE', '', @company_code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_setting_generate_employeeid_test 'FE', '', @company_code,@Location_Code,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -16292,8 +16274,7 @@ const PMSsettingsUpdate = async (req, res) => {
 };
 
 const SettingEmployeeUpdate = async (req, res) => {
-  const { employee_id, company_code, upcoming_birthday,
-    new_joinees, modified_by } = req.body;
+  const { employee_id, company_code, upcoming_birthday, new_joinees, modified_by, Location_Code } = req.body;
   try {
     const pool = await connection.connectToDatabase();
 
@@ -16302,10 +16283,11 @@ const SettingEmployeeUpdate = async (req, res) => {
       .input("mode", sql.NVarChar, "U")
       .input("employee_id", sql.NVarChar, employee_id)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("upcoming_birthday", sql.Int, upcoming_birthday)
       .input("new_joinees", sql.Int, new_joinees)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_setting_generate_employeeid @mode,@employee_id,@company_code,'','',@modified_by,@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_setting_generate_employeeid_test @mode,@employee_id,@company_code,@Location_Code,'','',@modified_by,@upcoming_birthday,@new_joinees,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.status(200).json("Edited data saved successfully");
   } catch (error) {
@@ -24289,16 +24271,16 @@ const DocumentRequestDetails = async (req, res) => {
         .input("mode", sql.NVarChar, "I")
         .input("detail_id", sql.Int, insertRow.detail_id || 0)
         .input("info_request_id", sql.Int, insertRow.info_request_id)
-        .input("keyfield", sql.NVarChar, "")
         .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("Location_Code", sql.NVarChar, insertRow.Location_Code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("document_Name", sql.NVarChar, insertRow.document_Name)
         .input("document_files", sql.VarBinary, document_files)
         .input("created_by", sql.NVarChar, insertRow.created_by)
         .input("RepManager", sql.NVarChar, insertRow.RepManager)
-        .query(`EXEC sp_ess_employee_document_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId, @request_status, @document_Name, 
-          @document_files, @created_by, '', '', '', '',@RepManager`);
+        .query(`EXEC sp_ess_employee_document_request_dtls_test @mode, @detail_id, @info_request_id, '', @company_code, @Location_Code, @EmployeeId, @request_status, @document_Name, 
+        @document_files, @created_by, '', '', '', '',@RepManager`);
     }
 
     res.status(200).json("Details inserted successfully");
@@ -24313,7 +24295,7 @@ const DocumentRequestDetails = async (req, res) => {
 
 // Code added by Dinesh Gokul 24-03-2026
 const GetDocumentsRequestDetails = async (req, res) => {
-  const { company_code, Info_request_id, EmployeeId, column_name, from_date, to_date } = req.body;
+  const { company_code, Info_request_id, EmployeeId, column_name, from_date, to_date, Location_Code } = req.body;
 
   if (!company_code) {
     return res.status(400).json("company_code is required.");
@@ -24329,10 +24311,11 @@ const GetDocumentsRequestDetails = async (req, res) => {
       .input("EmployeeId", sql.NVarChar, EmployeeId || "")
       .input("column_name", sql.NVarChar, column_name || "")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("from_date", sql.Date, from_date || null)
       .input("to_date", sql.Date, to_date || null)
-      .query(`EXEC sp_ess_employee_document_request_dtls 'SC', 0, @info_request_id, '', @company_code, @EmployeeId, '', '', Null, '', '', @column_name, @from_date, 
-        @to_date,''`);
+      .query(`EXEC sp_ess_employee_document_request_dtls_test @mode, 0, @info_request_id, '', @company_code, @Location_Code, @EmployeeId, '', '', Null, '', '', @column_name, @from_date, 
+      @to_date,''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -24365,16 +24348,14 @@ const ApproveDocumentRequest = async (req, res) => {
         .input("mode", sql.NVarChar, "AP")
         .input("detail_id", sql.Int, row.detail_id)
         .input("info_request_id", sql.Int, row.info_request_id)
-        .input("keyfield", sql.NVarChar, "")
         .input("company_code", sql.NVarChar, row.company_code)
+        .input("Location_Code", sql.NVarChar, row.Location_Code)
         .input("EmployeeId", sql.NVarChar, row.EmployeeId)
         .input("request_status", sql.NVarChar, row.request_status)
-        .input("document_Name", sql.NVarChar, "")
-        .input("document_files", sql.VarBinary, null)
         .input("created_by", sql.NVarChar, row.created_by)
         .input("modified_by", sql.NVarChar, row.modified_by)
-        .query(` EXEC sp_ess_employee_document_request_dtls @mode, @detail_id, @info_request_id, @keyfield, @company_code, @EmployeeId,
-        @request_status, @document_Name, @document_files, @created_by, @modified_by, '', '', '',''`);
+        .query(` EXEC sp_ess_employee_document_request_dtls_test @mode, @detail_id, @info_request_id, '', @company_code, @Location_Code, @EmployeeId,
+        @request_status, '', NULL, @created_by, @modified_by, '', '', '',''`);
     }
 
     res.status(200).json("Request processed successfully (Approved/Rejected)");
@@ -24409,13 +24390,12 @@ const DocumentRequestHdr = async (req, res) => {
         .input("mode", sql.NVarChar, "I")
         .input("info_request_id", sql.Int, 0) // :white_check_mark: DB generate pannum
         .input("company_code", sql.NVarChar, insertRow.company_code)
+        .input("Location_Code", sql.NVarChar, insertRow.Location_Code)
         .input("EmployeeId", sql.NVarChar, insertRow.EmployeeId)
         .input("purpose", sql.NVarChar, insertRow.purpose)
         .input("request_status", sql.NVarChar, insertRow.request_status)
         .input("created_by", sql.NVarChar, insertRow.created_by)
-        .query(`EXEC sp_ess_employee_document_request_hdr
-          @mode, @info_request_id, @company_code, @EmployeeId, '',
-          @purpose, @request_status, @created_by, ''`);
+        .query(`EXEC sp_ess_employee_document_request_hdr_test @mode, @info_request_id, @company_code, @Location_Code, @EmployeeId, '', @purpose, @request_status, @created_by, ''`);
 
       insertedId = result.recordset[0].info_request_id;
     }
@@ -26328,14 +26308,15 @@ const LeaveSummaryDrop = async (req, res) => {
 
 //code added by Sakthi on 20-04-2026
 const getUCN = async (req, res) => {
-  const { company_code } = req.body;
+  const { company_code, Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
       .request()
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_user_info_hdr 'UCN', @company_code, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_user_info_hdr_test 'UCN', @company_code, @Location_Code, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error(err);
@@ -27334,7 +27315,7 @@ const GetAcademicRequest = async (req, res) => {
 };
 
 const GetDocumentsRequest = async (req, res) => {
-  const { company_code, RepManager } = req.body;
+  const { company_code, RepManager, Location_Code } = req.body;
 
   if (!company_code) {
     return res.status(400).json("company_code is required.");
@@ -27347,8 +27328,9 @@ const GetDocumentsRequest = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "RED")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("RepManager", sql.NVarChar, RepManager)
-      .query(`EXEC sp_ess_employee_document_request_dtls @mode, 0, 0, '', @company_code, '', '', '', Null, '', '', '', '', '',@RepManager`);
+      .query(`EXEC sp_ess_employee_document_request_dtls_test @mode, 0, 0, '', @company_code, @Location_Code, '', '', '', Null, '', '', '', '', '',@RepManager`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
@@ -27636,7 +27618,7 @@ const getRoleRightsData = async (req, res) => {
 };
 
 const getUserData = async (req, res) => {
-  const { company_code, user_code } = req.body;
+  const { company_code, Location_Code, user_code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -27644,8 +27626,9 @@ const getUserData = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "GUIH")
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("user_code", sql.NVarChar, user_code)
-      .query(`EXEC sp_user_info_hdr @mode,@company_code,@user_code,'','','','','','','','','','','','','','','','','','','','','','',''`);
+      .query(`EXEC sp_user_info_hdr_test @mode,@company_code,@Location_Code,@user_code,'','','','','','','','','','','','','','','','','','','','','','',''`);
 
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
