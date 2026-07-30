@@ -9728,7 +9728,7 @@ const getTaxInvoiceNo = async (req, res) => {
 //Code Ended By Harish  18_11_2024
 
 //Code begin  by Mathu 19_11_2024
-const addEmployeeAcademicDetails = async (req, res) => {
+const   addEmployeeAcademicDetails = async (req, res) => {
   const employeeData = req.body.employeeData;
 
   if (!employeeData || !employeeData.length) {
@@ -19329,6 +19329,7 @@ const Shift_Pattern_DetailInsert = async (req, res) => {
     Shift_ID,
     Is_Off_Day,
     Company_Code,
+    Location_Code,
     Created_by,
   } = req.body;
 
@@ -19343,8 +19344,9 @@ const Shift_Pattern_DetailInsert = async (req, res) => {
       .input("Shift_ID", sql.NVarChar, Shift_ID)
       .input("Is_Off_Day", sql.NVarChar, Is_Off_Day)
       .input("Company_Code", sql.NVarChar, Company_Code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Created_by", sql.NVarChar, Created_by)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Detail_test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code,@Location_Code, '', @Created_by, '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -19376,9 +19378,10 @@ const Shift_Pattern_DetailUpdate = async (req, res) => {
         .input("Shift_ID", sql.NVarChar, item.Shift_ID)
         .input("Is_Off_Day", sql.NVarChar, item.Is_Off_Day)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode,@Pattern_Detail_ID,@Shift_Pattern_ID,@Day_Sequence,@Shift_ID,@Is_Off_Day,@Company_Code,@keyfield,'','',@Modified_by,'' `);
+        .query(`EXEC sp_Shift_Pattern_Detail_test @mode,@Pattern_Detail_ID,@Shift_Pattern_ID,@Day_Sequence,@Shift_ID,@Is_Off_Day,@Company_Code,@Location_Code,@keyfield,'','',@Modified_by,'' `);
     }
 
     res.status(200).json("Shift Pattern Detail updated successfully");
@@ -19389,7 +19392,7 @@ const Shift_Pattern_DetailUpdate = async (req, res) => {
 };
 
 const Shift_Pattern_DetailDelete = async (req, res) => {
-  const { keyfield, Company_Code } = req.body;
+  const { keyfield, Company_Code,Location_Code } = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
@@ -19397,8 +19400,9 @@ const Shift_Pattern_DetailDelete = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "D")
       .input("Company_Code", sql.NVarChar, Company_Code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("keyfield", sql.NVarChar, keyfield)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, '', '', 0, '', '', @Company_Code, '', '', '', ''`);
+      .query(`EXEC sp_Shift_Pattern_Detail_test @mode, '', '', 0, '', '', @Company_Code,@Location_Code, '', '', '', ''`);
 
     res.status(200).json({
       success: true,
@@ -19430,8 +19434,9 @@ const Shift_Pattern_DetailLoopInsert = async (req, res) => {
         .input("Shift_ID", sql.NVarChar, item.Shift_ID)
         .input("Is_Off_Day", sql.NVarChar, item.Is_Off_Day)
         .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("Created_by", sql.NVarChar, item.Created_by)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', @Created_by, '', '', ''`);
+        .query(`EXEC sp_Shift_Pattern_Detail_test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code,@Location_Code, '', @Created_by, '', '', ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data inserted successfully");
   } catch (err) {
@@ -19486,9 +19491,10 @@ const Shift_Pattern_DetailLoopDelete = async (req, res) => {
         .request()
         .input("mode", sql.NVarChar, "D")
         .input("Company_Code", sql.NVarChar, item.Company_Code)
+        .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("keyfield", sql.NVarChar, item.keyfield)
         .input("Modified_by", sql.NVarChar, item.Modified_by)
-        .query(`EXEC sp_Shift_Pattern_Detail @mode, '', '', 0, '', '', @Company_Code, @keyfield, '', '', @Modified_by, ''`);
+        .query(`EXEC sp_Shift_Pattern_Detail_test @mode, '', '', 0, '', '', @Company_Code,@Location_Code, @keyfield, '', '', @Modified_by, ''`);
     }
     res.status(200).json("Shift_Pattern_Detail data deleted successfully");
   } catch (err) {
@@ -19956,8 +19962,9 @@ const ShiftPatternDetail_SC = async (req, res) => {
     Shift_ID,
     Is_Off_Day,
     Company_Code,
-    company_code,
+    Location_Code,
     keyfield,
+
   } = req.body;
 
   try {
@@ -19974,7 +19981,8 @@ const ShiftPatternDetail_SC = async (req, res) => {
       .input("Shift_ID", sql.NVarChar, Shift_ID)
       .input("Is_Off_Day", sql.NVarChar, Is_Off_Day)
       .input("Company_Code", sql.NVarChar, Company_Code)
-      .query(`EXEC sp_Shift_Pattern_Detail @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code, '', '', '', '', ''`);
+      .input("Location_Code", sql.NVarChar, Location_Code)
+      .query(`EXEC sp_Shift_Pattern_Detail_test @mode, @Pattern_Detail_ID, @Shift_Pattern_ID, @Day_Sequence, @Shift_ID, @Is_Off_Day, @Company_Code,@Location_Code, '', '', '', '', ''`);
 
     // Send response
     if (result.recordset.length > 0) {
