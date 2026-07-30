@@ -48,6 +48,8 @@ function Input({ }) {
     .filter((permission) => permission.screen_type === "Documents")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
     setIsModalOpen(true); // Show the modal
@@ -260,6 +262,7 @@ function Input({ }) {
             document_files: fileBase64,
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             created_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           };
         }),
       ),
@@ -292,51 +295,12 @@ function Input({ }) {
     }
   };
 
-  // const handleDelete = async () => {
-  //   if (
-  //     !employeeId) {
-  //     setError("Please fill all required fields.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const deatils = {
-  //       EmployeeId: employeeId,company_code: sessionStorage.getItem("selectedCompanyCode")
-  //     }
-
-  //     const response = await fetch(`${config.apiBaseUrl}/delemployeedoc`, {
-  //       method: "POST",
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(deatils),
-  //     });
-
-  //     if (response.status === 200) {
-  //       console.log("Data deleted successfully");
-  //       setTimeout(() => {
-  //         toast.success("Data deleted successfully!", {
-  //           onClose: () => window.location.reload(),
-  //         });
-  //       }, 1000);
-  //     } else {
-  //       const errorResponse = await response.json();
-  //       console.error(errorResponse.message);
-  //       toast.warning(errorResponse.message, {
-  //       })
-  //     }
-  //   } catch (error) {
-  //     console.error("Error delete data:", error);
-  //     toast.error('Error delete data: ' + error.message, {
-  //     });
-  //   }
-  // };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleRefNo(employeeId);
     }
   };
+
   const convertBufferToBlobUrlAndFile = (
     buffer,
     fileName = "document.pdf",
@@ -598,78 +562,6 @@ function Input({ }) {
     }
   };
 
-  // const handleUpdate = async (relationName, index) => {
-  //   const relationGroup = documents.find(
-  //     (group) => group.relation === relationName,
-  //   );
-  //   const member = relationGroup ? relationGroup.members[index] : null;
-
-  //   if (!member.keyfield) {
-  //     setError(true);
-  //     toast.warning("Error: Missing required keyfield");
-  //     return;
-  //   }
-
-  //   if (!member) {
-  //     setError(true);
-  //     toast.warning("Error: Missing required fields");
-  //     return;
-  //   }
-
-  //   if (!member.documentName || !member.keyfield) {
-  //     setError(true);
-  //     toast.warning("Error: Missing required fields");
-  //     return;
-  //   }
-
-  //   const fileBase64 = member.document
-  //     ? await convertToBase64(member.document)
-  //     : null;
-
-  //   const editedData = {
-  //     EmployeeId: employeeId,
-  //     document_name: member.documentName,
-  //     document_files: fileBase64,
-  //     keyfield: member.keyfield,
-  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
-  //     modified_by: sessionStorage.getItem('selectedUserCode')
-  //   };
-  //   setError(false);
-
-  //   showConfirmationToast(
-  //     "Are you sure you want to update the data in the row ?",
-  //     async () => {
-  //       try {
-  //         setLoading(true);
-  //         const response = await fetch(`${config.apiBaseUrl}/updateempDoc`, {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({ editedData: [editedData] }),
-  //         });
-
-  //         if (response.ok) {
-  //           toast.success("Data updated successfully!", {
-  //             onClose: () => window.location.reload(),
-  //           });
-  //         } else {
-  //           const errorResponse = await response.json();
-  //           console.error(errorResponse.message);
-  //           toast.warning(errorResponse.message, {});
-  //         }
-  //       } catch (err) {
-  //         console.error("Error delete data:", err);
-  //         toast.error("Error delete data: " + err.message, {});
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     },
-  //     () => {
-  //       toast.info("Data updated cancelled.");
-  //     },
-  //   );
-  // };
   const handleUpdate = async (relationName, index) => {
     const relationGroup = documents.find(
       (group) => group.relation === relationName
@@ -724,6 +616,7 @@ function Input({ }) {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       modified_by: sessionStorage.getItem("selectedUserCode"),
+      Location_Code
     };
 
     setError(false);
@@ -766,6 +659,7 @@ function Input({ }) {
       }
     );
   };
+
   const handleDelete = async (relationName, index) => {
     const relationGroup = documents.find(
       (group) => group.relation === relationName,
@@ -792,7 +686,8 @@ function Input({ }) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
-      modified_by: sessionStorage.getItem('selectedUserCode')
+      modified_by: sessionStorage.getItem('selectedUserCode'),
+      Location_Code
     };
 
     showConfirmationToast(

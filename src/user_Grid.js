@@ -61,6 +61,8 @@ function UserGrid() {
     .filter((permission) => permission.screen_type === "User")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       const isReloadShortcut =
@@ -367,6 +369,7 @@ function UserGrid() {
         },
         body: JSON.stringify({
           company_code: company_code,
+          Location_Code,
           user_code: searchParams?.user_code ?? user_code,
           user_name: searchParams?.user_name ?? user_name,
           first_name: searchParams?.first_name ?? first_name,
@@ -464,29 +467,6 @@ function UserGrid() {
         maxLength: 250,
       },
     },
-    // {
-    //   headerName: "User Image",
-    //   field: "user_images",
-    //   editable: true,
-    //   cellStyle: { textAlign: "center" },
-    //   minWidth: 150,
-    //   cellEditorParams: {
-    //     maxLength: 250,
-    //   },
-    //   cellRenderer: (params) => {
-    //     if (params.value) {
-    //       const base64Image = arrayBufferToBase64(params.value.data);
-    //       return (
-    //         <img src={`data:image/jpeg;base64,${base64Image}`}
-    //           alt="Item Image"
-    //           style={{ width: " 50px", height: "50px" }}
-    //         />
-    //       );
-    //     } else {
-    //       return "";
-    //     }
-    //   },
-    // },
     {
       headerName: "User Status",
       field: "user_status",
@@ -507,17 +487,6 @@ function UserGrid() {
         values: loggriddrop,
       },
     },
-    // {
-    //   headerName: "User Type",
-    //   field: "user_type",
-    //   editable: true,
-    //   cellStyle: { textAlign: "left" },
-    //   cellEditor: "agSelectCellEditor",
-    //   cellEditorParams: {
-    //     maxLength: 50,
-    //     values: usergriddrop,
-    //   },
-    // },
     {
       headerName: "Email",
       field: "email_id",
@@ -810,21 +779,6 @@ function UserGrid() {
     setSelectedRows(selectedData);
   };
 
-  // Assuming you have a unique identifier for each row, such as 'id'
-  // const onCellValueChanged = (params) => {
-  //   const updatedRowData = [...rowData];
-  //   const rowIndex = updatedRowData.findIndex(
-  //     (row) => row.user_code === params.data.user_code // Use the unique identifier
-  //   );
-  //   if (rowIndex !== -1) {
-  //     updatedRowData[rowIndex][params.colDef.field] = params.newValue;
-  //     setRowData(updatedRowData);
-
-  //     // Add the edited row data to the state
-  //     setEditedData((prevData) => [...prevData, updatedRowData[rowIndex]]);
-  //   }
-  // };
-
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
@@ -876,6 +830,7 @@ function UserGrid() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "location_code": Location_Code,
               "company_code": company_code,
               "Modified-By": modified_by,
             },
@@ -928,6 +883,7 @@ function UserGrid() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "location_code": Location_Code,
               "company_code": company_code,
               "Modified-By": modified_by,
             },

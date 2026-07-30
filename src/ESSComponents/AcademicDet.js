@@ -55,6 +55,7 @@ function Input({ }) {
   const academicPermissions = permissions
     .filter((permission) => permission.screen_type === "AcademicDet")
     .map((permission) => permission.permission_type.toLowerCase());
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
@@ -146,6 +147,7 @@ function Input({ }) {
               academicYear: member.academicYear,
               document: fileBase64,
               company_code,
+              Location_Code,
               created_by,
             };
           }),
@@ -244,6 +246,7 @@ function Input({ }) {
         body: JSON.stringify({
           Id: code,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code: sessionStorage.getItem("selectedLocation_Code"),
         }),
       });
 
@@ -791,6 +794,7 @@ function Input({ }) {
       document: fileBase64,
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      Location_Code,
       modified_by: sessionStorage.getItem("selectedUserCode"),
     };
 
@@ -864,6 +868,7 @@ function Input({ }) {
     const keyfieldsToDelete = {
       keyfield: member.keyfield,
       company_code: sessionStorage.getItem("selectedCompanyCode"),
+      Location_Code,
       modified_by: sessionStorage.getItem('selectedUserCode')
     };
     setError(false);

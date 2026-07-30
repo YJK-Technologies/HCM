@@ -318,12 +318,13 @@ function ShiftPatternDetails() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Shift_Pattern_ID: Shift_Pattern_IDSC || null,
-          Pattern_Detail_ID: Pattern_Detail_IDSC || null,
-          Day_Sequence: Day_SequenceSC || null,
-          Shift_ID: Shift_IDSC || null,
-          Is_Off_Day: Is_Off_DaySC || null,
-          Company_Code,
+          Shift_Pattern_ID: Shift_Pattern_IDSC ,
+          Pattern_Detail_ID: Pattern_Detail_IDSC ,
+          Day_Sequence: Day_SequenceSC ,
+          Shift_ID: Shift_IDSC ,
+          Is_Off_Day: Is_Off_DaySC,
+          Company_Code:Company_Code,
+          Location_Code:Location_Code
         }),
       });
 
@@ -578,6 +579,7 @@ function ShiftPatternDetails() {
             Shift_ID: Shift_ID,
             Is_Off_Day: Is_Off_Day,
             Company_Code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code: sessionStorage.getItem("selectedLocation_Code"),
             Created_by: sessionStorage.getItem("selectedUserCode"),
           }),
         },
@@ -608,6 +610,7 @@ function ShiftPatternDetails() {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Location_Code = sessionStorage.getItem("selectedLocation_Code");
           const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
@@ -615,12 +618,14 @@ function ShiftPatternDetails() {
               ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
+                Location_Code,
                 Modified_by,
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
+                  Location_Code,
                   Modified_by,
                 },
               ],
@@ -663,6 +668,7 @@ function ShiftPatternDetails() {
         try {
           setLoading(true);
           const Company_Code = sessionStorage.getItem("selectedCompanyCode");
+          const Location_Code = sessionStorage.getItem("selectedLocation_Code");
           const Modified_by = sessionStorage.getItem("selectedUserCode");
 
           const dataToSend = {
@@ -670,12 +676,14 @@ function ShiftPatternDetails() {
               ? rowData.map((row) => ({
                 ...row,
                 Company_Code,
+                Location_Code,
                 Modified_by,
               }))
               : [
                 {
                   ...rowData,
                   Company_Code,
+                  Location_Code,
                   Modified_by,
                 },
               ],

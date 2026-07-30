@@ -255,7 +255,7 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
   const [Name, setname] = useState("");
   const [loading, setLoading] = useState(false);
 
-
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const handleSearch = async () => {
     setLoading(true);
@@ -264,10 +264,11 @@ export default function DocumentPopup({ open, handleClose, EmployeeInfo }) {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
       const payload = {
-        Employee_Id: Employee_Id || null,
-        document_name: document_name || null,
-        Name: Name || null,
+        Employee_Id: Employee_Id,
+        document_name: document_name,
+        Name: Name,
         company_code,
+        Location_Code
       };
 
       console.log("Payload:", payload);
