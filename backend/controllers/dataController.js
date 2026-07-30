@@ -9756,6 +9756,7 @@ const   addEmployeeAcademicDetails = async (req, res) => {
         .input("document", document)
         .input("keyfield", insertRow.keyfield)
         .input("company_code", insertRow.company_code)
+        .input("Location_Code", insertRow.Location_Code)
         .input("created_by", insertRow.created_by)
         .input("modified_by", insertRow.modified_by)
         .input("tempstr1", insertRow.tempstr1)
@@ -9766,7 +9767,7 @@ const   addEmployeeAcademicDetails = async (req, res) => {
         .input("datetime2", insertRow.datetime2)
         .input("datetime3", insertRow.datetime3)
         .input("datetime4", insertRow.datetime4)
-        .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@Document,@keyfield,@company_code,'',@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
+        .query(`EXEC sp_employee_academic_datails_test @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@Document,@keyfield,@company_code,@Location_Code,'',@created_by,@modified_by,@tempstr1,@tempstr2,@tempstr3,@tempstr4,@datetime1,@datetime2,@datetime3,@datetime4`);
     }
     res
       .status(200)
@@ -9783,7 +9784,7 @@ const allEmployeeAcademicDetails = async (req, res) => {
   try {
     await connection.connectToDatabase();
     const result = await sql.query(
-      `EXEC sp_employee_academic_datails 'A','','','','','',0,'','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      `EXEC sp_employee_academic_datails_test 'A','','','','','',0,'','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
     );
 
     res.json(result.recordset);
@@ -9821,8 +9822,9 @@ const updateEmployeeAcademicDetails = async (req, res) => {
         .input("document", document)
         .input("keyfield", updatedRow.keyfield)
         .input("company_code", updatedRow.company_code)
+        .input("Location_Code", updatedRow.Location_Code)
         .input("modified_by", updatedRow.modified_by)
-        .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@document,@keyfield,@company_code,'','',@modified_by,'','','','','','','',''`);
+        .query(`EXEC sp_employee_academic_datails_test @mode,@EmployeeId,@academicName,@major,@institution,@academicYear,@document,@keyfield,@company_code,@Location_Code,'','',@modified_by,'','','','','','','',''`);
     }
     res.status(200).json("Employee academic details updated successfully");
   } catch (err) {
@@ -9845,13 +9847,14 @@ const deleteEmployeeAcademicDetails = async (req, res) => {
   try {
     const pool = await connection.connectToDatabase();
     for (const record of keyfieldsToDelete) {
-      const { keyfield, company_code, modified_by } = record;
+      const { keyfield, company_code,Location_Code, modified_by } = record;
       await pool
         .request()
         .input("keyfield", sql.NVarChar, keyfield)
         .input("company_code", sql.NVarChar, company_code)
+        .input("Location_Code", sql.NVarChar, Location_Code)
         .input("modified_by", sql.NVarChar, modified_by)
-        .query(`EXEC sp_employee_academic_datails 'D','','','','','','',@keyfield,@company_code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+        .query(`EXEC sp_employee_academic_datails_test 'D','','','','','','',@keyfield,@company_code,@Location_Code,'','',@modified_by,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     }
 
     res.status(200).json("Employee academic details deleted successfully");
@@ -10737,7 +10740,7 @@ const getOverallTAX = async (req, res) => {
 
 //code added by pavun 23-12-2024
 const getAcademicDetailsSearchCretria = async (req, res) => {
-  const { EmployeeId, academicName, major, institution, Name, company_code, academic_year_from, academic_year_to } =
+  const { EmployeeId, academicName, major, institution, Name, company_code,Location_Code, academic_year_from, academic_year_to } =
     req.body;
 
   try {
@@ -10750,10 +10753,11 @@ const getAcademicDetailsSearchCretria = async (req, res) => {
       .input("major", sql.NVarChar, major)
       .input("institution", sql.NVarChar, institution)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Name", sql.NVarChar, Name)
       .input("academic_year_from", sql.Date, academic_year_from ? new Date(academic_year_from) : null)
       .input("academic_year_to", sql.Date, academic_year_to ? new Date(academic_year_to) : null)
-      .query(`EXEC sp_employee_academic_datails @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_employee_academic_datails_test @mode,@EmployeeId,@academicName,@major,@institution,'','','',@company_code,@Location_Code,@Name,'','',@academic_year_from,@academic_year_to,NULL,NULL,NULL,NULL,NULL,NULL`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {

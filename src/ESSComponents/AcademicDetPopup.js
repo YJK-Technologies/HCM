@@ -119,6 +119,9 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
   const [academicYearFrom, setAcademicYearFrom] = useState("");
   const [academicYearTo, setAcademicYearTo] = useState("");
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
+
   const handleSearch = async () => {
     setLoading(true)
     try {
@@ -131,7 +134,8 @@ export default function AcademicDetailsPopup({ open, handleClose, academicDetail
           EmployeeId, academicName: AcademicName, Name, major: Major, institution: Institution,
           academic_year_from: academicYearFrom || null,
           academic_year_to: academicYearTo || null,
-          company_code: sessionStorage.getItem("selectedCompanyCode")
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+          Location_Code
         })
       });
       if (response.ok) {
