@@ -1690,7 +1690,7 @@ const Dashboard = (payslip) => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
