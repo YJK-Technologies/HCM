@@ -33,8 +33,12 @@ function Input({ }) {
   const [Overtime_Allowed, setOvertime_Allowed] = useState('');
   const [selectedOvertime_Allowed, setSelectedOvertime_Allowed] = useState('');
   const [Currency_Code, setCurrency_Code] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+  const [isSelectCurrency, setIsSelectCurrency] = useState(false);
+  const [currencyDrop, setCurrencyDrop] = useState([]);
   const [statusDrop, setStatusDrop] = useState([]);
   const [statusGridDrop, setStatusGridDrop] = useState([]);
+  const [currencyGridDrop, setcurrencyGridDrop] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [Status, setStatus] = useState('');
   const [gridApi, setGridApi] = useState(null);
@@ -54,11 +58,15 @@ function Input({ }) {
   const [overTimeDropSc, setOverTimeDropSc] = useState([]);
   const [Overtime_AllowedSC, setOvertime_AllowedSC] = useState('');
   const [selectedOvertime_AllowedSc, setSelectedOvertime_AllowedSc] = useState('');
-  const [Currency_CodeSC, setCurrency_CodeSC] = useState('');
   const [statusDropSC, setStatusDropSC] = useState([]);
   const [selectedStatusSC, setSelectedStatusSC] = useState('');
   const [StatusSC, setStatusSC] = useState('');
 
+  const [selectedCurrencySC, setSelectedCurrencySC] = useState(null);
+  const [Currency_CodeSC, setCurrency_CodeSC] = useState("");
+  const [isSelectCurrencySC, setIsSelectCurrencySC] = useState(false);
+  const [currencyDropSC, setCurrencyDropSC] = useState([]);
+  
   const [isSelectStatus, setIsSelectStatus] = useState(false);
   const [isSelectOverTime, setIsSelectOverTime] = useState(false);
   const [isSelectStatusSC, setIsSelectStatusSC] = useState(false);
@@ -163,6 +171,23 @@ function Input({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
+    fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ company_code })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const currencyOption = data.map(option => option.attributedetails_name);
+        setcurrencyGridDrop(currencyOption);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const company_code = sessionStorage.getItem('selectedCompanyCode');
     fetch(`${config.apiBaseUrl}/getboolean`, {
       method: 'POST',
       headers: {
@@ -177,6 +202,18 @@ function Input({ }) {
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
+
+  useEffect(() => {
+  fetch(`${config.apiBaseUrl}/getCurrenyCode`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      company_code: sessionStorage.getItem("selectedCompanyCode"),
+    }),
+  })
+    .then((data) => data.json())
+    .then((val) => setCurrencyDrop(val));
+}, []);
 
   const filteredOptionStatusSC = Array.isArray(statusDropSC)
     ? statusDropSC.map((option) => ({
@@ -206,6 +243,20 @@ function Input({ }) {
     }))
     : [];
 
+    const filteredOptionCurrency = Array.isArray(currencyDrop)
+  ? currencyDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+  : [];
+
+  const filteredOptionCurrencySC = Array.isArray(currencyDropSC)
+  ? currencyDrop.map((option) => ({
+      value: option.attributedetails_name,
+      label: option.attributedetails_name,
+    }))
+  : [];
+
   const handleChangeStatusSC = (selectedStatusSC) => {
     setSelectedStatusSC(selectedStatusSC);
     setStatusSC(selectedStatusSC ? selectedStatusSC.value : "");
@@ -225,6 +276,16 @@ function Input({ }) {
     setSelectedOvertime_Allowed(selectedOvertime_Allowed);
     setOvertime_Allowed(selectedOvertime_Allowed ? selectedOvertime_Allowed.value : "");
   };
+
+  const handleChangeCurrency = (selectedCurrency) => {
+  setSelectedCurrency(selectedCurrency);
+  setCurrency_Code(selectedCurrency ? selectedCurrency.value : "");
+};
+
+const handleChangeCurrencySC = (selectedCurrency) => {
+  setSelectedCurrencySC(selectedCurrency);
+  setCurrency_CodeSC(selectedCurrency ? selectedCurrency.value : "");
+};
 
   const handleReload = () => {
     window.location.reload();
@@ -323,6 +384,10 @@ function Input({ }) {
     {
       headerName: "Currency Code",
       field: "Currency_Code",
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: currencyGridDrop,
+      },
       editable: true
     },
     {
@@ -918,7 +983,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="add3"
@@ -931,6 +996,31 @@ function Input({ }) {
                 onChange={(e) => setCurrency_Code(e.target.value)}
               />
               <label className="exp-form-labels">Currency Code</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup
+                ${selectedCurrency ? "has-value" : ""}
+                ${isSelectCurrency ? "is-focused" : ""}`}
+              title="Please Select the Currency Code"
+            >
+              <Select
+                id="currency_code"
+                isClearable
+                value={selectedCurrency}
+                onChange={handleChangeCurrency}
+                options={filteredOptionCurrency}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectCurrency(true)}
+                onBlur={() => setIsSelectCurrency(false)}
+              />
+
+              <label className="floating-label">
+                Currency Code
+              </label>
             </div>
           </div>
 
@@ -1125,7 +1215,7 @@ function Input({ }) {
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="Currency_Code"
@@ -1138,6 +1228,28 @@ function Input({ }) {
                 onChange={(e) => setCurrency_CodeSC(e.target.value)}
               />
               <label className="exp-form-labels"> Currency Code</label>
+            </div>
+          </div> */}
+
+          <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup
+                ${selectedCurrencySC ? "has-value" : ""}
+                ${isSelectCurrencySC ? "is-focused" : ""}`}
+              title="Please Select the Currency Code"
+            >
+              <Select
+                id="currency_codeSC"
+                isClearable
+                value={selectedCurrencySC}
+                onChange={handleChangeCurrencySC}
+                options={filteredOptionCurrencySC}
+                classNamePrefix="react-select"
+                placeholder=""
+                onFocus={() => setIsSelectCurrencySC(true)}
+                onBlur={() => setIsSelectCurrencySC(false)}
+              />
+              <label className="floating-label">Currency Code</label>
             </div>
           </div>
 

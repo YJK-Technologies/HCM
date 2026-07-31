@@ -390,7 +390,6 @@ function Grid() {
       headerName: "Locked",
       field: "locked",
       editable: true,
-      minWidth: 1000,
       cellStyle: { textAlign: "left" },
       // minWidth: 150,
       cellEditorParams: {
@@ -694,7 +693,7 @@ function Grid() {
   const onCellValueChanged = (params) => {
     const updatedRowData = [...rowData];
     const rowIndex = updatedRowData.findIndex(
-      (row) => row.company_no === params.data.company_no // Use the unique identifier 
+      (row) => row.keyfield === params.data.keyfield // Use the unique identifier 
     );
     if (rowIndex !== -1) {
       updatedRowData[rowIndex][params.colDef.field] = params.newValue;
