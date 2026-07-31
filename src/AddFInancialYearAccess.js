@@ -11,12 +11,12 @@ function StdAccInput({ }) {
   const navigate = useNavigate();
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
-  const [selectedTransaction, setSelectedTransaction] = useState('');
+  const [selectedTransaction, setSelectedTransaction] = useState("");
   const [transactiondrop, setTransactiondrop] = useState([]);
   const [TransactionType, setTransactionType] = useState("");
   const [selectedLockType, setSelectedLockType] = useState("");
   const [Lockdrop, setLockdrop] = useState([]);
-  const [LockType, setLockType] = useState([]);
+  const [LockType, setLockType] = useState("");
   const [isUpdated, setIsUpdated] = useState(false);
   const [keyfield, setKeyfield] = useState('');
   const [loading, setLoading] = useState(false);
@@ -275,6 +275,8 @@ function StdAccInput({ }) {
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message)
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -448,7 +450,7 @@ function StdAccInput({ }) {
                 isClearable
                 onKeyDown={(e) => handleKeyDown(e, lockType, transactionType)}
               />
-              <label className={`floating-label ${error && !selectedTransaction ? 'text-danger' : ''}`}>Transaction Type<span className="text-danger">*</span></label>
+              <label className={`floating-label ${error && !TransactionType ? 'text-danger' : ''}`}>Transaction Type<span className="text-danger">*</span></label>
             </div>
           </div>
 

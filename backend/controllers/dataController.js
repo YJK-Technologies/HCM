@@ -1314,7 +1314,6 @@ const WareHousedeleteData = async (req, res) => {
     const pool = await connection.connectToDatabase();
 
     for (const warehouse_code of warehouse_codesToDelete) {
-      try {
         await pool
           .request()
           .input("warehouse_code", warehouse_code)
@@ -1323,19 +1322,6 @@ const WareHousedeleteData = async (req, res) => {
           .query(`
         EXEC sp_warehouse_info 'D',@company_code,@warehouse_code,'','','','',@modified_by,'','','','','','','',''
         `);
-      } catch (err) {
-        if (err.number === 50000) {
-          // Foreign key constraint violation
-          res
-            .status(400)
-            .json(
-              "The warehouse cannot be deleted due to a link with another record",
-            );
-          return;
-        } else {
-          throw err; // Rethrow other SQL errors
-        }
-      }
     }
 
     res.status(200).json("WareHouse deleted successfully");
