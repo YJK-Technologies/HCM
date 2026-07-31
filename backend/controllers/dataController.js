@@ -23850,6 +23850,7 @@ const ApproveAcademicRequest = async (req, res) => {
         .input("detail_id", sql.Int, row.detail_id)
         .input("info_request_id", sql.Int, row.info_request_id)
         .input("company_code", sql.NVarChar, row.company_code)
+        .input("Location_Code", sql.NVarChar, row.Location_Code)
         .input("EmployeeId", sql.NVarChar, row.EmployeeId)
         .input("request_status", sql.NVarChar, row.request_status)
         .input("document", sql.VarBinary, null)
