@@ -595,6 +595,7 @@ function WarehouseGrid() {
 
     const company_code = sessionStorage.getItem('selectedCompanyCode');
     const modified_by = sessionStorage.getItem('selectedUserCode');
+    const Location_Code = sessionStorage.getItem('selectedLocationCode');
     // Filter the editedData state to include only the selected rows
     const selectedRowsData = editedData.filter(row => selectedRows.some(selectedRow => selectedRow.warehouse_code === row.warehouse_code));
 
@@ -614,7 +615,8 @@ function WarehouseGrid() {
             headers: {
               "Content-Type": "application/json",
               "company_code": company_code,
-              "modified-by": modified_by
+              "modified-by": modified_by,
+              "location_no": Location_Code
             },
             body: JSON.stringify({ editedData: selectedRowsData }), // Send only the selected rows for saving
             "company_code": company_code,
@@ -647,9 +649,6 @@ function WarehouseGrid() {
     );
   };
 
-
-
-
   const deleteSelectedRows = async () => {
     const selectedRows = gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
@@ -666,7 +665,7 @@ function WarehouseGrid() {
       async () => {
         setLoading(true);
         try {
-          const response = await fetch(`${config.apiBaseUrl}/Warehousedelete`, {
+          const response = await fetch(`${config.apiBaseUrl}/warehousedelete`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -681,17 +680,17 @@ function WarehouseGrid() {
 
           if (response.ok) {
             setTimeout(() => {
-              toast.success("Data Updated Successfully")
+              toast.success("Data Deleted Successfully")
               handleSearch();
             }, 1000);
             return;
           } else {
             const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            toast.warning(errorResponse.message || "Failed to Deleted data");
           }
         } catch (error) {
           console.error("Error saving data:", error);
-          toast.error("Error Updating Data: " + error.message);
+          toast.error("Error Deleted Data: " + error.message);
         } finally {
           setLoading(false);
         }
@@ -702,7 +701,6 @@ function WarehouseGrid() {
       }
     );
   };
-
 
   const formatDate = (dateString) => {
     if (!dateString) return ""; // Return 'N/A' if the date is missing
