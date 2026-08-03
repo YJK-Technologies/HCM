@@ -185,7 +185,7 @@ function TimeZoneMaster() {
 
     const filteredOptionDstApplicable = Array.isArray(dstApplicableDrop)
         ? dstApplicableDrop.map((option) => ({
-            value: option.attributedetails_name,
+            value: option.attributedetails_code,
             label: option.attributedetails_name,
         }))
         : [];
@@ -260,6 +260,11 @@ function TimeZoneMaster() {
     const reloadGridData = () => {
         setRowData([]);
         searchClearInputFields();
+    };
+
+    const reloadSaveData = () => {
+        setRowData([]);
+        addClearInputFields();
     };
 
     const columnDefs = [
@@ -718,7 +723,7 @@ function TimeZoneMaster() {
                                     <i class="fa-solid fa-floppy-disk"></i>
                                 </div>
                             )}
-                            <div className="action-icon reload" onClick={reloadGridData}>
+                            <div className="action-icon reload" onClick={reloadSaveData}>
                                 <span className="tooltip">Reload</span>
                                 <i className="fa-solid fa-rotate-right"></i>
                             </div>
@@ -744,7 +749,7 @@ function TimeZoneMaster() {
                                     </li>
                                 )}
                                 <li>
-                                    <button className="dropdown-item" onClick={reloadGridData}>
+                                    <button className="dropdown-item" onClick={reloadSaveData}>
                                         <i className="fa-solid fa-rotate-right text-dark fs-4"></i>
                                     </button>
                                 </li>
