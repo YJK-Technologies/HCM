@@ -63,6 +63,8 @@ function Input({ }) {
     .filter((permission) => permission.screen_type === "AcademicDetReq")
     .map((permission) => permission.permission_type.toLowerCase());
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const handlePdfClick = (url) => {
     setCurrentPdfUrl(url);
     setIsModalOpen(true); // Show the modal
@@ -87,16 +89,16 @@ function Input({ }) {
             members: [
               ...item.members,
               {
-  academicName: "",
-  major: "",
-  institution: "",
-  academicYear: "",
-  document: null,
-  documentUrl: "",
-  showDefaultImage: true,
-  keyfield: "",
-  purpose: "",
-},
+                academicName: "",
+                major: "",
+                institution: "",
+                academicYear: "",
+                document: null,
+                documentUrl: "",
+                showDefaultImage: true,
+                keyfield: "",
+                purpose: "",
+              },
             ],
           }
           : item,
@@ -113,94 +115,6 @@ function Input({ }) {
       ),
     );
   };
-
-  //   const handleSave = async () => {
-  //     if (!EmployeeId) {
-  //       setError(true);
-  //       toast.warning("Error: Missing required fields");
-  //       return;
-  //     }
-
-  //     for (const relationGroup of Academic) {
-  //       for (const member of relationGroup.members) {
-  //         if (
-  //           !member.academicName ||
-  //           !member.major ||
-  //           !member.institution ||
-  //           !member.academicYear ||
-  //           !member.purpose
-  //         ) {
-  //           setError(true);
-  //           toast.warning("Error: Missing required fields");
-  //           return;
-  //         }
-  //       }
-  //     }
-
-  //     const employeeData = await Promise.all(
-  //       Academic.flatMap((relationGroup) =>
-  //         relationGroup.members.map(async (member) => {
-
-  //   let fileBase64 = null;
-
-  //   if (member.document) {
-  //     const fileSize = member.document.size;
-  //     const maxSize = 1 * 1024 * 1024;
-
-  //     if (fileSize > maxSize) {
-  //       toast.warning("File size exceeds 1MB");
-  //       return null;
-  //     }
-
-  //     fileBase64 = await convertToBase64(member.document);
-  //   }
-
-  //   return {
-  //     EmployeeId: EmployeeId,
-  //     academicName: member.academicName,
-  //     major: member.major,
-  //     institution: member.institution,
-  //     academicYear: member.academicYear,
-  //     document: fileBase64,
-  //     company_code: sessionStorage.getItem("selectedCompanyCode"),
-  //     created_by: sessionStorage.getItem("selectedUserCode"),
-  //     purpose: member.purpose
-  //   };
-
-  // })
-  //       )
-
-  //     );
-  //     setError(false);
-  //     setLoading(true);
-
-  //     try {
-  //       const response = await fetch(
-  //         `${config.apiBaseUrl}/AcademicDetailsRequest`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({ employeeData }),
-  //         },
-  //       );
-  //       if (response.ok) {
-  //         toast.success("Data inserted successfully!", {
-  //           onClose: () => window.location.reload(),
-  //         });
-  //       } else {
-  //         const errorResponse = await response.json();
-  //         console.error(errorResponse.message);
-  //         toast.warning(errorResponse.message, {});
-  //       }
-  //     } catch (err) {
-  //       console.error("Error delete data:", err);
-  //       toast.error("Error delete data: " + err.message, {});
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
 
   const filteredOptionManager = Managerdrop.map((option) => ({
     value: option.EmployeeId,
@@ -267,6 +181,7 @@ function Input({ }) {
             purpose: Academic[0]?.members[0]?.purpose,
             request_status: "Pending",
             created_by,
+            Location_Code
           };
 
           const headerRes = await fetch(`${config.apiBaseUrl}/AcademicRequestHdr`,
@@ -310,6 +225,7 @@ function Input({ }) {
       },
     );
   };
+
   const saveAcademicDetails = async (info_request_id) => {
     try {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -349,6 +265,7 @@ function Input({ }) {
               RepManager: member.RepManager,
               document: fileBase64,
               created_by,
+              Location_Code
             };
           }),
         ),
@@ -544,12 +461,12 @@ function Input({ }) {
               ...doc,
               members: doc.members.map((member, i) =>
                 i === index
-                 ? {
-    ...member,
-    document: file,
-    documentUrl: fileUrl,
-    showDefaultImage: false,
-  }
+                  ? {
+                    ...member,
+                    document: file,
+                    documentUrl: fileUrl,
+                    showDefaultImage: false,
+                  }
                   : member,
               ),
             }
@@ -640,26 +557,26 @@ function Input({ }) {
   };
 
   const handleRemovePdf = (relation, index) => {
-  setAcademic((prev) =>
-    prev.map((doc) =>
-      doc.relation === relation
-        ? {
+    setAcademic((prev) =>
+      prev.map((doc) =>
+        doc.relation === relation
+          ? {
             ...doc,
             members: doc.members.map((m, i) =>
               i === index
                 ? {
-                    ...m,
-                    document: null,
-                    documentUrl: "",
-                    showDefaultImage: false,
-                  }
+                  ...m,
+                  document: null,
+                  documentUrl: "",
+                  showDefaultImage: false,
+                }
                 : m
             ),
           }
-        : doc
-    )
-  );
-};
+          : doc
+      )
+    );
+  };
 
   return (
     <div class="container-fluid Topnav-screen ">
@@ -922,58 +839,58 @@ function Input({ }) {
                 <div className="inputGroup">
                   <div className="image-upload-container">
                     {member.documentUrl && !member.showDefaultImage ? (
-  <div
-  className="image-preview-box"
-  onClick={() => {
-    if (member.documentUrl) {
-      handlePdfClick(member.documentUrl);
-    }
-  }}
->
-    <iframe
-      src={member.documentUrl}
-      title="PDF Preview"
-      className="pdf-inline-preview"
-    />
+                      <div
+                        className="image-preview-box"
+                        onClick={() => {
+                          if (member.documentUrl) {
+                            handlePdfClick(member.documentUrl);
+                          }
+                        }}
+                      >
+                        <iframe
+                          src={member.documentUrl}
+                          title="PDF Preview"
+                          className="pdf-inline-preview"
+                        />
 
-    <button
-      type="button"
-      className="delete-image-btn"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleRemovePdf(relationGroup.relation, index);
-      }}
-    >
-      &times;
-    </button>
-  </div>
-) : member.showDefaultImage ? (
-  <div className="upload-placeholder-box">
-    <img
-      src={DocumentImage}
-      alt="Default Document"
-      className="uploaded-image"
-    />
+                        <button
+                          type="button"
+                          className="delete-image-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemovePdf(relationGroup.relation, index);
+                          }}
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ) : member.showDefaultImage ? (
+                      <div className="upload-placeholder-box">
+                        <img
+                          src={DocumentImage}
+                          alt="Default Document"
+                          className="uploaded-image"
+                        />
 
-    <button
-      type="button"
-      className="delete-image-btn"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleRemovePdf(relationGroup.relation, index);
-      }}
-    >
-      &times;
-    </button>
-  </div>
-) : (
-  <div className="upload-placeholder-box">
-    <div className="upload-icon-text">
-      <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
-      <span>Upload Document</span>
-    </div>
-  </div>
-)}
+                        <button
+                          type="button"
+                          className="delete-image-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemovePdf(relationGroup.relation, index);
+                          }}
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder-box">
+                        <div className="upload-icon-text">
+                          <i className="fa-solid fa-file-arrow-up upload-icon me-1"></i>
+                          <span>Upload Document</span>
+                        </div>
+                      </div>
+                    )}
 
                     <input
                       type="file"

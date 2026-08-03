@@ -49,6 +49,8 @@ const EmployeeCompOff = () => {
   const [ReportingManagerSC, setReportingManagerSC] = useState("");
   const [ManagerdropSC, setManagerdropSC] = useState([]);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const gridRef = useRef();
 
   useEffect(() => {
@@ -76,6 +78,7 @@ const EmployeeCompOff = () => {
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         userid: sessionStorage.getItem("selectedUserCode"),
+        Location_Code
       }),
     })
       .then((response) => response.json())
@@ -176,10 +179,10 @@ const EmployeeCompOff = () => {
 
   const filteredOptionCopmOff = Array.isArray(compOffDrop)
     ? compOffDrop.map((option) => ({
-        value: option.Holiday_Date,
-        label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
-        holidayName: option.Holiday_Name,
-      }))
+      value: option.Holiday_Date,
+      label: `${option.Holiday_Date} - ${option.Holiday_Name}`,
+      holidayName: option.Holiday_Name,
+    }))
     : [];
 
   const handleChangeCompOff = (selectedCompOff) => {
@@ -287,12 +290,12 @@ const EmployeeCompOff = () => {
   };
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const handleCompOffSearch = async () => {
     const from = new Date(holidayFromDate);
@@ -388,11 +391,11 @@ const EmployeeCompOff = () => {
             {["add", "all permission"].some((permission) =>
               compOffRequestPermissions.includes(permission),
             ) && (
-              <div className="action-icon save" onClick={handleSave}>
-                <span className="tooltip">Save</span>
-                <i class="fa-solid fa-floppy-disk"></i>
-              </div>
-            )}
+                <div className="action-icon save" onClick={handleSave}>
+                  <span className="tooltip">Save</span>
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </div>
+              )}
             <div className="action-icon reload" onClick={handleReloadAdd}>
               <span className="tooltip">Reload</span>
               <i className="fa-solid fa-rotate-right"></i>
@@ -414,12 +417,12 @@ const EmployeeCompOff = () => {
               {["add", "all permission"].some((permission) =>
                 compOffRequestPermissions.includes(permission),
               ) && (
-                <li>
-                  <button className="dropdown-item" onClick={handleSave}>
-                    <i className="fa-solid fa-floppy-disk add fs-4"></i>
-                  </button>
-                </li>
-              )}
+                  <li>
+                    <button className="dropdown-item" onClick={handleSave}>
+                      <i className="fa-solid fa-floppy-disk add fs-4"></i>
+                    </button>
+                  </li>
+                )}
               <li>
                 <button className="dropdown-item" onClick={handleReloadAdd}>
                   <i className="fa-solid fa-arrow-rotate-right text-dark fs-4"></i>

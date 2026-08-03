@@ -65,6 +65,8 @@ function Input({ }) {
   const [isSelectedGrade, setIsSelectedGrade] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
   const navigate = useNavigate();
 
   const searchClearInputFields = () => {
@@ -84,7 +86,7 @@ function Input({ }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ company_code }),
+          body: JSON.stringify({ company_code, Location_Code }),
         });
 
         if (!response.ok) {
@@ -111,7 +113,7 @@ function Input({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {

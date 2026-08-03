@@ -118,6 +118,7 @@ function RequestReport({ }) {
         Info_request_id: safeId,
         request_status: status,
         company_code,
+        Location_Code
       };
     } else if (type === "Comp Off") {
       url = `${config.apiBaseUrl}/compOffRequestReport`;
@@ -340,7 +341,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdLoanDropSc(val))
@@ -354,7 +355,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setLoanTypeIdDropSc(val))
@@ -420,7 +421,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => {
@@ -862,7 +863,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdDropVisaSc(val))
@@ -1009,7 +1010,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => {
@@ -1474,7 +1475,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setEmpIdTravelDropSc(val));
@@ -1595,7 +1596,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => {
@@ -2323,6 +2324,7 @@ function RequestReport({ }) {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code
           }),
         },
       );
@@ -2362,6 +2364,7 @@ function RequestReport({ }) {
                 request_status: status,
                 created_by: sessionStorage.getItem("selectedUserCode"),
                 modified_by: sessionStorage.getItem("selectedUserCode"),
+                Location_Code
               },
             ],
           }),
@@ -2396,7 +2399,8 @@ function RequestReport({ }) {
           EmployeeId: academicEmpId,
           column_name: academicColumn,
           from_date: academicFromDate || null,
-          to_date: academicToDate || null
+          to_date: academicToDate || null,
+          Location_Code
         })
       });
 
@@ -3272,6 +3276,7 @@ function RequestReport({ }) {
           column_name: "",
           from_date: null,
           to_date: null,
+          Location_Code
         }),
       });
 
@@ -3304,6 +3309,7 @@ function RequestReport({ }) {
           column_name: docColumn,
           from_date: docFromDate || null,
           to_date: docToDate || null,
+          Location_Code
         }),
       });
 
@@ -3348,6 +3354,7 @@ function RequestReport({ }) {
               company_code: row.company_code,
               EmployeeId: row.EmployeeId,
               request_status: status,
+              Location_Code,
               created_by: sessionStorage.getItem("selectedUserCode"),
               modified_by: sessionStorage.getItem("selectedUserCode"),
             },
@@ -3643,7 +3650,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -3663,7 +3670,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -3707,7 +3714,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -3727,7 +3734,7 @@ function RequestReport({ }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ company_code })
+      body: JSON.stringify({ company_code, Location_Code })
     })
       .then((response) => response.json())
       .then((data) => {
@@ -3748,7 +3755,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setCurShiftDropSc(val))
@@ -3763,7 +3770,7 @@ function RequestReport({ }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setReqShiftDropSc(val))

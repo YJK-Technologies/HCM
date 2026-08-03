@@ -192,7 +192,7 @@ const Dashboard = (payslip) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -236,7 +236,7 @@ const Dashboard = (payslip) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -256,7 +256,7 @@ const Dashboard = (payslip) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -392,6 +392,7 @@ const Dashboard = (payslip) => {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           EmployeeId: sessionStorage.getItem("selectedUserCode"),
+          Location_Code
         }),
       });
 
@@ -1109,6 +1110,7 @@ const Dashboard = (payslip) => {
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
+          Location_Code
         }),
       });
 
@@ -1585,6 +1587,7 @@ const Dashboard = (payslip) => {
           body: JSON.stringify({
             manager: user_code,
             company_code,
+            Location_Code
           }),
         });
 
@@ -1687,7 +1690,7 @@ const Dashboard = (payslip) => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
@@ -1702,7 +1705,7 @@ const Dashboard = (payslip) => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
@@ -2104,6 +2107,7 @@ const Dashboard = (payslip) => {
             EmployeeId: row.EmployeeId,
             request_status: status,
             modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           })),
         };
       }
@@ -2123,6 +2127,7 @@ const Dashboard = (payslip) => {
             company_code,
             EmployeeId: row.EmployeeId,
             request_status: status,
+            Location_Code,
             created_by: sessionStorage.getItem("selectedUserCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),

@@ -49,6 +49,8 @@ const ShiftChangeRequest = () => {
     const [departmentDrop, setDepartmentDrop] = useState([]);
     const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
 
+    const Location_Code = sessionStorage.getItem('selectedLocationCode')
+
     useEffect(() => {
         const company_code = sessionStorage.getItem("selectedCompanyCode");
         fetch(`${config.apiBaseUrl}/getEmployeeId`, {
@@ -56,7 +58,7 @@ const ShiftChangeRequest = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((response) => response.json())
             .then((data) => {
@@ -100,7 +102,7 @@ const ShiftChangeRequest = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ Company_Code }),
+            body: JSON.stringify({ Company_Code, Location_Code }),
         })
             .then((response) => response.json())
             .then((data) => {
@@ -120,7 +122,7 @@ const ShiftChangeRequest = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ company_code })
+            body: JSON.stringify({ company_code, Location_Code })
         })
             .then((response) => response.json())
             .then((data) => {
@@ -151,7 +153,7 @@ const ShiftChangeRequest = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setCurShiftDropSc(val))
@@ -166,7 +168,7 @@ const ShiftChangeRequest = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ company_code }),
+            body: JSON.stringify({ company_code, Location_Code }),
         })
             .then((data) => data.json())
             .then((val) => setReqShiftDropSc(val))
@@ -426,7 +428,8 @@ const ShiftChangeRequest = () => {
                     From_Date: fromDate || FromDate,
                     To_Date: toDate || ToDate,
                     Employee_ID: sessionStorage.getItem('selectedUserCode'),
-                    company_code: sessionStorage.getItem('selectedCompanyCode')
+                    company_code: sessionStorage.getItem('selectedCompanyCode'),
+                    Location_Code
                 }),
             });
 

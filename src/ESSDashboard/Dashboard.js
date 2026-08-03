@@ -455,7 +455,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -499,7 +499,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -519,7 +519,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -540,7 +540,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftEmpIdDrop(val))
@@ -570,7 +570,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Company_Code }),
+      body: JSON.stringify({ Company_Code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftPatternIdDrop(val))
@@ -585,7 +585,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ company_code }),
+      body: JSON.stringify({ company_code, Location_Code }),
     })
       .then((data) => data.json())
       .then((val) => setShiftCodeDrop(val))
@@ -982,6 +982,7 @@ const Dashboard = () => {
           body: JSON.stringify({
             manager: user_code,
             company_code,
+            Location_Code
           }),
         });
 
@@ -1084,7 +1085,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
@@ -1099,7 +1100,7 @@ const Dashboard = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, }),
+            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
           },
         );
 
@@ -1501,6 +1502,7 @@ const Dashboard = () => {
             EmployeeId: row.EmployeeId,
             request_status: status,
             modified_by: sessionStorage.getItem("selectedUserCode"),
+            Location_Code
           })),
         };
       }
@@ -1520,6 +1522,7 @@ const Dashboard = () => {
             company_code,
             EmployeeId: row.EmployeeId,
             request_status: status,
+            Location_Code,
             created_by: sessionStorage.getItem("selectedUserCode"),
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
@@ -2039,6 +2042,7 @@ const Dashboard = () => {
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
+          Location_Code
         }),
       });
 
