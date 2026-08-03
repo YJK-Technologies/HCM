@@ -349,8 +349,8 @@ const ShiftChangeRequest = () => {
                     employee_id: sessionStorage.getItem('selectedUserCode'),
                     shift_from_date: effectiveFromDate ? effectiveFromDate : null,
                     shift_to_date: effectiveToDate ? effectiveToDate : null,
-                    current_shift_id: setCurShiftSc,
-                    requested_shift_id: setReqShiftSc,
+                    current_shift_id: curShiftSc,
+                    requested_shift_id: reqShiftSc,
                     is_swap_request: empStatusSc,
                     request_status: manStatusSc,
                 })
@@ -449,7 +449,7 @@ const ShiftChangeRequest = () => {
             toast.error("Error fetching search data: " + error.message);
         }
     };
-
+                        
     const empShiftCols = [
         {
           headerName: "S.No",

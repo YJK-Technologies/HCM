@@ -50,10 +50,10 @@ function WareHouseInput({ }) {
   }, []);
 
   useEffect(() => {
-    if (mode === "update" && warehouseCode && LocationCode) {
+    if (mode === "update" && warehouseCode  ) {
       fetchWarehouseData();
     }
-  }, [mode, warehouseCode, LocationCode]);
+  }, [mode, warehouseCode]);
 
   const fetchWarehouseData = async () => {
     try {
