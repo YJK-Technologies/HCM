@@ -66,7 +66,10 @@ import {
   MdPayments,
   MdCalendarMonth,
   MdOutlineAccountBalance,
-  MdOutlineEventBusy
+  MdOutlineEventBusy,
+  MdOutlineAlarm,
+  MdOutlineAccessTime,
+  MdOutlineWatchLater,
 } from "react-icons/md";
 import {
   HiOutlineUserGroup
@@ -196,6 +199,7 @@ export const leafIconMap = {
   "Project Progress": BsGraphUpArrow,
   "Project Chart Report": BsFileBarGraph,
   "Shift Summary Report": MdOutlineSchedule,
+  "Late Arrival Report": MdOutlineAlarm,
   "Employee Assets Report": BsPersonCheck,
   "Pending Asset Requests Report": BsClockHistory,
   "Asset Lifecycle Report": BsArrowRepeat,
