@@ -7,14 +7,31 @@ import config from "../Apiconfig";
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement, } from "chart.js";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement,
+} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { publicIpv4 } from "public-ip";
 import ShiftRequestModal from "./ShiftRequestModal.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement,
+);
 
 const Dashboard = (payslip) => {
   const navigate = useNavigate();
@@ -57,7 +74,7 @@ const Dashboard = (payslip) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const Location_Code = sessionStorage.getItem('selectedLocationCode')
+  const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
   const [checkInMode, setCheckInMode] = useState("");
 
@@ -82,41 +99,32 @@ const Dashboard = (payslip) => {
   };
 
   // For Checkin Mode
-    useEffect(() => {
-  
-      const fetchCheckInMode = async () => {
-  
-        try {
-  
-          const response = await fetch(
-            `${config.apiBaseUrl}/GetCheckInMode`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                company_code: sessionStorage.getItem("selectedCompanyCode"),
-                Location_Code: sessionStorage.getItem("selectedLocationCode"),
-              }),
-            }
-          );
-  
-          const data = await response.json();
-  
-          if (data.length > 0) {
-            setCheckInMode(data[0].Check_In_Mode);
-          }
-  
-        } catch (err) {
-          console.log(err);
+  useEffect(() => {
+    const fetchCheckInMode = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/GetCheckInMode`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code: sessionStorage.getItem("selectedCompanyCode"),
+            Location_Code: sessionStorage.getItem("selectedLocationCode"),
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.length > 0) {
+          setCheckInMode(data[0].Check_In_Mode);
         }
-  
-      };
-  
-      fetchCheckInMode();
-  
-    }, []);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchCheckInMode();
+  }, []);
 
   const handlePrev = () => {
     if (carouselRef.current) {
@@ -177,12 +185,12 @@ const Dashboard = (payslip) => {
   };
 
   const shiftConfig = {
-    S1: { label: "Morning Shift", icon: "fa-sun", color: "#f59e0b", },
-    S2: { label: "General Shift", icon: "fa-briefcase", color: "#3b82f6", },
-    S3: { label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6", },
-    S4: { label: "Night Shift", icon: "fa-moon", color: "#1e293b", },
-    S5: { label: "Split Shift", icon: "fa-clock", color: "#ec4899", },
-    S6: { label: "Week Off", icon: "fa-couch", color: "#22c55e", },
+    S1: { label: "Morning Shift", icon: "fa-sun", color: "#f59e0b" },
+    S2: { label: "General Shift", icon: "fa-briefcase", color: "#3b82f6" },
+    S3: { label: "Evening Shift", icon: "fa-cloud-sun", color: "#8b5cf6" },
+    S4: { label: "Night Shift", icon: "fa-moon", color: "#1e293b" },
+    S5: { label: "Split Shift", icon: "fa-clock", color: "#ec4899" },
+    S6: { label: "Week Off", icon: "fa-couch", color: "#22c55e" },
   };
 
   useEffect(() => {
@@ -392,7 +400,7 @@ const Dashboard = (payslip) => {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           EmployeeId: sessionStorage.getItem("selectedUserCode"),
-          Location_Code
+          Location_Code,
         }),
       });
 
@@ -435,7 +443,7 @@ const Dashboard = (payslip) => {
       body: JSON.stringify({
         EmployeeId: sessionStorage.getItem("selectedUserCode"),
         company_code: sessionStorage.getItem("selectedCompanyCode"),
-        Location_Code
+        Location_Code,
       }),
     })
       .then((data) => data.json())
@@ -767,7 +775,7 @@ const Dashboard = (payslip) => {
           },
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
-            Location_Code: sessionStorage.getItem('selectedLocationCode'),
+            Location_Code: sessionStorage.getItem("selectedLocationCode"),
           }),
         });
         if (response.ok) {
@@ -775,7 +783,7 @@ const Dashboard = (payslip) => {
           const newRows = searchData.map((matchedItem) => ({
             HOLIDAYS: matchedItem.HOLIDAYS,
             Description: matchedItem.Description,
-            Location_Code
+            Location_Code,
           }));
           setHolidayRowData(newRows);
         } else if (response.status === 404) {
@@ -807,7 +815,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Location_Code
+          Location_Code,
         }),
       });
 
@@ -982,7 +990,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Location_Code
+          Location_Code,
         }),
       });
 
@@ -1110,7 +1118,7 @@ const Dashboard = (payslip) => {
           DeviceDetails: deviceDetails,
           IP_Address: ipAddress,
           Location: location,
-          Location_Code
+          Location_Code,
         }),
       });
 
@@ -1176,7 +1184,7 @@ const Dashboard = (payslip) => {
         },
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Location_Code
+          Location_Code,
         }),
       });
 
@@ -1212,7 +1220,7 @@ const Dashboard = (payslip) => {
         salary_month,
         company_code,
         Employeeid,
-        Location_Code
+        Location_Code,
       };
 
       const response = await fetch(`${config.apiBaseUrl}/Getpayslip`, {
@@ -1223,29 +1231,24 @@ const Dashboard = (payslip) => {
         body: JSON.stringify(body),
       });
 
-     if (response.ok) {
-  const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-  console.log("Payslip Data:", data);
+        console.log("Payslip Data:", data);
 
-  setPayslipData(data[0]);
-  setShowModal(true);
+        setPayslipData(data[0]);
+        setShowModal(true);
+      } else if (response.status === 404) {
+        const [year, month] = selectedPeriod.split("-");
+        const monthName = new Date(year, month - 1).toLocaleString("en-US", {
+          month: "long",
+        });
 
-} else if (response.status === 404) {
-
-  const [year, month] = selectedPeriod.split("-");
-  const monthName = new Date(year, month - 1).toLocaleString("en-US", {
-    month: "long",
-  });
-
-  toast.warning(`No payslip found for ${monthName} ${year}.`);
-
-} else {
-
-  const errorResponse = await response.json();
-  toast.error(errorResponse.message || "Failed to fetch payslip");
-
-}
+        toast.warning(`No payslip found for ${monthName} ${year}.`);
+      } else {
+        const errorResponse = await response.json();
+        toast.error(errorResponse.message || "Failed to fetch payslip");
+      }
     } catch (err) {
       console.error(err);
       alert("Error fetching payslip");
@@ -1587,7 +1590,7 @@ const Dashboard = (payslip) => {
           body: JSON.stringify({
             manager: user_code,
             company_code,
-            Location_Code
+            Location_Code,
           }),
         });
 
@@ -1601,7 +1604,11 @@ const Dashboard = (payslip) => {
         const res = await fetch(`${config.apiBaseUrl}/LoanRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+          body: JSON.stringify({
+            manager_id: user_code,
+            company_code,
+            Location_Code: sessionStorage.getItem("selectedLocationCode"),
+          }),
         });
 
         if (res.ok) loanData = await res.json();
@@ -1614,7 +1621,11 @@ const Dashboard = (payslip) => {
         const res = await fetch(`${config.apiBaseUrl}/visaRequestDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+          body: JSON.stringify({
+            manager_id: user_code,
+            company_code,
+            Location_Code: sessionStorage.getItem("selectedLocationCode"),
+          }),
         });
 
         if (res.ok) visaData = await res.json();
@@ -1624,11 +1635,16 @@ const Dashboard = (payslip) => {
 
       /* ---------- Travel ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/travelRequestsDashboard`,
+        const res = await fetch(
+          `${config.apiBaseUrl}/travelRequestsDashboard`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ manager_id: user_code, company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+            body: JSON.stringify({
+              manager_id: user_code,
+              company_code,
+              Location_Code: sessionStorage.getItem("selectedLocationCode"),
+            }),
           },
         );
 
@@ -1652,13 +1668,15 @@ const Dashboard = (payslip) => {
       //   console.log("Travel API failed");
       // }
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ RepManager: user_code, company_code, Location_Code }),
-          },
-        );
+        const res = await fetch(`${config.apiBaseUrl}/GetPersonalRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            RepManager: user_code,
+            company_code,
+            Location_Code,
+          }),
+        });
 
         if (res.ok) empData = await res.json();
       } catch (err) {
@@ -1667,17 +1685,15 @@ const Dashboard = (payslip) => {
 
       /* ---------- Employee Family Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              company_code,
-              RepManager: user_code,
-              Location_Code
-            }),
-          },
-        );
+        const res = await fetch(`${config.apiBaseUrl}/GetFamilyRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            RepManager: user_code,
+            Location_Code,
+          }),
+        });
 
         if (res.ok) familyChangeData = await res.json();
       } catch (err) {
@@ -1686,13 +1702,15 @@ const Dashboard = (payslip) => {
 
       /* ---------- Academic ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
-          },
-        );
+        const res = await fetch(`${config.apiBaseUrl}/GetAcademicRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            RepManager: user_code,
+            Location_Code,
+          }),
+        });
 
         if (res.ok) academicData = await res.json();
       } catch (err) {
@@ -1701,13 +1719,15 @@ const Dashboard = (payslip) => {
 
       /* ---------- Documents ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ company_code, RepManager: user_code, Location_Code }),
-          },
-        );
+        const res = await fetch(`${config.apiBaseUrl}/GetDocumentsRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            RepManager: user_code,
+            Location_Code,
+          }),
+        });
 
         if (res.ok) documentData = await res.json();
       } catch (err) {
@@ -1716,15 +1736,18 @@ const Dashboard = (payslip) => {
 
       /* ---------- Comp Off ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/DashboardCompOffRequest`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            RepManager: user_code,
-            CompanyCode: company_code,
-            Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          }),
-        });
+        const res = await fetch(
+          `${config.apiBaseUrl}/DashboardCompOffRequest`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              RepManager: user_code,
+              CompanyCode: company_code,
+              Location_Code: sessionStorage.getItem("selectedLocationCode"),
+            }),
+          },
+        );
 
         if (res.ok) compOffData = await res.json();
       } catch (err) {
@@ -1733,17 +1756,15 @@ const Dashboard = (payslip) => {
 
       /* ---------- Employee Assets ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              company_code,
-              RepManager: user_code,
-              Location_Code
-            }),
-          },
-        );
+        const res = await fetch(`${config.apiBaseUrl}/GetAssetRequest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company_code,
+            RepManager: user_code,
+            Location_Code,
+          }),
+        });
 
         if (res.ok) assetData = await res.json();
       } catch (err) {
@@ -1752,15 +1773,18 @@ const Dashboard = (payslip) => {
 
       /* ---------- Shift Change ---------- */
       try {
-        const res = await fetch(`${config.apiBaseUrl}/shiftChangeRequestManager`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            company_code,
-            Location_Code: sessionStorage.getItem('selectedLocationCode'),
-            RepManager: user_code,
-          }),
-        });
+        const res = await fetch(
+          `${config.apiBaseUrl}/shiftChangeRequestManager`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              company_code,
+              Location_Code: sessionStorage.getItem("selectedLocationCode"),
+              RepManager: user_code,
+            }),
+          },
+        );
 
         if (res.ok) shiftChangeData = await res.json();
       } catch (err) {
@@ -1839,17 +1863,13 @@ const Dashboard = (payslip) => {
         EmployeeId: row.employee_id,
         EmployeeName: row.EmployeeName,
         title: `${row.current_shift_name} → ${row.requested_shift_name}`,
-        FromDate: row.FromDate
-          ? formatDate(row.FromDate)
-          : null,
-        ToDate: row.ToDate
-          ? formatDate(row.ToDate)
-          : null,
+        FromDate: row.FromDate ? formatDate(row.FromDate) : null,
+        ToDate: row.ToDate ? formatDate(row.ToDate) : null,
         status: row.request_status,
         keyfield: row.keyfield,
         currentShift: row.current_shift_name,
         requestedShift: row.requested_shift_name,
-        days: row.LeaveDays
+        days: row.LeaveDays,
       }));
 
       /* ---------- Employee Change Group ---------- */
@@ -1996,13 +2016,11 @@ const Dashboard = (payslip) => {
           ApprovedBy: approver,
           CompanyCode: company_code,
           modified_by: sessionStorage.getItem("selectedUserCode"),
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
           Keyfield: id,
         };
-      }
-
-      /* ---------- Leave ---------- */
-      else if (type === "Leave") {
+      } else if (type === "Leave") {
+        /* ---------- Leave ---------- */
         const [day, month, year] = FromDate.split("-");
         const backendDate = `${year}-${month}-${day}`;
 
@@ -2013,51 +2031,43 @@ const Dashboard = (payslip) => {
           LeaveStatus: status,
           FromDate: backendDate,
           company_code: company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          modified_by: sessionStorage.getItem("selectedUserCode")
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
+          modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      }
-
-      /* ---------- Loan ---------- */
-      else if (type === "Loan") {
+      } else if (type === "Loan") {
+        /* ---------- Loan ---------- */
         url = `${config.apiBaseUrl}/ApprovalLoan`;
 
         body = {
           loan_request_id: id,
           company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
           request_status: status,
         };
-      }
-
-      /* ---------- Visa ---------- */
-      else if (type === "Visa") {
+      } else if (type === "Visa") {
+        /* ---------- Visa ---------- */
         url = `${config.apiBaseUrl}/ApprovalVisa`;
 
         body = {
           visa_request_id: id,
           company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
           request_status: status,
-          Modified_by: sessionStorage.getItem("selectedUserCode")
+          Modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      }
-
-      /* ---------- Travel ---------- */
-      else if (type === "Travel") {
+      } else if (type === "Travel") {
+        /* ---------- Travel ---------- */
         url = `${config.apiBaseUrl}/ApprovalTravel`;
 
         body = {
           travel_request_id: id,
           company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
           request_status: status,
-          modified_by: sessionStorage.getItem("selectedUserCode")
+          modified_by: sessionStorage.getItem("selectedUserCode"),
         };
-      }
-
-      /* ---------- Employee Change ---------- */
-      else if (type === "Employee") {
+      } else if (type === "Employee") {
+        /* ---------- Employee Change ---------- */
         url = `${config.apiBaseUrl}/ApprovePersonalRequest`;
 
         body = {
@@ -2071,10 +2081,8 @@ const Dashboard = (payslip) => {
             },
           ],
         };
-      }
-
-      /* ---------- Family Change ---------- */
-      else if (type === "Family") {
+      } else if (type === "Family") {
+        /* ---------- Family Change ---------- */
         url = `${config.apiBaseUrl}/ApproveFamilyRequest`;
 
         body = {
@@ -2086,13 +2094,11 @@ const Dashboard = (payslip) => {
               request_status: status,
               approver_id: sessionStorage.getItem("selectedUserCode"),
               modified_by: sessionStorage.getItem("selectedUserCode"),
-            }
-          ]
+            },
+          ],
         };
-      }
-
-      /* ---------- Academic Change ---------- */
-      else if (type === "Academic") {
+      } else if (type === "Academic") {
+        /* ---------- Academic Change ---------- */
         url = `${config.apiBaseUrl}/ApproveAcademicRequest`;
 
         const selectedRequest = dashboardRequests.find(
@@ -2107,13 +2113,11 @@ const Dashboard = (payslip) => {
             EmployeeId: row.EmployeeId,
             request_status: status,
             modified_by: sessionStorage.getItem("selectedUserCode"),
-            Location_Code
+            Location_Code,
           })),
         };
-      }
-
-      /* ---------- Document Change ---------- */
-      else if (type === "Document") {
+      } else if (type === "Document") {
+        /* ---------- Document Change ---------- */
         url = `${config.apiBaseUrl}/ApproveDocumentRequest`;
 
         const selectedRequest = dashboardRequests.find(
@@ -2132,14 +2136,12 @@ const Dashboard = (payslip) => {
             modified_by: sessionStorage.getItem("selectedUserCode"),
           })),
         };
-      }
-
-      /* --------------- Asset Change -----------------*/
-      else if (type === "Asset") {
+      } else if (type === "Asset") {
+        /* --------------- Asset Change -----------------*/
         url = `${config.apiBaseUrl}/ApproveAssetRequest`;
 
         const selectedRequest = dashboardRequests.find(
-          (r) => r.id === id && r.type === "Asset"
+          (r) => r.id === id && r.type === "Asset",
         );
         const formatToSQLDate = (value) => {
           if (!value) return null;
@@ -2184,18 +2186,16 @@ const Dashboard = (payslip) => {
             };
           }),
         };
-      }
-
-      /* ---------- Shift Request ---------- */
-      else if (type === "Shift Change") {
+      } else if (type === "Shift Change") {
+        /* ---------- Shift Request ---------- */
         url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
 
         body = {
           request_id: id,
           company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
+          Location_Code: sessionStorage.getItem("selectedLocationCode"),
           request_status: status,
-          modified_by: sessionStorage.getItem('selectedUserCode'),
+          modified_by: sessionStorage.getItem("selectedUserCode"),
         };
       }
 
@@ -2222,15 +2222,17 @@ const Dashboard = (payslip) => {
   const [requestSearch, setRequestSearch] = useState("");
 
   const filteredRequests = dashboardRequests
-    .filter(r => (r.status || "").toLowerCase() === "pending")
-    .filter(req => {
+    .filter((r) => (r.status || "").toLowerCase() === "pending")
+    .filter((req) => {
       const searchLower = (requestSearch || "").trim().toLowerCase();
 
       if (!searchLower) return true;
 
       return (
-        (req.EmployeeName && String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
-        (req.EmployeeId && String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
+        (req.EmployeeName &&
+          String(req.EmployeeName).toLowerCase().includes(searchLower)) ||
+        (req.EmployeeId &&
+          String(req.EmployeeId).toLowerCase().includes(searchLower)) ||
         (req.type && String(req.type).toLowerCase().includes(searchLower)) ||
         (req.title && String(req.title).toLowerCase().includes(searchLower))
       );
@@ -2268,36 +2270,33 @@ const Dashboard = (payslip) => {
             </div>
           </div>
 
-          {
-          checkInMode === "Manual" && 
-          (
-          <div className="dashboard-wrapper">
-            <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
-              <div className="custom-badge">{user_code}</div>
-              <input
-                id="timing"
-                className="app-form-control"
-                type="text"
-                readOnly
-                value={timer}
-                style={{ maxWidth: "120px" }}
-              />
-              <button
-                onClick={handleTime}
-                className="check-btn"
-                style={{
-                  backgroundColor: isCheckedIn ? "red" : "green",
-                  color: "white",
-                }}
-                title={isCheckedIn ? "Check OUT" : "Check IN"}
-              >
-                <i className="fa-solid fa-clock me-2"></i>
-                {isCheckedIn ? "Check OUT" : "Check IN"}
-              </button>
+          {checkInMode === "Manual" && (
+            <div className="dashboard-wrapper">
+              <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
+                <div className="custom-badge">{user_code}</div>
+                <input
+                  id="timing"
+                  className="app-form-control"
+                  type="text"
+                  readOnly
+                  value={timer}
+                  style={{ maxWidth: "120px" }}
+                />
+                <button
+                  onClick={handleTime}
+                  className="check-btn"
+                  style={{
+                    backgroundColor: isCheckedIn ? "red" : "green",
+                    color: "white",
+                  }}
+                  title={isCheckedIn ? "Check OUT" : "Check IN"}
+                >
+                  <i className="fa-solid fa-clock me-2"></i>
+                  {isCheckedIn ? "Check OUT" : "Check IN"}
+                </button>
+              </div>
             </div>
-          </div>
           )}
-
         </div>
       </div>
 
@@ -2662,16 +2661,17 @@ const Dashboard = (payslip) => {
                         return (
                           <div
                             key={index}
-                            className={`day-cell ${isDayToday
-                              ? "today-cell"
-                              : isDayHoliday
-                                ? "holiday-cell"
-                                : isDayWeekend
-                                  ? "weekend-cell"
-                                  : isDayLeave
-                                    ? "leave-cell"
-                                    : ""
-                              }`}
+                            className={`day-cell ${
+                              isDayToday
+                                ? "today-cell"
+                                : isDayHoliday
+                                  ? "holiday-cell"
+                                  : isDayWeekend
+                                    ? "weekend-cell"
+                                    : isDayLeave
+                                      ? "leave-cell"
+                                      : ""
+                            }`}
                           >
                             {day}
                           </div>
@@ -2704,13 +2704,17 @@ const Dashboard = (payslip) => {
       <div className="dashboard-row spacing-mt-2">
         <div className="col-lg-8">
           <div className="dashboard-row ps-1 pe-1">
+            
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base joinees-card rounded app-shadow-lg height-full border-0 position-relative">
                 <div className="display-flex flex-between-center mb-3">
                   <h6 className="card-title-heading mb-0">New Joiners</h6>
                 </div>
 
-                <div className="joinee-carousel-container" ref={joineeCarouselRef}>
+                <div
+                  className="joinee-carousel-container"
+                  ref={joineeCarouselRef}
+                >
                   {NewJoinees.length > 0 ? (
                     NewJoinees.map((joinee, index) => (
                       <div key={index} className="joinee-slide">
@@ -2738,11 +2742,15 @@ const Dashboard = (payslip) => {
                           </div>
 
                           <div className="joinee-details mt-3">
-                            <h6 className="emp-name-text">{joinee.EmployeeName}</h6>
+                            <h6 className="emp-name-text">
+                              {joinee.EmployeeName}
+                            </h6>
                             <div className="emp-dept-sub">
                               {joinee.department_ID} • {joinee.EmployeeId}
                             </div>
-                            <div className="welcome-badge">Welcome Onboard! 🤝</div>
+                            <div className="welcome-badge">
+                              Welcome Onboard! 🤝
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -2750,7 +2758,9 @@ const Dashboard = (payslip) => {
                   ) : (
                     <div className="no-birthday-view">
                       <div className="empty-icon">👥</div>
-                      <p className="text-muted-color">No new joinees this month</p>
+                      <p className="text-muted-color">
+                        No new joinees this month
+                      </p>
                     </div>
                   )}
                 </div>
@@ -2779,7 +2789,9 @@ const Dashboard = (payslip) => {
             <div className="grid-col-lg-6 grid-col-md-6">
               <div className="app-card-base birthday-card-wrapper rounded app-shadow-lg height-full border-0 position-relative">
                 <div className="display-flex flex-between-center mb-3">
-                  <h6 className="card-title-heading mb-0">Upcoming Birthdays</h6>
+                  <h6 className="card-title-heading mb-0">
+                    Upcoming Birthdays
+                  </h6>
                 </div>
 
                 <div className="birthday-carousel-container" ref={carouselRef}>
@@ -2801,10 +2813,10 @@ const Dashboard = (payslip) => {
                               <div className="birthday-img-modern initials-avatar">
                                 {person.EmployeeName
                                   ? person.EmployeeName.split(" ")
-                                    .map((n) => n[0])
-                                    .join("")
-                                    .toUpperCase()
-                                    .slice(0, 2)
+                                      .map((n) => n[0])
+                                      .join("")
+                                      .toUpperCase()
+                                      .slice(0, 2)
                                   : "U"}
                               </div>
                             )}
@@ -2812,7 +2824,9 @@ const Dashboard = (payslip) => {
                           </div>
 
                           <div className="birthday-details mt-3">
-                            <h6 className="emp-name-text">{person.EmployeeName}</h6>
+                            <h6 className="emp-name-text">
+                              {person.EmployeeName}
+                            </h6>
                             <div className="emp-dept-sub">
                               {person.Department || "Team Member"}
                             </div>
@@ -2850,7 +2864,7 @@ const Dashboard = (payslip) => {
               </div>
             </div>
 
-            <div className="col-12 mt-0 ps-1 pe-1">
+            {/* <div className="col-12 mt-0 ps-1 pe-1">
               <div className="dashboard-card-base leave-balance-card rounded shadow-lg">
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
@@ -2910,6 +2924,84 @@ const Dashboard = (payslip) => {
                   )}
                 </div>
               </div>
+            </div> */}
+            <div className="col-12 mt-0 ps-1 pe-1">
+              <div className="dashboard-card-base leave-balance-card rounded shadow-lg p-3">
+                {/* Card Header */}
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 className="card-title-heading mb-0 fw-bold">
+                      Leave Balance
+                    </h6>
+                  </div>
+                  <button
+                    className="btn-apply-modern"
+                    title="Apply Leave"
+                    onClick={handleLeave}
+                  >
+                    Apply Leave
+                  </button>
+                </div>
+
+                {/* Horizontal Scroll Layout showing 4 items initially */}
+                <div className="leave-horizontal-container">
+                  {leaveData.length > 0 ? (
+                    leaveData.map((leave, index) => {
+                      const total = leave.Current_Total || 0;
+                      const available = leave.Current_Balance || 0;
+                      const percentage =
+                        total > 0 ? (available / total) * 100 : 0;
+                      const strokeDasharray = `${percentage}, 100`;
+
+                      return (
+                        <div
+                          key={index}
+                          className="leave-status-item"
+                          title={leave.leavetype}
+                        >
+                          <div className="leave-progress-wrapper">
+                            <svg viewBox="0 0 36 36" className="circular-chart">
+                              <path
+                                className="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              />
+                              <path
+                                className={`circle stroke-${leave.LeaveId.toLowerCase().replace(/\s/g, "-")}`}
+                                strokeDasharray={strokeDasharray}
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              />
+                              <text x="18" y="18" className="percentage">
+                                {available}
+                              </text>
+                            </svg>
+                          </div>
+
+                          <div className="leave-info-text text-center">
+                            <span
+                              className="leave-label fw-bold text-uppercase d-block text-truncate"
+                              style={{ fontSize: "11px", maxWidth: "110px" }}
+                            >
+                              {leave.LeaveId}
+                            </span>
+                            <span
+                              className="leave-total-sub text-muted d-block"
+                              style={{ fontSize: "10px" }}
+                            >
+                              OF {total} DAYS
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-4 w-100">
+                      <p className="text-muted mb-0">
+                        No leave data available.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2923,7 +3015,12 @@ const Dashboard = (payslip) => {
               <div className="header-top-row d-flex justify-content-between align-items-center mb-2">
                 <h6 className="card-title-heading mb-0">Pending Requests</h6>
                 <span className="request-badge-count">
-                  {dashboardRequests.filter(r => (r.status || "").toLowerCase() === "pending").length}&nbsp;&nbsp;Pending
+                  {
+                    dashboardRequests.filter(
+                      (r) => (r.status || "").toLowerCase() === "pending",
+                    ).length
+                  }
+                  &nbsp;&nbsp;Pending
                 </span>
               </div>
 
@@ -2959,27 +3056,38 @@ const Dashboard = (payslip) => {
                           employeeId: req.EmployeeId,
                           status: "Pending",
                           mode: "item",
-                          HolidayName: req.title
+                          HolidayName: req.title,
                         },
-                      })
+                      });
                     }}
                   >
                     {/* Avatar Fallback Logic */}
                     <div className="req-avatar">
                       {req.EmployeeName
-                        ? req.EmployeeName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-                        : "Mr.X"
-                      }
+                        ? req.EmployeeName.split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()
+                            .slice(0, 2)
+                        : "Mr.X"}
                     </div>
                     <div className="req-content">
                       <div className="req-top-row">
                         <span className="req-emp-name">{req.EmployeeName}</span>
-                        <span className="req-type-tag" onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/RequestReport", {
-                            state: { employeeId: req.EmployeeId, type: req.type, status: "Pending", mode: "type" },
-                          });
-                        }}>
+                        <span
+                          className="req-type-tag"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/RequestReport", {
+                              state: {
+                                employeeId: req.EmployeeId,
+                                type: req.type,
+                                status: "Pending",
+                                mode: "type",
+                              },
+                            });
+                          }}
+                        >
                           {req.type}
                         </span>
                       </div>
@@ -2996,7 +3104,11 @@ const Dashboard = (payslip) => {
                           <span>{req.FromDate}</span>
                           <i className="fa-solid fa-arrow-right-long mx-2"></i>
                           <span>{req.ToDate}</span>
-                          {req.days && <span className="req-days-count">({req.days} Days)</span>}
+                          {req.days && (
+                            <span className="req-days-count">
+                              ({req.days} Days)
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -3021,10 +3133,16 @@ const Dashboard = (payslip) => {
                         title="Reject"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleApproval(req.type, req.id, req.FromDate, false, {
-                            EmployeeId: req.EmployeeId,
-                            HolidayDate: req.HolidayDate,
-                          });
+                          handleApproval(
+                            req.type,
+                            req.id,
+                            req.FromDate,
+                            false,
+                            {
+                              EmployeeId: req.EmployeeId,
+                              HolidayDate: req.HolidayDate,
+                            },
+                          );
                         }}
                       >
                         <i className="fa-solid fa-xmark"></i>

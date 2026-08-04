@@ -3512,7 +3512,7 @@
 
 .fixed-list-heights {
     /* height: 590px;  */
-    height: 416px; 
+    height: 440px; 
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -4085,3 +4085,267 @@
 }
 
 /* Ended this code for mobile view of My Team & Time Tracking -- 28-04-2026 by Dinesh Gokul */
+
+/* Horizontal Scroll Container */
+.leave-horizontal-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px; /* Gap between cards */
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 4px;
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory; /* Smooth snapping when scrolling */
+}
+
+/* Custom Scrollbar */
+.leave-horizontal-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.leave-horizontal-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.leave-horizontal-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/*code added for the Leave Balance harizontal scroll on 04-aug-2026*/
+/* Show exactly 4 cards at a time (100% width minus 3 gaps of 12px) */
+.leave-status-item {
+  flex: 0 0 calc((100% - 36px) / 4); /* Exactly 4 items visible */
+  min-width: 140px; /* Prevents shrinking on smaller screens */
+  scroll-snap-align: start;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leave-status-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Circular Chart Fix */
+.leave-progress-wrapper {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 8px;
+}
+
+.circular-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #f1f5f9;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.percentage {
+  fill: #1e293b;
+  font-size: 0.6em;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ===================================================== */
+/* MOBILE RESPONSIVE FIXES FOR DASHBOARD LAYOUT           */
+/* ===================================================== */
+
+/* ----------------------------------------------------
+   1. TABLET & MOBILE GRID STACKING (< 768px)
+---------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Enforce 100% full width for main sections and grid columns */
+  .col-lg-8,
+  .grid-col-lg-4,
+  .grid-col-lg-6,
+  .grid-col-md-6 {
+    width: 100% !important;
+    margin-bottom: 12px;
+  }
+
+  .dashboard-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Padding adjustments for main cards */
+  .app-card-base,
+  .dashboard-card-base {
+    padding: 14px !important;
+  }
+
+  /* Fixed height adjustment for scrollable lists on mobile */
+  .fixed-list-heights {
+    height: auto !important;
+    max-height: 380px !important;
+  }
+
+  /* Pending Requests List Item Adjustments */
+  .request-item-modern {
+    padding: 10px 8px;
+    gap: 10px;
+  }
+
+  .req-emp-name {
+    font-size: 14px;
+  }
+
+  /* Fix for date range wrapping in Pending Requests */
+  .req-date-footer {
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+/* ----------------------------------------------------
+   2. SMALL MOBILE SCREENS (< 576px)
+---------------------------------------------------- */
+@media (max-width: 576px) {
+  /* Header typography scaling */
+  .card-title-heading {
+    font-size: 1.05rem;
+  }
+
+  /* --- A. NEW JOINEES & BIRTHDAYS CAROUSEL --- */
+  .joinee-card-inner,
+  .birthday-card-inner {
+    padding: 12px 10px !important;
+    border-radius: 16px;
+  }
+
+  /* Scale down profile avatars for small mobile screens */
+  .profile-image-wrapper {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .joinee-img-modern,
+  .birthday-img-modern,
+  .initials-avatar {
+    width: 80px !important;
+    height: 80px !important;
+    font-size: 2rem !important;
+  }
+
+  .joinee-icon-badge,
+  .birthday-icon-badge {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 12px !important;
+  }
+
+  .emp-name-text {
+    font-size: 0.95rem !important;
+  }
+
+  .emp-dept-sub {
+    font-size: 0.75rem !important;
+  }
+
+  .welcome-badge,
+  .wish-badge {
+    font-size: 10px !important;
+    padding: 3px 10px !important;
+  }
+
+  /* --- B. LEAVE BALANCE HORIZONTAL SCROLL --- */
+  .leave-horizontal-container {
+    gap: 8px !important;
+    padding: 6px 2px !important;
+  }
+
+  /* Displays 2 cards side-by-side on mobile screens */
+  .leave-status-item {
+    flex: 0 0 calc((100% - 8px) / 2) !important;
+    min-width: 125px !important;
+    padding: 10px 6px !important;
+  }
+
+  .leave-progress-wrapper {
+    width: 42px !important;
+    height: 42px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .leave-label {
+    font-size: 10px !important;
+    max-width: 95px !important;
+  }
+
+  .leave-total-sub {
+    font-size: 9px !important;
+  }
+
+  .btn-apply-modern {
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* --- C. PENDING REQUESTS CARD --- */
+  .header-top-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .request-badge-count {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .search-input-modern {
+    font-size: 12px;
+    padding: 8px 10px 8px 32px;
+  }
+
+  .search-icon {
+    font-size: 12px;
+    left: 10px;
+  }
+
+  /* Action buttons align horizontally at bottom for mobile */
+  .request-item-modern {
+    flex-wrap: wrap;
+  }
+
+  .req-actions-vertical {
+    flex-direction: row !important;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 6px;
+    gap: 12px;
+  }
+
+  .action-circle-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
