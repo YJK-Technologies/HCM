@@ -19,6 +19,9 @@ const ApplyLeave = () => {
   const [Reason, setReason] = useState("");
   const [Select_slots, setSelect_Slots] = useState("");
   const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
+  const [isResponsibleFocus, setIsResponsibleFocus] = useState(false);
+  const [selectedReponsablePerson, setselectedReponsablePerson] = useState('');
+  const [empDrop, setEmpDrop] = useState([]);
   const [ReportingManager, setReportingManager] = useState("");
   const [LeaveDrop, setLeaveDrop] = useState([]);
   const [SelectedLeave, setSelectedLeave] = useState("");
@@ -39,6 +42,8 @@ const ApplyLeave = () => {
   const [compOffOptions, setCompOffOptions] = useState([]);
   const [selectedCompOff, setSelectedCompOff] = useState(null);
   const [isSelectCompOff, setIsSelectCompOff] = useState(false);
+  
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   // useEffect(() => {
   //   fetch(`${config.apiBaseUrl}/getapplyLeavetype`,{
@@ -362,6 +367,41 @@ const ApplyLeave = () => {
     setselectedmanager(selectedOption);
     setReportingManager(selectedOption ? selectedOption.value : '');
   };
+
+      useEffect(() => {
+          const fetchUserData = async () => {
+              try {
+                  const response = await fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
+                  });
+  
+                  const val = await response.json();
+                  setEmpDrop(val);
+  
+              } catch (error) {
+                  console.error('Error fetching user data:', error);
+              }
+          };
+  
+          fetchUserData();
+      }, []);
+  
+
+  const filteredOptionResponsible = Array.isArray(empDrop)
+  ? empDrop.map((option) => ({
+      value: option.EmployeeId,
+      label: `${option.EmployeeId} - ${option.First_Name}`,
+    }))
+  : [];
+
+  const handleChangeResponsible = (selectedOption) => {
+        setselectedReponsablePerson(selectedOption);
+        setReasponsiblePerson(selectedOption ? selectedOption.value : "");
+};
 
   const [leaveRowData, setLeaveRowData] = useState([]);
   const [leaveDrop, setleaveDrop] = useState([]);
@@ -866,17 +906,28 @@ const ApplyLeave = () => {
               </div>
 
               <div className="col-md-6">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    title="Please Enter the Responsible Person"
-                    value={AlternativeReponsablePerson}
-                    onChange={(e) => setReasponsiblePerson(e.target.value)}
+                <div
+                  className={`inputGroup selectGroup 
+                    ${selectedReponsablePerson ? "has-value" : ""} 
+                    ${isResponsibleFocus ? "is-focused" : ""}`}
+                  title="Please Select the Responsible Person"
+                >
+                  <Select
+                    value={selectedReponsablePerson}
+                    options={filteredOptionResponsible}
+                    onChange={handleChangeResponsible}
                     placeholder=" "
-                    autoComplete="off"
+                    onFocus={() => setIsResponsibleFocus(true)}
+                    onBlur={() => setIsResponsibleFocus(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                   />
-                  <label className={`exp-form-labels ${error && !AlternativeReponsablePerson ? 'text-danger' : ''}`}>
+              
+                  <label
+                    className={`floating-label ${
+                      error && !AlternativeReponsablePerson ? "text-danger" : ""
+                    }`}
+                  >
                     Responsible Person<span className="text-danger">*</span>
                   </label>
                 </div>
