@@ -5,16 +5,7 @@ import { Doughnut, Bar } from "react-chartjs-2";
 import { getElementAtEvent } from "react-chartjs-2";
 import Vector from "./Team.png";
 import Select from "react-select";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip as ChartTooltip,
-  Legend as ChartLegend,
-  Title,
-  ArcElement,
-} from "chart.js";
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip as ChartTooltip, Legend as ChartLegend, Title, ArcElement,} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -24,14 +15,7 @@ import config from "../Apiconfig";
 import { publicIpv4 } from "public-ip";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,} from "recharts";
 import { showEightHourToast } from "../GlobalToast";
 
 ChartJS.register(
@@ -2819,7 +2803,7 @@ const Dashboard = () => {
 
   const reloadGridDatas = () => {
     clearInputsField([])
-    setRowData([])
+    setShiftRowData([])
   };
 
   const clearInputsField = () => {
