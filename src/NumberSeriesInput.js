@@ -203,7 +203,7 @@ function NumberSeriesInput({ }) {
         }),
       });
       if (response.ok) {
-        toast.success("Data inserted successfully", {
+        toast.success("Data Updated successfully", {
           onClose: () => {
             // clearInputFields();
             setError(false)
@@ -217,7 +217,7 @@ function NumberSeriesInput({ }) {
       }
     } catch (error) {
       console.error("Error Update data:", error);
-      toast.error('Error inserting data: ' + error.message);
+      toast.error('Error Updated data: ' + error.message);
     } finally {
       setLoading(false);
     }

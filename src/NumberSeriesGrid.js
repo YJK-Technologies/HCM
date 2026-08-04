@@ -352,6 +352,9 @@ function NumberSeriesGrid() {
         "Start No": formatValue(row.Start_No),
         "Running No": formatValue(row.Running_No),
         "End No": formatValue(row.End_No),
+        "Text": formatValue(row.comtext),
+        "Number Prefix": formatValue(row.number_prefix),
+        "Status": formatValue(row.Status),
       };
     });
 
