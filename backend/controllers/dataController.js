@@ -9403,7 +9403,7 @@ const addLeaveType = async (req, res) => {
       .input("Start_Year", sql.Date, Start_Year)
       .input("End_Year", sql.Date, End_Year)
       .input("status", sql.NVarChar, status)
-      .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@Start_Year,@End_Year,@status,'','','','',''`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,@created_by,@modified_by,@EmployeeId,@Start_Year,@End_Year,@status,'','','','',''`);
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -11979,7 +11979,7 @@ const getsearchLeavetypes = async (req, res) => {
       .input("mode", sql.NVarChar, "A")
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,'','','','','',0,0,'','','','','','','','','',NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,'','','','','',0,0,'','','','','','','','','',NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -12009,7 +12009,7 @@ const getLeaveTypeSearch = async (req, res) => {
       .input("Start_Year", sql.NVarChar, Start_Year)
       .input("End_Year", sql.NVarChar, End_Year)
       .input("status", sql.NVarChar, status)
-      .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','','',@Start_Year,@End_Year,@status,'',NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,@LeaveId,'',@code,@Type,@Accrual,0,0,@Exceed_Leave,'','','','',@Start_Year,@End_Year,@status,'',NULL,NULL,NULL,NULL`);
 
     // Send response
     if (result.recordset.length > 0) {
@@ -13153,7 +13153,7 @@ const addDailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_DailyLogin_pavun @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@Location_Code,@created_by,'',null,null,null,null,null,null,null,null`,);
+      .query(`EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@Location_Code,@created_by,'',null,null,null,null,null,null,null,null`,);
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -14053,7 +14053,7 @@ const deleteLeave = async (req, res) => {
         .input("Location_Code", sql.NVarChar, updatedRow.Location_Code)
         .input("Modified_by", sql.NVarChar, updatedRow.Modified_by)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
-        .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,@LeaveId,'','','','','','','','','',@Modified_by,'','','','',@keyfield,'',NULL,NULL,NULL`);
+        .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,@LeaveId,'','','','','','','','','',@Modified_by,'','','','',@keyfield,'',NULL,NULL,NULL`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -14092,7 +14092,7 @@ const UpdateLeaveType = async (req, res) => {
         .input("status", sql.NVarChar, updatedRow.status)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("Location_Code", sql.NVarChar, updatedRow.Location_Code)
-        .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,'',@Start_Year,@End_Year,@status,@keyfield,'',NULL,NULL,NULL`);
+        .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,@LeaveId,@Description,@code,@Type,@Accrual,@TotalDaystoBeCredit,@carryForward,@Exceed_Leave,@LeaveReason,'',@Modified_by,'',@Start_Year,@End_Year,@status,@keyfield,'',NULL,NULL,NULL`);
     }
     res.json({ success: true, message: "Data inserted successfully" });
   } catch (err) {
@@ -14225,7 +14225,7 @@ const DailyLogin = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(`EXEC sp_DailyLogin_pavun @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@Location_Code,@created_by,'',null,null,null,null,null,null,null,null`,);
+      .query(`EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location,'',@company_code,@Location_Code,@created_by,'',null,null,null,null,null,null,null,null`,);
     res.status(200).json("Check IN data inserted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -14264,7 +14264,7 @@ const DailyLogOUT = async (req, res) => {
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("created_by", sql.NVarChar, created_by)
       .input("modified_by", sql.NVarChar, modified_by)
-      .query(`EXEC sp_DailyLogin_pavun @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, 
+      .query(`EXEC sp_DailyLogin @mode,@userID,@DayofLogin,'','','','',@DeviceDetails,@IP_Address,@Location, @Shift_Code, 
         @company_code,@Location_Code,@created_by,@modified_by,null,null,null,null,null,null,null,null`,
       );
     res.status(200).json("Check out data inserted successfully");
@@ -15116,7 +15116,7 @@ const getapplyLeavetype = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_LeaveTypes_pavun @mode,@company_code,@Location_Code,'','','','','',0,0,'','','','',@EmployeeId,'','','','',NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_LeaveTypes @mode,@company_code,@Location_Code,'','','','','',0,0,'','','','',@EmployeeId,'','','','',NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -16117,7 +16117,7 @@ const GetUserCheckIN = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "FC")
       .input("userid", sql.NVarChar, userid)
-      .query(` EXEC sp_DailyLogin_pavun @mode,@userid,'','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(` EXEC sp_DailyLogin @mode,@userid,'','','','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
     res.json(result.recordset);
   } catch (err) {
     console.error("Error", err);
@@ -16371,7 +16371,7 @@ const getCheckInStatus = async (req, res) => {
       .input("userID", sql.NVarChar, userID)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_DailyLogin_pavun @mode,@userID,'','','','','','','','','',@company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
+      .query(`EXEC sp_DailyLogin @mode,@userID,'','','','','','','','','',@company_code,@Location_Code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     res.json(result.recordset);
   } catch (err) {
@@ -18641,7 +18641,7 @@ const TimeZonemasterInsert = async (req, res) => {
       );
     res.status(200).json({
       success: true,
-      message: "interview_schedule insertd successfully",
+      message: "Time Zone Master Inserted successfully",
     });
   } catch (err) {
     console.error("Error during interview_schedule insert:", err);

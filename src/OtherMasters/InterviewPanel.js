@@ -472,7 +472,7 @@ function InterviewPanel({ }) {
   const handleUpdate = async (rowData) => {
 
     showConfirmationToast(
-      "Are you sure you want to update the selected employee shift mapping data?",
+      "Are you sure you want to update the selected Interview Panel data?",
       async () => {
         try {
           setLoading(true);
@@ -506,7 +506,7 @@ function InterviewPanel({ }) {
           );
 
           if (response.ok) {
-            toast.success("Employee shift mapping updated successfully", {
+            toast.success("Interview Panel updated successfully", {
               onClose: () => handleSearch(),
             });
           } else {
