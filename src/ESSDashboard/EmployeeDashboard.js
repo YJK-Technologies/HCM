@@ -7,16 +7,7 @@ import config from "../Apiconfig";
 import { showEightHourToast } from "../GlobalToast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  PointElement,
-  LineElement,
-} from "chart.js";
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, LineElement,} from "chart.js";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -38,6 +29,8 @@ const Dashboard = (payslip) => {
   const [isCheckedIn, setIsCheckedIn] = useState(() => {
     return localStorage.getItem("isCheckedIn") === "true";
   });
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const Today = new Date().toISOString().split("T")[0];
   const [isCalendarVisible, setIsCalendarVisible] = useState(true);
   const [rowData, setRowData] = useState("");
@@ -77,6 +70,9 @@ const Dashboard = (payslip) => {
   const Location_Code = sessionStorage.getItem("selectedLocationCode");
 
   const [checkInMode, setCheckInMode] = useState("");
+
+  const [isSearching, setIsSearching] = useState(false);
+  const gridRef = useRef(null);
 
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
@@ -461,7 +457,8 @@ const Dashboard = (payslip) => {
       toast.warning("Start Date cannot be greater than End Date");
       return;
     }
-
+     setIsSearching(true);
+     gridRef.current?.api.showLoadingOverlay();
     try {
       const response = await fetch(
         `${config.apiBaseUrl}/ESSEmployeeDashboard`,
@@ -501,7 +498,10 @@ const Dashboard = (payslip) => {
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data: " + error.message);
-    }
+    } finally {
+      setIsSearching(false);
+     gridRef.current?.api.hideOverlay();
+  }
   };
 
   const handleEmpShiftReportSearch = async (fromDate, toDate) => {
@@ -1103,6 +1103,10 @@ const Dashboard = (payslip) => {
   };
 
   const handleTime = async () => {
+     // Prevent multiple clicks
+    if (isProcessing) return;
+
+    setIsProcessing(true);
     try {
       const route = isCheckedIn ? "/DailyLogOUT" : "/DailyLogin";
       const response = await fetch(`${config.apiBaseUrl}${route}`, {
@@ -1154,7 +1158,10 @@ const Dashboard = (payslip) => {
       }
     } catch (error) {
       toast.error("Error inserting data: " + error.message);
-    }
+    } finally {
+    // Enable button after API completes
+    setIsProcessing(false);
+  }
   };
 
   useEffect(() => {
@@ -1190,7 +1197,11 @@ const Dashboard = (payslip) => {
 
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) {
-        setAnnouncement(data[0].MessageTitle);
+        const allAnnouncements = data
+        .map((item) => item.MessageTitle)
+        .join("     ||     ");
+
+        setAnnouncement(allAnnouncements);
       } else {
         setAnnouncement("No announcements available.");
       }
@@ -2284,15 +2295,19 @@ const Dashboard = (payslip) => {
                 />
                 <button
                   onClick={handleTime}
+                  disabled={isProcessing}
                   className="check-btn"
                   style={{
                     backgroundColor: isCheckedIn ? "red" : "green",
                     color: "white",
+                    opacity: isProcessing ? 0.7 : 1,
+                    cursor: isProcessing ? "not-allowed" : "pointer",
                   }}
                   title={isCheckedIn ? "Check OUT" : "Check IN"}
                 >
                   <i className="fa-solid fa-clock me-2"></i>
-                  {isCheckedIn ? "Check OUT" : "Check IN"}
+                  {isProcessing ? "Processing..." : isCheckedIn ? "Check OUT" : "Check IN"}
+                  {/* {isCheckedIn ? "Check OUT" : "Check IN"} */}
                 </button>
               </div>
             </div>
@@ -2525,7 +2540,6 @@ const Dashboard = (payslip) => {
                     rowHeight={30}
                     pagination={true}
                     paginationAutoPageSize={true}
-                    onFirstDataRendered={onFirstDataRendered}
                   />
 
                   <ShiftRequestModal
@@ -2679,6 +2693,29 @@ const Dashboard = (payslip) => {
                       })}
                     </div>
                   </div>
+                      {/* legend section */}
+                    <div className="calendar-legend mt-3">
+                      <div className="legend-item">
+                        <span className="legend-color today-color"></span>
+                        <span>Today</span>
+                      </div>
+
+                      <div className="legend-item">
+                        <span className="legend-color holiday-color"></span>
+                        <span>Holiday</span>
+                      </div>
+
+                      <div className="legend-item">
+                        <span className="legend-color leave-color"></span>
+                        <span>Leave</span>
+                      </div>
+
+                      <div className="legend-item">
+                        <span className="legend-color weekend-color"></span>
+                        <span>Sunday</span>
+                      </div>
+                    </div>
+
                 </div>
               )}
 
@@ -2699,6 +2736,7 @@ const Dashboard = (payslip) => {
             </div>
           </div>
         </div>
+        
       </div>
 
       <div className="dashboard-row spacing-mt-2">
@@ -3230,12 +3268,14 @@ const Dashboard = (payslip) => {
                 style={{ height: 440, width: "100%" }}
               >
                 <AgGridReact
+                  ref={gridRef}
                   columnDefs={Employeecol}
                   rowData={rowData}
-                  suppressLoadingOverlay={true}
+                  // suppressLoadingOverlay={true}
                   pagination={true}
                   paginationAutoPageSize={true}
                   onFirstDataRendered={onFirstDataRendered}
+                   onGridReady={(params) => { params.api.hideOverlay(); }}
                   getRowStyle={(params) => {
                     if (params.data.Status === "Compensatory Leave") {
                       const themeColor = getComputedStyle(
