@@ -1201,6 +1201,47 @@
   transform: scale(1.05);
   /* Highlight today */
 }
+/*legend section*/
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 15px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.today-color {
+  background-color: var(--calendar-today);
+  border: 2px solid var(--color-primary);
+}
+
+.holiday-color {
+  background-color: var(--calendar-holiday);
+}
+
+.leave-color {
+  background-color: var(--calendar-leave);
+}
+
+.weekend-color {
+  background-color: #1b8bd6;
+}
 
 
 /* ===================================================== */
