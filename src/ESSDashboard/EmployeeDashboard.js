@@ -167,17 +167,90 @@ const Dashboard = (payslip) => {
     }
   };
 
+  const normalizeDate = (dateString) => {
+  if (!dateString) return "";
+
+  // Already yyyy-MM-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString))
+    return dateString;
+
+  // yyyy/MM/dd
+  if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateString))
+    return dateString.replace(/\//g, "-");
+
+  // yyyy.MM.dd
+  if (/^\d{4}\.\d{2}\.\d{2}$/.test(dateString))
+    return dateString.replace(/\./g, "-");
+
+  // dd/MM/yyyy OR MM/dd/yyyy
+if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+  const [part1, part2, yyyy] = dateString.split("/");
+
+  // If first part is greater than 12, it must be DD/MM
+  if (Number(part1) > 12) {
+    return `${yyyy}-${part2}-${part1}`;
+  }
+
+  // If second part is greater than 12, it must be MM/DD
+  if (Number(part2) > 12) {
+    return `${yyyy}-${part1}-${part2}`;
+  }
+
+  // Ambiguous (e.g. 08/01/2026)
+  // Default to MM/DD/yyyy
+  return `${yyyy}-${part1}-${part2}`;
+}
+
+  // dd-MM-yyyy OR MM-dd-yyyy
+if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
+  const [part1, part2, yyyy] = dateString.split("-");
+
+  if (Number(part1) > 12) {
+    return `${yyyy}-${part2}-${part1}`;
+  }
+
+  if (Number(part2) > 12) {
+    return `${yyyy}-${part1}-${part2}`;
+  }
+
+  // Ambiguous
+  return `${yyyy}-${part1}-${part2}`;
+}
+
+  // dd.MM.yyyy
+  if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
+    const [dd, mm, yyyy] = dateString.split(".");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // yyyyMMdd or any valid JS date
+  const d = new Date(dateString);
+
+  if (!isNaN(d.getTime())) {
+    return d.toISOString().split("T")[0];
+  }
+
+  return dateString;
+};
+
   // Filter shifts from existing Ag-Grid rowData for the calendar cells
+  // Format the date to match your API response format (YYYY-MM-DD)
+  // rempShiftRowData-la irunthu antha date-kku mela shift irukkannu check pannum
+  
   const getShiftDetailsForDay = (day) => {
     if (!day) return null;
 
-    // Format the date to match your API response format (YYYY-MM-DD)
-    const formattedDate = `${currentShiftDate.getFullYear()}-${String(currentShiftDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const formattedDate = normalizeDate(
+  `${currentShiftDate.getFullYear()}-${String(
+    currentShiftDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+);
 
-    // rempShiftRowData-la irunthu antha date-kku mela shift irukkannu check pannum
     return rempShiftRowData && Array.isArray(rempShiftRowData)
-      ? rempShiftRowData.find((s) => s.Date === formattedDate)
-      : null;
+    ? rempShiftRowData.find(
+        (s) => normalizeDate(s.Date) === formattedDate
+      )
+    : null;
   };
 
   const shiftConfig = {

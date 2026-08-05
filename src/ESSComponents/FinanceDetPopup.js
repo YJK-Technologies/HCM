@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import LoadingScreen from '../Loading';
+import Select from 'react-select';
 const config = require('../Apiconfig');
 
 const columnDefs = [
@@ -19,7 +20,7 @@ const columnDefs = [
   },
   {
     headerName: "First Name",
-    field: "first_name",
+    field: "First_Name",
     // filter: 'agTextColumnFilter',
     editable: false,
   },
@@ -106,6 +107,14 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
 
   const [PFNo, setPFNo] = useState("");
 
+  const [selectedSalaryType, setSelectedSalaryType] = useState('');
+  const [isSelectSalaryType, setIsSelectSalaryType] = useState(false);
+  const [salaryTypedrop, setSalaryTypedrop] = useState([]);
+
+  const [selectedPayScale, setSelectedPayScale] = useState('');
+  const [isSelectPayScale, setIsSelectPayScale] = useState(false);
+  const [payScaledrop, setPayScaledrop] = useState([]);
+
   const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
   const handleSearch = async () => {
@@ -170,6 +179,50 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
       setLoading(false);
     }
   };
+
+  const handleSalaryTypeChange = (selectedSalaryType) => {
+    setSelectedSalaryType(selectedSalaryType);
+    setSalaryType(selectedSalaryType ? selectedSalaryType.value : '');
+  };
+
+  const filteredOptionSalaryType = salaryTypedrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  const handlePayScaleChange = (selectedPayScale) => {
+    setSelectedPayScale(selectedPayScale);
+    setPayScale(selectedPayScale ? selectedPayScale.value : '');
+  };
+
+  const filteredOptionPayScale = payScaledrop.map((option) => ({
+    value: option.attributedetails_name,
+    label: option.attributedetails_name,
+  }));
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getSalaryType`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setSalaryTypedrop(val));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/getPayscale`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+      }),
+    })
+      .then((data) => data.json())
+      .then((val) => setPayScaledrop(val));
+  }, []);
 
   const handleClosePopup = () => {
     clearInputs();
@@ -281,7 +334,7 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                   </div>
                 </div>
 
-                <div className="form-block col-md-3">
+                {/* <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
                       type="text"
@@ -296,9 +349,34 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     />
                     <label className="exp-form-labels">Salary Type</label>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+                    ${setSelectedSalaryType ? "has-value" : ""} 
+                    ${isSelectSalaryType ? "is-focused" : ""}`}
+                    title="Please Select the Salary Type"
+                  >
+                    <Select
+                      id="status"
+                      type="text"
+                      placeholder=" "
+                      onFocus={() => setIsSelectSalaryType(true)}
+                      onBlur={() => setIsSelectSalaryType(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      value={selectedSalaryType}
+                      onChange={handleSalaryTypeChange}
+                      options={filteredOptionSalaryType}
+                    />
+                    <label htmlFor="Status" className={`floating-label`}>
+                      Salary Type
+                    </label>
+                  </div>
+                </div>
+
+                {/* <div className="form-block col-md-3">
                   <div className="inputGroup">
                     <input
                       type="text"
@@ -312,6 +390,31 @@ export default function FinanceDetailsPopup({ open, handleClose, finaceDetails }
                     // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                     <label className="exp-form-labels">Payscale</label>
+                  </div>
+                </div> */}
+
+                <div className="form-block col-md-3">
+                  <div
+                    className={`inputGroup selectGroup 
+                    ${selectedPayScale ? "has-value" : ""} 
+                    ${isSelectPayScale ? "is-focused" : ""}`}
+                    title="Please Select the Status"
+                  >
+                    <Select
+                      id="status"
+                      type="text"
+                      placeholder=" "
+                      onFocus={() => setIsSelectPayScale(true)}
+                      onBlur={() => setIsSelectPayScale(false)}
+                      classNamePrefix="react-select"
+                      isClearable
+                      value={selectedPayScale}
+                      onChange={handlePayScaleChange}
+                      options={filteredOptionPayScale}
+                    />
+                    <label htmlFor="Status" className={`floating-label`}>
+                      Payscale
+                    </label>
                   </div>
                 </div>
 
