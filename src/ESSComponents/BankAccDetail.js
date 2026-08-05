@@ -56,7 +56,7 @@ function Input({}) {
           isDelete: "",
           passBookImg: null,
           documentUrl: BankPassbook,
-          showDefaultImage: true,
+          isDefaultImage: true,
           keyfield: "",
           isNewFile: false,
         },
@@ -446,14 +446,16 @@ function Input({}) {
         !member.AccountHolderName ||
         !member.Account_NO ||
         !member.bankName ||
-        !member.IFSC_Code,
+        !member.IFSC_Code ||
+        !member.passBookImg,
     );
 
     if (hasInvalid) {
       setError(true);
       toast.warning("Please fill all required fields.");
       return;
-    }
+    } 
+
 
     setLoading(true);
 
@@ -628,7 +630,10 @@ function Input({}) {
       );
 
       if (response.ok) {
-        toast.success("Bank Details Updated Successfully.");
+        // toast.success("Bank Details Updated Successfully.");
+        toast.success("Bank Details updated successfully!", {
+          onClose: () => window.location.reload(),
+        });
       } else {
         const err = await response.json();
         toast.warning(err.message);
@@ -1308,7 +1313,7 @@ function Input({}) {
 
               <div className="col-md-2">
                 <div className="inputGroup">
-                  <div className="image-upload-container">
+                  <div className={`image-upload-container ${error && !member.passBookImg ? "image-error" : ""}`}>
                     {member.passBookImg ? (
                       <div className="image-preview-box">
                         <img

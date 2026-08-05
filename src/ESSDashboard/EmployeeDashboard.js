@@ -74,6 +74,8 @@ const Dashboard = (payslip) => {
   const [isSearching, setIsSearching] = useState(false);
   const gridRef = useRef(null);
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
   useEffect(() => {
     if (upcomingBirthdays.length > 0) {
       const timer = setInterval(() => {
@@ -1295,6 +1297,10 @@ if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
   const printRef = useRef();
 
   const handlePreview = async () => {
+    // Prevent multiple clicks
+    if (isGenerating) return;
+
+    setIsGenerating(true);
     try {
       const salary_month = selectedPeriod;
       const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -1336,7 +1342,10 @@ if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
     } catch (err) {
       console.error(err);
       alert("Error fetching payslip");
-    }
+    } finally {
+    // Re-enable the button
+    setIsGenerating(false);
+  }
   };
 
   const handlePrint = () => {
@@ -2662,11 +2671,23 @@ if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
 
                 <div className="action-container">
                   {selectedPeriod ? (
+                    // <button
+                    //   className="btn-payslip-primary"
+                    //   onClick={handlePreview}
+                    // >
+                    //   <i className="bi bi-file-pdf me-2"></i> Generate & Preview
+                    // </button>
                     <button
                       className="btn-payslip-primary"
                       onClick={handlePreview}
+                      disabled={isGenerating}
+                      style={{
+                        opacity: isGenerating ? 0.7 : 1,
+                        cursor: isGenerating ? "not-allowed" : "pointer",
+                      }}
                     >
-                      <i className="bi bi-file-pdf me-2"></i> Generate & Preview
+                      <i className="bi bi-file-pdf me-2"></i>
+                      {isGenerating ? "Generating..." : "Generate & Preview"}
                     </button>
                   ) : (
                     <div className="payslip-helper-text">
