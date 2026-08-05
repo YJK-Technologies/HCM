@@ -688,6 +688,7 @@ function Input({ }) {
       original.documentNo === member.documentNo &&
       original.issueDate === member.issueDate &&
       original.expiryDate === member.expiryDate &&
+      original.document === member.document &&
       member.isNewFile === false
     ) {
       toast.warning("No changes detected");

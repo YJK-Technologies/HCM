@@ -759,9 +759,9 @@ const handleUpdate = async (relationName, index) => {
   }));
 
   const filteredOptionBoolean = booleanDrop.map((option) => ({
-    value: option.attributedetails_name,
-    label: option.attributedetails_name,
-  }));
+  value: option.attributedetails_code,
+  label: option.attributedetails_name,
+}));
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getrelation`, {
@@ -1337,7 +1337,7 @@ useEffect(() => {
                     for="cno"
                     className={`floating-label ${error && !member.sex ? "text-danger" : ""}`}
                   >
-                    Gender
+                    Gender{showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
               </div>
@@ -1380,7 +1380,7 @@ useEffect(() => {
                     for="cno"
                     className={`floating-label ${error && !member.nationality ? "text-danger" : ""}`}
                   >
-                    Nationality
+                    Nationality{showAsterisk && <span className="text-danger">*</span>}
                   </label>
                 </div>
               </div>

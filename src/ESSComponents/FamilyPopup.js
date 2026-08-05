@@ -78,7 +78,7 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Departmeny ID",
+    headerName: "Department  ID",
     field: "department_id",
     editable: false,
   },
