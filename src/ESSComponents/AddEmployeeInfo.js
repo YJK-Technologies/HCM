@@ -126,6 +126,11 @@ function Input({ }) {
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
+  // Calculate the maximum allowed DOB (18 years ago)
+const maxDOB = new Date();
+maxDOB.setFullYear(maxDOB.getFullYear() - 18);
+const maxDOBString = maxDOB.toISOString().split("T")[0];
+
   const handleInsert = async () => {
     if (
       !First_Name ||
@@ -549,7 +554,7 @@ function Input({ }) {
   const filteredOptionGradeid = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
       value: option.GradeID,
-      label: option.GradeID,
+      label: `${option.GradeID} - ${option.GradeName}`,
     }))
     : [];
 
@@ -1616,6 +1621,7 @@ function Input({ }) {
                 type="date"
                 placeholder=""
                 value={DOB}
+                max={maxDOBString}
                 onChange={(e) => setDOB(e.target.value)}
               />
               <label htmlFor="dob" className={`exp-form-labels ${error && !DOB ? 'text-danger' : ''}`}>DOB{showAsterisk && <span className="text-danger">*</span>}</label>
