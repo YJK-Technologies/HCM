@@ -96,9 +96,7 @@ const Dashboard = () => {
   const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
   const [shiftDay, setShiftDay] = useState("");
   const [TRFromDate, setTRFromDate] = useState("");
-  const [shiftFromDate, setShiftFromDate] = useState("");
   const [TRToDate, setTRToDate] = useState("");
-  const [shiftToDate, setShiftToDate] = useState("");
   const [shiftCode, setShiftCode] = useState("");
   const [selectedShiftCode, setSelectedShiftCode] = useState("");
   const [shiftCodeDrop, setShiftCodeDrop] = useState([]);
@@ -130,6 +128,35 @@ const Dashboard = () => {
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
+  const systemDate = new Date().toISOString().split("T")[0];
+  /*code added for grid loading while the search function is runing*/
+  const [isSearching, setIsSearching] = useState(false);
+  const gridRef = useRef(null);
+  /*code added for Get Current Month StartDate and Get Current Month EndDate */
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getCurrentMonthStartDate = () => {
+    const today = new Date();
+    return formatLocalDate(
+      new Date(today.getFullYear(), today.getMonth(), 1)
+    );
+  };
+
+  const getCurrentMonthEndDate = () => {
+    const today = new Date();
+    return formatLocalDate(
+      new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    );
+  };
+
+  const [shiftFromDate, setShiftFromDate] = useState(getCurrentMonthStartDate);
+  const [shiftToDate, setShiftToDate] = useState(getCurrentMonthEndDate);
 
   // useEffect(() => {
   //   fetchDashboardData();
@@ -278,8 +305,8 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start_date: TRFromDate || null,
-          end_date: TRToDate || null,
+          start_date: TRFromDate || systemDate,
+          end_date: TRToDate || systemDate,
           userid: userId || "All",
           company_code,
           Status: "Active",
@@ -2114,6 +2141,8 @@ const Dashboard = () => {
   };
 
   const handleShiftSearch = async () => {
+     setIsSearching(true);
+     gridRef.current?.api.showLoadingOverlay();
     try {
       const response = await fetch(`${config.apiBaseUrl}/getAdEmpShiftReport`, {
         method: "POST",
@@ -2150,7 +2179,10 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching search data:", error);
       toast.error("Error fetching search data:", error);
-    }
+    } finally {
+      setIsSearching(false);
+     gridRef.current?.api.hideOverlay();
+  }
   };
 
   // const reloadGridData = () => {
@@ -2225,7 +2257,11 @@ const Dashboard = () => {
 
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) {
-        setAnnouncement(data[0].MessageTitle);
+        const allAnnouncements = data
+        .map((item) => item.MessageTitle)
+        .join("     ||     ");
+
+        setAnnouncement(allAnnouncements);
       } else {
         setAnnouncement("No announcements available.");
       }
@@ -3824,15 +3860,15 @@ const Dashboard = () => {
                 style={{ height: 440, width: "100%" }}
               >
                 <AgGridReact
+                  ref={gridRef}
                   columnDefs={ShiftColDefs}
                   onFirstDataRendered={onFirstDataRendered}
                   rowData={shiftRowData}
                   suppressRowClickSelection={true}
-                  onGridReady={(params) => {
+                  onGridReady={(params) => { { params.api.hideOverlay(); };
                     gridApiRef.current = params.api;
                     gridColumnApiRef.current = params.columnApi;
                   }}
-                  onFirstDataRendered={onFirstDataRendered}
                 />
               </div>
             </div>

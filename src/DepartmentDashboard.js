@@ -225,7 +225,7 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
     <div className="container-fluid Topnav-screen">
       <ToastContainer position="top-right" className="toast-design" theme="colored" />
 
-      <header className="main-header-box header-flex" style={{ padding: "15px", marginBottom: "20px" }}>
+      <header className="app-shadow-lg main-header-box header-flex" style={{ padding: "10px", marginBottom: "10px" }}>
         <h1 className="page-title">Department Dashboard</h1>
       </header>
 
@@ -386,12 +386,24 @@ const [nationalityToDate, setNationalityToDate] = useState(endDate);
 
         <div style={{ width: "100%", height: 320 }}>
             <ResponsiveContainer>
-                <BarChart data={desigData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <BarChart 
+                    data={desigData} 
+                    margin={{ top: 20, right: 30, left: 0, bottom: 65 }} // bottom margin increased for angled text
+                >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8F0F5" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} interval={0} fontSize={12} />
+                    <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        interval={0} 
+                        fontSize={11}
+                        angle={-35}             
+                        textAnchor="end"        
+                        height={70}             
+                    />
                     <YAxis axisLine={false} tickLine={false} />
                     <Tooltip cursor={{ fill: "#F4F7F9" }} />
-                    <Bar dataKey="count" fill="var(--sidenav-hover)" radius={[4,4,0,0]} barSize={30} />
+                    <Bar dataKey="count" fill="var(--sidenav-hover)" radius={[4, 4, 0, 0]} barSize={28} />
                 </BarChart>
             </ResponsiveContainer>
         </div>
