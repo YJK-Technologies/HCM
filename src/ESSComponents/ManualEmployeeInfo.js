@@ -2112,7 +2112,7 @@ function ManualEmployeeInfo({ }) {
                 value={selectedmanager}
                 options={filteredOptionManager}
                 onChange={handleChangemanager}
-                placeholder=" "
+                placeholder=" " 
                 onFocus={() => setIsSelectManager(true)}
                 onBlur={() => setIsSelectManager(false)}
                 classNamePrefix="react-select"

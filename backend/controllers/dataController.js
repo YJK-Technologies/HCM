@@ -23948,7 +23948,7 @@ const PersonalRequestDetails = async (req, res) => {
         .input("marital_status", sql.NVarChar, row.marital_status)
         .input("siblings", sql.NVarChar, row.siblings)
         .input("Kids", sql.NVarChar, row.Kids)
-        .input("Grade_id", sql.Int, row.Grade_id)
+        .input("Grade_id", sql.NVarChar, row.Grade_id)
         .input("Title", sql.NVarChar, row.Title)
         .input("Place_of_Birth", sql.NVarChar, row.Place_of_Birth)
         .input("Nationality", sql.NVarChar, row.Nationality)
