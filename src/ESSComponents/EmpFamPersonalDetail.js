@@ -182,6 +182,24 @@ function EmpFamPersonalDetail({ }) {
       return;
     }
 
+        // Validate required fields
+        setError(false);
+        for (const group of familyMembers) {
+          for (const member of group.members) {
+            if (
+              !member.selectRepManager ||
+              !member.selectRelation ||
+              !member.name ||
+              !member.dob ||
+              !member.Age
+            ) {
+              setError(true);
+              toast.warning("Please fill all required fields");
+              return;
+            }
+          }
+        }
+
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
@@ -848,7 +866,7 @@ function EmpFamPersonalDetail({ }) {
                     className={`floating-label ${error && !member.selectRelation ? "text-danger" : ""
                       }`}
                   >
-                    Relation <span className="text-danger">*</span>
+                    Relation<span className="text-danger">*</span>
                   </label>
                 </div>
               </div>
@@ -882,7 +900,7 @@ function EmpFamPersonalDetail({ }) {
                     className={`exp-form-labels ${error && !member.name ? "text-danger" : ""
                       }`}
                   >
-                    Name <span className="text-danger">*</span>
+                    Name<span className="text-danger">*</span>
                   </label>
                 </div>
               </div>
@@ -1295,9 +1313,9 @@ function EmpFamPersonalDetail({ }) {
                       )
                     }
                   />
-                  <label for="cno" className={`floating-label`}>
-                    Reporting Manager
-                  </label>
+              <label className={`floating-label ${error && !member.selectRepManager ? 'text-danger' : ''}`}>
+                Reporting Manager<span className="text-danger">*</span>
+              </label>
                 </div>
               </div>
 

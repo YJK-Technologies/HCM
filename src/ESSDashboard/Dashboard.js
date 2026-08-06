@@ -1255,16 +1255,18 @@ const Dashboard = () => {
       const grouped = {};
 
       empData.forEach((row) => {
-        if (!grouped[row.Info_request_id]) {
-          grouped[row.Info_request_id] = {
+        if (!grouped[row.info_request_id]) {
+          grouped[row.info_request_id] = {
             type: "Employee",
-            id: row.Info_request_id,
+            id: row.info_request_id,
             EmployeeId: row.EmployeeId,
             EmployeeName: row.EmployeeName,
             title: "Detail Changes",
             status: row.request_status,
+            rows: [],
           };
         }
+        grouped[row.info_request_id].rows.push(row);
       });
 
       const formattedEmp = Object.values(grouped);
