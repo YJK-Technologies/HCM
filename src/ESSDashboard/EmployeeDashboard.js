@@ -13,6 +13,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { publicIpv4 } from "public-ip";
 import ShiftRequestModal from "./ShiftRequestModal.js";
+import { showConfirmationToast } from '../ToastConfirmation';
 
 ChartJS.register(
   BarElement,
@@ -2292,6 +2293,10 @@ if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
         };
       }
 
+      showConfirmationToast(
+      `Are you sure you want to ${status.toLowerCase()} this ${type} request?`,
+      async () => {
+        try {
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -2310,6 +2315,15 @@ if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
       console.error("Approval error:", error);
       toast.error("Something went wrong");
     }
+    },
+      () => {
+        toast.info(`${status} cancelled`);
+      },
+      );
+      } catch (error) {
+        console.error(error);
+        toast.error("Something went wrong");
+      }
   };
 
   const [requestSearch, setRequestSearch] = useState("");

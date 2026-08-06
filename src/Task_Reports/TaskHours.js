@@ -158,6 +158,7 @@ const MyAgGridComponent = () => {
         userid: user,
         Status: Status,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/getTaskHourReport`, {

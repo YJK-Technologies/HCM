@@ -263,7 +263,7 @@ const ApplyLeave = () => {
         item.LeaveId === LeaveType ||
         item.LeaveName === LeaveType
     );
-
+    console.log(selectedLeaveBalance)
     if (!selectedLeaveBalance) {
       toast.error("Leave type not found in balance");
       return;
@@ -626,6 +626,7 @@ const ApplyLeave = () => {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
         EmployeeId: sessionStorage.getItem("selectedUserCode")
       }),
     })

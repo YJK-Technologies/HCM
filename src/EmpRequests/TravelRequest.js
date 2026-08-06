@@ -237,7 +237,7 @@ function TravelRequest({ }) {
       .then((val) => {
         const Manager = val.map((option) => ({
           value: option.EmployeeId,
-          label: `${option.EmployeeId}`,
+          label: `${option.EmployeeId} - ${option.full_name}`,
         }));
 
         setManagerdropAG(Manager);
@@ -769,15 +769,19 @@ function TravelRequest({ }) {
     fetchProductCodesSC(selectedDPTSC ? selectedDPTSC.value : "");
   };
 
-  const filteredOptionDPt = DPTdrop.map((option) => ({
-    value: option.department_ID,
-    label: `${option.department_ID}`,
-  }));
+  const filteredOptionDPt = Array.isArray(DPTdrop)
+    ? DPTdrop.map((option) => ({
+        value: option?.department_ID,
+        label: `${option?.department_ID} - ${option?.dept_name}`,
+    }))
+    : [];
 
-  const filteredOptionDPtSC = DPTdropSC.map((option) => ({
-    value: option.department_ID,
-    label: `${option.department_ID}`,
-  }));
+  const filteredOptionDPtSC = Array.isArray(DPTdropSC)
+    ? DPTdropSC.map((option) => ({
+        value: option?.department_ID,
+        label: `${option?.department_ID} - ${option?.dept_name}`,
+    }))
+    : [];
 
   useEffect(() => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
@@ -904,7 +908,7 @@ function TravelRequest({ }) {
       .then((data) => {
         const deptOptions = data.map((option) => ({
           value: option.department_ID,
-          label: `${option.department_ID}`,
+          label: `${option.department_ID} - ${option.dept_name}`,
         }));
         setDepartmentDrop(deptOptions);
       })
@@ -1611,6 +1615,9 @@ function TravelRequest({ }) {
       const deptObj = departmentDrop.find((d) => d.value == row.department_id);
       const deptName = deptObj ? deptObj.label : "";
 
+      const managerObj = ManagerdropAG.find((d) => d.value == row.manager_id);
+      const managerName = managerObj ? managerObj.label : "";
+
       const countryObj = CountrydropGR.find(
         (c) => c.value == row.destination_country_id,
       );
@@ -1631,7 +1638,7 @@ function TravelRequest({ }) {
         Status: row.request_status || "",
         Remarks: row.Remarks || "",
         Priority: row.priority_level || "",
-        Manager: row.manager_id || "",
+        Manager: managerName || "",
       };
     });
   };

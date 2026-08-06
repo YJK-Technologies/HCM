@@ -532,7 +532,7 @@ function VisaRequest({ }) {
             .then((val) => {
                 const Manager = val.map((option) => ({
                     value: option.EmployeeId,
-                    label: `${option.EmployeeId}`,
+                    label: `${option.EmployeeId} - ${option.full_name}`,
                 }));
 
                 setManagerdropAG(Manager);
@@ -1051,6 +1051,9 @@ function VisaRequest({ }) {
                 (d) => d.value === row.destination_country_id
             );
 
+            const managerObj = ManagerdropAG.find((d) => d.value == row.manager_id);
+            const managerName = managerObj ? managerObj.label : "";
+
             const countryName = countryObj
                 ? countryObj.label.split(" - ").slice(1).join(" - ")
                 : "";
@@ -1070,7 +1073,7 @@ function VisaRequest({ }) {
                 "Sponsor Name": row.sponsor_name || "",
                 "Estimated Cost": row.estimated_cost || "",
                 "Remarks": row.Remarks || "",
-                Manager: row.manager_id || "",
+                "Manager":`${row.manager_id} - ${managerName}` || "",
             };
         });
     };

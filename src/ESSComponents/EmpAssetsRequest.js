@@ -67,11 +67,12 @@ function EmployeeAssets({ }) {
     .map((permission) => permission.permission_type.toLowerCase());
 
   const EmployeeID = sessionStorage.getItem("selectedUserCode");
+
   useEffect(() => {
-    if (AssetIDDrop.length > 0 && EmployeeID) {
+    if (AssetIDDrop.length > 0 ) {
       handleEmployeeAssets(EmployeeID);
     }
-  }, [AssetIDDrop, EmployeeID]);
+  }, [AssetIDDrop]);
 
   const AcademicDet = () => {
     navigate("/AcademicDetReq");
@@ -252,6 +253,7 @@ function EmployeeAssets({ }) {
         if (
           !member.AssetID ||
           !member.ExpectedReturnDate ||
+          !member.selectRepManager ||
           !member.selectedStatus
         ) {
           setError(true);
@@ -924,7 +926,8 @@ function EmployeeAssets({ }) {
                     }
                   />
 
-                  <label className="floating-label">Reporting Manager</label>
+                  <label className={`floating-label ${error && !member.selectRepManager ? "text-danger" : ""}`}>
+                    Reporting Manager {showAsterisk && <span className="text-danger">*</span>}</label>
                 </div>
               </div>
             </div>
