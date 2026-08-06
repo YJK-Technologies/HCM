@@ -10,6 +10,7 @@ const config = require('../Apiconfig');
 export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets, EmployeeAssetsPopup }) {
   const [loading, setLoading] = useState(false);
   const [EmployeeId, setEmployeeId] = useState("");
+  const [EmployeeName, setEmployeeName] = useState("");
   const [AssetID, setAssetID] = useState("");
   const [ConditionAtIssue, setConditionAtIssue] = useState("");
   const [Remarks, setRemarks] = useState("");
@@ -30,6 +31,7 @@ export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets,
         },
         body: JSON.stringify({
           EmployeeID: EmployeeId,
+          EmployeeName:EmployeeName,
           ConditionAtIssue: ConditionAtIssue,
           Remarks: Remarks,
           AssetID: AssetID,
@@ -66,13 +68,35 @@ export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets,
       field: "EmployeeId",
       editable: false,
     },
+    {
+
+      headerName: "First Name ",
+      field: "First_Name",
+      editable: false,
+    },
 
     {
-      headerName: "Asset ID",
-      field: "AssetID",
-      // filter: 'agTextColumnFilter',
+      headerName: "Middle Name",
+      field: "Middle_Name",
       editable: true,
     },
+
+   {
+      headerName: "Last Name",
+      field: "Last_Name",
+      editable: true,
+    },
+       {
+      headerName: "Email",
+      field: "email",
+      editable: true,
+    },
+     {
+      headerName: "Phone Number",
+      field: "phone1",
+      editable: true,
+    },
+    
 
     {
       headerName: "Allocation Date",
@@ -185,7 +209,7 @@ export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets,
               {/* HEADER */}
               <div className="shadow-lg p-2 bg-light main-header-box">
                 <div className="header-flex">
-                  <h1 className="custom-modal-title">Employee Asset Popup</h1>
+                  <h1 className="custom-modal-title">Employee Asset Help</h1>
 
                   <div className="action-wrapper">
                     <div className="action-icon delete" onClick={handleClose}>
@@ -213,6 +237,22 @@ export default function EmployeeAssetsPopup({ open, handleClose, onSelectAssets,
                       autoComplete="off"
                     />
                     <label className="exp-form-labels">Employee ID</label>
+                  </div>
+                </div>
+                <div className="form-block col-md-4 col-sm-6 mb-2">
+                  <div className="inputGroup">
+                    <input
+                      type="text"
+                      placeholder=" "
+                      className="exp-input-field form-control"
+                      title="Please Enter the Employee Name"
+                      value={EmployeeName}
+                      maxLength={100}
+                      onChange={(e) => setEmployeeName(e.target.value)}
+                      // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      autoComplete="off"
+                    />
+                    <label className="exp-form-labels">Employee Name</label>
                   </div>
                 </div>
 
