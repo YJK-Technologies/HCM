@@ -17,16 +17,9 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,} from "recharts";
 import { showEightHourToast } from "../GlobalToast";
+import { showConfirmationToast } from '../ToastConfirmation';
 
-ChartJS.register(
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  ChartTooltip,
-  ChartLegend,
-  Title,
-  ArcElement,
-);
+ChartJS.register( BarElement, CategoryScale, LinearScale, ChartTooltip, ChartLegend, Title, ArcElement,);
 
 const Dashboard = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -1607,6 +1600,10 @@ const Dashboard = () => {
         };
       }
 
+      showConfirmationToast(
+      `Are you sure you want to ${status.toLowerCase()} this ${type} request?`,
+      async () => {
+        try {
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -1625,6 +1622,15 @@ const Dashboard = () => {
       console.error("Approval error:", error);
       toast.error("Something went wrong");
     }
+    },
+      () => {
+        toast.info(`${status} cancelled`);
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong");
+  }
   };
 
   useEffect(() => {

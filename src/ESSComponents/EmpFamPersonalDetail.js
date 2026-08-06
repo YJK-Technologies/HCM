@@ -74,6 +74,7 @@ function EmpFamPersonalDetail({ }) {
     .map((permission) => permission.permission_type.toLowerCase());
 
   const employeeId = sessionStorage.getItem("selectedUserCode");
+  
   useEffect(() => {
     if (
       relativedrop.length > 0 &&

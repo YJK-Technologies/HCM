@@ -2025,6 +2025,8 @@ function RequestReport({ }) {
       },
       body: JSON.stringify({
         company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem('selectedLocationCode'),
+        EmployeeId: sessionStorage.getItem("selectedUserCode"),
       }),
     })
       .then((data) => data.json())
@@ -2032,12 +2034,14 @@ function RequestReport({ }) {
   }, []);
 
   const filterOptionLeaves = [
-    { value: "All", label: "All" },
-    ...leaveDrop.map((option) => ({
-      value: option.LeaveId,
-      label: option.LeaveId,
-    })),
-  ];
+  { value: "All", label: "All" },
+  ...(Array.isArray(leaveDrop)
+    ? leaveDrop.map((option) => ({
+        value: option.LeaveId,
+        label: option.LeaveId,
+      }))
+    : []),
+];
 
   const handleLeaves = (SelectedLeave) => {
     setSelectedLeave(SelectedLeave);
@@ -2299,11 +2303,41 @@ function RequestReport({ }) {
   const [academicRowData, setAcademicRowData] = useState([]);
   const [loadingAcademic, setLoadingAcademic] = useState(false);
   const [academicInfoId, setAcademicInfoId] = useState("");
-  const [academicEmpId, setAcademicEmpId] = useState("");
   const [academicColumn, setAcademicColumn] = useState("");
   const [academicFromDate, setAcademicFromDate] = useState("");
   const [academicToDate, setAcademicToDate] = useState("");
 
+  const [selectedEmpIdacademicSc, setSelectedEmpIdacademicSc] = useState("");
+  const [isSelectedEmpIdacademicSc, setIsSelectedEmpIdacademicSc] = useState(false);
+  const [empIdacademicSc, setEmpIdacademicSc] = useState("");
+  const [empIdDropacademicSc, setEmpIdDropacademicSc] = useState([]);
+
+    const handleChangeEmpIdacademicSc = (selectedEmpIdacademicSc) => {
+    setSelectedEmpIdacademicSc(selectedEmpIdacademicSc);
+    setEmpIdacademicSc(selectedEmpIdacademicSc ? selectedEmpIdacademicSc.value : "");
+  };
+
+  const filteredOptionEmpIdacademicSc = Array.isArray(empIdDropacademicSc)
+    ? empIdDropacademicSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
+
+      useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDropacademicSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   useEffect(() => {
     if (requestType === "Academic") {
@@ -2396,7 +2430,7 @@ function RequestReport({ }) {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Info_request_id: academicInfoId || 0,
-          EmployeeId: academicEmpId,
+          EmployeeId: empIdacademicSc,
           column_name: academicColumn,
           from_date: academicFromDate || null,
           to_date: academicToDate || null,
@@ -2421,7 +2455,8 @@ function RequestReport({ }) {
 
   const handleAcademicReset = () => {
     setAcademicInfoId("");
-    setAcademicEmpId("");
+    setEmpIdacademicSc("");
+    setSelectedEmpIdacademicSc("");
     setAcademicColumn("");
     setAcademicFromDate("");
     setAcademicToDate("");
@@ -2617,10 +2652,41 @@ function RequestReport({ }) {
   const [personalRowData, setPersonalRowData] = useState([]);
   const [loadingPersonal, setLoadingPersonal] = useState(false);
   const [PersonalInfoId, setPersonalInfoId] = useState("");
-  const [PersonalEmpId, setPersonalEmpId] = useState("");
   const [personalColumn, setPersonalColumn] = useState("");
   const [personalFromDate, setPersonalFromDate] = useState("");
   const [personalToDate, setPersonalToDate] = useState("");
+
+  const [selectedEmpIdpersonalSc, setSelectedEmpIdpersonalSc] = useState("");
+  const [isSelectedEmpIdpersonalSc, setIsSelectedEmpIdpersonalSc] = useState(false);
+  const [empIdacpersonalSc, setEmpIdpersonalSc] = useState("");
+  const [empIdDroppersonalSc, setEmpIdDroppersonalSc] = useState([]);
+
+    const handleChangeEmpIdpersonalSc = (selectedEmpIdpersonalSc) => {
+    setSelectedEmpIdpersonalSc(selectedEmpIdpersonalSc);
+    setEmpIdpersonalSc(selectedEmpIdpersonalSc ? selectedEmpIdpersonalSc.value : "");
+  };
+
+  const filteredOptionEmpIdpersonalSc = Array.isArray(empIdDroppersonalSc)
+    ? empIdDroppersonalSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
+
+      useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDroppersonalSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   useEffect(() => {
     if (requestType === "Employee") {
@@ -2670,7 +2736,7 @@ function RequestReport({ }) {
           body: JSON.stringify({
             company_code: sessionStorage.getItem("selectedCompanyCode"),
             Info_request_id: PersonalInfoId || 0,
-            EmployeeId: PersonalEmpId,
+            EmployeeId: empIdacpersonalSc,
             Location_Code,
             column_name: personalColumn,
             from_date: personalFromDate || null,
@@ -2736,7 +2802,8 @@ function RequestReport({ }) {
   const handlePersonalReset = () => {
     setPersonalColumn("");
     setPersonalFromDate("");
-    setPersonalEmpId("");
+    setSelectedEmpIdpersonalSc("");
+    setEmpIdpersonalSc("");
     setPersonalToDate("");
     fetchPersonalData(); // 🔁 reload all
   };
@@ -2837,6 +2904,38 @@ function RequestReport({ }) {
 
   const [loadingFamily, setLoadingFamily] = useState(false);
 
+  const [selectedEmpIdfamilySc, setSelectedEmpIdfamilySc] = useState("");
+  const [isSelectedEmpIdfamilySc, setIsSelectedEmpIdfamilySc] = useState(false);
+  const [empIdacfamilySc, setEmpIdfamilySc] = useState("");
+  const [empIdDropfamilySc, setEmpIdDropfamilySc] = useState([]);
+
+    const handleChangeEmpIdfamilySc = (selectedEmpIdfamilySc) => {
+    setSelectedEmpIdfamilySc(selectedEmpIdfamilySc);
+    setEmpIdfamilySc(selectedEmpIdfamilySc ? selectedEmpIdfamilySc.value : "");
+  };
+
+  const filteredOptionEmpIdfamilySc = Array.isArray(empIdDropfamilySc)
+    ? empIdDropfamilySc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
+
+      useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDropfamilySc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   useEffect(() => {
     if (requestType === "Family") {
       fetchFamilyData();
@@ -2895,7 +2994,7 @@ function RequestReport({ }) {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Info_request_id: familyInfoId || 0,
-          EmployeeId: familyEmpId,
+          EmployeeId: empIdacfamilySc,
           column_name: familyColumn,
           from_date: familyFromDate || null,
           to_date: familyToDate || null,
@@ -2919,7 +3018,8 @@ function RequestReport({ }) {
 
   const handleFamilyReset = () => {
     setFamilyInfoId("");
-    setFamilyEmpId("");
+    setEmpIdfamilySc("");
+    setSelectedEmpIdfamilySc("");
     setFamilyColumn("");
     setFamilyFromDate("");
     setFamilyToDate("");
@@ -3049,11 +3149,42 @@ function RequestReport({ }) {
   // Asset States
   const [assetRowData, setAssetRowData] = useState([]);
   const [assetInfoId, setAssetInfoId] = useState("");
-  const [assetEmpId, setAssetEmpId] = useState("");
   const [assetFieldName, setAssetFieldName] = useState("");
   const [assetFromDate, setAssetFromDate] = useState("");
   const [assetToDate, setAssetToDate] = useState("");
   const [loadingAsset, setLoadingAsset] = useState(false);
+
+  const [selectedEmpIdassetSc, setSelectedEmpIdassetSc] = useState("");
+  const [isSelectedEmpIdassetSc, setIsSelectedEmpIdassetSc] = useState(false);
+  const [empIdacassetSc, setEmpIdassetSc] = useState("");
+  const [empIdDropassetSc, setEmpIdDropassetSc] = useState([]);
+
+    const handleChangeEmpIdassetSc = (selectedEmpIdassetSc) => {
+    setSelectedEmpIdassetSc(selectedEmpIdassetSc);
+    setEmpIdassetSc(selectedEmpIdassetSc ? selectedEmpIdassetSc.value : "");
+  };
+
+  const filteredOptionEmpIdassetSc = Array.isArray(empIdDropassetSc)
+    ? empIdDropassetSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
+
+      useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdassetSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   useEffect(() => {
     if (requestType === "Asset") {
@@ -3110,7 +3241,7 @@ function RequestReport({ }) {
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Info_request_id: assetInfoId,
           Location_Code,
-          EmployeeId: assetEmpId,
+          EmployeeId: empIdacassetSc,
           FieldName: assetFieldName,
           FromDate: assetFromDate,
           ToDate: assetToDate,
@@ -3133,7 +3264,8 @@ function RequestReport({ }) {
 
   const handleAssetReset = () => {
     setAssetInfoId("");
-    setAssetEmpId("");
+    setEmpIdassetSc("");
+    setSelectedEmpIdassetSc("");
     setAssetFieldName("");
     setAssetFromDate("");
     setAssetToDate("");
@@ -3247,12 +3379,43 @@ function RequestReport({ }) {
   const [documentRowData, setDocumentRowData] = useState([]);
 
   const [docInfoId, setDocInfoId] = useState("");
-  const [docEmpId, setDocEmpId] = useState("");
   const [docColumn, setDocColumn] = useState("");
   const [docFromDate, setDocFromDate] = useState("");
   const [docToDate, setDocToDate] = useState("");
 
   const [loadingDocument, setLoadingDocument] = useState(false);
+
+  const [selectedEmpIddocSc, setSelectedEmpIddocSc] = useState("");
+  const [isSelectedEmpIddocSc, setIsSelectedEmpIddocSc] = useState(false);
+  const [empIdacdocSc, setEmpIddocSc] = useState("");
+  const [empIdDropdocSc, setEmpIdDropdocSc] = useState([]);
+
+    const handleChangeEmpIddocSc = (selectedEmpIddocSc) => {
+    setSelectedEmpIddocSc(selectedEmpIddocSc);
+    setEmpIddocSc(selectedEmpIddocSc ? selectedEmpIddocSc.value : "");
+  };
+
+  const filteredOptionEmpIddocSc = Array.isArray(empIdDropdocSc)
+    ? empIdDropdocSc.map((option) => ({
+      value: option?.EmployeeId,
+      label: `${option?.EmployeeId}-${option?.First_Name}`,
+    }))
+    : [];
+
+      useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+    fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code }),
+    })
+      .then((data) => data.json())
+      .then((val) => setEmpIdDropdocSc(val))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   useEffect(() => {
     if (requestType === "Document") {
@@ -3305,7 +3468,7 @@ function RequestReport({ }) {
         body: JSON.stringify({
           company_code: sessionStorage.getItem("selectedCompanyCode"),
           Info_request_id: docInfoId || 0,
-          EmployeeId: docEmpId,
+          EmployeeId: empIdacdocSc,
           column_name: docColumn,
           from_date: docFromDate || null,
           to_date: docToDate || null,
@@ -3329,7 +3492,8 @@ function RequestReport({ }) {
 
   const handleDocumentReset = () => {
     setDocInfoId("");
-    setDocEmpId("");
+    setEmpIddocSc("");
+    setSelectedEmpIddocSc("");
     setDocColumn("");
     setDocFromDate("");
     setDocToDate("");
@@ -5425,19 +5589,27 @@ function RequestReport({ }) {
               </div>
 
               {/* Employee ID */}
-              <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+               <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedEmpIdacademicSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdacademicSc ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="department"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedEmpIdacademicSc(true)}
+                    onBlur={() => setIsSelectedEmpIdacademicSc(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                     type="text"
-                    className="exp-input-field form-control"
-                    placeholder=""
-                    value={academicEmpId}
-                    onChange={(e) => setAcademicEmpId(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handleAcademicSearch()
-                    }
+                    value={selectedEmpIdacademicSc}
+                    onChange={handleChangeEmpIdacademicSc}
+                    options={filteredOptionEmpIdacademicSc}
                   />
-                  <label className="exp-form-labels">Employee ID</label>
+                  <label htmlFor="selecteddpt" className={`floating-label`}>
+                    Employee ID
+                  </label>
                 </div>
               </div>
 
@@ -5560,21 +5732,28 @@ function RequestReport({ }) {
 
               {/* Employee ID */}
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedEmpIdpersonalSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdpersonalSc ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="department"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedEmpIdpersonalSc(true)}
+                    onBlur={() => setIsSelectedEmpIdpersonalSc(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                     type="text"
-                    className="exp-input-field form-control"
-                    placeholder=""
-                    value={PersonalEmpId}
-                    onChange={(e) => setPersonalEmpId(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handlePersonalSearch()
-                    }
+                    value={selectedEmpIdpersonalSc}
+                    onChange={handleChangeEmpIdpersonalSc}
+                    options={filteredOptionEmpIdpersonalSc}
                   />
-                  <label className="exp-form-labels">Employee ID</label>
+                  <label htmlFor="selecteddpt" className={`floating-label`}>
+                    Employee ID
+                  </label>
                 </div>
               </div>
-
 
               {/* Column Name */}
               <div className="col-md-2">
@@ -5688,16 +5867,26 @@ function RequestReport({ }) {
               </div>
 
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedEmpIdfamilySc ? "has-value" : ""} 
+                  ${isSelectedEmpIdfamilySc ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="department"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedEmpIdfamilySc(true)}
+                    onBlur={() => setIsSelectedEmpIdfamilySc(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                     type="text"
-                    placeholder=""
-                    className="exp-input-field form-control"
-                    value={familyEmpId}
-                    onChange={(e) => setFamilyEmpId(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleFamilySearch()}
+                    value={selectedEmpIdfamilySc}
+                    onChange={handleChangeEmpIdfamilySc}
+                    options={filteredOptionEmpIdfamilySc}
                   />
-                  <label className="exp-form-labels">Employee ID</label>
+                  <label htmlFor="selecteddpt" className={`floating-label`}>
+                    Employee ID
+                  </label>
                 </div>
               </div>
 
@@ -5805,16 +5994,26 @@ function RequestReport({ }) {
               </div>
 
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedEmpIdassetSc ? "has-value" : ""} 
+                  ${isSelectedEmpIdassetSc ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="department"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedEmpIdassetSc(true)}
+                    onBlur={() => setIsSelectedEmpIdassetSc(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                     type="text"
-                    className="exp-input-field form-control"
-                    value={assetEmpId}
-                    placeholder=""
-                    onChange={(e) => setAssetEmpId(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAssetSearch()}
+                    value={selectedEmpIdassetSc}
+                    onChange={handleChangeEmpIdassetSc}
+                    options={filteredOptionEmpIdassetSc}
                   />
-                  <label className="exp-form-labels">Employee ID</label>
+                  <label htmlFor="selecteddpt" className={`floating-label`}>
+                    Employee ID
+                  </label>
                 </div>
               </div>
 
@@ -5913,15 +6112,26 @@ function RequestReport({ }) {
               </div>
 
               <div className="col-md-2">
-                <div className="inputGroup">
-                  <input
+                <div
+                  className={`inputGroup selectGroup 
+                  ${selectedEmpIddocSc ? "has-value" : ""} 
+                  ${isSelectedEmpIddocSc ? "is-focused" : ""}`}
+                >
+                  <Select
+                    id="department"
+                    placeholder=" "
+                    onFocus={() => setIsSelectedEmpIddocSc(true)}
+                    onBlur={() => setIsSelectedEmpIddocSc(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                     type="text"
-                    className="exp-input-field form-control"
-                    value={docEmpId}
-                    placeholder=""
-                    onChange={(e) => setDocEmpId(e.target.value)}
+                    value={selectedEmpIddocSc}
+                    onChange={handleChangeEmpIddocSc}
+                    options={filteredOptionEmpIddocSc}
                   />
-                  <label className="exp-form-labels">Employee ID</label>
+                  <label htmlFor="selecteddpt" className={`floating-label`}>
+                    Employee ID
+                  </label>
                 </div>
               </div>
 

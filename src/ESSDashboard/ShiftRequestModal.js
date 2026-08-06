@@ -32,7 +32,7 @@ const ShiftRequestModal = ({ isOpen, onClose, rowData, onSuccess, screenType }) 
                     const [empRes, shiftRes, managerRes, priorityRes] = await Promise.all([
                         fetch(`${config.apiBaseUrl}/getEmployeeId`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code, Location_Code }) }),
                         fetch(`${config.apiBaseUrl}/ShiftMasterDropDown`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code, Location_Code }) }),
-                        fetch(`${config.apiBaseUrl}/ESSManager`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) }),
+                        fetch(`${config.apiBaseUrl}/ESSManager`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code, Location_Code }) }),
                         fetch(`${config.apiBaseUrl}/getPriority`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_code }) })
                     ]);
 

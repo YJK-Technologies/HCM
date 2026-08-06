@@ -195,6 +195,22 @@ function EmpDocumentReq({ }) {
       return;
     }
 
+        // Validate required fields
+        setError(false);
+        for (const group of documents) {
+          for (const member of group.members) {
+            if (
+              !member.selectDocumentName ||
+              !member.selectRepManager
+            ) {
+              setError(true);
+              toast.warning("Please fill all required fields");
+              return;
+            }
+          }
+        }
+        setError(false); 
+
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
@@ -840,8 +856,8 @@ function EmpDocumentReq({ }) {
                     }
                   />
 
-                  <label className="floating-label">
-                    Reporting Manager
+                  <label className={`floating-label ${error && !member.selectRepManager ? 'text-danger' : ''}`}>
+                    Reporting Manager<span className="text-danger">*</span>
                   </label>
                 </div>
               </div>

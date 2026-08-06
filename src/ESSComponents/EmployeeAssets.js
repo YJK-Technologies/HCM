@@ -310,8 +310,8 @@ const handleSave = async () => {
     for (const member of group.members) {
       if (
         !member.AssetID ||
-        !member.AllocationDate ||
-        !member.selectedStatus
+        !member.AllocationDate 
+        
       ) {
         setError(true);
         toast.warning("Please fill all required fields");
@@ -1088,15 +1088,6 @@ const handleDeleteAsset = async (relation, index) => {
                     value={member.ExpectedReturnDate}
                     onChange={(e) => {
                       const value = e.target.value;
-
-                      if (
-                        member.AllocationDate &&
-                        new Date(value) <= new Date(member.AllocationDate)
-                      ) {
-                        toast.error("Issue Date must be less than Expiry Date");
-                        return;
-                      }
-
                       handleDateChange(
                         relationGroup.relation,
                         index,
@@ -1106,13 +1097,11 @@ const handleDeleteAsset = async (relation, index) => {
                     }}
                     required
                   />
-                  <label
-                    for="cno"
-                    className={`exp-form-labels ${error && !member.ExpectedReturnDate ? "text-danger" : ""}`}
-                  >
+                  <label for="cno" className= "exp-form-labels">
+                     {" "}
+                  
                     Expected Return Date
-                    {showAsterisk && <span className="text-danger">*</span>}
-                  </label>
+                   </label>
                 </div>
               </div>
 
