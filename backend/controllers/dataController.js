@@ -23948,7 +23948,7 @@ const PersonalRequestDetails = async (req, res) => {
         .input("marital_status", sql.NVarChar, row.marital_status)
         .input("siblings", sql.NVarChar, row.siblings)
         .input("Kids", sql.NVarChar, row.Kids)
-        .input("Grade_id", sql.Int, row.Grade_id)
+        .input("Grade_id", sql.NVarChar, row.Grade_id)
         .input("Title", sql.NVarChar, row.Title)
         .input("Place_of_Birth", sql.NVarChar, row.Place_of_Birth)
         .input("Nationality", sql.NVarChar, row.Nationality)
@@ -24434,7 +24434,7 @@ const EmployeeAssetsInsert = async (req, res) => {
       .input("CreatedDate", sql.DateTime, CreatedDate)
       .input("modify_by", sql.NVarChar, modify_by)
       .input("modify_date", sql.DateTime, modify_date)
-      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue,
+      .query(`EXEC sp_EmployeeAssets_ramya @mode, @AllocationID, @AssetID, @EmployeeID, '',@AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue,
       @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Location_Code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
 
     res.status(200).json({ success: true, message: "EmployeeAssets insertd successfully" });
@@ -24470,7 +24470,7 @@ const EmployeeAssetsUpdate = async (req, res) => {
       .input("CreatedDate", sql.DateTime, CreatedDate)
       .input("modify_by", sql.NVarChar, modify_by)
       .input("modify_date", sql.DateTime, modify_date)
-      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue,
+      .query(`EXEC sp_EmployeeAssets_ramya @mode, @AllocationID, @AssetID, @EmployeeID,'', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, @ConditionAtIssue,
       @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Location_Code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
 
     res.status(200).json({ success: true, message: "EmployeeAssets updated successfully" });
@@ -24491,7 +24491,7 @@ const EmployeeAssetsDelete = async (req, res) => {
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
       .input("Keyfield", sql.NVarChar, Keyfield)
-      .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, '', '', '', '', '','', '', '', '', '', @company_code, @Location_Code, @Keyfield, '', '', '', ''`);
+      .query(`EXEC sp_EmployeeAssets_ramya @mode, @AllocationID, '', '','', '', '', '','', '', '', '', '', @company_code, @Location_Code, @Keyfield, '', '', '', ''`);
 
     res.status(200).json({ success: true, message: "EmployeeAssets deleted successfully" });
   } catch (err) {
@@ -24529,7 +24529,7 @@ const EmployeeAssetsLoopInsert = async (req, res) => {
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
         .input("modify_date", sql.DateTime, item.modify_date)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID,'', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, 
+        .query(`EXEC sp_EmployeeAssets_ramya @mode, @AllocationID, @AssetID, @EmployeeID,'', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, 
         @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Location_Code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, @modify_date`);
     }
     res.status(200).json("EmployeeAssets data inserted successfully");
@@ -24567,7 +24567,7 @@ const EmployeeAssetsLoopUpdate = async (req, res) => {
         .input("CreatedBy", sql.NVarChar, item.CreatedBy)
         .input("CreatedDate", sql.DateTime, item.CreatedDate)
         .input("modify_by", sql.NVarChar, item.modify_by)
-        .query(`EXEC sp_EmployeeAssets @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, 
+        .query(`EXEC sp_EmployeeAssets_ramya @mode, @AllocationID, @AssetID, @EmployeeID, '', @AllocationDate, @ExpectedReturnDate, @ActualReturnDate, @AllocationStatus, 
         @ConditionAtIssue, @ConditionAtReturn, @ApprovedBy, @Remarks, @company_code, @Location_Code, @Keyfield, @CreatedBy, @CreatedDate, @modify_by, ''`);
     }
     res.status(200).json("EmployeeAssets data updated successfully");
@@ -24592,7 +24592,7 @@ const EmployeeAssetsLoopDelete = async (req, res) => {
         .input("Location_Code", sql.NVarChar, item.Location_Code)
         .input("Keyfield", sql.NVarChar, item.Keyfield)
         .input("modify_by", sql.NVarChar, item.modify_by)
-        .query(`EXEC sp_EmployeeAssets @mode, 0, 0, '', '', '', '', '', '', '', '', '', '', @company_code, @Location_Code, @Keyfield, '', '',@modify_by,''`);
+        .query(`EXEC sp_EmployeeAssets_ramya @mode, 0, 0, '', '', '', '', '', '', '', '', '', '', @company_code, @Location_Code, @Keyfield, '', '',@modify_by,''`);
     }
     res.status(200).json("EmployeeAssets data deleted successfully");
   } catch (err) {
@@ -24932,7 +24932,7 @@ const GetRepaymentScheduleReport = async (req, res) => {
 
 //code added by mathu 01-04-2026
 const getAssetSearchCretria = async (req, res) => {
-  const { EmployeeID, AssetID, ConditionAtIssue, Remarks, company_code, Location_Code } = req.body;
+  const { EmployeeID,EmployeeName, AssetID, ConditionAtIssue, Remarks, company_code, Location_Code } = req.body;
 
   try {
     const pool = await connection.connectToDatabase();
@@ -24941,11 +24941,12 @@ const getAssetSearchCretria = async (req, res) => {
       .input("mode", sql.NVarChar, "SC")
       .input("AssetID", sql.BigInt, AssetID)
       .input("EmployeeID", sql.NVarChar, EmployeeID)
+      .input("EmployeeName", sql.NVarChar, EmployeeName)
       .input("ConditionAtIssue", sql.NVarChar, ConditionAtIssue)
       .input("Remarks", sql.NVarChar, Remarks)
       .input("company_code", sql.NVarChar, company_code)
       .input("Location_Code", sql.NVarChar, Location_Code)
-      .query(`EXEC sp_EmployeeAssets @mode,'',@AssetID,@EmployeeID,'','','','','',@ConditionAtIssue,'','',@Remarks,@company_code,@Location_Code,'','','','',''`);
+      .query(`EXEC sp_EmployeeAssets_ramya @mode,'',@AssetID,@EmployeeID,@EmployeeName,'','','','',@ConditionAtIssue,'','',@Remarks,@company_code,@Location_Code,'','','','',''`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {

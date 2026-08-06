@@ -575,7 +575,7 @@ const handleChangeCurrencySC = (selectedCurrency) => {
   const handleDelete = async (rowData) => {
 
     showConfirmationToast(
-      "Are you sure you want to delete the selected employee shift mapping data?",
+      "Are you sure you want to delete the selected Country Master data?",
       async () => {
         try {
           setLoading(true);

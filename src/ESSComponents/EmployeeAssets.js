@@ -19,7 +19,6 @@ function EmployeeAssets({}) {
   const [showAsterisk, setShowAsterisk] = useState(true);
   const employeeIdRef = useRef(null);
   const navigate = useNavigate();
-  const [employeeID, setEmployeeId] = useState("");
   const [First_Name, setFirst_Name] = useState("");
   const [department_id, setdepartment_id] = useState("");
   const [designation_id, setdesignation_id] = useState("");
@@ -68,7 +67,7 @@ function EmployeeAssets({}) {
   const NavigatecomDet = () => {
     navigate("/CompanyDetails", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -79,7 +78,7 @@ function EmployeeAssets({}) {
   const FinanceDet = () => {
     navigate("/FinanceDet", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -90,7 +89,7 @@ function EmployeeAssets({}) {
   const BankAccDet = () => {
     navigate("/BankAccDet", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -101,7 +100,7 @@ function EmployeeAssets({}) {
   const IdentDoc = () => {
     navigate("/IdentDoc", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -112,7 +111,7 @@ function EmployeeAssets({}) {
   const AcademicDet = () => {
     navigate("/AcademicDet", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -123,7 +122,7 @@ function EmployeeAssets({}) {
   const Insurance1 = () => {
     navigate("/Family", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -134,7 +133,7 @@ function EmployeeAssets({}) {
   const Documents = () => {
     navigate("/Documents", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -144,7 +143,7 @@ function EmployeeAssets({}) {
   const EmployeeAssets = () => {
     navigate("/EmployeeAssets", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -155,7 +154,7 @@ function EmployeeAssets({}) {
   const EmployeeLoan = () => {
     navigate("/AddEmployeeInfo", {
       state: {
-        employeeId: employeeID,
+        employeeId: EmployeeID,
         firstName: First_Name,
         department_id: department_id,
         designation_id: designation_id,
@@ -290,7 +289,7 @@ function EmployeeAssets({}) {
     //   handleEmployeeAssets(employeeId);
     // }
     if (employeeId) {
-      setEmployeeId(employeeId);   
+        
       setEmployeeID(employeeId);   
       setFirst_Name(firstName || "");
       setdepartment_id(department_id || "");
@@ -311,8 +310,8 @@ const handleSave = async () => {
     for (const member of group.members) {
       if (
         !member.AssetID ||
-        !member.AllocationDate ||
-        !member.selectedStatus
+        !member.AllocationDate 
+        
       ) {
         setError(true);
         toast.warning("Please fill all required fields");
@@ -1089,15 +1088,6 @@ const handleDeleteAsset = async (relation, index) => {
                     value={member.ExpectedReturnDate}
                     onChange={(e) => {
                       const value = e.target.value;
-
-                      if (
-                        member.AllocationDate &&
-                        new Date(value) <= new Date(member.AllocationDate)
-                      ) {
-                        toast.error("Issue Date must be less than Expiry Date");
-                        return;
-                      }
-
                       handleDateChange(
                         relationGroup.relation,
                         index,
@@ -1107,13 +1097,11 @@ const handleDeleteAsset = async (relation, index) => {
                     }}
                     required
                   />
-                  <label
-                    for="cno"
-                    className={`exp-form-labels ${error && !member.ExpectedReturnDate ? "text-danger" : ""}`}
-                  >
+                  <label for="cno" className= "exp-form-labels">
+                     {" "}
+                  
                     Expected Return Date
-                    {showAsterisk && <span className="text-danger">*</span>}
-                  </label>
+                   </label>
                 </div>
               </div>
 

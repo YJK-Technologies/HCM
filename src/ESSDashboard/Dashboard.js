@@ -17,16 +17,9 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,} from "recharts";
 import { showEightHourToast } from "../GlobalToast";
+import { showConfirmationToast } from '../ToastConfirmation';
 
-ChartJS.register(
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  ChartTooltip,
-  ChartLegend,
-  Title,
-  ArcElement,
-);
+ChartJS.register( BarElement, CategoryScale, LinearScale, ChartTooltip, ChartLegend, Title, ArcElement,);
 
 const Dashboard = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -1262,16 +1255,18 @@ const Dashboard = () => {
       const grouped = {};
 
       empData.forEach((row) => {
-        if (!grouped[row.Info_request_id]) {
-          grouped[row.Info_request_id] = {
+        if (!grouped[row.info_request_id]) {
+          grouped[row.info_request_id] = {
             type: "Employee",
-            id: row.Info_request_id,
+            id: row.info_request_id,
             EmployeeId: row.EmployeeId,
             EmployeeName: row.EmployeeName,
             title: "Detail Changes",
             status: row.request_status,
+            rows: [],
           };
         }
+        grouped[row.info_request_id].rows.push(row);
       });
 
       const formattedEmp = Object.values(grouped);
@@ -1605,6 +1600,10 @@ const Dashboard = () => {
         };
       }
 
+      showConfirmationToast(
+      `Are you sure you want to ${status.toLowerCase()} this ${type} request?`,
+      async () => {
+        try {
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -1623,6 +1622,15 @@ const Dashboard = () => {
       console.error("Approval error:", error);
       toast.error("Something went wrong");
     }
+    },
+      () => {
+        toast.info(`${status} cancelled`);
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong");
+  }
   };
 
   useEffect(() => {

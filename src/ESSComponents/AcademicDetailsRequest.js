@@ -166,6 +166,25 @@ function Input({ }) {
       return;
     }
 
+    // Validate required fields
+    setError(false);
+    for (const group of Academic) {
+      for (const member of group.members) {
+        if (
+          !member.academicName ||
+          !member.major ||
+          !member.institution ||
+          !member.academicYear ||
+          !member.selectRepManager
+        ) {
+          setError(true);
+          toast.warning("Please fill all required fields");
+          return;
+        }
+      }
+    }
+    setError(false); 
+
     showConfirmationToast(
       "Are you sure you want to update the data ?",
       async () => {
@@ -768,7 +787,7 @@ function Input({ }) {
                   />
                   <label
                     for="add1"
-                    className={`exp-form-labels ${error && !member.relationName ? "text-danger" : ""}`}
+                    className={`exp-form-labels ${error && !member.academicYear ? "text-danger" : ""}`}
                   >
                     Academic Year<span className="text-danger">*</span>
                   </label>
@@ -831,7 +850,8 @@ function Input({ }) {
                       )
                     }
                   />
-                  <label className="floating-label">Reporting Manager</label>
+                  <label className={`exp-form-labels ${error && !member.selectRepManager ? "text-danger" : ""}`}>
+                    Reporting Manager<span className="text-danger">*</span></label>
                 </div>
               </div>
 
