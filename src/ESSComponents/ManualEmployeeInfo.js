@@ -1528,7 +1528,7 @@ function ManualEmployeeInfo({ }) {
                 autoComplete="off"
                 maxLength={18}
               />
-              <label htmlFor="Aadharno" className="exp-form-labels" > Aadhaar No </label>
+              <label htmlFor="Aadharno" className="exp-form-labels" > ID </label>
             </div>
           </div>
 
