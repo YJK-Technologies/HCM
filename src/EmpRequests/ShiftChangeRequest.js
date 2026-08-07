@@ -134,6 +134,17 @@ const ShiftChangeRequest = () => {
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
+    
+    const handleReloadAdd = () => {
+          clearInputsAdd([]);
+  };
+   
+   const clearInputsAdd = () => {
+    setFromDate("");
+    setToDate("");
+  };
+
+
 
     const handleFromDate = (e) => {
         const selectedDate = e.target.value;
@@ -578,10 +589,10 @@ const ShiftChangeRequest = () => {
                 <div className="header-flex">
                     <h1 className="page-title">Shift Change Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div className="icon-btn reload"  >
-                            <span className="tooltip">Reload</span>
-                            <i className="fa-solid fa-rotate-right"></i>
-                        </div>
+            <div className="action-icon reload" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-rotate-right"></i>
+            </div>
                     </div>
                 </div>
             </div>
