@@ -49,6 +49,8 @@ const ShiftChangeRequest = () => {
     const [departmentDrop, setDepartmentDrop] = useState([]);
     const [shiftPatternIdDropGrid, setShiftPatternIdDropGrid] = useState([]);
 
+    const [empDropAG, setEmpDropAG] = useState([]);
+
     const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
     useEffect(() => {
@@ -133,6 +135,43 @@ const ShiftChangeRequest = () => {
                 setShiftIdDropGrid(shiftOption);
             })
             .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+    
+    const handleReloadAdd = () => {
+          clearInputsAdd([]);
+  };
+   
+   const clearInputsAdd = () => {
+    setFromDate("");
+    setToDate("");
+  };
+
+
+
+    useEffect(() => {
+        const company_code = sessionStorage.getItem("selectedCompanyCode");
+        const Location_Code = sessionStorage.getItem("selectedLocationCode");
+        fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            company_code,
+            Location_Code,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const empOptions = data.map((option) => ({
+              value: option.EmployeeId,
+              label: `${option.EmployeeId} - ${option.First_Name}`,
+            }));
+            setEmpDropAG(empOptions);
+          })
+          .catch((error) =>
+            console.error("Error fetching employee data:", error)
+          );
     }, []);
 
     const handleFromDate = (e) => {
@@ -303,10 +342,19 @@ const ShiftChangeRequest = () => {
             field: "priority",
             editable: false,
         },
-        {
-            headerName: "Reporting Manager",
-            field: "RepManager",
-            editable: false,
+         {
+          headerName: "Reporting Manager",
+          field: "RepManager",
+          editable: false,
+          cellEditor: "agSelectCellEditor",
+          cellEditorParams: {
+            values: empDropAG.map((e) => e.value),
+          },
+          valueFormatter: (params) => {
+            const manager = empDropAG.find((e) => e.value == params.value);
+            return manager ? manager.label : params.value;
+          },
+          cellStyle: { textAlign: "center" },
         },
         {
             headerName: "Manager Approval Status",
@@ -578,10 +626,10 @@ const ShiftChangeRequest = () => {
                 <div className="header-flex">
                     <h1 className="page-title">Shift Change Request</h1>
                     <div className="action-wrapper desktop-actions">
-                        <div className="icon-btn reload"  >
-                            <span className="tooltip">Reload</span>
-                            <i className="fa-solid fa-rotate-right"></i>
-                        </div>
+            <div className="action-icon reload" onClick={handleReloadAdd}>
+              <span className="tooltip">Reload</span>
+              <i className="fa-solid fa-rotate-right"></i>
+            </div>
                     </div>
                 </div>
             </div>

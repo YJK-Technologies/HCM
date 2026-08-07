@@ -78,7 +78,6 @@ function Input({ }) {
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
-
     const fetchDept = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/getID`, {
@@ -100,9 +99,8 @@ function Input({ }) {
       }
     };
 
-    if (company_code) {
       fetchDept();
-    }
+
   }, []);
 
   useEffect(() => {
@@ -119,7 +117,7 @@ function Input({ }) {
       .then((data) => {
         const grade = data.map((option) => ({
           value: option.GradeID,
-          label: `${option.GradeID}`,
+          label: `${option.GradeID} - ${option.GradeName}`,
         }));
         setIDdropAG(grade);
       })
@@ -132,7 +130,8 @@ function Input({ }) {
   const filteredOptionGrade = Array.isArray(IDdrop)
     ? IDdrop.map((option) => ({
       value: option.GradeID,
-      label: option.GradeID,
+      label: `${option.GradeID} - ${option.GradeName}`,
+      
     }))
     : [];
 
@@ -816,6 +815,9 @@ function Input({ }) {
               </label>
             </div>
           </div>
+
+          
+      
 
           <div className="col-md-2">
             <div className="inputGroup">
