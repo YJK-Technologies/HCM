@@ -455,7 +455,7 @@ function Input() {
   };
 
   const handleSave = async () => {
-    if (!FromDate || !ToDate || !EligibleDays) {
+    if (!FromDate || !ToDate || !EligibleDays || !Status) {
       setError(true);
       toast.warning("Error: Missing required fields");
       return;
@@ -471,6 +471,7 @@ function Input() {
         Start_Year: formattedFromDate,
         End_Year: formattedToDate,
         Salary_Days: EligibleDays,
+        status:Status,
         company_code: sessionStorage.getItem("selectedCompanyCode"),
         created_by: sessionStorage.getItem("selectedUserCode"),
       };
