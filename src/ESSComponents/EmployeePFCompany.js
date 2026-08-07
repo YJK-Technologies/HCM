@@ -184,6 +184,8 @@ function Input({ }) {
     } catch (error) {
       console.error("Error inserting data:", error);
       toast.error('Error inserting data: ' + error.message);
+    }finally {
+      setLoading(false);
     }
   };
 
