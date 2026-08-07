@@ -18,6 +18,9 @@ const LeaveRequestPage = () => {
   const [Reason, setReason] = useState("");
   const [Select_slots, setSelect_Slots] = useState("");
   const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
+  const [isResponsibleFocus, setIsResponsibleFocus] = useState(false);
+  const [selectedReponsablePerson, setselectedReponsablePerson] = useState('');
+  const [empDrop, setEmpDrop] = useState([]);
   const [ReportingManager, setReportingManager] = useState("");
   const [ReportingManagerSC, setReportingManagerSC] = useState("");
   const [LeaveDrop, setLeaveDrop] = useState([]);
@@ -41,6 +44,9 @@ const LeaveRequestPage = () => {
   const [compOffOptions, setCompOffOptions] = useState([]);
   const [selectedCompOff, setSelectedCompOff] = useState(null);
   const [isSelectCompOff, setIsSelectCompOff] = useState(false);
+  const [empDropAG, setEmpDropAG] = useState([]);
+
+  const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   //code added by Pavun purpose of set user permisssion
   const permissions = JSON.parse(sessionStorage.getItem('permissions')) || {};
@@ -138,6 +144,69 @@ const LeaveRequestPage = () => {
       }
     }
   };
+
+        useEffect(() => {
+          const fetchUserData = async () => {
+              try {
+                  const response = await fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), Location_Code })
+                  });
+  
+                  const val = await response.json();
+                  setEmpDrop(val);
+  
+              } catch (error) {
+                  console.error('Error fetching user data:', error);
+              }
+          };
+  
+          fetchUserData();
+      }, []);
+  
+
+  const filteredOptionResponsible = Array.isArray(empDrop)
+  ? empDrop.map((option) => ({
+      value: option.EmployeeId,
+      label: `${option.EmployeeId} - ${option.First_Name}`,
+    }))
+  : [];
+
+  const handleChangeResponsible = (selectedOption) => {
+        setselectedReponsablePerson(selectedOption);
+        setReasponsiblePerson(selectedOption ? selectedOption.value : "");
+  };
+
+  useEffect(() => {
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const Location_Code = sessionStorage.getItem("selectedLocationCode");
+
+  fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      company_code,
+      Location_Code,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const empOptions = data.map((option) => ({
+        value: option.EmployeeId,
+        label: `${option.EmployeeId} - ${option.First_Name}`,
+      }));
+
+      setEmpDropAG(empOptions);
+    })
+    .catch((error) =>
+      console.error("Error fetching employee data:", error)
+    );
+  }, []);
 
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getSelectslot`, {
@@ -532,9 +601,16 @@ const LeaveRequestPage = () => {
       headerName: "Reporting Manager",
       field: "ReportingManager",
       editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: empDropAG.map((e) => e.value),
+      },
+      valueFormatter: (params) => {
+        const manager = empDropAG.find((e) => e.value == params.value);
+        return manager ? manager.label : params.value;
+      },
       cellStyle: { textAlign: "center" },
-    },
-
+    }
   ];
 
   const handleSearchItem = async () => {
@@ -949,18 +1025,29 @@ const LeaveRequestPage = () => {
                 </div>
               </div>
 
-              <div className="col-md-6">
-                <div className="inputGroup">
-                  <input
-                    type="text"
-                    className="exp-input-field form-control"
-                    title="Please Enter the Responsible Person"
-                    value={AlternativeReponsablePerson}
-                    onChange={(e) => setReasponsiblePerson(e.target.value)}
+                <div className="col-md-6">
+                <div
+                  className={`inputGroup selectGroup 
+                    ${selectedReponsablePerson ? "has-value" : ""} 
+                    ${isResponsibleFocus ? "is-focused" : ""}`}
+                  title="Please Select the Responsible Person"
+                >
+                  <Select
+                    value={selectedReponsablePerson}
+                    options={filteredOptionResponsible}
+                    onChange={handleChangeResponsible}
                     placeholder=" "
-                    autoComplete="off"
+                    onFocus={() => setIsResponsibleFocus(true)}
+                    onBlur={() => setIsResponsibleFocus(false)}
+                    classNamePrefix="react-select"
+                    isClearable
                   />
-                  <label className={`exp-form-labels ${error && !AlternativeReponsablePerson ? 'text-danger' : ''}`}>
+              
+                  <label
+                    className={`floating-label ${
+                      error && !AlternativeReponsablePerson ? "text-danger" : ""
+                    }`}
+                  >
                     Responsible Person<span className="text-danger">*</span>
                   </label>
                 </div>

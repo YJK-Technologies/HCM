@@ -656,19 +656,19 @@ function VisaRequest({ }) {
             field: "visa_request_id",
             editable: false
         },
-        {
-            headerName: "Employee ID",
-            field: "employee_id",
-            editable: false,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: empIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = empIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
-            },
-        },
+        // {
+        //     headerName: "Employee ID",
+        //     field: "employee_id",
+        //     editable: false,
+        //     cellEditor: "agSelectCellEditor",
+        //     cellEditorParams: {
+        //         values: empIdDropGrid.map(d => d.value),
+        //     },
+        //     valueFormatter: (params) => {
+        //         const dept = empIdDropGrid.find(d => d.value === params.value);
+        //         return dept ? dept.label : params.value;
+        //     },
+        // },
         {
             headerName: "Passport ID",
             field: "passport_id",
@@ -1060,7 +1060,7 @@ function VisaRequest({ }) {
 
             return {
                 "Visa Request ID": row.visa_request_id || "",
-                "Employee ID": `${row.employee_id} - ${empName}` || "",
+                // "Employee ID": `${row.employee_id} - ${empName}` || "",
                 "Passport ID": row.passport_id || "",
                 "Country ID": `${row.destination_country_id} - ${countryName}` || "",
                 "Visa Type": row.visa_type_id || "",
