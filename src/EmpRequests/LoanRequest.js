@@ -509,7 +509,7 @@ function LoanRequest({ }) {
             .then((val) => {
                 const Manager = val.map((option) => ({
                     value: option.EmployeeId,
-                    label: `${option.EmployeeId}`,
+                    label: `${option.EmployeeId} - ${option.full_name}`,
                 }));
 
                 setManagerdropAG(Manager);
@@ -1114,9 +1114,10 @@ function LoanRequest({ }) {
     };
 
     const handleEMICalculation = () => {
-        if (!loanAmount || !interestRate || !repayMonth) {
+        // if (!loanAmount || !interestRate || !repayMonth) {
+        if (!loanTypeId) {
             setMonthlyInstallment("");
-            toast.warning("Please fill all required fields");
+            toast.warning("Must fill the Loan Type ID field");
             return;
         }
 

@@ -786,11 +786,14 @@ function Input({ }) {
       "Description": row.Description || "",
       "Code": row.code || "",
       "Type": row.Type || "",
-      "Accural": row.Accural || "",
+      "Accural": row.Accrual || "",
       "Total Days to be Credit": row.TotalDaystoBeCredit || "",
       "Carry Forward": row.carryForward || "",
       "Exceed Leave": row.Exceed_Leave || "",
       "Leave Reason": row.LeaveReason || "",
+      "Start Year": row.Start_Year || "",
+      "End Year": row.End_Year || "",
+      "Status": row.status || "",
     }));
   };
 

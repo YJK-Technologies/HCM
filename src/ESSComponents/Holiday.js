@@ -31,7 +31,6 @@ function HoliDays() {
   const [showAsterisk, setShowAsterisk] = useState(true);
 
   const [holidayName, setHolidayName] = useState('');
-  const [countryCode, setCountryCode] = useState('');
   const [locationId, setLocationId] = useState('');
   const [holidayType, setHolidayType] = useState('');
   const [selectedHolidayType, setSelectedHolidayType] = useState('');
@@ -47,7 +46,6 @@ function HoliDays() {
   const [statusDropGrid, setStatusDroGrid] = useState([]);
 
   const [holidayNameSc, setHolidayNameSc] = useState('');
-  const [countryCodeSc, setCountryCodeSc] = useState('');
   const [locationIdSc, setLocationIdSc] = useState('');
   const [holidayTypeSc, setHolidayTypeSc] = useState('');
   const [selectedHolidayTypeSc, setSelectedHolidayTypeSc] = useState('');
@@ -66,6 +64,17 @@ function HoliDays() {
   const [isSelectHolidayType, setIsSelectHolidayType] = useState(false);
   const [isSelectHolidayTypeSc, setIsSelectHolidayTypeSc] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [selectedCountryCode, setSelectedCountryCode] = useState(null);
+  const [countryCode, setCountryCode] = useState("");
+  const [isSelectedCountryCode, setIsSelectedCountryCode] = useState(false);
+  const [countryIdDrop, setCountyIdDrop] = useState([]);
+
+  const [selectedCountryCodeSc, setSelectedCountryCodeSc] = useState(null);
+  const [countryCodeSc, setCountryCodeSc] = useState("");
+  const [isSelectedCountryCodeSc, setIsSelectedCountryCodeSc] = useState(false);
+
+  const [countryIdDropAG, setCountyIdDropAG] = useState([]);
 
 const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
@@ -224,6 +233,44 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+    useEffect(() => {
+      const company_code = sessionStorage.getItem('selectedCompanyCode');
+      fetch(`${config.apiBaseUrl}/GetCountry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ company_code })
+      })
+        .then((data) => data.json())
+        .then((val) => setCountyIdDrop(val))
+        .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      fetch(`${config.apiBaseUrl}/GetCountry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ company_code }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const countryOptions = data.map((option) => ({
+            value: option.Country_Code,
+            label: `${option.Country_Code} - ${option.Country_Name}`,
+          }));
+        
+          setCountyIdDropAG(countryOptions);
+        })
+        .catch((error) =>
+          console.error("Error fetching country data:", error)
+        );
+    }, []);
+
   const filteredOptionIsPaid = isPaidDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -254,6 +301,13 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionCountryCode = Array.isArray(countryIdDrop)
+  ? countryIdDrop.map((option) => ({
+      value: option?.Country_Code,
+      label: `${option?.Country_Code} - ${option?.Country_Name}`,
+    }))
+  : [];
+
   const handleChangeIsPaid = (selectedIsPaid) => {
     setSelectedIsPaid(selectedIsPaid);
     setIsPaid(selectedIsPaid ? selectedIsPaid.value : "");
@@ -283,6 +337,16 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
     setSelectedStatusSc(selectedStatusSc);
     setStatusSc(selectedStatusSc ? selectedStatusSc.value : "");
   };
+
+  const handleChangeCountryCode = (selectedCountryCode) => {
+  setSelectedCountryCode(selectedCountryCode);
+  setCountryCode(selectedCountryCode ? selectedCountryCode.value : "");
+};
+
+const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
+  setSelectedCountryCodeSc(selectedCountryCodeSc);
+  setCountryCodeSc(selectedCountryCodeSc ? selectedCountryCodeSc.value : "");
+};
 
   const columnDefs = [
     {
@@ -351,6 +415,16 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
       headerName: "Country Code",
       field: "Country_Code",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: countryIdDropAG.map((c) => c.value),
+      },
+      valueFormatter: (params) => {
+        const country = countryIdDropAG.find(
+          (c) => c.value == params.value
+        );
+        return country ? country.label : params.value;
+      },
       cellStyle: { textAlign: "center" },
     },
     {
@@ -809,19 +883,29 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Description"
-                class="exp-input-field form-control"
-                type="text"
+            <div
+              className={`inputGroup selectGroup
+                ${selectedCountryCode ? "has-value" : ""}
+                ${isSelectedCountryCode ? "is-focused" : ""}`}
+              title="Please select the Country Code"
+            >
+              <Select
+                id="countryCode"
+                classNamePrefix="react-select"
                 placeholder=""
-                required
-                title="Please Enter the Country Code"
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                maxLength={255}
+                onFocus={() => setIsSelectedCountryCode(true)}
+                onBlur={() => setIsSelectedCountryCode(false)}
+                isClearable
+                value={selectedCountryCode}
+                onChange={handleChangeCountryCode}
+                options={filteredOptionCountryCode}
               />
-              <label for="cname" className={`exp-form-labels`}>Country Code</label>
+              <label
+                htmlFor="countryCode"
+                className="floating-label"
+              >
+                Country Code
+              </label>
             </div>
           </div>
 
@@ -989,19 +1073,29 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
           </div>
 
           <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Description"
-                class="exp-input-field form-control"
-                type="text"
+            <div
+              className={`inputGroup selectGroup
+                ${selectedCountryCodeSc ? "has-value" : ""}
+                ${isSelectedCountryCodeSc ? "is-focused" : ""}`}
+              title="Please select the Country Code"
+            >
+              <Select
+                id="countryCodeSc"
+                classNamePrefix="react-select"
                 placeholder=""
-                required
-                title="Please Enter the Country Code"
-                value={countryCodeSc}
-                onChange={(e) => setCountryCodeSc(e.target.value)}
-                maxLength={255}
+                onFocus={() => setIsSelectedCountryCodeSc(true)}
+                onBlur={() => setIsSelectedCountryCodeSc(false)}
+                isClearable
+                value={selectedCountryCodeSc}
+                onChange={handleChangeCountryCodeSc}
+                options={filteredOptionCountryCode}
               />
-              <label for="cname" className={`exp-form-labels`}>Country Code</label>
+              <label
+                htmlFor="countryCodeSc"
+                className="floating-label"
+              >
+                Country Code
+              </label>
             </div>
           </div>
 

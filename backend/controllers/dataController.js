@@ -9357,29 +9357,9 @@ const getMartial = async (req, res) => {
 };
 
 const addLeaveType = async (req, res) => {
-  const {
-    company_code,
-    Location_Code,
-    LeaveId,
-    Description,
-    code,
-    Type,
-    Accrual,
-    TotalDaystoBeCredit,
-    carryForward,
-    Exceed_Leave,
-    LeaveReason,
-    created_by,
-    modified_by,
-    EmployeeId,
-    Start_Year,
-    End_Year,
-    status,
-    datetime1,
-    datetime2,
-    datetime3,
-    datetime4,
-  } = req.body;
+  const { company_code, Location_Code, LeaveId, Description, code, Type, Accrual, TotalDaystoBeCredit, carryForward, 
+    Exceed_Leave, LeaveReason, created_by, modified_by, EmployeeId, Start_Year, End_Year, status, datetime1, 
+    datetime2, datetime3, datetime4,} = req.body;
   let pool;
   try {
     pool = await sql.connect(dbConfig);
@@ -12088,19 +12068,8 @@ const getsearchHoliday = async (req, res) => {
 
 //Code added By AK on 2025-01-13 CODE START
 const AddBonusDetails = async (req, res) => {
-  const {
-    company_code,
-    GradeID,
-    Annual_bonus,
-    Referral_bonus,
-    Retention_bonus,
-    Holiday_bonus,
-    Performance_bonus,
-    Discretionary_bonus,
-    Start_Year,
-    End_Year,
-    created_by,
-  } = req.body;
+  const { company_code, GradeID, Annual_bonus, Referral_bonus, Retention_bonus, Holiday_bonus, Performance_bonus,
+     Discretionary_bonus, Start_Year, End_Year, created_by,  } = req.body;
   try {
     const pool = await connection.connectToDatabase();
     const result = await pool
@@ -14639,14 +14608,7 @@ const PMSEmployeechart = async (req, res) => {
 
 //code added by arjun 02/04/25
 const AddSalaryCriteria = async (req, res) => {
-  const {
-    Start_Year,
-    End_Year,
-    Salary_Days,
-    company_code,
-    status,
-    created_by,
-  } = req.body;
+  const { Start_Year, End_Year, Salary_Days, company_code, status, created_by,} = req.body;
   try {
     const pool = await connection.connectToDatabase(dbConfig);
     await pool
@@ -18351,21 +18313,8 @@ const getNationality = async (req, res) => {
 };
 
 const CountryMasterInsert = async (req, res) => {
-  const {
-    Country_Code,
-    Country_Name,
-    TimeZone_Default,
-    Week_Start_Day,
-    ISO_Code,
-    Weekend_Days,
-    Max_Work_Hours_Day,
-    Max_Work_Hours_Week,
-    Overtime_Allowed,
-    Currency_Code,
-    Status,
-    company_code,
-    created_by,
-  } = req.body;
+  const { Country_Code, Country_Name, TimeZone_Default, Week_Start_Day, ISO_Code, Weekend_Days, Max_Work_Hours_Day, Max_Work_Hours_Week, Overtime_Allowed,
+    Currency_Code, Status, company_code, created_by,} = req.body;
 
   try {
     const pool = await sql.connect(dbConfig);
