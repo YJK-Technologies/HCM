@@ -1915,7 +1915,7 @@ const maxDOBString = maxDOB.toISOString().split("T")[0];
                 autoComplete="off"
                 maxLength={18}
               />
-              <label htmlFor="Aadharno" className="exp-form-labels">Aadhaar No</label>
+              <label htmlFor="Aadharno" className="exp-form-labels">ID</label>
             </div>
           </div>
 
@@ -2305,7 +2305,7 @@ const maxDOBString = maxDOB.toISOString().split("T")[0];
             </div>
           </div>
 
-          <div className="col-md-2">
+          {/* <div className="col-md-2">
             <div className="inputGroup">
               <input
                 id="passportNo"
@@ -2378,7 +2378,7 @@ const maxDOBString = maxDOB.toISOString().split("T")[0];
               />
               <label htmlFor="otherIdNo" className="exp-form-labels">Other ID No</label>
             </div>
-          </div> 
+          </div>  */}
 
           <div className="col-md-2">
             <div

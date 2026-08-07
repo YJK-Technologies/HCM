@@ -976,7 +976,7 @@ function EmpFamPersonalDetail({ }) {
                     }}
                   />
                   <label for="cno" className="exp-form-labels">
-                    Aadhaar No
+                    ID
                   </label>
                 </div>
               </div>

@@ -1994,7 +1994,7 @@ const Dashboard = () => {
     //   field: "shift",
     // },
     {
-      headerName: "Aadhaar No",
+      headerName: "ID",
       field: "AAdhar_no",
     },
     {
@@ -2701,7 +2701,7 @@ const Dashboard = () => {
         Designation: row.designation_ID || "",
         Manager: row.manager || "",
         Shift: row.shift || "",
-        "Aadhaar No": row.AAdhar_no || "",
+        "ID": row.AAdhar_no || "",
         "PF No": row.PFNo || "",
         "Account No": row.Account_NO || "",
         "Marital Status": row.marital_status || "",

@@ -1454,6 +1454,7 @@ function RequestReport({ }) {
 
   const [empIdTravelDropGrid, setEmpIdTravelDropGrid] = useState([]);
   const [depTavelDropGrid, setDepTavelDropGrid] = useState([]);
+  const [depmanagerDropGrid, setDepmanagerDropGrid] = useState([]);
 
   useEffect(() => {
     const company_code = sessionStorage.getItem("selectedCompanyCode");
@@ -1629,6 +1630,26 @@ function RequestReport({ }) {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
+    fetch(`${config.apiBaseUrl}/ESSManager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ company_code, Location_Code: sessionStorage.getItem('selectedLocationCode'), }),
+    })
+      .then((data) => data.json())
+      .then((val) => {
+        const Manager = val.map((option) => ({
+          value: option?.EmployeeId,
+          label: `${option?.EmployeeId}-${option?.full_name}`,
+        }));
+        setDepmanagerDropGrid(Manager);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   const searchClearTravelInputFields = () => {
     setTravelReqIdSc("");
     setSelectedEmpIdTravelSc("");
@@ -1798,8 +1819,15 @@ function RequestReport({ }) {
       headerName: "Manager",
       field: "manager_id",
       editable: false,
-    },
-    {
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: depmanagerDropGrid.map((d) => d.value),
+      },
+      valueFormatter: (params) => {
+        const Manager = depmanagerDropGrid.find((d) => d.value === params.value);
+        return Manager ? Manager.label : params.value;
+      },
+    },    {
       headerName: "Keyfield",
       field: "keyfield",
       hide: true,
