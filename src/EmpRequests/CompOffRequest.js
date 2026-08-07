@@ -23,7 +23,6 @@ const EmployeeCompOff = () => {
   const [FromDate, setFromDate] = useState("");
   const [ToDate, setToDate] = useState("");
   const [Reason, setReason] = useState("");
-  const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
   const [error, setError] = useState(false);
   const [Managerdrop, setManagerdrop] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
@@ -48,6 +47,12 @@ const EmployeeCompOff = () => {
   const [isSelectManagerSC, setIsSelectManagerSC] = useState(false);
   const [ReportingManagerSC, setReportingManagerSC] = useState("");
   const [ManagerdropSC, setManagerdropSC] = useState([]);
+
+  const [selectedReponsablePerson, setselectedReponsablePerson] = useState('');
+  const [isResponsibleFocus, setIsResponsibleFocus] = useState(false);
+  const [AlternativeReponsablePerson, setReasponsiblePerson] = useState("");
+  const [empDrop, setEmpDrop] = useState([]);
+  const [empDropAG, setEmpDropAG] = useState([]);
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
@@ -99,6 +104,69 @@ const EmployeeCompOff = () => {
       .then((data) => data.json())
       .then((val) => setstatusDropSc(val));
   }, []);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), 
+                  Location_Code })
+              });
+  
+              const val = await response.json();
+              setEmpDrop(val);
+  
+          } catch (error) {
+              console.error('Error fetching user data:', error);
+          }
+      };
+  
+      fetchUserData();
+  }, []);
+  
+  useEffect(() => {
+  const company_code = sessionStorage.getItem("selectedCompanyCode");
+  const Location_Code = sessionStorage.getItem("selectedLocationCode");
+
+  fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      company_code,
+      Location_Code,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const empOptions = data.map((option) => ({
+        value: option.EmployeeId,
+        label: `${option.EmployeeId} - ${option.First_Name}`,
+      }));
+
+      setEmpDropAG(empOptions);
+    })
+    .catch((error) =>
+      console.error("Error fetching employee data:", error)
+    );
+  }, []);
+  
+    const filteredOptionResponsible = Array.isArray(empDrop)
+    ? empDrop.map((option) => ({
+        value: option.EmployeeId,
+        label: `${option.EmployeeId} - ${option.First_Name}`,
+      }))
+    : [];
+  
+    const handleChangeResponsible = (selectedOption) => {
+          setselectedReponsablePerson(selectedOption);
+          setReasponsiblePerson(selectedOption ? selectedOption.value : "");
+  };
 
   const handleFromDate = (e) => {
     const selectedDate = e.target.value;
@@ -280,8 +348,16 @@ const EmployeeCompOff = () => {
       headerName: "Reporting Manager",
       field: "RepManager",
       editable: false,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: empDropAG.map((e) => e.value),
+      },
+      valueFormatter: (params) => {
+        const manager = empDropAG.find((e) => e.value == params.value);
+        return manager ? manager.label : params.value;
+      },
       cellStyle: { textAlign: "center" },
-    },
+    }
   ];
 
   const defaultColDef = {
@@ -536,17 +612,30 @@ const EmployeeCompOff = () => {
           </div>
 
           <div className="col-md-6">
-            <div className="inputGroup">
-              <input
-                type="text"
-                className="exp-input-field form-control"
-                value={AlternativeReponsablePerson}
-                title="Please enter the Responsible Person"
-                onChange={(e) => setReasponsiblePerson(e.target.value)}
+            <div
+              className={`inputGroup selectGroup 
+                ${selectedReponsablePerson ? "has-value" : ""} 
+                ${isResponsibleFocus ? "is-focused" : ""}`}
+              title="Please Select the Responsible Person"
+            >
+              <Select
+                value={selectedReponsablePerson}
+                options={filteredOptionResponsible}
+                onChange={handleChangeResponsible}
                 placeholder=" "
-                autoComplete="off"
+                onFocus={() => setIsResponsibleFocus(true)}
+                onBlur={() => setIsResponsibleFocus(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label className={`exp-form-labels`}>Responsible Person</label>
+          
+              <label
+                className={`floating-label ${
+                  error && !AlternativeReponsablePerson ? "text-danger" : ""
+                }`}
+              >
+                Responsible Person<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
