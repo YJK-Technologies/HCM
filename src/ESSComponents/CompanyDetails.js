@@ -53,6 +53,11 @@ function Input() {
   const [workLocation, setWorkLocation] = useState('');
   const [originalData, setOriginalData] = useState(null);
 
+  const [selectedLocNo, setSelectedLocNo] = useState('');
+  const [isSelectLocNo, setIsSelectLocNo] = useState(false);
+  const [LocNodrop, setLocNodrop] = useState([]);
+  const [LocNo, setLocNo] = useState("");
+
   const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
   //code added by Pavun purpose of set user permisssion
@@ -171,7 +176,30 @@ function Input() {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionLocNo = Array.isArray(LocNodrop)
+    ? LocNodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no}-${option.location_name}`,
+    }))
+    : [];
 
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/GetLocations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        company_no: sessionStorage.getItem("selectedCompanyCode")
+      }),
+    })
+      .then((response) => response.json())
+      .then(setLocNodrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+  
   // shift dropdown function 
   useEffect(() => {
 
@@ -213,6 +241,12 @@ function Input() {
   const handleChangeCode = (selectedOption) => {
     setselectedmanager(selectedOption);
     setManager(selectedOption ? selectedOption.value : '');
+  };
+
+  //
+    const handleChangeLocNo = (selectedLocNo) => {
+    setSelectedLocNo(selectedLocNo);
+    setLocNo(selectedLocNo ? selectedLocNo.value : '');
   };
 
   // Manager change effect to fetch shift data using selected manager's company code
@@ -304,7 +338,7 @@ function Input() {
         shift: Shift,
         status: status,
         Section: section,
-        Work_Location: workLocation,
+        Work_Location: LocNo,
         Employee_Type: empType,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode'),
@@ -469,7 +503,7 @@ function Input() {
       shift: Shift || "",
       status: status || "",
       Section: section || "",
-      Work_Location: workLocation || "",
+      Work_Location: LocNo || "",
       Employee_Type: empType || ""
     };
 
@@ -591,6 +625,10 @@ function Input() {
       setselecteddept(selecteddept);
       setdpt(selecteddept?.value || null);
 
+      const selectedLocationNo = filteredOptionLocNo.find(option => option.value === Work_Location);
+      setSelectedLocNo(selectedLocationNo);
+      setLocNo(selectedLocationNo?.value || null);
+
       const designationData = await fetchProductCodes(department_ID);
       const selectedDesg = designationData.find(option => option.value === designation_ID);
       setDesignation(selectedDesg);
@@ -625,7 +663,8 @@ function Input() {
           shift: row.shift || "",
           status: row.status || "",
           Section: row.Section || "",
-          Work_Location: row.Work_Location || "",
+          // Work_Location: row.Work_Location || "",
+          Work_Location: row.LocNo || "",
           Employee_Type: row.Employee_Type || ""
         });
       }
@@ -670,7 +709,7 @@ function Input() {
         const searchData = await response.json();
 
         if (searchData && searchData.length > 0) {
-          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = searchData;
+          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, LocNo, shift, status, Section, Work_Location, Employee_Type }] = searchData;
           const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
           const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
@@ -686,6 +725,10 @@ function Input() {
           const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
           setselecteddept(selecteddept);
           setdpt(selecteddept?.value || null);
+
+          const selectedLocationNo = filteredOptionLocNo.find(option => option.value === Work_Location);
+          setSelectedLocNo(selectedLocationNo);
+          setLocNo(selectedLocationNo?.value || null);
 
           const designationData = await fetchProductCodes(department_ID);
           const selectedDesg = designationData.find(option => option.value === designation_ID);
@@ -723,7 +766,8 @@ function Input() {
               shift: row.shift || "",
               status: row.status || "",
               Section: row.Section || "",
-              Work_Location: row.Work_Location || "",
+              // Work_Location: row.Work_Location || "",
+              Work_Location: row.LocNo || "",
               Employee_Type: row.Employee_Type || ""
             });
           }
@@ -1142,20 +1186,29 @@ function Input() {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="DOL"
-                className="exp-input-field form-control"
-                title="Please Enter the Work Location"
+            <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedLocNo ? "has-value" : ""} 
+              ${isSelectLocNo ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
+            >
+              <Select
+                id="shift"
                 type="text"
-                name="DOL"
+                value={selectedLocNo}
+                onChange={handleChangeLocNo}
+                options={filteredOptionLocNo}
                 placeholder=" "
-                value={workLocation}
-                maxLength={100}
-                onChange={(e) => setWorkLocation(e.target.value)}
+                onFocus={() => setIsSelectLocNo(true)}
+                onBlur={() => setIsSelectLocNo(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label htmlFor="DOL" className="exp-form-labels">Work Location</label>
+
+              <label htmlFor="selectedshift" className={`floating-label ${error && !LocNo ? 'text-danger' : ''}`}>
+                Work Location<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 

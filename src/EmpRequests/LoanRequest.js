@@ -586,19 +586,19 @@ function LoanRequest({ }) {
             field: "loan_request_id",
             editable: false
         },
-        {
-            headerName: "Employee ID",
-            field: "employee_id",
-            editable: true,
-            cellEditor: "agSelectCellEditor",
-            cellEditorParams: {
-                values: empIdDropGrid.map(d => d.value),
-            },
-            valueFormatter: (params) => {
-                const dept = empIdDropGrid.find(d => d.value === params.value);
-                return dept ? dept.label : params.value;
-            },
-        },
+        // {
+        //     headerName: "Employee ID",
+        //     field: "employee_id",
+        //     editable: true,
+        //     cellEditor: "agSelectCellEditor",
+        //     cellEditorParams: {
+        //         values: empIdDropGrid.map(d => d.value),
+        //     },
+        //     valueFormatter: (params) => {
+        //         const dept = empIdDropGrid.find(d => d.value === params.value);
+        //         return dept ? dept.label : params.value;
+        //     },
+        // },
         // {
         //     headerName: "Request Number",
         //     field: "request_number",
@@ -959,7 +959,7 @@ function LoanRequest({ }) {
 
             return {
                 "Loan Request ID": row.loan_request_id || "",
-                "Employee ID": `${row.employee_id} - ${empName}` || "",
+                // "Employee ID": `${row.employee_id} - ${empName}` || "",
                 // "Request Number": row.request_number || "",
                 "Loan Type ID": row.loan_type_id || "",
                 "Loan Amount": row.loan_amount || "",
