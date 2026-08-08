@@ -250,7 +250,7 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
     useEffect(() => {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      fetch(`${config.apiBaseUrl}/GetLocations`, {
+      fetch(`${config.apiBaseUrl}/GetCountry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
