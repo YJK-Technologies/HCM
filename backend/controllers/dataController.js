@@ -11880,8 +11880,8 @@ const addEmployeeHoliday = async (req, res) => {
       .input("mode", sql.NVarChar, "I") // Insert mode
       .input("Holiday_Date", sql.Date, Holiday_Date)
       .input("Country_Code", sql.NVarChar, Country_Code)
-      .input("Location_ID", sql.Int, Location_ID)
-      .input("Location_Code", sql.NVarChar, Location_Code)
+      .input("Location_ID", sql.VarChar, Location_ID)
+      .input("Location_Code", sql.VarChar, Location_Code)
       .input("Holiday_Name", sql.NVarChar, Holiday_Name)
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
@@ -11927,8 +11927,8 @@ const updateEmployeeHoliday = async (req, res) => {
         .input("mode", sql.NVarChar, "U") // Insert mode
         .input("Holiday_Date", sql.Date, updatedRow.Holiday_Date)
         .input("Country_Code", sql.NVarChar, updatedRow.Country_Code)
-        .input("Location_ID", sql.Int, updatedRow.Location_ID)
-        .input("Location_Code", sql.NVarChar, updatedRow.Location_Code)
+        .input("Location_ID", sql.VarChar, updatedRow.Location_ID)
+        .input("Location_Code", sql.VarChar, updatedRow.Location_Code)
         .input("Holiday_Name", sql.NVarChar, updatedRow.Holiday_Name)
         .input("Holiday_Type", sql.NVarChar, updatedRow.Holiday_Type)
         .input("Is_Paid", sql.NVarChar, updatedRow.Is_Paid)
@@ -12046,8 +12046,8 @@ const getsearchHoliday = async (req, res) => {
       .input("StartDate", sql.NVarChar, StartDate)
       .input("EndDate", sql.NVarChar, EndDate)
       .input("Country_Code", sql.NVarChar, Country_Code)
-      .input("Location_ID", sql.Int, Location_ID)
-      .input("Location_Code", sql.NVarChar, Location_Code)
+      .input("Location_ID", sql.VarChar, Location_ID)
+      .input("Location_Code", sql.VarChar, Location_Code)
       .input("Holiday_Name", sql.NVarChar, Holiday_Name)
       .input("Holiday_Type", sql.NVarChar, Holiday_Type)
       .input("Is_Paid", sql.NVarChar, Is_Paid)
@@ -14288,7 +14288,7 @@ const deleteEmployeeHoliday = async (req, res) => {
         .input("company_code", sql.NVarChar, updatedRow.company_code)
         .input("keyfield", sql.NVarChar, updatedRow.keyfield)
         .input("modified_by", sql.NVarChar, updatedRow.modified_by)
-        .query(`EXEC sp_Holiday_Master @mode,0,'','',0,'','','','','','','',@company_code,'',@modified_by,'','',@keyfield`);
+        .query(`EXEC sp_Holiday_Master @mode,0,'','','','','','','','','','',@company_code,'',@modified_by,'','',@keyfield`);
     }
     res.status(200).json("Data Deleted Successfully");
   } catch (err) {
@@ -18564,6 +18564,24 @@ const GetCountry = async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 };
+
+const GetLocations = async (req, res) => {
+  const { company_no} = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_no", sql.NVarChar, company_no)
+      .query(
+        `EXEC [sp_user_company_mapping] 'GL','','','@company_no','','',0,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+
 
 const TimeZonemasterInsert = async (req, res) => {
   const {

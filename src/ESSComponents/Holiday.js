@@ -250,7 +250,7 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
     useEffect(() => {
       const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      fetch(`${config.apiBaseUrl}/GetCountry`, {
+      fetch(`${config.apiBaseUrl}/GetLocations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1115,6 +1115,7 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
               <label for="cname" className={`exp-form-labels`}>Location ID</label>
             </div>
           </div>
+          
 
           <div className="col-md-2">
             <div
