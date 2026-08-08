@@ -53,6 +53,11 @@ function Input() {
   const [workLocation, setWorkLocation] = useState('');
   const [originalData, setOriginalData] = useState(null);
 
+  const [selectedLocNo, setSelectedLocNo] = useState('');
+  const [isSelectLocNo, setIsSelectLocNo] = useState(false);
+  const [LocNodrop, setLocNodrop] = useState([]);
+  const [LocNo, setLocNo] = useState("");
+
   const Location_Code = sessionStorage.getItem('selectedLocationCode');
 
   //code added by Pavun purpose of set user permisssion
@@ -171,7 +176,30 @@ function Input() {
     label: option.attributedetails_name,
   }));
 
+  const filteredOptionLocNo = Array.isArray(LocNodrop)
+    ? LocNodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no}-${option.location_name}`,
+    }))
+    : [];
 
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/GetLocations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        company_no: sessionStorage.getItem("selectedCompanyCode")
+      }),
+    })
+      .then((response) => response.json())
+      .then(setLocNodrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+  
   // shift dropdown function 
   useEffect(() => {
 
@@ -213,6 +241,12 @@ function Input() {
   const handleChangeCode = (selectedOption) => {
     setselectedmanager(selectedOption);
     setManager(selectedOption ? selectedOption.value : '');
+  };
+
+  //
+    const handleChangeLocNo = (selectedLocNo) => {
+    setSelectedLocNo(selectedLocNo);
+    setLocNo(selectedLocNo ? selectedLocNo.value : '');
   };
 
   // Manager change effect to fetch shift data using selected manager's company code
@@ -304,7 +338,7 @@ function Input() {
         shift: Shift,
         status: status,
         Section: section,
-        Work_Location: workLocation,
+        Work_Location: LocNo,
         Employee_Type: empType,
         company_code: sessionStorage.getItem('selectedCompanyCode'),
         created_by: sessionStorage.getItem('selectedUserCode'),
@@ -469,7 +503,7 @@ function Input() {
       shift: Shift || "",
       status: status || "",
       Section: section || "",
-      Work_Location: workLocation || "",
+      Work_Location: LocNo || "",
       Employee_Type: empType || ""
     };
 
@@ -568,72 +602,92 @@ function Input() {
     setOpen(true);
   };
 
-  const CompanyDetails = async (data) => {
+  // const CompanyDetails = async (data) => {
 
-    if (data && data.length > 0) {
-      setSaveButtonVisible(false);
-      setUpdateButtonVisible(true);
-      setShowAsterisk(false);
-      const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = data;
-      const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
-      const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
+  //   if (data && data.length > 0) {
+  //     setSaveButtonVisible(false);
+  //     setUpdateButtonVisible(true);
+  //     setShowAsterisk(false);
+  //     const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = data;
+  //     const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
+  //     const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
 
-      setEmployeeId(EmployeeId);
-      setdepartment_id(department_ID);
-      setdesignation_id(designation_ID);
-      setFirst_Name(First_Name);
-      setDOJ(formatDateDOJ);
-      setDOL(formatDateDOL);
-      setSection(Section);
-      setWorkLocation(Work_Location);
+  //     setEmployeeId(EmployeeId);
+  //     setdepartment_id(department_ID);
+  //     setdesignation_id(designation_ID);
+  //     setFirst_Name(First_Name);
+  //     setDOJ(formatDateDOJ);
+  //     setDOL(formatDateDOL);
+  //     setSection(Section);
+  //     setWorkLocation(Work_Location);
 
-      const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
-      setselecteddept(selecteddept);
-      setdpt(selecteddept?.value || null);
+  //     const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
+  //     setselecteddept(selecteddept);
+  //     setdpt(selecteddept?.value || null);
 
-      const designationData = await fetchProductCodes(department_ID);
-      const selectedDesg = designationData.find(option => option.value === designation_ID);
-      setDesignation(selectedDesg);
-      setSelecteddesg(selectedDesg?.value || null);
+  //     const selectedLocationNo = filteredOptionLocNo.find(option => option.value === Work_Location);
+  //     setSelectedLocNo(selectedLocationNo);
+  //     setLocNo(selectedLocationNo?.value || null);
 
-      const managerData = await fetchmanager(designation_ID);
-      const selectedmanager = managerData.find(option => option.value === manager);
-      setselectedmanager(selectedmanager);
-      setManager(selectedmanager?.value || null);
+  //     const designationData = await fetchProductCodes(department_ID);
+  //     const selectedDesg = designationData.find(option => option.value === designation_ID);
+  //     setDesignation(selectedDesg);
+  //     setSelecteddesg(selectedDesg?.value || null);
 
-      const selectedShift = filteredOptionShift.find(option => option.value === shift);
-      setSelectedShift(selectedShift);
-      setShift(selectedShift?.value || null);
+  //     const managerData = await fetchmanager(designation_ID);
+  //     const selectedmanager = managerData.find(option => option.value === manager);
+  //     setselectedmanager(selectedmanager);
+  //     setManager(selectedmanager?.value || null);
 
-      const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
-      setSelectedEmpType(selectedEmpType);
-      setEmpType(selectedEmpType?.value || null);
+  //     const selectedShift = filteredOptionShift.find(option => option.value === shift);
+  //     setSelectedShift(selectedShift);
+  //     setShift(selectedShift?.value || null);
 
-      const selectedStatus = filteredOptionStatus.find(option => option.value === status);
-      setSelectedStatus(selectedStatus);
-      setStatus(selectedStatus?.value || null);
-      if (data && data.length > 0) {
-        const row = data[0];
+  //     const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
+  //     setSelectedEmpType(selectedEmpType);
+  //     setEmpType(selectedEmpType?.value || null);
 
-        setOriginalData({
-          EmployeeId: row.EmployeeId || "",
-          department_ID: row.department_ID || "",
-          designation_ID: row.designation_ID || "",
-          DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
-          DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
-          manager: row.manager || "",
-          shift: row.shift || "",
-          status: row.status || "",
-          Section: row.Section || "",
-          Work_Location: row.Work_Location || "",
-          Employee_Type: row.Employee_Type || ""
-        });
-      }
+  //     const selectedStatus = filteredOptionStatus.find(option => option.value === status);
+  //     setSelectedStatus(selectedStatus);
+  //     setStatus(selectedStatus?.value || null);
+  //     if (data && data.length > 0) {
+  //       const row = data[0];
+
+  //       setOriginalData({
+  //         EmployeeId: row.EmployeeId || "",
+  //         department_ID: row.department_ID || "",
+  //         designation_ID: row.designation_ID || "",
+  //         DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
+  //         DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
+  //         manager: row.manager || "",
+  //         shift: row.shift || "",
+  //         status: row.status || "",
+  //         Section: row.Section || "",
+  //         // Work_Location: row.Work_Location || "",
+  //         Work_Location: row.LocNo || "",
+  //         Employee_Type: row.Employee_Type || ""
+  //       });
+  //     }
 
 
-      console.log(data);
-    };
+  //     console.log(data);
+  //   };
+  // }
+
+
+const CompanyDetails = async (data) => {
+  if (data && data.length > 0) {
+    setSaveButtonVisible(false);
+    setUpdateButtonVisible(true);
+    setShowAsterisk(false);
+
+    const [{ EmployeeId }] = data;
+
+    handleRefNO(EmployeeId);
+  } else {
+    console.log("Data not fetched...!");
   }
+};
 
   const tabs = [
     { label: 'Personal Details' },
@@ -647,101 +701,263 @@ function Input() {
     { label: 'Employee Assets' }
   ];
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleRefNO(EmployeeId)
-    }
-  };
+  // const handleKeyPress = (e) => {
+  //   if (e.key === 'Enter') {
+  //     handleRefNO(EmployeeId)
+  //   }
+  // };
 
-  const handleRefNO = async (code) => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/getEmpcompanyDetails`, {
+
+const handleKeyPress = (e) => {
+  if (e.key === "Enter") {
+    handleRefNO(EmployeeId);
+  }
+};
+
+  // const handleRefNO = async (code) => {
+  //   try {
+  //     const response = await fetch(`${config.apiBaseUrl}/getEmpcompanyDetails`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), }),
+  //     });
+
+  //     if (response.ok) {
+  //       setSaveButtonVisible(false);
+  //       setShowAsterisk(false);
+  //       setUpdateButtonVisible(true);
+  //       const searchData = await response.json();
+
+  //       if (searchData && searchData.length > 0) {
+  //         const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, LocNo, shift, status, Section, Work_Location, Employee_Type }] = searchData;
+  //         const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
+  //         const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
+
+  //         setEmployeeId(EmployeeId);
+  //         setdepartment_id(department_ID);
+  //         setdesignation_id(designation_ID);
+  //         setFirst_Name(First_Name);
+  //         setDOJ(formatDateDOJ);
+  //         setDOL(formatDateDOL);
+  //         setSection(Section);
+  //         setWorkLocation(Work_Location);
+
+  //         const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
+  //         setselecteddept(selecteddept);
+  //         setdpt(selecteddept?.value || null);
+
+  //         const selectedLocationNo = filteredOptionLocNo.find(option => option.value === Work_Location);
+  //         setSelectedLocNo(selectedLocationNo);
+  //         setLocNo(selectedLocationNo?.value || null);
+
+  //         const designationData = await fetchProductCodes(department_ID);
+  //         const selectedDesg = designationData.find(option => option.value === designation_ID);
+  //         setDesignation(selectedDesg);
+  //         setSelecteddesg(selectedDesg?.value || null);
+
+  //         const managerData = await fetchmanager(designation_ID);
+
+  //         const selectedmanager = managerData.find(option => option.value === manager);
+  //         setselectedmanager(selectedmanager);
+  //         setManager(selectedmanager?.value || null);
+
+  //         const selectedShift = filteredOptionShift.find(option => option.value === shift);
+  //         setSelectedShift(selectedShift);
+  //         setShift(selectedShift?.value || null);
+
+  //         const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
+  //         setSelectedEmpType(selectedEmpType);
+  //         setEmpType(selectedEmpType?.value || null);
+
+  //         const selectedStatus = filteredOptionStatus.find(option => option.value === status);
+  //         setSelectedStatus(selectedStatus);
+  //         setStatus(selectedStatus?.value || null);
+
+  //         if (searchData && searchData.length > 0) {
+  //           const row = searchData[0];
+
+  //           setOriginalData({
+  //             EmployeeId: row.EmployeeId || "",
+  //             department_ID: row.department_ID || "",
+  //             designation_ID: row.designation_ID || "",
+  //             DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
+  //             DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
+  //             manager: row.manager || "",
+  //             shift: row.shift || "",
+  //             status: row.status || "",
+  //             Section: row.Section || "",
+  //             // Work_Location: row.Work_Location || "",
+  //             Work_Location: row.LocNo || "",
+  //             Employee_Type: row.Employee_Type || ""
+  //           });
+  //         }
+
+  //       }
+  //     } else if (response.status === 404) {
+  //       toast.warning("Employee not found");
+  //     } else {
+  //       const errorResponse = await response.json();
+  //       toast.warning(errorResponse.message || "Failed to insert sales data");
+  //       console.error(errorResponse.details || errorResponse.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error inserting data:", error);
+  //     toast.error('Error inserting data: ' + error.message);
+  //   }
+  // };
+
+ const handleRefNO = async (employeeId) => {
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/getEmpcompanyDetails`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Id: code, company_code: sessionStorage.getItem("selectedCompanyCode"), }),
-      });
-
-      if (response.ok) {
-        setSaveButtonVisible(false);
-        setShowAsterisk(false);
-        setUpdateButtonVisible(true);
-        const searchData = await response.json();
-
-        if (searchData && searchData.length > 0) {
-          const [{ EmployeeId, department_ID, First_Name, designation_ID, DOJ, DOL, manager, shift, status, Section, Work_Location, Employee_Type }] = searchData;
-          const formatDateDOJ = DOJ ? new Date(DOJ).toISOString().split('T')[0] : '';
-          const formatDateDOL = DOL ? new Date(DOL).toISOString().split('T')[0] : '';
-
-          setEmployeeId(EmployeeId);
-          setdepartment_id(department_ID);
-          setdesignation_id(designation_ID);
-          setFirst_Name(First_Name);
-          setDOJ(formatDateDOJ);
-          setDOL(formatDateDOL);
-          setSection(Section);
-          setWorkLocation(Work_Location);
-
-          const selecteddept = filteredOptionDPt.find(option => option.value === department_ID);
-          setselecteddept(selecteddept);
-          setdpt(selecteddept?.value || null);
-
-          const designationData = await fetchProductCodes(department_ID);
-          const selectedDesg = designationData.find(option => option.value === designation_ID);
-          setDesignation(selectedDesg);
-          setSelecteddesg(selectedDesg?.value || null);
-
-          const managerData = await fetchmanager(designation_ID);
-
-          const selectedmanager = managerData.find(option => option.value === manager);
-          setselectedmanager(selectedmanager);
-          setManager(selectedmanager?.value || null);
-
-          const selectedShift = filteredOptionShift.find(option => option.value === shift);
-          setSelectedShift(selectedShift);
-          setShift(selectedShift?.value || null);
-
-          const selectedEmpType = filteredOptionEmpType.find(option => option.value === Employee_Type);
-          setSelectedEmpType(selectedEmpType);
-          setEmpType(selectedEmpType?.value || null);
-
-          const selectedStatus = filteredOptionStatus.find(option => option.value === status);
-          setSelectedStatus(selectedStatus);
-          setStatus(selectedStatus?.value || null);
-
-          if (searchData && searchData.length > 0) {
-            const row = searchData[0];
-
-            setOriginalData({
-              EmployeeId: row.EmployeeId || "",
-              department_ID: row.department_ID || "",
-              designation_ID: row.designation_ID || "",
-              DOJ: row.DOJ ? new Date(row.DOJ).toISOString().split("T")[0] : "",
-              DOL: row.DOL ? new Date(row.DOL).toISOString().split("T")[0] : "",
-              manager: row.manager || "",
-              shift: row.shift || "",
-              status: row.status || "",
-              Section: row.Section || "",
-              Work_Location: row.Work_Location || "",
-              Employee_Type: row.Employee_Type || ""
-            });
-          }
-
-        }
-      } else if (response.status === 404) {
-        toast.warning("Employee not found");
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
-        console.error(errorResponse.details || errorResponse.message);
+        body: JSON.stringify({
+          Id: employeeId,
+          company_code: sessionStorage.getItem("selectedCompanyCode"),
+        }),
       }
-    } catch (error) {
-      console.error("Error inserting data:", error);
-      toast.error('Error inserting data: ' + error.message);
-    }
-  };
+    );
 
+    if (response.ok) {
+      const searchData = await response.json();
+
+      if (searchData && searchData.length > 0) {
+        setSaveButtonVisible(false);
+        setUpdateButtonVisible(true);
+        setShowAsterisk(false);
+
+        const [
+          {
+            EmployeeId,
+            department_ID,
+            First_Name,
+            designation_ID,
+            DOJ,
+            DOL,
+            manager,
+            LocNo,
+            shift,
+            status,
+            Section,
+            Work_Location,
+            Employee_Type,
+          },
+        ] = searchData;
+
+        const formatDateDOJ = DOJ
+          ? new Date(DOJ).toISOString().split("T")[0]
+          : "";
+
+        const formatDateDOL = DOL
+          ? new Date(DOL).toISOString().split("T")[0]
+          : "";
+
+        setEmployeeId(EmployeeId || "");
+        setdepartment_id(department_ID || "");
+        setdesignation_id(designation_ID || "");
+        setFirst_Name(First_Name || "");
+        setDOJ(formatDateDOJ);
+        setDOL(formatDateDOL);
+        setSection(Section || "");
+        setWorkLocation(Work_Location || "");
+
+        const selecteddept = filteredOptionDPt.find(
+          (option) => option.value === department_ID
+        );
+
+        setselecteddept(selecteddept || null);
+        setdpt(selecteddept?.value || null);
+
+        const selectedLocationNo = filteredOptionLocNo.find(
+          (option) => option.value === Work_Location
+        );
+
+        setSelectedLocNo(selectedLocationNo || null);
+        setLocNo(selectedLocationNo?.value || null);
+
+        const designationData = await fetchProductCodes(department_ID);
+
+        const selectedDesg = designationData.find(
+          (option) => option.value === designation_ID
+        );
+
+        setDesignation(selectedDesg || null);
+        setSelecteddesg(selectedDesg?.value || null);
+
+        const managerData = await fetchmanager(designation_ID);
+
+        const selectedmanager = managerData.find(
+          (option) => option.value === manager
+        );
+
+        setselectedmanager(selectedmanager || null);
+        setManager(selectedmanager?.value || null);
+
+        const selectedShift = filteredOptionShift.find(
+          (option) => option.value === shift
+        );
+
+        setSelectedShift(selectedShift || null);
+        setShift(selectedShift?.value || null);
+
+        const selectedEmpType = filteredOptionEmpType.find(
+          (option) => option.value === Employee_Type
+        );
+
+        setSelectedEmpType(selectedEmpType || null);
+        setEmpType(selectedEmpType?.value || null);
+
+        const selectedStatus = filteredOptionStatus.find(
+          (option) => option.value === status
+        );
+
+        setSelectedStatus(selectedStatus || null);
+        setStatus(selectedStatus?.value || null);
+
+        setOriginalData({
+          EmployeeId: EmployeeId || "",
+          department_ID: department_ID || "",
+          designation_ID: designation_ID || "",
+          DOJ: DOJ
+            ? new Date(DOJ).toISOString().split("T")[0]
+            : "",
+          DOL: DOL
+            ? new Date(DOL).toISOString().split("T")[0]
+            : "",
+          manager: manager || "",
+          shift: shift || "",
+          status: status || "",
+          Section: Section || "",
+          Work_Location: LocNo || "",
+          Employee_Type: Employee_Type || "",
+        });
+      }
+    } else if (response.status === 404) {
+      toast.warning("Employee not found");
+    } else {
+      const errorResponse = await response.json();
+
+      toast.warning(
+        errorResponse.message || "Failed to fetch company details"
+      );
+
+      console.error(
+        errorResponse.details || errorResponse.message
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching company details:", error);
+    toast.error("Error fetching data: " + error.message);
+  }
+};
+
+ 
   const reloadGridData = () => {
     window.location.reload();
   };
@@ -754,27 +970,27 @@ function Input() {
     return `${year}-${month}-${day}`;
   };
 
-  useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } = location.state || {};
+  // useEffect(() => {
+  //   const { employeeId, firstName, department_id, designation_id } = location.state || {};
 
-    if (employeeId) {
-      setEmployeeId(employeeId);
-      setFirst_Name(firstName || "");
-      setdepartment_id(department_id || "");
-      setdesignation_id(designation_id || "");
-    }
+  //   if (employeeId) {
+  //     setEmployeeId(employeeId);
+  //     setFirst_Name(firstName || "");
+  //     setdepartment_id(department_id || "");
+  //     setdesignation_id(designation_id || "");
+  //   }
 
-    if (
-      employeeId &&
-      DPTdrop?.length > 0 &&
-      statusdrop?.length > 0 &&
-      Managerdrop?.length > 0 &&
-      Shiftdrop?.length > 0 &&
-      empTypeDrop?.length > 0
-    ) {
-      handleRefNO(employeeId);
-    }
-  }, [location.state, DPTdrop, Managerdrop, statusdrop, Shiftdrop, empTypeDrop]);
+  //   if (
+  //     employeeId &&
+  //     DPTdrop?.length > 0 &&
+  //     statusdrop?.length > 0 &&
+  //     Managerdrop?.length > 0 &&
+  //     Shiftdrop?.length > 0 &&
+  //     empTypeDrop?.length > 0
+  //   ) {
+  //     handleRefNO(employeeId);
+  //   }
+  // }, [location.state, DPTdrop, Managerdrop, statusdrop, Shiftdrop, empTypeDrop]);
 
   // useEffect(() => {
   //   if (location.state) {
@@ -796,6 +1012,29 @@ function Input() {
   //   }
   // }, [location.state, DPTdrop, Managerdrop, statusdrop, Shiftdrop]);
 
+
+useEffect(() => {
+  const { employeeId, firstName, department_id, designation_id,} = location.state || {};
+
+  if (employeeId) {
+    setEmployeeId(employeeId);
+    setFirst_Name(firstName || "");
+    setdepartment_id(department_id || "");
+    setdesignation_id(designation_id || "");
+  }
+
+  if (
+    employeeId &&
+    DPTdrop?.length > 0 &&
+    statusdrop?.length > 0 &&
+    Managerdrop?.length > 0 &&
+    Shiftdrop?.length > 0 &&
+    empTypeDrop?.length > 0
+  ) {
+    handleRefNO(employeeId);
+  }
+}, [ location.state, DPTdrop, Managerdrop, statusdrop, Shiftdrop, empTypeDrop,]);
+ 
   return (
     <div className="container-fluid Topnav-screen">
       {loading && <LoadingScreen />}
@@ -1142,20 +1381,29 @@ function Input() {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="DOL"
-                className="exp-input-field form-control"
-                title="Please Enter the Work Location"
+            <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedLocNo ? "has-value" : ""} 
+              ${isSelectLocNo ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
+            >
+              <Select
+                id="shift"
                 type="text"
-                name="DOL"
+                value={selectedLocNo}
+                onChange={handleChangeLocNo}
+                options={filteredOptionLocNo}
                 placeholder=" "
-                value={workLocation}
-                maxLength={100}
-                onChange={(e) => setWorkLocation(e.target.value)}
+                onFocus={() => setIsSelectLocNo(true)}
+                onBlur={() => setIsSelectLocNo(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label htmlFor="DOL" className="exp-form-labels">Work Location</label>
+
+              <label htmlFor="selectedshift" className={`floating-label ${error && !LocNo ? 'text-danger' : ''}`}>
+                Work Location<span className="text-danger">*</span>
+              </label>
             </div>
           </div>
 
