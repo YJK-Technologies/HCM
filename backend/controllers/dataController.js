@@ -27919,6 +27919,30 @@ const getUserSettings = async (req, res) => {
 };
 //code ended by sakthi on  24-07-26
 
+//code added by sakthi on 08-08-26
+const GetLocations = async (req, res) => {
+  const { company_code, company_no } = req.body;
+  try {
+    const pool = await connection.connectToDatabase();
+    const result = await pool
+      .request()
+      .input("company_no", sql.NVarChar, company_no)
+      .input("company_code", sql.NVarChar, company_code)
+      .query(
+        `EXEC sp_user_company_mapping 'GL',@company_code,'',@company_no,'','',0,'','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
+      );
+    if (result.recordset.length > 0) {
+      res.status(200).json(result.recordset); // 200 OK if data is found
+    } else {
+      res.status(404).json("Data not found"); // 404 Not Found if no data is found
+    }
+  } catch (err) {
+    console.error("Error during update:", err);
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+};
+//code ended by sakthi on 08-08-26
+
 module.exports = {
   login,
   forgetPassword,
@@ -28792,5 +28816,6 @@ module.exports = {
   GetCheckInMode,
   getDefaultUserCompany,
   userSettingsInsert,
-  getUserSettings
+  getUserSettings,
+  GetLocations
 };
