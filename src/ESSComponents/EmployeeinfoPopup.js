@@ -145,7 +145,7 @@ const columnDefs = [
     editable: false,
   },
   {
-    headerName: "Aadhaar No",
+    headerName: "ID",
     field: "Aadhar_no",
     editable: false,
   },

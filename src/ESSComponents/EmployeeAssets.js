@@ -33,6 +33,9 @@ function EmployeeAssets({}) {
   const [AssetIDDrop, setAssetIDDrop] = useState([]);
   const [originalAssetvalue, setOriginalAssetvalue] = useState([]);
 
+  const [isSelectApprovedBy, setIsSelectApprovedBy] = useState({});
+  const [empDrop, setEmpDrop] = useState([]);
+
   const location = useLocation();
 
   const Location_Code = sessionStorage.getItem('selectedLocationCode');
@@ -333,7 +336,8 @@ const handleSave = async () => {
       AllocationStatus: member.selectedStatus?.value || "",
       ConditionAtIssue: member.ConditionAtIssue || "",
       ConditionAtReturn: member.ConditionAtReturn || "",
-      ApprovedBy: member.ApprovedBy || "",
+      // ApprovedBy: member.ApprovedBy || "",
+      ApprovedBy: member.selectedApprovedBy?.value || "",
       Remarks: member.Remarks || "",
       company_code: sessionStorage.getItem("selectedCompanyCode"),
       Keyfield: "",
@@ -478,7 +482,8 @@ const handleUpdateAsset = async (relation, index) => {
     AllocationStatus: member.selectedStatus?.value,
     ConditionAtIssue: member.ConditionAtIssue,
     ConditionAtReturn: member.ConditionAtReturn,
-    ApprovedBy: member.ApprovedBy,
+    // ApprovedBy: member.ApprovedBy,
+    ApprovedBy: member.selectedApprovedBy?.value,
     Remarks: member.Remarks,
     company_code: sessionStorage.getItem("selectedCompanyCode"),
     modify_by: sessionStorage.getItem("selectedUserCode"),
@@ -579,6 +584,13 @@ const handleDeleteAsset = async (relation, index) => {
     label: option.attributedetails_name,
   }));
 
+    const filteredOptionApprovedBy = Array.isArray(empDrop)
+    ? empDrop.map((option) => ({
+        value: option.EmployeeId,
+        label: `${option.EmployeeId} - ${option.First_Name}`,
+      }))
+    : [];
+
   useEffect(() => {
     fetch(`${config.apiBaseUrl}/getAllocationStatus`, {
       method: "POST",
@@ -589,6 +601,26 @@ const handleDeleteAsset = async (relation, index) => {
     })
       .then((data) => data.json())
       .then((val) => setStatusdrop(val));
+  }, []);
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch(`${config.apiBaseUrl}/getEmployeeId`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ company_code: sessionStorage.getItem('selectedCompanyCode'), 
+                  Location_Code })
+              });
+              const val = await response.json();
+              setEmpDrop(val);
+          } catch (error) {
+              console.error('Error fetching user data:', error);
+          }
+      };
+      fetchUserData();
   }, []);
 
   const handleChangeStatus = (selectedStatus, relation, index) => {
@@ -605,6 +637,27 @@ const handleDeleteAsset = async (relation, index) => {
               ...member,
               Status: selectedStatus?.value || "",
               selectedStatus: selectedStatus || null,
+            };
+          }),
+        };
+      }),
+    );
+  };
+
+  const handleChangeApprovedBy = (selectedApprovedBy, relation, index) => {
+    setAssetvalue((prevDocuments) =>
+      prevDocuments.map((doc) => {
+        if (doc.relation !== relation) return doc;
+
+        return {
+          ...doc,
+          members: doc.members.map((member, i) => {
+            if (i !== index) return member;
+
+            return {
+              ...member,
+              Status: selectedApprovedBy?.value || "",
+              selectedApprovedBy: selectedApprovedBy || null,
             };
           }),
         };
@@ -667,7 +720,8 @@ const handleDeleteAsset = async (relation, index) => {
                   selectedStatus: null,
                   ConditionAtIssue: "",
                   ConditionAtReturn: "",
-                  ApprovedBy: "",
+                  // ApprovedBy: "",
+                  selectedApprovedBy: null,
                   Remarks: "",
                   keyfield: "",
                 },
@@ -700,7 +754,14 @@ const handleDeleteAsset = async (relation, index) => {
 
               ConditionAtIssue: item.ConditionAtIssue || "",
               ConditionAtReturn: item.ConditionAtReturn || "",
-              ApprovedBy: item.ApprovedBy || "",
+              // ApprovedBy: item.ApprovedBy || "",
+              selectedApprovedBy: item.ApprovedBy
+                ? {
+                    label: item.ApprovedBy,
+                    value: item.ApprovedBy,
+                  }
+                : null,
+
               Remarks: item.Remarks || "",
               keyfield: item.Keyfield  || "",
             })),
@@ -726,7 +787,8 @@ const handleDeleteAsset = async (relation, index) => {
                 selectedStatus: "",
                 ConditionAtIssue: "",
                 ConditionAtReturn: "",
-                ApprovedBy: "",
+                // ApprovedBy: "",
+                selectedApprovedBy: "",
                 Remarks: "",
                 keyfield: "",
               },
@@ -1236,7 +1298,7 @@ const handleDeleteAsset = async (relation, index) => {
               </div>
 
               {/* Approved By */}
-              <div className="col-md-2">
+              {/* <div className="col-md-2">
                 <div className="inputGroup">
                   <input
                     type="text"
@@ -1260,6 +1322,46 @@ const handleDeleteAsset = async (relation, index) => {
                     }}
                   />
                   <label className="exp-form-labels">Approved By</label>
+                </div>
+              </div> */}
+
+                <div className="col-md-2">
+                <div
+                  className={`inputGroup selectGroup 
+               ${member.selectedApprovedBy ? "has-value" : ""}
+                  ${isSelectApprovedBy[index] ? "is-focused" : ""}`}
+                  title="Please Select the Allocation Status"
+                >
+                  <Select
+                    placeholder=" "
+                    onFocus={() =>
+                      setIsSelectApprovedBy((prev) => ({
+                        ...prev,
+                        [index]: true,
+                      }))
+                    }
+                    onBlur={() =>
+                      setIsSelectApprovedBy((prev) => ({
+                        ...prev,
+                        [index]: false,
+                      }))
+                    }
+                    classNamePrefix="react-select"
+                    isClearable
+                    value={member.selectedApprovedBy}
+                    options={filteredOptionApprovedBy}
+                    maxLength={50}
+                    onChange={(selectoption) =>
+                      handleChangeApprovedBy(
+                        selectoption,
+                        relationGroup.relation,
+                        index,
+                      )
+                    }
+                  />
+                  <label for="cno" className={`floating-label`}>
+                    Approved By
+                  </label>
                 </div>
               </div>
 

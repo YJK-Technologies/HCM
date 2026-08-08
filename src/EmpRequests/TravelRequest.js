@@ -1160,19 +1160,19 @@ function TravelRequest({ }) {
       field: "travel_request_id",
       editable: false,
     },
-    {
-      headerName: "Employee ID",
-      field: "employee_id",
-      editable: false,
-      cellEditor: "agSelectCellEditor",
-      cellEditorParams: {
-        values: empIdDropGrid.map(d => d.value),
-      },
-      valueFormatter: (params) => {
-        const dept = empIdDropGrid.find(d => d.value === params.value);
-        return dept ? dept.label : params.value;
-      },
-    },
+    // {
+    //   headerName: "Employee ID",
+    //   field: "employee_id",
+    //   editable: false,
+    //   cellEditor: "agSelectCellEditor",
+    //   cellEditorParams: {
+    //     values: empIdDropGrid.map(d => d.value),
+    //   },
+    //   valueFormatter: (params) => {
+    //     const dept = empIdDropGrid.find(d => d.value === params.value);
+    //     return dept ? dept.label : params.value;
+    //   },
+    // },
     {
       headerName: "Department",
       field: "department_id",
@@ -1625,7 +1625,7 @@ function TravelRequest({ }) {
 
       return {
         "Travel Request ID": row.travel_request_id || "",
-        "Employee ID": row.employee_id || "",
+        // "Employee ID": row.employee_id || "",
         Department: deptName,
         "Travel Type": row.travel_type || "",
         "Destination Country": countryName,
@@ -2301,9 +2301,9 @@ function TravelRequest({ }) {
               />
               <label
                 for="sname"
-                className={`exp-form-labels ${error && !remarks ? "text-danger" : ""}`}
+                className={`exp-form-labels`}
               >
-                Remarks<span className="text-danger">*</span>
+                Remarks
               </label>
             </div>
           </div>
