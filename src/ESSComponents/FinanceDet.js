@@ -237,22 +237,49 @@ function Input({ }) {
     { label: "Employee Assets" },
   ];
 
-  useEffect(() => {
-    const { employeeId, firstName, department_id, designation_id } =
-      location.state || {};
+  // useEffect(() => {
+  //   const { employeeId, firstName, department_id, designation_id } =
+  //     location.state || {};
 
-    if (employeeId) {
-      setEmployeeId(employeeId);
-      setFirst_Name(firstName || "");
-      setdepartment_id(department_id || "");
-      setdesignation_id(designation_id || "");
-    }
+  //   if (employeeId) {
+  //     setEmployeeId(employeeId);
+  //     setFirst_Name(firstName || "");
+  //     setdepartment_id(department_id || "");
+  //     setdesignation_id(designation_id || "");
+  //   }
 
-    if (employeeId && salaryTypeDrop?.length > 0 && PayscaleDrop?.length > 0) {
-      handleRefNo(employeeId);
-    }
-  }, [location.state, salaryTypeDrop, PayscaleDrop]);
+  //   if (employeeId && salaryTypeDrop?.length > 0 && PayscaleDrop?.length > 0) {
+  //     handleRefNo(employeeId);
+  //   }
+  // }, [location.state, salaryTypeDrop, PayscaleDrop]);
 
+
+useEffect(() => {
+  const {
+    employeeId,
+    firstName,
+    department_id,
+    designation_id,
+  } = location.state || {};
+
+  if (employeeId) {
+    setEmployeeId(employeeId);
+    setFirst_Name(firstName || "");
+    setdepartment_id(department_id || "");
+    setdesignation_id(designation_id || "");
+  }
+
+  if (
+    employeeId &&
+    salaryTypeDrop?.length > 0 &&
+    PayscaleDrop?.length > 0
+  ) {
+    handleRefNo(employeeId);
+  }
+}, [location.state, salaryTypeDrop, PayscaleDrop]);
+
+
+ 
   const handleSave = async () => {
     if (!EmployeeId || !salaryType || !payscale || !PFNo || !salaryMonth) {
       setError(true);
@@ -300,30 +327,122 @@ function Input({ }) {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleRefNo(EmployeeId);
-    }
-  };
+  // const handleKeyPress = (e) => {
+  //   if (e.key === "Enter") {
+  //     handleRefNo(EmployeeId);
+  //   }
+  // };
 
-  const handleRefNo = async (code) => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/getEmployeeSalary`, {
+
+const handleKeyPress = (e) => {
+  if (e.key === "Enter") {
+    handleRefNo(EmployeeId);
+  }
+};
+
+
+
+  // const handleRefNo = async (code) => {
+  //   try {
+  //     const response = await fetch(`${config.apiBaseUrl}/getEmployeeSalary`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         Id: code,
+  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //       }),
+  //     });
+
+  //     if (response.ok) {
+  //       setSaveButtonVisible(false);
+  //       setUpdateButtonVisible(true);
+  //       setShowAsterisk(false);
+  //       const searchData = await response.json();
+  //       const [
+  //         {
+  //           EmployeeId,
+  //           PFNo,
+  //           department_id,
+  //           First_Name,
+  //           designation_id,
+  //           Payscale,
+  //           salaryType,
+  //           salary_month,
+  //         },
+  //       ] = searchData;
+
+  //       setEmployeeId(EmployeeId);
+  //       setPFNo(PFNo);
+  //       setSalaryMonth(salary_month);
+  //       setdepartment_id(department_id);
+  //       setdesignation_id(designation_id);
+  //       setFirst_Name(First_Name);
+
+  //       const selectedSalaryType = filteredOptionSalaryType.find(
+  //         (option) => option.value === salaryType,
+  //       );
+  //       setSelectedSalaryType(selectedSalaryType);
+  //       console.log(selectedSalaryType.value);
+  //       setSalaryType(selectedSalaryType);
+
+  //       const selectedOptionPayscale = filteredOptionPayscale.find(
+  //         (option) => option.value === Payscale,
+  //       );
+  //       setselectedPayscale(selectedOptionPayscale);
+  //       setPayscale(selectedOptionPayscale);
+
+  //       // existing setState code...
+
+  //       setOriginalData({
+  //         EmployeeId: EmployeeId || "",
+  //         salaryType: salaryType || "",
+  //         Payscale: Payscale || "",
+  //         PFNo: PFNo || "",
+  //         salary_month: salary_month || "",
+  //       });
+  //     } else if (response.status === 404) {
+  //       toast.warning("Data not found");
+  //       setSalaryType("");
+  //       setPayscale("");
+  //       setPFNo("");
+  //       setSalaryMonth("");
+  //     } else {
+  //       const errorResponse = await response.json();
+  //       toast.warning(errorResponse.message || "Failed to insert sales data");
+  //       console.error(errorResponse.details || errorResponse.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error inserting data:", error);
+  //     toast.error("Error inserting data: " + error.message);
+  //   }
+  // };
+
+const handleRefNo = async (employeeId) => {
+  try {
+    const response = await fetch(
+      `${config.apiBaseUrl}/getEmployeeSalary`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Id: code,
+          Id: employeeId,
           company_code: sessionStorage.getItem("selectedCompanyCode"),
         }),
-      });
+      }
+    );
 
-      if (response.ok) {
+    if (response.ok) {
+      const searchData = await response.json();
+
+      if (searchData.length > 0) {
         setSaveButtonVisible(false);
         setUpdateButtonVisible(true);
         setShowAsterisk(false);
-        const searchData = await response.json();
+
         const [
           {
             EmployeeId,
@@ -337,27 +456,26 @@ function Input({ }) {
           },
         ] = searchData;
 
-        setEmployeeId(EmployeeId);
-        setPFNo(PFNo);
-        setSalaryMonth(salary_month);
-        setdepartment_id(department_id);
-        setdesignation_id(designation_id);
-        setFirst_Name(First_Name);
+        setEmployeeId(EmployeeId || "");
+        setPFNo(PFNo || "");
+        setSalaryMonth(salary_month || "");
+        setdepartment_id(department_id || "");
+        setdesignation_id(designation_id || "");
+        setFirst_Name(First_Name || "");
 
         const selectedSalaryType = filteredOptionSalaryType.find(
-          (option) => option.value === salaryType,
+          (option) => option.value === salaryType
         );
-        setSelectedSalaryType(selectedSalaryType);
-        console.log(selectedSalaryType.value);
-        setSalaryType(selectedSalaryType);
+
+        setSelectedSalaryType(selectedSalaryType || null);
+        setSalaryType(selectedSalaryType?.value || "");
 
         const selectedOptionPayscale = filteredOptionPayscale.find(
-          (option) => option.value === Payscale,
+          (option) => option.value === Payscale
         );
-        setselectedPayscale(selectedOptionPayscale);
-        setPayscale(selectedOptionPayscale);
 
-        // existing setState code...
+        setselectedPayscale(selectedOptionPayscale || null);
+        setPayscale(selectedOptionPayscale?.value || "");
 
         setOriginalData({
           EmployeeId: EmployeeId || "",
@@ -366,23 +484,40 @@ function Input({ }) {
           PFNo: PFNo || "",
           salary_month: salary_month || "",
         });
-      } else if (response.status === 404) {
-        toast.warning("Data not found");
-        setSalaryType("");
-        setPayscale("");
-        setPFNo("");
-        setSalaryMonth("");
-      } else {
-        const errorResponse = await response.json();
-        toast.warning(errorResponse.message || "Failed to insert sales data");
-        console.error(errorResponse.details || errorResponse.message);
       }
-    } catch (error) {
-      console.error("Error inserting data:", error);
-      toast.error("Error inserting data: " + error.message);
-    }
-  };
+    } else if (response.status === 404) {
+      toast.warning("Data not found");
 
+      setSaveButtonVisible(true);
+      setUpdateButtonVisible(false);
+      setShowAsterisk(true);
+
+      setPFNo("");
+      setSalaryMonth("");
+      setSalaryType("");
+      setPayscale("");
+
+      setSelectedSalaryType(null);
+      setselectedPayscale(null);
+    } else {
+      const errorResponse = await response.json();
+
+      toast.warning(
+        errorResponse.message || "Failed to fetch financial details"
+      );
+
+      console.error(
+        errorResponse.details || errorResponse.message
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching financial details:", error);
+    toast.error("Error fetching financial details: " + error.message);
+  }
+};
+
+
+ 
   const handleDelete = async () => {
     if (!EmployeeId || !PFNo) {
       setError(true);
@@ -575,78 +710,96 @@ function Input({ }) {
     setOpen(false);
   };
 
-  const finaceDetails = async (data) => {
-    // 🔴 1. Handle NO DATA case FIRST
-    if (!data || data.length === 0) {
-      toast.warning("Financial details not found for this employee");
+  // const finaceDetails = async (data) => {
+  //   // 🔴 1. Handle NO DATA case FIRST
+  //   if (!data || data.length === 0) {
+  //     toast.warning("Financial details not found for this employee");
 
-      setSaveButtonVisible(true);
-      setUpdateButtonVisible(false);
-      setShowAsterisk(true);
+  //     setSaveButtonVisible(true);
+  //     setUpdateButtonVisible(false);
+  //     setShowAsterisk(true);
 
-      // Clear states if needed
-      setEmployeeId("");
-      setFirst_Name("");
-      setdepartment_id("");
-      setdesignation_id("");
-      setPFNo("");
-      setSalaryMonth("");
-      setSalaryType("");
-      setPayscale("");
-      setSelectedSalaryType(null);
-      setselectedPayscale(null);
+  //     // Clear states if needed
+  //     setEmployeeId("");
+  //     setFirst_Name("");
+  //     setdepartment_id("");
+  //     setdesignation_id("");
+  //     setPFNo("");
+  //     setSalaryMonth("");
+  //     setSalaryType("");
+  //     setPayscale("");
+  //     setSelectedSalaryType(null);
+  //     setselectedPayscale(null);
 
-      return; // 🔥 STOP execution
-    }
+  //     return; // 🔥 STOP execution
+  //   }
 
-    // 🔴 2. Data exists
+  //   // 🔴 2. Data exists
+  //   setSaveButtonVisible(false);
+  //   setUpdateButtonVisible(true);
+  //   setShowAsterisk(false);
+
+  //   const [
+  //     {
+  //       employeeId,
+  //       salaryType,
+  //       first_name,
+  //       Department,
+  //       Designation,
+  //       Payscale,
+  //       PFNo,
+  //       salaryMonth,
+  //     },
+  //   ] = data;
+
+  //   console.log("Finance Data:", data);
+
+  //   setEmployeeId(employeeId || "");
+  //   setFirst_Name(first_name || "");
+  //   setdepartment_id(Department || "");
+  //   setdesignation_id(Designation || "");
+  //   setPFNo(PFNo || "");
+  //   setSalaryMonth(salaryMonth || "");
+
+  //   const selectedSalaryType = filteredOptionSalaryType.find(
+  //     (option) => option.value === salaryType,
+  //   );
+  //   setSelectedSalaryType(selectedSalaryType);
+  //   setSalaryType(selectedSalaryType?.value || null);
+
+  //   const selectedPayscale = filteredOptionPayscale.find(
+  //     (option) => option.value === Payscale,
+  //   );
+  //   setselectedPayscale(selectedPayscale);
+  //   setPayscale(selectedPayscale?.value || null);
+
+  //   setOriginalData({
+  //     EmployeeId: employeeId || "",
+  //     salaryType: salaryType || "",
+  //     Payscale: Payscale || "",
+  //     PFNo: PFNo || "",
+  //     salary_month: salaryMonth || "",
+  //   });
+  // };
+
+
+const finaceDetails = async (data) => {
+  if (data && data.length > 0) {
     setSaveButtonVisible(false);
     setUpdateButtonVisible(true);
     setShowAsterisk(false);
 
-    const [
-      {
-        employeeId,
-        salaryType,
-        first_name,
-        Department,
-        Designation,
-        Payscale,
-        PFNo,
-        salaryMonth,
-      },
-    ] = data;
+    const [{ employeeId }] = data;
 
-    console.log("Finance Data:", data);
+    handleRefNo(employeeId);
+  } else {
+    console.log("Data not fetched...!");
+  }
+};
 
-    setEmployeeId(employeeId || "");
-    setFirst_Name(first_name || "");
-    setdepartment_id(Department || "");
-    setdesignation_id(Designation || "");
-    setPFNo(PFNo || "");
-    setSalaryMonth(salaryMonth || "");
 
-    const selectedSalaryType = filteredOptionSalaryType.find(
-      (option) => option.value === salaryType,
-    );
-    setSelectedSalaryType(selectedSalaryType);
-    setSalaryType(selectedSalaryType?.value || null);
 
-    const selectedPayscale = filteredOptionPayscale.find(
-      (option) => option.value === Payscale,
-    );
-    setselectedPayscale(selectedPayscale);
-    setPayscale(selectedPayscale?.value || null);
-
-    setOriginalData({
-      EmployeeId: employeeId || "",
-      salaryType: salaryType || "",
-      Payscale: Payscale || "",
-      PFNo: PFNo || "",
-      salary_month: salaryMonth || "",
-    });
-  };
-
+ 
   const handleSalaryChange = (e) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
