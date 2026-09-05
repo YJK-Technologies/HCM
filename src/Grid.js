@@ -241,8 +241,7 @@ function Grid() {
   const handleSearch = async (searchParams = null) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${config.apiBaseUrl}/companysearchcriteria`,
+      const response = await fetch(`${config.apiBaseUrl}/companysearchcriteria`,
         {
           method: "POST",
           headers: {
@@ -770,7 +769,7 @@ function Grid() {
   };
 
   const handleNavigateToForm = () => {
-    navigate("/AddCompany", { state: { mode: "create" } }); // Pass selectedRows as props to the Input component
+    navigate("/AddCompany", { state: { mode: "create" } });
   };
 
   // const handleNavigateWithRowData = (selectedRow) => {

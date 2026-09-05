@@ -42,6 +42,8 @@ function AttriDetInput({ }) {
   const attributeDetailsCode = location.state?.attributedetails_code;
   const company_code = sessionStorage.getItem('selectedCompanyCode');
 
+  const [attributeheader_name, setAttributeheader_name] = useState("");
+
   useEffect(() => {
     if (!location.state) {
       clearInputFields();
@@ -79,6 +81,7 @@ function AttriDetInput({ }) {
           label: attribute.attributeheader_code,
           value: attribute.attributeheader_code,
         });
+        setAttributeheader_name(attribute.attributeheader_name || "")
         setAttributeheader_Code(attribute.attributeheader_code || "");
         setAttributedetails_code(attribute.attributedetails_code || "");
         setAttributedetails_name(attribute.attributedetails_name || "");
@@ -94,6 +97,7 @@ function AttriDetInput({ }) {
 
   const clearInputFields = () => {
     setSelectedHeader("");
+    setAttributeheader_name("");
     setAttributeheader_Code("");
     setAttributedetails_code("");
     setAttributedetails_name("");
@@ -253,6 +257,7 @@ function AttriDetInput({ }) {
         },
         body: JSON.stringify({
           attributeheader_code,
+          attributeheader_name,
           attributedetails_code,
           attributedetails_name,
           descriptions,

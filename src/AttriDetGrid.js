@@ -158,6 +158,16 @@ function AttriDetGrid() {
       }
     },
     {
+      headerName: "Name",
+      field: "attributeheader_name",
+      editable: true,
+      cellStyle: { textAlign: "center" },
+      // minWidth: 150,
+      cellEditorParams: {
+        maxLength: 250,
+      },
+    },
+    {
       headerName: "Sub Code",
       field: "attributedetails_code",
       //editable: true,
@@ -230,6 +240,7 @@ function AttriDetGrid() {
 
       return {
         "Code": formatValue(row.attributeheader_code),
+        "Name": formatValue(row.attributeheader_name),
         "Sub Code": formatValue(row.attributedetails_code),
         "Detail Name": formatValue(row.attributedetails_name),
         "Description": formatValue(row.descriptions),
