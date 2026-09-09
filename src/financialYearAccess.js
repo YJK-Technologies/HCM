@@ -338,18 +338,7 @@ function Grid() {
           </span>
         );
       },
-      valueFormatter: (params) => formatDate(params.value),
-      // filter: "agDateColumnFilter",
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue);
-          const cellDateOnly = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate());
-          if (cellDateOnly < filterLocalDateAtMidnight) return -1;
-          if (cellDateOnly > filterLocalDateAtMidnight) return 1;
-          return 0;
-        },
-        browserDatePicker: true,
-      },
+
     },
     {
       headerName: "End Year",
@@ -360,17 +349,7 @@ function Grid() {
       cellEditorParams: {
         maxLength: 250,
       },
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue.split('/').join('-'));
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          }
-          return 0;
-        },
-      },
+
     },
     {
       headerName: "Transaction Type ",
