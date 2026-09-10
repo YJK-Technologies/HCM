@@ -84,6 +84,8 @@ function Input({ }) {
   const [isSelectstatus, setIsSelectstatus] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [originalRowData, setOriginalRowData] = useState([]);
+
   const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
   const searchClearInputFields = () => {
@@ -115,10 +117,17 @@ function Input({ }) {
           <div className="position-relative d-flex align-items-center" style={{ minHeight: '100%', justifyContent: 'center' }}>
             {showIcons && (
               <>
-                <span
+                {/* <span
                   className="icon mx-2"
                   onClick={() => saveEditedData(params.data, params.node.data)}
                   style={{ cursor: 'pointer' }}
+                >
+                  <i className="fa-regular fa-floppy-disk" title="Save"></i>
+                </span> */}
+                <span
+                  className="icon mx-2"
+                  onClick={() => saveEditedData(params.data, params.node.rowIndex)}
+                  style={{ cursor: "pointer" }}
                 >
                   <i className="fa-regular fa-floppy-disk" title="Save"></i>
                 </span>
@@ -290,12 +299,16 @@ function Input({ }) {
       });
       if (response.ok) {
         const searchData = await response.json();
+        // Grid data
         setrowData(searchData);
+        // Store original data for change comparison
+        setOriginalRowData(JSON.parse(JSON.stringify(searchData)));
         console.log("Data fetched successfully");
       } else if (response.status === 404) {
         console.log("Data not found");
         toast.warning("Data not found");
         setrowData([]);
+        setOriginalRowData([]);
       } else {
         const errorResponse = await response.json();
         toast.warning(errorResponse.message || "Failed to insert data");
@@ -427,62 +440,159 @@ function Input({ }) {
     }
   };
 
-  const saveEditedData = async (rowData) => {
-    showConfirmationToast(
-      "Are you sure you want to update the data in the selected rows?",
-      async () => {
+  // const saveEditedData = async (rowData) => {
+  //   showConfirmationToast(
+  //     "Are you sure you want to update the data in the selected rows?",
+  //     async () => {
 
-        try {
-          setLoading(true);
-          const company_code = sessionStorage.getItem('selectedCompanyCode');
-          const modified_by = sessionStorage.getItem('selectedUserCode');
+  //       try {
+  //         setLoading(true);
+  //         // Find original row
+  //       const originalRow = originalRowData.find(
+  //         (row) => row.Announcement_id === rowData.Announcement_id
+  //       );
 
-          const dataToSend = {
-            editedData: Array.isArray(rowData)
-              ? rowData.map((row) => ({
-                ...row,
-                company_code,
-                modified_by,
-                Location_Code
-              }))
-              : [
-                {
-                  ...rowData,
-                  company_code,
-                  modified_by,
-                  Location_Code
-                },
-              ],
-          };
-          const response = await fetch(`${config.apiBaseUrl}/updateAnnouncementDetails`, {
+  //       if (!originalRow) {
+  //         toast.warning("Original data not found.");
+  //         return;
+  //       }
+
+  //       // Check changes
+  //       const hasChanges = Object.keys(rowData).some((key) => {
+  //         return rowData[key] !== originalRow[key];
+  //       });
+
+  //       // No changes
+  //       if (!hasChanges) {
+  //         toast.info("No changes were made.");
+  //         return;
+  //       }
+  //         const company_code = sessionStorage.getItem('selectedCompanyCode');
+  //         const modified_by = sessionStorage.getItem('selectedUserCode');
+
+  //         const dataToSend = {
+  //           editedData: Array.isArray(rowData)
+  //             ? rowData.map((row) => ({
+  //               ...row,
+  //               company_code,
+  //               modified_by,
+  //               Location_Code
+  //             }))
+  //             : [
+  //               {
+  //                 ...rowData,
+  //                 company_code,
+  //                 modified_by,
+  //                 Location_Code
+  //               },
+  //             ],
+  //         };
+  //         const response = await fetch(`${config.apiBaseUrl}/updateAnnouncementDetails`, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify(dataToSend)
+  //         });
+
+  //         if (response.ok) {
+  //           toast.success("Data updated successfully", {
+  //             onClose: () => handleSearch(), // Runs handleSearch when toast closes
+  //           });
+  //         } else {
+  //           const errorResponse = await response.json();
+  //           toast.warning(errorResponse.message || "Failed to insert sales data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error deleting rows:", error);
+  //         toast.error('Error Deleting Data: ' + error.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     },
+  //     () => {
+  //       toast.info("Data updated cancelled.");
+  //     }
+  //   );
+  // };
+
+const saveEditedData = async (rowData, rowIndex) => {
+  showConfirmationToast(
+    "Are you sure you want to update the data in the selected rows?",
+    async () => {
+      try {
+        setLoading(true);
+
+        // Get original row using row index
+        const originalRow = originalRowData[rowIndex];
+
+        if (!originalRow) {
+          toast.warning("Original data not found.");
+          return;
+        }
+
+        // Check whether any field has changed
+        const hasChanges = Object.keys(rowData).some((key) => {
+          return rowData[key] !== originalRow[key];
+        });
+
+        // No changes
+        if (!hasChanges) {
+          toast.info("No changes were made.");
+          return;
+        }
+
+        const company_code =
+          sessionStorage.getItem("selectedCompanyCode");
+
+        const modified_by =
+          sessionStorage.getItem("selectedUserCode");
+
+        const dataToSend = {
+          editedData: [
+            {
+              ...rowData,
+              company_code,
+              modified_by,
+              Location_Code,
+            },
+          ],
+        };
+
+        const response = await fetch(
+          `${config.apiBaseUrl}/updateAnnouncementDetails`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(dataToSend)
-          });
-
-          if (response.ok) {
-            toast.success("Data updated successfully", {
-              onClose: () => handleSearch(), // Runs handleSearch when toast closes
-            });
-          } else {
-            const errorResponse = await response.json();
-            toast.warning(errorResponse.message || "Failed to insert sales data");
+            body: JSON.stringify(dataToSend),
           }
-        } catch (error) {
-          console.error("Error deleting rows:", error);
-          toast.error('Error Deleting Data: ' + error.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-      () => {
-        toast.info("Data updated cancelled.");
-      }
-    );
-  };
+        );
 
+        if (response.ok) {
+          toast.success("Data updated successfully", {
+            onClose: () => handleSearch(),
+          });
+        } else {
+          const errorResponse = await response.json();
+
+          toast.warning(
+            errorResponse.message || "Failed to update data"
+          );
+        }
+      } catch (error) {
+        console.error("Error updating data:", error);
+        toast.error("Error Updating Data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      toast.info("Data update cancelled.");
+    }
+  );
+};
 
   const deleteSelectedRows = async (rowData) => {
     const company_code = sessionStorage.getItem('selectedCompanyCode');
