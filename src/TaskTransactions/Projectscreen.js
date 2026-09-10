@@ -874,6 +874,7 @@ const AccountInformation = () => {
       formData.append("PriorityLevel", PriorityLevel);
       formData.append("created_by", sessionStorage.getItem("selectedUserCode"));
       formData.append("company_code", sessionStorage.getItem("selectedCompanyCode"));
+      formData.append("Location_Code", sessionStorage.getItem("selectedLocationCode"));
 
       // Save daily task
       const response = await fetch(`${config.apiBaseUrl}/addDailyTask`, {
