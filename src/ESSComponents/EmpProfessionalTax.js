@@ -50,9 +50,9 @@ function Input({ }) {
   const navigate = useNavigate();
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const [Start_Year, setStart_Year] = useState(FirstDate);
-  const [Start_YearSC, setStart_YearSC] = useState('');
+  const [Start_YearSC, setStart_YearSC] = useState(FirstDate);
   const [End_Year, setEnd_Year] = useState(LastDate);
-  const [End_YearSC, setEnd_YearSC] = useState('');
+  const [End_YearSC, setEnd_YearSC] = useState(LastDate);
   const [rowData, setRowData] = useState([]);
   const [Empsalaryfrom, setEmpsalaryfrom] = useState(0);
   const [EmpsalaryTo, setEmpsalaryTo] = useState(0);

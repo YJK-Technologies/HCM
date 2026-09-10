@@ -1706,7 +1706,8 @@ function LoanRequest({ }) {
                                 autoComplete="off"
                                 value={monthlyInstallmentSc}
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "");
+                                    // const value = e.target.value.replace(/\D/g, "");
+                                    const value = e.target.value .replace(/[^0-9.]/g, "") .replace(/(\..*)\./g, "$1");
                                     setMonthlyInstallmentSc(value);
                                 }}
                             />

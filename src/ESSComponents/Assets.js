@@ -517,7 +517,7 @@ function Assets({ }) {
       headerName: "Currency Code",
       field: "CurrencyCode",
       editable: true,
-      // cellEditor: "agSelectCellEditor",
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: currencyDropGrid,
       },
@@ -545,7 +545,7 @@ function Assets({ }) {
       field: "AssetStatus",
       filter: "agTextColumnFilter",
       editable: true,
-      // cellEditor: "agSelectCellEditor",
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: statusDropGrid,
       },
@@ -561,7 +561,7 @@ function Assets({ }) {
       field: "Country",
       filter: "agTextColumnFilter",
       editable: true,
-      // cellEditor: "agSelectCellEditor",
+      cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: CountrydropGrid.map((d) => d.value),
       },
