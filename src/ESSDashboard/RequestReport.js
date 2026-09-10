@@ -202,102 +202,218 @@ function RequestReport({ }) {
     }
   };
 
-  const handleApproval = async (type, id, row, isApproved) => {
-    try {
-      const company_code = sessionStorage.getItem("selectedCompanyCode");
+const handleApproval = async (type, id, row, isApproved) => {
+  try {
+    const company_code = sessionStorage.getItem("selectedCompanyCode");
 
-      let url = "";
-      let body = {};
-      const status = isApproved ? "Approved" : "Rejected";
+    let url = "";
+    let body = {};
+    const status = isApproved ? "Approved" : "Rejected";
 
-      if (type === "Leave") {
-        const [day, month, year] = row.FromDate.split("-");
-        const backendDate = `${year}-${month}-${day}`;
+    if (type === "Leave") {
 
-        url = `${config.apiBaseUrl}/LeaveAuthorization`;
+      // Validate only while approving Leave
+      if (isApproved) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        body = {
-          EmployeeId: id,
-          LeaveStatus: status,
-          FromDate: row.FromDate,
-          company_code: sessionStorage.getItem("selectedCompanyCode"),
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          modified_by: sessionStorage.getItem("selectedUserCode")
-        };
-      } else if (type === "Loan") {
-        url = `${config.apiBaseUrl}/ApprovalLoan`;
+        // row.FromDate format: YYYY-MM-DD
+        const leaveDate = new Date(`${row.FromDate}T00:00:00`);
+        leaveDate.setHours(0, 0, 0, 0);
 
-        body = {
-          loan_request_id: id,
-          company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          request_status: status,
-        };
-      } else if (type === "Visa") {
-        url = `${config.apiBaseUrl}/ApprovalVisa`;
-
-        body = {
-          visa_request_id: id,
-          company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          request_status: status,
-          Modified_by: sessionStorage.getItem("selectedUserCode")
-        };
-      } else if (type === "Travel") {
-        url = `${config.apiBaseUrl}/ApprovalTravel`;
-
-        body = {
-          travel_request_id: id,
-          company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          request_status: status,
-          modified_by: sessionStorage.getItem("selectedUserCode")
-        };
-      } else if (type === "Comp Off") {
-        url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
-
-        body = {
-          EmployeeId: row.EmployeeId,
-          Status: status,
-          HolidayDate: row.HolidayDate,
-          ApprovedBy: sessionStorage.getItem("selectedUserCode"),
-          CompanyCode: company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          ModifiedBy: sessionStorage.getItem("selectedUserCode"),
-          Keyfield: id,
-        };
-      } else if (type === "Shift Change") {
-        url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
-
-        body = {
-          request_id: id,
-          company_code,
-          Location_Code: sessionStorage.getItem('selectedLocationCode'),
-          request_status: status,
-          modified_by: sessionStorage.getItem('selectedUserCode'),
-        };
+        if (leaveDate < today) {
+          toast.warning("Past date leave cannot be approved.");
+          return;
+        }
       }
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      url = `${config.apiBaseUrl}/LeaveAuthorization`;
 
-      if (response.ok) {
-        toast.success(`${type} ${status} successfully`);
-        handleSearch(requestType, searchEmpId, searchId, Status);
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to process request");
-      }
-    } catch (error) {
-      console.error("Approval error:", error);
-      toast.error("Something went wrong");
+      body = {
+        EmployeeId: id,
+        LeaveStatus: status,
+        FromDate: row.FromDate,
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        modified_by: sessionStorage.getItem("selectedUserCode")
+      };
+
+    } else if (type === "Loan") {
+      url = `${config.apiBaseUrl}/ApprovalLoan`;
+
+      body = {
+        loan_request_id: id,
+        company_code,
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        request_status: status,
+      };
+
+    } else if (type === "Visa") {
+      url = `${config.apiBaseUrl}/ApprovalVisa`;
+
+      body = {
+        visa_request_id: id,
+        company_code,
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        request_status: status,
+        Modified_by: sessionStorage.getItem("selectedUserCode")
+      };
+
+    } else if (type === "Travel") {
+      url = `${config.apiBaseUrl}/ApprovalTravel`;
+
+      body = {
+        travel_request_id: id,
+        company_code,
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        request_status: status,
+        modified_by: sessionStorage.getItem("selectedUserCode")
+      };
+
+    } else if (type === "Comp Off") {
+      url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
+
+      body = {
+        EmployeeId: row.EmployeeId,
+        Status: status,
+        HolidayDate: row.HolidayDate,
+        ApprovedBy: sessionStorage.getItem("selectedUserCode"),
+        CompanyCode: company_code,
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        ModifiedBy: sessionStorage.getItem("selectedUserCode"),
+        Keyfield: id,
+      };
+
+    } else if (type === "Shift Change") {
+      url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
+
+      body = {
+        request_id: id,
+        company_code,
+        Location_Code: sessionStorage.getItem("selectedLocationCode"),
+        request_status: status,
+        modified_by: sessionStorage.getItem("selectedUserCode"),
+      };
     }
-  };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      toast.success(`${type} ${status} successfully`);
+      handleSearch(requestType, searchEmpId, searchId, Status);
+    } else {
+      const errorData = await response.json();
+      toast.error(errorData.message || "Failed to process request");
+    }
+  } catch (error) {
+    console.error("Approval error:", error);
+    toast.error("Something went wrong");
+  }
+};
+
+
+  // const handleApproval = async (type, id, row, isApproved) => {
+  //   try {
+  //     const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+  //     let url = "";
+  //     let body = {};
+  //     const status = isApproved ? "Approved" : "Rejected";
+
+  //     if (type === "Leave") {
+  //       const [day, month, year] = row.FromDate.split("-");
+  //       const backendDate = `${year}-${month}-${day}`;
+
+  //       url = `${config.apiBaseUrl}/LeaveAuthorization`;
+
+  //       body = {
+  //         EmployeeId: id,
+  //         LeaveStatus: status,
+  //         FromDate: row.FromDate,
+  //         company_code: sessionStorage.getItem("selectedCompanyCode"),
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         modified_by: sessionStorage.getItem("selectedUserCode")
+  //       };
+  //     } else if (type === "Loan") {
+  //       url = `${config.apiBaseUrl}/ApprovalLoan`;
+
+  //       body = {
+  //         loan_request_id: id,
+  //         company_code,
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         request_status: status,
+  //       };
+  //     } else if (type === "Visa") {
+  //       url = `${config.apiBaseUrl}/ApprovalVisa`;
+
+  //       body = {
+  //         visa_request_id: id,
+  //         company_code,
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         request_status: status,
+  //         Modified_by: sessionStorage.getItem("selectedUserCode")
+  //       };
+  //     } else if (type === "Travel") {
+  //       url = `${config.apiBaseUrl}/ApprovalTravel`;
+
+  //       body = {
+  //         travel_request_id: id,
+  //         company_code,
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         request_status: status,
+  //         modified_by: sessionStorage.getItem("selectedUserCode")
+  //       };
+  //     } else if (type === "Comp Off") {
+  //       url = `${config.apiBaseUrl}/DashboardCompOffApproval`;
+
+  //       body = {
+  //         EmployeeId: row.EmployeeId,
+  //         Status: status,
+  //         HolidayDate: row.HolidayDate,
+  //         ApprovedBy: sessionStorage.getItem("selectedUserCode"),
+  //         CompanyCode: company_code,
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         ModifiedBy: sessionStorage.getItem("selectedUserCode"),
+  //         Keyfield: id,
+  //       };
+  //     } else if (type === "Shift Change") {
+  //       url = `${config.apiBaseUrl}/shiftRequestManagerApproval`;
+
+  //       body = {
+  //         request_id: id,
+  //         company_code,
+  //         Location_Code: sessionStorage.getItem('selectedLocationCode'),
+  //         request_status: status,
+  //         modified_by: sessionStorage.getItem('selectedUserCode'),
+  //       };
+  //     }
+
+  //     const response = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(body),
+  //     });
+
+  //     if (response.ok) {
+  //       toast.success(`${type} ${status} successfully`);
+  //       handleSearch(requestType, searchEmpId, searchId, Status);
+  //     } else {
+  //       const errorData = await response.json();
+  //       toast.error(errorData.message || "Failed to process request");
+  //     }
+  //   } catch (error) {
+  //     console.error("Approval error:", error);
+  //     toast.error("Something went wrong");
+  //   }
+  // };
 
   //Loan Report Screen Input Fields
   const [rowLoanData, setRowLoanData] = useState([]);
