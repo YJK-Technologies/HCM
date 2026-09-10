@@ -335,11 +335,13 @@ const MyAgGridComponent = () => {
     const taskDate = params.data.work_date;
     const userID = params.data.user.split(" - ")[0];
     const companyCode = sessionStorage.getItem('selectedCompanyCode');
+    const locationCode = sessionStorage.getItem('selectedLocationCode');
 
     const requestBody = {
       start_date: taskDate,
       userid: userID,
-      company_code: companyCode
+      company_code: companyCode,
+      Location_Code: locationCode
     };
 
     try {

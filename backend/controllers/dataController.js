@@ -13003,6 +13003,7 @@ const addDailyTask = async (req, res) => {
     PriorityLevel,
     company_code,
     created_by,
+    Location_Code
   } = req.body;
   let pool;
 
@@ -13026,10 +13027,9 @@ const addDailyTask = async (req, res) => {
       .input("PriorityLevel", sql.VarChar, PriorityLevel)
       .input("Files", sql.VarBinary, Files)
       .input("company_code", sql.NVarChar, company_code)
+      .input("Location_Code", sql.NVarChar, Location_Code)
       .input("created_by", sql.NVarChar, created_by)
-      .query(
-        `EXEC sp_DailyTask @mode,@TaskMasterID,@DailyTaskID,@DailyTaskTiltle,@HourseTaken,@TaskDescription,@TaskStauts,@userID,@PriorityLevel,@Files,@company_code,@created_by,'',null,null,null,null,null,null,null,null`,
-      );
+      .query(`EXEC sp_DailyTask_pavun @mode,@TaskMasterID,@DailyTaskID,@DailyTaskTiltle,@HourseTaken,@TaskDescription,@TaskStauts,@userID,@PriorityLevel,@Files,@company_code,@Location_Code,@created_by,'',null,null,null,null,null,null,null,null`);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -13052,9 +13052,7 @@ const delDailyTask = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "D") // Insert mode
       .input("DailyTaskID", sql.VarChar, DailyTaskID)
-      .query(
-        `EXEC sp_DailyTask @mode,'',@DailyTaskID,'','','','','','','','','',null,null,null,null,null,null,null,null`,
-      );
+      .query(`EXEC sp_DailyTask_pavun @mode,'',@DailyTaskID,'','','','','','','','','','','',null,null,null,null,null,null,null,null`,);
     res.status(200).json("Daily Task Deleted successfully");
   } catch (err) {
     console.error("Error inserting data:", err);
@@ -13571,9 +13569,7 @@ const getTaskDetailReport = async (req, res) => {
       .request()
       .input("mode", sql.NVarChar, "TD")
       .input("TaskMasterID", sql.VarChar, TaskMasterID)
-      .query(
-        `EXEC sp_DailyTask @mode,@TaskMasterID,'','',0,'','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,
-      );
+      .query(`EXEC sp_DailyTask_pavun @mode,@TaskMasterID,'','',0,'','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`,);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -13600,9 +13596,7 @@ const getTaskHourReport = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
-      .query(
-        `EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`,
-      );
+      .query(`EXEC sp_task_hour_report @mode,@start_date,@end_date,@userid,'',@company_code,@Location_Code,'', @Status`,);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {
@@ -14363,8 +14357,7 @@ const getprojectSC = async (req, res) => {
       .input("PriorityLevel", sql.NVarChar, PriorityLevel)
       .input("TaskStatus", sql.NVarChar, TaskStatus)
       .input("company_code", sql.NVarChar, company_code)
-      .query(`EXEC sp_ProjectMaster @mode,@ProjectID,@ProjectName,'',@ProjectManager,@StartDate,@EndDate,@PriorityLevel,@TaskStatus,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-`);
+      .query(`EXEC sp_ProjectMaster @mode,@ProjectID,@ProjectName,'',@ProjectManager,@StartDate,@EndDate,@PriorityLevel,@TaskStatus,'',@company_code,'','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL`);
 
     // Send response
     if (result.recordset.length > 0) {
@@ -16262,9 +16255,7 @@ const getEmployeeCheckInCheckOut = async (req, res) => {
       .input("company_code", sql.VarChar, company_code)
       .input("Location_Code", sql.VarChar, Location_Code)
       .input("Status", sql.VarChar, Status)
-      .query(
-        `EXEC sp_task_hour_report @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,
-      );
+      .query(`EXEC sp_task_hour_report @mode,@start_date,'',@userid,'',@company_code,@Location_Code,'', @Status`,);
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset);
     } else {

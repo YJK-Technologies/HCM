@@ -116,12 +116,12 @@ const MyAgGridComponent = () => {
   ];
 
   const onFirstDataRendered = (params) => {
-  const allColumnIds = params.columnApi
-    .getColumns()
-    .map((col) => col.getId());
+    const allColumnIds = params.columnApi
+      .getColumns()
+      .map((col) => col.getId());
 
-  params.columnApi.autoSizeColumns(allColumnIds);
-};
+    params.columnApi.autoSizeColumns(allColumnIds);
+  };
 
   const columnDefs2 = [
     { headerName: 'S.No', field: 'sno', maxlength: '150', maxwidth: '150' },
@@ -154,8 +154,8 @@ const MyAgGridComponent = () => {
         ProjectID: project,
         ProjectName: ProjectName,
         ProjectManager: ProjectManager,
-        startdate: StartDate,
-        enddate: EndDate,
+        StartDate: StartDate,
+        EndDate: EndDate,
         PriorityLevel: PriorityLevel,
         company_code: sessionStorage.getItem("selectedCompanyCode")
       };
@@ -385,21 +385,24 @@ const MyAgGridComponent = () => {
   };
 
   const transformRowData = (data) => {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
     return data.map(row => ({
       "Project ID": row.projectid,
       "Task Master ID": row.TaskMasterID,
-      "Task Title ": row.TaskTitle,
+      "Task Title": row.TaskTitle?.trim(), // Fixed trailing space in key name as well
       "User ID & User Name": row.userID,
       "Estimated Hours": row.EstimatedHours,
       "Actual Hours": row.Actual_hours,
       "Description": row.Description,
       "Status": row.TaskStatus,
-
     }));
   };
 
   const handleExportToExcel = () => {
-    if (rowDataReport.length === 0) {
+    if (!Array.isArray(rowDataReport) || rowDataReport.length === 0) {
       toast.warning('There is no data to export.');
       return;
     }
