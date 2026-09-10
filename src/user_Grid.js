@@ -500,40 +500,83 @@ function UserGrid() {
       },
     },
     {
-      headerName: "DOB",
-      field: "dob",
-      editable: true,
-      cellStyle: { textAlign: "left" },
-      valueSetter: (params) => {
-        if (!params.newValue) return false;
+  headerName: "DOB",
+  field: "dob",
+  editable: true,
+  cellStyle: { textAlign: "left" },
+  filter: "agDateCellEditor",
 
-        const selectedDate = new Date(params.newValue);
-        selectedDate.setHours(0, 0, 0, 0);
+  cellEditorParams: () => {
+    const today = new Date();
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    const maxDob = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate()
+    );
 
-        const maxDob = new Date(
-          today.getFullYear() - 18,
-          today.getMonth(),
-          today.getDate()
-        );
-        maxDob.setHours(0, 0, 0, 0);
+    return {
+      max: maxDob,
+    };
+  },
 
-        if (selectedDate > today) {
-          toast.warning("Future dates are not allowed for DOB");
-          return false;
-        }
+  valueSetter: (params) => {
+    if (!params.newValue) {
+      return false;
+    }
 
-        if (selectedDate > maxDob) {
-          toast.warning("Age must be 18 years or above");
-          return false;
-        }
+    // Convert selected value to Date
+    const selectedDate = new Date(params.newValue);
 
-        params.data.dob = params.newValue;
-        return true;
-      },
-    },
+    if (isNaN(selectedDate.getTime())) {
+      return false;
+    }
+
+    selectedDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Maximum DOB = Today - 18 years
+    const maxDob = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate()
+    );
+
+    maxDob.setHours(0, 0, 0, 0);
+
+    // Future date validation
+    if (selectedDate > today) {
+      toast.warning("Future dates are not allowed for DOB");
+      return false;
+    }
+
+    // Age validation
+    if (selectedDate > maxDob) {
+      toast.warning("Age must be 18 years or above");
+      return false;
+    }
+
+    // Format date as YYYY-MM-DD
+    const year = selectedDate.getFullYear();
+
+    const month = String(
+      selectedDate.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+      selectedDate.getDate()
+    ).padStart(2, "0");
+
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Update AG Grid data
+    params.data.dob = formattedDate;
+
+    return true;
+  },
+},
     {
       headerName: "Role ID-Name",
       field: "role_id",

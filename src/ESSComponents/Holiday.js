@@ -75,6 +75,17 @@ function HoliDays() {
   const [isSelectedCountryCodeSc, setIsSelectedCountryCodeSc] = useState(false);
 
   const [countryIdDropAG, setCountyIdDropAG] = useState([]);
+  const [LocNodropAG, setLocNodropAG] = useState([]);
+
+  const [selectedLocNo, setSelectedLocNo] = useState('');
+  const [isSelectLocNo, setIsSelectLocNo] = useState(false);
+  const [LocNodrop, setLocNodrop] = useState([]);
+  const [LocNo, setLocNo] = useState("");
+
+  const [selectedLocNoSc, setSelectedLocNoSc] = useState(null);
+  const [LocNoSc, setLocNoSc] = useState("");
+  const [isSelectedLocNoSc, setIsSelectLocNoSc] = useState(false)
+
 
 const Location_Code = sessionStorage.getItem('selectedLocationCode')
 
@@ -83,6 +94,8 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
     setenddate("");
     setHolidayNameSc("");
     setCountryCodeSc("");
+    setLocNoSc("");
+    setSelectedLocNoSc("");
     setLocationIdSc("");
     setSelectedHolidayTypeSc("");
     setHolidayTypeSc("");
@@ -271,6 +284,33 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
         );
     }, []);
 
+      useEffect(() => {
+      const company_code = sessionStorage.getItem("selectedCompanyCode");
+
+      fetch(`${config.apiBaseUrl}/GetLocations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        company_no: sessionStorage.getItem("selectedCompanyCode")
+      }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const LocationOptions = data.map((option) => ({
+            value: option.location_no,
+            label: `${option.location_no} - ${option.location_name}`,
+          }));
+        
+          setLocNodropAG(LocationOptions);
+        })
+        .catch((error) =>
+          console.error("Error fetching country data:", error)
+        );
+    }, []);
+
   const filteredOptionIsPaid = isPaidDrop.map((option) => ({
     value: option.attributedetails_name,
     label: option.attributedetails_name,
@@ -307,6 +347,35 @@ const Location_Code = sessionStorage.getItem('selectedLocationCode')
       label: `${option?.Country_Code} - ${option?.Country_Name}`,
     }))
   : [];
+    const filteredOptionLocNo = Array.isArray(LocNodrop)
+    ? LocNodrop.map((option) => ({
+      value: option.location_no,
+      label: `${option.location_no}-${option.location_name}`,
+    }))
+    : [];
+
+
+  useEffect(() => {
+    fetch(`${config.apiBaseUrl}/GetLocations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        company_code: sessionStorage.getItem("selectedCompanyCode"),
+        company_no: sessionStorage.getItem("selectedCompanyCode")
+      }),
+    })
+      .then((response) => response.json())
+      .then(setLocNodrop)
+      .catch((error) => console.error("Error fetching warehouse:", error));
+  }, []);
+
+  const handleChangeLocNo = (selectedLocNo) => {
+    setSelectedLocNo(selectedLocNo);
+    setLocNo(selectedLocNo ? selectedLocNo.value : '');
+  };
+
 
   const handleChangeIsPaid = (selectedIsPaid) => {
     setSelectedIsPaid(selectedIsPaid);
@@ -347,6 +416,11 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
   setSelectedCountryCodeSc(selectedCountryCodeSc);
   setCountryCodeSc(selectedCountryCodeSc ? selectedCountryCodeSc.value : "");
 };
+
+  const handleChangeLocNoSc = (selectedLocNoSc) => {
+    setSelectedLocNoSc(selectedLocNoSc);
+    setLocNoSc(selectedLocNoSc ? selectedLocNoSc.value : '');
+  };
 
   const columnDefs = [
     {
@@ -431,6 +505,16 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
       headerName: "Location ID",
       field: "Location_ID",
       editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: LocNodropAG.map((c) => c.value),
+      },
+      valueFormatter: (params) => {
+        const location = LocNodropAG.find(
+          (c) => c.value == params.value
+        );
+        return location ? location.label : params.value;
+      },
       cellStyle: { textAlign: "center" },
     },
     {
@@ -488,7 +572,7 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
           StartDate: startdate,
           EndDate: enddate,
           Country_Code: countryCodeSc,
-          Location_ID: locationIdSc,
+          Location_ID: LocNoSc,
           Location_Code: Location_Code,
           Holiday_Name: holidayNameSc,
           Holiday_Type: holidayTypeSc,
@@ -525,7 +609,7 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
       const Header = {
         Holiday_Date: HolidayDate,
         Country_Code: countryCode,
-        Location_ID: locationId,
+        Location_ID: LocNo,
         Location_Code: Location_Code,
         Holiday_Name: holidayName,
         Holiday_Type: holidayType,
@@ -909,25 +993,29 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Description"
-                class="exp-input-field form-control"
+            <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedLocNo ? "has-value" : ""} 
+              ${isSelectLocNo ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
+            >
+              <Select
+                id="shift"
                 type="text"
-                placeholder=""
-                maxLength={15}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                required
-                title="Please Enter the Location ID"
-                value={locationId}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  setLocationId(value);
-                }}
+                value={selectedLocNo}
+                onChange={handleChangeLocNo}
+                options={filteredOptionLocNo}
+                placeholder=" "
+                onFocus={() => setIsSelectLocNo(true)}
+                onBlur={() => setIsSelectLocNo(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label for="cname" className={`exp-form-labels`}>Location ID</label>
+
+              <label htmlFor="selectedshift" className={`floating-label `}>
+                Location Id
+              </label>
             </div>
           </div>
 
@@ -1099,22 +1187,32 @@ const handleChangeCountryCodeSc = (selectedCountryCodeSc) => {
             </div>
           </div>
 
-          <div className="col-md-2">
-            <div className="inputGroup">
-              <input
-                id="Description"
-                class="exp-input-field form-control"
+            <div className="col-md-2">
+            <div
+              className={`inputGroup selectGroup 
+              ${selectedLocNoSc ? "has-value" : ""} 
+              ${isSelectedLocNoSc ? "is-focused" : ""}`}
+              title="Please Select the Employee Type"
+            >
+              <Select
+                id="shift"
                 type="text"
-                placeholder=""
-                required
-                title="Please Enter the Location ID"
-                value={locationIdSc}
-                onChange={(e) => setLocationIdSc(e.target.value)}
-                maxLength={255}
+                value={selectedLocNoSc}
+                onChange={handleChangeLocNoSc}
+                options={filteredOptionLocNo}
+                placeholder=" "
+                onFocus={() => setIsSelectLocNoSc(true)}
+                onBlur={() => setIsSelectLocNoSc(false)}
+                classNamePrefix="react-select"
+                isClearable
               />
-              <label for="cname" className={`exp-form-labels`}>Location ID</label>
+
+              <label htmlFor="selectedshift" className={`floating-label `}>
+                Location Id
+              </label>
             </div>
           </div>
+          
 
           <div className="col-md-2">
             <div
