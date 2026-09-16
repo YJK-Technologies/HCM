@@ -491,7 +491,7 @@ const handleUpdateAsset = async (relation, index) => {
   };
 
   showConfirmationToast(
-    "Update this row?",
+    "Are you sure you want to update the data in the row ?",
     async () => {
       setLoading(true);
       try {
