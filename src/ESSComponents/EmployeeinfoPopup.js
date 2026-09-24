@@ -437,6 +437,65 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
     handleClosePopup();   // ✅ clean and simple
   }
 
+  const handleRowDoubleClick = (params) => {
+    const row = params.data;
+
+    if (!row) return;
+
+    const selectedData = [{
+      EmployeeId: row.EmployeeId,
+      DOB: row.DOB,
+      First_Name: row.First_Name,
+      Middle_Name: row.Middle_Name,
+      Last_Name: row.Last_Name,
+      Father_Name: row.father_name,
+      Mother_Name: row.mother_name,
+      Gender: row.Gender,
+      Email: row.email,
+      Grade_id: row.Grade_id,
+      phone1: row.phone1,
+      phone2: row.phone2,
+      Address1: row.Address1,
+      Address2: row.address2,
+      Address3: row.address3,
+      PermanantAddress: row.PermanantAddress,
+      Reference_Name: row.Reference_name,
+      Reference_Phone: row.Reference_Phone,
+      Marital_Status: row.Marital_Status,
+      Pan_No: row.Pan_No,
+      Aadhar_no: row.Aadhar_no,
+      Kids: row.Kids,
+      Photos: row.Photos,
+      designation_id: row.designation_id,
+      department_id: row.department_id,
+      Title: row.Title,
+      Place_of_Birth: row.Place_of_Birth,
+      Nationality: row.Nationality,
+      Religion: row.Religion,
+      Blood_Group: row.Blood_Group,
+      Spouse_Name: row.Spouse_Name,
+      Number_of_Siblings: row.Number_of_Siblings,
+      Number_of_Children: row.Number_of_Children,
+      Email_Business: row.Email_Business,
+      Phone_Alternate: row.Phone_Alternate,
+      Emergency_Contact_Name: row.Emergency_Contact_Name,
+      Emergency_Contact_Relationship: row.Emergency_Contact_Relationship,
+      Emergency_Contact_Phone: row.Emergency_Contact_Phone,
+      City: row.City,
+      State: row.State,
+      Country: row.Country,
+      Postal_Code: row.Postal_Code,
+      Status: row.Status || row.status || "",
+      Passport_No: row.Passport_No,
+      Passport_Expiry_Date: row.Passport_Expiry_Date,
+      Other_Id_Type: row.Other_Id_Type,
+      Other_Id_No: row.Other_Id_No
+    }];
+
+    EmployeeInfo(selectedData);
+    handleClosePopup();   // ✅ clean and simple
+  };
+
   const onFirstDataRendered = (params) => {
     const allColumnIds = params.columnApi
       .getColumns()
@@ -695,7 +754,8 @@ export default function EmployeeInfoPopup({ open, handleClose, EmployeeInfo }) {
                     gridOptions={gridOptions}
                     onFirstDataRendered={onFirstDataRendered}
                     onSelectionChanged={handleRowSelected}
-                    onFirstDataRendered={onFirstDataRendered}
+                    // onFirstDataRendered={onFirstDataRendered}
+                    onRowDoubleClicked={handleRowDoubleClick}
                   />
                 </div>
               </div>
